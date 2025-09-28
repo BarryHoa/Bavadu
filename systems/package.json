@@ -1,0 +1,42 @@
+{
+  "name": "bava-backend",
+  "version": "1.0.0",
+  "description": "Backend system for Bava project using Fastify, Drizzle ORM, TypeScript and Bun",
+  "main": "src/server.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/server.ts",
+    "dev": "bun --watch src/server.ts",
+    "build": "bun build src/server.ts --outdir dist --target bun",
+    "test": "bun test",
+    "db:generate": "bunx drizzle-kit generate",
+    "db:migrate": "bunx drizzle-kit migrate",
+    "db:studio": "bunx drizzle-kit studio",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "fastify",
+    "backend",
+    "api",
+    "user",
+    "auth"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "fastify": "^4.24.3",
+    "@fastify/cors": "^8.4.0",
+    "@fastify/jwt": "^7.2.4",
+    "fastify-plugin": "^4.5.1",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.3.1",
+    "drizzle-orm": "^0.29.0",
+    "postgres": "^3.4.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "drizzle-kit": "^0.20.4"
+  }
+}
