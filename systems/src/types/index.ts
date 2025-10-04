@@ -82,7 +82,7 @@ declare module "fastify" {
   }
 
   interface FastifyRequest {
-    user?: JWTPayload;
+    user?: JWTPayload | string | object | Buffer;
   }
 }
 

@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { authGroup } from "./auth";
 import { userGroup } from "./user";
-import { healthGroup } from "./health";
+// import { healthGroup } from "./health";
 
 // Register all route groups
 export async function registerRouteGroups(fastify: FastifyInstance) {

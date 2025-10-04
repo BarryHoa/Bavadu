@@ -1,55 +1,27 @@
-import usersModel from "@/Models/UsersModel";
-import UsersModel from "@/Models/UsersModel";
-import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import { GetUserListReq } from "@/Models/Users/UserInterface";
+import usersModel from "@/Models/Users/UsersModel";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
-// List users router
+
+
 async function listUsersRouter(fastify: FastifyInstance) {
-  // Get all users
-  fastify.get(
+  fastify.get<{
+    Querystring: GetUserListReq;
+  }>(
     "/",
-    {
-      schema: {
-        querystring: {
-          type: "object",
-          properties: {
-            limit: { type: "number", minimum: 1, maximum: 100, default: 10 },
-            search: { type: "string" },
-            filters: { type: "object" },
-            sorts: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  field: { type: "string" },
-                  direction: { type: "string", enum: ["asc", "desc"] },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-    async (request: FastifyRequest, reply: FastifyReply) => {
+    async (request, reply: FastifyReply) => {
       try {
-        // TODO: Implement actual user fetching logic with database
-        // For now, return mock data
 
-        const users = await usersModel.getUsers(request.query as any);
+
+        const result = await usersModel.getUsers(request.query);
 
         return {
           success: true,
-          data: {
-            users: users,
-            pagination: {
-              page: request.query.page,
-              limit: request.query.limit,
-              total: users.length,
-              pages: Math.ceil(users.length / request.query.limit),
-            },
-          },
+          ...result
+         
         };
       } catch (error) {
-        console.error("Get users error:", error);
+        fastify.log.error(error);
         reply.code(500).send({
           success: false,
           message: "Internal server error",
