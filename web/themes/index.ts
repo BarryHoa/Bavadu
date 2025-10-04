@@ -1,3 +1,5 @@
+import { Theme, ThemeMode } from "./types";
+
 // Export theme types
 export type {
   Theme,

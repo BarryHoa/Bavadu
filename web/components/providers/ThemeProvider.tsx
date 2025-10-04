@@ -2,19 +2,20 @@
 
 import { useEffect } from "react";
 import { useThemeStore } from "@/lib/stores/themeStore";
+import { ThemeMode } from "@/themes/types";
 
 interface ThemeProviderProps {
   children: React.ReactNode;
-  defaultTheme?: "light" | "dark" | "system";
+  defaultTheme?: ThemeMode;
   storageKey?: string;
 }
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
+  defaultTheme = "light",
   storageKey = "theme-storage",
 }: ThemeProviderProps) {
-  const { setTheme, getSystemTheme } = useThemeStore();
+  const { setTheme, getCurrentTheme } = useThemeStore();
 
   useEffect(() => {
     // Initialize theme on mount
@@ -34,8 +35,8 @@ export function ThemeProvider({
 
     const handleChange = () => {
       const { theme } = useThemeStore.getState();
-      if (theme === "system") {
-        setTheme("system");
+      if (theme === "light") {
+        setTheme("light");
       }
     };
 

@@ -4,28 +4,28 @@ import { cn } from "@/lib/utils";
 
 // Input size styles using XStyled
 const getInputSizeStyles = (size: string) => {
-  switch (size) {
-    case "sm":
-      return {
-        h: "2rem",
-        px: "sm",
-        fontSize: "xs",
-      };
-    case "md":
-      return {
-        h: "2.5rem",
-        px: "md",
-        fontSize: "sm",
-      };
-    case "lg":
-      return {
-        h: "3rem",
-        px: "lg",
-        fontSize: "base",
-      };
-    default:
-      return {};
+  const h = {
+    sm: "2rem",
+    md: "2.5rem",
+    lg: "3rem",
   }
+  const px = {
+    sm: "sm",
+    md: "md",
+    lg: "lg",
+  }
+  const fontSize = {
+    sm: "xs",
+    md: "sm",
+    lg: "base",
+  }
+  return  {
+    h: h[size as keyof typeof h],
+    px: px[size as keyof typeof px],
+    fontSize: fontSize[size as keyof typeof fontSize] ?? "sm",
+  }
+
+ 
 };
 
 // Input container
@@ -51,7 +51,7 @@ const ErrorMessage = (props: any) => (
 
 // Input interfaces
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> {
   size?: "sm" | "md" | "lg";
   label?: string;
   error?: string;
@@ -77,7 +77,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           display="flex"
           width="100%"
           borderRadius="md"
-          fontSize="sm"
+          // fontSize="sm"
           fontWeight="normal"
           transition="all 0.2s ease"
           outline="none"
