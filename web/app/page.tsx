@@ -9,7 +9,7 @@ import {
   CardTitle,
   Input,
 } from "@/components/ui";
-import { ThemeToggle } from "@/components/ui/ThemeToggle/ThemeToggle";
+
 import { useAuthStore } from "@/lib/stores/authStore";
 import { useThemeStore } from "@/lib/stores/themeStore";
 import { x } from "@xstyled/emotion";
@@ -41,12 +41,10 @@ export default function HomePage() {
         </x.h1>
 
         <x.div display="flex" gap="md" alignItems="center">
-          <ThemeToggle />
-
           {isAuthenticated ? (
             <x.div display="flex" gap="sm" alignItems="center">
               <span>Welcome, {user?.name}!</span>
-              <Button variant="outline" onClick={logout}>
+              <Button type="outline" onClick={logout}>
                 Logout
               </Button>
             </x.div>
@@ -85,11 +83,11 @@ export default function HomePage() {
             </CardHeader>
             <CardContent>
               <x.div display="flex" flexWrap="wrap" gap="md">
-                <Button variant="primary">Primary</Button>
-                <Button variant="secondary">Secondary</Button>
-                <Button variant="outline">Outline</Button>
-                <Button variant="ghost">Ghost</Button>
-                <Button variant="destructive">Destructive</Button>
+                <Button type="primary">Primary</Button>
+                <Button type="secondary">Secondary</Button>
+                <Button type="outline">Outline</Button>
+                <Button type="ghost">Ghost</Button>
+                <Button type="destructive">Destructive</Button>
               </x.div>
               <x.div display="flex" flexWrap="wrap" gap="md" mt="md">
                 <Button size="sm">Small</Button>
@@ -114,17 +112,20 @@ export default function HomePage() {
             </CardHeader>
             <CardContent>
               <x.div display="flex" flexDirection="column" gap="md">
-                <Input label="Email" placeholder="Enter your email" />
+                <Input placeholder="Enter your email" />
                 <Input
-                  label="Password"
+                  // label="Password"
                   type="password"
                   placeholder="Enter your password"
-                  helperText="Password must be at least 8 characters."
+
+                  // helperText="Password must be at least 8 characters."
                 />
                 <Input
-                  label="Username"
+                  // label="Username"
                   placeholder="Enter your username"
-                  error="Username is required."
+                  disabled
+                  value="33333"
+                  // error="Username is required."
                 />
               </x.div>
             </CardContent>
@@ -139,15 +140,6 @@ export default function HomePage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <x.div
-                display="flex"
-                gap="md"
-                alignItems="center"
-                marginBottom="1rem"
-              >
-                <ThemeToggle />
-              </x.div>
-
               <x.div
                 p="md"
                 backgroundColor="muted"
@@ -201,14 +193,14 @@ export default function HomePage() {
                   <x.div
                     width="20px"
                     height="20px"
-                    backgroundColor={theme.colors.foreground}
+                    // backgroundColor={theme.colors.foreground}
                     borderRadius="sm"
                     title="Foreground"
                   />
                   <x.div
                     width="20px"
                     height="20px"
-                    backgroundColor={theme.colors.muted}
+                    // backgroundColor={theme.colors.muted}
                     borderRadius="sm"
                     title="Muted"
                   />
@@ -222,14 +214,14 @@ export default function HomePage() {
                   <x.div
                     width="20px"
                     height="20px"
-                    backgroundColor={theme.colors.input}
+                    // backgroundColor={theme.colors.input}
                     borderRadius="sm"
                     title="Input"
                   />
                   <x.div
                     width="20px"
                     height="20px"
-                    backgroundColor={theme.colors.ring}
+                    // backgroundColor={theme.colors.ring}
                     borderRadius="sm"
                     title="Ring"
                   />
@@ -264,7 +256,7 @@ export default function HomePage() {
                 <ul
                   style={{
                     fontSize: "0.875rem",
-                    color: theme.colors.mutedForeground,
+                    // color: theme.colors.mutedForeground,
                     listStyle: "disc",
                     paddingLeft: "1rem",
                     margin: "0",
@@ -290,7 +282,7 @@ export default function HomePage() {
                 <ul
                   style={{
                     fontSize: "0.875rem",
-                    color: theme.colors.mutedForeground,
+                    // color: theme.colors.mutedForeground,
                     listStyle: "disc",
                     paddingLeft: "1rem",
                     margin: "0",

@@ -1,12 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import {
-  lightTheme,
-  darkTheme,
-  blueTheme,
-  Theme,
-  ThemeMode,
-} from "../../themes";
+import { lightTheme, Theme, ThemeMode } from "../../themes";
 
 interface ThemeState {
   theme: ThemeMode;
@@ -31,20 +25,20 @@ export const useThemeStore = create<ThemeState & ThemeActions>()(
         set({ theme, resolvedTheme: theme });
 
         // Apply theme to document
-        if (typeof window !== "undefined") {
-          const root = document.documentElement;
+        // if (typeof window !== "undefined") {
+        //   const root = document.documentElement;
 
-          if (theme === "dark") {
-            root.classList.add("dark");
-          } else {
-            root.classList.remove("dark");
-          }
-        }
+        //   if (theme === "dark") {
+        //     root.classList.add("dark");
+        //   } else {
+        //     root.classList.remove("dark");
+        //   }
+        // }
       },
 
       toggleTheme: () => {
         const { theme } = get();
-        const themes: ThemeMode[] = ["light", "dark", "blue"];
+        const themes: ThemeMode[] = ["light"];
         const currentIndex = themes.indexOf(theme);
         const nextIndex = (currentIndex + 1) % themes.length;
         const newTheme = themes[nextIndex];
@@ -53,14 +47,11 @@ export const useThemeStore = create<ThemeState & ThemeActions>()(
 
       getCurrentTheme: () => {
         const { resolvedTheme } = get();
-        switch (resolvedTheme) {
-          case "dark":
-            return darkTheme;
-          case "blue":
-            return blueTheme;
-          default:
-            return lightTheme;
-        }
+        const themes = {
+          // dark : darkTheme,
+          light: lightTheme,
+        };
+        return themes[resolvedTheme] || lightTheme;
       },
     }),
     {
@@ -74,15 +65,15 @@ export const useThemeStore = create<ThemeState & ThemeActions>()(
           // Apply theme on hydration
           state.resolvedTheme = state.theme;
 
-          if (typeof window !== "undefined") {
-            const root = document.documentElement;
+          // if (typeof window !== "undefined") {
+          //   const root = document.documentElement;
 
-            if (state.theme === "dark") {
-              root.classList.add("dark");
-            } else {
-              root.classList.remove("dark");
-            }
-          }
+          //   if (state.theme === "dark") {
+          //     root.classList.add("dark");
+          //   } else {
+          //     root.classList.remove("dark");
+          //   }
+          // }
         }
       },
     }

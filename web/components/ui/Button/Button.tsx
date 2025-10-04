@@ -2,79 +2,9 @@ import { forwardRef } from "react";
 import { x } from "@xstyled/emotion";
 import styled from "@emotion/styled";
 import { cn } from "@/lib/utils";
+import getButtonSizeStyles from "./utils/getInputSizeStyles";
 
 // Button variants using XStyled
-const getButtonVariantStyles = (variant: string) => {
-  switch (variant) {
-    case "primary":
-      return {
-        bg: "primary.500",
-        color: "white",
-        _hover: { bg: "primary.600" },
-        _active: { bg: "primary.700" },
-      };
-    case "secondary":
-      return {
-        bg: "secondary.100",
-        color: "secondary.900",
-        _hover: { bg: "secondary.200" },
-        _active: { bg: "secondary.300" },
-      };
-    case "outline":
-      return {
-        bg: "transparent",
-        color: "primary.500",
-        border: "1px solid",
-        borderColor: "primary.500",
-        _hover: { bg: "primary.50" },
-        _active: { bg: "primary.100" },
-      };
-    case "ghost":
-      return {
-        bg: "transparent",
-        color: "primary.500",
-        _hover: { bg: "primary.50" },
-        _active: { bg: "primary.100" },
-      };
-    case "destructive":
-      return {
-        bg: "error.500",
-        color: "white",
-        _hover: { bg: "error.600" },
-        _active: { bg: "error.700" },
-      };
-    default:
-      return {};
-  }
-};
-
-const getButtonSizeStyles = (size: string) => {
-  switch (size) {
-    case "sm":
-      return {
-        px: "sm",
-        py: "xs",
-        fontSize: "sm",
-        h: "2rem",
-      };
-    case "md":
-      return {
-        px: "md",
-        py: "sm",
-        fontSize: "base",
-        h: "2.5rem",
-      };
-    case "lg":
-      return {
-        px: "lg",
-        py: "md",
-        fontSize: "lg",
-        h: "3rem",
-      };
-    default:
-      return {};
-  }
-};
 
 // Loading spinner styled component
 const StyledSpinner = styled.div<{ size: string }>`
@@ -126,71 +56,117 @@ const IconWrapper = ({
 };
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "destructive";
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "size" | "type"> {
+  type?: "primary" | "secondary" | "outline" | "default" | "dashed";
+  color?: string;
   size?: "sm" | "md" | "lg";
   loading?: boolean;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
   children?: React.ReactNode;
 }
+
+const ButtonStyled = styled(x.button)<ButtonProps>`
+  display: inline-flex;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.1s ease;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  vertical-align: middle;
+  white-space: nowrap;
+  outline: none;
+
+  ${(props) => {
+    const { type, theme, color } = props;
+    console.log("Button type:", type);
+    const colors = theme.colors;
+    switch (type) {
+      case "primary":
+        return `
+          background-color: ${colors.primary};
+          color: ${colors.gray.gray1};
+          border: 1px solid ${colors.primary};
+          &:active {
+             boxShadow: "0 0 0 6px ${colors.primary}",
+          }
+        `;
+      case "secondary":
+        return `
+            background: ${colors.secondary};
+            color: ${colors.gray.gray1};
+            border: 1px solid ${colors.secondary};
+            &:active {
+              boxShadow: "0 0 0 6px ${colors.secondary}",
+            }
+          `;
+      case "outline":
+        return `
+            background: transparent;
+            color: ${color ?? colors.primary};
+            border: 1px solid ${color ?? colors.primary};
+            &:hover:not(:disabled) {
+              background: ${color ?? colors.primary};
+              color: ${colors.gray.gray1};
+            }
+            &:active {
+              boxShadow: "0 0 0 6px ${colors.primary}",
+            }
+          `;
+      default: {
+        return `
+            background: ${colors.background};
+            color: ${colors.textPrimary};
+            border: 1px solid ${colors.border};
+            &:hover {
+              background: ${colors.gray.gray3};
+          }
+        `;
+      }
+    }
+  }}
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  &:focus,
+  &:focus-visible,
+  &:focus-within {
+    outline: none;
+  }
+`;
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       className,
-      variant = "primary",
+      type = "default",
       size = "md",
       loading = false,
-      leftIcon,
-      rightIcon,
       children,
       disabled,
+      color,
       ...props
     },
     ref
   ) => {
-    const variantStyles = getButtonVariantStyles(variant);
     const sizeStyles = getButtonSizeStyles(size);
 
     return (
-      <x.button
+      <ButtonStyled
         ref={ref}
         className={cn("", className)}
-        disabled={disabled || loading}
-        display="inline-flex"
-        alignItems="center"
-        justifyContent="center"
-        gap="sm"
-        borderRadius="md"
-        fontWeight="medium"
-        transition="all 0.2s ease"
-        cursor="pointer"
-        border="none"
-        outline="none"
-        _focus={{
-          outline: "2px solid",
-          outlineColor: "ring",
-          outlineOffset: "2px",
-        }}
-        _disabled={{
-          opacity: 0.5,
-          cursor: "not-allowed",
-        }}
-        {...variantStyles}
+        type={type}
+        color={color}
         {...sizeStyles}
         {...props}
       >
-        {loading ? (
-          <LoadingSpinner size={size} />
-        ) : leftIcon ? (
-          <IconWrapper size={size}>{leftIcon}</IconWrapper>
-        ) : null}
         {children}
-        {!loading && rightIcon && (
-          <IconWrapper size={size}>{rightIcon}</IconWrapper>
-        )}
-      </x.button>
+      </ButtonStyled>
     );
   }
 );
