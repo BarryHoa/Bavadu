@@ -1,15 +1,29 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { EmotionProvider } from "@/lib/emotion-provider";
-import { XStyledThemeProvider } from "@/lib/xstyled-theme-provider";
+import "@/styles/globals.css";
+import { Metadata, Viewport } from "next";
+import clsx from "clsx";
 
-const inter = Inter({ subsets: ["latin"] });
+import { Providers } from "./providers";
+
+import { siteConfig } from "@/config/site";
+import { fontSans } from "@/config/fonts";
+import { Navbar } from "@/components/navbar";
 
 export const metadata: Metadata = {
-  title: "Bava Frontend",
-  description:
-    "High-performance React frontend with Next.js 15, Ark UI, and Panda CSS",
+  title: {
+    default: siteConfig.name,
+    template: `%s - ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  icons: {
+    icon: "/favicon.ico",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
+  ],
 };
 
 export default function RootLayout({
@@ -18,11 +32,34 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <EmotionProvider>
-          <XStyledThemeProvider>{children}</XStyledThemeProvider>
-        </EmotionProvider>
+    <html suppressHydrationWarning lang="en">
+      <head />
+      <body
+        className={clsx(
+          "min-h-screen text-foreground bg-background font-sans antialiased",
+          fontSans.variable
+        )}
+      >
+        <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
+          <div className="relative flex flex-col h-screen">
+            <Navbar />
+            <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">
+              {children}
+            </main>
+            <footer className="w-full flex items-center justify-center py-3">
+              <a
+                className="flex items-center gap-1 text-current"
+                href="https://heroui.com?utm_source=next-app-template"
+                title="heroui.com homepage"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className="text-default-600">Powered by</span>
+                <p className="text-primary">HeroUI</p>
+              </a>
+            </footer>
+          </div>
+        </Providers>
       </body>
     </html>
   );
