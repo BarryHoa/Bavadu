@@ -10,8 +10,15 @@ const config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)"],
+        sans: ["var(--font-sans)", "Satoshi", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)"],
+        "noto-sans-sc": [
+          "var(--font-noto-sans-sc)",
+          "Noto Sans SC",
+          "system-ui",
+          "sans-serif",
+        ],
+        satoshi: ["Satoshi", "system-ui", "sans-serif"],
       },
     },
   },
