@@ -1,3 +1,71 @@
 @import "tailwindcss";
 
-@config "../tailwind.config.js"
+@config "../tailwind.config.js";
+
+
+
+/* Site wallpaper background (can be replaced by changing --bg-image-url) */
+:root {
+  --bg-image-url: url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1920&q=80");
+  --bg-size: cover;   /* cover = full-bleed; contain = keep original */
+  --bg-attach: fixed; /* fixed = stay when scroll; scroll = move with page */
+}
+
+body {
+  background-image: var(--bg-image-url);
+  background-size: var(--bg-size);
+  background-position: center;
+  background-attachment: var(--bg-attach);
+}
+
+/* Helpers to toggle behavior via body className */
+.bg-cover-mode { --bg-size: cover; }
+.bg-contain-mode { --bg-size: contain; }
+.bg-fixed-mode { --bg-attach: fixed; }
+.bg-scroll-mode { --bg-attach: scroll; }
+
+/* Overlay scrollbar (doesn't shift layout), shows on hover/scroll/touch */
+.scroll-overlay {
+  overflow: auto; /* keep scrollbar inside content box */
+  scrollbar-gutter: stable both-edges; /* avoid layout shift, keep inside */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Firefox */
+.scroll-overlay {
+  scrollbar-width: thin;
+  scrollbar-color: transparent; /* hidden by default */
+}
+
+/* WebKit */
+.scroll-overlay::-webkit-scrollbar {
+  width: 8px;   /* mimic Firefox `scrollbar-width: thin` */
+  height: 8px;
+  background: transparent;
+}
+.scroll-overlay::-webkit-scrollbar-thumb {
+  background: transparent; /* hidden by default */
+  border-radius: 9999px;
+  min-height: 28px; /* feel similar to Firefox */
+}
+.scroll-overlay:hover::-webkit-scrollbar-thumb,
+.scroll-overlay.show-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(126,126,126,0.6);
+}
+.scroll-overlay::-webkit-scrollbar-thumb:hover,
+.scroll-overlay.show-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(126,126,126,0.75);
+}
+.scroll-overlay::-webkit-scrollbar-thumb:active,
+.scroll-overlay.show-scrollbar::-webkit-scrollbar-thumb:active {
+  background: rgba(126,126,126,0.9);
+}
+.scroll-overlay::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Firefox visible state */
+.scroll-overlay:hover,
+.scroll-overlay.show-scrollbar {
+  scrollbar-color: rgba(126, 126, 126, 0.6);
+}

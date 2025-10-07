@@ -8,6 +8,7 @@ import { Providers } from "./providers";
 import { siteConfig } from "@/config/site";
 import { fontSans, fontNotoSansSC } from "@/config/fonts";
 import { Navbar } from "@/components/navbar";
+import ScrollbarReveal from "@/components/scrollbar-reveal";
 
 export const metadata: Metadata = {
   title: {
@@ -37,7 +38,7 @@ export default function RootLayout({
       <head />
       <body
         className={clsx(
-          "min-h-screen text-foreground bg-background font-sans antialiased",
+          "h-screen overflow-hidden text-foreground bg-background font-sans antialiased",
           fontSans.variable,
           fontNotoSansSC.variable
         )}
@@ -45,22 +46,11 @@ export default function RootLayout({
         <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
           <div className="relative flex flex-col h-screen">
             {/* <Navbar /> */}
-            <main className="container mx-auto pt-1 px-0 flex-grow">
+            <main className="container mx-auto p-0  my-1 flex-1">
               {children}
             </main>
-            <footer className="w-full flex items-center justify-center py-3">
-              <a
-                className="flex items-center gap-1 text-current"
-                href="https://heroui.com?utm_source=next-app-template"
-                title="heroui.com homepage"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <span className="text-default-600">Powered by</span>
-                <p className="text-primary">HeroUI</p>
-              </a>
-            </footer>6
           </div>
+          {/* <ScrollbarReveal /> */}
         </Providers>
       </body>
     </html>
