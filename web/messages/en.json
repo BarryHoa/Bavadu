@@ -1,0 +1,38 @@
+{
+  "common": {
+    "settings": "Settings",
+    "background": "Background",
+    "transparency": "Transparency",
+    "save": "Save",
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "preview": "Preview"
+  },
+  "background": {
+    "title": "Background Settings",
+    "description": "Choose background image and adjust transparency",
+    "selectBackground": "Select Background",
+    "backgroundOptions": {
+      "bg1": "Background 1",
+      "bg2": "Background 2",
+      "bg3": "Background 3",
+      "bg4": "Background 4",
+      "bg5": "Background 5",
+      "bg6": "Background 6",
+      "bg7": "Background 7",
+      "bg8": "Background 8"
+    },
+    "transparencyLabel": "Transparency: {value}%",
+    "transparencyDescription": "Adjust background image transparency"
+  },
+  "navigation": {
+    "home": "Home",
+    "about": "About",
+    "blog": "Blog",
+    "docs": "Docs",
+    "pricing": "Pricing",
+    "workspaces": "Workspaces",
+    "dashboard": "Dashboard",
+    "settings": "Settings"
+  }
+}

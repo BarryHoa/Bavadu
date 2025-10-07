@@ -1,0 +1,38 @@
+{
+  "common": {
+    "settings": "Cài đặt",
+    "background": "Hình nền",
+    "transparency": "Độ trong suốt",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "apply": "Áp dụng",
+    "preview": "Xem trước"
+  },
+  "background": {
+    "title": "Cài đặt hình nền",
+    "description": "Chọn hình nền và điều chỉnh độ trong suốt",
+    "selectBackground": "Chọn hình nền",
+    "backgroundOptions": {
+      "bg1": "Hình nền 1",
+      "bg2": "Hình nền 2",
+      "bg3": "Hình nền 3",
+      "bg4": "Hình nền 4",
+      "bg5": "Hình nền 5",
+      "bg6": "Hình nền 6",
+      "bg7": "Hình nền 7",
+      "bg8": "Hình nền 8"
+    },
+    "transparencyLabel": "Độ trong suốt: {value}%",
+    "transparencyDescription": "Điều chỉnh độ trong suốt của hình nền"
+  },
+  "navigation": {
+    "home": "Trang chủ",
+    "about": "Giới thiệu",
+    "blog": "Blog",
+    "docs": "Tài liệu",
+    "pricing": "Bảng giá",
+    "workspaces": "Không gian làm việc",
+    "dashboard": "Bảng điều khiển",
+    "settings": "Cài đặt"
+  }
+}

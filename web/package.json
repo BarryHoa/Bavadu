@@ -14,6 +14,7 @@
     "@heroui/autocomplete": "2.3.29",
     "@heroui/avatar": "2.2.22",
     "@heroui/badge": "2.2.17",
+    "@heroui/breadcrumbs": "^2.2.22",
     "@heroui/button": "2.2.27",
     "@heroui/card": "2.2.25",
     "@heroui/chip": "2.2.22",
@@ -38,6 +39,7 @@
     "@heroui/scroll-shadow": "2.3.18",
     "@heroui/select": "2.4.28",
     "@heroui/skeleton": "2.2.17",
+    "@heroui/slider": "^2.4.24",
     "@heroui/snippet": "2.2.28",
     "@heroui/spacer": "2.2.21",
     "@heroui/spinner": "2.2.24",
@@ -56,6 +58,7 @@
     "intl-messageformat": "10.7.17",
     "lucide-react": "^0.545.0",
     "next": "15.5.4",
+    "next-intl": "^4.3.11",
     "next-themes": "0.4.6",
     "react": "19.2.0",
     "react-dom": "19.2.0"
