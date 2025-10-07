@@ -44,8 +44,8 @@ export default function RootLayout({
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
           <div className="relative flex flex-col h-screen">
-            <Navbar />
-            <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">
+            {/* <Navbar /> */}
+            <main className="container mx-auto pt-1 px-0 flex-grow">
               {children}
             </main>
             <footer className="w-full flex items-center justify-center py-3">
@@ -59,7 +59,7 @@ export default function RootLayout({
                 <span className="text-default-600">Powered by</span>
                 <p className="text-primary">HeroUI</p>
               </a>
-            </footer>
+            </footer>6
           </div>
         </Providers>
       </body>
