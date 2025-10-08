@@ -23,7 +23,10 @@
       "bg8": "Hình nền 8"
     },
     "transparencyLabel": "Độ trong suốt: {value}%",
-    "transparencyDescription": "Điều chỉnh độ trong suốt của hình nền"
+    "transparencyDescription": "Điều chỉnh độ trong suốt của hình nền",
+    "glassEffect": "Hiệu ứng Kính Mờ",
+    "glassEffectDescription": "Điều chỉnh độ trong suốt của thẻ để tạo hiệu ứng kính",
+    "glassOpacityLabel": "Độ mờ kính: {value}%"
   },
   "navigation": {
     "home": "Trang chủ",

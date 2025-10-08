@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useSettings } from "@/app/context/SettingsContext";
 import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Button } from "@heroui/button";
 import { Slider } from "@heroui/slider";
-import { Image } from "@heroui/image";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
+import { useEffect } from "react";
 
 interface BackgroundSettingsProps {
   onBackgroundChange?: (background: string, transparency: number) => void;
@@ -22,40 +22,30 @@ const backgroundOptions = [
   { id: "bg_8", name: "bg8", file: "bg_8.jpg" },
 ];
 
-export default function BackgroundSettings({
+export default function BackgroundSetting({
   onBackgroundChange,
 }: BackgroundSettingsProps) {
   const t = useTranslations("background");
   const tCommon = useTranslations("common");
 
-  const [selectedBackground, setSelectedBackground] = useState("bg_1");
-  const [transparency, setTransparency] = useState(50);
-  const [previewMode, setPreviewMode] = useState(false);
-
-  // Load settings from localStorage on mount
-  useEffect(() => {
-    const savedBackground = localStorage.getItem("selectedBackground");
-    const savedTransparency = localStorage.getItem("backgroundTransparency");
-
-    if (savedBackground) {
-      setSelectedBackground(savedBackground);
-    }
-    if (savedTransparency) {
-      setTransparency(parseInt(savedTransparency));
-    }
-  }, []);
+  const {
+    selectedBackground,
+    setSelectedBackground,
+    backgroundTransparency,
+    setBackgroundTransparency,
+    glassOpacity,
+    setGlassOpacity,
+  } = useSettings();
 
   // Apply background to body when settings change
   useEffect(() => {
-    if (previewMode || !previewMode) {
-      applyBackground();
-    }
-  }, [selectedBackground, transparency, previewMode]);
+    applyBackground();
+  }, [selectedBackground, backgroundTransparency]);
 
   const applyBackground = () => {
     const body = document.body;
     const backgroundImage = `/background/${backgroundOptions.find((bg) => bg.id === selectedBackground)?.file}`;
-    const opacity = (100 - transparency) / 100;
+    const opacity = (100 - backgroundTransparency) / 100;
 
     body.style.backgroundImage = `url(${backgroundImage})`;
     body.style.backgroundSize = "cover";
@@ -64,10 +54,10 @@ export default function BackgroundSettings({
     body.style.backgroundAttachment = "fixed";
 
     // Create or update overlay for transparency
-    let overlay = document.getElementById("background-overlay");
+    let overlay = document.getElementById("workspace-layout");
     if (!overlay) {
       overlay = document.createElement("div");
-      overlay.id = "background-overlay";
+      overlay.id = "workspace-layout";
       overlay.style.position = "fixed";
       overlay.style.top = "0";
       overlay.style.left = "0";
@@ -87,13 +77,13 @@ export default function BackgroundSettings({
     if (onBackgroundChange) {
       const backgroundFile =
         backgroundOptions.find((bg) => bg.id === backgroundId)?.file || "";
-      onBackgroundChange(backgroundFile, transparency);
+      onBackgroundChange(backgroundFile, backgroundTransparency);
     }
   };
 
   const handleTransparencyChange = (value: number | number[]) => {
     const newTransparency = Array.isArray(value) ? value[0] : value;
-    setTransparency(newTransparency);
+    setBackgroundTransparency(newTransparency);
     if (onBackgroundChange) {
       const backgroundFile =
         backgroundOptions.find((bg) => bg.id === selectedBackground)?.file ||
@@ -102,25 +92,9 @@ export default function BackgroundSettings({
     }
   };
 
-  const handleSave = () => {
-    localStorage.setItem("selectedBackground", selectedBackground);
-    localStorage.setItem("backgroundTransparency", transparency.toString());
-    setPreviewMode(false);
-  };
-
-  const handleCancel = () => {
-    const savedBackground =
-      localStorage.getItem("selectedBackground") || "bg_1";
-    const savedTransparency = parseInt(
-      localStorage.getItem("backgroundTransparency") || "50"
-    );
-    setSelectedBackground(savedBackground);
-    setTransparency(savedTransparency);
-    setPreviewMode(false);
-  };
-
-  const handlePreview = () => {
-    setPreviewMode(true);
+  const handleGlassOpacityChange = (value: number | number[]) => {
+    const newOpacity = Array.isArray(value) ? value[0] : value;
+    setGlassOpacity(newOpacity);
   };
 
   return (
@@ -139,28 +113,27 @@ export default function BackgroundSettings({
             {backgroundOptions.map((option) => (
               <div
                 key={option.id}
-                className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
+                className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all group ${
                   selectedBackground === option.id
                     ? "border-primary shadow-lg"
                     : "border-default-200 hover:border-default-300"
                 }`}
                 onClick={() => handleBackgroundSelect(option.id)}
               >
-                <Image
-                  src={`/background/${option.file}`}
-                  alt={t(`backgroundOptions.${option.name}`)}
-                  className="w-full h-24 object-cover"
-                  classNames={{
-                    wrapper: "w-full h-24",
-                  }}
-                />
-                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                  <span className="text-white text-xs font-medium bg-black/50 px-2 py-1 rounded">
-                    {t(`backgroundOptions.${option.name}`)}
-                  </span>
+                <div className="relative w-full h-24 overflow-hidden">
+                  <Image
+                    src={`/background/${option.file}`}
+                    alt={t(`backgroundOptions.${option.name}`)}
+                    fill
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                    className="object-cover rounded-lg transition-transform duration-300 group-hover:scale-110"
+                    quality={75}
+                    priority={selectedBackground === option.id}
+                  />
                 </div>
+
                 {selectedBackground === option.id && (
-                  <div className="absolute top-2 right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                  <div className="absolute top-2 right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center z-10 border-1 border-white">
                     <span className="text-white text-xs">✓</span>
                   </div>
                 )}
@@ -187,27 +160,44 @@ export default function BackgroundSettings({
               disableThumbScale={true}
               hideThumb={false}
               hideValue={false}
-              value={transparency}
+              value={backgroundTransparency}
               onChange={handleTransparencyChange}
               className="max-w-md"
             />
             <div className="text-sm text-default-500">
-              {t("transparencyLabel", { value: transparency })}
+              {t("transparencyLabel", { value: backgroundTransparency })}
             </div>
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex justify-end gap-3 pt-4 border-t">
-          <Button variant="bordered" onClick={handleCancel}>
-            {tCommon("cancel")}
-          </Button>
-          <Button variant="bordered" onClick={handlePreview}>
-            {tCommon("preview")}
-          </Button>
-          <Button color="primary" onClick={handleSave}>
-            {tCommon("save")}
-          </Button>
+        {/* Glass Effect Control */}
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-lg font-medium">{t("glassEffect")}</h3>
+            <p className="text-sm text-default-500">
+              {t("glassEffectDescription")}
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Slider
+              aria-label="Glass Opacity"
+              step={1}
+              minValue={0}
+              maxValue={100}
+              color="secondary"
+              showSteps={false}
+              showOutline={false}
+              disableThumbScale={true}
+              hideThumb={false}
+              hideValue={false}
+              value={glassOpacity}
+              onChange={handleGlassOpacityChange}
+              className="max-w-md"
+            />
+            <div className="text-sm text-default-500">
+              {t("glassOpacityLabel", { value: glassOpacity })}
+            </div>
+          </div>
         </div>
       </CardBody>
     </Card>

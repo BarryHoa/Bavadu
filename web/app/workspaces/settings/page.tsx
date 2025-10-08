@@ -1,23 +1,17 @@
 "use client";
 
-import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Button } from "@heroui/button";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Divider } from "@heroui/divider";
 import { Input } from "@heroui/input";
 import { Switch } from "@heroui/switch";
-import { Divider } from "@heroui/divider";
-import { title } from "@/components/primitives";
+import BackgroundSetting from "./features/BackgroundSetting";
 
 export default function WorkspaceSettings() {
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Workspace Settings</h1>
-        <p className="text-gray-600 mt-1">
-          Manage your workspace configuration and preferences
-        </p>
-      </div>
-
       <div className="grid gap-6">
+        <BackgroundSetting />
         {/* General Settings */}
         <Card>
           <CardHeader>
@@ -32,7 +26,7 @@ export default function WorkspaceSettings() {
                 variant="bordered"
               />
             </div>
-            
+
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Description</label>
               <Input
@@ -62,7 +56,9 @@ export default function WorkspaceSettings() {
           <CardBody className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm font-medium">Email Notifications</label>
+                <label className="text-sm font-medium">
+                  Email Notifications
+                </label>
                 <p className="text-xs text-default-500">
                   Receive notifications via email
                 </p>
@@ -74,7 +70,9 @@ export default function WorkspaceSettings() {
 
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm font-medium">Push Notifications</label>
+                <label className="text-sm font-medium">
+                  Push Notifications
+                </label>
                 <p className="text-xs text-default-500">
                   Receive push notifications in browser
                 </p>
@@ -104,7 +102,9 @@ export default function WorkspaceSettings() {
           <CardBody className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm font-medium">Two-Factor Authentication</label>
+                <label className="text-sm font-medium">
+                  Two-Factor Authentication
+                </label>
                 <p className="text-xs text-default-500">
                   Add an extra layer of security
                 </p>
@@ -125,7 +125,9 @@ export default function WorkspaceSettings() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Session Timeout Duration</label>
+              <label className="text-sm font-medium">
+                Session Timeout Duration
+              </label>
               <Input
                 placeholder="30"
                 defaultValue="30"
@@ -143,12 +145,8 @@ export default function WorkspaceSettings() {
 
         {/* Actions */}
         <div className="flex justify-end gap-3 pt-4">
-          <Button variant="bordered">
-            Cancel
-          </Button>
-          <Button color="primary">
-            Save Changes
-          </Button>
+          <Button variant="bordered">Cancel</Button>
+          <Button color="primary">Save Changes</Button>
         </div>
       </div>
     </div>

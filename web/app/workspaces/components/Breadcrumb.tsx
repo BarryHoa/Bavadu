@@ -1,11 +1,11 @@
 "use client";
 
 import {
-  Breadcrumbs as HeroBreadcrumbs,
   BreadcrumbItem as HeroBreadcrumbItem,
+  Breadcrumbs as HeroBreadcrumbs,
 } from "@heroui/breadcrumbs";
-import { useBreadcrumbs } from "../context/breadcrumbs";
 import { ChevronRight } from "lucide-react";
+import { useBreadcrumbs } from "../context/breadcrumbs";
 
 export type BreadcrumbItem = {
   label: string;
@@ -19,7 +19,7 @@ export default function Breadcrumb({ items }: { items?: BreadcrumbItem[] }) {
   return (
     <HeroBreadcrumbs
       itemClasses={{
-        base: "gap-1",
+        base: "gap-1 ",
         separator: "text-default-400",
         item: "text-xs font-medium text-default-500 hover:text-default-700",
       }}

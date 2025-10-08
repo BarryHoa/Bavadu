@@ -23,7 +23,10 @@
       "bg8": "Background 8"
     },
     "transparencyLabel": "Transparency: {value}%",
-    "transparencyDescription": "Adjust background image transparency"
+    "transparencyDescription": "Adjust background image transparency",
+    "glassEffect": "Liquid Glass Effect",
+    "glassEffectDescription": "Adjust card transparency for glass morphism effect",
+    "glassOpacityLabel": "Glass Opacity: {value}%"
   },
   "navigation": {
     "home": "Home",

@@ -1,44 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/card";
-import { Avatar } from "@heroui/avatar";
 import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from "@heroui/dropdown";
-import { Link } from "@heroui/link";
-import { Divider } from "@heroui/divider";
-import {
+  BarChart3,
+  FolderOpen,
+  Home,
   LayoutDashboard,
   Settings,
   Users,
-  FolderOpen,
-  BarChart3,
-  Bell,
-  Search,
-  Menu,
-  X,
-  Home,
-  ChevronRight,
-  Moon,
-  Sun,
-  LogOut,
-  User,
-  Mail,
-  Phone,
-  MapPin,
 } from "lucide-react";
+import { useState } from "react";
 
-import MenuPanel from "./components/Menu";
-import Breadcrumb, { BreadcrumbItem } from "./components/Breadcrumb";
-import Nav from "./components/Nav";
-import Content from "./components/Content";
-import { BreadcrumbProvider } from "./context/breadcrumbs";
 import { usePathname } from "next/navigation";
+import Breadcrumb, { BreadcrumbItem } from "./components/Breadcrumb";
+import Content from "./components/Content";
+import MenuPanel from "./components/Menu";
+import Nav from "./components/Nav";
+import { BreadcrumbProvider } from "./context/breadcrumbs";
 
 const navigationItems = [
   {
@@ -96,7 +73,10 @@ export default function WorkspaceLayout({
 
   return (
     <BreadcrumbProvider initial={initialCrumbs}>
-      <div className="w-full h-screen flex flex-col flex-1 overflow-hidden bg-slate-50">
+      <div
+        className="w-full h-screen flex flex-col flex-1 overflow-hidden bg-slate-50"
+        id="workspace-layout"
+      >
         {/* Top header */}
         <Nav onOpenSidebar={() => setSidebarOpen(true)} />
         <div className="flex min-h-0 flex-1">
@@ -108,15 +88,17 @@ export default function WorkspaceLayout({
 
           {/* Mobile sidebar overlay */}
 
-          <div className="w-full min-h-0 flex flex-col h-full overflow-auto scroll-overlay ">
-            {/* Breadcrumb */}
-            <div className="px-2 py-2 font-small">
-              <Breadcrumb items={breadcrumbItems} />
-            </div>
+          <div className="w-full min-h-0 flex flex-1 h-full overflow-auto scroll-overlay">
+            <div className="min-w-3xl flex flex-col flex-1">
+              {/* Breadcrumb */}
+              <div className="px-2 py-2 font-small rounded-md">
+                <Breadcrumb items={breadcrumbItems} />
+              </div>
 
-            {/* Page content */}
-            <div className="flex-1 ">
-              <Content>{children}</Content>
+              {/* Page content */}
+              <div className="flex-1">
+                <Content>{children}</Content>
+              </div>
             </div>
           </div>
         </div>

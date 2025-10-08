@@ -1,14 +1,12 @@
-import "@/styles/globals.css";
 import "@/styles/fonts.css";
-import { Metadata, Viewport } from "next";
+import "@/styles/globals.css";
 import clsx from "clsx";
+import { Metadata, Viewport } from "next";
 
 import { Providers } from "./providers";
 
+import { fontNotoSansSC, fontSans } from "@/config/fonts";
 import { siteConfig } from "@/config/site";
-import { fontSans, fontNotoSansSC } from "@/config/fonts";
-import { Navbar } from "@/components/navbar";
-import ScrollbarReveal from "@/components/scrollbar-reveal";
 
 export const metadata: Metadata = {
   title: {
@@ -28,13 +26,17 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Load messages for the default locale
+  const locale = "en";
+  const messages = (await import(`@/messages/${locale}.json`)).default;
+
   return (
-    <html suppressHydrationWarning lang="en">
+    <html suppressHydrationWarning lang={locale}>
       <head />
       <body
         className={clsx(
@@ -43,10 +45,17 @@ export default function RootLayout({
           fontNotoSansSC.variable
         )}
       >
-        <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
+        <Providers
+          themeProps={{ attribute: "class", defaultTheme: "light" }}
+          locale={locale}
+          messages={messages}
+        >
           <div className="relative flex flex-col h-screen">
             {/* <Navbar /> */}
-            <main className="container mx-auto p-0  my-1 flex-1">
+            <main
+              className="container mx-auto p-0  my-1 flex-1"
+              style={{ maxWidth: "1920px" }}
+            >
               {children}
             </main>
           </div>

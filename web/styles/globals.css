@@ -2,13 +2,15 @@
 
 @config "../tailwind.config.js";
 
-
-
 /* Site wallpaper background (can be replaced by changing --bg-image-url) */
 :root {
   --bg-image-url: url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1920&q=80");
-  --bg-size: cover;   /* cover = full-bleed; contain = keep original */
+  --bg-size: cover; /* cover = full-bleed; contain = keep original */
   --bg-attach: fixed; /* fixed = stay when scroll; scroll = move with page */
+
+  /* Glass effect variables */
+  --glass-opacity: 0.3;
+  --glass-opacity-percent: 30;
 }
 
 body {
@@ -19,10 +21,18 @@ body {
 }
 
 /* Helpers to toggle behavior via body className */
-.bg-cover-mode { --bg-size: cover; }
-.bg-contain-mode { --bg-size: contain; }
-.bg-fixed-mode { --bg-attach: fixed; }
-.bg-scroll-mode { --bg-attach: scroll; }
+.bg-cover-mode {
+  --bg-size: cover;
+}
+.bg-contain-mode {
+  --bg-size: contain;
+}
+.bg-fixed-mode {
+  --bg-attach: fixed;
+}
+.bg-scroll-mode {
+  --bg-attach: scroll;
+}
 
 /* Overlay scrollbar (doesn't shift layout), shows on hover/scroll/touch */
 .scroll-overlay {
@@ -39,7 +49,7 @@ body {
 
 /* WebKit */
 .scroll-overlay::-webkit-scrollbar {
-  width: 8px;   /* mimic Firefox `scrollbar-width: thin` */
+  width: 8px; /* mimic Firefox `scrollbar-width: thin` */
   height: 8px;
   background: transparent;
 }
@@ -50,15 +60,15 @@ body {
 }
 .scroll-overlay:hover::-webkit-scrollbar-thumb,
 .scroll-overlay.show-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(126,126,126,0.6);
+  background: rgba(126, 126, 126, 0.6);
 }
 .scroll-overlay::-webkit-scrollbar-thumb:hover,
 .scroll-overlay.show-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(126,126,126,0.75);
+  background: rgba(126, 126, 126, 0.75);
 }
 .scroll-overlay::-webkit-scrollbar-thumb:active,
 .scroll-overlay.show-scrollbar::-webkit-scrollbar-thumb:active {
-  background: rgba(126,126,126,0.9);
+  background: rgba(126, 126, 126, 0.9);
 }
 .scroll-overlay::-webkit-scrollbar-track {
   background: transparent;
@@ -68,4 +78,16 @@ body {
 .scroll-overlay:hover,
 .scroll-overlay.show-scrollbar {
   scrollbar-color: rgba(126, 126, 126, 0.6);
+}
+
+/* Global Glass Effect for all Cards */
+[data-slot="base"] {
+  @apply backdrop-blur-md border border-white/20 shadow-xl transition-all duration-300;
+  background-color: rgba(255, 255, 255, var(--glass-opacity)) !important;
+}
+
+/* Dark mode glass effect */
+.dark [data-slot="base"] {
+  background-color: rgba(0, 0, 0, var(--glass-opacity)) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
 }
