@@ -28,6 +28,33 @@
     "glassEffectDescription": "Điều chỉnh độ trong suốt của thẻ để tạo hiệu ứng kính",
     "glassOpacityLabel": "Độ mờ kính: {value}%"
   },
+  "language": {
+    "title": "Cài đặt ngôn ngữ",
+    "description": "Chọn ngôn ngữ ưa thích của bạn",
+    "selectLanguage": "Chọn ngôn ngữ",
+    "currentLanguage": "Ngôn ngữ hiện tại",
+    "selectPlaceholder": "Chọn một ngôn ngữ"
+  },
+  "number": {
+    "title": "Cài đặt định dạng số",
+    "description": "Cấu hình cách hiển thị số",
+    "decimalPlaces": "Số chữ số thập phân",
+    "decimalPlacesDescription": "Số chữ số sau dấu phẩy (0-7)",
+    "decimalSeparator": "Dấu phân cách thập phân",
+    "decimalSeparatorDescription": "Ký tự dùng để phân cách phần thập phân",
+    "thousandSeparator": "Dấu phân cách hàng ngàn",
+    "thousandSeparatorDescription": "Ký tự dùng để phân cách hàng ngàn",
+    "customSeparator": "Dấu tùy chỉnh",
+    "currentValue": "Giá trị hiện tại",
+    "preview": "Xem trước",
+    "previewDescription": "Xem số sẽ được định dạng như thế nào",
+    "originalNumber": "Gốc",
+    "formattedNumber": "Đã định dạng",
+    "errorEmpty": "Dấu phân cách không được để trống",
+    "errorSame": "Các dấu phân cách phải khác nhau",
+    "placeholderDecimalSeparator": "Nhập dấu phân cách thập phân",
+    "placeholderThousandSeparator": "Nhập dấu phân cách hàng ngàn"
+  },
   "navigation": {
     "home": "Trang chủ",
     "about": "Giới thiệu",

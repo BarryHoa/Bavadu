@@ -28,6 +28,33 @@
     "glassEffectDescription": "Adjust card transparency for glass morphism effect",
     "glassOpacityLabel": "Glass Opacity: {value}%"
   },
+  "language": {
+    "title": "Language Settings",
+    "description": "Choose your preferred language",
+    "selectLanguage": "Select Language",
+    "currentLanguage": "Current Language",
+    "selectPlaceholder": "Choose a language"
+  },
+  "number": {
+    "title": "Number Format Settings",
+    "description": "Configure how numbers are displayed",
+    "decimalPlaces": "Decimal Places",
+    "decimalPlacesDescription": "Number of digits after decimal point (0-7)",
+    "decimalSeparator": "Decimal Separator",
+    "decimalSeparatorDescription": "Character used to separate decimal part",
+    "thousandSeparator": "Thousand Separator",
+    "thousandSeparatorDescription": "Character used to separate thousands",
+    "customSeparator": "Custom Separator",
+    "currentValue": "Current value",
+    "preview": "Preview",
+    "previewDescription": "See how numbers will be formatted",
+    "originalNumber": "Original",
+    "formattedNumber": "Formatted",
+    "errorEmpty": "Separator cannot be empty",
+    "errorSame": "Separators must be different",
+    "placeholderDecimalSeparator": "Enter decimal separator",
+    "placeholderThousandSeparator": "Enter thousand separator"
+  },
   "navigation": {
     "home": "Home",
     "about": "About",

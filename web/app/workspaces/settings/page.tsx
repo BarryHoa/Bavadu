@@ -6,11 +6,15 @@ import { Divider } from "@heroui/divider";
 import { Input } from "@heroui/input";
 import { Switch } from "@heroui/switch";
 import BackgroundSetting from "./features/BackgroundSetting";
+import LanguageSetting from "./features/LanguageSetting";
+import NumberSetting from "./features/NumberSetting";
 
 export default function WorkspaceSettings() {
   return (
     <div className="space-y-6">
       <div className="grid gap-6">
+        <LanguageSetting />
+        <NumberSetting />
         <BackgroundSetting />
         {/* General Settings */}
         <Card>

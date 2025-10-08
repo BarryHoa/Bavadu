@@ -19,6 +19,21 @@ interface SettingsContextType {
   blurIntensity: number;
   setBlurIntensity: (intensity: number) => void;
 
+  // Language settings
+  locale: string;
+  setLocale: (locale: string) => void;
+
+  // Number format settings
+  decimalPlaces: number;
+  setDecimalPlaces: (places: number) => void;
+  decimalSeparator: string;
+  setDecimalSeparator: (separator: string) => void;
+  thousandSeparator: string;
+  setThousandSeparator: (separator: string) => void;
+
+  // Utility function
+  formatNumber: (value: number) => string;
+
   // Actions
   saveSettings: () => void;
   resetSettings: () => void;
@@ -34,6 +49,10 @@ const DEFAULT_SETTINGS = {
   backgroundTransparency: 50,
   glassOpacity: 30,
   blurIntensity: 12,
+  locale: "en",
+  decimalPlaces: 2,
+  decimalSeparator: ".",
+  thousandSeparator: ",",
 };
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
@@ -48,6 +67,16 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   );
   const [blurIntensity, setBlurIntensity] = useState(
     DEFAULT_SETTINGS.blurIntensity
+  );
+  const [locale, setLocale] = useState(DEFAULT_SETTINGS.locale);
+  const [decimalPlaces, setDecimalPlaces] = useState(
+    DEFAULT_SETTINGS.decimalPlaces
+  );
+  const [decimalSeparator, setDecimalSeparator] = useState(
+    DEFAULT_SETTINGS.decimalSeparator
+  );
+  const [thousandSeparator, setThousandSeparator] = useState(
+    DEFAULT_SETTINGS.thousandSeparator
   );
 
   // Load settings from localStorage on mount
@@ -80,12 +109,20 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     const savedTransparency = localStorage.getItem("backgroundTransparency");
     const savedGlassOpacity = localStorage.getItem("glassOpacity");
     const savedBlurIntensity = localStorage.getItem("blurIntensity");
+    const savedLocale = localStorage.getItem("locale");
+    const savedDecimalPlaces = localStorage.getItem("decimalPlaces");
+    const savedDecimalSeparator = localStorage.getItem("decimalSeparator");
+    const savedThousandSeparator = localStorage.getItem("thousandSeparator");
 
     if (savedBackground) setSelectedBackground(savedBackground);
     if (savedTransparency)
       setBackgroundTransparency(parseInt(savedTransparency));
     if (savedGlassOpacity) setGlassOpacity(parseInt(savedGlassOpacity));
     if (savedBlurIntensity) setBlurIntensity(parseInt(savedBlurIntensity));
+    if (savedLocale) setLocale(savedLocale);
+    if (savedDecimalPlaces) setDecimalPlaces(parseInt(savedDecimalPlaces));
+    if (savedDecimalSeparator) setDecimalSeparator(savedDecimalSeparator);
+    if (savedThousandSeparator) setThousandSeparator(savedThousandSeparator);
   };
 
   const saveSettings = () => {
@@ -96,6 +133,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     );
     localStorage.setItem("glassOpacity", glassOpacity.toString());
     localStorage.setItem("blurIntensity", blurIntensity.toString());
+    localStorage.setItem("locale", locale);
+    localStorage.setItem("decimalPlaces", decimalPlaces.toString());
+    localStorage.setItem("decimalSeparator", decimalSeparator);
+    localStorage.setItem("thousandSeparator", thousandSeparator);
   };
 
   const resetSettings = () => {
@@ -103,12 +144,39 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     setBackgroundTransparency(DEFAULT_SETTINGS.backgroundTransparency);
     setGlassOpacity(DEFAULT_SETTINGS.glassOpacity);
     setBlurIntensity(DEFAULT_SETTINGS.blurIntensity);
+    setLocale(DEFAULT_SETTINGS.locale);
+    setDecimalPlaces(DEFAULT_SETTINGS.decimalPlaces);
+    setDecimalSeparator(DEFAULT_SETTINGS.decimalSeparator);
+    setThousandSeparator(DEFAULT_SETTINGS.thousandSeparator);
 
     // Clear localStorage
     localStorage.removeItem("selectedBackground");
     localStorage.removeItem("backgroundTransparency");
     localStorage.removeItem("glassOpacity");
     localStorage.removeItem("blurIntensity");
+    localStorage.removeItem("locale");
+    localStorage.removeItem("decimalPlaces");
+    localStorage.removeItem("decimalSeparator");
+    localStorage.removeItem("thousandSeparator");
+  };
+
+  const formatNumber = (value: number): string => {
+    // Format number with current settings
+    const fixedValue = value.toFixed(decimalPlaces);
+    const [integerPart, decimalPart] = fixedValue.split(".");
+
+    // Add thousand separators
+    const formattedInteger = integerPart.replace(
+      /\B(?=(\d{3})+(?!\d))/g,
+      thousandSeparator
+    );
+
+    // Combine with decimal separator
+    if (decimalPlaces > 0 && decimalPart) {
+      return `${formattedInteger}${decimalSeparator}${decimalPart}`;
+    }
+
+    return formattedInteger;
   };
 
   return (
@@ -122,6 +190,15 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         setGlassOpacity,
         blurIntensity,
         setBlurIntensity,
+        locale,
+        setLocale,
+        decimalPlaces,
+        setDecimalPlaces,
+        decimalSeparator,
+        setDecimalSeparator,
+        thousandSeparator,
+        setThousandSeparator,
+        formatNumber,
         saveSettings,
         resetSettings,
         loadSettings,
