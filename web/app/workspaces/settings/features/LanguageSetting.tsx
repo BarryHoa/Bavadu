@@ -25,35 +25,31 @@ export default function LanguageSetting() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-col">
-          <h2 className="text-xl font-semibold">{t("title")}</h2>
-          <p className="text-sm text-default-500">{t("description")}</p>
+    <Card className="h-full">
+      <CardHeader className="pb-2">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-lg font-semibold">{t("title")}</h2>
+          <p className="text-xs text-default-500">{t("description")}</p>
         </div>
       </CardHeader>
-      <CardBody className="space-y-4">
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">{t("selectLanguage")}</h3>
-
-          <Select
-            label={t("currentLanguage")}
-            placeholder={t("selectPlaceholder")}
-            selectedKeys={[locale]}
-            onChange={(e) => handleLanguageChange(e.target.value)}
-            className="max-w-xs"
-            variant="bordered"
-          >
-            {languages.map((lang) => (
-              <SelectItem key={lang.code} textValue={lang.name}>
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">{lang.flag}</span>
-                  <span>{lang.name}</span>
-                </div>
-              </SelectItem>
-            ))}
-          </Select>
-        </div>
+      <CardBody className="pt-2">
+        <Select
+          label={t("currentLanguage")}
+          placeholder={t("selectPlaceholder")}
+          selectedKeys={[locale]}
+          onChange={(e) => handleLanguageChange(e.target.value)}
+          variant="bordered"
+          size="sm"
+        >
+          {languages.map((lang) => (
+            <SelectItem key={lang.code} textValue={lang.name}>
+              <div className="flex items-center gap-2">
+                <span className="text-lg">{lang.flag}</span>
+                <span>{lang.name}</span>
+              </div>
+            </SelectItem>
+          ))}
+        </Select>
       </CardBody>
     </Card>
   );

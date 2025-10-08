@@ -99,17 +99,17 @@ export default function BackgroundSetting({
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex flex-col">
-          <h2 className="text-xl font-semibold">{t("title")}</h2>
-          <p className="text-sm text-default-500">{t("description")}</p>
+      <CardHeader className="pb-2">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-lg font-semibold">{t("title")}</h2>
+          <p className="text-xs text-default-500">{t("description")}</p>
         </div>
       </CardHeader>
-      <CardBody className="space-y-6">
+      <CardBody className="space-y-4 pt-2">
         {/* Background Selection */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">{t("selectBackground")}</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium">{t("selectBackground")}</label>
+          <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
             {backgroundOptions.map((option) => (
               <div
                 key={option.id}
@@ -120,12 +120,12 @@ export default function BackgroundSetting({
                 }`}
                 onClick={() => handleBackgroundSelect(option.id)}
               >
-                <div className="relative w-full h-24 overflow-hidden">
+                <div className="relative w-full h-16 overflow-hidden">
                   <Image
                     src={`/background/${option.file}`}
                     alt={t(`backgroundOptions.${option.name}`)}
                     fill
-                    sizes="(max-width: 768px) 50vw, 25vw"
+                    sizes="(max-width: 768px) 25vw, 12.5vw"
                     className="object-cover rounded-lg transition-transform duration-300 group-hover:scale-110"
                     quality={75}
                     priority={selectedBackground === option.id}
@@ -133,7 +133,7 @@ export default function BackgroundSetting({
                 </div>
 
                 {selectedBackground === option.id && (
-                  <div className="absolute top-2 right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center z-10 border-1 border-white">
+                  <div className="absolute top-1 right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center z-10 border-1 border-white">
                     <span className="text-white text-xs">✓</span>
                   </div>
                 )}
@@ -142,15 +142,13 @@ export default function BackgroundSetting({
           </div>
         </div>
 
-        {/* Transparency Control */}
-        <div className="space-y-4">
-          <div>
-            <h3 className="text-lg font-medium">{tCommon("transparency")}</h3>
-            <p className="text-sm text-default-500">
-              {t("transparencyDescription")}
-            </p>
-          </div>
+        {/* Sliders in 2 columns */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Transparency Control */}
           <div className="space-y-2">
+            <label className="text-sm font-medium">
+              {tCommon("transparency")}
+            </label>
             <Slider
               aria-label="Transparency"
               step={1}
@@ -159,26 +157,19 @@ export default function BackgroundSetting({
               showOutline={false}
               disableThumbScale={true}
               hideThumb={false}
-              hideValue={false}
+              hideValue={true}
               value={backgroundTransparency}
               onChange={handleTransparencyChange}
-              className="max-w-md"
+              size="sm"
             />
-            <div className="text-sm text-default-500">
+            <div className="text-xs text-default-500">
               {t("transparencyLabel", { value: backgroundTransparency })}
             </div>
           </div>
-        </div>
 
-        {/* Glass Effect Control */}
-        <div className="space-y-4">
-          <div>
-            <h3 className="text-lg font-medium">{t("glassEffect")}</h3>
-            <p className="text-sm text-default-500">
-              {t("glassEffectDescription")}
-            </p>
-          </div>
+          {/* Glass Effect Control */}
           <div className="space-y-2">
+            <label className="text-sm font-medium">{t("glassEffect")}</label>
             <Slider
               aria-label="Glass Opacity"
               step={1}
@@ -189,12 +180,12 @@ export default function BackgroundSetting({
               showOutline={false}
               disableThumbScale={true}
               hideThumb={false}
-              hideValue={false}
+              hideValue={true}
               value={glassOpacity}
               onChange={handleGlassOpacityChange}
-              className="max-w-md"
+              size="sm"
             />
-            <div className="text-sm text-default-500">
+            <div className="text-xs text-default-500">
               {t("glassOpacityLabel", { value: glassOpacity })}
             </div>
           </div>

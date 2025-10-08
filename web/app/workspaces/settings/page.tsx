@@ -13,8 +13,13 @@ export default function WorkspaceSettings() {
   return (
     <div className="space-y-6">
       <div className="grid gap-6">
-        <LanguageSetting />
-        <NumberSetting />
+        {/* Language & Number Settings - 2 columns */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <LanguageSetting />
+          <NumberSetting />
+        </div>
+
+        {/* Background Setting - Full width */}
         <BackgroundSetting />
         {/* General Settings */}
         <Card>
