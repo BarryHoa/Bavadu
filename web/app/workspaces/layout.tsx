@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Settings,
   Users,
+  UserCircle,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -35,6 +36,12 @@ const navigationItems = [
     name: "Analytics",
     href: "/workspaces/analytics",
     icon: BarChart3,
+    badge: null,
+  },
+  {
+    name: "Profile",
+    href: "/workspaces/profile",
+    icon: UserCircle,
     badge: null,
   },
   {

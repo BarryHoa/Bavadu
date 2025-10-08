@@ -82,7 +82,7 @@ body {
 
 /* Global Glass Effect for all Cards */
 [data-slot="base"] {
-  @apply backdrop-blur-md border border-white/20 shadow-xl transition-all duration-300;
+  /* @apply backdrop-blur-md border border-white/20 shadow-xl transition-all duration-300; */
   background-color: rgba(255, 255, 255, var(--glass-opacity)) !important;
 }
 

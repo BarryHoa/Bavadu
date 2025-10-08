@@ -38,7 +38,7 @@ const config = {
         },
         borderWidth: {
           small: "1px",
-          medium: "2px",
+          medium: "1.5px",
           large: "3px",
         },
       },

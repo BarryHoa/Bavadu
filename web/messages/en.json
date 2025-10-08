@@ -64,5 +64,107 @@
     "workspaces": "Workspaces",
     "dashboard": "Dashboard",
     "settings": "Settings"
+  },
+  "profile": {
+    "title": "Profile",
+    "description": "Manage your personal information and preferences",
+    "changePassword": "Change Password",
+    "myDocuments": "My Documents",
+    "viewMore": "View More",
+    "personalInfo": {
+      "title": "Personal Information",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "nickname": "Nickname / Display Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "address": "Address",
+      "gender": "Gender",
+      "dateOfBirth": "Date of Birth",
+      "jobTitle": "Job Title",
+      "bio": "Bio / Description",
+      "placeholders": {
+        "firstName": "Enter first name",
+        "lastName": "Enter last name",
+        "nickname": "Enter nickname or display name",
+        "email": "Enter email address",
+        "phone": "Enter phone number",
+        "address": "Enter full address",
+        "gender": "Select gender",
+        "dateOfBirth": "Select date of birth",
+        "jobTitle": "Enter job title",
+        "bio": "Tell us about yourself..."
+      },
+      "genderOptions": {
+        "male": "Male",
+        "female": "Female",
+        "other": "Other",
+        "preferNotToSay": "Prefer not to say"
+      }
+    },
+    "socialLinks": {
+      "title": "Social Links",
+      "website": "Website",
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "twitter": "Twitter"
+    },
+    "awards": {
+      "title": "Awards & Certifications",
+      "allAwards": "All Awards & Certifications"
+    },
+    "digitalSignature": {
+      "title": "Digital Signature",
+      "signatureActive": "Signature Active",
+      "noSignature": "No Signature",
+      "validUntil": "Valid until: {date}",
+      "createMessage": "Create a digital signature to verify your identity",
+      "management": "Digital Signature Management",
+      "status": "Signature Status: Active",
+      "created": "Created: {date}",
+      "expires": "Expires: {date}",
+      "publicKey": "Public Key",
+      "signatureHash": "Signature Hash",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "close": "Close",
+      "regenerate": "Regenerate Signature",
+      "aboutTitle": "About Digital Signatures",
+      "aboutPoints": {
+        "p1": "Your digital signature uniquely identifies you in the system",
+        "p2": "Public key can be shared with others to verify your identity",
+        "p3": "Private key is securely stored and never shared",
+        "p4": "Signatures expire after 1 year for security purposes"
+      },
+      "warning": "Warning: Regenerating your signature will invalidate the current one. All previously signed documents will need to be re-verified."
+    },
+    "documents": {
+      "title": "My Documents",
+      "columns": {
+        "name": "DOCUMENT NAME",
+        "uploadDate": "UPLOAD DATE",
+        "createdBy": "CREATED BY",
+        "size": "SIZE",
+        "action": "ACTION"
+      },
+      "note": "Note: Click the download icon to download any document. All documents are securely stored and encrypted. Showing {current} of {total} documents."
+    },
+    "changePasswordModal": {
+      "title": "Change Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "placeholders": {
+        "currentPassword": "Enter current password",
+        "newPassword": "Enter new password",
+        "confirmPassword": "Confirm new password"
+      },
+      "requirements": "Password requirements: At least 8 characters, including uppercase, lowercase, number and special character.",
+      "update": "Update Password"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save Changes"
+    }
   }
 }

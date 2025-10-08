@@ -4,9 +4,12 @@ import { notFound } from "next/navigation";
 // Can be imported from a shared config
 const locales = ["en", "vi"];
 
-const getImportMessages = async ({ locale }: GetRequestConfigParams) => {
-  if (!locales.includes(locale as any)) notFound();
-  return (await import(`./messages/${locale}.json`)).default;
-};
+export default getRequestConfig(async ({ locale }: GetRequestConfigParams) => {
+  if (!locale || !locales.includes(locale)) notFound();
 
-export default getRequestConfig(getImportMessages);
+  return {
+    locale: locale as string,
+    messages: (await import(`./messages/${locale}.json`)).default,
+    timeZone: "Asia/Ho_Chi_Minh",
+  };
+});

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSettings } from "@/app/context/SettingsContext";
-import Input from "@/components/base/Input/Input";
+import Input from "@/components/base/Input";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Slider } from "@heroui/slider";
 import { useTranslations } from "next-intl";

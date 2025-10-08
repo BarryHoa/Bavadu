@@ -3,11 +3,12 @@
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Divider } from "@heroui/divider";
-import { Input } from "@heroui/input";
+
 import { Switch } from "@heroui/switch";
 import BackgroundSetting from "./features/BackgroundSetting";
 import LanguageSetting from "./features/LanguageSetting";
 import NumberSetting from "./features/NumberSetting";
+import Input from "@/components/base/Input";
 
 export default function WorkspaceSettings() {
   return (
@@ -147,13 +148,14 @@ export default function WorkspaceSettings() {
                     <span className="text-default-400 text-small">minutes</span>
                   </div>
                 }
+                width="200px"
               />
             </div>
           </CardBody>
         </Card>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-4">
+        <div className="flex justify-end gap-3">
           <Button variant="bordered">Cancel</Button>
           <Button color="primary">Save Changes</Button>
         </div>

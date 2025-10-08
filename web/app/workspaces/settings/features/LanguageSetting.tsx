@@ -1,6 +1,7 @@
 "use client";
 
 import { useSettings } from "@/app/context/SettingsContext";
+import SelectBase from "@/components/base/Select";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Select, SelectItem } from "@heroui/select";
 import { useTranslations } from "next-intl";
@@ -33,12 +34,13 @@ export default function LanguageSetting() {
         </div>
       </CardHeader>
       <CardBody className="pt-2">
-        <Select
+        <SelectBase
           label={t("currentLanguage")}
           placeholder={t("selectPlaceholder")}
           selectedKeys={[locale]}
           onChange={(e) => handleLanguageChange(e.target.value)}
           variant="bordered"
+          labelPlacement="outside"
           size="sm"
         >
           {languages.map((lang) => (
@@ -49,7 +51,7 @@ export default function LanguageSetting() {
               </div>
             </SelectItem>
           ))}
-        </Select>
+        </SelectBase>
       </CardBody>
     </Card>
   );
