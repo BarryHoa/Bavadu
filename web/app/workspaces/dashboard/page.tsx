@@ -1,20 +1,21 @@
 "use client";
 
-import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Button } from "@heroui/button";
 import { Avatar } from "@heroui/avatar";
+import { Button } from "@heroui/button";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Divider } from "@heroui/divider";
 import { Progress } from "@heroui/progress";
-import { 
-  TrendingUp, 
-  Users, 
-  DollarSign, 
+import {
   Activity,
-  ArrowUpRight,
   ArrowDownRight,
+  ArrowUpRight,
   Calendar,
   Clock,
+  DollarSign,
+  Eye,
   Star,
-  Eye
+  TrendingUp,
+  Users,
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -25,15 +26,15 @@ export default function Dashboard() {
       change: "+20.1%",
       changeType: "increase",
       icon: DollarSign,
-      color: "text-green-600"
+      color: "text-green-600",
     },
     {
       title: "Total Users",
       value: "2,350",
       change: "+180.1%",
-      changeType: "increase", 
+      changeType: "increase",
       icon: Users,
-      color: "text-blue-600"
+      color: "text-blue-600",
     },
     {
       title: "Sales",
@@ -41,7 +42,7 @@ export default function Dashboard() {
       change: "+19%",
       changeType: "increase",
       icon: TrendingUp,
-      color: "text-purple-600"
+      color: "text-purple-600",
     },
     {
       title: "Active Now",
@@ -49,8 +50,8 @@ export default function Dashboard() {
       change: "+201",
       changeType: "increase",
       icon: Activity,
-      color: "text-orange-600"
-    }
+      color: "text-orange-600",
+    },
   ];
 
   const recentActivities = [
@@ -58,26 +59,26 @@ export default function Dashboard() {
       user: "John Doe",
       action: "created a new project",
       time: "2 minutes ago",
-      avatar: "https://i.pravatar.cc/150?u=john"
+      avatar: "https://i.pravatar.cc/150?u=john",
     },
     {
-      user: "Jane Smith", 
+      user: "Jane Smith",
       action: "updated project settings",
       time: "5 minutes ago",
-      avatar: "https://i.pravatar.cc/150?u=jane"
+      avatar: "https://i.pravatar.cc/150?u=jane",
     },
     {
       user: "Mike Johnson",
       action: "commented on a task",
-      time: "10 minutes ago", 
-      avatar: "https://i.pravatar.cc/150?u=mike"
+      time: "10 minutes ago",
+      avatar: "https://i.pravatar.cc/150?u=mike",
     },
     {
       user: "Sarah Wilson",
       action: "completed a milestone",
       time: "1 hour ago",
-      avatar: "https://i.pravatar.cc/150?u=sarah"
-    }
+      avatar: "https://i.pravatar.cc/150?u=sarah",
+    },
   ];
 
   return (
@@ -86,7 +87,9 @@ export default function Dashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-1">Welcome back! Here's what's happening today.</p>
+          <p className="text-gray-600 mt-1">
+            Welcome back! Here's what's happening today.
+          </p>
         </div>
         <div className="flex gap-3">
           <Button variant="bordered">
@@ -109,20 +112,36 @@ export default function Dashboard() {
               <CardBody className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                    <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                    <p className="text-sm font-medium text-gray-600">
+                      {stat.title}
+                    </p>
+                    <p className="text-2xl font-bold text-gray-900 mt-1">
+                      {stat.value}
+                    </p>
                     <div className="flex items-center mt-2">
                       {stat.changeType === "increase" ? (
-                        <ArrowUpRight size={16} className="text-green-600 mr-1" />
+                        <ArrowUpRight
+                          size={16}
+                          className="text-green-600 mr-1"
+                        />
                       ) : (
-                        <ArrowDownRight size={16} className="text-red-600 mr-1" />
+                        <ArrowDownRight
+                          size={16}
+                          className="text-red-600 mr-1"
+                        />
                       )}
-                      <span className={`text-sm font-medium ${
-                        stat.changeType === "increase" ? "text-green-600" : "text-red-600"
-                      }`}>
+                      <span
+                        className={`text-sm font-medium ${
+                          stat.changeType === "increase"
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
                         {stat.change}
                       </span>
-                      <span className="text-sm text-gray-500 ml-1">from last month</span>
+                      <span className="text-sm text-gray-500 ml-1">
+                        from last month
+                      </span>
                     </div>
                   </div>
                   <div className={`p-3 rounded-lg bg-gray-50 ${stat.color}`}>
@@ -143,14 +162,15 @@ export default function Dashboard() {
           </CardHeader>
           <CardBody className="space-y-4">
             {recentActivities.map((activity, index) => (
-              <div key={index} className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg">
-                <Avatar
-                  size="sm"
-                  src={activity.avatar}
-                />
+              <div
+                key={index}
+                className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg"
+              >
+                <Avatar size="sm" src={activity.avatar} />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-900">
-                    <span className="font-semibold">{activity.user}</span> {activity.action}
+                    <span className="font-semibold">{activity.user}</span>{" "}
+                    {activity.action}
                   </p>
                   <p className="text-xs text-gray-500 flex items-center">
                     <Clock size={12} className="mr-1" />
@@ -173,7 +193,9 @@ export default function Dashboard() {
           <CardBody className="space-y-4">
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-gray-600">Project Progress</span>
+                <span className="text-sm font-medium text-gray-600">
+                  Project Progress
+                </span>
                 <span className="text-sm font-bold text-gray-900">75%</span>
               </div>
               <Progress value={75} color="primary" />
@@ -181,7 +203,9 @@ export default function Dashboard() {
 
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-gray-600">Team Performance</span>
+                <span className="text-sm font-medium text-gray-600">
+                  Team Performance
+                </span>
                 <span className="text-sm font-bold text-gray-900">88%</span>
               </div>
               <Progress value={88} color="success" />
@@ -189,7 +213,9 @@ export default function Dashboard() {
 
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-gray-600">Goal Achievement</span>
+                <span className="text-sm font-medium text-gray-600">
+                  Goal Achievement
+                </span>
                 <span className="text-sm font-bold text-gray-900">92%</span>
               </div>
               <Progress value={92} color="warning" />
