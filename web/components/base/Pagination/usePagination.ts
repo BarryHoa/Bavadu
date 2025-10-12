@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import {
   PAGINATION_DEFAULT_PAGE_SIZE,
   PAGINATION_PAGE_SIZE_OPTIONS,
-} from "./dataTableConst";
+} from "./pagginationConts";
 
 export interface UsePaginationProps {
   pageSizeOptions?: number[];

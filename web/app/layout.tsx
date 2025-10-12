@@ -39,11 +39,11 @@ export default async function RootLayout({
     <html suppressHydrationWarning lang={locale}>
       <head />
       <body
-        className={clsx(
-          "h-screen overflow-hidden text-foreground bg-background font-sans antialiased",
-          fontSans.variable,
-          fontNotoSansSC.variable
-        )}
+      // className={clsx(
+      //   // "text-foreground bg-background font-sans antialiased",
+      //   fontSans.variable,
+      //   fontNotoSansSC.variable
+      // )}
       >
         <Providers
           themeProps={{ attribute: "class", defaultTheme: "light" }}

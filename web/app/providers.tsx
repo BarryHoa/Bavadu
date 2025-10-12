@@ -8,6 +8,7 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { SettingsProvider } from "./context/SettingsContext";
+import { NavigationLoader } from "@/components/base/NavigationLoader";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -36,7 +37,10 @@ export function Providers({
     <NextIntlClientProvider locale={locale} messages={messages}>
       <SettingsProvider>
         <HeroUIProvider navigate={router.push}>
-          <NextThemesProvider {...themeProps}>{children}</NextThemesProvider>
+          <NextThemesProvider {...themeProps}>
+            <NavigationLoader style="bar" minLoadingTime={300} />
+            {children}
+          </NextThemesProvider>
         </HeroUIProvider>
       </SettingsProvider>
     </NextIntlClientProvider>

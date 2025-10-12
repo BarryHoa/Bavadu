@@ -12,6 +12,9 @@
   --glass-opacity: 0.3;
   --glass-opacity-percent: 30;
 }
+html {
+  scrollbar-gutter: unset !important;
+}
 
 body {
   background-image: var(--bg-image-url);
@@ -34,50 +37,26 @@ body {
   --bg-attach: scroll;
 }
 
-/* Overlay scrollbar (doesn't shift layout), shows on hover/scroll/touch */
-.scroll-overlay {
-  overflow: auto; /* keep scrollbar inside content box */
-  scrollbar-gutter: stable both-edges; /* avoid layout shift, keep inside */
-  -webkit-overflow-scrolling: touch;
-}
-
+/* Custom thin scrollbar for all elements */
 /* Firefox */
-.scroll-overlay {
+* {
   scrollbar-width: thin;
-  scrollbar-color: transparent; /* hidden by default */
 }
 
-/* WebKit */
-.scroll-overlay::-webkit-scrollbar {
-  width: 8px; /* mimic Firefox `scrollbar-width: thin` */
-  height: 8px;
+/* WebKit (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(126, 126, 126, 0.5);
+  border-radius: 3px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(126, 126, 126, 0.7);
+}
+*::-webkit-scrollbar-track {
   background: transparent;
-}
-.scroll-overlay::-webkit-scrollbar-thumb {
-  background: transparent; /* hidden by default */
-  border-radius: 9999px;
-  min-height: 28px; /* feel similar to Firefox */
-}
-.scroll-overlay:hover::-webkit-scrollbar-thumb,
-.scroll-overlay.show-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(126, 126, 126, 0.6);
-}
-.scroll-overlay::-webkit-scrollbar-thumb:hover,
-.scroll-overlay.show-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(126, 126, 126, 0.75);
-}
-.scroll-overlay::-webkit-scrollbar-thumb:active,
-.scroll-overlay.show-scrollbar::-webkit-scrollbar-thumb:active {
-  background: rgba(126, 126, 126, 0.9);
-}
-.scroll-overlay::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* Firefox visible state */
-.scroll-overlay:hover,
-.scroll-overlay.show-scrollbar {
-  scrollbar-color: rgba(126, 126, 126, 0.6);
 }
 
 /* Global Glass Effect for all Cards */
@@ -90,4 +69,48 @@ body {
 .dark [data-slot="base"] {
   background-color: rgba(0, 0, 0, var(--glass-opacity)) !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
+}
+.before\:bg-default\/60 {
+  &::before {
+    background-color: rgba(102, 171, 249, 0.6)
+  }
+}
+
+/* DataTable Frozen Columns */
+.frozen-column {
+  background-color: inherit;
+  position: sticky !important;
+  z-index: 10 !important;
+}
+
+/* Shadow effect for frozen columns */
+.frozen-left::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 10px;
+  transform: translateX(100%);
+  pointer-events: none;
+  box-shadow: inset 10px 0 8px -8px rgba(0, 0, 0, 0.15);
+}
+
+.frozen-right::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 10px;
+  transform: translateX(-100%);
+  pointer-events: none;
+  box-shadow: inset -10px 0 8px -8px rgba(0, 0, 0, 0.15);
+}
+
+
+
+/* Ensure frozen columns maintain background on hover */
+.frozen-column {
+  background-color: rgba(255, 255, 255, var(--glass-opacity, 0.3)) !important;
 }

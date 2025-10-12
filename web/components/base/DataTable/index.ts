@@ -1,6 +1,6 @@
 export { default } from "./DataTable";
 export { default as DataTable } from "./DataTable";
-export { default as usePagination } from "./usePagination";
+export { default as usePagination } from "../Pagination/usePagination";
 
 export type {
   DataTableColumn,
@@ -8,4 +8,7 @@ export type {
   DataTableProps,
 } from "./DataTable";
 
-export type { UsePaginationProps, UsePaginationReturn } from "./usePagination";
+export type {
+  UsePaginationProps,
+  UsePaginationReturn,
+} from "../Pagination/usePagination";

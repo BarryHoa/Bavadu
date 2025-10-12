@@ -11,11 +11,13 @@ import {
 } from "../Table";
 import { Pagination } from "@heroui/pagination";
 import { Spinner } from "@heroui/spinner";
-import usePagination from "./usePagination";
+import usePagination from "../Pagination/usePagination";
 import {
   PAGINATION_DEFAULT_PAGE_SIZE,
   PAGINATION_PAGE_SIZE_OPTIONS,
-} from "./dataTableConst";
+} from "../Pagination/pagginationConts";
+import { TableProps } from "@heroui/table";
+import PaginationComponent from "../Pagination/Pagination";
 
 export interface DataTableColumn<T = any> {
   key: string;
@@ -24,6 +26,7 @@ export interface DataTableColumn<T = any> {
   width?: number;
   sortable?: boolean;
   render?: (value: any, record: T, index: number) => React.ReactNode;
+  fixed?: "left" | "right"; // Freeze column to left or right
 }
 
 export interface DataTableSummary {
@@ -31,7 +34,7 @@ export interface DataTableSummary {
   values: Record<string, React.ReactNode>;
 }
 
-export interface DataTableProps<T = any> {
+export type DataTableProps<T = any> = TableProps & {
   columns: DataTableColumn<T>[];
   dataSource: T[];
   rowKey?: string;
@@ -49,26 +52,11 @@ export interface DataTableProps<T = any> {
 
   // Table features
   loading?: boolean;
-  sticky?: boolean;
-  striped?: boolean;
-  bordered?: boolean;
-  hoverable?: boolean;
-  compact?: boolean;
-
-  // Theme
-  color?:
-    | "default"
-    | "primary"
-    | "secondary"
-    | "success"
-    | "warning"
-    | "danger";
 
   // Summary
   summary?: DataTableSummary;
 
   // Selection
-  selectable?: boolean;
   selectedKeys?: Set<string | number>;
   onSelectionChange?: (keys: Set<string | number>) => void;
 
@@ -92,11 +80,12 @@ export interface DataTableProps<T = any> {
     td?: string;
     footer?: string;
     pagination?: string;
+    selectedRow?: string; // Custom class for selected rows
   };
 
   // Custom empty state
   emptyContent?: React.ReactNode;
-}
+};
 
 export default function DataTable<T = any>({
   columns,
@@ -104,21 +93,17 @@ export default function DataTable<T = any>({
   rowKey = "id",
   pagination = { pageSize: PAGINATION_DEFAULT_PAGE_SIZE, page: 1 },
   loading = false,
-  sticky = true,
-  striped = true,
-  bordered = false,
-  hoverable = true,
-  compact = true,
   color = "primary",
   summary,
-  selectable = false,
   selectedKeys,
   onSelectionChange,
   onChangeTable,
   className = "",
   classNames = {},
   emptyContent = "No data available",
+  ...rest
 }: DataTableProps<T>) {
+  console.log(className, classNames);
   const isPagination = pagination && typeof pagination === "object";
 
   const paginationInfo = usePagination({
@@ -192,7 +177,88 @@ export default function DataTable<T = any>({
     [paginationInfo, sortDescriptor, onChangeTable]
   );
 
-  // Get theme colors based on color prop
+  // Calculate frozen column positions
+  const frozenColumnsInfo = useMemo(() => {
+    const leftColumns: Array<{ key: string; left: number; width: number }> = [];
+    const rightColumns: Array<{ key: string; right: number; width: number }> =
+      [];
+    let leftOffset = 0;
+    let rightOffset = 0;
+
+    // Calculate left frozen columns
+    columns.forEach((col) => {
+      if (col.fixed === "left") {
+        leftColumns.push({
+          key: col.key,
+          left: leftOffset,
+          width: col.width || 150,
+        });
+        leftOffset += col.width || 150;
+      }
+    });
+
+    // Calculate right frozen columns (from right to left)
+    for (let i = columns.length - 1; i >= 0; i--) {
+      const col = columns[i];
+      if (col.fixed === "right") {
+        rightColumns.unshift({
+          key: col.key,
+          right: rightOffset,
+          width: col.width || 150,
+        });
+        rightOffset += col.width || 150;
+      }
+    }
+
+    return { leftColumns, rightColumns };
+  }, [columns]);
+
+  // Get frozen column style
+  const getFrozenStyle = useCallback(
+    (columnKey: string) => {
+      const leftCol = frozenColumnsInfo.leftColumns.find(
+        (c) => c.key === columnKey
+      );
+      if (leftCol) {
+        return {
+          position: "sticky" as const,
+          left: leftCol.left,
+          zIndex: 10,
+        };
+      }
+
+      const rightCol = frozenColumnsInfo.rightColumns.find(
+        (c) => c.key === columnKey
+      );
+      if (rightCol) {
+        return {
+          position: "sticky" as const,
+          right: rightCol.right,
+          zIndex: 10,
+        };
+      }
+
+      return {};
+    },
+    [frozenColumnsInfo]
+  );
+
+  // Get frozen column class
+  const getFrozenClass = useCallback(
+    (columnKey: string) => {
+      const isLeftFrozen = frozenColumnsInfo.leftColumns.some(
+        (c) => c.key === columnKey
+      );
+      const isRightFrozen = frozenColumnsInfo.rightColumns.some(
+        (c) => c.key === columnKey
+      );
+
+      if (isLeftFrozen) return "frozen-column frozen-left";
+      if (isRightFrozen) return "frozen-column frozen-right";
+      return "";
+    },
+    [frozenColumnsInfo]
+  );
 
   // Render cell content
   const renderCell = useCallback(
@@ -209,131 +275,93 @@ export default function DataTable<T = any>({
   );
 
   // Table bottom content (pagination + summary)
-  const bottomContent = useMemo(() => {
-    if (!pagination && !summary) return null;
 
-    return (
-      <div className="flex flex-col gap-4">
-        {/* Summary Row */}
-        {summary && (
-          <div
-            className={`bg-default-100 rounded-lg p-4 ${classNames.footer || ""}`}
-          >
-            <div
-              className="grid gap-2"
-              style={{ gridTemplateColumns: `repeat(${columns.length}, 1fr)` }}
-            >
-              {columns.map((column, index) => (
-                <div
-                  key={column.key}
-                  className={`px-3 py-2 ${
-                    column.align === "center"
-                      ? "text-center"
-                      : column.align === "end"
-                        ? "text-right"
-                        : "text-left"
-                  } ${index === 0 ? "font-semibold" : ""}`}
-                >
-                  {index === 0 && summary.label ? (
-                    <span className="text-sm font-semibold">
-                      {summary.label}
-                    </span>
-                  ) : summary.values[column.key] ? (
-                    summary.values[column.key]
-                  ) : null}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Pagination */}
-        {isPagination && paginationInfo.pages > 1 && (
-          <div
-            className={`flex justify-between items-center ${classNames.pagination || ""}`}
-          >
-            <div className="text-small text-default-500">
-              {isPagination && pagination.showTotal && (
-                <span>
-                  Showing{" "}
-                  {(paginationInfo.from + 1) * paginationInfo.pageSize + 1} to{" "}
-                  {paginationInfo.to}
-                  of {pagination.total} entries
-                </span>
-              )}
-            </div>
-            <Pagination
-              isCompact
-              showControls
-              showShadow
-              color="primary"
-              page={paginationInfo.currentPage}
-              total={paginationInfo.pages}
-              onChange={handlePageChange}
-            />
-          </div>
-        )}
-      </div>
-    );
-  }, [
-    pagination,
-    summary,
-    columns,
-    paginationInfo,
-    dataSource.length,
-    handlePageChange,
-    classNames,
-  ]);
+  // Get selection color class
 
   return (
-    <div className={`w-full ${classNames.wrapper || ""}`}>
-      <Table
-        aria-label="Data table"
-        isHeaderSticky={sticky}
-        isStriped={striped}
-        isCompact={compact}
-        removeWrapper={!bordered}
-        selectionMode={selectable ? "multiple" : undefined}
-        selectedKeys={selectedKeys}
-        onSelectionChange={onSelectionChange as any}
-        bottomContent={bottomContent}
-        bottomContentPlacement="outside"
-        // hoverable={hoverable}
-        className={className}
-        color={color}
-      >
-        <TableHeader>
-          {columns.map((column) => (
-            <TableColumn
-              key={column.key}
-              align={column.align || "start"}
-              width={column.width}
-              allowsSorting={column.sortable}
-            >
-              {column.label}
-            </TableColumn>
-          ))}
-        </TableHeader>
-        <TableBody
-          items={dataSource}
-          isLoading={loading}
-          loadingContent={<Spinner label="Loading..." />}
-          emptyContent={emptyContent}
-        >
-          {(item) => {
-            const index = dataSource.indexOf(item);
-            return (
-              <TableRow key={getRowKey(item, index)}>
-                {columns.map((column) => (
-                  <TableCell key={column.key}>
-                    {renderCell(item, column, index)}
-                  </TableCell>
-                ))}
-              </TableRow>
-            );
+    <div className={`w-full bg-content1 ${classNames.wrapper || ""}`}>
+      <div className="flex flex-col gap-4 flex-1">
+        <Table
+          aria-label="Data table"
+          isHeaderSticky
+          // isStriped
+          isCompact
+          selectionMode="multiple"
+          selectedKeys={selectedKeys}
+          onSelectionChange={onSelectionChange as any}
+          // bottomContent={bottomContent}
+          className={className}
+          classNames={{
+            ...classNames,
+            tbody: "overflow-x-auto",
+            wrapper: "p-2 rounded-none",
+            th: "bg-primary-700 text-white ",
           }}
-        </TableBody>
-      </Table>
+          // color={"success"}
+          {...rest}
+        >
+          <TableHeader>
+            {columns.map((column) => (
+              <TableColumn
+                key={column.key}
+                align={column.align || "start"}
+                width={column.width}
+                allowsSorting={column.sortable}
+                className={getFrozenClass(column.key)}
+                style={getFrozenStyle(column.key)}
+              >
+                {column.label}
+              </TableColumn>
+            ))}
+          </TableHeader>
+          <TableBody
+            items={dataSource}
+            isLoading={loading}
+            loadingContent={<Spinner label="Loading..." />}
+            emptyContent={emptyContent}
+          >
+            {(item) => {
+              const index = dataSource.indexOf(item);
+              return (
+                <TableRow key={getRowKey(item, index)}>
+                  {columns.map((column) => (
+                    <TableCell
+                      key={column.key}
+                      className={getFrozenClass(column.key)}
+                      style={getFrozenStyle(column.key)}
+                    >
+                      {renderCell(item, column, index)}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              );
+            }}
+          </TableBody>
+        </Table>
+      </div>
+      {isPagination && paginationInfo.pages > 1 && (
+        <div
+          className={`px-2 flex flex-col sm:flex-row justify-between items-center ${classNames.pagination || ""}`}
+        >
+          <div className="text-small text-default-500 py-2">
+            {isPagination && pagination.showTotal && (
+              <span>
+                Showing{" "}
+                {(paginationInfo.from + 1) * paginationInfo.pageSize + 1} to{" "}
+                {paginationInfo.to}
+                of {pagination.total} entries
+              </span>
+            )}
+          </div>
+          <PaginationComponent
+            page={paginationInfo.currentPage}
+            pageSize={paginationInfo.pageSize}
+            total={paginationInfo.pages}
+            onChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+          />
+        </div>
+      )}
     </div>
   );
 }

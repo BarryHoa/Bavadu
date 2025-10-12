@@ -427,6 +427,7 @@ export default function DataTableDemoPage() {
               pageSize: 5,
               page: 1,
               showTotal: true,
+              total: 100,
             }}
             onChangeTable={handleTableChange}
           />
@@ -461,9 +462,6 @@ export default function DataTableDemoPage() {
               showTotal: true,
             }}
             onChangeTable={handleTableChange}
-            classNames={{
-              wrapper: "shadow-md rounded-lg border border-divider",
-            }}
           />
         </section>
 
@@ -479,7 +477,6 @@ export default function DataTableDemoPage() {
             columns={employeeColumns}
             dataSource={employees}
             rowKey="id"
-            sticky
             striped
             pagination={false}
             classNames={{
