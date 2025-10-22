@@ -214,3 +214,6 @@ web/
 - Menu tự động refresh khi restart server (thay đổi file routers.json)
 - **Serialization**: Tất cả data được serialize thành plain objects để truyền từ Server Component sang Client Component
 - **Type Safety**: Đầy đủ TypeScript interfaces cho serialized data
+- **Smart Navigation**:
+  - Menu có children → Click để toggle expand/collapse
+  - Menu không có children → Click để navigate (redirect)
