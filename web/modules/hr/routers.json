@@ -1,0 +1,151 @@
+{
+  "name": "Human Resources",
+  "href": "/workspaces/modules/hr",
+  "icon": "Users",
+  "badge": "156",
+  "children": [
+    {
+      "name": "Dashboard",
+      "href": "/workspaces/modules/hr",
+      "icon": "BarChart3"
+    },
+    {
+      "name": "Employee Management",
+      "href": "/workspaces/modules/hr/employees",
+      "icon": "Users",
+      "badge": "156",
+      "children": [
+        {
+          "name": "All Employees",
+          "href": "/workspaces/modules/hr/employees",
+          "icon": "Users",
+          "badge": "156"
+        },
+        {
+          "name": "Add Employee",
+          "href": "/workspaces/modules/hr/employees/new",
+          "icon": "UserPlus"
+        },
+        {
+          "name": "Employee Profiles",
+          "href": "/workspaces/modules/hr/employees/profiles",
+          "icon": "UserCheck"
+        },
+        {
+          "name": "Organizational Chart",
+          "href": "/workspaces/modules/hr/employees/org-chart",
+          "icon": "Building2"
+        }
+      ]
+    },
+    {
+      "name": "Attendance & Time",
+      "href": "/workspaces/modules/hr/attendance",
+      "icon": "Clock",
+      "badge": "142",
+      "children": [
+        {
+          "name": "Daily Attendance",
+          "href": "/workspaces/modules/hr/attendance",
+          "icon": "Calendar"
+        },
+        {
+          "name": "Time Tracking",
+          "href": "/workspaces/modules/hr/attendance/time-tracking",
+          "icon": "Clock"
+        },
+        {
+          "name": "Leave Management",
+          "href": "/workspaces/modules/hr/attendance/leave",
+          "icon": "CalendarDays"
+        },
+        {
+          "name": "Attendance Reports",
+          "href": "/workspaces/modules/hr/attendance/reports",
+          "icon": "PieChart"
+        }
+      ]
+    },
+    {
+      "name": "Payroll & Compensation",
+      "href": "/workspaces/modules/hr/payroll",
+      "icon": "DollarSign",
+      "children": [
+        {
+          "name": "Monthly Payroll",
+          "href": "/workspaces/modules/hr/payroll",
+          "icon": "Receipt"
+        },
+        {
+          "name": "Salary Structure",
+          "href": "/workspaces/modules/hr/payroll/salary-structure",
+          "icon": "DollarSign"
+        },
+        {
+          "name": "Benefits Management",
+          "href": "/workspaces/modules/hr/payroll/benefits",
+          "icon": "Award"
+        },
+        {
+          "name": "Tax Management",
+          "href": "/workspaces/modules/hr/payroll/tax",
+          "icon": "FileText"
+        }
+      ]
+    },
+    {
+      "name": "Performance & Development",
+      "href": "/workspaces/modules/hr/performance",
+      "icon": "TrendingUp",
+      "children": [
+        {
+          "name": "Performance Reviews",
+          "href": "/workspaces/modules/hr/performance/reviews",
+          "icon": "Target"
+        },
+        {
+          "name": "Goal Setting",
+          "href": "/workspaces/modules/hr/performance/goals",
+          "icon": "Target"
+        },
+        {
+          "name": "Training & Development",
+          "href": "/workspaces/modules/hr/performance/training",
+          "icon": "GraduationCap"
+        },
+        {
+          "name": "Career Planning",
+          "href": "/workspaces/modules/hr/performance/career",
+          "icon": "Briefcase"
+        }
+      ]
+    },
+    {
+      "name": "HR Administration",
+      "href": "/workspaces/modules/hr/admin",
+      "icon": "Settings",
+      "children": [
+        {
+          "name": "HR Policies",
+          "href": "/workspaces/modules/hr/admin/policies",
+          "icon": "FileText"
+        },
+        {
+          "name": "User Roles",
+          "href": "/workspaces/modules/hr/admin/roles",
+          "icon": "UserCog"
+        },
+        {
+          "name": "System Settings",
+          "href": "/workspaces/modules/hr/admin/settings",
+          "icon": "Settings"
+        },
+        {
+          "name": "Security & Access",
+          "href": "/workspaces/modules/hr/admin/security",
+          "icon": "Shield"
+        }
+      ]
+    }
+  ]
+}

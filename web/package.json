@@ -6,7 +6,11 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint --fix"
+    "lint": "eslint --fix",
+    "module:install": "node scripts/module-manager.js install",
+    "module:uninstall": "node scripts/module-manager.js uninstall",
+    "module:list": "node scripts/module-manager.js list",
+    "module:create": "node scripts/module-manager.js create"
   },
   "dependencies": {
     "@heroui/accordion": "2.2.24",

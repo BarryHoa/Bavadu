@@ -1,0 +1,52 @@
+{
+  "name": "Analytics",
+  "href": "/workspaces/modules/analytics",
+  "icon": "BarChart3",
+  "badge": "24",
+  "children": [
+    {
+      "name": "Dashboard",
+      "href": "/workspaces/modules/analytics",
+      "icon": "BarChart3"
+    },
+    {
+      "name": "Reports",
+      "href": "/workspaces/modules/analytics/reports",
+      "icon": "FileText",
+      "children": [
+        {
+          "name": "Financial Reports",
+          "href": "/workspaces/modules/analytics/reports/financial",
+          "icon": "DollarSign"
+        },
+        {
+          "name": "Performance Reports",
+          "href": "/workspaces/modules/analytics/reports/performance",
+          "icon": "TrendingUp"
+        },
+        {
+          "name": "Custom Reports",
+          "href": "/workspaces/modules/analytics/reports/custom",
+          "icon": "FileText"
+        }
+      ]
+    },
+    {
+      "name": "Data Visualization",
+      "href": "/workspaces/modules/analytics/visualization",
+      "icon": "PieChart",
+      "children": [
+        {
+          "name": "Charts",
+          "href": "/workspaces/modules/analytics/visualization/charts",
+          "icon": "BarChart3"
+        },
+        {
+          "name": "Graphs",
+          "href": "/workspaces/modules/analytics/visualization/graphs",
+          "icon": "TrendingUp"
+        }
+      ]
+    }
+  ]
+}

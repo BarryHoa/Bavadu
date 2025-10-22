@@ -9,7 +9,7 @@ import {
   NavbarItem,
   NavbarMenuToggle,
 } from "@heroui/navbar";
-import { Search, Sun, Bell, Menu as MenuIcon } from "lucide-react";
+import { Sun, Bell, Menu as MenuIcon } from "lucide-react";
 
 export default function Nav({ onOpenSidebar }: { onOpenSidebar: () => void }) {
   return (

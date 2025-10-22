@@ -1,0 +1,27 @@
+{
+  "modules": {
+    "dashboard": {
+      "name": "Dashboard",
+      "version": "1.0.0",
+      "description": "Main dashboard module with overview and navigation",
+      "category": "System",
+      "icon": "LayoutDashboard"
+    },
+    "hr": {
+      "name": "Human Resources",
+      "version": "1.0.0",
+      "description": "Complete HR management system with employee management, attendance tracking, and payroll processing",
+      "category": "Business",
+      "icon": "Users"
+    },
+    "analytics": {
+      "name": "Business Analytics",
+      "version": "3.0.1",
+      "description": "Powerful analytics dashboard with real-time insights, custom reports, and data visualization",
+      "category": "Analytics",
+      "icon": "BarChart3"
+    }
+  },
+  "installed": ["dashboard", "hr", "analytics"],
+  "version": "1.0.0"
+}
