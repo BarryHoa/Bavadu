@@ -8,6 +8,8 @@ import MenuPanel from "./components/Menu";
 import Nav from "./components/Nav";
 import { WorkspaceProvider } from "@base/contexts/workspace";
 import { MenuWorkspaceElement } from "@base/interface/WorkspaceMenuInterface";
+import clsx from "clsx";
+import { ChevronRight } from "lucide-react";
 
 interface SerializedNavigationItem {
   name: string;
@@ -45,7 +47,7 @@ export default function WorkspaceLayoutClient({
 
   const initialCrumbs = [...autoCrumbs];
 
-  console.log(moduleMenus);
+  // console.log(moduleMenus);
   return (
     <WorkspaceProvider initialBreadcrumbs={initialCrumbs}>
       <div
@@ -60,6 +62,8 @@ export default function WorkspaceLayoutClient({
             isOpen={sidebarOpen}
             onClose={() => setSidebarOpen(false)}
             moduleMenus={moduleMenus}
+            sidebarOpen={sidebarOpen}
+            onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           />
 
           {/* Mobile sidebar overlay */}
@@ -68,6 +72,19 @@ export default function WorkspaceLayoutClient({
             <div className="min-w-3xl flex flex-col flex-1">
               {/* Breadcrumb */}
               <div className="px-2 py-2 font-small rounded-md">
+                <button
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
+                  className="mb-2 p-2 hover:bg-gray-100 rounded-md"
+                >
+                  <ChevronRight
+                    size={20}
+                    className={clsx(
+                      "display-inline-block",
+                      "transition-transform",
+                      sidebarOpen ? "rotate-180" : ""
+                    )}
+                  />
+                </button>
                 <Breadcrumb items={initialCrumbs} />
               </div>
 

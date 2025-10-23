@@ -4,7 +4,7 @@
 
 /* Site wallpaper background (can be replaced by changing --bg-image-url) */
 :root {
-  --bg-image-url: url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1920&q=80");
+  /* --bg-image-url: url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1920&q=80"); */
   --bg-size: cover; /* cover = full-bleed; contain = keep original */
   --bg-attach: fixed; /* fixed = stay when scroll; scroll = move with page */
 
@@ -59,11 +59,7 @@ body {
   background: transparent;
 }
 
-/* Global Glass Effect for all Cards */
-[data-slot="base"] {
-  /* @apply backdrop-blur-md border border-white/20 shadow-xl transition-all duration-300; */
-  background-color: rgba(255, 255, 255, var(--glass-opacity)) !important;
-}
+
 
 /* Dark mode glass effect */
 .dark [data-slot="base"] {

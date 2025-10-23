@@ -13,6 +13,7 @@ import {
 } from "@heroui/table";
 import { Badge } from "@heroui/badge";
 import { DatePicker } from "@heroui/date-picker";
+import { CalendarDate } from "@internationalized/date";
 import {
   DollarSign,
   Download,
@@ -26,7 +27,7 @@ import {
 import { useState } from "react";
 
 export default function PayrollPage() {
-  const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [selectedMonth, setSelectedMonth] = useState<CalendarDate | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
   const payrollData = [

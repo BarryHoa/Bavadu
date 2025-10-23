@@ -2,10 +2,10 @@
 
 import { Button } from "@heroui/button";
 import { Drawer } from "@heroui/drawer";
-import { Link } from "@heroui/link";
 import { ScrollShadow } from "@heroui/scroll-shadow";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { MenuWorkspaceElement } from "@base/interface/WorkspaceMenuInterface";
 
@@ -14,6 +14,8 @@ interface MenuProps {
   isOpen: boolean;
   onClose: () => void;
   moduleMenus?: MenuWorkspaceElement[];
+  sidebarOpen?: boolean;
+  onToggleSidebar?: () => void;
 }
 
 export default function Menu({
@@ -24,6 +26,7 @@ export default function Menu({
 }: MenuProps) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const activeItemRef = useRef<HTMLDivElement>(null);
 
   const toggleExpanded = (itemName: string) => {
     setExpandedItems((prev) =>
@@ -45,6 +48,56 @@ export default function Menu({
     return false;
   };
 
+  // Find all parent items that need to be expanded for the current path
+  const findParentItemsToExpand = (
+    items: MenuWorkspaceElement[],
+    path: string
+  ): string[] => {
+    const parentsToExpand: string[] = [];
+
+    const checkItem = (item: MenuWorkspaceElement): boolean => {
+      if (item.path && isActive(item.path)) {
+        return true;
+      }
+
+      if (item.children) {
+        const hasActiveChild = item.children.some((child) => checkItem(child));
+        if (hasActiveChild) {
+          parentsToExpand.push(item.name);
+        }
+        return hasActiveChild;
+      }
+
+      return false;
+    };
+
+    items.forEach((item) => checkItem(item));
+    return parentsToExpand;
+  };
+
+  // Auto-expand menu items and scroll to active item on path change
+  useEffect(() => {
+    const allItems = [...items, ...moduleMenus];
+    const parentsToExpand = findParentItemsToExpand(allItems, pathname);
+
+    if (parentsToExpand.length > 0) {
+      setExpandedItems((prev) => {
+        const newExpanded = Array.from(new Set([...prev, ...parentsToExpand]));
+        return newExpanded;
+      });
+
+      // Scroll to active item after a short delay to allow expansion
+      // setTimeout(() => {
+      //   if (activeItemRef.current) {
+      //     activeItemRef.current.scrollIntoView({
+      //       behavior: "smooth",
+      //       block: "center",
+      //     });
+      //   }
+      // }, 100);
+    }
+  }, [pathname, items, moduleMenus]);
+
   // Render menu item (workspace hoặc module)
   const renderMenuItem = (item: MenuWorkspaceElement) => {
     const hasChildren = item.children && item.children.length > 0;
@@ -56,6 +109,7 @@ export default function Menu({
     return (
       <div key={item.name} className="mb-1">
         <div
+          ref={isItemActive ? activeItemRef : null}
           className={`flex items-center justify-between px-3 py-3 rounded-xl transition-all duration-200 group ${
             isItemActive
               ? "bg-blue-50 text-blue-600"
@@ -78,12 +132,18 @@ export default function Menu({
                     : "text-gray-700 group-hover:text-blue-600"
                 }`}
               >
-                <div className="w-5 h-5 mr-3 bg-gray-300 rounded flex items-center justify-center">
+                <div className="w-5 h-5 bg-gray-300 rounded flex items-center justify-center flex-shrink-0">
                   <span className="text-xs font-bold">
                     {item.icon.charAt(0)}
                   </span>
                 </div>
-                <span>{item.name}</span>
+                <span
+                  className={`ml-3 transition-opacity duration-300 ${
+                    isOpen ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  {item.name}
+                </span>
               </div>
             ) : (
               <Link
@@ -95,17 +155,27 @@ export default function Menu({
                 }`}
                 onClick={onClose}
               >
-                <div className="w-5 h-5 mr-3 bg-gray-300 rounded flex items-center justify-center">
+                <div className="w-5 h-5 bg-gray-300 rounded flex items-center justify-center flex-shrink-0">
                   <span className="text-xs font-bold">
                     {item.icon.charAt(0)}
                   </span>
                 </div>
-                <span>{item.name}</span>
+                <span
+                  className={`ml-3 transition-opacity duration-300 ${
+                    isOpen ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  {item.name}
+                </span>
               </Link>
             )}
           </div>
           {hasChildren && (
-            <div>
+            <div
+              className={`transition-opacity duration-300 ${
+                isOpen ? "opacity-100" : "opacity-0"
+              }`}
+            >
               {isExpanded ? (
                 <ChevronDown size={14} />
               ) : (
@@ -116,35 +186,58 @@ export default function Menu({
         </div>
 
         {hasChildren && isExpanded && (
-          <div className="ml-6 py-1 space-y-1">
+          <div
+            className={`ml-6 py-1 space-y-1 transition-all duration-300 ${
+              isOpen
+                ? "opacity-100 max-h-96"
+                : "opacity-0 max-h-0 overflow-hidden"
+            }`}
+          >
             {item.children?.map((child) => {
               const childPath = child.path;
-              const childHref = childPath || "#";
+              const childAs = child.as;
+              const isChildActive = childPath && isActive(childPath);
               return (
-                <Link
+                <div
                   key={child.name}
-                  href={childHref}
+                  ref={isChildActive ? activeItemRef : null}
                   className={`flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-all duration-200 ${
-                    childPath && isActive(childPath)
+                    isChildActive
                       ? "bg-blue-100 text-blue-600"
                       : "hover:bg-blue-50 text-gray-600 hover:text-blue-600"
                   }`}
-                  onClick={onClose}
                 >
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 mr-2 bg-gray-300 rounded flex items-center justify-center">
-                      <span className="text-xs font-bold">
-                        {child.icon.charAt(0)}
+                  <Link
+                    href={childPath || "#"}
+                    as={childAs || childPath}
+                    className="flex items-center flex-1"
+                    onClick={onClose}
+                  >
+                    <div className="flex items-center">
+                      <div className="w-4 h-4 mr-2 bg-gray-300 rounded flex items-center justify-center">
+                        <span className="text-xs font-bold">
+                          {child.icon.charAt(0)}
+                        </span>
+                      </div>
+                      <span
+                        className={`transition-opacity duration-300 ${
+                          isOpen ? "opacity-100" : "opacity-0"
+                        }`}
+                      >
+                        {child.name}
                       </span>
                     </div>
-                    <span>{child.name}</span>
-                  </div>
+                  </Link>
                   {child.badge && (
-                    <span className="bg-blue-100 text-blue-600 text-xs font-semibold px-2 py-1 rounded-full">
+                    <span
+                      className={`bg-blue-100 text-blue-600 text-xs font-semibold px-2 py-1 rounded-full transition-opacity duration-300 ${
+                        isOpen ? "opacity-100" : "opacity-0"
+                      }`}
+                    >
                       {child.badge}
                     </span>
                   )}
-                </Link>
+                </div>
               );
             })}
           </div>
@@ -156,16 +249,28 @@ export default function Menu({
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex lg:flex-col w-64 bg-white shadow-xl flex-shrink-0">
+      <aside
+        className={`hidden lg:flex lg:flex-col bg-white shadow-xl flex-shrink-0 transition-all duration-300 ease-in-out ${
+          isOpen ? "w-64" : "w-16"
+        }`}
+      >
         <ScrollShadow className="flex-1 px-2 py-4">
-          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-3">
+          <div
+            className={`text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-3 transition-opacity duration-300 ${
+              isOpen ? "opacity-100" : "opacity-0"
+            }`}
+          >
             Main
           </div>
           {items.map(renderMenuItem)}
 
           {moduleMenus.length > 0 && (
             <div className="mt-4">
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-3">
+              <div
+                className={`text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-3 transition-opacity duration-300 ${
+                  isOpen ? "opacity-100" : "opacity-0"
+                }`}
+              >
                 Module
               </div>
               {moduleMenus.map(renderMenuItem)}
