@@ -36,7 +36,7 @@ export default function ThemeDemo() {
                 <div className="h-6 bg-primary-200 rounded"></div>
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <h3 className="font-medium">Secondary</h3>
               <div className="space-y-1">
@@ -47,7 +47,7 @@ export default function ThemeDemo() {
                 <div className="h-6 bg-secondary-200 rounded"></div>
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <h3 className="font-medium">Success</h3>
               <div className="space-y-1">
@@ -58,7 +58,7 @@ export default function ThemeDemo() {
                 <div className="h-6 bg-success-200 rounded"></div>
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <h3 className="font-medium">Warning</h3>
               <div className="space-y-1">
@@ -85,12 +85,24 @@ export default function ThemeDemo() {
             <Button color="success">Success</Button>
             <Button color="warning">Warning</Button>
             <Button color="danger">Danger</Button>
-            <Button variant="bordered" color="primary">Bordered</Button>
-            <Button variant="light" color="primary">Light</Button>
-            <Button variant="flat" color="primary">Flat</Button>
-            <Button variant="faded" color="primary">Faded</Button>
-            <Button variant="shadow" color="primary">Shadow</Button>
-            <Button variant="ghost" color="primary">Ghost</Button>
+            <Button variant="bordered" color="primary">
+              Bordered
+            </Button>
+            <Button variant="light" color="primary">
+              Light
+            </Button>
+            <Button variant="flat" color="primary">
+              Flat
+            </Button>
+            <Button variant="faded" color="primary">
+              Faded
+            </Button>
+            <Button variant="shadow" color="primary">
+              Shadow
+            </Button>
+            <Button variant="ghost" color="primary">
+              Ghost
+            </Button>
           </div>
         </CardBody>
       </Card>
@@ -107,9 +119,15 @@ export default function ThemeDemo() {
             <Chip color="success">Success</Chip>
             <Chip color="warning">Warning</Chip>
             <Chip color="danger">Danger</Chip>
-            <Chip variant="bordered" color="primary">Bordered</Chip>
-            <Chip variant="flat" color="primary">Flat</Chip>
-            <Chip variant="dot" color="primary">Dot</Chip>
+            <Chip variant="bordered" color="primary">
+              Bordered
+            </Chip>
+            <Chip variant="flat" color="primary">
+              Flat
+            </Chip>
+            <Chip variant="dot" color="primary">
+              Dot
+            </Chip>
           </div>
         </CardBody>
       </Card>
@@ -171,7 +189,7 @@ export default function ThemeDemo() {
                 </p>
               </CardBody>
             </Card>
-            
+
             <Card className="bg-content2">
               <CardBody>
                 <h3 className="font-semibold mb-2">Content 2</h3>
@@ -180,7 +198,7 @@ export default function ThemeDemo() {
                 </p>
               </CardBody>
             </Card>
-            
+
             <Card className="bg-content3">
               <CardBody>
                 <h3 className="font-semibold mb-2">Content 3</h3>
@@ -190,13 +208,13 @@ export default function ThemeDemo() {
               </CardBody>
             </Card>
           </div>
-          
+
           <Divider />
-          
+
           <div className="text-center">
             <p className="text-default-600">
-              Theme configuration đã được áp dụng thành công! 
-              Tất cả các component đều sử dụng light theme với màu sắc tùy chỉnh.
+              Theme configuration đã được áp dụng thành công! Tất cả các
+              component đều sử dụng light theme với màu sắc tùy chỉnh.
             </p>
           </div>
         </CardBody>

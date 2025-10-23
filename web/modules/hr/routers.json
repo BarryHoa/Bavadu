@@ -1,148 +1,186 @@
 {
+  "key": "hr-main",
   "name": "Human Resources",
-  "href": "/workspaces/modules/hr",
   "icon": "Users",
-  "badge": "156",
   "children": [
     {
+      "key": "hr-dashboard",
       "name": "Dashboard",
-      "href": "/workspaces/modules/hr",
+      "path": "/workspaces/modules/hr",
+      "as": "/workspaces/modules/hr",
       "icon": "BarChart3"
     },
     {
+      "key": "hr-employee-management",
       "name": "Employee Management",
-      "href": "/workspaces/modules/hr/employees",
       "icon": "Users",
-      "badge": "156",
       "children": [
         {
+          "key": "hr-employees-all",
           "name": "All Employees",
-          "href": "/workspaces/modules/hr/employees",
-          "icon": "Users",
-          "badge": "156"
+          "path": "/workspaces/modules/hr/employees",
+          "as": "/workspaces/modules/hr/employees",
+          "icon": "Users"
         },
         {
+          "key": "hr-employees-add",
           "name": "Add Employee",
-          "href": "/workspaces/modules/hr/employees/new",
+          "path": "/workspaces/modules/hr/employees/new",
+          "as": "/workspaces/modules/hr/employees/new",
           "icon": "UserPlus"
         },
         {
+          "key": "hr-employees-profiles",
           "name": "Employee Profiles",
-          "href": "/workspaces/modules/hr/employees/profiles",
+          "path": "/workspaces/modules/hr/employees/profiles",
+          "as": "/workspaces/modules/hr/employees/profiles",
           "icon": "UserCheck"
         },
         {
+          "key": "hr-employees-org-chart",
           "name": "Organizational Chart",
-          "href": "/workspaces/modules/hr/employees/org-chart",
+          "path": "/workspaces/modules/hr/employees/org-chart",
+          "as": "/workspaces/modules/hr/employees/org-chart",
           "icon": "Building2"
         }
       ]
     },
     {
+      "key": "hr-attendance",
       "name": "Attendance & Time",
-      "href": "/workspaces/modules/hr/attendance",
       "icon": "Clock",
-      "badge": "142",
       "children": [
         {
+          "key": "hr-attendance-daily",
           "name": "Daily Attendance",
-          "href": "/workspaces/modules/hr/attendance",
+          "path": "/workspaces/modules/hr/attendance",
+          "as": "/workspaces/modules/hr/attendance",
           "icon": "Calendar"
         },
         {
+          "key": "hr-attendance-time-tracking",
           "name": "Time Tracking",
-          "href": "/workspaces/modules/hr/attendance/time-tracking",
+          "path": "/workspaces/modules/hr/attendance/time-tracking",
+          "as": "/workspaces/modules/hr/attendance/time-tracking",
           "icon": "Clock"
         },
         {
+          "key": "hr-attendance-leave",
           "name": "Leave Management",
-          "href": "/workspaces/modules/hr/attendance/leave",
+          "path": "/workspaces/modules/hr/attendance/leave",
+          "as": "/workspaces/modules/hr/attendance/leave",
           "icon": "CalendarDays"
         },
         {
+          "key": "hr-attendance-reports",
           "name": "Attendance Reports",
-          "href": "/workspaces/modules/hr/attendance/reports",
+          "path": "/workspaces/modules/hr/attendance/reports",
+          "as": "/workspaces/modules/hr/attendance/reports",
           "icon": "PieChart"
         }
       ]
     },
     {
+      "key": "hr-payroll",
       "name": "Payroll & Compensation",
-      "href": "/workspaces/modules/hr/payroll",
       "icon": "DollarSign",
       "children": [
         {
+          "key": "hr-payroll-monthly",
           "name": "Monthly Payroll",
-          "href": "/workspaces/modules/hr/payroll",
+          "path": "/workspaces/modules/hr/payroll",
+          "as": "/workspaces/modules/hr/payroll",
           "icon": "Receipt"
         },
         {
+          "key": "hr-payroll-salary-structure",
           "name": "Salary Structure",
-          "href": "/workspaces/modules/hr/payroll/salary-structure",
+          "path": "/workspaces/modules/hr/payroll/salary-structure",
+          "as": "/workspaces/modules/hr/payroll/salary-structure",
           "icon": "DollarSign"
         },
         {
+          "key": "hr-payroll-benefits",
           "name": "Benefits Management",
-          "href": "/workspaces/modules/hr/payroll/benefits",
+          "path": "/workspaces/modules/hr/payroll/benefits",
+          "as": "/workspaces/modules/hr/payroll/benefits",
           "icon": "Award"
         },
         {
+          "key": "hr-payroll-tax",
           "name": "Tax Management",
-          "href": "/workspaces/modules/hr/payroll/tax",
+          "path": "/workspaces/modules/hr/payroll/tax",
+          "as": "/workspaces/modules/hr/payroll/tax",
           "icon": "FileText"
         }
       ]
     },
     {
+      "key": "hr-performance",
       "name": "Performance & Development",
-      "href": "/workspaces/modules/hr/performance",
       "icon": "TrendingUp",
       "children": [
         {
+          "key": "hr-performance-reviews",
           "name": "Performance Reviews",
-          "href": "/workspaces/modules/hr/performance/reviews",
+          "path": "/workspaces/modules/hr/performance/reviews",
+          "as": "/workspaces/modules/hr/performance/reviews",
           "icon": "Target"
         },
         {
+          "key": "hr-performance-goals",
           "name": "Goal Setting",
-          "href": "/workspaces/modules/hr/performance/goals",
+          "path": "/workspaces/modules/hr/performance/goals",
+          "as": "/workspaces/modules/hr/performance/goals",
           "icon": "Target"
         },
         {
+          "key": "hr-performance-training",
           "name": "Training & Development",
-          "href": "/workspaces/modules/hr/performance/training",
+          "path": "/workspaces/modules/hr/performance/training",
+          "as": "/workspaces/modules/hr/performance/training",
           "icon": "GraduationCap"
         },
         {
+          "key": "hr-performance-career",
           "name": "Career Planning",
-          "href": "/workspaces/modules/hr/performance/career",
+          "path": "/workspaces/modules/hr/performance/career",
+          "as": "/workspaces/modules/hr/performance/career",
           "icon": "Briefcase"
         }
       ]
     },
     {
+      "key": "hr-admin",
       "name": "HR Administration",
-      "href": "/workspaces/modules/hr/admin",
       "icon": "Settings",
       "children": [
         {
+          "key": "hr-admin-policies",
           "name": "HR Policies",
-          "href": "/workspaces/modules/hr/admin/policies",
+          "path": "/workspaces/modules/hr/admin/policies",
+          "as": "/workspaces/modules/hr/admin/policies",
           "icon": "FileText"
         },
         {
+          "key": "hr-admin-roles",
           "name": "User Roles",
-          "href": "/workspaces/modules/hr/admin/roles",
+          "path": "/workspaces/modules/hr/admin/roles",
+          "as": "/workspaces/modules/hr/admin/roles",
           "icon": "UserCog"
         },
         {
+          "key": "hr-admin-settings",
           "name": "System Settings",
-          "href": "/workspaces/modules/hr/admin/settings",
+          "path": "/workspaces/modules/hr/admin/settings",
+          "as": "/workspaces/modules/hr/admin/settings",
           "icon": "Settings"
         },
         {
+          "key": "hr-admin-security",
           "name": "Security & Access",
-          "href": "/workspaces/modules/hr/admin/security",
+          "path": "/workspaces/modules/hr/admin/security",
+          "as": "/workspaces/modules/hr/admin/security",
           "icon": "Shield"
         }
       ]

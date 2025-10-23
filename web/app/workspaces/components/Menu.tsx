@@ -8,18 +8,10 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { MenuItem } from "../../../lib/menu-loader";
-
-// Interface cho menu item từ workspace
-interface WorkspaceMenuItem {
-  name: string;
-  href: string;
-  icon: string;
-  badge?: string | null;
-  children?: WorkspaceMenuItem[];
-}
+import { MenuWorkspaceElement } from "@base/interface/WorkspaceMenuInterface";
 
 interface MenuProps {
-  items: WorkspaceMenuItem[];
+  items: MenuWorkspaceElement[];
   isOpen: boolean;
   onClose: () => void;
   moduleMenus?: MenuItem[];
@@ -42,23 +34,28 @@ export default function Menu({
     );
   };
 
-  const isActive = (href: string) => {
-    return pathname === href || pathname.startsWith(href + "/");
+  const isActive = (path: string) => {
+    return pathname === path || pathname.startsWith(path + "/");
   };
 
-  const hasActiveChild = (item: WorkspaceMenuItem | MenuItem): boolean => {
-    if (isActive(item.href)) return true;
+  const hasActiveChild = (item: MenuWorkspaceElement | MenuItem): boolean => {
+    if ("path" in item && item.path && isActive(item.path)) return true;
+    if ("href" in item && item.href && isActive(item.href)) return true;
     if (item.children) {
-      return item.children.some((child) => hasActiveChild(child));
+      return item.children.some((child) =>
+        hasActiveChild(child as MenuWorkspaceElement | MenuItem)
+      );
     }
     return false;
   };
 
   // Render menu item (workspace hoặc module)
-  const renderMenuItem = (item: WorkspaceMenuItem | MenuItem) => {
+  const renderMenuItem = (item: MenuWorkspaceElement | MenuItem) => {
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems.includes(item.name);
-    const isItemActive = isActive(item.href);
+    const itemPath =
+      "path" in item ? item.path : "href" in item ? item.href : undefined;
+    const isItemActive = itemPath ? isActive(itemPath) : false;
     const hasActiveChildren = hasChildren && hasActiveChild(item);
 
     return (
@@ -95,7 +92,7 @@ export default function Menu({
               </div>
             ) : (
               <Link
-                href={item.href}
+                href={itemPath || "#"}
                 className={`flex items-center flex-1 text-sm font-medium ${
                   isItemActive
                     ? "text-blue-600"
@@ -125,32 +122,42 @@ export default function Menu({
 
         {hasChildren && isExpanded && (
           <div className="ml-6 py-1 space-y-1">
-            {item.children?.map((child) => (
-              <Link
-                key={child.name}
-                href={child.href}
-                className={`flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-all duration-200 ${
-                  isActive(child.href)
-                    ? "bg-blue-100 text-blue-600"
-                    : "hover:bg-blue-50 text-gray-600 hover:text-blue-600"
-                }`}
-                onClick={onClose}
-              >
-                <div className="flex items-center">
-                  <div className="w-4 h-4 mr-2 bg-gray-300 rounded flex items-center justify-center">
-                    <span className="text-xs font-bold">
-                      {child.icon.charAt(0)}
-                    </span>
+            {item.children?.map((child) => {
+              const childItem = child as MenuWorkspaceElement | MenuItem;
+              const childPath =
+                "path" in childItem
+                  ? childItem.path
+                  : "href" in childItem
+                    ? childItem.href
+                    : undefined;
+              const childHref = childPath || "#";
+              return (
+                <Link
+                  key={child.name}
+                  href={childHref}
+                  className={`flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-all duration-200 ${
+                    childPath && isActive(childPath)
+                      ? "bg-blue-100 text-blue-600"
+                      : "hover:bg-blue-50 text-gray-600 hover:text-blue-600"
+                  }`}
+                  onClick={onClose}
+                >
+                  <div className="flex items-center">
+                    <div className="w-4 h-4 mr-2 bg-gray-300 rounded flex items-center justify-center">
+                      <span className="text-xs font-bold">
+                        {child.icon.charAt(0)}
+                      </span>
+                    </div>
+                    <span>{child.name}</span>
                   </div>
-                  <span>{child.name}</span>
-                </div>
-                {child.badge && (
-                  <span className="bg-blue-100 text-blue-600 text-xs font-semibold px-2 py-1 rounded-full">
-                    {child.badge}
-                  </span>
-                )}
-              </Link>
-            ))}
+                  {child.badge && (
+                    <span className="bg-blue-100 text-blue-600 text-xs font-semibold px-2 py-1 rounded-full">
+                      {child.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>

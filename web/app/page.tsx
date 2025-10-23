@@ -5,9 +5,9 @@ import { Link } from "@heroui/link";
 import { Snippet } from "@heroui/snippet";
 import { button as buttonStyles } from "@heroui/theme";
 
-import { GithubIcon } from "@/components/icons";
-import { subtitle, title } from "@/components/primitives";
-import ThemeDemo from "@/components/theme-demo";
+import { GithubIcon } from "@base/components/icons";
+import { subtitle, title } from "@base/components/primitives";
+import ThemeDemo from "@base/themes/theme-demo";
 import { siteConfig } from "@/config/site";
 
 export default function Home() {

@@ -8,7 +8,7 @@ import { Switch } from "@heroui/switch";
 import BackgroundSetting from "./features/BackgroundSetting";
 import LanguageSetting from "./features/LanguageSetting";
 import NumberSetting from "./features/NumberSetting";
-import Input from "@/components/base/Input";
+import Input from "@base/components/base/Input";
 
 export default function WorkspaceSettings() {
   return (

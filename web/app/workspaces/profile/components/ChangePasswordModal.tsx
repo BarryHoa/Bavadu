@@ -9,7 +9,7 @@ import {
   ModalBody,
   ModalFooter,
 } from "@heroui/modal";
-import InputBase from "@/components/base/Input";
+import InputBase from "@base/components/base/Input";
 import { Lock, KeyRound } from "lucide-react";
 
 export default function ChangePasswordModal() {

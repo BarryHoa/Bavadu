@@ -1,7 +1,7 @@
 "use client";
 
 import { useSettings } from "@/app/context/SettingsContext";
-import SelectBase from "@/components/base/Select";
+import SelectBase from "@base/components/base/Select";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Select, SelectItem } from "@heroui/select";
 import { useTranslations } from "next-intl";
