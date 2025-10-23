@@ -7,14 +7,13 @@ import { ScrollShadow } from "@heroui/scroll-shadow";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { MenuItem } from "../../../lib/menu-loader";
 import { MenuWorkspaceElement } from "@base/interface/WorkspaceMenuInterface";
 
 interface MenuProps {
   items: MenuWorkspaceElement[];
   isOpen: boolean;
   onClose: () => void;
-  moduleMenus?: MenuItem[];
+  moduleMenus?: MenuWorkspaceElement[];
 }
 
 export default function Menu({
@@ -38,23 +37,19 @@ export default function Menu({
     return pathname === path || pathname.startsWith(path + "/");
   };
 
-  const hasActiveChild = (item: MenuWorkspaceElement | MenuItem): boolean => {
-    if ("path" in item && item.path && isActive(item.path)) return true;
-    if ("href" in item && item.href && isActive(item.href)) return true;
+  const hasActiveChild = (item: MenuWorkspaceElement): boolean => {
+    if (item.path && isActive(item.path)) return true;
     if (item.children) {
-      return item.children.some((child) =>
-        hasActiveChild(child as MenuWorkspaceElement | MenuItem)
-      );
+      return item.children.some((child) => hasActiveChild(child));
     }
     return false;
   };
 
   // Render menu item (workspace hoặc module)
-  const renderMenuItem = (item: MenuWorkspaceElement | MenuItem) => {
+  const renderMenuItem = (item: MenuWorkspaceElement) => {
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems.includes(item.name);
-    const itemPath =
-      "path" in item ? item.path : "href" in item ? item.href : undefined;
+    const itemPath = item.path;
     const isItemActive = itemPath ? isActive(itemPath) : false;
     const hasActiveChildren = hasChildren && hasActiveChild(item);
 
@@ -123,13 +118,7 @@ export default function Menu({
         {hasChildren && isExpanded && (
           <div className="ml-6 py-1 space-y-1">
             {item.children?.map((child) => {
-              const childItem = child as MenuWorkspaceElement | MenuItem;
-              const childPath =
-                "path" in childItem
-                  ? childItem.path
-                  : "href" in childItem
-                    ? childItem.href
-                    : undefined;
+              const childPath = child.path;
               const childHref = childPath || "#";
               return (
                 <Link

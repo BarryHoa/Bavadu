@@ -1,49 +1,49 @@
 {
   "name": "Analytics",
-  "href": "/workspaces/modules/analytics",
+  "href": "/",
   "icon": "BarChart3",
   "badge": "24",
   "children": [
     {
       "name": "Dashboard",
-      "href": "/workspaces/modules/analytics",
+      "href": "/",
       "icon": "BarChart3"
     },
     {
       "name": "Reports",
-      "href": "/workspaces/modules/analytics/reports",
+      "href": "/reports",
       "icon": "FileText",
       "children": [
         {
           "name": "Financial Reports",
-          "href": "/workspaces/modules/analytics/reports/financial",
+          "href": "/reports/financial",
           "icon": "DollarSign"
         },
         {
           "name": "Performance Reports",
-          "href": "/workspaces/modules/analytics/reports/performance",
+          "href": "/reports/performance",
           "icon": "TrendingUp"
         },
         {
           "name": "Custom Reports",
-          "href": "/workspaces/modules/analytics/reports/custom",
+          "href": "/reports/custom",
           "icon": "FileText"
         }
       ]
     },
     {
       "name": "Data Visualization",
-      "href": "/workspaces/modules/analytics/visualization",
+      "href": "/visualization",
       "icon": "PieChart",
       "children": [
         {
           "name": "Charts",
-          "href": "/workspaces/modules/analytics/visualization/charts",
+          "href": "/visualization/charts",
           "icon": "BarChart3"
         },
         {
           "name": "Graphs",
-          "href": "/workspaces/modules/analytics/visualization/graphs",
+          "href": "/visualization/graphs",
           "icon": "TrendingUp"
         }
       ]

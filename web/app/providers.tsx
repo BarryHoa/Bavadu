@@ -7,8 +7,8 @@ import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { useRouter } from "next/navigation";
 import * as React from "react";
-import { SettingsProvider } from "./context/SettingsContext";
 import { NavigationLoader } from "@base/components/base/NavigationLoader";
+import { GlobalSettingsProvider } from "@base/contexts/global-settings";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -35,14 +35,14 @@ export function Providers({
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <SettingsProvider>
-        <HeroUIProvider navigate={router.push}>
-          <NextThemesProvider {...themeProps}>
+      <HeroUIProvider navigate={router.push}>
+        <NextThemesProvider {...themeProps}>
+          <GlobalSettingsProvider>
             <NavigationLoader style="bar" minLoadingTime={300} />
             {children}
-          </NextThemesProvider>
-        </HeroUIProvider>
-      </SettingsProvider>
+          </GlobalSettingsProvider>
+        </NextThemesProvider>
+      </HeroUIProvider>
     </NextIntlClientProvider>
   );
 }

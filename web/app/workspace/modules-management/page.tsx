@@ -38,7 +38,7 @@ export default function ModuleManagementsPage() {
       const isSystemAdmin = userRole === "system-admin";
 
       if (!isSystemAdmin) {
-        router.push("/workspaces/modules");
+        router.push("/workspace/modules");
         return;
       }
 
@@ -123,7 +123,7 @@ export default function ModuleManagementsPage() {
             </p>
             <Button
               color="primary"
-              onClick={() => router.push("/workspaces/modules")}
+              onClick={() => router.push("/workspace/modules")}
             >
               Go Back
             </Button>
@@ -224,7 +224,7 @@ export default function ModuleManagementsPage() {
             ) : (
               <Button
                 color="primary"
-                onClick={() => (window.location.href = "/workspaces/modules")}
+                onClick={() => (window.location.href = "/workspace/modules")}
               >
                 Browse Modules
               </Button>

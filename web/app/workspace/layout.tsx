@@ -4,13 +4,13 @@ import WorkspaceLayoutClient from "./WorkspaceLayoutClient";
 const navigationItems = [
   {
     name: "Profile",
-    href: "/workspaces/profile",
+    href: "/workspace/profile",
     icon: "UserCircle",
     badge: null,
   },
   {
     name: "Settings",
-    href: "/workspaces/settings",
+    href: "/workspace/settings",
     icon: "Settings",
     badge: null,
   },

@@ -6,8 +6,8 @@ import Breadcrumb, { BreadcrumbItem } from "./components/Breadcrumb";
 import Content from "./components/Content";
 import MenuPanel from "./components/Menu";
 import Nav from "./components/Nav";
-import { BreadcrumbProvider } from "./context/breadcrumbs";
-import { MenuItem } from "../../lib/menu-loader";
+import { WorkspaceProvider } from "@base/contexts/workspace";
+import { MenuWorkspaceElement } from "@base/interface/WorkspaceMenuInterface";
 
 interface SerializedNavigationItem {
   name: string;
@@ -19,7 +19,7 @@ interface SerializedNavigationItem {
 interface WorkspaceLayoutClientProps {
   children: React.ReactNode;
   navigationItems: SerializedNavigationItem[];
-  moduleMenus: MenuItem[];
+  moduleMenus: MenuWorkspaceElement[];
 }
 
 export default function WorkspaceLayoutClient({
@@ -30,8 +30,12 @@ export default function WorkspaceLayoutClient({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const pathname = usePathname();
 
-  const defaultCrumbs: BreadcrumbItem[] = [{ label: "Home", href: "/" }];
-  const parts = (pathname || "/workspaces").split("/").filter(Boolean);
+  // const defaultCrumbs: BreadcrumbItem[] = [];
+  const parts = (pathname || "/workspace")
+    .split("/")
+    .filter(Boolean)
+    .filter((p) => p !== "modules");
+
   let acc = "";
   const autoCrumbs: BreadcrumbItem[] = parts.map((p) => {
     acc += `/${p}`;
@@ -39,10 +43,11 @@ export default function WorkspaceLayoutClient({
     return { label, href: acc };
   });
 
-  const initialCrumbs = [...defaultCrumbs, ...autoCrumbs];
+  const initialCrumbs = [...autoCrumbs];
 
+  console.log(moduleMenus);
   return (
-    <BreadcrumbProvider initial={initialCrumbs}>
+    <WorkspaceProvider initialBreadcrumbs={initialCrumbs}>
       <div
         className="w-full h-screen flex flex-col flex-1 overflow-hidden bg-slate-50"
         id="workspace-layout"
@@ -51,7 +56,7 @@ export default function WorkspaceLayoutClient({
         <Nav onOpenSidebar={() => setSidebarOpen(true)} />
         <div className="flex min-h-0 flex-1">
           <MenuPanel
-            items={navigationItems}
+            items={navigationItems as unknown as MenuWorkspaceElement[]}
             isOpen={sidebarOpen}
             onClose={() => setSidebarOpen(false)}
             moduleMenus={moduleMenus}
@@ -74,6 +79,6 @@ export default function WorkspaceLayoutClient({
           </div>
         </div>
       </div>
-    </BreadcrumbProvider>
+    </WorkspaceProvider>
   );
 }

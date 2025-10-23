@@ -8,7 +8,7 @@ export default function ModulesPage() {
 
   useEffect(() => {
     // Redirect to dashboard
-    router.push("/workspaces/modules/dashboard");
+    router.push("/workspace/modules/dashboard");
   }, [router]);
 
   return (
