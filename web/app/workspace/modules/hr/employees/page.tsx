@@ -1,87 +1,100 @@
 "use client";
 
-import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Avatar } from "@heroui/avatar";
+import { Badge } from "@heroui/badge";
 import { Button } from "@heroui/button";
+import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Input } from "@heroui/input";
 import {
   Table,
-  TableHeader,
-  TableColumn,
   TableBody,
-  TableRow,
   TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
 } from "@heroui/table";
-import { Avatar } from "@heroui/avatar";
-import { Badge } from "@heroui/badge";
-import { Search, Filter, Plus, Edit, Trash2, Eye } from "lucide-react";
-import { useState } from "react";
+import { Edit, Eye, Filter, Plus, Search, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+
+interface Employee {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  position: string;
+  department: string;
+  status: string;
+  avatar?: string;
+  joinDate: string;
+  salary?: string;
+  address?: string;
+  dateOfBirth?: string;
+  emergencyContact?: string;
+  emergencyPhone?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function EmployeesPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const employees = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john.doe@company.com",
-      position: "Software Engineer",
-      department: "Engineering",
-      status: "active",
-      avatar: "https://i.pravatar.cc/150?u=john",
-      joinDate: "2023-01-15",
-      salary: "$75,000",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane.smith@company.com",
-      position: "Product Manager",
-      department: "Product",
-      status: "active",
-      avatar: "https://i.pravatar.cc/150?u=jane",
-      joinDate: "2022-08-20",
-      salary: "$95,000",
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      email: "mike.johnson@company.com",
-      position: "UX Designer",
-      department: "Design",
-      status: "on-leave",
-      avatar: "https://i.pravatar.cc/150?u=mike",
-      joinDate: "2023-03-10",
-      salary: "$65,000",
-    },
-    {
-      id: 4,
-      name: "Sarah Wilson",
-      email: "sarah.wilson@company.com",
-      position: "HR Manager",
-      department: "Human Resources",
-      status: "active",
-      avatar: "https://i.pravatar.cc/150?u=sarah",
-      joinDate: "2021-11-05",
-      salary: "$85,000",
-    },
-    {
-      id: 5,
-      name: "David Brown",
-      email: "david.brown@company.com",
-      position: "DevOps Engineer",
-      department: "Engineering",
-      status: "active",
-      avatar: "https://i.pravatar.cc/150?u=david",
-      joinDate: "2023-06-12",
-      salary: "$80,000",
-    },
-  ];
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  const fetchEmployees = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/employees");
+      const data = await response.json();
+
+      if (data.success) {
+        setEmployees(data.data || []);
+      } else {
+        setError(data.error || "Failed to fetch employees");
+      }
+    } catch (err) {
+      setError("Failed to fetch employees");
+      // console.error("Error fetching employees:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteEmployee = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this employee?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/employees/${id}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        setEmployees(employees.filter((emp) => emp.id !== id));
+      } else {
+        alert(data.error || "Failed to delete employee");
+      }
+    } catch (err) {
+      alert("Failed to delete employee");
+      // console.error("Error deleting employee:", err);
+    }
+  };
 
   const filteredEmployees = employees.filter(
     (employee) =>
-      employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      `${employee.firstName} ${employee.lastName}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.position.toLowerCase().includes(searchTerm.toLowerCase()),
+      employee.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.department.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status: string) => {
@@ -96,6 +109,26 @@ export default function EmployeesPage() {
         return "default";
     }
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg">Loading employees...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg text-red-600">Error: {error}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -145,75 +178,88 @@ export default function EmployeesPage() {
               <TableColumn>ACTIONS</TableColumn>
             </TableHeader>
             <TableBody>
-              {filteredEmployees.map((employee) => (
-                <TableRow key={employee.id}>
-                  <TableCell>
-                    <div className="flex items-center space-x-3">
-                      <Avatar
-                        name={employee.name}
-                        size="sm"
-                        src={employee.avatar}
-                      />
-                      <div>
-                        <p className="font-medium">{employee.name}</p>
-                        <p className="text-sm text-gray-600">
-                          {employee.email}
-                        </p>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <p className="font-medium">{employee.position}</p>
-                  </TableCell>
-                  <TableCell>
-                    <Badge color="primary" variant="flat">
-                      {employee.department}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      color={getStatusColor(employee.status)}
-                      variant="flat"
-                    >
-                      {employee.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <p className="text-sm">{employee.joinDate}</p>
-                  </TableCell>
-                  <TableCell>
-                    <p className="font-medium">{employee.salary}</p>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        isIconOnly
-                        color="primary"
-                        size="sm"
-                        variant="light"
-                      >
-                        <Eye size={16} />
-                      </Button>
-                      <Button
-                        isIconOnly
-                        color="warning"
-                        size="sm"
-                        variant="light"
-                      >
-                        <Edit size={16} />
-                      </Button>
-                      <Button
-                        isIconOnly
-                        color="danger"
-                        size="sm"
-                        variant="light"
-                      >
-                        <Trash2 size={16} />
-                      </Button>
-                    </div>
+              {filteredEmployees.length === 0 ? (
+                <TableRow>
+                  <TableCell className="text-center py-8" colSpan={7}>
+                    No employees found
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                filteredEmployees.map((employee) => (
+                  <TableRow key={employee.id}>
+                    <TableCell>
+                      <div className="flex items-center space-x-3">
+                        <Avatar
+                          name={`${employee.firstName} ${employee.lastName}`}
+                          size="sm"
+                          src={employee.avatar}
+                        />
+                        <div>
+                          <p className="font-medium">
+                            {employee.firstName} {employee.lastName}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {employee.email}
+                          </p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <p className="font-medium">{employee.position}</p>
+                    </TableCell>
+                    <TableCell>
+                      <Badge color="primary" variant="flat">
+                        {employee.department}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        color={getStatusColor(employee.status)}
+                        variant="flat"
+                      >
+                        {employee.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <p className="text-sm">{employee.joinDate}</p>
+                    </TableCell>
+                    <TableCell>
+                      <p className="font-medium">
+                        {employee.salary ? `$${employee.salary}` : "N/A"}
+                      </p>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          isIconOnly
+                          color="primary"
+                          size="sm"
+                          variant="light"
+                        >
+                          <Eye size={16} />
+                        </Button>
+                        <Button
+                          isIconOnly
+                          color="warning"
+                          size="sm"
+                          variant="light"
+                        >
+                          <Edit size={16} />
+                        </Button>
+                        <Button
+                          isIconOnly
+                          color="danger"
+                          size="sm"
+                          variant="light"
+                          onClick={() => handleDeleteEmployee(employee.id)}
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardBody>

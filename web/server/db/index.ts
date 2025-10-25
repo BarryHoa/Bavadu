@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
-import * as schema from "./schema";
+import * as schema from "./schemas";
 
 // Create connection using standard PostgreSQL environment variables
 const connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}?sslmode=${process.env.PGSSLMODE || "disable"}`;
@@ -14,6 +14,3 @@ const client = postgres(connectionString, {
 
 // Create Drizzle instance
 export const db = drizzle(client, { schema });
-
-// Export schema for easy access
-export * from "./schema";
