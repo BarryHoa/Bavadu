@@ -1,11 +1,9 @@
-import "@/styles/fonts.css";
-import "@/styles/globals.css";
-import clsx from "clsx";
+import "@/module-base/styles/fonts.css";
+import "@/module-base/styles/globals.css";
 import { Metadata, Viewport } from "next";
 
 import { Providers } from "./providers";
 
-import { fontNotoSansSC, fontSans } from "@/config/fonts";
 import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {

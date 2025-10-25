@@ -3,14 +3,26 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "node scripts/dev-with-env.js local",
+    "dev:prod": "node scripts/dev-with-env.js prod",
+    "dev:staging": "node scripts/dev-with-env.js staging",
+    "dev:test": "node scripts/dev-with-env.js test",
+    "next": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint --fix",
     "module:install": "node scripts/module-manager.js install",
     "module:uninstall": "node scripts/module-manager.js uninstall",
     "module:list": "node scripts/module-manager.js list",
-    "module:create": "node scripts/module-manager.js create"
+    "module:create": "node scripts/module-manager.js create",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "env:setup": "bash envs/setup-env.sh",
+    "env:local": "bash envs/setup-env.sh local",
+    "env:staging": "bash envs/setup-env.sh staging",
+    "env:production": "bash envs/setup-env.sh production",
+    "env:test": "bash envs/setup-env.sh test"
   },
   "dependencies": {
     "@heroui/accordion": "2.2.24",
@@ -66,7 +78,12 @@
     "next-intl": "^4.3.11",
     "next-themes": "0.4.6",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "bcryptjs": "^2.4.3",
+    "drizzle-orm": "^0.29.0",
+    "postgres": "^3.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@eslint/compat": "^1.4.0",
@@ -93,6 +110,10 @@
     "prettier": "3.6.2",
     "tailwind-variants": "3.1.1",
     "tailwindcss": "4.1.14",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/lodash": "^4.17.20",
+    "@types/jsonwebtoken": "^9.0.5",
+    "drizzle-kit": "^0.20.4"
   }
 }
