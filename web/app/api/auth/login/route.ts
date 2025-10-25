@@ -8,11 +8,10 @@ export async function POST(request: NextRequest) {
 
     // TODO: Implement actual login logic with database
     // For now, return a mock response
-    const token = jwt.sign(
-      { email, userId: "mock-user-id" },
-      process.env.JWT_SECRET || "your-super-secret-jwt-key-here",
-      { expiresIn: process.env.JWT_EXPIRES_IN || "24h" }
-    );
+    const secret = process.env.JWT_SECRET || "your-super-secret-jwt-key-here";
+    const token = jwt.sign({ email, userId: "mock-user-id" }, secret, {
+      expiresIn: "24h",
+    });
 
     return NextResponse.json({
       success: true,

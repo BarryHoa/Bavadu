@@ -1,31 +1,34 @@
 "use client";
 
-import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Badge } from "@heroui/badge";
 import { Button } from "@heroui/button";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { DatePicker } from "@heroui/date-picker";
 import { Input } from "@heroui/input";
 import {
   Table,
-  TableHeader,
-  TableColumn,
   TableBody,
-  TableRow,
   TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
 } from "@heroui/table";
-import { Badge } from "@heroui/badge";
-import { DatePicker } from "@heroui/date-picker";
+import { parseDate } from "@internationalized/date";
 import {
-  Calendar,
-  Clock,
-  CheckCircle,
-  XCircle,
   AlertCircle,
-  Filter,
+  Calendar,
+  CheckCircle,
+  Clock,
   Download,
+  Filter,
+  XCircle,
 } from "lucide-react";
 import { useState } from "react";
 
 export default function AttendancePage() {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(
+    parseDate(new Date().toISOString().split("T")[0])
+  );
   const [searchTerm, setSearchTerm] = useState("");
 
   const attendanceData = [
@@ -164,7 +167,7 @@ export default function AttendancePage() {
             <DatePicker
               label="Select Date"
               value={selectedDate}
-              onChange={setSelectedDate}
+              onChange={(date) => date && setSelectedDate(date)}
               className="flex-1"
             />
             <Input
@@ -219,13 +222,15 @@ export default function AttendancePage() {
                       <p className="font-medium">{record.checkOut}</p>
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        color={getStatusColor(record.status)}
-                        variant="flat"
-                        startContent={<StatusIcon size={12} />}
-                      >
-                        {record.status}
-                      </Badge>
+                      <div className="flex items-center gap-1">
+                        <StatusIcon size={12} />
+                        <Badge
+                          color={getStatusColor(record.status)}
+                          variant="flat"
+                        >
+                          {record.status}
+                        </Badge>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <p className="font-medium">{record.hours}</p>

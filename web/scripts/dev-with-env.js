@@ -11,10 +11,7 @@ const environment = args[0] || "local"; // Default to local if no argument provi
 // Define environment file mappings
 const envFiles = {
   local: "envs/.env.local",
-  prod: "envs/.env.production",
   production: "envs/.env.production",
-  staging: "envs/.env.staging",
-  test: "envs/.env.test",
 };
 
 // Get the source environment file
@@ -22,7 +19,7 @@ const sourceFile = envFiles[environment];
 
 if (!sourceFile) {
   console.error(`❌ Unknown environment: ${environment}`);
-  console.log("Available environments: local, prod, production, staging, test");
+  console.log("Available environments: local, production");
   process.exit(1);
 }
 

@@ -140,13 +140,14 @@ export class ModuleRegistryManager {
       total: installed.length + available.length,
       installed: installed.length,
       available: available.length,
-      categories: [...new Set(this.getAllModules().map((m) => m.category))]
-        .length,
+      categories: Array.from(
+        new Set(this.getAllModules().map((m) => m.category))
+      ).length,
     };
   }
 
   public getCategories(): string[] {
-    return [...new Set(this.getAllModules().map((m) => m.category))];
+    return Array.from(new Set(this.getAllModules().map((m) => m.category)));
   }
 
   public refreshRegistry(): void {

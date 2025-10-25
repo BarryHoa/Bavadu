@@ -2,13 +2,14 @@
 
 import type { ThemeProviderProps } from "next-themes";
 
+import { NavigationLoader } from "@base/components/base/NavigationLoader";
+import { GlobalSettingsProvider } from "@base/contexts/global-settings";
 import { HeroUIProvider } from "@heroui/system";
 import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { useRouter } from "next/navigation";
 import * as React from "react";
-import { NavigationLoader } from "@base/components/base/NavigationLoader";
-import { GlobalSettingsProvider } from "@base/contexts/global-settings";
+import { SettingsProvider } from "./context/SettingsContext";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -38,8 +39,10 @@ export function Providers({
       <HeroUIProvider navigate={router.push}>
         <NextThemesProvider {...themeProps}>
           <GlobalSettingsProvider>
-            <NavigationLoader style="bar" minLoadingTime={300} />
-            {children}
+            <SettingsProvider>
+              <NavigationLoader style="bar" minLoadingTime={300} />
+              {children}
+            </SettingsProvider>
           </GlobalSettingsProvider>
         </NextThemesProvider>
       </HeroUIProvider>
