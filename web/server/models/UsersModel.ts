@@ -1,7 +1,8 @@
-import { db } from "@/server/db";
-import { users } from "@/server/db/schema";
+import { db } from "@serv/db";
+import { users } from "@serv/db/schema";
 import { and, asc, desc, eq, or, sql } from "drizzle-orm/sql";
 import omit from "lodash/omit";
+
 import { GetUserListReq } from "./interfaces/UserInterface";
 import { ModalController } from "./ModalController";
 
@@ -21,8 +22,9 @@ class UsersModel extends ModalController {
     // Apply filters
     if (Object.keys(filters).length > 0) {
       const conditions = Object.entries(filters).map(([key, value]) =>
-        eq(users[key as keyof typeof users._.columns], value as any)
+        eq(users[key as keyof typeof users._.columns], value as any),
       );
+
       query = query.where(and(...conditions));
     }
 
@@ -31,8 +33,8 @@ class UsersModel extends ModalController {
       query = query.where(
         or(
           sql`${users.username} ILIKE ${"%" + search + "%"}`,
-          sql`${users.email} ILIKE ${"%" + search + "%"}`
-        )
+          sql`${users.email} ILIKE ${"%" + search + "%"}`,
+        ),
       );
     }
 
@@ -41,6 +43,7 @@ class UsersModel extends ModalController {
       sorts.forEach(({ field, direction }) => {
         // check field in users table
         const key = (users as any)?.[field];
+
         if (!key) return;
 
         query = query.orderBy(direction === "asc" ? asc(key) : desc(key));
@@ -53,6 +56,7 @@ class UsersModel extends ModalController {
     query = query.limit(limit).offset(offset);
 
     let rows = [];
+
     try {
       rows = await query;
     } catch (error) {
@@ -73,4 +77,5 @@ class UsersModel extends ModalController {
 }
 
 const usersModel = new UsersModel();
+
 export default usersModel;

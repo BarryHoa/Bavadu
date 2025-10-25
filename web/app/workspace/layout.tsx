@@ -1,4 +1,5 @@
 import { loadMenusFromModules } from "../../lib/menu-loader";
+
 import WorkspaceLayoutClient from "./WorkspaceLayoutClient";
 
 const navigationItems = [
@@ -25,8 +26,8 @@ export default function WorkspaceLayout({
 
   return (
     <WorkspaceLayoutClient
-      navigationItems={navigationItems}
       moduleMenus={moduleMenus}
+      navigationItems={navigationItems}
     >
       {children}
     </WorkspaceLayoutClient>

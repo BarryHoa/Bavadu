@@ -32,8 +32,8 @@ export default function ThemeDemo() {
                 <div className="h-8 bg-primary-500 rounded flex items-center justify-center text-white text-sm">
                   Primary
                 </div>
-                <div className="h-6 bg-primary-100 rounded"></div>
-                <div className="h-6 bg-primary-200 rounded"></div>
+                <div className="h-6 bg-primary-100 rounded" />
+                <div className="h-6 bg-primary-200 rounded" />
               </div>
             </div>
 
@@ -43,8 +43,8 @@ export default function ThemeDemo() {
                 <div className="h-8 bg-secondary-500 rounded flex items-center justify-center text-white text-sm">
                   Secondary
                 </div>
-                <div className="h-6 bg-secondary-100 rounded"></div>
-                <div className="h-6 bg-secondary-200 rounded"></div>
+                <div className="h-6 bg-secondary-100 rounded" />
+                <div className="h-6 bg-secondary-200 rounded" />
               </div>
             </div>
 
@@ -54,8 +54,8 @@ export default function ThemeDemo() {
                 <div className="h-8 bg-success-500 rounded flex items-center justify-center text-white text-sm">
                   Success
                 </div>
-                <div className="h-6 bg-success-100 rounded"></div>
-                <div className="h-6 bg-success-200 rounded"></div>
+                <div className="h-6 bg-success-100 rounded" />
+                <div className="h-6 bg-success-200 rounded" />
               </div>
             </div>
 
@@ -65,8 +65,8 @@ export default function ThemeDemo() {
                 <div className="h-8 bg-warning-500 rounded flex items-center justify-center text-white text-sm">
                   Warning
                 </div>
-                <div className="h-6 bg-warning-100 rounded"></div>
-                <div className="h-6 bg-warning-200 rounded"></div>
+                <div className="h-6 bg-warning-100 rounded" />
+                <div className="h-6 bg-warning-200 rounded" />
               </div>
             </div>
           </div>
@@ -85,22 +85,22 @@ export default function ThemeDemo() {
             <Button color="success">Success</Button>
             <Button color="warning">Warning</Button>
             <Button color="danger">Danger</Button>
-            <Button variant="bordered" color="primary">
+            <Button color="primary" variant="bordered">
               Bordered
             </Button>
-            <Button variant="light" color="primary">
+            <Button color="primary" variant="light">
               Light
             </Button>
-            <Button variant="flat" color="primary">
+            <Button color="primary" variant="flat">
               Flat
             </Button>
-            <Button variant="faded" color="primary">
+            <Button color="primary" variant="faded">
               Faded
             </Button>
-            <Button variant="shadow" color="primary">
+            <Button color="primary" variant="shadow">
               Shadow
             </Button>
-            <Button variant="ghost" color="primary">
+            <Button color="primary" variant="ghost">
               Ghost
             </Button>
           </div>
@@ -119,13 +119,13 @@ export default function ThemeDemo() {
             <Chip color="success">Success</Chip>
             <Chip color="warning">Warning</Chip>
             <Chip color="danger">Danger</Chip>
-            <Chip variant="bordered" color="primary">
+            <Chip color="primary" variant="bordered">
               Bordered
             </Chip>
-            <Chip variant="flat" color="primary">
+            <Chip color="primary" variant="flat">
               Flat
             </Chip>
-            <Chip variant="dot" color="primary">
+            <Chip color="primary" variant="dot">
               Dot
             </Chip>
           </div>
@@ -155,19 +155,19 @@ export default function ThemeDemo() {
         </CardHeader>
         <CardBody>
           <div className="flex flex-wrap gap-4">
-            <Badge content="5" color="primary">
+            <Badge color="primary" content="5">
               <Button>Primary Badge</Button>
             </Badge>
-            <Badge content="3" color="secondary">
+            <Badge color="secondary" content="3">
               <Button>Secondary Badge</Button>
             </Badge>
-            <Badge content="New" color="success">
+            <Badge color="success" content="New">
               <Button>Success Badge</Button>
             </Badge>
-            <Badge content="!" color="warning">
+            <Badge color="warning" content="!">
               <Button>Warning Badge</Button>
             </Badge>
-            <Badge content="X" color="danger">
+            <Badge color="danger" content="X">
               <Button>Danger Badge</Button>
             </Badge>
           </div>

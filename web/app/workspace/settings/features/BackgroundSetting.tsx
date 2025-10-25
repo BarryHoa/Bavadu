@@ -1,11 +1,12 @@
 "use client";
 
-import { useSettings } from "@/app/context/SettingsContext";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Slider } from "@heroui/slider";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useEffect } from "react";
+
+import { useSettings } from "@/app/context/SettingsContext";
 
 interface BackgroundSettingsProps {
   onBackgroundChange?: (background: string, transparency: number) => void;
@@ -55,6 +56,7 @@ export default function BackgroundSetting({
 
     // Create or update overlay for transparency
     let overlay = document.getElementById("workspace-layout");
+
     if (!overlay) {
       overlay = document.createElement("div");
       overlay.id = "workspace-layout";
@@ -77,23 +79,27 @@ export default function BackgroundSetting({
     if (onBackgroundChange) {
       const backgroundFile =
         backgroundOptions.find((bg) => bg.id === backgroundId)?.file || "";
+
       onBackgroundChange(backgroundFile, backgroundTransparency);
     }
   };
 
   const handleTransparencyChange = (value: number | number[]) => {
     const newTransparency = Array.isArray(value) ? value[0] : value;
+
     setBackgroundTransparency(newTransparency);
     if (onBackgroundChange) {
       const backgroundFile =
         backgroundOptions.find((bg) => bg.id === selectedBackground)?.file ||
         "";
+
       onBackgroundChange(backgroundFile, newTransparency);
     }
   };
 
   const handleGlassOpacityChange = (value: number | number[]) => {
     const newOpacity = Array.isArray(value) ? value[0] : value;
+
     setGlassOpacity(newOpacity);
   };
 
@@ -122,13 +128,13 @@ export default function BackgroundSetting({
               >
                 <div className="relative w-full h-16 overflow-hidden">
                   <Image
-                    src={`/background/${option.file}`}
-                    alt={t(`backgroundOptions.${option.name}`)}
                     fill
-                    sizes="(max-width: 768px) 25vw, 12.5vw"
+                    alt={t(`backgroundOptions.${option.name}`)}
                     className="object-cover rounded-lg transition-transform duration-300 group-hover:scale-110"
-                    quality={75}
                     priority={selectedBackground === option.id}
+                    quality={75}
+                    sizes="(max-width: 768px) 25vw, 12.5vw"
+                    src={`/background/${option.file}`}
                   />
                 </div>
 
@@ -151,16 +157,16 @@ export default function BackgroundSetting({
             </label>
             <Slider
               aria-label="Transparency"
-              step={1}
               color="primary"
-              showSteps={false}
-              showOutline={false}
               disableThumbScale={true}
               hideThumb={false}
               hideValue={true}
+              showOutline={false}
+              showSteps={false}
+              size="sm"
+              step={1}
               value={backgroundTransparency}
               onChange={handleTransparencyChange}
-              size="sm"
             />
             <div className="text-xs text-default-500">
               {t("transparencyLabel", { value: backgroundTransparency })}
@@ -172,18 +178,18 @@ export default function BackgroundSetting({
             <label className="text-sm font-medium">{t("glassEffect")}</label>
             <Slider
               aria-label="Glass Opacity"
-              step={1}
-              minValue={0}
-              maxValue={100}
               color="secondary"
-              showSteps={false}
-              showOutline={false}
               disableThumbScale={true}
               hideThumb={false}
               hideValue={true}
+              maxValue={100}
+              minValue={0}
+              showOutline={false}
+              showSteps={false}
+              size="sm"
+              step={1}
               value={glassOpacity}
               onChange={handleGlassOpacityChange}
-              size="sm"
             />
             <div className="text-xs text-default-500">
               {t("glassOpacityLabel", { value: glassOpacity })}

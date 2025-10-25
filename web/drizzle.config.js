@@ -3,12 +3,10 @@ import { defineConfig } from "drizzle-kit";
 export default defineConfig({
   schema: "./server/db/schema.ts",
   out: "./server/db/migrations",
-  driver: "pg",
+  dialect: "postgresql",
   dbCredentials: {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT || 5432,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+    url: `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}?sslmode=${process.env.PGSSLMODE || "disable"}`,
   },
+  verbose: true,
+  strict: true,
 });

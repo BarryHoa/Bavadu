@@ -79,7 +79,7 @@ const defaultSettings = {
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
@@ -88,9 +88,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   // Load settings from localStorage on mount
   useEffect(() => {
     const savedSettings = localStorage.getItem("workspace-settings");
+
     if (savedSettings) {
       try {
         const parsed = JSON.parse(savedSettings);
+
         setSettings({ ...defaultSettings, ...parsed });
       } catch (error) {
         console.error("Error loading settings:", error);
@@ -105,7 +107,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
   const updateSetting = <K extends keyof typeof settings>(
     key: K,
-    value: (typeof settings)[K]
+    value: (typeof settings)[K],
   ) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
@@ -202,8 +204,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
 export function useSettings() {
   const context = useContext(SettingsContext);
+
   if (context === undefined) {
     throw new Error("useSettings must be used within a SettingsProvider");
   }
+
   return context;
 }

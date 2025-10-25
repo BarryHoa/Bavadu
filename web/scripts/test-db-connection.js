@@ -29,17 +29,18 @@ function loadEnvFile(filePath) {
 
 // Test database connection
 async function testConnection(envVars) {
-  const { DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD } = envVars;
+  const { PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD, PGSSLMODE } = envVars;
 
   console.log("🔍 Testing PostgreSQL Database Connection");
   console.log("========================================");
-  console.log(`Host: ${DB_HOST}`);
-  console.log(`Port: ${DB_PORT}`);
-  console.log(`Database: ${DB_NAME}`);
-  console.log(`User: ${DB_USER}`);
+  console.log(`Host: ${PGHOST}`);
+  console.log(`Port: ${PGPORT}`);
+  console.log(`Database: ${PGDATABASE}`);
+  console.log(`User: ${PGUSER}`);
+  console.log(`SSL Mode: ${PGSSLMODE || "disable"}`);
   console.log("");
 
-  const connectionString = `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
+  const connectionString = `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=${PGSSLMODE || "disable"}`;
 
   try {
     console.log("⏳ Connecting to database...");

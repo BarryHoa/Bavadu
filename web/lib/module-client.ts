@@ -10,12 +10,15 @@ export class ModuleClient {
   async getInstalledModules(): Promise<ModuleInfo[]> {
     try {
       const response = await fetch(`${this.baseUrl}/installed`);
+
       if (!response.ok) {
         throw new Error("Failed to fetch installed modules");
       }
+
       return await response.json();
     } catch (error) {
       console.error("Error fetching installed modules:", error);
+
       return [];
     }
   }
@@ -28,12 +31,15 @@ export class ModuleClient {
   }> {
     try {
       const response = await fetch(this.baseUrl);
+
       if (!response.ok) {
         throw new Error("Failed to fetch modules");
       }
+
       return await response.json();
     } catch (error) {
       console.error("Error fetching modules:", error);
+
       return {
         modules: {},
         installed: [],
@@ -61,9 +67,11 @@ export class ModuleClient {
       }
 
       const result = await response.json();
+
       return result.success;
     } catch (error) {
       console.error("Error installing module:", error);
+
       return false;
     }
   }
@@ -86,9 +94,11 @@ export class ModuleClient {
       }
 
       const result = await response.json();
+
       return result.success;
     } catch (error) {
       console.error("Error uninstalling module:", error);
+
       return false;
     }
   }
@@ -99,11 +109,12 @@ export class ModuleClient {
 
   searchModules(query: string, modules: ModuleInfo[]): ModuleInfo[] {
     const lowercaseQuery = query.toLowerCase();
+
     return modules.filter(
       (module) =>
         module.name.toLowerCase().includes(lowercaseQuery) ||
         module.description.toLowerCase().includes(lowercaseQuery) ||
-        module.category.toLowerCase().includes(lowercaseQuery)
+        module.category.toLowerCase().includes(lowercaseQuery),
     );
   }
 }

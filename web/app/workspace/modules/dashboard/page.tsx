@@ -4,12 +4,10 @@ import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Badge } from "@heroui/badge";
 import {
-  LayoutDashboard,
   Users,
   BarChart3,
   Settings,
   Package,
-  TrendingUp,
   Activity,
   Clock,
 } from "lucide-react";
@@ -103,7 +101,7 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <p className="text-gray-600">Welcome to your workspace dashboard</p>
         </div>
-        <Badge content="System" color="primary" variant="flat">
+        <Badge color="primary" content="System" variant="flat">
           <Button color="primary" variant="flat">
             Dashboard Module
           </Button>

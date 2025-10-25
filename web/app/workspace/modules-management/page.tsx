@@ -19,9 +19,10 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 import { moduleClient } from "@/lib/module-client";
 import { ModuleInfo } from "@/lib/module-registry";
-import { useRouter } from "next/navigation";
 
 export default function ModuleManagementsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -39,6 +40,7 @@ export default function ModuleManagementsPage() {
 
       if (!isSystemAdmin) {
         router.push("/workspace/modules");
+
         return;
       }
 
@@ -53,8 +55,10 @@ export default function ModuleManagementsPage() {
     if (isAuthorized) {
       const loadModules = async () => {
         const installedModules = await moduleClient.getInstalledModules();
+
         setModules(installedModules);
       };
+
       loadModules();
     }
   }, [isAuthorized]);
@@ -72,6 +76,7 @@ export default function ModuleManagementsPage() {
       Security: "danger",
       Automation: "warning",
     };
+
     return colors[category] || "default";
   };
 
@@ -88,13 +93,16 @@ export default function ModuleManagementsPage() {
       Database,
       FileText,
     };
+
     return iconMap[iconName] || Package;
   };
 
   const handleUninstall = async (moduleId: string) => {
     const success = await moduleClient.uninstallModule(moduleId);
+
     if (success) {
       const installedModules = await moduleClient.getInstalledModules();
+
       setModules(installedModules);
     }
   };
@@ -103,7 +111,7 @@ export default function ModuleManagementsPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
           <p className="text-gray-600">Checking authorization...</p>
         </div>
       </div>
@@ -139,14 +147,14 @@ export default function ModuleManagementsPage() {
         <CardBody>
           <div className="flex items-center space-x-2">
             <Input
+              className="flex-1"
               placeholder="Search modules..."
+              size="sm"
+              startContent={<Search size={16} />}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              startContent={<Search size={16} />}
-              size="sm"
-              className="flex-1"
             />
-            <Button color="primary" variant="flat" size="sm" title="Add module">
+            <Button color="primary" size="sm" title="Add module" variant="flat">
               Add
             </Button>
           </div>
@@ -156,6 +164,7 @@ export default function ModuleManagementsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {filteredModules.map((module) => {
           const ModuleIcon = getIconComponent(module.icon);
+
           return (
             <Card
               key={module.name}
@@ -174,21 +183,21 @@ export default function ModuleManagementsPage() {
                     </p>
                     <Badge
                       color={getCategoryColor(module.category) as any}
-                      variant="flat"
                       size="sm"
+                      variant="flat"
                     >
                       {module.category}
                     </Badge>
                   </div>
                   <Button
-                    color="danger"
-                    variant="flat"
-                    size="sm"
                     className="w-full"
+                    color="danger"
+                    size="sm"
                     startContent={<Trash2 size={12} />}
+                    variant="flat"
                     onClick={() =>
                       handleUninstall(
-                        module.name.toLowerCase().replace(/\s+/g, "")
+                        module.name.toLowerCase().replace(/\s+/g, ""),
                       )
                     }
                   >

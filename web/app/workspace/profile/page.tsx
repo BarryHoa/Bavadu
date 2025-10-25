@@ -9,18 +9,12 @@ import { parseDate } from "@internationalized/date";
 import InputBase from "@base/components/base/Input";
 import SelectBase from "@base/components/base/Select";
 import DatePickerBase from "@base/components/base/DatePicker";
-import AwardsCertifications from "./components/AwardsCertifications";
-import DigitalSignature from "./components/DigitalSignature";
-import DocumentList from "./components/DocumentList";
-import UserRole from "./components/UserRole";
-import ChangePasswordModal from "./components/ChangePasswordModal";
 import {
   User,
   Mail,
   Phone,
   MapPin,
   Briefcase,
-  Calendar,
   Camera,
   Save,
   Globe,
@@ -30,6 +24,12 @@ import {
   UserCircle,
 } from "lucide-react";
 
+import AwardsCertifications from "./components/AwardsCertifications";
+import DigitalSignature from "./components/DigitalSignature";
+import DocumentList from "./components/DocumentList";
+import UserRole from "./components/UserRole";
+import ChangePasswordModal from "./components/ChangePasswordModal";
+
 export default function ProfilePage() {
   return (
     <div className="space-y-6">
@@ -37,22 +37,22 @@ export default function ProfilePage() {
         {/* Profile Card - Left Side */}
         <Card className="lg:col-span-1">
           <CardBody className="p-6 relative">
-            <UserRole role="Super Admin" color="primary" />
+            <UserRole color="primary" role="Super Admin" />
 
             <div className="flex flex-col items-center space-y-4">
               <div className="relative">
                 <Avatar
-                  src="https://i.pravatar.cc/150?u=user"
-                  className="w-32 h-32"
                   isBordered
+                  className="w-32 h-32"
                   color="primary"
+                  src="https://i.pravatar.cc/150?u=user"
                 />
                 <Button
                   isIconOnly
-                  size="sm"
-                  color="primary"
                   className="absolute bottom-0 right-0"
+                  color="primary"
                   radius="full"
+                  size="sm"
                 >
                   <Camera size={16} />
                 </Button>
@@ -76,7 +76,7 @@ export default function ProfilePage() {
           <Card>
             <CardHeader>
               <h2 className="text-xl font-semibold flex items-center">
-                <User size={20} className="mr-2" />
+                <User className="mr-2" size={20} />
                 Personal Information
               </h2>
             </CardHeader>
@@ -86,20 +86,20 @@ export default function ProfilePage() {
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">First Name</label>
                   <InputBase
-                    placeholder="Enter first name"
                     defaultValue="John"
+                    placeholder="Enter first name"
+                    startContent={<User className="text-gray-400" size={16} />}
                     variant="bordered"
-                    startContent={<User size={16} className="text-gray-400" />}
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">Last Name</label>
                   <InputBase
-                    placeholder="Enter last name"
                     defaultValue="Doe"
+                    placeholder="Enter last name"
+                    startContent={<User className="text-gray-400" size={16} />}
                     variant="bordered"
-                    startContent={<User size={16} className="text-gray-400" />}
                   />
                 </div>
               </div>
@@ -110,12 +110,12 @@ export default function ProfilePage() {
                   Nickname / Display Name
                 </label>
                 <InputBase
-                  placeholder="Enter nickname or display name"
                   defaultValue="JD"
-                  variant="bordered"
+                  placeholder="Enter nickname or display name"
                   startContent={
-                    <UserCircle size={16} className="text-gray-400" />
+                    <UserCircle className="text-gray-400" size={16} />
                   }
+                  variant="bordered"
                 />
               </div>
 
@@ -124,9 +124,9 @@ export default function ProfilePage() {
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">Gender</label>
                   <SelectBase
+                    defaultSelectedKeys={["male"]}
                     placeholder="Select gender"
                     variant="bordered"
-                    defaultSelectedKeys={["male"]}
                   >
                     <SelectItem key="male">Male</SelectItem>
                     <SelectItem key="female">Female</SelectItem>
@@ -140,10 +140,10 @@ export default function ProfilePage() {
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">Date of Birth</label>
                   <DatePickerBase
-                    defaultValue={parseDate("1990-01-15")}
-                    minValue={parseDate("1945-01-01")}
-                    maxValue={parseDate(new Date().toISOString().split("T")[0])}
                     showMonthAndYearPickers
+                    defaultValue={parseDate("1990-01-15")}
+                    maxValue={parseDate(new Date().toISOString().split("T")[0])}
+                    minValue={parseDate("1945-01-01")}
                   />
                 </div>
               </div>
@@ -153,22 +153,22 @@ export default function ProfilePage() {
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">Email Address</label>
                   <InputBase
-                    type="email"
-                    placeholder="Enter email address"
                     defaultValue="john.doe@example.com"
+                    placeholder="Enter email address"
+                    startContent={<Mail className="text-gray-400" size={16} />}
+                    type="email"
                     variant="bordered"
-                    startContent={<Mail size={16} className="text-gray-400" />}
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">Phone Number</label>
                   <InputBase
-                    type="tel"
-                    placeholder="Enter phone number"
                     defaultValue="+1 (555) 123-4567"
+                    placeholder="Enter phone number"
+                    startContent={<Phone className="text-gray-400" size={16} />}
+                    type="tel"
                     variant="bordered"
-                    startContent={<Phone size={16} className="text-gray-400" />}
                   />
                 </div>
               </div>
@@ -177,10 +177,10 @@ export default function ProfilePage() {
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">Address</label>
                 <InputBase
-                  placeholder="Enter full address"
                   defaultValue="123 Main Street, San Francisco, CA 94102"
+                  placeholder="Enter full address"
+                  startContent={<MapPin className="text-gray-400" size={16} />}
                   variant="bordered"
-                  startContent={<MapPin size={16} className="text-gray-400" />}
                 />
               </div>
 
@@ -188,12 +188,12 @@ export default function ProfilePage() {
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">Job Title</label>
                 <InputBase
-                  placeholder="Enter job title"
                   defaultValue="Senior Developer"
-                  variant="bordered"
+                  placeholder="Enter job title"
                   startContent={
-                    <Briefcase size={16} className="text-gray-400" />
+                    <Briefcase className="text-gray-400" size={16} />
                   }
+                  variant="bordered"
                 />
               </div>
 
@@ -201,11 +201,11 @@ export default function ProfilePage() {
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">Bio / Description</label>
                 <Textarea
-                  placeholder="Tell us about yourself..."
                   defaultValue="Passionate developer with 5+ years of experience in building web applications. Love coding and learning new technologies."
-                  variant="bordered"
-                  minRows={4}
                   maxRows={8}
+                  minRows={4}
+                  placeholder="Tell us about yourself..."
+                  variant="bordered"
                 />
               </div>
             </CardBody>
@@ -215,7 +215,7 @@ export default function ProfilePage() {
           <Card>
             <CardHeader>
               <h2 className="text-xl font-semibold flex items-center">
-                <Globe size={20} className="mr-2" />
+                <Globe className="mr-2" size={20} />
                 Social Links
               </h2>
             </CardHeader>
@@ -223,11 +223,11 @@ export default function ProfilePage() {
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">Website</label>
                 <InputBase
-                  type="url"
-                  placeholder="https://yourwebsite.com"
                   defaultValue="https://johndoe.com"
+                  placeholder="https://yourwebsite.com"
+                  startContent={<Globe className="text-gray-400" size={16} />}
+                  type="url"
                   variant="bordered"
-                  startContent={<Globe size={16} className="text-gray-400" />}
                 />
               </div>
 
@@ -235,24 +235,24 @@ export default function ProfilePage() {
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">GitHub</label>
                   <InputBase
-                    placeholder="github.com/username"
                     defaultValue="github.com/johndoe"
-                    variant="bordered"
+                    placeholder="github.com/username"
                     startContent={
-                      <Github size={16} className="text-gray-400" />
+                      <Github className="text-gray-400" size={16} />
                     }
+                    variant="bordered"
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">LinkedIn</label>
                   <InputBase
-                    placeholder="linkedin.com/in/username"
                     defaultValue="linkedin.com/in/johndoe"
-                    variant="bordered"
+                    placeholder="linkedin.com/in/username"
                     startContent={
-                      <Linkedin size={16} className="text-gray-400" />
+                      <Linkedin className="text-gray-400" size={16} />
                     }
+                    variant="bordered"
                   />
                 </div>
               </div>
@@ -260,10 +260,10 @@ export default function ProfilePage() {
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">Twitter</label>
                 <InputBase
-                  placeholder="@username"
                   defaultValue="@johndoe"
+                  placeholder="@username"
+                  startContent={<Twitter className="text-gray-400" size={16} />}
                   variant="bordered"
-                  startContent={<Twitter size={16} className="text-gray-400" />}
                 />
               </div>
             </CardBody>
@@ -273,7 +273,7 @@ export default function ProfilePage() {
           <div className="flex justify-end gap-3">
             <Button variant="bordered">Cancel</Button>
             <Button color="secondary">
-              <Save size={16} className="mr-2" />
+              <Save className="mr-2" size={16} />
               Save Changes
             </Button>
           </div>

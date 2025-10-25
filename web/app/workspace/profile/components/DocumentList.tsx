@@ -2,13 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@heroui/button";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from "@heroui/modal";
+import { Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/modal";
 import {
   Table,
   TableHeader,
@@ -175,12 +169,12 @@ export default function DocumentList() {
   return (
     <>
       <Button
-        color="primary"
-        variant="flat"
         className="flex-1"
-        startContent={<FileText size={16} />}
-        onPress={() => setIsDocumentModalOpen(true)}
+        color="primary"
         size="sm"
+        startContent={<FileText size={16} />}
+        variant="flat"
+        onPress={() => setIsDocumentModalOpen(true)}
       >
         My Documents
       </Button>
@@ -188,9 +182,9 @@ export default function DocumentList() {
       {/* Documents List Modal */}
       <Modal
         isOpen={isDocumentModalOpen}
-        onClose={() => setIsDocumentModalOpen(false)}
-        size="3xl"
         placement="center"
+        size="3xl"
+        onClose={() => setIsDocumentModalOpen(false)}
       >
         <ModalContent>
           {(onClose) => (
@@ -203,13 +197,13 @@ export default function DocumentList() {
                 <div className="flex flex-col">
                   <div className="overflow-auto max-h-[500px]">
                     <Table
-                      aria-label="Documents table"
-                      selectionMode="single"
-                      selectionBehavior="replace"
                       removeWrapper
+                      aria-label="Documents table"
                       classNames={{
                         th: " sticky top-0 z-10 shadow-sm",
                       }}
+                      selectionBehavior="replace"
+                      selectionMode="single"
                     >
                       <TableHeader>
                         <TableColumn>DOCUMENT NAME</TableColumn>
@@ -226,7 +220,7 @@ export default function DocumentList() {
                           >
                             <TableCell>
                               <div className="flex items-center gap-2">
-                                <FileText size={16} className="text-primary" />
+                                <FileText className="text-primary" size={16} />
                                 <span className="font-medium">{doc.name}</span>
                               </div>
                             </TableCell>
@@ -247,10 +241,10 @@ export default function DocumentList() {
                             </TableCell>
                             <TableCell>
                               <Button
+                                isIconOnly
+                                color="primary"
                                 size="sm"
                                 variant="light"
-                                color="primary"
-                                isIconOnly
                                 onPress={() => handleDownload(doc)}
                               >
                                 <Download size={16} />
@@ -266,8 +260,8 @@ export default function DocumentList() {
                       showControls
                       showShadow
                       color="primary"
-                      size="sm"
                       page={page}
+                      size="sm"
                       total={pages}
                       onChange={setPage}
                     />

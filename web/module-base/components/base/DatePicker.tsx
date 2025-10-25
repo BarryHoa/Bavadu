@@ -6,8 +6,8 @@ const DatePickerBase = (props: DatePickerBaseProps) => {
   return (
     <DatePicker
       labelPlacement="outside"
-      variant="bordered"
       size="sm"
+      variant="bordered"
       {...props}
     />
   );

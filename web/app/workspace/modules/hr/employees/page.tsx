@@ -13,15 +13,7 @@ import {
 } from "@heroui/table";
 import { Avatar } from "@heroui/avatar";
 import { Badge } from "@heroui/badge";
-import {
-  Search,
-  Filter,
-  Plus,
-  MoreVertical,
-  Edit,
-  Trash2,
-  Eye,
-} from "lucide-react";
+import { Search, Filter, Plus, Edit, Trash2, Eye } from "lucide-react";
 import { useState } from "react";
 
 export default function EmployeesPage() {
@@ -89,7 +81,7 @@ export default function EmployeesPage() {
     (employee) =>
       employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.position.toLowerCase().includes(searchTerm.toLowerCase())
+      employee.position.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const getStatusColor = (status: string) => {
@@ -123,13 +115,13 @@ export default function EmployeesPage() {
         <CardBody>
           <div className="flex flex-col md:flex-row gap-4">
             <Input
+              className="flex-1"
               placeholder="Search employees..."
+              startContent={<Search size={16} />}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              startContent={<Search size={16} />}
-              className="flex-1"
             />
-            <Button variant="bordered" startContent={<Filter size={16} />}>
+            <Button startContent={<Filter size={16} />} variant="bordered">
               Filters
             </Button>
           </div>
@@ -158,9 +150,9 @@ export default function EmployeesPage() {
                   <TableCell>
                     <div className="flex items-center space-x-3">
                       <Avatar
-                        src={employee.avatar}
                         name={employee.name}
                         size="sm"
+                        src={employee.avatar}
                       />
                       <div>
                         <p className="font-medium">{employee.name}</p>
@@ -174,7 +166,7 @@ export default function EmployeesPage() {
                     <p className="font-medium">{employee.position}</p>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="flat" color="primary">
+                    <Badge color="primary" variant="flat">
                       {employee.department}
                     </Badge>
                   </TableCell>
@@ -196,25 +188,25 @@ export default function EmployeesPage() {
                     <div className="flex items-center space-x-2">
                       <Button
                         isIconOnly
+                        color="primary"
                         size="sm"
                         variant="light"
-                        color="primary"
                       >
                         <Eye size={16} />
                       </Button>
                       <Button
                         isIconOnly
+                        color="warning"
                         size="sm"
                         variant="light"
-                        color="warning"
                       >
                         <Edit size={16} />
                       </Button>
                       <Button
                         isIconOnly
+                        color="danger"
                         size="sm"
                         variant="light"
-                        color="danger"
                       >
                         <Trash2 size={16} />
                       </Button>

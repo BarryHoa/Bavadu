@@ -13,10 +13,10 @@ export default function UserRole({
 }: UserRoleProps) {
   return (
     <Chip
-      color={color}
-      variant="flat"
-      size="sm"
       className="absolute top-3 right-3"
+      color={color}
+      size="sm"
+      variant="flat"
     >
       {role}
     </Chip>

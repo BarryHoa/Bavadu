@@ -1,6 +1,9 @@
 "use client";
 
 import { useMemo, useState, useCallback } from "react";
+import { Spinner } from "@heroui/spinner";
+import { TableProps } from "@heroui/table";
+
 import {
   Table,
   TableHeader,
@@ -9,14 +12,11 @@ import {
   TableRow,
   TableCell,
 } from "../Table";
-import { Pagination } from "@heroui/pagination";
-import { Spinner } from "@heroui/spinner";
 import usePagination from "../Pagination/usePagination";
 import {
   PAGINATION_DEFAULT_PAGE_SIZE,
   PAGINATION_PAGE_SIZE_OPTIONS,
 } from "../Pagination/pagginationConts";
-import { TableProps } from "@heroui/table";
 import PaginationComponent from "../Pagination/Pagination";
 
 export interface DataTableColumn<T = any> {
@@ -136,19 +136,22 @@ export default function DataTable<T = any>({
     (record: T, index: number) => {
       if (isExistRowKey) {
         const val = (record as any)[rowKey];
+
         if (typeof val === "string" || typeof val === "number") {
           return String(val);
         }
       }
+
       return index;
     },
-    [rowKey, isExistRowKey]
+    [rowKey, isExistRowKey],
   );
 
   // Handle page change
   const handlePageChange = useCallback(
     (page: number) => {
       const newPage = paginationInfo.handleChangePage(page);
+
       if (onChangeTable) {
         onChangeTable({
           page: newPage,
@@ -158,13 +161,14 @@ export default function DataTable<T = any>({
         });
       }
     },
-    [paginationInfo, sortDescriptor, onChangeTable]
+    [paginationInfo, sortDescriptor, onChangeTable],
   );
 
   // Handle page size change
   const handlePageSizeChange = useCallback(
     (pageSize: number) => {
       const newPageSize = paginationInfo.handleChangePageSize(pageSize);
+
       if (onChangeTable) {
         onChangeTable({
           page: paginationInfo.currentPage,
@@ -174,7 +178,7 @@ export default function DataTable<T = any>({
         });
       }
     },
-    [paginationInfo, sortDescriptor, onChangeTable]
+    [paginationInfo, sortDescriptor, onChangeTable],
   );
 
   // Calculate frozen column positions
@@ -200,6 +204,7 @@ export default function DataTable<T = any>({
     // Calculate right frozen columns (from right to left)
     for (let i = columns.length - 1; i >= 0; i--) {
       const col = columns[i];
+
       if (col.fixed === "right") {
         rightColumns.unshift({
           key: col.key,
@@ -217,8 +222,9 @@ export default function DataTable<T = any>({
   const getFrozenStyle = useCallback(
     (columnKey: string) => {
       const leftCol = frozenColumnsInfo.leftColumns.find(
-        (c) => c.key === columnKey
+        (c) => c.key === columnKey,
       );
+
       if (leftCol) {
         return {
           position: "sticky" as const,
@@ -228,8 +234,9 @@ export default function DataTable<T = any>({
       }
 
       const rightCol = frozenColumnsInfo.rightColumns.find(
-        (c) => c.key === columnKey
+        (c) => c.key === columnKey,
       );
+
       if (rightCol) {
         return {
           position: "sticky" as const,
@@ -240,24 +247,25 @@ export default function DataTable<T = any>({
 
       return {};
     },
-    [frozenColumnsInfo]
+    [frozenColumnsInfo],
   );
 
   // Get frozen column class
   const getFrozenClass = useCallback(
     (columnKey: string) => {
       const isLeftFrozen = frozenColumnsInfo.leftColumns.some(
-        (c) => c.key === columnKey
+        (c) => c.key === columnKey,
       );
       const isRightFrozen = frozenColumnsInfo.rightColumns.some(
-        (c) => c.key === columnKey
+        (c) => c.key === columnKey,
       );
 
       if (isLeftFrozen) return "frozen-column frozen-left";
       if (isRightFrozen) return "frozen-column frozen-right";
+
       return "";
     },
-    [frozenColumnsInfo]
+    [frozenColumnsInfo],
   );
 
   // Render cell content
@@ -271,7 +279,7 @@ export default function DataTable<T = any>({
 
       return value;
     },
-    []
+    [],
   );
 
   // Table bottom content (pagination + summary)
@@ -283,11 +291,11 @@ export default function DataTable<T = any>({
       <div className="flex flex-col gap-4 flex-1">
         <Table
           aria-label="Data table"
+          selectedKeys={selectedKeys}
+          selectionMode="multiple"
           isHeaderSticky
           // isStriped
           isCompact
-          selectionMode="multiple"
-          selectedKeys={selectedKeys}
           onSelectionChange={onSelectionChange as any}
           // bottomContent={bottomContent}
           className={className}
@@ -305,23 +313,24 @@ export default function DataTable<T = any>({
               <TableColumn
                 key={column.key}
                 align={column.align || "start"}
-                width={column.width}
                 allowsSorting={column.sortable}
                 className={getFrozenClass(column.key)}
                 style={getFrozenStyle(column.key)}
+                width={column.width}
               >
                 {column.label}
               </TableColumn>
             ))}
           </TableHeader>
           <TableBody
-            items={dataSource}
-            isLoading={loading}
-            loadingContent={<Spinner label="Loading..." />}
             emptyContent={emptyContent}
+            isLoading={loading}
+            items={dataSource}
+            loadingContent={<Spinner label="Loading..." />}
           >
             {(item) => {
               const index = dataSource.indexOf(item);
+
               return (
                 <TableRow key={getRowKey(item, index)}>
                   {columns.map((column) => (

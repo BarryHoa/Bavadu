@@ -35,6 +35,7 @@ export class ModuleLoader {
     if (fs.existsSync(this.registryPath)) {
       return JSON.parse(fs.readFileSync(this.registryPath, "utf8"));
     }
+
     return { modules: {}, installed: [], version: "1.0.0" };
   }
 
@@ -67,9 +68,10 @@ export class ModuleLoader {
       [];
 
     for (const moduleName of this.registry.installed) {
-      const module = this.registry.modules[moduleName];
-      if (module && module.routes) {
-        module.routes.forEach((route) => {
+      const moduleInfo = this.registry.modules[moduleName];
+
+      if (moduleInfo && moduleInfo.routes) {
+        moduleInfo.routes.forEach((route) => {
           routes.push({
             path: route.path,
             component: route.component,
@@ -91,8 +93,10 @@ export class ModuleLoader {
 
       if (fs.existsSync(componentsPath)) {
         const componentFiles = this.getComponentFiles(componentsPath);
+
         componentFiles.forEach((file) => {
           const componentName = path.basename(file, path.extname(file));
+
           components[`${moduleName}/${componentName}`] = path.relative(
             process.cwd(),
             file
@@ -110,6 +114,7 @@ export class ModuleLoader {
 
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
+
       if (entry.isDirectory()) {
         files.push(...this.getComponentFiles(fullPath));
       } else if (
@@ -132,8 +137,10 @@ export class ModuleLoader {
 
       if (fs.existsSync(typesPath)) {
         const typeFiles = this.getTypeFiles(typesPath);
+
         typeFiles.forEach((file) => {
           const typeName = path.basename(file, path.extname(file));
+
           types[`${moduleName}/${typeName}`] = path.relative(
             process.cwd(),
             file
@@ -151,6 +158,7 @@ export class ModuleLoader {
 
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
+
       if (entry.isDirectory()) {
         files.push(...this.getTypeFiles(fullPath));
       } else if (entry.isFile() && entry.name.endsWith(".ts")) {
@@ -170,8 +178,10 @@ export class ModuleLoader {
 
       if (fs.existsSync(libPath)) {
         const libFiles = this.getLibFiles(libPath);
+
         libFiles.forEach((file) => {
           const libName = path.basename(file, path.extname(file));
+
           libs[`${moduleName}/${libName}`] = path.relative(process.cwd(), file);
         });
       }
@@ -186,6 +196,7 @@ export class ModuleLoader {
 
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
+
       if (entry.isDirectory()) {
         files.push(...this.getLibFiles(fullPath));
       } else if (

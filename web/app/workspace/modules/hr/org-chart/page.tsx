@@ -3,15 +3,7 @@
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
-import {
-  Building2,
-  Users,
-  Plus,
-  Edit,
-  Trash2,
-  ZoomIn,
-  ZoomOut,
-} from "lucide-react";
+import { Building2, Plus, ZoomIn, ZoomOut } from "lucide-react";
 import { useState } from "react";
 
 export default function OrgChartPage() {
@@ -108,8 +100,8 @@ export default function OrgChartPage() {
           <div className="flex items-center gap-2">
             <Button
               size="sm"
-              variant="light"
               startContent={<ZoomOut className="w-4 h-4" />}
+              variant="light"
               onClick={handleZoomOut}
             >
               Zoom Out
@@ -117,8 +109,8 @@ export default function OrgChartPage() {
             <span className="text-sm text-gray-500">{zoomLevel}%</span>
             <Button
               size="sm"
-              variant="light"
               startContent={<ZoomIn className="w-4 h-4" />}
+              variant="light"
               onClick={handleZoomIn}
             >
               Zoom In
@@ -145,7 +137,7 @@ export default function OrgChartPage() {
                   </div>
                   <h3 className="font-bold text-lg">{orgData.ceo.name}</h3>
                   <p className="text-sm opacity-90">{orgData.ceo.position}</p>
-                  <Chip size="sm" className="mt-2" color="secondary">
+                  <Chip className="mt-2" color="secondary" size="sm">
                     {orgData.ceo.department}
                   </Chip>
                 </div>
@@ -154,7 +146,7 @@ export default function OrgChartPage() {
 
             {/* Connection Lines */}
             <div className="flex justify-center mb-8">
-              <div className="w-px h-8 bg-gray-300"></div>
+              <div className="w-px h-8 bg-gray-300" />
             </div>
 
             {/* C-Level */}
@@ -173,9 +165,9 @@ export default function OrgChartPage() {
                     <h4 className="font-semibold text-sm">{exec.name}</h4>
                     <p className="text-xs text-gray-600">{exec.position}</p>
                     <Chip
-                      size="sm"
                       className="mt-1"
                       color="primary"
+                      size="sm"
                       variant="flat"
                     >
                       {exec.department}

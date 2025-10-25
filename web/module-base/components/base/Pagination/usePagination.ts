@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
+
 import {
   PAGINATION_DEFAULT_PAGE_SIZE,
   PAGINATION_PAGE_SIZE_OPTIONS,
@@ -53,6 +54,7 @@ export default function usePagination({
     if (defaultPage > pages) {
       return pages;
     }
+
     return defaultPage;
   }, [defaultPage]);
 
@@ -91,23 +93,27 @@ export default function usePagination({
     (page: number) => {
       if (page > pages || page < 1) {
         setCurrentPage(pages);
+
         return pages;
       }
       setCurrentPage(page);
+
       return page;
     },
-    [pages]
+    [pages],
   );
   const handleChangePageSize = useCallback(
     (pageSize: number) => {
       if (!pageSizeOptions.includes(pageSize)) {
         setPageSize(pageSizeOptions[0]);
+
         return pageSizeOptions[0];
       }
       setPageSize(pageSize);
+
       return pageSize;
     },
-    [pageSizeOptions]
+    [pageSizeOptions],
   );
   const resetPage = useCallback(() => {
     setCurrentPage(1);

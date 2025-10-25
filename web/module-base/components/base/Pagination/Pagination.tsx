@@ -6,7 +6,7 @@ import {
   DropdownItem,
 } from "@heroui/dropdown";
 import { Button } from "@heroui/button";
-import { cn } from "@heroui/theme";
+
 import { PAGINATION_PAGE_SIZE_OPTIONS } from "./pagginationConts";
 
 export const ChevronIcon = (props: React.SVGProps<SVGSVGElement>) => {
@@ -47,6 +47,7 @@ export default function PaginationComponent({
 }) {
   const handlePageSizeChange = (key: any) => {
     const selectedValue = Number(key);
+
     onPageSizeChange(selectedValue);
   };
 
@@ -56,10 +57,7 @@ export default function PaginationComponent({
         disableCursorAnimation
         isCompact
         showControls
-        page={page}
         className="gap-2"
-        total={total}
-        onChange={onChange}
         classNames={{
           base: "overflow-hidden",
           wrapper: "gap-0 h-8 rounded-sm border border-divider",
@@ -68,29 +66,33 @@ export default function PaginationComponent({
           prev: "w-8 h-8 text-small rounded-none bg-transparent",
           cursor: "w-8 h-8 text-small rounded-none bg-transparent",
         }}
+        page={page}
+        total={total}
+        onChange={onChange}
       />
       <Dropdown placement="top">
         <DropdownTrigger>
           <Button
-            variant="bordered"
-            size="sm"
             className="min-w-[80px] h-8"
             endContent={<ChevronIcon className="text-small rotate-90" />}
+            size="sm"
+            variant="bordered"
           >
             {pageSize} / page
           </Button>
         </DropdownTrigger>
         <DropdownMenu
           aria-label="Page size selection"
-          selectionMode="single"
+          className="min-w-[60px]"
           selectedKeys={[String(pageSize)]}
+          selectionMode="single"
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];
+
             if (selectedKey) {
               handlePageSizeChange(selectedKey);
             }
           }}
-          className="min-w-[60px]"
         >
           {PAGINATION_PAGE_SIZE_OPTIONS.map((item) => (
             <DropdownItem key={String(item)} textValue={String(item)}>

@@ -1,7 +1,6 @@
 "use client";
 
 import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
 import { Switch } from "@heroui/switch";
 import {
@@ -112,6 +111,7 @@ export default function SecurityPage() {
       failed: "danger",
       blocked: "warning",
     };
+
     return colors[status] || "default";
   };
 
@@ -266,8 +266,8 @@ export default function SecurityPage() {
                   </TableCell>
                   <TableCell>
                     <Chip
-                      size="sm"
                       color={getStatusColor(event.status) as any}
+                      size="sm"
                       variant="flat"
                     >
                       {event.status}

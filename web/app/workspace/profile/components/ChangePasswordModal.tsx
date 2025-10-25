@@ -24,21 +24,21 @@ export default function ChangePasswordModal() {
   return (
     <>
       <Button
-        color="danger"
-        variant="flat"
         className="flex-1"
-        startContent={<KeyRound size={16} />}
-        onPress={() => setIsOpen(true)}
+        color="danger"
         size="sm"
+        startContent={<KeyRound size={16} />}
+        variant="flat"
+        onPress={() => setIsOpen(true)}
       >
         Change Password
       </Button>
 
       <Modal
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        size="md"
         placement="center"
+        size="md"
+        onClose={() => setIsOpen(false)}
       >
         <ModalContent>
           {() => (
@@ -53,20 +53,20 @@ export default function ChangePasswordModal() {
                     Current Password
                   </label>
                   <InputBase
-                    type="password"
                     placeholder="Enter current password"
+                    startContent={<Lock className="text-gray-400" size={16} />}
+                    type="password"
                     variant="bordered"
-                    startContent={<Lock size={16} className="text-gray-400" />}
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">New Password</label>
                   <InputBase
-                    type="password"
                     placeholder="Enter new password"
+                    startContent={<Lock className="text-gray-400" size={16} />}
+                    type="password"
                     variant="bordered"
-                    startContent={<Lock size={16} className="text-gray-400" />}
                   />
                 </div>
 
@@ -75,10 +75,10 @@ export default function ChangePasswordModal() {
                     Confirm New Password
                   </label>
                   <InputBase
-                    type="password"
                     placeholder="Confirm new password"
+                    startContent={<Lock className="text-gray-400" size={16} />}
+                    type="password"
                     variant="bordered"
-                    startContent={<Lock size={16} className="text-gray-400" />}
                   />
                 </div>
 

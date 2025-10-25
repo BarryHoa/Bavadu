@@ -27,7 +27,7 @@ import { useState } from "react";
 
 export default function AttendancePage() {
   const [selectedDate, setSelectedDate] = useState(
-    parseDate(new Date().toISOString().split("T")[0])
+    parseDate(new Date().toISOString().split("T")[0]),
   );
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -87,7 +87,7 @@ export default function AttendancePage() {
   const filteredData = attendanceData.filter(
     (employee) =>
       employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.department.toLowerCase().includes(searchTerm.toLowerCase())
+      employee.department.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const getStatusColor = (status: string) => {
@@ -134,7 +134,7 @@ export default function AttendancePage() {
           </p>
         </div>
         <div className="flex space-x-2">
-          <Button variant="bordered" startContent={<Download size={16} />}>
+          <Button startContent={<Download size={16} />} variant="bordered">
             Export
           </Button>
           <Button color="primary" startContent={<Calendar size={16} />}>
@@ -165,19 +165,19 @@ export default function AttendancePage() {
         <CardBody>
           <div className="flex flex-col md:flex-row gap-4">
             <DatePicker
+              className="flex-1"
               label="Select Date"
               value={selectedDate}
               onChange={(date) => date && setSelectedDate(date)}
-              className="flex-1"
             />
             <Input
+              className="flex-1"
               placeholder="Search employees..."
+              startContent={<Clock size={16} />}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              startContent={<Clock size={16} />}
-              className="flex-1"
             />
-            <Button variant="bordered" startContent={<Filter size={16} />}>
+            <Button startContent={<Filter size={16} />} variant="bordered">
               Filters
             </Button>
           </div>
@@ -203,6 +203,7 @@ export default function AttendancePage() {
             <TableBody>
               {filteredData.map((record) => {
                 const StatusIcon = getStatusIcon(record.status);
+
                 return (
                   <TableRow key={record.id}>
                     <TableCell>
@@ -211,7 +212,7 @@ export default function AttendancePage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="flat" color="primary">
+                      <Badge color="primary" variant="flat">
                         {record.department}
                       </Badge>
                     </TableCell>

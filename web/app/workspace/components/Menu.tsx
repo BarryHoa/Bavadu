@@ -32,7 +32,7 @@ export default function Menu({
     setExpandedItems((prev) =>
       prev.includes(itemName)
         ? prev.filter((name) => name !== itemName)
-        : [...prev, itemName]
+        : [...prev, itemName],
     );
   };
 
@@ -45,13 +45,14 @@ export default function Menu({
     if (item.children) {
       return item.children.some((child) => hasActiveChild(child));
     }
+
     return false;
   };
 
   // Find all parent items that need to be expanded for the current path
   const findParentItemsToExpand = (
     items: MenuWorkspaceElement[],
-    path: string
+    path: string,
   ): string[] => {
     const parentsToExpand: string[] = [];
 
@@ -62,9 +63,11 @@ export default function Menu({
 
       if (item.children) {
         const hasActiveChild = item.children.some((child) => checkItem(child));
+
         if (hasActiveChild) {
           parentsToExpand.push(item.name);
         }
+
         return hasActiveChild;
       }
 
@@ -72,6 +75,7 @@ export default function Menu({
     };
 
     items.forEach((item) => checkItem(item));
+
     return parentsToExpand;
   };
 
@@ -83,6 +87,7 @@ export default function Menu({
     if (parentsToExpand.length > 0) {
       setExpandedItems((prev) => {
         const newExpanded = Array.from(new Set([...prev, ...parentsToExpand]));
+
         return newExpanded;
       });
 
@@ -147,12 +152,12 @@ export default function Menu({
               </div>
             ) : (
               <Link
-                href={itemPath || "#"}
                 className={`flex items-center flex-1 text-sm font-medium ${
                   isItemActive
                     ? "text-blue-600"
                     : "text-gray-700 group-hover:text-blue-600"
                 }`}
+                href={itemPath || "#"}
                 onClick={onClose}
               >
                 <div className="w-5 h-5 bg-gray-300 rounded flex items-center justify-center flex-shrink-0">
@@ -197,6 +202,7 @@ export default function Menu({
               const childPath = child.path;
               const childAs = child.as;
               const isChildActive = childPath && isActive(childPath);
+
               return (
                 <div
                   key={child.name}
@@ -208,9 +214,9 @@ export default function Menu({
                   }`}
                 >
                   <Link
-                    href={childPath || "#"}
                     as={childAs || childPath}
                     className="flex items-center flex-1"
+                    href={childPath || "#"}
                     onClick={onClose}
                   >
                     <div className="flex items-center">
@@ -281,11 +287,11 @@ export default function Menu({
 
       {/* Mobile sidebar */}
       <Drawer
+        backdrop="opaque"
         isOpen={isOpen}
-        onOpenChange={(open) => !open && onClose()}
         placement="left"
         size="sm"
-        backdrop="opaque"
+        onOpenChange={(open) => !open && onClose()}
       >
         <div className="w-72 h-full bg-white shadow-xl flex flex-col">
           <div className="flex items-center justify-between h-20 px-6 bg-gradient-to-r from-blue-600 to-purple-600">
@@ -297,9 +303,9 @@ export default function Menu({
             </div>
             <Button
               isIconOnly
-              variant="light"
-              size="sm"
               className="text-white"
+              size="sm"
+              variant="light"
               onPress={onClose}
             >
               ✕

@@ -54,7 +54,7 @@ export function GlobalSettingsProvider({
       updateSettings,
       resetSettings,
     }),
-    [settings]
+    [settings],
   );
 
   return (
@@ -66,10 +66,12 @@ export function GlobalSettingsProvider({
 
 export function useGlobalSettings() {
   const ctx = useContext(GlobalSettingsContext);
+
   if (!ctx) {
     throw new Error(
-      "useGlobalSettings must be used within GlobalSettingsProvider"
+      "useGlobalSettings must be used within GlobalSettingsProvider",
     );
   }
+
   return ctx;
 }

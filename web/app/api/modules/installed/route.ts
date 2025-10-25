@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+
+import { NextResponse } from "next/server";
 
 const MODULE_REGISTRY_PATH = path.join(process.cwd(), "modules", "module.json");
 
@@ -25,9 +26,11 @@ function loadRegistry(): ModuleRegistry {
       return JSON.parse(fs.readFileSync(MODULE_REGISTRY_PATH, "utf8"));
     } catch (error) {
       console.error("Error loading module registry:", error);
+
       return getDefaultRegistry();
     }
   }
+
   return getDefaultRegistry();
 }
 
@@ -52,7 +55,7 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to load installed modules" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

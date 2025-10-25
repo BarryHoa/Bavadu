@@ -13,12 +13,13 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Health check error:", error);
+
     return NextResponse.json(
       {
         success: false,
         message: "Health check failed",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

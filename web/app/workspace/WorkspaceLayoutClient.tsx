@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import Breadcrumb, { BreadcrumbItem } from "./components/Breadcrumb";
-import Content from "./components/Content";
-import MenuPanel from "./components/Menu";
-import Nav from "./components/Nav";
 import { WorkspaceProvider } from "@base/contexts/workspace";
 import { MenuWorkspaceElement } from "@base/interface/WorkspaceMenuInterface";
 import clsx from "clsx";
 import { ChevronRight } from "lucide-react";
+
+import Breadcrumb, { BreadcrumbItem } from "./components/Breadcrumb";
+import Content from "./components/Content";
+import MenuPanel from "./components/Menu";
+import Nav from "./components/Nav";
 
 interface SerializedNavigationItem {
   name: string;
@@ -42,6 +43,7 @@ export default function WorkspaceLayoutClient({
   const autoCrumbs: BreadcrumbItem[] = parts.map((p) => {
     acc += `/${p}`;
     const label = p.charAt(0).toUpperCase() + p.slice(1);
+
     return { label, href: acc };
   });
 
@@ -58,11 +60,11 @@ export default function WorkspaceLayoutClient({
         <Nav onOpenSidebar={() => setSidebarOpen(true)} />
         <div className="flex min-h-0 flex-1">
           <MenuPanel
-            items={navigationItems as unknown as MenuWorkspaceElement[]}
             isOpen={sidebarOpen}
-            onClose={() => setSidebarOpen(false)}
+            items={navigationItems as unknown as MenuWorkspaceElement[]}
             moduleMenus={moduleMenus}
             sidebarOpen={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
             onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           />
 
@@ -73,16 +75,16 @@ export default function WorkspaceLayoutClient({
               {/* Breadcrumb */}
               <div className="px-2 py-2 font-small rounded-md">
                 <button
-                  onClick={() => setSidebarOpen(!sidebarOpen)}
                   className="mb-2 p-2 hover:bg-gray-100 rounded-md"
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
                 >
                   <ChevronRight
-                    size={20}
                     className={clsx(
                       "display-inline-block",
                       "transition-transform",
-                      sidebarOpen ? "rotate-180" : ""
+                      sidebarOpen ? "rotate-180" : "",
                     )}
+                    size={20}
                   />
                 </button>
                 <Breadcrumb items={initialCrumbs} />

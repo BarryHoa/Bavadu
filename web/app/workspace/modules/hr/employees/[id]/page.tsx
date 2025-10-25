@@ -5,19 +5,7 @@ import { Button } from "@heroui/button";
 import { Avatar } from "@heroui/avatar";
 import { Badge } from "@heroui/badge";
 import { Divider } from "@heroui/divider";
-import {
-  ArrowLeft,
-  Edit,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  DollarSign,
-  Briefcase,
-  Users,
-  Clock,
-  Award,
-} from "lucide-react";
+import { ArrowLeft, Edit, Mail, Phone, MapPin } from "lucide-react";
 import { useParams } from "next/navigation";
 
 export default function EmployeeDetailPage() {
@@ -67,9 +55,9 @@ export default function EmployeeDetailPage() {
       {/* Header */}
       <div className="flex items-center space-x-4">
         <Button
-          variant="light"
-          startContent={<ArrowLeft size={16} />}
           className="p-2"
+          startContent={<ArrowLeft size={16} />}
+          variant="light"
         >
           Back
         </Button>
@@ -88,19 +76,19 @@ export default function EmployeeDetailPage() {
           <CardBody className="p-6">
             <div className="flex flex-col items-center space-y-4">
               <Avatar
-                src={employee.avatar}
-                name={employee.name}
-                className="w-24 h-24"
                 isBordered
+                className="w-24 h-24"
                 color="primary"
+                name={employee.name}
+                src={employee.avatar}
               />
               <div className="text-center">
                 <h2 className="text-xl font-bold">{employee.name}</h2>
                 <p className="text-gray-600">{employee.position}</p>
                 <Badge
+                  className="mt-2"
                   color={getStatusColor(employee.status)}
                   variant="flat"
-                  className="mt-2"
                 >
                   {employee.status}
                 </Badge>
@@ -110,15 +98,15 @@ export default function EmployeeDetailPage() {
 
               <div className="w-full space-y-3">
                 <div className="flex items-center space-x-3">
-                  <Mail size={16} className="text-gray-400" />
+                  <Mail className="text-gray-400" size={16} />
                   <span className="text-sm">{employee.email}</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <Phone size={16} className="text-gray-400" />
+                  <Phone className="text-gray-400" size={16} />
                   <span className="text-sm">{employee.phone}</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <MapPin size={16} className="text-gray-400" />
+                  <MapPin className="text-gray-400" size={16} />
                   <span className="text-sm">{employee.address}</span>
                 </div>
               </div>

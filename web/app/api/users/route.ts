@@ -1,5 +1,5 @@
-import usersModel from "@/server/models/UsersModel";
-import { GetUserListReq } from "@/server/models/interfaces/UserInterface";
+import usersModel from "@serv/models/UsersModel";
+import { GetUserListReq } from "@serv/models/interfaces/UserInterface";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -31,12 +31,13 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Get users error:", error);
+
     return NextResponse.json(
       {
         success: false,
         message: "Internal server error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -61,16 +62,17 @@ export async function POST(request: NextRequest) {
         message: "User created successfully",
         data: { user: newUser },
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("Create user error:", error);
+
     return NextResponse.json(
       {
         success: false,
         message: "Internal server error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

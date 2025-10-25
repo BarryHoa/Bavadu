@@ -1,11 +1,12 @@
 "use client";
 
-import { useSettings } from "@/app/context/SettingsContext";
 import SelectBase from "@base/components/base/Select";
 import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Select, SelectItem } from "@heroui/select";
+import { SelectItem } from "@heroui/select";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+
+import { useSettings } from "@/app/context/SettingsContext";
 
 const languages = [
   { code: "en", name: "English", flag: "🇺🇸" },
@@ -36,12 +37,12 @@ export default function LanguageSetting() {
       <CardBody className="pt-2">
         <SelectBase
           label={t("currentLanguage")}
+          labelPlacement="outside"
           placeholder={t("selectPlaceholder")}
           selectedKeys={[locale]}
-          onChange={(e) => handleLanguageChange(e.target.value)}
-          variant="bordered"
-          labelPlacement="outside"
           size="sm"
+          variant="bordered"
+          onChange={(e) => handleLanguageChange(e.target.value)}
         >
           {languages.map((lang) => (
             <SelectItem key={lang.code} textValue={lang.name}>

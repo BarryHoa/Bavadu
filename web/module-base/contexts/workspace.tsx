@@ -1,7 +1,8 @@
 "use client";
 
-import React, { createContext, useContext, useState, useMemo } from "react";
 import type { BreadcrumbItem } from "../../app/workspace/components/Breadcrumb";
+
+import React, { createContext, useContext, useState, useMemo } from "react";
 
 export interface WorkspaceState {
   currentModule: string | null;
@@ -35,7 +36,7 @@ const defaultWorkspaceState: WorkspaceState = {
 };
 
 const WorkspaceContext = createContext<WorkspaceContextValue | undefined>(
-  undefined
+  undefined,
 );
 
 export function WorkspaceProvider({
@@ -97,7 +98,7 @@ export function WorkspaceProvider({
       resetWorkspace,
       resetBreadcrumbs,
     }),
-    [state, initialBreadcrumbs]
+    [state, initialBreadcrumbs],
   );
 
   return (
@@ -109,18 +110,22 @@ export function WorkspaceProvider({
 
 export function useWorkspace() {
   const ctx = useContext(WorkspaceContext);
+
   if (!ctx) {
     throw new Error("useWorkspace must be used within WorkspaceProvider");
   }
+
   return ctx;
 }
 
 // Backward compatibility hook for breadcrumbs
 export function useBreadcrumbs() {
   const ctx = useContext(WorkspaceContext);
+
   if (!ctx) {
     throw new Error("useBreadcrumbs must be used within WorkspaceProvider");
   }
+
   return {
     breadcrumbs: ctx.breadcrumbs,
     setBreadcrumbs: ctx.setBreadcrumbs,

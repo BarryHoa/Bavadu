@@ -46,9 +46,9 @@ export default function AwardsCertifications() {
           </h3>
           {hasMoreAwards && (
             <Button
+              color="primary"
               size="sm"
               variant="light"
-              color="primary"
               onPress={() => setIsAwardsModalOpen(true)}
             >
               View More
@@ -69,10 +69,10 @@ export default function AwardsCertifications() {
       {/* Awards & Certifications Modal */}
       <Modal
         isOpen={isAwardsModalOpen}
-        onClose={() => setIsAwardsModalOpen(false)}
-        size="2xl"
         placement="center"
         scrollBehavior="inside"
+        size="2xl"
+        onClose={() => setIsAwardsModalOpen(false)}
       >
         <ModalContent>
           {(onClose) => (

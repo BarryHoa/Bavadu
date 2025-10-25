@@ -12,7 +12,7 @@ import {
   TableRow,
   TableCell,
 } from "@heroui/table";
-import { Search, Plus, Shield, Users, Settings } from "lucide-react";
+import { Search, Plus, Shield, Users } from "lucide-react";
 import { useState } from "react";
 
 export default function RolesPage() {
@@ -65,7 +65,7 @@ export default function RolesPage() {
   const filteredRoles = roles.filter(
     (role) =>
       role.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      role.description.toLowerCase().includes(searchTerm.toLowerCase())
+      role.description.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const getPermissionColor = (permission: string) => {
@@ -75,6 +75,7 @@ export default function RolesPage() {
       attendance: "warning",
       policies: "secondary",
     };
+
     return colors[permission] || "default";
   };
 
@@ -95,11 +96,11 @@ export default function RolesPage() {
         <CardBody>
           <div className="flex items-center gap-4 mb-6">
             <Input
+              className="max-w-sm"
               placeholder="Search roles..."
+              startContent={<Search className="w-4 h-4" />}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              startContent={<Search className="w-4 h-4" />}
-              className="max-w-sm"
             />
           </div>
 
@@ -127,8 +128,8 @@ export default function RolesPage() {
                       {role.permissions.map((permission) => (
                         <Chip
                           key={permission}
-                          size="sm"
                           color={getPermissionColor(permission) as any}
+                          size="sm"
                           variant="flat"
                         >
                           {permission}
@@ -144,8 +145,8 @@ export default function RolesPage() {
                   </TableCell>
                   <TableCell>
                     <Chip
-                      size="sm"
                       color={role.status === "active" ? "success" : "danger"}
+                      size="sm"
                       variant="flat"
                     >
                       {role.status}
@@ -156,7 +157,7 @@ export default function RolesPage() {
                       <Button size="sm" variant="light">
                         Edit
                       </Button>
-                      <Button size="sm" variant="light" color="danger">
+                      <Button color="danger" size="sm" variant="light">
                         Delete
                       </Button>
                     </div>

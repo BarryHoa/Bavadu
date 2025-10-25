@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+
+import { NextRequest, NextResponse } from "next/server";
 
 const MODULE_REGISTRY_PATH = path.join(process.cwd(), "modules", "module.json");
 
@@ -25,9 +26,11 @@ function loadRegistry(): ModuleRegistry {
       return JSON.parse(fs.readFileSync(MODULE_REGISTRY_PATH, "utf8"));
     } catch (error) {
       console.error("Error loading module registry:", error);
+
       return getDefaultRegistry();
     }
   }
+
   return getDefaultRegistry();
 }
 
@@ -51,11 +54,12 @@ function saveRegistry(registry: ModuleRegistry): void {
 export async function GET() {
   try {
     const registry = loadRegistry();
+
     return NextResponse.json(registry);
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to load modules" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -67,13 +71,13 @@ export async function POST(request: NextRequest) {
 
     if (action === "install") {
       const availableModule = registry.available.find(
-        (m) => m.name.toLowerCase().replace(/\s+/g, "") === moduleId
+        (m) => m.name.toLowerCase().replace(/\s+/g, "") === moduleId,
       );
 
       if (!availableModule) {
         return NextResponse.json(
           { error: "Module not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
@@ -88,7 +92,7 @@ export async function POST(request: NextRequest) {
       if (!registry.installed.includes(moduleId)) {
         return NextResponse.json(
           { error: "Module not installed" },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
@@ -103,7 +107,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to process request" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

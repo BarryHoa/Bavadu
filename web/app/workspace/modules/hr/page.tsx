@@ -86,7 +86,7 @@ export default function HRPage() {
           <h1 className="text-3xl font-bold">Human Resources</h1>
           <p className="text-gray-600">Manage your workforce efficiently</p>
         </div>
-        <Badge content="HR Module" color="primary" variant="flat">
+        <Badge color="primary" content="HR Module" variant="flat">
           <Button color="primary" variant="flat">
             Module Active
           </Button>

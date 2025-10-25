@@ -44,9 +44,9 @@ export default async function RootLayout({
       // )}
       >
         <Providers
-          themeProps={{ attribute: "class", defaultTheme: "light" }}
           locale={locale}
           messages={messages}
+          themeProps={{ attribute: "class", defaultTheme: "light" }}
         >
           <div className="relative flex flex-col h-screen">
             {/* <Navbar /> */}

@@ -13,7 +13,7 @@ const nextConfig = {
     // Add module resolution for modules directory
     config.resolve.alias = {
       ...config.resolve.alias,
-      "@modules": require("path").resolve(__dirname, "modules"),
+      "@mdl": require("path").resolve(__dirname, "modules"),
     };
 
     return config;

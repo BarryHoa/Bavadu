@@ -32,9 +32,11 @@ export class ModuleRegistryManager {
         return JSON.parse(fs.readFileSync(this.registryPath, "utf8"));
       } catch (error) {
         console.error("Error loading module registry:", error);
+
         return this.getDefaultRegistry();
       }
     }
+
     return this.getDefaultRegistry();
   }
 
@@ -52,7 +54,7 @@ export class ModuleRegistryManager {
     try {
       fs.writeFileSync(
         this.registryPath,
-        JSON.stringify(this.registry, null, 2)
+        JSON.stringify(this.registry, null, 2),
       );
     } catch (error) {
       console.error("Error saving module registry:", error);
@@ -77,7 +79,7 @@ export class ModuleRegistryManager {
     return (
       this.registry.modules[id] ||
       this.registry.available.find(
-        (m) => m.name.toLowerCase().replace(/\s+/g, "") === id
+        (m) => m.name.toLowerCase().replace(/\s+/g, "") === id,
       ) ||
       null
     );
@@ -89,8 +91,9 @@ export class ModuleRegistryManager {
 
   public installModule(moduleId: string): boolean {
     const availableModule = this.registry.available.find(
-      (m) => m.name.toLowerCase().replace(/\s+/g, "") === moduleId
+      (m) => m.name.toLowerCase().replace(/\s+/g, "") === moduleId,
     );
+
     if (!availableModule) {
       return false;
     }
@@ -99,6 +102,7 @@ export class ModuleRegistryManager {
     this.registry.modules[moduleId] = availableModule;
     this.registry.installed.push(moduleId);
     this.saveRegistry();
+
     return true;
   }
 
@@ -110,25 +114,27 @@ export class ModuleRegistryManager {
     // Remove from installed modules
     delete this.registry.modules[moduleId];
     this.registry.installed = this.registry.installed.filter(
-      (id) => id !== moduleId
+      (id) => id !== moduleId,
     );
     this.saveRegistry();
+
     return true;
   }
 
   public getModulesByCategory(category: string): ModuleInfo[] {
     return this.getAllModules().filter(
-      (module) => module.category === category
+      (module) => module.category === category,
     );
   }
 
   public searchModules(query: string): ModuleInfo[] {
     const lowercaseQuery = query.toLowerCase();
+
     return this.getAllModules().filter(
       (module) =>
         module.name.toLowerCase().includes(lowercaseQuery) ||
         module.description.toLowerCase().includes(lowercaseQuery) ||
-        module.category.toLowerCase().includes(lowercaseQuery)
+        module.category.toLowerCase().includes(lowercaseQuery),
     );
   }
 
@@ -141,7 +147,7 @@ export class ModuleRegistryManager {
       installed: installed.length,
       available: available.length,
       categories: Array.from(
-        new Set(this.getAllModules().map((m) => m.category))
+        new Set(this.getAllModules().map((m) => m.category)),
       ).length,
     };
   }

@@ -97,7 +97,7 @@ export default function PoliciesPage() {
     (policy) =>
       policy.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       policy.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      policy.description.toLowerCase().includes(searchTerm.toLowerCase())
+      policy.description.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const getStatusColor = (status: string) => {
@@ -106,6 +106,7 @@ export default function PoliciesPage() {
       draft: "warning",
       archived: "default",
     };
+
     return colors[status] || "default";
   };
 
@@ -118,6 +119,7 @@ export default function PoliciesPage() {
       Security: "warning",
       HR: "default",
     };
+
     return colors[category] || "default";
   };
 
@@ -138,11 +140,11 @@ export default function PoliciesPage() {
         <CardBody>
           <div className="flex items-center gap-4 mb-6">
             <Input
+              className="max-w-sm"
               placeholder="Search policies..."
+              startContent={<Search className="w-4 h-4" />}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              startContent={<Search className="w-4 h-4" />}
-              className="max-w-sm"
             />
           </div>
 
@@ -169,8 +171,8 @@ export default function PoliciesPage() {
                   </TableCell>
                   <TableCell>
                     <Chip
-                      size="sm"
                       color={getCategoryColor(policy.category) as any}
+                      size="sm"
                       variant="flat"
                     >
                       {policy.category}
@@ -184,8 +186,8 @@ export default function PoliciesPage() {
                   </TableCell>
                   <TableCell>
                     <Chip
-                      size="sm"
                       color={getStatusColor(policy.status) as any}
+                      size="sm"
                       variant="flat"
                     >
                       {policy.status}
@@ -201,23 +203,23 @@ export default function PoliciesPage() {
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        variant="light"
                         startContent={<Eye className="w-4 h-4" />}
+                        variant="light"
                       >
                         View
                       </Button>
                       <Button
                         size="sm"
-                        variant="light"
                         startContent={<Edit className="w-4 h-4" />}
+                        variant="light"
                       >
                         Edit
                       </Button>
                       <Button
-                        size="sm"
-                        variant="light"
                         color="danger"
+                        size="sm"
                         startContent={<Trash2 className="w-4 h-4" />}
+                        variant="light"
                       >
                         Delete
                       </Button>

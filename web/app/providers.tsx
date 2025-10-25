@@ -9,6 +9,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { useRouter } from "next/navigation";
 import * as React from "react";
+
 import { SettingsProvider } from "./context/SettingsContext";
 
 export interface ProvidersProps {
@@ -40,7 +41,7 @@ export function Providers({
         <NextThemesProvider {...themeProps}>
           <GlobalSettingsProvider>
             <SettingsProvider>
-              <NavigationLoader style="bar" minLoadingTime={300} />
+              <NavigationLoader minLoadingTime={300} style="bar" />
               {children}
             </SettingsProvider>
           </GlobalSettingsProvider>

@@ -48,14 +48,14 @@ export default function DigitalSignature() {
       <div className="w-full space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-            <Shield size={14} className="text-primary" />
+            <Shield className="text-primary" size={14} />
             Digital Signature
           </h3>
           <Button
+            isIconOnly
+            color="primary"
             size="sm"
             variant="light"
-            color="primary"
-            isIconOnly
             onPress={() => setIsSignatureModalOpen(true)}
           >
             <KeyRound size={14} />
@@ -65,7 +65,7 @@ export default function DigitalSignature() {
         {hasSignature ? (
           <div className="p-2 rounded-lg border border-gray-200 bg-green-50">
             <div className="flex items-center gap-2 mb-1">
-              <CheckCircle size={14} className="text-green-600" />
+              <CheckCircle className="text-green-600" size={14} />
               <h4 className="text-sm font-semibold text-green-900">
                 Signature Active
               </h4>
@@ -89,10 +89,10 @@ export default function DigitalSignature() {
       {/* Digital Signature Modal */}
       <Modal
         isOpen={isSignatureModalOpen}
-        onClose={() => setIsSignatureModalOpen(false)}
-        size="2xl"
         placement="center"
         scrollBehavior="inside"
+        size="2xl"
+        onClose={() => setIsSignatureModalOpen(false)}
       >
         <ModalContent>
           {(onClose) => (
@@ -104,7 +104,7 @@ export default function DigitalSignature() {
               <ModalBody className="space-y-4">
                 {/* Status */}
                 <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 border border-green-200">
-                  <CheckCircle size={20} className="text-green-600" />
+                  <CheckCircle className="text-green-600" size={20} />
                   <div className="flex-1">
                     <h4 className="text-sm font-semibold text-green-900">
                       Signature Status: Active
@@ -121,24 +121,24 @@ export default function DigitalSignature() {
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-medium">Public Key</label>
                     <Button
-                      size="sm"
-                      variant="light"
                       color="primary"
+                      size="sm"
                       startContent={<Copy size={14} />}
+                      variant="light"
                       onPress={handleCopyPublicKey}
                     >
                       {copied ? "Copied!" : "Copy"}
                     </Button>
                   </div>
                   <Textarea
-                    value={signatureData.publicKey}
                     readOnly
-                    variant="bordered"
-                    minRows={4}
-                    maxRows={6}
                     classNames={{
                       input: "font-mono text-xs",
                     }}
+                    maxRows={6}
+                    minRows={4}
+                    value={signatureData.publicKey}
+                    variant="bordered"
                   />
                 </div>
 
@@ -146,13 +146,13 @@ export default function DigitalSignature() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Signature Hash</label>
                   <Textarea
-                    value={signatureData.signatureHash}
                     readOnly
-                    variant="bordered"
-                    minRows={2}
                     classNames={{
                       input: "font-mono text-xs",
                     }}
+                    minRows={2}
+                    value={signatureData.signatureHash}
+                    variant="bordered"
                   />
                 </div>
 
@@ -192,8 +192,8 @@ export default function DigitalSignature() {
                 </Button>
                 <Button
                   color="warning"
-                  variant="flat"
                   startContent={<RefreshCw size={16} />}
+                  variant="flat"
                   onPress={handleRegenerateSignature}
                 >
                   Regenerate Signature

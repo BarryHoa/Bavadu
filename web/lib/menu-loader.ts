@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+
 import { MenuWorkspaceElement } from "@base/interface/WorkspaceMenuInterface";
 
 export interface MenuItem {
@@ -34,7 +35,7 @@ export function loadMenusFromModules(): MenuWorkspaceElement[] {
         // Recursively update paths to prepend module path
         const updatePaths = (
           items: MenuWorkspaceElement[],
-          modulePrefix: string
+          modulePrefix: string,
         ): MenuWorkspaceElement[] => {
           return items.map((item) => ({
             ...item,
@@ -51,6 +52,7 @@ export function loadMenusFromModules(): MenuWorkspaceElement[] {
           if (!path) {
             return undefined;
           }
+
           // remove the last slash if it exists
           return `${modulePrefix}${path.replace(/\/$/, "")}`;
         };

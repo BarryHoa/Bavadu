@@ -2,6 +2,7 @@
 
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState, useRef, Suspense } from "react";
+
 import { LoadingBar } from "./LoadingBar";
 import { LoadingOverlay } from "./LoadingOverlay";
 
@@ -63,6 +64,7 @@ function NavigationLoaderContent({
     // Skip first render (tránh hiển thị loading khi page load lần đầu)
     if (isFirstRenderRef.current) {
       isFirstRenderRef.current = false;
+
       return;
     }
 

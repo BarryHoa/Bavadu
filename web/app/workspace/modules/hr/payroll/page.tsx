@@ -21,7 +21,6 @@ import {
   Calculator,
   TrendingUp,
   Users,
-  Clock,
   AlertCircle,
 } from "lucide-react";
 import { useState } from "react";
@@ -91,7 +90,7 @@ export default function PayrollPage() {
   const filteredData = payrollData.filter(
     (employee) =>
       employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.department.toLowerCase().includes(searchTerm.toLowerCase())
+      employee.department.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const getStatusColor = (status: string) => {
@@ -130,7 +129,7 @@ export default function PayrollPage() {
           <p className="text-gray-600">Manage employee salaries and payments</p>
         </div>
         <div className="flex space-x-2">
-          <Button variant="bordered" startContent={<Download size={16} />}>
+          <Button startContent={<Download size={16} />} variant="bordered">
             Export
           </Button>
           <Button color="primary" startContent={<Calculator size={16} />}>
@@ -161,17 +160,17 @@ export default function PayrollPage() {
         <CardBody>
           <div className="flex flex-col md:flex-row gap-4">
             <DatePicker
+              className="flex-1"
               label="Select Month"
               value={selectedMonth}
               onChange={setSelectedMonth}
-              className="flex-1"
             />
             <Input
+              className="flex-1"
               placeholder="Search employees..."
+              startContent={<Users size={16} />}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              startContent={<Users size={16} />}
-              className="flex-1"
             />
             <Button variant="bordered">Filter</Button>
           </div>
@@ -205,7 +204,7 @@ export default function PayrollPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="flat" color="primary">
+                    <Badge color="primary" variant="flat">
                       {record.department}
                     </Badge>
                   </TableCell>
@@ -243,20 +242,20 @@ export default function PayrollPage() {
                     <div className="flex items-center space-x-2">
                       <Button
                         isIconOnly
-                        size="sm"
-                        variant="light"
                         color="primary"
+                        size="sm"
                         title="View Details"
+                        variant="light"
                       >
                         <Calculator size={16} />
                       </Button>
                       {record.status === "pending" && (
                         <Button
                           isIconOnly
-                          size="sm"
-                          variant="light"
                           color="success"
+                          size="sm"
                           title="Send Payment"
+                          variant="light"
                         >
                           <Send size={16} />
                         </Button>

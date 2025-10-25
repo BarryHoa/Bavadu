@@ -3,12 +3,12 @@
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Divider } from "@heroui/divider";
-
 import { Switch } from "@heroui/switch";
+import Input from "@base/components/base/Input";
+
 import BackgroundSetting from "./features/BackgroundSetting";
 import LanguageSetting from "./features/LanguageSetting";
 import NumberSetting from "./features/NumberSetting";
-import Input from "@base/components/base/Input";
 
 export default function WorkspaceSettings() {
   return (
@@ -31,8 +31,8 @@ export default function WorkspaceSettings() {
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Workspace Name</label>
               <Input
-                placeholder="Enter workspace name"
                 defaultValue="My Workspace"
+                placeholder="Enter workspace name"
                 variant="bordered"
               />
             </div>
@@ -40,8 +40,8 @@ export default function WorkspaceSettings() {
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Description</label>
               <Input
-                placeholder="Enter workspace description"
                 defaultValue=""
+                placeholder="Enter workspace description"
                 variant="bordered"
               />
             </div>
@@ -139,15 +139,15 @@ export default function WorkspaceSettings() {
                 Session Timeout Duration
               </label>
               <Input
-                placeholder="30"
                 defaultValue="30"
-                variant="bordered"
-                type="number"
                 endContent={
                   <div className="pointer-events-none flex items-center">
                     <span className="text-default-400 text-small">minutes</span>
                   </div>
                 }
+                placeholder="30"
+                type="number"
+                variant="bordered"
                 width="200px"
               />
             </div>

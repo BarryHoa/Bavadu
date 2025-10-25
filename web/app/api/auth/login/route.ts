@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password } = body;
+    const { email, password: _password } = body;
 
     // TODO: Implement actual login logic with database
     // For now, return a mock response
@@ -25,7 +25,11 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Login error:", error);
+    // Log error for debugging (in production, use proper logging service)
+    if (process.env.NODE_ENV === "development") {
+      console.error("Login error:", error);
+    }
+
     return NextResponse.json(
       {
         success: false,

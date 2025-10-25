@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { refreshToken } = body;
+    const { refreshToken: _refreshToken } = body;
 
     // TODO: Implement actual token refresh logic
     // For now, return a mock response
@@ -21,7 +21,11 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Token refresh error:", error);
+    // Log error for debugging (in production, use proper logging service)
+    if (process.env.NODE_ENV === "development") {
+      console.error("Token refresh error:", error);
+    }
+
     return NextResponse.json(
       {
         success: false,
