@@ -99,7 +99,7 @@ export class ModuleLoader {
 
           components[`${moduleName}/${componentName}`] = path.relative(
             process.cwd(),
-            file
+            file,
           );
         });
       }
@@ -143,7 +143,7 @@ export class ModuleLoader {
 
           types[`${moduleName}/${typeName}`] = path.relative(
             process.cwd(),
-            file
+            file,
           );
         });
       }

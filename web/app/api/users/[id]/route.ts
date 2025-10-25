@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
@@ -28,14 +28,14 @@ export async function GET(
         success: false,
         message: "Internal server error",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
@@ -62,17 +62,17 @@ export async function PUT(
         success: false,
         message: "Internal server error",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { id: _id } = await params;
 
     // TODO: Implement actual user deletion logic
     // For now, return success
@@ -88,7 +88,7 @@ export async function DELETE(
         success: false,
         message: "Internal server error",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

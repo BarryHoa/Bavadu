@@ -56,10 +56,10 @@ export async function GET() {
     const registry = loadRegistry();
 
     return NextResponse.json(registry);
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Failed to load modules" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -71,13 +71,13 @@ export async function POST(request: NextRequest) {
 
     if (action === "install") {
       const availableModule = registry.available.find(
-        (m) => m.name.toLowerCase().replace(/\s+/g, "") === moduleId,
+        (m) => m.name.toLowerCase().replace(/\s+/g, "") === moduleId
       );
 
       if (!availableModule) {
         return NextResponse.json(
           { error: "Module not found" },
-          { status: 404 },
+          { status: 404 }
         );
       }
 
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       if (!registry.installed.includes(moduleId)) {
         return NextResponse.json(
           { error: "Module not installed" },
-          { status: 404 },
+          { status: 404 }
         );
       }
 
@@ -104,10 +104,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Failed to process request" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

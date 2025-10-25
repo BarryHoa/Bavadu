@@ -19,7 +19,7 @@ export async function POST(_request: NextRequest) {
         success: false,
         message: "Internal server error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

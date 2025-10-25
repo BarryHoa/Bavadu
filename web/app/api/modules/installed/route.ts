@@ -52,10 +52,10 @@ export async function GET() {
       .filter(Boolean);
 
     return NextResponse.json(installedModules);
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Failed to load installed modules" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

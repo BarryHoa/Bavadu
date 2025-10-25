@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { username, email, password } = body;
+    const { username, email, password: _password } = body;
 
     // TODO: Implement actual registration logic with database
     // For now, return a mock response
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         success: false,
         message: "Internal server error",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

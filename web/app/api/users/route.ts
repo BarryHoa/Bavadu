@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
         success: false,
         message: "Internal server error",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { username, email, password } = body;
+    const { username, email, password: _password } = body;
 
     // TODO: Implement actual user creation logic
     // For now, return mock data
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
         message: "User created successfully",
         data: { user: newUser },
       },
-      { status: 201 },
+      { status: 201 }
     );
   } catch (error) {
     console.error("Create user error:", error);
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
         success: false,
         message: "Internal server error",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
