@@ -35,7 +35,7 @@ class EmployeesModel extends ModalController {
     // Apply filters
     if (Object.keys(filters).length > 0) {
       const conditions = Object.entries(filters).map(([key, value]) =>
-        eq(employees[key as keyof typeof employees._.columns], value as any)
+        eq(employees[key as keyof typeof employees._.columns], value as any),
       );
 
       query = query.where(and(...conditions));
@@ -49,8 +49,8 @@ class EmployeesModel extends ModalController {
           sql`${employees.lastName} ILIKE ${"%" + search + "%"}`,
           sql`${employees.email} ILIKE ${"%" + search + "%"}`,
           sql`${employees.position} ILIKE ${"%" + search + "%"}`,
-          sql`${employees.department} ILIKE ${"%" + search + "%"}`
-        )
+          sql`${employees.department} ILIKE ${"%" + search + "%"}`,
+        ),
       );
     }
 
@@ -102,6 +102,7 @@ class EmployeesModel extends ModalController {
       return result[0] || null;
     } catch (error) {
       console.error("Database query error:", error);
+
       return null;
     }
   }
@@ -112,6 +113,7 @@ class EmployeesModel extends ModalController {
         .insert(employees)
         .values(employeeData)
         .returning();
+
       return result[0];
     } catch (error) {
       console.error("Database insert error:", error);
@@ -126,6 +128,7 @@ class EmployeesModel extends ModalController {
         .set({ ...employeeData, updatedAt: new Date() })
         .where(eq(employees.id, id))
         .returning();
+
       return result[0];
     } catch (error) {
       console.error("Database update error:", error);
@@ -139,6 +142,7 @@ class EmployeesModel extends ModalController {
         .delete(employees)
         .where(eq(employees.id, id))
         .returning();
+
       return result[0];
     } catch (error) {
       console.error("Database delete error:", error);

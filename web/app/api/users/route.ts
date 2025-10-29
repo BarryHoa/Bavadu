@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
         success: false,
         message: "Internal server error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
         message: "User created successfully",
         data: { user: newUser },
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("Create user error:", error);
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
         success: false,
         message: "Internal server error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

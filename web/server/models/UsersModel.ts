@@ -22,7 +22,7 @@ class UsersModel extends ModalController {
     // Apply filters
     if (Object.keys(filters).length > 0) {
       const conditions = Object.entries(filters).map(([key, value]) =>
-        eq(users[key as keyof typeof users._.columns], value as any)
+        eq(users[key as keyof typeof users._.columns], value as any),
       );
 
       query = query.where(and(...conditions));
@@ -33,8 +33,8 @@ class UsersModel extends ModalController {
       query = query.where(
         or(
           sql`${users.username} ILIKE ${"%" + search + "%"}`,
-          sql`${users.email} ILIKE ${"%" + search + "%"}`
-        )
+          sql`${users.email} ILIKE ${"%" + search + "%"}`,
+        ),
       );
     }
 

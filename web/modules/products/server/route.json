@@ -1,0 +1,14 @@
+[
+  {
+    "path": "/",
+    "handler": "/products/get-list"
+  },
+  {
+    "path": "/[id]",
+    "handler": "/products/get-by-id"
+  },
+  {
+    "path": "/product-types",
+    "handler": "/products-types/get-list"
+  }
+]

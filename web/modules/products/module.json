@@ -1,0 +1,12 @@
+{
+  "name": "products",
+  "title": "Products",
+  "version": "0.1.0",
+  "server": {
+    "schemas": ["server/schemas/product.ts"],
+    "models": ["server/models/ProductsModel.ts"]
+  },
+  "clients": {
+    "entry": "clients/index.ts"
+  }
+}

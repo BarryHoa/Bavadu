@@ -19,7 +19,7 @@ export async function GET(_request: NextRequest) {
         success: false,
         message: "Health check failed",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

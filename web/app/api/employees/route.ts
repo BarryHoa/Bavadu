@@ -17,9 +17,11 @@ export async function GET(request: NextRequest) {
 
     // Parse filters
     const filters: Record<string, any> = {};
+
     searchParams.forEach((value, key) => {
       if (key.startsWith("filter_")) {
         const filterKey = key.replace("filter_", "");
+
         filters[filterKey] = value;
       }
     });
@@ -27,6 +29,7 @@ export async function GET(request: NextRequest) {
 
     // Parse sorts
     const sortParam = searchParams.get("sort");
+
     if (sortParam) {
       try {
         params.sorts = JSON.parse(sortParam);
@@ -44,9 +47,10 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching employees:", error);
+
     return NextResponse.json(
       { success: false, error: "Failed to fetch employees" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -66,7 +70,7 @@ export async function POST(request: NextRequest) {
     ) {
       return NextResponse.json(
         { success: false, error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -78,9 +82,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error creating employee:", error);
+
     return NextResponse.json(
       { success: false, error: "Failed to create employee" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
