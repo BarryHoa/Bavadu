@@ -1,14 +1,25 @@
+
 [
   {
-    "path": "/",
-    "handler": "/products/get-list"
+    "path" : "/",
+    "routes": [
+      {
+        "path": "/",
+        "handler": "/products/get-list"
+      },
+      {
+        "path": "/[id]",
+        "handler": "/products/get-by-id"
+      }
+    ]
   },
   {
-    "path": "/[id]",
-    "handler": "/products/get-by-id"
-  },
-  {
-    "path": "/product-types",
-    "handler": "/products-types/get-list"
+    "group": "products-types",
+    "routes": [
+      {
+        "path": "/",
+        "handler": "/products-types/get-list"
+      }
+    ]
   }
 ]

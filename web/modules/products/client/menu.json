@@ -1,0 +1,15 @@
+{
+    "key": "products-main",
+    "name": "Products",
+    "icon": "Package",
+    "children": [
+      {
+        "key": "products-list",
+        "name": "All Products",
+        "path": "/",
+        "as": "/",
+        "icon": "Package"
+      }
+    ]
+  }
+  

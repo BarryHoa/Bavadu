@@ -25,7 +25,7 @@ export function loadMenusFromModules(): MenuWorkspaceElement[] {
     .map((dirent) => dirent.name);
 
   for (const moduleDir of moduleDirs) {
-    const routerPath = path.join(modulesPath, moduleDir, "routers.json");
+    const routerPath = path.join(modulesPath, moduleDir, "client", "menu.json");
 
     if (fs.existsSync(routerPath)) {
       try {

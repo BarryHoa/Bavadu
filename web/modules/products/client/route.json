@@ -1,0 +1,18 @@
+[
+  {
+    "path": "/",
+    "layout": "/main-layout",
+    "routes": [
+      { "path": "/", "page": "/ProductsListPage" },
+      { "path": "/[id]", "page": "/detail" }
+    ]
+  },
+  {
+    "group": "products-types",
+    "layout": "/products-types/layout",
+    "routes": [
+      { "path": "/", "page": "/products-types/index" }
+    ]
+  }
+
+]
