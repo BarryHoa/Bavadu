@@ -1,23 +1,24 @@
 "use client";
 
-import { useMemo, useState, useCallback } from "react";
+ import { useMemo, useState, useCallback } from "react";
+ import type { ReactNode } from "react";
 import { Spinner } from "@heroui/spinner";
 import { TableProps } from "@heroui/table";
 
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableColumn,
-  TableRow,
-  TableCell,
-} from "../Table";
-import usePagination from "../Pagination/usePagination";
-import {
-  PAGINATION_DEFAULT_PAGE_SIZE,
-  PAGINATION_PAGE_SIZE_OPTIONS,
-} from "../Pagination/pagginationConts";
-import PaginationComponent from "../Pagination/Pagination";
+ import {
+   Table,
+   TableHeader,
+   TableBody,
+   TableColumn,
+   TableRow,
+   TableCell,
+ } from "@base/components/base/Table";
+ import usePagination from "@base/components/base/Pagination/usePagination";
+ import {
+   PAGINATION_DEFAULT_PAGE_SIZE,
+   PAGINATION_PAGE_SIZE_OPTIONS,
+ } from "@base/components/base/Pagination/pagginationConts";
+ import PaginationComponent from "@base/components/base/Pagination/Pagination";
 
 export interface DataTableColumn<T = any> {
   key: string;
@@ -25,13 +26,13 @@ export interface DataTableColumn<T = any> {
   align?: "start" | "center" | "end";
   width?: number;
   sortable?: boolean;
-  render?: (value: any, record: T, index: number) => React.ReactNode;
+   render?: (value: any, record: T, index: number) => ReactNode;
   fixed?: "left" | "right"; // Freeze column to left or right
 }
 
 export interface DataTableSummary {
   label?: string;
-  values: Record<string, React.ReactNode>;
+   values: Record<string, ReactNode>;
 }
 
 export type DataTableProps<T = any> = TableProps & {
@@ -84,7 +85,7 @@ export type DataTableProps<T = any> = TableProps & {
   };
 
   // Custom empty state
-  emptyContent?: React.ReactNode;
+   emptyContent?: ReactNode;
 };
 
 export default function DataTable<T = any>({
@@ -102,8 +103,7 @@ export default function DataTable<T = any>({
   classNames = {},
   emptyContent = "No data available",
   ...rest
-}: DataTableProps<T>) {
-  console.log(className, classNames);
+ }: DataTableProps<T>) {
   const isPagination = pagination && typeof pagination === "object";
 
   const paginationInfo = usePagination({

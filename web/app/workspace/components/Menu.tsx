@@ -7,7 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { MenuWorkspaceElement } from "@base/interface/WorkspaceMenuInterface";
+import { MenuWorkspaceElement } from "@/module-base/client/interface/WorkspaceMenuInterface";
 
 interface MenuProps {
   items: MenuWorkspaceElement[];

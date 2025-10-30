@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-import { MenuWorkspaceElement } from "@base/interface/WorkspaceMenuInterface";
+import { MenuWorkspaceElement } from "@/module-base/client/interface/WorkspaceMenuInterface";
 
 export interface MenuItem {
   name: string;

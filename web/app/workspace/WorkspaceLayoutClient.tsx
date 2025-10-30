@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { WorkspaceProvider } from "@base/contexts/workspace";
-import { MenuWorkspaceElement } from "@base/interface/WorkspaceMenuInterface";
+import { WorkspaceProvider } from "@/module-base/client/contexts/workspace";
+import { MenuWorkspaceElement } from "@/module-base/client/interface/WorkspaceMenuInterface";
 import clsx from "clsx";
 import { ChevronRight } from "lucide-react";
 

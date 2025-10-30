@@ -2,8 +2,8 @@
 
 import type { ThemeProviderProps } from "next-themes";
 
-import { NavigationLoader } from "@base/components/base/NavigationLoader";
-import { GlobalSettingsProvider } from "@base/contexts/global-settings";
+import { NavigationLoader } from "@/module-base/client/components/base/NavigationLoader";
+import { GlobalSettingsProvider } from "@/module-base/client/contexts/global-settings";
 import { HeroUIProvider } from "@heroui/system";
 import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider as NextThemesProvider } from "next-themes";

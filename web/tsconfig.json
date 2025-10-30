@@ -23,6 +23,8 @@
       "@/*": ["./*"],
       "@mdl/*": ["./modules/*"],
       "@base/*": ["./module-base/*"],
+      "@base/client/*": ["./module-base/client/*"],
+      "@base/server/*": ["./module-base/server/*"],
       "@serv/*": ["./server/*"]
     }
   },
