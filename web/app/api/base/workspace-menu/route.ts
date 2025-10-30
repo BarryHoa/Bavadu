@@ -12,6 +12,7 @@ export async function GET() {
       message: `Loaded ${menus.length} module(s) menu`,
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error loading menus:", error);
 
     return NextResponse.json(
