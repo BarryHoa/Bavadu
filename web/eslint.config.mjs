@@ -47,6 +47,7 @@ export default defineConfig([
   {
     extends: fixupConfigRules(
       compat.extends(
+        "airbnb",
         "plugin:react/recommended",
         "plugin:prettier/recommended",
         "plugin:jsx-a11y/recommended",
@@ -79,6 +80,8 @@ export default defineConfig([
         ecmaFeatures: {
           jsx: true,
         },
+        project: path.join(__dirname, "tsconfig.json"),
+        tsconfigRootDir: __dirname,
       },
     },
 
@@ -91,6 +94,24 @@ export default defineConfig([
     files: ["**/*.ts", "**/*.tsx"],
 
     rules: {
+      // Airbnb compatibility tweaks for TS/Next
+      "react/jsx-filename-extension": [
+        "warn",
+        { extensions: [".tsx", ".jsx"] },
+      ],
+      "import/extensions": [
+        "off",
+        "ignorePackages",
+        {
+          ts: "never",
+          tsx: "never",
+          js: "never",
+          jsx: "never",
+        },
+      ],
+      "import/no-unresolved": "off",
+      "import/prefer-default-export": "off",
+
       "no-console": "warn",
       "react/prop-types": "off",
       "react/jsx-uses-react": "off",
