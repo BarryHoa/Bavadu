@@ -1,7 +1,6 @@
 [
   {
     "path": "/",
-    "layout": "/main-layout",
     "routes": [
       { "path": "/", "page": "/ProductsListPage" },
       { "path": "/[id]", "page": "/detail" }

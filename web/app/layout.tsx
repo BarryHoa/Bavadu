@@ -1,5 +1,5 @@
-import "@/module-base/styles/fonts.css";
-import "@/module-base/styles/globals.css";
+import "@base/client/styles/fonts.css";
+import "@base/client/styles/globals.css";
 import { Metadata, Viewport } from "next";
 
 import { Providers } from "./providers";
@@ -31,7 +31,7 @@ export default async function RootLayout({
 }) {
   // Load messages for the default locale
   const locale = "en";
-  const messages = (await import(`@/messages/${locale}.json`)).default;
+ 
 
   return (
     <html suppressHydrationWarning lang={locale}>
@@ -43,11 +43,7 @@ export default async function RootLayout({
       //   fontNotoSansSC.variable
       // )}
       >
-        <Providers
-          locale={locale}
-          messages={messages}
-          themeProps={{ attribute: "class", defaultTheme: "light" }}
-        >
+        <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
           <div className="relative flex flex-col h-screen">
             {/* <Navbar /> */}
             <main

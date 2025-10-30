@@ -6,9 +6,9 @@ import { Avatar } from "@heroui/avatar";
 import { Textarea } from "@heroui/input";
 import { SelectItem } from "@heroui/select";
 import { parseDate } from "@internationalized/date";
-import InputBase from "@/module-base/client/components/base/Input";
-import SelectBase from "@/module-base/client/components/base/Select";
-import DatePickerBase from "@/module-base/client/components/base/DatePicker";
+import InputBase from "@base/client/components/base/Input";
+import SelectBase from "@base/client/components/base/Select";
+import DatePickerBase from "@base/client/components/base/DatePicker";
 import {
   User,
   Mail,

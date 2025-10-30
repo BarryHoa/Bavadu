@@ -5,7 +5,7 @@ import {
   Breadcrumbs as HeroBreadcrumbs,
 } from "@heroui/breadcrumbs";
 import { ChevronRight } from "lucide-react";
-import { useBreadcrumbs } from "@/module-base/client/contexts/workspace";
+import { useBreadcrumbs } from "@base/client/contexts/workspace";
 
 export type BreadcrumbItem = {
   label: string;

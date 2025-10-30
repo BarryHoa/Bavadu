@@ -6,7 +6,7 @@ import { SwitchProps, useSwitch } from "@heroui/switch";
 import { useTheme } from "next-themes";
 import { useIsSSR } from "@react-aria/ssr";
 import clsx from "clsx";
-import { SunFilledIcon, MoonFilledIcon } from "@/module-base/client/components/icons";
+import { SunFilledIcon, MoonFilledIcon } from "@base/client/components/icons";
 
 export interface ThemeSwitchProps {
   className?: string;

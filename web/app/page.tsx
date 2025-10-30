@@ -4,9 +4,9 @@ import { Code } from "@heroui/code";
 import { Link } from "@heroui/link";
 import { Snippet } from "@heroui/snippet";
 import { button as buttonStyles } from "@heroui/theme";
-import { GithubIcon } from "@/module-base/client/components/icons";
-import { subtitle, title } from "@/module-base/client/components/primitives";
-import ThemeDemo from "@/module-base/client/themes/theme-demo";
+import { GithubIcon } from "@base/client/components/icons";
+import { subtitle, title } from "@base/client/components/primitives";
+
 
 import { siteConfig } from "@/config/site";
 
@@ -57,7 +57,7 @@ export default function Home() {
         </div>
       </section>
 
-      <ThemeDemo />
+
     </div>
   );
 }

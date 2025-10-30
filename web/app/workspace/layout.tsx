@@ -2,6 +2,8 @@ import { headers } from "next/headers";
 
 import WorkspaceLayoutClient from "./WorkspaceLayoutClient";
 
+// i18n is provided at module level layouts to avoid loading all messages here
+
 const navigationItems = [
   {
     name: "Profile",
@@ -22,31 +24,20 @@ export default async function WorkspaceLayout({
 }: {
   children: React.ReactNode;
 }) {
-  let moduleMenus = [] as any;
+  const hdrs = await headers();
+  const protocol = hdrs.get("x-forwarded-proto") ?? "http";
+  const host = hdrs.get("host");
+  const baseUrl = `${protocol}://${host}`;
 
-  try {
-    const hdrs = await headers();
-    const protocol = hdrs.get("x-forwarded-proto") ?? "http";
-    const host = hdrs.get("host");
-    const baseUrl = `${protocol}://${host}`;
+  // Fetch menus
+  const menusPromise = fetch(`${baseUrl}/api/base/workspace-menu`, {
+    cache: "no-store",
+  })
+    .then(async (res) => (res.ok ? res.json() : { data: [] }))
+    .then((json) => json?.data ?? [])
+    .catch(() => []);
 
-    const res = await fetch(`${baseUrl}/api/base/workspace-menu`, {
-      cache: "no-store",
-      // revalidate: 0, // Alternative in some Next versions
-    });
-
-    if (res.ok) {
-      const json = await res.json();
-
-      moduleMenus = json?.data ?? [];
-    } else {
-      moduleMenus = [];
-    }
-  } catch (error) {
-    moduleMenus = [];
-    // eslint-disable-next-line no-console
-    console.error(error);
-  }
+  const moduleMenus = await menusPromise;
 
   return (
     <WorkspaceLayoutClient

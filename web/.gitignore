@@ -88,3 +88,6 @@ public
 # Temporary folders
 tmp/
 temp/
+
+app/api/modules/*
+app/workspace/modules/*

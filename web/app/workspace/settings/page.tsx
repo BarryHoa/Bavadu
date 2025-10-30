@@ -4,7 +4,7 @@ import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Divider } from "@heroui/divider";
 import { Switch } from "@heroui/switch";
-import Input from "@/module-base/client/components/base/Input";
+import Input from "@base/client/components/base/Input";
 
 import BackgroundSetting from "./features/BackgroundSetting";
 import LanguageSetting from "./features/LanguageSetting";
