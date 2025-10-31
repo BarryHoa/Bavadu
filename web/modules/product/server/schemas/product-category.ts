@@ -3,7 +3,7 @@ import { pgTable, varchar, timestamp, boolean, integer, uuid, jsonb } from "driz
 // Product Categories
 export const productCategories = pgTable("product_categories", {
   id: uuid("id").primaryKey().defaultRandom(),
-  code: varchar("code", { length: 50 }).notNull().unique(),
+  code: varchar("code", { length: 100 }).notNull().unique(),
   name: jsonb("name").notNull(), // LocaleDataType<string>
   description: jsonb("description"), // LocaleDataType<string>
   parentId: uuid("parent_id").references((): any => productCategories.id),

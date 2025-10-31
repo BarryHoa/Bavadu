@@ -9,7 +9,7 @@ export interface ProductVariant {
   productMasterId: MasterProductId;
   name: LocaleDataType<string>;
   description?: LocaleDataType<string>;
-  images?: string[];
+  images?: { url: string; alt?: string }[];
   sku?: string;
   barcode?: string;
   manufacturer?: {
