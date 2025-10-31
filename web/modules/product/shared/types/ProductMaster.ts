@@ -55,8 +55,6 @@ export interface MasterProduct {
     id: MasterProductId;
     code: string; // Unique product code
     name: LocaleDataType<string>;
-    image?: string;
-    description?: LocaleDataType<string>;
     // Core classification
     type: ProductMasterType;
     // Business features (module gates)
