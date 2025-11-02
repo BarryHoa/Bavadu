@@ -22,21 +22,7 @@ export async function GET(
 
     const product = await productsModel.getProductById(id);
 
-    if (!product) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Product not found",
-          message: `Product with ID ${id} does not exist`,
-        },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: product,
-    });
+    return NextResponse.json(product);
   } catch (error) {
     return NextResponse.json(
       {

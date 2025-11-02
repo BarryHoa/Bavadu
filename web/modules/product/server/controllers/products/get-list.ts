@@ -1,13 +1,12 @@
-import ProductModel from "../../models/ProductModel/ProductModel";
-
 import { NextRequest, NextResponse } from "next/server";
+import productsModel from "../../models/ProductModel/ProductModel";
 
 // Handles POST requests to fetch a list of products
 export async function POST(request: NextRequest) {
   try {
     // Parse request body for parameters
     const params = await request.json();
-    const data = await ProductModel.getProducts(params);
+    const data = await productsModel.getProducts(params);
 
     return NextResponse.json({
       success: true,

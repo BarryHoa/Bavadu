@@ -1,24 +1,24 @@
 "use client";
 
- import { useMemo, useState, useCallback } from "react";
- import type { ReactNode } from "react";
 import { Spinner } from "@heroui/spinner";
 import { TableProps } from "@heroui/table";
+import type { ReactNode } from "react";
+import { useCallback, useMemo, useState } from "react";
 
- import {
-   Table,
-   TableHeader,
-   TableBody,
-   TableColumn,
-   TableRow,
-   TableCell,
- } from "@base/components/base/Table";
- import usePagination from "@base/components/base/Pagination/usePagination";
- import {
-   PAGINATION_DEFAULT_PAGE_SIZE,
-   PAGINATION_PAGE_SIZE_OPTIONS,
- } from "@base/components/base/Pagination/pagginationConts";
- import PaginationComponent from "@base/components/base/Pagination/Pagination";
+import {
+  PAGINATION_DEFAULT_PAGE_SIZE,
+  PAGINATION_PAGE_SIZE_OPTIONS,
+} from "../Pagination/pagginationConts";
+import PaginationComponent from "../Pagination/Pagination";
+import usePagination from "../Pagination/usePagination";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+} from "../Table";
 
 export interface DataTableColumn<T = any> {
   key: string;
@@ -26,13 +26,13 @@ export interface DataTableColumn<T = any> {
   align?: "start" | "center" | "end";
   width?: number;
   sortable?: boolean;
-   render?: (value: any, record: T, index: number) => ReactNode;
+  render?: (value: any, record: T, index: number) => ReactNode;
   fixed?: "left" | "right"; // Freeze column to left or right
 }
 
 export interface DataTableSummary {
   label?: string;
-   values: Record<string, ReactNode>;
+  values: Record<string, ReactNode>;
 }
 
 export type DataTableProps<T = any> = TableProps & {
@@ -85,7 +85,7 @@ export type DataTableProps<T = any> = TableProps & {
   };
 
   // Custom empty state
-   emptyContent?: ReactNode;
+  emptyContent?: ReactNode;
 };
 
 export default function DataTable<T = any>({
@@ -103,7 +103,7 @@ export default function DataTable<T = any>({
   classNames = {},
   emptyContent = "No data available",
   ...rest
- }: DataTableProps<T>) {
+}: DataTableProps<T>) {
   const isPagination = pagination && typeof pagination === "object";
 
   const paginationInfo = usePagination({
@@ -144,7 +144,7 @@ export default function DataTable<T = any>({
 
       return index;
     },
-    [rowKey, isExistRowKey],
+    [rowKey, isExistRowKey]
   );
 
   // Handle page change
@@ -161,7 +161,7 @@ export default function DataTable<T = any>({
         });
       }
     },
-    [paginationInfo, sortDescriptor, onChangeTable],
+    [paginationInfo, sortDescriptor, onChangeTable]
   );
 
   // Handle page size change
@@ -178,7 +178,7 @@ export default function DataTable<T = any>({
         });
       }
     },
-    [paginationInfo, sortDescriptor, onChangeTable],
+    [paginationInfo, sortDescriptor, onChangeTable]
   );
 
   // Calculate frozen column positions
@@ -222,7 +222,7 @@ export default function DataTable<T = any>({
   const getFrozenStyle = useCallback(
     (columnKey: string) => {
       const leftCol = frozenColumnsInfo.leftColumns.find(
-        (c) => c.key === columnKey,
+        (c) => c.key === columnKey
       );
 
       if (leftCol) {
@@ -234,7 +234,7 @@ export default function DataTable<T = any>({
       }
 
       const rightCol = frozenColumnsInfo.rightColumns.find(
-        (c) => c.key === columnKey,
+        (c) => c.key === columnKey
       );
 
       if (rightCol) {
@@ -247,17 +247,17 @@ export default function DataTable<T = any>({
 
       return {};
     },
-    [frozenColumnsInfo],
+    [frozenColumnsInfo]
   );
 
   // Get frozen column class
   const getFrozenClass = useCallback(
     (columnKey: string) => {
       const isLeftFrozen = frozenColumnsInfo.leftColumns.some(
-        (c) => c.key === columnKey,
+        (c) => c.key === columnKey
       );
       const isRightFrozen = frozenColumnsInfo.rightColumns.some(
-        (c) => c.key === columnKey,
+        (c) => c.key === columnKey
       );
 
       if (isLeftFrozen) return "frozen-column frozen-left";
@@ -265,7 +265,7 @@ export default function DataTable<T = any>({
 
       return "";
     },
-    [frozenColumnsInfo],
+    [frozenColumnsInfo]
   );
 
   // Render cell content
@@ -279,7 +279,7 @@ export default function DataTable<T = any>({
 
       return value;
     },
-    [],
+    []
   );
 
   // Table bottom content (pagination + summary)
@@ -328,7 +328,7 @@ export default function DataTable<T = any>({
             items={dataSource}
             loadingContent={<Spinner label="Loading..." />}
           >
-            {(item) => {
+            {(item: T) => {
               const index = dataSource.indexOf(item);
 
               return (

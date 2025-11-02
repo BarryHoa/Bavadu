@@ -1,6 +1,6 @@
 "use client";
 
-import Input from "@base/client/components/base/Input";
+import Input from "@/module-base/client/components/Input";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Slider } from "@heroui/slider";
 import { useTranslations } from "next-intl";
@@ -26,7 +26,7 @@ export default function NumberSetting() {
 
   const validateSeparators = (
     newDecimal: string,
-    newThousand: string,
+    newThousand: string
   ): boolean => {
     // Check if empty
     if (!newDecimal || newDecimal.trim() === "") {

@@ -14,7 +14,19 @@ const nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       "@mdl": require("path").resolve(__dirname, "modules"),
+      "@base": require("path").resolve(__dirname, "module-base"),
     };
+
+    // Allow dynamic imports for server-side code
+    if (isServer) {
+      config.externals = config.externals || [];
+      // Don't externalize modules that need to be bundled
+    }
+
+    // Allow more flexible dynamic imports
+    config.module = config.module || {};
+    config.module.unknownContextCritical = false;
+    config.module.exprContextCritical = false;
 
     return config;
   },

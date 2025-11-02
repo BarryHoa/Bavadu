@@ -1,4 +1,4 @@
-import { tv } from "tailwind-variants";
+import { tv, type VariantProps } from "@heroui/theme";
 
 export const title = tv({
   base: "tracking-tight inline font-semibold",
@@ -14,7 +14,7 @@ export const title = tv({
     },
     size: {
       sm: "text-3xl lg:text-4xl",
-      md: "text-[2.3rem] lg:text-5xl",
+      md: "text-[2.3rem] lg:text-5xl leading-9",
       lg: "text-4xl lg:text-6xl",
     },
     fullWidth: {
@@ -51,3 +51,6 @@ export const subtitle = tv({
     fullWidth: true,
   },
 });
+
+export type TitleVariants = VariantProps<typeof title>;
+export type SubtitleVariants = VariantProps<typeof subtitle>;

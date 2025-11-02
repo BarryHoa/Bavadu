@@ -1,16 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import InputBase from "@/module-base/client/components/Input";
 import { Button } from "@heroui/button";
 import {
   Modal,
-  ModalContent,
-  ModalHeader,
   ModalBody,
+  ModalContent,
   ModalFooter,
+  ModalHeader,
 } from "@heroui/modal";
-import InputBase from "@base/client/components/base/Input";
-import { Lock, KeyRound } from "lucide-react";
+import { KeyRound, Lock } from "lucide-react";
+import { useState } from "react";
 
 export default function ChangePasswordModal() {
   const [isOpen, setIsOpen] = useState(false);

@@ -1,6 +1,5 @@
+import { loadMenusFromModules } from "@/lib/menu-loader";
 import { NextResponse } from "next/server";
-
-import { loadMenusFromModules } from "../../../../lib/menu-loader";
 
 export async function GET() {
   try {
@@ -22,7 +21,7 @@ export async function GET() {
         error: "Failed to load menus",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

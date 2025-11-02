@@ -9,9 +9,6 @@
   {
     "group": "products-types",
     "layout": "/products-types/layout",
-    "routes": [
-      { "path": "/", "page": "/products-types/index" }
-    ]
+    "routes": [{ "path": "/", "page": "/products-types/index" }]
   }
-
 ]

@@ -1,14 +1,13 @@
 "use client";
 import type { ThemeProviderProps } from "next-themes";
 
-
-import { useRouter } from "next/navigation";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { HeroUIProvider } from "@heroui/system";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { useRouter } from "next/navigation";
 
 import { SettingsProvider } from "./context/SettingsContext";
 
-import { NavigationLoader } from "@base/client/components/base/NavigationLoader";
+import { NavigationLoader } from "@/module-base/client/components/NavigationLoader";
 import { GlobalSettingsProvider } from "@base/client/contexts/global-settings";
 
 export interface ProvidersProps {

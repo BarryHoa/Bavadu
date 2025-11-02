@@ -1,7 +1,11 @@
 // Server-side exports for base module can be added here as needed
 
 // Export models
-export { ModalController } from "./models/BaseModel";
+export { BaseModel } from "./models/BaseModel";
+export {
+  ModelSystemStore,
+  default as modelSystemStore,
+} from "./models/ModelSystemStore";
 
 // Export interfaces
 export * from "./models/interfaces/EmployeeInterface";
@@ -15,5 +19,3 @@ export * from "./models/Users/UserInterface";
 export * from "./interfaces/DynamicEntities";
 export * from "./interfaces/Locale";
 export * from "./interfaces/User";
-
-

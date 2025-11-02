@@ -1,0 +1,49 @@
+[
+  {
+    "path": "/view-list-data-table",
+    "routes": [
+      {
+        "path": "/data",
+        "handler": "/view-data-table-list/data"
+      },
+      {
+        "path": "/filter",
+        "handler": "/view-data-table-list/filter"
+      },
+      {
+        "path": "/favorite-filter",
+        "handler": "/view-data-table-list/favorite-filter"
+      },
+      {
+        "path": "/group-by",
+        "handler": "/view-data-table-list/group-by"
+      },
+      {
+        "path": "/favorite-filter-update",
+        "handler": "/view-data-table-list/favorite-filter-update"
+      }
+    ]
+  },
+  {
+    "path": "/workspace",
+    "routes": [
+      {
+        "path": "/menu",
+        "handler": "/workspace/get-menu"
+      }
+    ]
+  },
+  {
+    "path": "/health",
+    "routes": [
+      {
+        "path": "/",
+        "handler": "/heath/index"
+      },
+      {
+        "path": "/ping",
+        "handler": "/heath/ping"
+      }
+    ]
+  }
+]

@@ -16,6 +16,18 @@ const handlerExists = (moduleName, handlerPath) =>
     )
   );
 
+// Check if handler exists in module-base
+const handlerExistsBase = (handlerPath) =>
+  fs.existsSync(
+    path.join(
+      process.cwd(),
+      "module-base",
+      "server",
+      "controllers",
+      `${handlerPath}.ts`
+    )
+  );
+
 // ===== Client helpers =====
 const pageExists = (moduleName, pagePath) =>
   fs.existsSync(
@@ -60,6 +72,32 @@ const layoutExists = (moduleName, layoutPath) =>
       `${layoutPath}.ts`
     )
   );
+
+// Scan module-base routes
+const scanModuleBase = async () => {
+  const routeFile = path.join(
+    process.cwd(),
+    "module-base",
+    "server",
+    "route.json"
+  );
+
+  if (!fs.existsSync(routeFile)) {
+    return null;
+  }
+
+  try {
+    const routeGroups = JSON.parse(fs.readFileSync(routeFile, "utf-8"));
+    if (Array.isArray(routeGroups) && routeGroups.length > 0) {
+      console.log(`Processing module-base (${routeGroups.length} groups)`);
+      return routeGroups;
+    }
+  } catch (error) {
+    console.error(`Error processing module-base route.json:`, error);
+  }
+
+  return null;
+};
 
 const scanModules = async () => {
   const modules = {};
@@ -150,6 +188,19 @@ export * from "@mdl/${moduleName}/server/controllers${route.handler}";
 `;
 };
 
+// Generate route content for module-base (uses @base instead of @mdl)
+const generateRouteContentBase = (route, type = "route") => {
+  const comment =
+    type.toLowerCase() === "route"
+      ? `Generated from module-base/server/route.json`
+      : `${type} route: ${route.path}`;
+
+  return `${AUTO_HEADER}// ${comment}
+
+export * from "@base/server/controllers${route.handler}";
+`;
+};
+
 const generateRouteFile = (moduleName, routes) => {
   const validRoutes = routes.filter((route) => {
     const exists = handlerExists(moduleName, route.handler);
@@ -187,10 +238,16 @@ ${routeHandlers.join("\n")}
 };
 
 // ===== Client generation helpers =====
-const genClientPageContent = (moduleName, pagePath) => `${AUTO_HEADER}export { default } from "@mdl/${moduleName}/client/pages${pagePath}";
+const genClientPageContent = (
+  moduleName,
+  pagePath
+) => `${AUTO_HEADER}export { default } from "@mdl/${moduleName}/client/pages${pagePath}";
 `;
 
-const genClientLayoutContent = (moduleName, layoutPath) => `${AUTO_HEADER}export { default } from "@mdl/${moduleName}/client/layouts${layoutPath}";
+const genClientLayoutContent = (
+  moduleName,
+  layoutPath
+) => `${AUTO_HEADER}export { default } from "@mdl/${moduleName}/client/layouts${layoutPath}";
 `;
 
 const createPageFile = (filePath, content) => {
@@ -222,74 +279,84 @@ const createRouteFile = (filePath, content, type) => {
 const buildServerRoutes = async () => {
   console.log("🔍 Scanning modules for server routes...");
   const modules = await scanModules();
+  const moduleBaseRoutes = await scanModuleBase();
 
-  if (Object.keys(modules).length === 0) {
+  const hasModules = Object.keys(modules).length > 0;
+  const hasModuleBase = moduleBaseRoutes !== null;
+
+  if (!hasModules && !hasModuleBase) {
     console.log("❌ No modules with routes found");
     return;
   }
 
-  console.log(`✅ Found ${Object.keys(modules).length} modules with routes`);
-
-  const apiModulesDir = path.join(process.cwd(), "app", "api", "modules");
-
-  if (fs.existsSync(apiModulesDir)) {
-    console.log("🗑️  Cleaning existing api/modules directory...");
-    try {
-      deleteRecursive(apiModulesDir);
-      console.log("✅ Successfully cleaned api/modules directory");
-    } catch (error) {
-      console.error("❌ Error cleaning directory:", error.message);
-      try {
-        fs.rmSync(apiModulesDir, { recursive: true, force: true });
-        console.log("✅ Fallback cleanup successful");
-      } catch (fallbackError) {
-        console.error("❌ Fallback cleanup failed:", fallbackError.message);
-      }
-    }
+  if (hasModules) {
+    console.log(`✅ Found ${Object.keys(modules).length} modules with routes`);
   }
 
-  fs.mkdirSync(apiModulesDir, { recursive: true });
-  console.log("📁 Created fresh api/modules directory");
+  // ===== Build module-base routes in api/base/ =====
+  if (hasModuleBase) {
+    console.log("📝 Building module-base routes in api/base/...");
+    const apiBaseDir = path.join(process.cwd(), "app", "api", "base");
 
-  for (const [moduleName, routeGroups] of Object.entries(modules)) {
-    console.log(`📝 Generating routes for module: ${moduleName}`);
-    const moduleApiDir = path.join(apiModulesDir, moduleName);
-    fs.mkdirSync(moduleApiDir, { recursive: true });
+    if (fs.existsSync(apiBaseDir)) {
+      console.log("🗑️  Cleaning existing api/base directory...");
+      try {
+        deleteRecursive(apiBaseDir);
+        console.log("✅ Successfully cleaned api/base directory");
+      } catch (error) {
+        console.error("❌ Error cleaning directory:", error.message);
+        try {
+          fs.rmSync(apiBaseDir, { recursive: true, force: true });
+          console.log("✅ Fallback cleanup successful");
+        } catch (fallbackError) {
+          console.error("❌ Fallback cleanup failed:", fallbackError.message);
+        }
+      }
+    }
 
-    let createdCount = 0;
-    let skippedCount = 0;
+    fs.mkdirSync(apiBaseDir, { recursive: true });
+    console.log("📁 Created fresh api/base directory");
 
-    for (const group of routeGroups) {
-      const groupName = group.group || null;
+    let baseCreatedCount = 0;
+    let baseSkippedCount = 0;
+
+    for (const group of moduleBaseRoutes) {
+      const groupPath = group.path || "/";
       const routes = Array.isArray(group.routes) ? group.routes : [];
 
       if (routes.length === 0) continue;
 
-      const targetDir = groupName
-        ? path.join(moduleApiDir, groupName)
-        : moduleApiDir;
+      // Create directory for this group path (e.g., /view-list-data-table -> view-list-data-table/)
+      const groupPathClean = groupPath.replace(/^\//, "");
+      const targetDir = path.join(apiBaseDir, groupPathClean);
       fs.mkdirSync(targetDir, { recursive: true });
 
-      // Main route for this group
+      // Main route for this group (path === "/")
       const rootRoutes = routes.filter((route) => route.path === "/");
       if (rootRoutes.length > 0) {
-        const mainRouteContent = generateRouteFile(moduleName, rootRoutes);
-        if (mainRouteContent) {
+        const validRootRoutes = rootRoutes.filter((route) =>
+          handlerExistsBase(route.handler)
+        );
+
+        if (validRootRoutes.length > 0) {
+          const mainRouteContent =
+            validRootRoutes.length === 1
+              ? generateRouteContentBase(validRootRoutes[0], "route")
+              : `${AUTO_HEADER}// Generated from module-base/server/route.json\n\n${validRootRoutes.map((route) => `export * from "@base/server/controllers${route.handler}";`).join("\n")}\n`;
+
           createRouteFile(
             path.join(targetDir, "route.ts"),
             mainRouteContent,
-            groupName ? `group:${groupName}` : "main"
+            "main"
           );
-          createdCount += rootRoutes.filter((route) =>
-            handlerExists(moduleName, route.handler)
-          ).length;
+          baseCreatedCount += validRootRoutes.length;
         } else {
           console.warn(
-            `  ⚠️  Skipping ${groupName ? `group "${groupName}" ` : "main "}route - no valid handlers found`
+            `  ⚠️  Skipping group "${groupPath}" main route - no valid handlers found`
           );
         }
-        skippedCount += rootRoutes.filter(
-          (route) => !handlerExists(moduleName, route.handler)
+        baseSkippedCount += rootRoutes.filter(
+          (route) => !handlerExistsBase(route.handler)
         ).length;
       }
 
@@ -297,11 +364,11 @@ const buildServerRoutes = async () => {
       routes.forEach((route) => {
         if (route.path === "/") return;
 
-        if (!handlerExists(moduleName, route.handler)) {
+        if (!handlerExistsBase(route.handler)) {
           console.warn(
             `  ⚠️  Skipping route "${route.path}" - handler not found: ${route.handler}.ts`
           );
-          skippedCount++;
+          baseSkippedCount++;
           return;
         }
 
@@ -311,22 +378,121 @@ const buildServerRoutes = async () => {
           : route.path.replace(/^\//, "");
 
         const routeFile = path.join(targetDir, routePath, "route.ts");
-        const content = generateRouteContent(
-          moduleName,
+        const content = generateRouteContentBase(
           route,
           isDynamic ? "Dynamic" : "Static"
         );
 
         createRouteFile(routeFile, content, isDynamic ? "dynamic" : "static");
-        createdCount++;
+        baseCreatedCount++;
       });
     }
 
     console.log(
-      `✅ Generated ${createdCount} routes for ${moduleName}${skippedCount > 0 ? ` (skipped ${skippedCount} with missing handlers)` : ""}`
+      `✅ Generated ${baseCreatedCount} routes for module-base${baseSkippedCount > 0 ? ` (skipped ${baseSkippedCount} with missing handlers)` : ""}`
     );
   }
 
+  // ===== Build regular modules routes in api/modules/ =====
+  if (hasModules) {
+    const apiModulesDir = path.join(process.cwd(), "app", "api", "modules");
+
+    if (fs.existsSync(apiModulesDir)) {
+      console.log("🗑️  Cleaning existing api/modules directory...");
+      try {
+        deleteRecursive(apiModulesDir);
+        console.log("✅ Successfully cleaned api/modules directory");
+      } catch (error) {
+        console.error("❌ Error cleaning directory:", error.message);
+        try {
+          fs.rmSync(apiModulesDir, { recursive: true, force: true });
+          console.log("✅ Fallback cleanup successful");
+        } catch (fallbackError) {
+          console.error("❌ Fallback cleanup failed:", fallbackError.message);
+        }
+      }
+    }
+
+    fs.mkdirSync(apiModulesDir, { recursive: true });
+    console.log("📁 Created fresh api/modules directory");
+
+    for (const [moduleName, routeGroups] of Object.entries(modules)) {
+      console.log(`📝 Generating routes for module: ${moduleName}`);
+      const moduleApiDir = path.join(apiModulesDir, moduleName);
+      fs.mkdirSync(moduleApiDir, { recursive: true });
+
+      let createdCount = 0;
+      let skippedCount = 0;
+
+      for (const group of routeGroups) {
+        const groupName = group.group || null;
+        const routes = Array.isArray(group.routes) ? group.routes : [];
+
+        if (routes.length === 0) continue;
+
+        const targetDir = groupName
+          ? path.join(moduleApiDir, groupName)
+          : moduleApiDir;
+        fs.mkdirSync(targetDir, { recursive: true });
+
+        // Main route for this group
+        const rootRoutes = routes.filter((route) => route.path === "/");
+        if (rootRoutes.length > 0) {
+          const mainRouteContent = generateRouteFile(moduleName, rootRoutes);
+          if (mainRouteContent) {
+            createRouteFile(
+              path.join(targetDir, "route.ts"),
+              mainRouteContent,
+              groupName ? `group:${groupName}` : "main"
+            );
+            createdCount += rootRoutes.filter((route) =>
+              handlerExists(moduleName, route.handler)
+            ).length;
+          } else {
+            console.warn(
+              `  ⚠️  Skipping ${groupName ? `group "${groupName}" ` : "main "}route - no valid handlers found`
+            );
+          }
+          skippedCount += rootRoutes.filter(
+            (route) => !handlerExists(moduleName, route.handler)
+          ).length;
+        }
+
+        // Other routes in this group
+        routes.forEach((route) => {
+          if (route.path === "/") return;
+
+          if (!handlerExists(moduleName, route.handler)) {
+            console.warn(
+              `  ⚠️  Skipping route "${route.path}" - handler not found: ${route.handler}.ts`
+            );
+            skippedCount++;
+            return;
+          }
+
+          const isDynamic =
+            route.path.includes("[") && route.path.includes("]");
+          const routePath = isDynamic
+            ? route.path.replace(/\[([^\]]+)\]/g, "[$1]")
+            : route.path.replace(/^\//, "");
+
+          const routeFile = path.join(targetDir, routePath, "route.ts");
+          const content = generateRouteContent(
+            moduleName,
+            route,
+            isDynamic ? "Dynamic" : "Static"
+          );
+
+          createRouteFile(routeFile, content, isDynamic ? "dynamic" : "static");
+          createdCount++;
+        });
+      }
+
+      console.log(
+        `✅ Generated ${createdCount} routes for ${moduleName}${skippedCount > 0 ? ` (skipped ${skippedCount} with missing handlers)` : ""}`
+      );
+    }
+  }
 };
 
 const buildClientPages = async () => {
@@ -334,7 +500,12 @@ const buildClientPages = async () => {
   console.log("🔍 Scanning client routes...");
   const clientModules = await scanClientRoutes();
 
-  const workspaceModulesDir = path.join(process.cwd(), "app", "workspace", "modules");
+  const workspaceModulesDir = path.join(
+    process.cwd(),
+    "app",
+    "workspace",
+    "modules"
+  );
 
   if (fs.existsSync(workspaceModulesDir)) {
     console.log("🗑️  Cleaning existing app/workspace/modules directory...");
@@ -374,7 +545,10 @@ const buildClientPages = async () => {
       // group-level layout
       if (group.layout) {
         if (layoutExists(moduleName, group.layout)) {
-          const layoutContent = genClientLayoutContent(moduleName, group.layout);
+          const layoutContent = genClientLayoutContent(
+            moduleName,
+            group.layout
+          );
           createPageFile(path.join(targetDir, "layout.tsx"), layoutContent);
         } else {
           console.warn(
@@ -401,7 +575,9 @@ const buildClientPages = async () => {
       routes.forEach((r) => {
         if (r.path === "/") return;
         if (!pageExists(moduleName, r.page)) {
-          console.warn(`  ⚠️  Skipping "${r.path}" - page not found: ${r.page}.tsx`);
+          console.warn(
+            `  ⚠️  Skipping "${r.path}" - page not found: ${r.page}.tsx`
+          );
           skipped++;
           return;
         }
@@ -414,7 +590,10 @@ const buildClientPages = async () => {
         // route-level layout
         if (r.layout) {
           if (layoutExists(moduleName, r.layout)) {
-            const routeLayoutContent = genClientLayoutContent(moduleName, r.layout);
+            const routeLayoutContent = genClientLayoutContent(
+              moduleName,
+              r.layout
+            );
             const layoutFile = path.join(targetDir, routePath, "layout.tsx");
             createPageFile(layoutFile, routeLayoutContent);
           } else {

@@ -1,34 +1,34 @@
 "use client";
 
+import DatePickerBase from "@/module-base/client/components/DatePicker";
+import InputBase from "@/module-base/client/components/Input";
+import SelectBase from "@/module-base/client/components/Select";
+import { Avatar } from "@heroui/avatar";
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Avatar } from "@heroui/avatar";
 import { Textarea } from "@heroui/input";
 import { SelectItem } from "@heroui/select";
 import { parseDate } from "@internationalized/date";
-import InputBase from "@base/client/components/base/Input";
-import SelectBase from "@base/client/components/base/Select";
-import DatePickerBase from "@base/client/components/base/DatePicker";
 import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
   Briefcase,
   Camera,
-  Save,
-  Globe,
   Github,
+  Globe,
   Linkedin,
+  Mail,
+  MapPin,
+  Phone,
+  Save,
   Twitter,
+  User,
   UserCircle,
 } from "lucide-react";
 
 import AwardsCertifications from "./components/AwardsCertifications";
+import ChangePasswordModal from "./components/ChangePasswordModal";
 import DigitalSignature from "./components/DigitalSignature";
 import DocumentList from "./components/DocumentList";
 import UserRole from "./components/UserRole";
-import ChangePasswordModal from "./components/ChangePasswordModal";
 
 export default function ProfilePage() {
   return (

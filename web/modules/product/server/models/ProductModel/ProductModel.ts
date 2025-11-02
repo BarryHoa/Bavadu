@@ -17,6 +17,10 @@ import {
 } from "./ProductModelInterface";
 
 class ProductModel extends BaseModel implements ProductModelInterface {
+  constructor() {
+    super("product.variant");
+  }
+
   private mapToMasterProduct(dbProduct: TblProductMaster): MasterProduct {
     return {
       id: dbProduct.id,
