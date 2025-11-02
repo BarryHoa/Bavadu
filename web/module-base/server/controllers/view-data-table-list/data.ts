@@ -1,11 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getEnv } from "../../env";
 import modelSystemStore from "../../models/ModelSystemStore";
 
 /**
  * Load model instance from modelId string
  * Format: "module.ModelName" -> loads from "@mdl/module/server/models/ModelName/ModelName"
+ *
+ * ⚠️ NOTE: Dynamic import với template string KHÔNG work trên Edge Runtime
+ * Chỉ chạy được trên Node.js runtime. Đảm bảo route có: export const runtime = "nodejs"
+ *
+ * This is a fallback if model is not in registry yet (on-demand loading)
  */
 async function loadModel(modelId: string): Promise<any> {
+  // Check runtime - dynamic imports only work on Node.js
+  if (typeof process === "undefined" || process.env.NEXT_RUNTIME === "edge") {
+    throw new Error(
+      `Cannot load model ${modelId} on Edge Runtime. Dynamic imports are not supported. ` +
+        `Ensure models are pre-loaded at server startup and route has: export const runtime = "nodejs"`
+    );
+  }
+
   // Check if already in store
   if (modelSystemStore.has(modelId)) {
     return modelSystemStore.get(modelId);
@@ -20,6 +34,7 @@ async function loadModel(modelId: string): Promise<any> {
       );
     }
 
+    // ⚠️ Dynamic import with template string - ONLY works on Node.js runtime
     // Import model module - this will create the instance and register it via BaseModel constructor
     const modelPath = `@mdl/${module}/server/models/${modelName}/${modelName}`;
     const modelModule = await import(modelPath);
@@ -50,7 +65,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { modelId, params } = body ?? {};
-
+    console.log("body", body, modelId, params);
     if (!modelId || typeof modelId !== "string") {
       return NextResponse.json(
         { error: "Missing or invalid modelId" },
@@ -58,25 +73,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Load model instance (from store or dynamically)
-    let modelInstance = modelSystemStore.get(modelId);
+    // ✅ Use env pattern (like Odoo env['model.name'])
+    const env = getEnv();
 
-    if (!modelInstance) {
-      try {
-        modelInstance = await loadModel(modelId);
-      } catch (loadError) {
-        console.error("Failed to load model:", loadError);
-        return NextResponse.json(
-          {
-            error: "Model not found",
-            message:
-              loadError instanceof Error
-                ? loadError.message
-                : "Failed to load model",
-          },
-          { status: 404 }
+    // Try to get model from registry first
+    let modelInstance;
+    try {
+      if (env.has(modelId)) {
+        modelInstance = env.get(modelId);
+      } else {
+        // Fallback: try on-demand loading if not in registry
+        // Note: This should rarely happen if models are loaded at server startup
+        console.warn(
+          `⚠️  Model ${modelId} not found in registry, attempting on-demand load...`
         );
+        modelInstance = await loadModel(modelId);
       }
+    } catch (loadError) {
+      console.error("Failed to load model:", loadError);
+      return NextResponse.json(
+        {
+          error: "Model not found",
+          message:
+            loadError instanceof Error
+              ? loadError.message
+              : "Failed to load model",
+        },
+        { status: 404 }
+      );
     }
 
     if (

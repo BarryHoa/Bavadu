@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import productsModel from "../../models/ProductModel/ProductModel";
+import { getEnv } from "@/module-base/server/env";
 
 // Handles POST requests to fetch a list of products
 export async function POST(request: NextRequest) {
   try {
+    // ✅ Use env pattern (like Odoo env['product.product'])
+    const env = getEnv();
+    const productModel = env.get("product.variant"); // Model ID từ ProductModel constructor
+    
     // Parse request body for parameters
     const params = await request.json();
-    const data = await productsModel.getProducts(params);
+    const data = await productModel.getProducts(params);
 
     return NextResponse.json({
       success: true,

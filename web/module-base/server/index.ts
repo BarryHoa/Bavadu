@@ -7,6 +7,10 @@ export {
   default as modelSystemStore,
 } from "./models/ModelSystemStore";
 
+// Export Environment (Odoo-style env pattern)
+export { getEnv, Environment } from "./env";
+export { default as getEnvDefault } from "./env";
+
 // Export interfaces
 export * from "./models/interfaces/EmployeeInterface";
 export * from "./models/interfaces/FilterInterface";

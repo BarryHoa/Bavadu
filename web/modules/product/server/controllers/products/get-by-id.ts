@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-import productsModel from "@/modules/product/server/models/ProductModel/ProductModel";
+import { getEnv } from "@/module-base/server/env";
 
 export async function GET(
   request: NextRequest,
@@ -20,7 +19,11 @@ export async function GET(
       );
     }
 
-    const product = await productsModel.getProductById(id);
+    // ✅ Use env pattern (like Odoo env['product.product'])
+    const env = getEnv();
+    const productModel = env.get("product.variant"); // Model ID từ ProductModel constructor
+    
+    const product = await productModel.getProductById(id);
 
     return NextResponse.json(product);
   } catch (error) {

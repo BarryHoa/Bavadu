@@ -8,6 +8,6 @@ export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
     // Only run on server-side (Node.js runtime)
     // Import AutoLoadModel to trigger model loading
-    await import("./module-base/server/controllers/AutoLoadModel");
+    // await import("./module-base/server/controllers/AutoLoadModel");
   }
 }

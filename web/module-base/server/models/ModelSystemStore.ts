@@ -1,76 +1,52 @@
 /**
- * Server-side Model System Store
- * Stores model instances by their ID to avoid recreating them on each request
- * No limit on number of instances - stores all models indefinitely
+ * ModelSystemStore - Singleton store for model instances
+ * Similar to Odoo's Registry pattern
+ *
+ * Stores model instances by their modelId (e.g., "product.product", "product.ProductModel")
  */
+
 class ModelSystemStore {
   private models: Map<string, any> = new Map();
 
-  constructor() {
-    // Constructor
+  /**
+   * Set model instance in store
+   */
+  public set(modelId: string, modelInstance: any): void {
+    this.models.set(modelId, modelInstance);
   }
 
   /**
-   * Get model instance by ID
-   * @param modelId - Model identifier (e.g., "product.ProductModel")
-   * @returns Model instance if exists, null otherwise
+   * Get model instance from store
    */
-  public get(modelId: string): any | null {
-    return this.models.get(modelId) || null;
-  }
-
-  /**
-   * Set model instance with ID
-   * @param modelId - Model identifier
-   * @param instance - Model instance to store
-   */
-  public set(modelId: string, instance: any): void {
-    this.models.set(modelId, instance);
+  public get<T = any>(modelId: string): T | undefined {
+    return this.models.get(modelId) as T | undefined;
   }
 
   /**
    * Check if model exists in store
-   * @param modelId - Model identifier
-   * @returns true if model exists, false otherwise
    */
   public has(modelId: string): boolean {
     return this.models.has(modelId);
   }
 
   /**
-   * Get or create model instance
-   * If model doesn't exist, create it using factory function and store it
-   * @param modelId - Model identifier
-   * @param factory - Factory function to create model instance if not exists
-   * @returns Model instance
+   * Get all registered model IDs
    */
-  public getOrCreate<T>(
-    modelId: string,
-    factory: () => T | Promise<T>
-  ): T | Promise<T> {
-    if (this.has(modelId)) {
-      return this.get(modelId) as T;
-    }
-
-    const instance = factory();
-
-    // Handle both sync and async factory
-    if (instance instanceof Promise) {
-      return instance.then((inst) => {
-        this.set(modelId, inst);
-        return inst;
-      }) as Promise<T>;
-    }
-
-    this.set(modelId, instance);
-    return instance;
+  public getAllKeys(): string[] {
+    return Array.from(this.models.keys());
   }
 
   /**
-   * Remove model instance from store
-   * @param modelId - Model identifier
+   * Get count of registered models
    */
-  public remove(modelId: string): boolean {
+  public size(): number {
+    return this.models.size;
+  }
+
+  /**
+   * Remove model from store
+   */
+  public delete(modelId: string): boolean {
     return this.models.delete(modelId);
   }
 
@@ -80,33 +56,10 @@ class ModelSystemStore {
   public clear(): void {
     this.models.clear();
   }
-
-  /**
-   * Get all model IDs in store
-   */
-  public getAllKeys(): string[] {
-    return Array.from(this.models.keys());
-  }
-
-  /**
-   * Get store size
-   */
-  public size(): number {
-    return this.models.size;
-  }
-
-  /**
-   * Get store statistics
-   */
-  public getStats() {
-    return {
-      currentSize: this.models.size,
-      totalModels: this.models.size,
-    };
-  }
 }
 
+// Export singleton instance
 const modelSystemStore = new ModelSystemStore();
+
 export default modelSystemStore;
 export { ModelSystemStore };
-
