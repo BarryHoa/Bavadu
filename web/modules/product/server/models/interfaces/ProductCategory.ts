@@ -1,5 +1,5 @@
-import { LocaleDataType } from "@/module-base/shared/Locale";
-import { User } from "@base/shared/User";
+import { LocaleDataType } from "@base/server/interfaces/Locale";
+import { User } from "@base/server/interfaces/User";
 
 export type ProductCategoryId = string; // uuid v7
 export interface ProductCategory {
@@ -15,3 +15,4 @@ export interface ProductCategory {
     createdBy?: User;
     updatedBy?: User;
   }
+

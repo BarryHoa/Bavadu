@@ -12,3 +12,8 @@ export type ListParamsRequest<
   filters?: F;
   sorts?: S;
 };
+
+export type ListParamsResponse<T> = {
+  data: T[];
+  total: number;
+};

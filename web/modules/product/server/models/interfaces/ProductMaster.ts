@@ -3,8 +3,8 @@
 // Product Master Type
 // ========================================
 
-import { LocaleDataType } from "@/module-base/shared/Locale";
-import { User } from "@base/shared/User";
+import { LocaleDataType } from "@base/server/interfaces/Locale";
+import { User } from "@base/server/interfaces/User";
 import { ProductCategory } from "./ProductCategory";
 import { ProductAttribute } from "./ProductAttribute";
 
@@ -72,3 +72,4 @@ export interface MasterProduct {
     updatedBy?: User;
     attributes?: ProductAttribute[];
   }
+

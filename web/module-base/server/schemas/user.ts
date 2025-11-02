@@ -1,40 +1,54 @@
-import { boolean, integer, pgTable, serial, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  pgTable,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 
-
-
-export const users = pgTable("users", {
+// Users
+export const table_user = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(), // UUID v7
   avatar: varchar("avatar", { length: 512 }),
   gender: varchar("gender", { length: 10 }), // 'male', 'female', 'other'
-  dateOfBirth: timestamp("date_of_birth"),
+  dateOfBirth: timestamp("date_of_birth", { withTimezone: true }),
   bio: varchar("bio", { length: 120 }),
   firstName: varchar("first_name", { length: 50 }),
   lastName: varchar("last_name", { length: 50 }),
   phones: varchar("phones", { length: 20 }).array(),
   addresses: varchar("addresses", { length: 225 }).array(),
   emails: varchar("emails", { length: 255 }).array(),
-  status: varchar("status", { length: 20 }).default('active').notNull(), // 'active', 'inactive', 'block'
+  status: varchar("status", { length: 20 })
+    .default("active")
+    .notNull(), // 'active', 'inactive', 'block'
   isVerified: boolean("is_verified").default(false).notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }),
+  updatedAt: timestamp("updated_at", { withTimezone: true }),
+  createdBy: varchar("created_by", { length: 36 }), // uuid user id
+  updatedBy: varchar("updated_by", { length: 36 }), // uuid user id
 });
 
-export const usersLogin= pgTable("users_login", {
-  userId: uuid("user_id").notNull().references(() => users.id),
+export type TblUser = typeof table_user.$inferSelect;
+export type NewTblUser = typeof table_user.$inferInsert;
+
+// Users Login
+export const table_user_login = pgTable("users_login", {
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => table_user.id),
   username: varchar("username", { length: 50 }).unique(),
   email: varchar("email", { length: 255 }).unique(),
   phone: varchar("phone", { length: 20 }),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
-  lastLoginAt: timestamp("last_login_at"),
+  lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
   lastLoginIp: varchar("last_login_ip", { length: 45 }),
   lastLoginUserAgent: varchar("last_login_user_agent", { length: 255 }),
   lastLoginLocation: varchar("last_login_location", { length: 255 }),
   lastLoginDevice: varchar("last_login_device", { length: 255 }),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }),
+  updatedAt: timestamp("updated_at", { withTimezone: true }),
 });
 
-
-export type User = typeof users.$inferSelect;
-export type UsersLogin = typeof usersLogin.$inferSelect;
+export type TblUserLogin = typeof table_user_login.$inferSelect;
+export type NewTblUserLogin = typeof table_user_login.$inferInsert;
 

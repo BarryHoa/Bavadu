@@ -1,4 +1,3 @@
-import { U } from "@heroui/slider/dist/use-slider-BxNnx6bI";
 import { LocaleDataType } from "./Locale";
 import { User } from "./User";
 
@@ -54,3 +53,4 @@ export interface DynamicEntity<V = string> {
   createdBy?: User;
   updatedBy?: User;
 }
+

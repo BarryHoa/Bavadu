@@ -1,5 +1,5 @@
-import { LocaleDataType } from "@/module-base/shared/Locale";
-import { User } from "@/module-base/shared/User";
+import { LocaleDataType } from "@base/server/interfaces/Locale";
+import { User } from "@base/server/interfaces/User";
 import { MasterProductId } from "./ProductMaster";
 import { UnitOfMeasure } from "./ProductUom";
 import { ProductAttribute } from "./ProductAttribute";
@@ -27,3 +27,4 @@ export interface ProductVariant {
   createdBy?: User;
   updatedBy?: User;
 }
+

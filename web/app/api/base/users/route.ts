@@ -1,6 +1,8 @@
-import usersModel from "@serv/models/UsersModel";
-import { GetUserListReq } from "@serv/models/interfaces/UserInterface";
+import { GetUserListReq } from "@/module-base/server/models/Users/UserInterface";
 import { NextRequest, NextResponse } from "next/server";
+
+// TODO: Create UsersModel or remove this import
+// import usersModel from "@/module-base/server/models/Users/UsersModel";
 
 export async function GET(request: NextRequest) {
   try {
@@ -23,7 +25,12 @@ export async function GET(request: NextRequest) {
         : [],
     };
 
-    const result = await usersModel.getUsers(params);
+    // TODO: Implement actual user fetching logic
+    // const result = await usersModel.getUsers(params);
+    const result = {
+      data: [],
+      total: 0,
+    };
 
     return NextResponse.json({
       success: true,

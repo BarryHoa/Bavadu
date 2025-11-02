@@ -1,5 +1,5 @@
-import { LocaleDataType } from "@base/shared/Locale";
-import { User } from "@base/shared/User";
+import { LocaleDataType } from "@base/server/interfaces/Locale";
+import { User } from "@base/server/interfaces/User";
 
 export interface ProductPacking {
   id: string; // uuid v7
@@ -11,3 +11,4 @@ export interface ProductPacking {
   createdBy?: User;
   updatedBy?: User;
 }
+

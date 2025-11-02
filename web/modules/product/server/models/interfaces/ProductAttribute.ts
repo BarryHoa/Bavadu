@@ -1,4 +1,4 @@
-import { LocaleDataType } from "@/module-base/shared/Locale";
+import { LocaleDataType } from "@base/server/interfaces/Locale";
 
 export interface ProductAttribute {
   /**
@@ -9,3 +9,4 @@ export interface ProductAttribute {
   name: LocaleDataType<string>;
   value: string;
 }
+

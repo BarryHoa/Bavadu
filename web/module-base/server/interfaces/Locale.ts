@@ -4,3 +4,4 @@ export type LocaleDataType<DataT extends string = string> = {
 } & {
   [key in string]: DataT | undefined;
 }
+

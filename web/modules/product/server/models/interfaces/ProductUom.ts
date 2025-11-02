@@ -1,4 +1,4 @@
-import { LocaleDataType } from "@base/shared/Locale";
+import { LocaleDataType } from "@base/server/interfaces/Locale";
 
 export type UnitOfMeasure = {
   id: string; // uuid v7
@@ -19,4 +19,5 @@ export type UnitOfMeasureConversion = {
   createdAt?: number; // unix timestamp (ms)
   updatedAt?: number; // unix timestamp (ms)
 }
+
 

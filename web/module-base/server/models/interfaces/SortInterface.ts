@@ -4,3 +4,4 @@ export type ParamSortSingle = {
   direction: SortDirection;
 };
 export type ParamSortMultiple = Array<ParamSortSingle>;
+

@@ -40,3 +40,4 @@ export interface UserInfo extends User {
   createdBy: string;
   updatedBy: string;
 }
+

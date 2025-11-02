@@ -49,3 +49,4 @@ export interface CreateEmployeeReq {
 export interface UpdateEmployeeReq extends Partial<CreateEmployeeReq> {
   id: number;
 }
+
