@@ -22,7 +22,9 @@ async function main() {
   const envPath = path.join(root, ".env");
   const env = loadEnv(envPath);
 
-  const conn = `postgres://${env.PGUSER}:${env.PGPASSWORD}@${env.PGHOST}:${env.PGPORT}/${env.PGDATABASE}?sslmode=${env.PGSSLMODE || "disable"}`;
+  const sslMode = env.PGSSLMODE || "disable";
+  const channelBinding = env.PGCHANNELBINDING || "";
+  const conn = `postgres://${env.PGUSER}:${env.PGPASSWORD}@${env.PGHOST}:${env.PGPORT}/${env.PGDATABASE}?sslmode=${sslMode}${channelBinding ? `&channel_binding=${channelBinding}` : ""}`;
   const sql = postgres(conn, { max: 1 });
 
   const migDir = path.join(root, "server/db/migrations");

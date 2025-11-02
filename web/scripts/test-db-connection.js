@@ -29,7 +29,7 @@ function loadEnvFile(filePath) {
 
 // Test database connection
 async function testConnection(envVars) {
-  const { PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD, PGSSLMODE } = envVars;
+  const { PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD, PGSSLMODE, PGCHANNELBINDING } = envVars;
 
   console.log("🔍 Testing PostgreSQL Database Connection");
   console.log("========================================");
@@ -38,9 +38,14 @@ async function testConnection(envVars) {
   console.log(`Database: ${PGDATABASE}`);
   console.log(`User: ${PGUSER}`);
   console.log(`SSL Mode: ${PGSSLMODE || "disable"}`);
+  if (PGCHANNELBINDING) {
+    console.log(`Channel Binding: ${PGCHANNELBINDING}`);
+  }
   console.log("");
 
-  const connectionString = `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=${PGSSLMODE || "disable"}`;
+  const sslMode = PGSSLMODE || "disable";
+  const channelBinding = PGCHANNELBINDING || "";
+  const connectionString = `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=${sslMode}${channelBinding ? `&channel_binding=${channelBinding}` : ""}`;
 
   try {
     console.log("⏳ Connecting to database...");

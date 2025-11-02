@@ -4,7 +4,9 @@ import postgres from "postgres";
 import * as schema from "./schemas";
 
 // Create connection using standard PostgreSQL environment variables
-const connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}?sslmode=${process.env.PGSSLMODE || "disable"}`;
+const sslMode = process.env.PGSSLMODE || "disable";
+const channelBinding = process.env.PGCHANNELBINDING || "";
+const connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}?sslmode=${sslMode}${channelBinding ? `&channel_binding=${channelBinding}` : ""}`;
 
 const client = postgres(connectionString, {
   max: 10,

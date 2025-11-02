@@ -5,7 +5,11 @@ export default defineConfig({
   out: "./server/db/migrations",
   dialect: "postgresql",
   dbCredentials: {
-    url: `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}?sslmode=${process.env.PGSSLMODE || "disable"}`,
+    url: (() => {
+      const sslMode = process.env.PGSSLMODE || "disable";
+      const channelBinding = process.env.PGCHANNELBINDING || "";
+      return `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}?sslmode=${sslMode}${channelBinding ? `&channel_binding=${channelBinding}` : ""}`;
+    })(),
   },
   verbose: true,
   strict: true,
