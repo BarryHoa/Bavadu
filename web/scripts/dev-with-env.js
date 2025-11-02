@@ -10,8 +10,8 @@ const environment = args[0] || "local"; // Default to local if no argument provi
 
 // Define environment file mappings
 const envFiles = {
-  local: "envs/.env.local",
-  production: "envs/.env.production",
+  local: "envs/env.local",
+  production: "envs/env.prod",
 };
 
 // Get the source environment file

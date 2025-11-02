@@ -9,7 +9,7 @@ web/envs/
 ├── .env.example          # Template with all required variables
 ├── env.local            # Local development environment
 ├── env.staging          # Staging environment
-├── env.production       # Production environment
+├── env.prod             # Production environment
 ├── env.test             # Test environment
 ├── README.md            # Detailed documentation
 └── setup-env.sh         # Setup script
@@ -33,8 +33,8 @@ npm run env:setup all
 
 ```bash
 # Copy specific environment file
-cp envs/env.local .env.local
-cp envs/env.production .env.production
+cp envs/env.local env.local
+cp envs/env.prod env.prod
 ```
 
 ## Available Scripts
@@ -61,7 +61,7 @@ cp envs/env.production .env.production
 - Moderate security settings
 - Debug mode enabled
 
-### Production (`env.production`)
+### Production (`env.prod`)
 
 - Database: `bava_db_production`
 - Production domain URLs
@@ -108,10 +108,10 @@ Each environment uses a separate database:
 
 ```bash
 # Local development
-docker run -v $(pwd)/envs/env.local:/app/.env.local your-app
+docker run -v $(pwd)/envs/env.local:/app/env.local your-app
 
 # Production
-docker run -v $(pwd)/envs/env.production:/app/.env.production your-app
+docker run -v $(pwd)/envs/env.prod:/app/env.prod your-app
 ```
 
 ### Environment Variables

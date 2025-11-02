@@ -65,7 +65,7 @@ The following API routes were created in Next.js App Router format:
 
 ## Environment Variables
 
-Create a `.env.local` file with the following variables:
+Create a `env.local` file with the following variables:
 
 ```env
 # Database Configuration

@@ -40,7 +40,7 @@ When you run `bun run dev`, the system automatically:
 ### Environment File Mapping
 
 - `bun run dev` → copies `envs/env.local` to `.env`
-- `bun run dev prod` → copies `envs/env.production` to `.env`
+- `bun run dev prod` → copies `envs/env.prod` to `.env`
 - `bun run dev staging` → copies `envs/env.staging` to `.env`
 - `bun run dev test` → copies `envs/env.test` to `.env`
 
@@ -74,7 +74,7 @@ bun run dev:test      # Test environment
 - Debug mode: enabled
 - Logging: debug level
 
-### Production (`envs/env.production`)
+### Production (`envs/env.prod`)
 
 - Database: `bava_db_production`
 - URL: `https://your-production-domain.com`
@@ -122,7 +122,7 @@ The system automatically detects the environment based on the command argument a
 1. **Environment file not found**
 
    ```
-   ❌ Environment file not found: envs/env.production
+   ❌ Environment file not found: envs/env.prod
    ```
 
    **Solution**: Make sure the environment file exists in the `envs/` directory
@@ -167,7 +167,7 @@ bun run dev
 
 ```bash
 bun run dev prod
-# ✅ Copied envs/env.production to .env
+# ✅ Copied envs/env.prod to .env
 # 🚀 Starting development server with prod environment...
 ```
 
