@@ -1,22 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Example edge handler for /view-list-data-table/data route (GET)
 export async function POST(request: NextRequest) {
-  // get body and validate
-  console.log("request", request);
-  const body = await request.json();
-  // const { modelId, params } = body;
-  // if (!modelId) {
-  //   return NextResponse.json(
-  //     { error: "Model ID is required" },
-  //     { status: 400 }
-  //   );
-  // }
-  // if (!params) {
-  //   return NextResponse.json({ error: "Params are required" }, { status: 400 });
-  // }
-  return NextResponse.json(
-    { success: true, data: "Hello World" },
-    { status: 200 }
-  );
+  try {
+    // Đọc body - Fastify không parse nữa, Next.js tự parse
+    const body = await request.json();
+    console.log("body", body);
+
+    // Extract modelId
+    const { modelId } = body;
+
+    // Validate
+    // if (!modelId) {
+    //   return NextResponse.json(
+    //     { error: "Model ID is required" },
+    //     { status: 400 }
+    //   );
+    // }
+
+    return NextResponse.json(
+      { success: true, data: "Hello World", body },
+      { status: 200 }
+    );
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: "Invalid request",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 400 }
+    );
+  }
 }

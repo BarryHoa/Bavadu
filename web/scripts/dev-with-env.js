@@ -43,11 +43,15 @@ try {
     `🚀 Starting development server with ${environment} environment...`
   );
 
-  // Start the custom server (avoids Turbopack issues)
-  const nextDev = spawn("node", ["scripts/setup-env-and-server.js", environment, "dev"], {
-    stdio: "inherit",
-    shell: true,
-  });
+  // Start the custom server (Next app via server.ts)
+  const nextDev = spawn(
+    "node",
+    ["scripts/setup-env-and-server.js", environment, "dev"],
+    {
+      stdio: "inherit",
+      shell: true,
+    }
+  );
 
   // Handle process termination
   process.on("SIGINT", () => {
