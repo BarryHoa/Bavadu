@@ -1,8 +1,7 @@
 import { BaseModel } from "@/module-base/server/models/BaseModel";
-import { db } from "@/server/db";
 import { eq, sql } from "drizzle-orm";
 
-import { ListParamsRequest, ListParamsResponse } from "@/module-base/server";
+import { getEnv, ListParamsRequest, ListParamsResponse } from "@/module-base/server";
 import { table_product_category } from "../../schemas";
 import {
   table_product_master,
@@ -39,7 +38,8 @@ class ProductModel extends BaseModel implements ProductModelInterface {
   }
 
   getProductById = async (id: string): Promise<MasterProduct | null> => {
-    const products = await db
+    const env = getEnv();
+    const products = await env.getDb()
       .select()
       .from(table_product_master)
       .where(eq(table_product_master.id, id))
@@ -55,6 +55,7 @@ class ProductModel extends BaseModel implements ProductModelInterface {
   getProducts = async (
     params: ListParamsRequest<ProductFilter>
   ): Promise<ListParamsResponse<ProductVariantElm>> => {
+    const env = getEnv();
     const { offset, limit, search, filters, sorts } =
       this.getDefaultParamsForList(params);
 
@@ -92,7 +93,7 @@ class ProductModel extends BaseModel implements ProductModelInterface {
     // Lấy tổng số sản phẩm trước khi áp dụng limit/offset
 
     // Query both data and total in two steps since window functions and .fn are not supported in this setup
-    const productMasterQuery = db
+    const productMasterQuery = env.getDb()
       .select(selectProductMaster)
       .from(table_product_master)
       .leftJoin(
@@ -103,7 +104,7 @@ class ProductModel extends BaseModel implements ProductModelInterface {
 
     // Step 1: Query paginated data
 
-    const productsQuery = db
+    const productsQuery = env.getDb()
       .select()
       .from(table_product_variant)
       .innerJoinLateral(
@@ -121,5 +122,6 @@ class ProductModel extends BaseModel implements ProductModelInterface {
     });
   };
 }
+export default ProductModel;
 
-export default new ProductModel();
+// export default new ProductModel();

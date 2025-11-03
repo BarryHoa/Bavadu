@@ -1,79 +1,59 @@
-/**
- * Environment - Similar to Odoo's env pattern
- * Allows accessing models via env['model.name'] like Odoo
- *
- * Usage:
- *   const env = getEnv();
- *   const productModel = env.get('product.product');
- *
- *   // Check if model exists
- *   if (env.has('product.product')) {
- *     const model = env.get('product.product');
- *   }
- */
 
-import modelSystemStore from "./models/ModelSystemStore";
-
-/**
- * Environment class - tương tự Odoo env
- * Cho phép truy cập models qua env['model.name']
- */
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 class Environment {
-  /**
-   * Get model by ID - giống Odoo env['res.partner']
-   * @param modelId Model ID (e.g., 'product.product', 'product.ProductModel')
-   * @returns Model instance
-   * @throws Error if model not found
-   */
-  get<T = any>(modelId: string): T {
-    const model = modelSystemStore.get(modelId);
-    if (!model) {
-      throw new Error(
-        `Model ${modelId} not found in registry. Available models: ${modelSystemStore.getAllKeys().join(", ")}`
-      );
-    }
-    return model as T;
+  private db: any;
+  private models: any;
+  constructor() {
+    // Create connection using standard PostgreSQL environment variables
+    const sslMode = process.env.PGSSLMODE || "disable";
+    const channelBinding = process.env.PGCHANNELBINDING || "";
+    const connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}?sslmode=${sslMode}${channelBinding ? `&channel_binding=${channelBinding}` : ""}`;
+    const client = postgres(connectionString, {
+      max: 10,
+      idle_timeout: 20,
+      connect_timeout: 10,
+    });
+    
+    // Create Drizzle instance
+    const db = drizzle(client, {  });
+    this.db = db;
+    this.models = new Map<string, any>();  ;
   }
 
-  /**
-   * Check if model exists - giống Odoo 'res.partner' in env
-   * @param modelId Model ID to check
-   * @returns true if model exists
-   */
-  has(modelId: string): boolean {
-    return modelSystemStore.has(modelId);
+  getDb(): any {
+    return this.db;
   }
 
-  /**
-   * Get all registered model IDs
-   * @returns Array of model IDs
-   */
-  keys(): string[] {
-    return modelSystemStore.getAllKeys();
+  hasModel(modelId: string): boolean {
+    return this.models.has(modelId);
   }
 
-  /**
-   * Get count of registered models
-   */
-  size(): number {
-    return modelSystemStore.size();
+  getModelKeys(): string[] {
+    return Array.from(this.models.keys());
+  }
+
+  getModelSize(): number {
+    return this.models.size || 0;
+  }
+
+  getModel(modelId: string): any {
+    return this.models.get(modelId);
+  }
+
+  setModel(modelId: string, model: any): void {
+    this.models.set(modelId, model);
+  }
+  registerModels = async () => {
+    // const models = await import("@mdl/product/server/models/Product/ProductModel");
+    // console.log("Registering product.product model", models.default);
+    // this.setModel("product.product", new models.default());
   }
 }
 
 // Singleton instance
 let envInstance: Environment | null = null;
 
-/**
- * Get environment instance - tương tự Odoo self.env
- * Returns singleton instance of Environment
- *
- * @example
- * ```typescript
- * const env = getEnv();
- * const productModel = env.get('product.product');
- * const data = await productModel.getList();
- * ```
- */
 export function getEnv(): Environment {
   if (!envInstance) {
     envInstance = new Environment();

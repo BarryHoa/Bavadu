@@ -2,7 +2,7 @@ import {
   ListParamsRequest,
   ListParamsResponse,
   ParamFilter,
-} from "@/module-base/server";
+} from "@base/server";
 import { MasterProduct } from "../interfaces/ProductMaster";
 import { ProductVariant } from "../interfaces/ProductVariant";
 

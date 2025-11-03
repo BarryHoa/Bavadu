@@ -21,7 +21,7 @@ export async function GET(
 
     // ✅ Use env pattern (like Odoo env['product.product'])
     const env = getEnv();
-    const productModel = env.get("product.variant"); // Model ID từ ProductModel constructor
+    const productModel = env.getModel("product.variant"); // Model ID từ ProductModel constructor
     
     const product = await productModel.getProductById(id);
 

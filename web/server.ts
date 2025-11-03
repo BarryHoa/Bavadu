@@ -6,6 +6,8 @@
 import { createServer } from "http";
 import next from "next";
 import { parse } from "url";
+import getEnv from "@base/server/env";
+
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
@@ -22,15 +24,11 @@ const handle = app.getRequestHandler();
 async function loadAllModels() {
   try {
     // Import and use the generated registry
-    const { registerAllModels } = await import(
-      "./module-base/server/models/ModelRegistry"
-    );
-    registerAllModels();
+    getEnv().registerModels()
+    console.log(module);
   } catch (error: any) {
     console.error("❌ Failed to load model registry:", error?.message || error);
-    console.log(
-      "💡 Run: npm run models:generate to generate the registry file"
-    );
+    
   }
 }
 

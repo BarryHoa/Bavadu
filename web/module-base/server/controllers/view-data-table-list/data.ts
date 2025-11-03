@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getEnv } from "../../env";
-import modelSystemStore from "../../models/ModelSystemStore";
+
 
 /**
  * Load model instance from modelId string
@@ -20,10 +20,7 @@ async function loadModel(modelId: string): Promise<any> {
     );
   }
 
-  // Check if already in store
-  if (modelSystemStore.has(modelId)) {
-    return modelSystemStore.get(modelId);
-  }
+
 
   try {
     const [module, modelName] = modelId.split(".");
@@ -44,13 +41,6 @@ async function loadModel(modelId: string): Promise<any> {
       throw new Error(`Model ${modelName} not found in module ${module}`);
     }
 
-    // Model should now be in store (registered by BaseModel constructor)
-    // But it might be registered with a different key (e.g., "product" instead of "product.ProductModel")
-    // So we ensure it's also registered with the requested modelId
-    if (!modelSystemStore.has(modelId)) {
-      // Register it with the requested modelId
-      modelSystemStore.set(modelId, modelInstance);
-    }
 
     return modelInstance;
   } catch (error) {
@@ -79,8 +69,8 @@ export async function POST(request: NextRequest) {
     // Try to get model from registry first
     let modelInstance;
     try {
-      if (env.has(modelId)) {
-        modelInstance = env.get(modelId);
+      if (env.hasModel(modelId)) {
+        modelInstance = env.getModel(modelId);
       } else {
         // Fallback: try on-demand loading if not in registry
         // Note: This should rarely happen if models are loaded at server startup

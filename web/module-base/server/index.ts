@@ -2,12 +2,7 @@
 
 // Export models
 export { BaseModel } from "./models/BaseModel";
-export {
-  ModelSystemStore,
-  default as modelSystemStore,
-} from "./models/ModelSystemStore";
 
-// Export Environment (Odoo-style env pattern)
 export { getEnv, Environment } from "./env";
 export { default as getEnvDefault } from "./env";
 

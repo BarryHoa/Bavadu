@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
   try {
     // ✅ Use env pattern (like Odoo env['product.product'])
     const env = getEnv();
-    const productModel = env.get("product.variant"); // Model ID từ ProductModel constructor
+    const productModel = env.getModel("product.variant"); // Model ID từ ProductModel constructor
     
     // Parse request body for parameters
     const params = await request.json();
