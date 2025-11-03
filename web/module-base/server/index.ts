@@ -3,9 +3,6 @@
 // Export models
 export { BaseModel } from "./models/BaseModel";
 
-export { getEnv, Environment } from "./env";
-export { default as getEnvDefault } from "./env";
-
 // Export interfaces
 export * from "./models/interfaces/EmployeeInterface";
 export * from "./models/interfaces/FilterInterface";

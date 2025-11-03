@@ -3,11 +3,7 @@
  * This file runs code on server startup
  * https://nextjs.org/docs/app/api-reference/instrumentation
  */
-
+import getEnv from "@base/server/env"; //import env
 export async function register() {
-  if (process.env.NEXT_RUNTIME === "nodejs") {
-    // Only run on server-side (Node.js runtime)
-    // Import AutoLoadModel to trigger model loading
-    // await import("./module-base/server/controllers/AutoLoadModel");
-  }
-}
+  await getEnv().init(); //init env
+} //end register

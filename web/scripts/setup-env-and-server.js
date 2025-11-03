@@ -12,10 +12,7 @@ const mode = args[1] || "dev"; // "dev" or "prod"
 // Define environment file mappings
 const envFiles = {
   local: "envs/env.local",
-  production: "envs/env.prod",
   prod: "envs/env.prod",
-  staging: "envs/env.staging",
-  test: "envs/env.test",
 };
 
 // Get the source environment file
@@ -54,12 +51,7 @@ try {
 
   const useBun = isBun && isBun.length > 0;
   const command = useBun ? "bun" : "tsx";
-  const args =
-    mode === "dev"
-      ? useBun
-        ? ["--watch", "server.ts"]
-        : ["watch", "server.ts"]
-      : ["server.ts"];
+  const args = ["./server.ts"]; // Run once in all modes (no watch)
 
   console.log(`Using ${command} to run server...`);
 

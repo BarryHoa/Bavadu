@@ -1,0 +1,10 @@
+{
+  "name": "module-base",
+  "version": "0.1.0",
+  "description": "Module base",
+  "category": "System",
+  "icon": "Package",
+  "models": {
+    "user": "Users/UserModel"
+  }
+}

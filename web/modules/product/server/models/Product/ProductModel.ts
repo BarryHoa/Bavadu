@@ -1,7 +1,11 @@
 import { BaseModel } from "@/module-base/server/models/BaseModel";
 import { eq, sql } from "drizzle-orm";
 
-import { getEnv, ListParamsRequest, ListParamsResponse } from "@/module-base/server";
+import getEnv from "@base/server/env";
+import {
+  ListParamsRequest,
+  ListParamsResponse,
+} from "@base/server/models/interfaces/ListInterface";
 import { table_product_category } from "../../schemas";
 import {
   table_product_master,
@@ -17,7 +21,7 @@ import {
 
 class ProductModel extends BaseModel implements ProductModelInterface {
   constructor() {
-    super("product.variant");
+    super();
   }
 
   private mapToMasterProduct(dbProduct: TblProductMaster): MasterProduct {
@@ -39,7 +43,8 @@ class ProductModel extends BaseModel implements ProductModelInterface {
 
   getProductById = async (id: string): Promise<MasterProduct | null> => {
     const env = getEnv();
-    const products = await env.getDb()
+    const products = await env
+      .getDb()
       .select()
       .from(table_product_master)
       .where(eq(table_product_master.id, id))
@@ -52,10 +57,12 @@ class ProductModel extends BaseModel implements ProductModelInterface {
     return this.mapToMasterProduct(products[0]);
   };
 
-  getProducts = async (
+  //handle for view data table list
+  getViewDataList = async (
     params: ListParamsRequest<ProductFilter>
   ): Promise<ListParamsResponse<ProductVariantElm>> => {
     const env = getEnv();
+    console.log("params", params);
     const { offset, limit, search, filters, sorts } =
       this.getDefaultParamsForList(params);
 
@@ -93,7 +100,8 @@ class ProductModel extends BaseModel implements ProductModelInterface {
     // Lấy tổng số sản phẩm trước khi áp dụng limit/offset
 
     // Query both data and total in two steps since window functions and .fn are not supported in this setup
-    const productMasterQuery = env.getDb()
+    const productMasterQuery = env
+      .getDb()
       .select(selectProductMaster)
       .from(table_product_master)
       .leftJoin(
@@ -104,7 +112,8 @@ class ProductModel extends BaseModel implements ProductModelInterface {
 
     // Step 1: Query paginated data
 
-    const productsQuery = env.getDb()
+    const productsQuery = env
+      .getDb()
       .select()
       .from(table_product_variant)
       .innerJoinLateral(

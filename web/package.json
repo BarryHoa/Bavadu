@@ -6,16 +6,11 @@
     "@mdl/*": "./modules/*"
   },
   "scripts": {
-    "dev": "npm run routes:generate && npm run server:dev",
-    "dev:prod": "npm run routes:generate && npm run server:dev:prod",
-    "dev:staging": "npm run routes:generate && npm run server:dev:staging",
-    "dev:test": "npm run routes:generate && npm run server:dev:test",
-    "next": "next dev --turbopack",
-    "server:dev": "node scripts/setup-env-and-server.js local dev",
-    "server:dev:prod": "node scripts/setup-env-and-server.js prod dev",
-    "server:dev:staging": "node scripts/setup-env-and-server.js staging dev",
-    "server:dev:test": "node scripts/setup-env-and-server.js test dev",
-    "server:start": "NODE_ENV=production tsx server.ts",
+    "dev": "node scripts/dev-with-env.js local",
+    "dev:prod": "node scripts/dev-with-env.js prod",
+    "dev:staging": "node scripts/dev-with-env.js staging",
+    "dev:test": "node scripts/dev-with-env.js test",
+    "next": "next dev --no-turbo",
     "build": "npm run routes:generate && next build",
     "start": "npm run server:start",
     "lint": "eslint --fix",
@@ -26,9 +21,7 @@
     "db:seed": "node scripts/seed-db.js",
     "env:setup": "node setup-env.js",
     "env:local": "node setup-env.js",
-    "env:staging": "node setup-env.js",
-    "env:production": "node setup-env.js",
-    "env:test": "node setup-env.js"
+    "env:production": "node setup-env.js"
   },
   "dependencies": {
     "@heroui/accordion": "2.2.24",

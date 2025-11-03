@@ -43,8 +43,8 @@ try {
     `🚀 Starting development server with ${environment} environment...`
   );
 
-  // Start the Next.js development server
-  const nextDev = spawn("bun", ["run", "next"], {
+  // Start the custom server (avoids Turbopack issues)
+  const nextDev = spawn("node", ["scripts/setup-env-and-server.js", environment, "dev"], {
     stdio: "inherit",
     shell: true,
   });

@@ -17,8 +17,8 @@ export interface ProductFilter extends ParamFilter {
 export interface ProductVariantElm extends ProductVariant {}
 
 export interface ProductModelInterface {
-  getProducts(
-    filter: ListParamsRequest<ProductFilter>
+  getViewDataList(
+    request: ListParamsRequest<ProductFilter>
   ): Promise<ListParamsResponse<ProductVariantElm>>;
   getProductById(id: string): Promise<MasterProduct | null>;
 }

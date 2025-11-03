@@ -4,5 +4,11 @@
   "version": "0.1.0",
   "description": "Products module",
   "category": "Business",
-  "icon": "Package"
+  "icon": "Package",
+  "models": {
+    "product.variant": "Product/ProductModel",
+    "product.master": "Product/ProductMasterModel",
+    "product.category": "Product/ProductCategoryModel",
+    "product.attribute": "Product/ProductAttributeModel"
+  }
 }

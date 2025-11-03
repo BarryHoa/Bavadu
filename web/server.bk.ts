@@ -3,11 +3,10 @@
  * Loads all models at server startup before handling requests
  */
 
+import getEnv from "@base/server/env";
 import { createServer } from "http";
 import next from "next";
 import { parse } from "url";
-import getEnv from "@base/server/env";
-
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
@@ -24,11 +23,9 @@ const handle = app.getRequestHandler();
 async function loadAllModels() {
   try {
     // Import and use the generated registry
-    getEnv().registerModels()
-    console.log(module);
+    await getEnv().init();
   } catch (error: any) {
     console.error("❌ Failed to load model registry:", error?.message || error);
-    
   }
 }
 
