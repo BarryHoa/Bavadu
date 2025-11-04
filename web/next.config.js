@@ -34,13 +34,8 @@ const nextConfig = {
   experimental: {
     // Allow importing from modules directory
     externalDir: true,
-    // Turbopack alias configuration
-    turbo: {
-      resolveAlias: {
-        "@mdl": "./modules",
-        "@base": "./module-base",
-      },
-    },
+   
+    
   },
 };
 

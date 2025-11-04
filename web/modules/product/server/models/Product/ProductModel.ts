@@ -1,7 +1,7 @@
 import { BaseModel } from "@/module-base/server/models/BaseModel";
 import { eq, sql } from "drizzle-orm";
 
-import getEnv from "@base/server/env";
+import { getEnv } from "@base/server";
 import {
   ListParamsRequest,
   ListParamsResponse,
@@ -62,72 +62,74 @@ class ProductModel extends BaseModel implements ProductModelInterface {
     params: ListParamsRequest<ProductFilter>
   ): Promise<ListParamsResponse<ProductVariantElm>> => {
     const env = getEnv();
-    console.log("params", params);
+    const db = env.getDb();
+
     const { offset, limit, search, filters, sorts } =
       this.getDefaultParamsForList(params);
-
-    // build select
-    const selectProductMaster = {
-      id: table_product_master.id,
-      name: table_product_master.name,
-      type: table_product_master.type,
-      features: table_product_master.features,
-      category: {
-        id: table_product_category.id,
-        name: table_product_category.name,
-        code: table_product_category.code,
-      },
-      brand: table_product_master.brand,
-    };
-    const selectProductVariant = {
-      id: table_product_variant.id,
-      name: table_product_variant.name,
-      description: table_product_variant.description,
-      images: table_product_variant.images,
-      sku: table_product_variant.sku,
-      barcode: table_product_variant.barcode,
-      manufacturer: table_product_variant.manufacturer,
-      // baseUom: table_product_variant.baseUom,
-      isActive: table_product_variant.isActive,
-      createdAt: table_product_variant.createdAt,
-      updatedAt: table_product_variant.updatedAt,
-      createdBy: table_product_variant.createdBy,
-      updatedBy: table_product_variant.updatedBy,
-      productMaster: selectProductMaster,
-      brand: table_product_master.brand,
-      features: table_product_master.features,
-    };
-    // Lấy tổng số sản phẩm trước khi áp dụng limit/offset
-
-    // Query both data and total in two steps since window functions and .fn are not supported in this setup
-    const productMasterQuery = env
-      .getDb()
-      .select(selectProductMaster)
-      .from(table_product_master)
+    
+    // Get data with total count in single query using window function
+    const products = await db
+      .select({
+        // Product variant fields
+        id: table_product_variant.id,
+        name: table_product_variant.name,
+        description: table_product_variant.description,
+        sku: table_product_variant.sku,
+        // Product master fields (flat)
+        productMasterId: table_product_master.id,
+        productMasterName: table_product_master.name,
+        productMasterType: table_product_master.type,
+        productMasterBrand: table_product_master.brand,
+        // Category fields (flat)
+        categoryId: table_product_category.id,
+        categoryName: table_product_category.name,
+        categoryCode: table_product_category.code,
+        // Total count using window function (same for all rows)
+        total: sql<number>`count(*) over()::int`.as('total'),
+      })
+      .from(table_product_variant)
+      .innerJoin(
+        table_product_master,
+        eq(
+          table_product_variant.productMasterId,
+          table_product_master.id
+        )
+      )
       .leftJoin(
         table_product_category,
-        eq(table_product_master.categoryId, table_product_category.id)
+        eq(
+          table_product_master.categoryId,
+          table_product_category.id
+        )
       )
-      .as("productMaster");
-
-    // Step 1: Query paginated data
-
-    const productsQuery = env
-      .getDb()
-      .select()
-      .from(table_product_variant)
-      .innerJoinLateral(
-        productMasterQuery,
-        sql`product_variants.product_master_id = productMaster.id`
-      )
-      .limit(limit)
+      .limit(2)
       .offset(offset);
-
-    const list = await productsQuery;
+    
+    // Extract total from first row (same for all rows due to window function)
+    const total = products.length > 0 ? products[0].total : 0;
+    
+    // Map flat results to nested structure
+    const list = products.map((row: typeof products[0]) => ({
+      id: row.id,
+      name: row.name,
+      description: row.description,
+      sku: row.sku,
+      productMaster: {
+        id: row.productMasterId,
+        name: row.productMasterName,
+        type: row.productMasterType,
+        brand: row.productMasterBrand,
+        category: {
+          id: row.categoryId,
+          name: row.categoryName,
+          code: row.categoryCode,
+        },
+      },
+    }));
 
     return this.getPagination({
       data: list,
-      total: list.length,
+      total: total,
     });
   };
 }

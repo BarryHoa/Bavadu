@@ -57,16 +57,62 @@ try {
 
   const serverProcess = spawn(command, args, {
     stdio: "inherit",
-    shell: true,
+    shell: false, // Don't use shell to have better control over process
     cwd: path.join(__dirname, ".."),
   });
 
+  // Function to kill all bun processes
+  const killBunProcesses = () => {
+    try {
+      if (process.platform !== "win32") {
+        // On Unix/Linux, find and kill all bun processes related to server.ts
+        const { execSync } = require("child_process");
+        try {
+          // Kill processes by finding them via command line
+          execSync(`pkill -f "bun.*server.ts" || true`, { stdio: "ignore" });
+          execSync(`pkill -f "bun run.*server.ts" || true`, { stdio: "ignore" });
+        } catch (e) {
+          // Ignore if no processes found
+        }
+      } else {
+        // On Windows
+        const { exec } = require("child_process");
+        exec(`taskkill /F /IM bun.exe /T 2>nul || taskkill /F /IM node.exe /T 2>nul`, () => {});
+      }
+    } catch (err) {
+      // Ignore errors
+    }
+  };
+
   // Handle process termination
-  process.on("SIGINT", () => {
+  const cleanup = () => {
     console.log("\n🛑 Stopping server...");
-    serverProcess.kill("SIGINT");
-    process.exit(0);
-  });
+    
+    // First try graceful shutdown
+    if (serverProcess && !serverProcess.killed) {
+      serverProcess.kill("SIGTERM");
+    }
+    
+    // Also kill bun processes directly
+    if (useBun) {
+      killBunProcesses();
+    }
+    
+    // Force kill after timeout
+    setTimeout(() => {
+      if (serverProcess && !serverProcess.killed) {
+        console.log("Force killing server process...");
+        serverProcess.kill("SIGKILL");
+        if (useBun) {
+          killBunProcesses();
+        }
+      }
+      process.exit(0);
+    }, 3000);
+  };
+
+  process.on("SIGINT", cleanup);
+  process.on("SIGTERM", cleanup);
 
   serverProcess.on("close", (code) => {
     console.log(`Server exited with code ${code}`);

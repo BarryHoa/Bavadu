@@ -4,9 +4,10 @@
  * Loads all models at server startup before handling requests
  */
 
-import getEnv from "@base/server/env";
+import Environment from "@base/server/env";
 import http from "http";
 import next from "next";
+import dayjs from "dayjs";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.HOSTNAME || "localhost";
@@ -23,37 +24,26 @@ const app = next({
 const handle = app.getRequestHandler();
 
 async function loadAllModels(): Promise<void> {
-  await getEnv().init();
-  console.log("✅ All models loaded successfully");
+  
 }
 
 async function startServer(): Promise<void> {
   try {
     await app.prepare();
-    console.log("✅ Next.js app prepared");
 
-    await loadAllModels();
+    const envProcess = new Environment();
+   
 
     const server = http.createServer(async (req, res) => {
-      try {
-        // Optional health check
-        if (req.url === "/health") {
-          res.statusCode = 200;
-          res.setHeader("content-type", "application/json");
-          res.end(
-            JSON.stringify({ status: "ok", ts: new Date().toISOString() })
-          );
-          return;
-        }
-
-        await handle(req, res);
-      } catch (err) {
-        console.error("❌ Request handling error:", err);
-        if (!res.headersSent) {
-          res.statusCode = 500;
-          res.end("Internal Server Error");
-        }
+      // INSERT_YOUR_CODE
+      // Make a global variable for runtime at server
+      // The value is always "server"
+      (globalThis as any).systemRuntimeVariables = {
+        env: envProcess,
+        timestamp: dayjs().format('YYYY-MM-DD HH:mm:ss')  
       }
+      await handle(req, res);
+    
     });
 
     // Graceful shutdown

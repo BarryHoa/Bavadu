@@ -1,4 +1,5 @@
-import getEnv from "@base/server/env";
+
+import { getEnv } from "@base/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(

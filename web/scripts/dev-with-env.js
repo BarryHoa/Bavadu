@@ -52,6 +52,10 @@ try {
       shell: true,
     }
   );
+  // const nextDev = spawn("bun", ["run", "next"], {
+  //   stdio: "inherit",
+  //   shell: true,
+  // });
 
   // Handle process termination
   process.on("SIGINT", () => {

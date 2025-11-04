@@ -6,8 +6,8 @@
     "@mdl/*": "./modules/*"
   },
   "scripts": {
-    "dev": "node scripts/dev-with-env.js local",
-    "dev:prod": "node scripts/dev-with-env.js prod",
+    "dev": "npm run routes:generate && node scripts/dev-with-env.js local",
+    "dev:prod": "npm run routes:generate && node scripts/dev-with-env.js prod",
     "next": "next dev",
     "build": "npm run routes:generate && next build",
     "server:start": "NODE_ENV=production tsx server.ts",
@@ -69,6 +69,7 @@
     "@react-aria/ssr": "3.9.10",
     "@react-aria/visually-hidden": "3.8.28",
     "clsx": "2.1.1",
+    "dayjs": "^1.11.19",
     "drizzle-orm": "^0.44.7",
     "framer-motion": "12.23.22",
     "lodash": "^4.17.21",
