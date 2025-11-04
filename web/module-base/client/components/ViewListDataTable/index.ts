@@ -7,3 +7,4 @@ export {
   type ViewListDataTableStoreState,
   type ViewListDataTableStoreActions,
 } from "./useViewListDataTableStore";
+export { useViewListDataTableQueries } from "./useViewListDataTableQueries";

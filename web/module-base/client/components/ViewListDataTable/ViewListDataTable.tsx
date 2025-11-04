@@ -1,8 +1,7 @@
 "use client";
 
 import { Alert } from "@heroui/alert";
-import { useEffect, useMemo, useState } from "react";
-import ViewListDataTableService from "../../services/ViewListDataTableService";
+import { useMemo } from "react";
 import { DataTable, DataTableProps } from "../DataTable";
 
 import ColumnVisibilityMenu from "./components/ColumnVisibilityMenu";
@@ -10,6 +9,7 @@ import FavoriteFilter from "./components/FavoriteFilter";
 import FilterMenu, { FilterOption } from "./components/FilterMenu";
 import GroupByMenu, { GroupOption } from "./components/GroupByMenu";
 import SearchBar from "./components/SearchBar";
+import { useViewListDataTableQueries } from "./useViewListDataTableQueries";
 import { useViewListDataTableStore } from "./useViewListDataTableStore";
 
 type ViewListDataTableProps<T = any> = Omit<
@@ -30,155 +30,25 @@ type ViewListDataTableProps<T = any> = Omit<
 export default function ViewListDataTable<T = any>({
   columns,
   model,
-  dataSource: propDataSource,
-  filterOptions: propFilterOptions,
-  groupByOptions: propGroupByOptions,
-  initialFavoriteFilter: propInitialFavoriteFilter,
   ...dataTableProps
 }: ViewListDataTableProps<T>) {
-  // Service instance
-  const service = useMemo(() => new ViewListDataTableService(), []);
-
-  // State for fetched data
-  const [fetchedDataSource, setFetchedDataSource] = useState<T[]>([]);
-  const [fetchedFilterOptions, setFetchedFilterOptions] = useState<
-    FilterOption<T>[]
-  >([]);
-  const [fetchedGroupByOptions, setFetchedGroupByOptions] = useState<
-    GroupOption[]
-  >([]);
-  const [fetchedFavoriteFilter, setFetchedFavoriteFilter] = useState<
-    ((row: T) => boolean) | null
-  >(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
   // Use the store hook - each instance gets its own store
   const store = useViewListDataTableStore({
     columns,
   });
 
-  // Fetch data from service
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchData = async () => {
-      if (!model) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Validate modelId format (should be module.model)
-        const modelId = model.includes(".") ? model : `${model}.${model}`;
-
-        // Fetch data in parallel
-        const [
-          dataResponse,
-          filterResponse,
-          groupByResponse,
-          favoriteResponse,
-        ] = await Promise.allSettled([
-          service.getData({
-            modelId: modelId as `${string}.${string}`,
-            params: {
-              // Search and filters are handled locally for now
-              // Can be sent to API for server-side filtering if needed
-            },
-          }),
-          service.getFilter({
-            modelId: modelId as `${string}.${string}`,
-            params: {},
-          }),
-          service.getGroupBy({
-            modelId: modelId as `${string}.${string}`,
-            params: {},
-          }),
-          service.getFavoriteFilter({
-            modelId: modelId as `${string}.${string}`,
-            params: {},
-          }),
-        ]);
-
-        if (!isMounted) return;
-
-        // Handle data response
-        if (dataResponse.status === "fulfilled") {
-          const result = dataResponse.value;
-          if (result.success && Array.isArray(result.data)) {
-            setFetchedDataSource(result.data);
-          }
-        }
-
-        // Handle filter response
-        if (filterResponse.status === "fulfilled") {
-          const result = filterResponse.value;
-          if (result.success && Array.isArray(result.data)) {
-            // Convert API response to FilterOption format
-            const filters: FilterOption<T>[] = result.data.map((item: any) => ({
-              label: item.label || item.name || String(item),
-              filterFn: item.filterFn || (() => true), // Default filter function
-            }));
-            setFetchedFilterOptions(filters);
-          }
-        }
-
-        // Handle groupBy response
-        if (groupByResponse.status === "fulfilled") {
-          const result = groupByResponse.value;
-          if (result.success && Array.isArray(result.data)) {
-            // Convert API response to GroupOption format
-            const groups: GroupOption[] = result.data.map((item: any) => ({
-              key: item.key || item.id || String(item),
-              label: item.label || item.name || String(item),
-            }));
-            setFetchedGroupByOptions(groups);
-          }
-        }
-
-        // Handle favorite filter response
-        if (favoriteResponse.status === "fulfilled") {
-          const result = favoriteResponse.value;
-          if (result.success && result.data) {
-            // Convert API response to filter function
-            // This might need adjustment based on actual API response format
-            setFetchedFavoriteFilter(
-              typeof result.data === "function"
-                ? result.data
-                : (row: T) => {
-                    // Default implementation - adjust based on API response
-                    return true;
-                  }
-            );
-          }
-        }
-
-        setLoading(false);
-      } catch (err) {
-        if (!isMounted) return;
-        setError(err instanceof Error ? err.message : "Failed to fetch data");
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-
-    return () => {
-      isMounted = false;
-    };
-    // Only refetch when model changes, not on search/filter changes (filtering is done locally)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [model]);
-
-  // Use prop values if provided, otherwise use fetched values
-  const dataSource = propDataSource ?? fetchedDataSource;
-  const filterOptions = propFilterOptions ?? fetchedFilterOptions;
-  const groupByOptions = propGroupByOptions ?? fetchedGroupByOptions;
-  const initialFavoriteFilter =
-    propInitialFavoriteFilter ?? fetchedFavoriteFilter;
+  // Fetch data using react-query
+  const {
+    data: dataSource,
+    filters: filterOptions,
+    groupByOptions: groupByOptions,
+    favoriteFilter: initialFavoriteFilter,
+    isLoading,
+    error: fetchError,
+  } = useViewListDataTableQueries<T>({
+    model,
+    // enabled: !propDataSource, // Only fetch if dataSource is not provided as prop
+  });
 
   // Actual filtering logic
   const filteredData = useMemo(() => {
@@ -297,14 +167,14 @@ export default function ViewListDataTable<T = any>({
       </div>
 
       {/* Error Display */}
-      {error && (
+      {fetchError && (
         <Alert
           color="danger"
           variant="flat"
           title="Error loading data"
           className="mb-4"
         >
-          {error}
+          {fetchError}
         </Alert>
       )}
 
@@ -313,7 +183,7 @@ export default function ViewListDataTable<T = any>({
         {...dataTableProps}
         columns={displayColumns}
         dataSource={processedData}
-        loading={loading || dataTableProps.loading}
+        loading={isLoading || dataTableProps.loading}
       />
     </div>
   );

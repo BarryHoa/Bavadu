@@ -6,6 +6,6 @@
   "category": "Business",
   "icon": "Package",
   "models": {
-    "product.variant": "Product/ProductModel"
+    "product": "Product/ProductModel"
   }
 }
