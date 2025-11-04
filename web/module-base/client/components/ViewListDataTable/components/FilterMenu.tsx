@@ -8,7 +8,7 @@ import {
   DropdownItem,
 } from "@heroui/dropdown";
 import { Checkbox } from "@heroui/checkbox";
-import { FunnelIcon } from "@heroui/icons";
+import { Filter } from "lucide-react";
 
 export interface FilterOption<T = any> {
   label: string;
@@ -33,7 +33,7 @@ export default function FilterMenu<T = any>({
   return (
     <Dropdown>
       <DropdownTrigger>
-        <Button variant="bordered" startContent={<FunnelIcon />}>
+        <Button variant="bordered" startContent={<Filter size={16} />}>
           Filters
         </Button>
       </DropdownTrigger>

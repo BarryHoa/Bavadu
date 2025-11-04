@@ -1,7 +1,7 @@
 "use client";
 
-import { IconButton } from "@heroui/button";
-import { StarIcon, StarOutlineIcon } from "@heroui/icons";
+import { Button } from "@heroui/button";
+import { Star } from "lucide-react";
 
 interface FavoriteFilterProps {
   isActive: boolean;
@@ -13,14 +13,14 @@ export default function FavoriteFilter({
   onToggle,
 }: FavoriteFilterProps) {
   return (
-    <IconButton
+    <Button
       variant={isActive ? "solid" : "bordered"}
       color={isActive ? "warning" : "default"}
       aria-label="Show favorites"
-      onClick={onToggle}
+      onPress={onToggle}
       title="Show favorites"
     >
-      {isActive ? <StarIcon /> : <StarOutlineIcon />}
-    </IconButton>
+      <Star className={isActive ? "fill-current" : ""} />
+    </Button>
   );
 }

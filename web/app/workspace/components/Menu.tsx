@@ -1,13 +1,12 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Drawer } from "@heroui/drawer";
-import { ScrollShadow } from "@heroui/scroll-shadow";
-import { useState, useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import { ChevronDown, ChevronRight } from "lucide-react";
 import { MenuWorkspaceElement } from "@base/client/interface/WorkspaceMenuInterface";
+import { ScrollShadow } from "@heroui/scroll-shadow";
+import clsx from "clsx";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 interface MenuProps {
   items: MenuWorkspaceElement[];
@@ -23,6 +22,7 @@ export default function Menu({
   isOpen,
   onClose,
   moduleMenus = [],
+  onToggleSidebar,
 }: MenuProps) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
@@ -32,7 +32,7 @@ export default function Menu({
     setExpandedItems((prev) =>
       prev.includes(itemName)
         ? prev.filter((name) => name !== itemName)
-        : [...prev, itemName],
+        : [...prev, itemName]
     );
   };
 
@@ -52,7 +52,7 @@ export default function Menu({
   // Find all parent items that need to be expanded for the current path
   const findParentItemsToExpand = (
     items: MenuWorkspaceElement[],
-    path: string,
+    path: string
   ): string[] => {
     const parentsToExpand: string[] = [];
 
@@ -115,7 +115,7 @@ export default function Menu({
       <div key={item.name} className="mb-1">
         <div
           ref={isItemActive ? activeItemRef : null}
-          className={`flex items-center justify-between px-3 py-3 rounded-xl transition-all duration-200 group ${
+          className={`flex items-center justify-between px-1 py-1 rounded-xl transition-all duration-200 group ${
             isItemActive
               ? "bg-blue-50 text-blue-600"
               : hasActiveChildren
@@ -260,14 +260,32 @@ export default function Menu({
           isOpen ? "w-64" : "w-16"
         }`}
       >
-        <ScrollShadow className="flex-1 px-2 py-4">
+        <ScrollShadow className="flex-1 px-2 pb-4 pt-1">
           <div
-            className={`text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-3 transition-opacity duration-300 ${
-              isOpen ? "opacity-100" : "opacity-0"
-            }`}
+            className={`flex flex-1 gap-2 items-center ${isOpen ? "justify-between" : "justify-center"}`}
           >
-            Main
+            <div
+              className={`flex-auto text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 transition-opacity duration-300 ${
+                isOpen ? "inline-block" : "hidden"
+              }`}
+            >
+              Main
+            </div>
+
+            <button
+              className={`rounded-md flex-end cursor-pointer hover:bg-gray-100 p-1`}
+              onClick={onToggleSidebar}
+            >
+              <ChevronRight
+                className={clsx(
+                  "transition-transform",
+                  isOpen ? "rotate-180" : ""
+                )}
+                size={20}
+              />
+            </button>
           </div>
+
           {items.map(renderMenuItem)}
 
           {moduleMenus.length > 0 && (
@@ -284,50 +302,6 @@ export default function Menu({
           )}
         </ScrollShadow>
       </aside>
-
-      {/* Mobile sidebar */}
-      <Drawer
-        backdrop="opaque"
-        isOpen={isOpen}
-        placement="left"
-        size="sm"
-        onOpenChange={(open) => !open && onClose()}
-      >
-        <div className="w-72 h-full bg-white shadow-xl flex flex-col">
-          <div className="flex items-center justify-between h-20 px-6 bg-gradient-to-r from-blue-600 to-purple-600">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-3">
-                <span className="text-blue-600 font-bold text-lg">D</span>
-              </div>
-              <h1 className="text-xl font-bold text-white">Seven Admin</h1>
-            </div>
-            <Button
-              isIconOnly
-              className="text-white"
-              size="sm"
-              variant="light"
-              onPress={onClose}
-            >
-              ✕
-            </Button>
-          </div>
-          <ScrollShadow className="flex-1 px-4 py-6 space-y-1">
-            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-3">
-              Main
-            </div>
-            {items.map(renderMenuItem)}
-
-            {moduleMenus.length > 0 && (
-              <div className="mt-4">
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-3">
-                  Module
-                </div>
-                {moduleMenus.map(renderMenuItem)}
-              </div>
-            )}
-          </ScrollShadow>
-        </div>
-      </Drawer>
     </>
   );
 }

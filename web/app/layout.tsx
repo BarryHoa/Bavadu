@@ -31,7 +31,6 @@ export default async function RootLayout({
 }) {
   // Load messages for the default locale
   const locale = "en";
- 
 
   return (
     <html suppressHydrationWarning lang={locale}>
@@ -47,7 +46,7 @@ export default async function RootLayout({
           <div className="relative flex flex-col h-screen">
             {/* <Navbar /> */}
             <main
-              className="container mx-auto p-0  my-1 flex-1"
+              className="container mx-auto p-0 flex-1"
               style={{ maxWidth: "1920px" }}
             >
               {children}

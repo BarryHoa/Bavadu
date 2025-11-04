@@ -6,9 +6,6 @@
   "category": "Business",
   "icon": "Package",
   "models": {
-    "product.variant": "Product/ProductModel",
-    "product.master": "Product/ProductMasterModel",
-    "product.category": "Product/ProductCategoryModel",
-    "product.attribute": "Product/ProductAttributeModel"
+    "product.variant": "Product/ProductModel"
   }
 }

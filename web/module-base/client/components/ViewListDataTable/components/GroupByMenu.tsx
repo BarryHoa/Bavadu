@@ -7,7 +7,7 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@heroui/dropdown";
-import { GroupIcon } from "@heroui/icons";
+import { Users } from "lucide-react";
 
 export interface GroupOption {
   key: string;
@@ -32,7 +32,7 @@ export default function GroupByMenu({
   return (
     <Dropdown>
       <DropdownTrigger>
-        <Button variant="bordered" startContent={<GroupIcon />}>
+        <Button variant="bordered" startContent={<Users size={16} />}>
           Group by
         </Button>
       </DropdownTrigger>

@@ -8,7 +8,7 @@ import {
   DropdownItem,
 } from "@heroui/dropdown";
 import { Checkbox } from "@heroui/checkbox";
-import { EyeIcon, EyeOffIcon } from "@heroui/icons";
+import { Eye, EyeOff } from "lucide-react";
 import { DataTableColumn } from "../../DataTable";
 
 interface ColumnVisibilityMenuProps<T = any> {
@@ -29,7 +29,7 @@ export default function ColumnVisibilityMenu<T = any>({
       <DropdownTrigger>
         <Button
           variant="bordered"
-          startContent={allVisible ? <EyeIcon /> : <EyeOffIcon />}
+          startContent={allVisible ? <Eye size={16} /> : <EyeOff size={16} />}
         >
           Columns
         </Button>

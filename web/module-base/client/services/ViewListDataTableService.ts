@@ -1,7 +1,7 @@
 import ClientHttpService from "./ClientHttpService";
 
 type DataTableParams = {
-  modelId: `${string}.${string}`;
+  modelId: string;
   params: any;
 };
 

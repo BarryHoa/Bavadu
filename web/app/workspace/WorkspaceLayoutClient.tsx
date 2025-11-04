@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { usePathname } from "next/navigation";
 import { WorkspaceProvider } from "@base/client/contexts/workspace";
 import { MenuWorkspaceElement } from "@base/client/interface/WorkspaceMenuInterface";
-import clsx from "clsx";
-import { ChevronRight } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 import Breadcrumb, { BreadcrumbItem } from "./components/Breadcrumb";
 import Content from "./components/Content";
@@ -73,25 +71,12 @@ export default function WorkspaceLayoutClient({
           <div className="w-full min-h-0 flex flex-1 h-full overflow-auto scroll-overlay">
             <div className="min-w-3xl flex flex-col flex-1">
               {/* Breadcrumb */}
-              <div className="px-2 py-2 font-small rounded-md">
-                <button
-                  className="mb-2 p-2 hover:bg-gray-100 rounded-md"
-                  onClick={() => setSidebarOpen(!sidebarOpen)}
-                >
-                  <ChevronRight
-                    className={clsx(
-                      "display-inline-block",
-                      "transition-transform",
-                      sidebarOpen ? "rotate-180" : "",
-                    )}
-                    size={20}
-                  />
-                </button>
+              <div className="p-2">
                 <Breadcrumb items={initialCrumbs} />
               </div>
 
               {/* Page content */}
-              <div className="flex-1">
+              <div className="flex-1 p-2">
                 <Content>{children}</Content>
               </div>
             </div>
