@@ -5,10 +5,10 @@ import { MenuWorkspaceElement } from "@base/client/interface/WorkspaceMenuInterf
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-import Breadcrumb, { BreadcrumbItem } from "./components/Breadcrumb";
-import Content from "./components/Content";
-import MenuPanel from "./components/Menu";
-import Nav from "./components/Nav";
+import Breadcrumb, { BreadcrumbItem } from "@base/client/layouts/workspace/components/Breadcrumb";
+import Content from "@base/client/layouts/workspace/components/Content";
+import MenuPanel from "@base/client/layouts/workspace/components/Menu";
+import Nav from "@base/client/layouts/workspace/components/Nav";
 
 interface SerializedNavigationItem {
   name: string;

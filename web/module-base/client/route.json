@@ -1,0 +1,8 @@
+[
+  {
+    "path": "/admin",
+    "routes": [
+      { "path": "/models", "page": "Admin/ModelsListPage" }
+    ]
+  }
+]

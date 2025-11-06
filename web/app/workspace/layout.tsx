@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 
-import WorkspaceLayoutClient from "./WorkspaceLayoutClient";
-import ModuleI18nProvider from "@/module-base/client/contexts/i18n";
+import WorkspaceLayoutClient from "@base/client/layouts/workspace/WorkspaceLayoutClient";
+import ModuleI18nProvider from "@base/client/contexts/i18n";
 
 // i18n is provided at module level layouts to avoid loading all messages here
 

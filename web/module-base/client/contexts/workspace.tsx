@@ -1,6 +1,6 @@
 "use client";
 
-import type { BreadcrumbItem } from "../../../app/workspace/components/Breadcrumb";
+import type { BreadcrumbItem } from "../layouts/workspace/components/Breadcrumb";
 
 import React, { createContext, useContext, useState, useMemo } from "react";
 
