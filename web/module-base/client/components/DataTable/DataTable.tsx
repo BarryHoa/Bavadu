@@ -1,7 +1,15 @@
 "use client";
 
 import { Spinner } from "@heroui/spinner";
-import { TableProps } from "@heroui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableProps,
+  TableRow,
+} from "@heroui/table";
 import type { ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 
@@ -11,24 +19,12 @@ import {
 } from "../Pagination/pagginationConts";
 import PaginationComponent from "../Pagination/Pagination";
 import usePagination from "../Pagination/usePagination";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from "../Table";
-
-export interface DataTableColumn<T = any> {
-  key: string;
-  label: string;
-  align?: "start" | "center" | "end";
-  width?: number;
-  sortable?: boolean;
-  render?: (value: any, record: T, index: number) => ReactNode;
-  fixed?: "left" | "right"; // Freeze column to left or right
-}
+import { type DataTableColumnDefinition } from "./DataTableColumn";
+import useColumns from "./hooks/useColumns";
+import useDataTableSelection, {
+  type DataTableRowSelection,
+} from "./hooks/useDataTableSelection";
+export type { DataTableColumnDefinition } from "./DataTableColumn";
 
 export interface DataTableSummary {
   label?: string;
@@ -36,9 +32,10 @@ export interface DataTableSummary {
 }
 
 export type DataTableProps<T = any> = TableProps & {
-  columns: DataTableColumn<T>[];
+  columns: DataTableColumnDefinition<T>[];
   dataSource: T[];
   rowKey?: string;
+  tableLayout?: "auto" | "fixed";
 
   // Pagination
   pagination?:
@@ -58,8 +55,7 @@ export type DataTableProps<T = any> = TableProps & {
   summary?: DataTableSummary;
 
   // Selection
-  selectedKeys?: Set<string | number>;
-  onSelectionChange?: (keys: Set<string | number>) => void;
+  rowSelection?: false | DataTableRowSelection<T>;
 
   // Events
   onChangeTable?: (params: {
@@ -96,15 +92,16 @@ export default function DataTable<T = any>({
   loading = false,
   color = "primary",
   summary,
-  selectedKeys,
-  onSelectionChange,
+  rowSelection = false,
   onChangeTable,
   className = "",
   classNames = {},
   emptyContent = "No data available",
+  tableLayout = "auto",
   ...rest
 }: DataTableProps<T>) {
   const isPagination = pagination && typeof pagination === "object";
+  const processedColumns = useColumns(columns);
 
   const paginationInfo = usePagination({
     pageSizeOptions: isPagination
@@ -138,7 +135,7 @@ export default function DataTable<T = any>({
         const val = (record as any)[rowKey];
 
         if (typeof val === "string" || typeof val === "number") {
-          return String(val);
+          return val;
         }
       }
 
@@ -181,141 +178,42 @@ export default function DataTable<T = any>({
     [paginationInfo, sortDescriptor, onChangeTable]
   );
 
-  // Calculate frozen column positions
-  const frozenColumnsInfo = useMemo(() => {
-    const leftColumns: Array<{ key: string; left: number; width: number }> = [];
-    const rightColumns: Array<{ key: string; right: number; width: number }> =
-      [];
-    let leftOffset = 0;
-    let rightOffset = 0;
-
-    // Calculate left frozen columns
-    columns.forEach((col) => {
-      if (col.fixed === "left") {
-        leftColumns.push({
-          key: col.key,
-          left: leftOffset,
-          width: col.width || 150,
-        });
-        leftOffset += col.width || 150;
-      }
-    });
-
-    // Calculate right frozen columns (from right to left)
-    for (let i = columns.length - 1; i >= 0; i--) {
-      const col = columns[i];
-
-      if (col.fixed === "right") {
-        rightColumns.unshift({
-          key: col.key,
-          right: rightOffset,
-          width: col.width || 150,
-        });
-        rightOffset += col.width || 150;
-      }
-    }
-
-    return { leftColumns, rightColumns };
-  }, [columns]);
-
-  // Get frozen column style
-  const getFrozenStyle = useCallback(
-    (columnKey: string) => {
-      const leftCol = frozenColumnsInfo.leftColumns.find(
-        (c) => c.key === columnKey
-      );
-
-      if (leftCol) {
-        return {
-          position: "sticky" as const,
-          left: leftCol.left,
-          zIndex: 10,
-        };
-      }
-
-      const rightCol = frozenColumnsInfo.rightColumns.find(
-        (c) => c.key === columnKey
-      );
-
-      if (rightCol) {
-        return {
-          position: "sticky" as const,
-          right: rightCol.right,
-          zIndex: 10,
-        };
-      }
-
-      return {};
-    },
-    [frozenColumnsInfo]
+  const tableSelectionProps = useDataTableSelection(
+    rowSelection,
+    dataSource,
+    getRowKey
   );
-
-  // Get frozen column class
-  const getFrozenClass = useCallback(
-    (columnKey: string) => {
-      const isLeftFrozen = frozenColumnsInfo.leftColumns.some(
-        (c) => c.key === columnKey
-      );
-      const isRightFrozen = frozenColumnsInfo.rightColumns.some(
-        (c) => c.key === columnKey
-      );
-
-      if (isLeftFrozen) return "frozen-column frozen-left";
-      if (isRightFrozen) return "frozen-column frozen-right";
-
-      return "";
-    },
-    [frozenColumnsInfo]
-  );
-
-  // Render cell content
-  const renderCell = useCallback(
-    (record: T, column: DataTableColumn<T>, index: number) => {
-      const value = (record as any)[column.key];
-
-      if (column.render) {
-        return column.render(value, record, index);
-      }
-
-      return value;
-    },
-    []
-  );
-
-  // Table bottom content (pagination + summary)
-
-  // Get selection color class
 
   return (
     <div className={`w-full bg-content1 ${classNames.wrapper || ""}`}>
       <div className="flex flex-col gap-4 flex-1">
         <Table
           aria-label="Data table"
-          selectedKeys={selectedKeys}
-          selectionMode="multiple"
+          {...(tableSelectionProps ?? {})}
           isHeaderSticky
-          // isStriped
+          isStriped
           isCompact
-          onSelectionChange={onSelectionChange as any}
+          layout={tableLayout}
           // bottomContent={bottomContent}
           className={className}
           classNames={{
             ...classNames,
             tbody: "overflow-x-auto",
             wrapper: "p-2 rounded-none",
-            th: "bg-primary-700 text-white ",
+            th: "bg-primary-700 text-white hover:bg-primary-700/80",
+            tr: "hover:bg-primary-700/10 ",
+            td: "rounded-none",
           }}
-          // color={"success"}
           {...rest}
         >
           <TableHeader>
-            {columns.map((column) => (
+            {processedColumns.map((column) => (
               <TableColumn
                 key={column.key}
                 align={column.align || "start"}
                 allowsSorting={column.sortable}
-                className={getFrozenClass(column.key)}
-                style={getFrozenStyle(column.key)}
+                className={column.frozenClassName}
+                style={column.frozenStyle}
                 width={column.width}
               >
                 {column.label}
@@ -333,13 +231,13 @@ export default function DataTable<T = any>({
 
               return (
                 <TableRow key={getRowKey(item, index)}>
-                  {columns.map((column) => (
+                  {processedColumns.map((column) => (
                     <TableCell
                       key={column.key}
-                      className={getFrozenClass(column.key)}
-                      style={getFrozenStyle(column.key)}
+                      className={column.frozenClassName}
+                      style={column.frozenStyle}
                     >
-                      {renderCell(item, column, index)}
+                      {column.renderValue(item, index)}
                     </TableCell>
                   ))}
                 </TableRow>

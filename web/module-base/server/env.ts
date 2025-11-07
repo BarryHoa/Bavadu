@@ -1,10 +1,21 @@
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { dirname, join, relative } from "path";
 import postgres from "postgres";
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Asia/Ho_Chi_Minh");
 
-type ModelInstance = unknown;
-type ModelFactory = () => ModelInstance;
+type ModelFactoryElm = {
+  instance: () => object;
+  path: string;
+  module: string;
+  key: string;
+  timestamp: string;
+};
 type SchemaRegistry = Record<string, unknown>;
 
 interface EnvironmentOptions {
@@ -14,9 +25,7 @@ interface EnvironmentOptions {
 class Environment {
   private readonly projectRoot: string;
   private db: ReturnType<typeof drizzle> | null = null;
-  private readonly models = new Map<string, ModelInstance>();
-  private readonly modelFactories = new Map<string, ModelFactory>();
-  private readonly modelPaths = new Map<string, string>();
+  private readonly modelFactories = new Map<string, ModelFactoryElm>();
 
   private constructor(projectRoot: string) {
     this.projectRoot = projectRoot;
@@ -37,37 +46,75 @@ class Environment {
   }
 
   getModel<T extends object>(modelId: string): T | undefined {
-    const model = this.models.get(modelId);
-    if (!model || typeof model !== "object" || !(model instanceof Object)) {
+    const factoryElm = this.modelFactories.get(modelId);
+
+    if (!factoryElm) {
       return undefined;
     }
-    return model as T;
+
+    try {
+      console.log(
+        "Log load model: ",
+        modelId,
+        "created at: ",
+        factoryElm.timestamp
+      );
+      const instance = factoryElm.instance();
+
+      if (instance && typeof instance === "object") {
+        return instance as T;
+      }
+    } catch (error) {
+      console.error(
+        `Failed to instantiate model "${modelId}"${factoryElm.path ? ` from ${factoryElm.path}` : ""}:`,
+        error
+      );
+    }
+
+    return undefined;
   }
-  getModelKeys(): string[] {
-    return Array.from(this.models.keys()) as string[];
+  getAllModels(): ModelFactoryElm[] {
+    return Array.from(this.modelFactories.values());
   }
 
   async reloadModel(modelId: string): Promise<boolean> {
-    const factory = this.modelFactories.get(modelId);
-    if (!factory) {
+    const factoryElm = this.modelFactories.get(modelId);
+    if (!factoryElm) {
       console.warn(`Model "${modelId}" is not registered.`);
       return false;
     }
 
-    try {
-      const instance = factory();
-      this.models.set(modelId, instance);
+    const rootPath = [
+      factoryElm.module === "base" ? "base" : "mdl",
+      factoryElm.module === "base" ? undefined : factoryElm.module,
+      "server",
+      "models",
+      factoryElm.path,
+    ]
+      .filter(Boolean)
+      .join("/");
 
-      const sourcePath = this.modelPaths.get(modelId);
-      console.log(
-        `Model "${modelId}" reloaded${sourcePath ? ` from ${sourcePath}` : ""}`
+    try {
+      const moduleSpecifier = `@${rootPath}`;
+      const cacheBustedSpecifier = `${moduleSpecifier}?update=${Date.now()}`;
+      const mod = await import(cacheBustedSpecifier);
+      const ModelClass = mod?.default;
+      if (!ModelClass) {
+        throw new Error("Missing default export");
+      }
+
+      const factory = () => new ModelClass();
+      this.registerOneModel(
+        modelId,
+        factoryElm.module,
+        factory,
+        factoryElm.path
       );
 
       return true;
     } catch (error) {
-      const sourcePath = this.modelPaths.get(modelId);
       console.error(
-        `Failed to reload model "${modelId}"${sourcePath ? ` from ${sourcePath}` : ""}:`,
+        `Failed to reload model "${modelId}"${factoryElm.path ? ` from ${factoryElm.path}` : ""}:`,
         error
       );
       return false;
@@ -87,12 +134,22 @@ class Environment {
     let errorCount = 0;
 
     for (const moduleJsonPath of moduleJsonPaths) {
-      const moduleDefinition = this.safeReadJson<{ models?: Record<string, string> }>(moduleJsonPath);
+      const moduleDefinition = this.safeReadJson<{
+        models?: Record<string, string>;
+      }>(moduleJsonPath);
       const configuredModels = moduleDefinition?.models;
       if (!configuredModels) continue;
 
       for (const [modelId, fileName] of Object.entries(configuredModels)) {
-        const modelPath = join(dirname(moduleJsonPath), "server", "models", fileName);
+        const pathToModelFile = join("server", "models", fileName);
+
+        const modelPath = join(dirname(moduleJsonPath), pathToModelFile);
+        const folderMdlRoot = this.resolveModuleName(moduleJsonPath);
+
+        const folderName =
+          folderMdlRoot === "module-base"
+            ? "base"
+            : (folderMdlRoot ?? "unknown-module");
 
         try {
           const mod = await import(this.toImportPath(modelPath));
@@ -101,12 +158,15 @@ class Environment {
             throw new Error("Missing default export");
           }
 
-          const factory: ModelFactory = () => new ModelClass();
-          this.registerModel(modelId, factory, modelPath);
+          const factory = () => new ModelClass();
+          this.registerOneModel(modelId, folderName, factory, fileName);
           loadedCount++;
         } catch (error) {
           errorCount++;
-          console.error(`Failed to load model "${modelId}" from ${modelPath}:`, error);
+          console.error(
+            `Failed to load model "${modelId}" from ${modelPath}:`,
+            error
+          );
         }
       }
     }
@@ -163,14 +223,26 @@ class Environment {
   private collectSchemaEntryPoints(): string[] {
     const schemaPaths: string[] = [];
 
-    const baseSchema = join(this.projectRoot, "module-base", "server", "schemas", "index.ts");
+    const baseSchema = join(
+      this.projectRoot,
+      "module-base",
+      "server",
+      "schemas",
+      "index.ts"
+    );
     if (existsSync(baseSchema)) {
       schemaPaths.push(baseSchema);
     }
 
     const modulesRoot = join(this.projectRoot, "modules");
     for (const dir of this.safeReadDir(modulesRoot)) {
-      const schemaPath = join(modulesRoot, dir, "server", "schemas", "index.ts");
+      const schemaPath = join(
+        modulesRoot,
+        dir,
+        "server",
+        "schemas",
+        "index.ts"
+      );
       if (existsSync(schemaPath)) {
         schemaPaths.push(schemaPath);
       }
@@ -198,15 +270,53 @@ class Environment {
   }
 
   private toImportPath(targetPath: string): string {
-    const relativePath = relative(this.projectRoot, targetPath).replace(/\\/g, "/");
+    const relativePath = relative(this.projectRoot, targetPath).replace(
+      /\\/g,
+      "/"
+    );
     return `@/${relativePath}`;
   }
 
-  private registerModel(modelId: string, factory: ModelFactory, sourcePath: string): void {
-    const instance = factory();
-    this.modelFactories.set(modelId, factory);
-    this.modelPaths.set(modelId, sourcePath);
-    this.models.set(modelId, instance);
+  private registerOneModel(
+    modelId: string,
+    moduleName: string,
+    factory: () => object,
+    sourcePath: string
+  ): void {
+    const entry: ModelFactoryElm = {
+      instance: factory,
+      path: sourcePath,
+      module: moduleName,
+      key: modelId,
+      timestamp: dayjs().toISOString(),
+    };
+
+    this.modelFactories.set(modelId, entry);
+
+    try {
+      factory();
+    } catch (error) {
+      console.error(
+        `Model "${modelId}" threw during initialization${sourcePath ? ` from ${sourcePath}` : ""}:`,
+        error
+      );
+      throw error;
+    }
+  }
+
+  private resolveModuleName(moduleJsonPath: string): string {
+    const moduleDir = dirname(moduleJsonPath);
+    const relativeModuleDir = relative(this.projectRoot, moduleDir).replace(
+      /\\/g,
+      "/"
+    );
+
+    if (!relativeModuleDir || relativeModuleDir === ".") {
+      return "root";
+    }
+
+    const segments = relativeModuleDir.split("/").filter(Boolean);
+    return segments.pop() ?? relativeModuleDir;
   }
 
   private createPgClient() {
@@ -227,4 +337,3 @@ class Environment {
 }
 
 export default Environment;
-

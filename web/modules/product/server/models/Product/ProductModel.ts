@@ -66,7 +66,7 @@ class ProductModel extends BaseModel implements ProductModelInterface {
 
     const { offset, limit, search, filters, sorts } =
       this.getDefaultParamsForList(params);
-    
+
     // Get data with total count in single query using window function
     const products = await db
       .select({
@@ -85,31 +85,25 @@ class ProductModel extends BaseModel implements ProductModelInterface {
         categoryName: table_product_category.name,
         categoryCode: table_product_category.code,
         // Total count using window function (same for all rows)
-        total: sql<number>`count(*) over()::int`.as('total'),
+        total: sql<number>`count(*) over()::int`.as("total"),
       })
       .from(table_product_variant)
       .innerJoin(
         table_product_master,
-        eq(
-          table_product_variant.productMasterId,
-          table_product_master.id
-        )
+        eq(table_product_variant.productMasterId, table_product_master.id)
       )
       .leftJoin(
         table_product_category,
-        eq(
-          table_product_master.categoryId,
-          table_product_category.id
-        )
+        eq(table_product_master.categoryId, table_product_category.id)
       )
       .limit(2)
       .offset(offset);
-    
+
     // Extract total from first row (same for all rows due to window function)
     const total = products.length > 0 ? products[0].total : 0;
-    
+
     // Map flat results to nested structure
-    const list = products.map((row: typeof products[0]) => ({
+    const list = products.map((row: (typeof products)[0]) => ({
       id: row.id,
       name: row.name,
       description: row.description,
@@ -126,7 +120,6 @@ class ProductModel extends BaseModel implements ProductModelInterface {
         },
       },
     }));
-
     return this.getPagination({
       data: list,
       total: total,

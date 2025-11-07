@@ -1,18 +1,25 @@
 import ClientHttpService from "@/module-base/client/services/ClientHttpService";
 
-type ModelListResponse = {
-  success: boolean;
-  data: string[];
-  message: string;
+export type ModelRow = {
+  key: string;
+  module: string;
+  path: string;
 };
 
-type ReloadModelRequest = {
+export type ModelListResponse = {
+  success: boolean;
+  data: ModelRow[];
+  total: number;
+  message?: string;
+};
+
+export type ReloadModelRequest = {
   key: string;
 };
 
-type ReloadModelResponse = {
+export type ReloadModelResponse = {
   success: boolean;
-  message: string;
+  message?: string;
 };
 
 class AdminModelService extends ClientHttpService {

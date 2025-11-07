@@ -1,109 +1,240 @@
 "use client";
 
 import { Button } from "@heroui/button";
+import { Card, CardBody } from "@heroui/card";
+import { Input } from "@heroui/input";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import MiniSearch from "minisearch";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import DataTable, {
   DataTableColumn,
 } from "@/module-base/client/components/DataTable";
+import { useTranslations } from "next-intl";
 
-import { Card, CardBody } from "@heroui/card";
-import adminModelService from "./services/AdminModelService";
+import adminModelService, {
+  type ModelRow,
+  type ReloadModelRequest,
+  type ReloadModelResponse,
+} from "./services/AdminModelService";
 
-type ModelRow = {
-  key: string;
-};
+const MODEL_LIST_QUERY_KEY = ["admin", "models", "list"] as const;
 
 export default function ModelsListPage() {
-  const [models, setModels] = useState<ModelRow[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [reloadingKey, setReloadingKey] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const t = useTranslations("admin.models");
+  const actionsT = useTranslations("common.actions");
+  const queryClient = useQueryClient();
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "error" | "success";
+  } | null>(null);
 
-  const fetchModels = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await adminModelService.getModelList();
-      if (!response.success) {
-        throw new Error(response.message || "Failed to load models.");
-      }
-
-      const data = Array.isArray(response.data) ? response.data : [];
-      setModels(data.map((key) => ({ key })));
-      setErrorMessage(null);
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to load models.";
-      setErrorMessage(message);
-      setModels([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const showToast = useCallback(
+    (message: string, type: "error" | "success" = "error") => {
+      setToast({ message, type });
+    },
+    []
+  );
 
   useEffect(() => {
-    fetchModels();
-  }, [fetchModels]);
+    if (!toast) return;
+
+    const timer = setTimeout(() => {
+      setToast(null);
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+  const modelListQuery = useQuery<ModelRow[], Error>({
+    queryKey: MODEL_LIST_QUERY_KEY,
+    queryFn: async () => {
+      const response = await adminModelService.getModelList();
+      return response.data;
+    },
+  });
+
+  const reloadModelMutation = useMutation<
+    ReloadModelResponse,
+    Error,
+    ReloadModelRequest
+  >({
+    mutationFn: (payload: ReloadModelRequest) =>
+      adminModelService.reloadModel(payload),
+    onSuccess: (data, variables) => {
+      if (!data.success) {
+        const errorMessage =
+          data.message || t("toast.reloadError", { key: variables.key });
+        setActionError(errorMessage);
+        showToast(errorMessage, "error");
+        return;
+      }
+
+      const successMessage =
+        data.message || t("toast.reloadSuccess", { key: variables.key });
+      setActionError(null);
+      showToast(successMessage, "success");
+      queryClient.invalidateQueries({ queryKey: MODEL_LIST_QUERY_KEY });
+    },
+    onError: (error, variables) => {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : t("toast.reloadError", { key: variables?.key ?? "-" });
+      setActionError(errorMessage);
+      showToast(errorMessage, "error");
+    },
+  });
 
   const handleReload = useCallback(
-    async (key: string) => {
-      setReloadingKey(key);
-      try {
-        const response = await adminModelService.reloadModel({ key });
-        if (!response.success) {
-          throw new Error(response.message || `Failed to reload model ${key}.`);
-        }
-
-        await fetchModels();
-      } catch (error) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : `Failed to reload model ${key}.`;
-        setErrorMessage(message);
-      } finally {
-        setReloadingKey(null);
-      }
+    (key: string) => {
+      setActionError(null);
+      reloadModelMutation.mutate({ key });
     },
-    [fetchModels]
+    [reloadModelMutation]
   );
+
+  const handleRefresh = useCallback(() => {
+    setActionError(null);
+    modelListQuery.refetch();
+  }, [modelListQuery]);
+
+  const models = modelListQuery.data ?? [];
+  const currentReloadKey = reloadModelMutation.variables?.key;
+  const loading = modelListQuery.isLoading || modelListQuery.isFetching;
+  const queryErrorMessage =
+    modelListQuery.error instanceof Error ? t("toast.loadError") : null;
+
+  useEffect(() => {
+    if (queryErrorMessage) {
+      showToast(queryErrorMessage, "error");
+    }
+  }, [queryErrorMessage, showToast]);
+
+  const miniSearch = useMemo(() => {
+    const search = new MiniSearch<ModelRow>({
+      fields: ["key", "module", "path"],
+      storeFields: ["key", "module", "path"],
+      idField: "key",
+    });
+
+    if (models.length) {
+      search.addAll(models);
+    }
+
+    return search;
+  }, [models]);
+
+  const filteredModels = useMemo<ModelRow[]>(() => {
+    if (!searchTerm.trim()) {
+      return models;
+    }
+
+    const results = miniSearch.search(searchTerm, {
+      prefix: true,
+      fuzzy: 0.2,
+    });
+
+    if (!results.length) {
+      return [];
+    }
+
+    return results.map(({ key, module, path }) => ({ key, module, path }));
+  }, [miniSearch, models, searchTerm]);
 
   const columns = useMemo<DataTableColumn<ModelRow>[]>(
     () => [
-      { key: "key", label: "Key" },
+      { key: "key", label: t("table.columns.key") },
+      { key: "module", label: t("table.columns.module") },
+      { key: "path", label: t("table.columns.path") },
       {
         key: "action",
-        label: "Action",
+        label: actionsT("action"),
+        align: "end",
         render: (_, record) => (
           <Button
             size="sm"
             color="primary"
-            isDisabled={loading || reloadingKey === record.key}
-            isLoading={reloadingKey === record.key}
+            isDisabled={
+              loading ||
+              (reloadModelMutation.isPending && currentReloadKey === record.key)
+            }
+            isLoading={
+              reloadModelMutation.isPending && currentReloadKey === record.key
+            }
             onPress={() => handleReload(record.key)}
           >
-            Reload
+            {actionsT("reload")}
           </Button>
         ),
       },
     ],
-    [handleReload, reloadingKey, loading]
+    [
+      actionsT,
+      currentReloadKey,
+      handleReload,
+      loading,
+      reloadModelMutation.isPending,
+      t,
+    ]
   );
+
+  const emptyStateMessage =
+    actionError ||
+    queryErrorMessage ||
+    (searchTerm.trim() && filteredModels.length === 0
+      ? t("table.empty.search")
+      : t("table.empty.default"));
 
   return (
     <Card>
       <CardBody className="flex flex-col gap-4">
-        {errorMessage && (
-          <p className="text-danger-500 text-sm">{errorMessage}</p>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <Input
+              classNames={{
+                input: "text-sm",
+              }}
+              isClearable
+              labelPlacement="outside"
+              placeholder={t("filters.searchPlaceholder")}
+              size="sm"
+              value={searchTerm}
+              onClear={() => setSearchTerm("")}
+              onValueChange={setSearchTerm}
+            />
+            <Button
+              color="primary"
+              size="sm"
+              title={actionsT("refresh")}
+              variant="flat"
+              onPress={handleRefresh}
+              isLoading={loading}
+              isDisabled={loading || reloadModelMutation.isPending}
+            >
+              {actionsT("refresh")}
+            </Button>
+          </div>
+          <DataTable
+            rowKey="key"
+            columns={columns}
+            dataSource={filteredModels}
+            pagination={false}
+            loading={loading}
+            emptyContent={emptyStateMessage}
+          />
+        </div>
+        {toast && (
+          <div className="fixed right-4 top-4 z-50 flex max-w-sm flex-col gap-2">
+            <div
+              className={`rounded-medium px-4 py-3 text-sm shadow-large ${toast.type === "error" ? "bg-danger-100 text-danger" : "bg-success-100 text-success"}`}
+            >
+              {toast.message}
+            </div>
+          </div>
         )}
-        <DataTable
-          rowKey="key"
-          columns={columns}
-          dataSource={models}
-          pagination={false}
-          loading={loading}
-          emptyContent={errorMessage ?? "No models found."}
-        />
       </CardBody>
     </Card>
   );

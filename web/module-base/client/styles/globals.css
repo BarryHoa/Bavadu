@@ -50,12 +50,6 @@ body {
 
 /* Dark mode glass effect */
 
-.before\:bg-default\/60 {
-  &::before {
-    background-color: rgba(102, 171, 249, 0.6);
-  }
-}
-
 /* DataTable Frozen Columns */
 .frozen-column {
   background-color: inherit;

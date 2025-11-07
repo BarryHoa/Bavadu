@@ -17,7 +17,6 @@ export default function Breadcrumb({ items }: { items?: BreadcrumbItem[] }) {
   const ctx = useBreadcrumbs();
   const data = items ?? ctx.breadcrumbs;
 
-  console.log(data);
   return (
     <HeroBreadcrumbs
       itemClasses={{

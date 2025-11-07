@@ -6,7 +6,18 @@
     "save": "Save",
     "cancel": "Cancel",
     "apply": "Apply",
-    "preview": "Preview"
+    "preview": "Preview",
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "saveChanges": "Save changes",
+      "close": "Close",
+      "regenerate": "Regenerate",
+      "reload": "Reload",
+      "refresh": "Refresh",
+      "search": "Search",
+      "action": "Action"
+    }
   },
   "background": {
     "title": "Background Settings",
@@ -64,6 +75,31 @@
     "workspaces": "Workspaces",
     "dashboard": "Dashboard",
     "settings": "Settings"
+  },
+  "admin": {
+    "models": {
+      "filters": {
+        "searchPlaceholder": "Search models by key, module, or path...",
+        "refresh": "Refresh"
+      },
+      "table": {
+        "columns": {
+          "key": "Model",
+          "module": "Module",
+          "path": "Path",
+          "action": "Action"
+        },
+        "empty": {
+          "search": "No models match the current search.",
+          "default": "No models found."
+        }
+      },
+      "toast": {
+        "reloadSuccess": "Reloaded model {key} successfully.",
+        "reloadError": "Failed to reload model {key}.",
+        "loadError": "Failed to load model list."
+      }
+    }
   },
   "profile": {
     "title": "Profile",

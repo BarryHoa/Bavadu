@@ -6,65 +6,21 @@
     "save": "Lưu",
     "cancel": "Hủy",
     "apply": "Áp dụng",
-    "preview": "Xem trước"
-  },
-  "background": {
-    "title": "Cài đặt hình nền",
-    "description": "Chọn hình nền và điều chỉnh độ trong suốt",
-    "selectBackground": "Chọn hình nền",
-    "backgroundOptions": {
-      "bg1": "Hình nền 1",
-      "bg2": "Hình nền 2",
-      "bg3": "Hình nền 3",
-      "bg4": "Hình nền 4",
-      "bg5": "Hình nền 5",
-      "bg6": "Hình nền 6",
-      "bg7": "Hình nền 7",
-      "bg8": "Hình nền 8"
-    },
-    "transparencyLabel": "Độ trong suốt: {value}%",
-    "transparencyDescription": "Điều chỉnh độ trong suốt của hình nền",
-    "glassEffect": "Hiệu ứng Kính Mờ",
-    "glassEffectDescription": "Điều chỉnh độ trong suốt của thẻ để tạo hiệu ứng kính",
-    "glassOpacityLabel": "Độ mờ kính: {value}%"
-  },
-  "language": {
-    "title": "Cài đặt ngôn ngữ",
-    "description": "Chọn ngôn ngữ ưa thích của bạn",
-    "selectLanguage": "Chọn ngôn ngữ",
-    "currentLanguage": "Ngôn ngữ hiện tại",
-    "selectPlaceholder": "Chọn một ngôn ngữ"
-  },
-  "number": {
-    "title": "Cài đặt định dạng số",
-    "description": "Cấu hình cách hiển thị số",
-    "decimalPlaces": "Số chữ số thập phân",
-    "decimalPlacesDescription": "Số chữ số sau dấu phẩy (0-7)",
-    "decimalSeparator": "Dấu phân cách thập phân",
-    "decimalSeparatorDescription": "Ký tự dùng để phân cách phần thập phân",
-    "thousandSeparator": "Dấu phân cách hàng ngàn",
-    "thousandSeparatorDescription": "Ký tự dùng để phân cách hàng ngàn",
-    "customSeparator": "Dấu tùy chỉnh",
-    "currentValue": "Giá trị hiện tại",
     "preview": "Xem trước",
-    "previewDescription": "Xem số sẽ được định dạng như thế nào",
-    "originalNumber": "Gốc",
-    "formattedNumber": "Đã định dạng",
-    "errorEmpty": "Dấu phân cách không được để trống",
-    "errorSame": "Các dấu phân cách phải khác nhau",
-    "placeholderDecimalSeparator": "Nhập dấu phân cách thập phân",
-    "placeholderThousandSeparator": "Nhập dấu phân cách hàng ngàn"
+
+    "actions": {
+      "cancel": "Hủy",
+      "save": "Lưu",
+      "saveChanges": "Lưu thay đổi",
+      "close": "Đóng",
+      "regenerate": "Tạo Lại",
+      "reload": "Tải lại",
+      "refresh": "Làm mới",
+      "search": "Tìm kiếm",
+      "action": "Thao tác"
+    }
   },
-  "navigation": {
-    "home": "Trang chủ",
-    "about": "Giới thiệu",
-    "blog": "Blog",
-    "docs": "Tài liệu",
-    "pricing": "Bảng giá",
-    "workspaces": "Không gian làm việc",
-    "dashboard": "Bảng điều khiển",
-    "settings": "Cài đặt"
-  },
+
   "profile": {
     "title": "Hồ Sơ",
     "description": "Quản lý thông tin cá nhân và tùy chọn của bạn",
@@ -165,6 +121,31 @@
     "actions": {
       "cancel": "Hủy",
       "save": "Lưu Thay Đổi"
+    }
+  },
+  "admin": {
+    "models": {
+      "filters": {
+        "searchPlaceholder": "Tìm kiếm theo mã mô hình, module hoặc đường dẫn...",
+        "refresh": "Làm mới"
+      },
+      "table": {
+        "columns": {
+          "key": "Mô hình",
+          "module": "Module",
+          "path": "Đường dẫn",
+          "action": "Thao tác"
+        },
+        "empty": {
+          "search": "Không có mô hình nào khớp với tìm kiếm hiện tại.",
+          "default": "Chưa có mô hình nào."
+        }
+      },
+      "toast": {
+        "reloadSuccess": "Tải lại mô hình {key} thành công.",
+        "reloadError": "Không thể tải lại mô hình {key}.",
+        "loadError": "Không thể tải danh sách mô hình."
+      }
     }
   }
 }
