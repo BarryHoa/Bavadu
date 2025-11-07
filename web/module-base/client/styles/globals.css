@@ -1,15 +1,6 @@
 @import "tailwindcss";
+@config "../../../tailwind.config.js";
 
-/* Site wallpaper background (can be replaced by changing --bg-image-url) */
-:root {
-  /* --bg-image-url: url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1920&q=80"); */
-  --bg-size: cover; /* cover = full-bleed; contain = keep original */
-  --bg-attach: fixed; /* fixed = stay when scroll; scroll = move with page */
-
-  /* Glass effect variables */
-  --glass-opacity: 0.3;
-  --glass-opacity-percent: 30;
-}
 html {
   scrollbar-gutter: unset !important;
 }
@@ -58,10 +49,7 @@ body {
 }
 
 /* Dark mode glass effect */
-.dark [data-slot="base"] {
-  background-color: rgba(0, 0, 0, var(--glass-opacity)) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-}
+
 .before\:bg-default\/60 {
   &::before {
     background-color: rgba(102, 171, 249, 0.6);

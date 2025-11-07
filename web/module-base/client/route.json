@@ -2,7 +2,7 @@
   {
     "path": "/admin",
     "routes": [
-      { "path": "/models", "page": "Admin/ModelsViewListPage/ModelsViewListPage" }
+      { "path": "/models", "page": "/Admin/ModelsViewList/ModelsListPage" }
     ]
   }
 ]

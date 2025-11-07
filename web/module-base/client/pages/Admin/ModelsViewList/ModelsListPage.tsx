@@ -7,6 +7,7 @@ import DataTable, {
   DataTableColumn,
 } from "@/module-base/client/components/DataTable";
 
+import { Card, CardBody } from "@heroui/card";
 import adminModelService from "./services/AdminModelService";
 
 type ModelRow = {
@@ -90,28 +91,20 @@ export default function ModelsListPage() {
   );
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Models</h1>
-        <Button
-          size="sm"
-          variant="flat"
-          onPress={fetchModels}
-          isLoading={loading}
-          isDisabled={loading}
-        >
-          Refresh
-        </Button>
-      </div>
-      {errorMessage && <p className="text-danger-500 text-sm">{errorMessage}</p>}
-      <DataTable
-        rowKey="key"
-        columns={columns}
-        dataSource={models}
-        pagination={false}
-        loading={loading}
-        emptyContent={errorMessage ?? "No models found."}
-      />
-    </div>
+    <Card>
+      <CardBody className="flex flex-col gap-4">
+        {errorMessage && (
+          <p className="text-danger-500 text-sm">{errorMessage}</p>
+        )}
+        <DataTable
+          rowKey="key"
+          columns={columns}
+          dataSource={models}
+          pagination={false}
+          loading={loading}
+          emptyContent={errorMessage ?? "No models found."}
+        />
+      </CardBody>
+    </Card>
   );
 }

@@ -33,16 +33,10 @@ export default async function RootLayout({
   const locale = "en";
 
   return (
-    <html suppressHydrationWarning lang={locale}>
+    <html suppressHydrationWarning lang={locale} className="light">
       <head />
-      <body
-      // className={clsx(
-      //   // "text-foreground bg-background font-sans antialiased",
-      //   fontSans.variable,
-      //   fontNotoSansSC.variable
-      // )}
-      >
-        <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
+      <body>
+        <Providers>
           <div className="relative flex flex-col h-screen">
             {/* <Navbar /> */}
             <main

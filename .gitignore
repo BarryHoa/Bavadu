@@ -90,7 +90,6 @@ tmp/
 temp/
 
 # Editor directories and files
-.vscode/
 .idea/
 *.swp
 *.swo
@@ -120,7 +119,3 @@ Thumbs.db
 
 # Test coverage
 coverage/
-
-# Allow VSCode settings for web workspace
-!web/.vscode/
-!web/.vscode/settings.json
