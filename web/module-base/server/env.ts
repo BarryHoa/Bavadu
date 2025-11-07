@@ -33,8 +33,12 @@ class Environment {
     return this.db;
   }
 
-  getModel<T = unknown>(modelId: string): T | undefined {
-    return this.models.get(modelId) as T | undefined;
+  getModel<T extends object>(modelId: string): T | undefined {
+    const model = this.models.get(modelId);
+    if (!model || typeof model !== 'object' || !(model instanceof Object)) {
+      return undefined;
+    }
+    return model as T;
   }
 
   private async init(): Promise<void> {

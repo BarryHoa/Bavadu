@@ -10,11 +10,12 @@ class UserModel extends BaseModel {
   }
 
   getUserById = async (id: string) => {
-   const db = getEnv()?.getDb();
-    const user = await db.query.table_user.findFirst({
-      where: eq(table_user.id, id),
-    });
-    return user;
+   const db = getEnv()?.getDb() ?? null;
+   if (!db) {
+    throw new Error('Database not initialized');
+   }
+    const user = await db.select().from(table_user).where(eq(table_user.id, id));
+    return user[0];
   };
 }
 

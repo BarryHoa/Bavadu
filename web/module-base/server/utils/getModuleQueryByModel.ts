@@ -29,7 +29,7 @@ const getModuleQueryByModel = async (props: GetModuleQueryByModelProps) => {
   if (!model) {
     return NextResponse.json({ status: 500, message: 'MODEL NOT FOUND' });
   }
-  const method = model[modelMethod];
+  const method = (model as any)[modelMethod] as (params?: Record<string, any>) => Promise<any>;
 
   if (!method) {
     return NextResponse.json({ status: 500, message: 'METHOD NOT FOUND' });
