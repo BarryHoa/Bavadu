@@ -1,102 +1,40 @@
 import { drizzle } from "drizzle-orm/postgres-js";
-import { existsSync, readdirSync, readFileSync, statSync } from "fs";
+import { existsSync, readdirSync, readFileSync } from "fs";
 import { dirname, join, relative } from "path";
 import postgres from "postgres";
 
+type ModelInstance = unknown;
+type SchemaRegistry = Record<string, unknown>;
+
+interface EnvironmentOptions {
+  projectRoot?: string;
+}
+
 class Environment {
+  private readonly projectRoot: string;
   private db: ReturnType<typeof drizzle> | null = null;
-  private models = new Map<string, any>();
-  constructor() {
-    this.init();
+  private readonly models = new Map<string, ModelInstance>();
+
+  private constructor(projectRoot: string) {
+    this.projectRoot = projectRoot;
   }
 
-  private async registerModels(): Promise<void> {
-    console.group("Registering models...");
-    const rootDir = process.cwd();
-    const modulesRoot = join(rootDir, "modules");
-    const moduleJsonPaths: string[] = [];
-
-    // Find module.json files
-    const baseModuleJson = join(rootDir, "module-base", "module.json");
-    if (existsSync(baseModuleJson)) moduleJsonPaths.push(baseModuleJson);
-
-    if (existsSync(modulesRoot)) {
-      for (const dirName of readdirSync(modulesRoot)) {
-        const candidateDir = join(modulesRoot, dirName);
-        if (!statSync(candidateDir).isDirectory()) continue;
-        const jsonPath = join(candidateDir, "module.json");
-        if (existsSync(jsonPath)) moduleJsonPaths.push(jsonPath);
-      }
-    }
-
-    let loadedCount = 0;
-    let errorCount = 0;
-
-    for (const moduleJsonPath of moduleJsonPaths) {
-      let moduleJson: { models?: Record<string, string> };
-      try {
-        moduleJson = JSON.parse(readFileSync(moduleJsonPath, "utf8"));
-      } catch {
-        continue;
-      }
-
-      const models = moduleJson?.models;
-      if (!models || typeof models !== "object" || Array.isArray(models)) {
-        continue;
-      }
-
-      const moduleDir = dirname(moduleJsonPath);
-
-      for (const [modelId, fileName] of Object.entries(models)) {
-        const filePath = join(moduleDir, "server/models", fileName);
-        const relFromCwd = `@/${relative(rootDir, filePath).replace(/\\/g, "/")}`;
-
-        try {
-          const mod = await import(relFromCwd);
-          const ModelClass = mod?.default;
-          if (!ModelClass) {
-            errorCount++;
-            continue;
-          }
-
-          const modelInstance = new ModelClass();
-          this.models.set(modelId, modelInstance);
-          loadedCount++;
-        } catch (error) {
-          console.error(`Failed to load ${modelId} from ${relFromCwd}:`, error);
-          errorCount++;
-        }
-      }
-    }
-
-    console.log(
-      `Model registry: ${loadedCount} loaded${errorCount ? `, ${errorCount} errors` : ""}`
-    );
-    console.groupEnd();
+  static async create(options: EnvironmentOptions = {}): Promise<Environment> {
+    const env = new Environment(options.projectRoot ?? process.cwd());
+    await env.init();
+    return env;
   }
-  private async registerDb(): Promise<void> {
-    console.group("Connecting to database...");
-    try {
-      const sslMode = process.env.PGSSLMODE || "disable";
-      const client = postgres({
-        host: process.env.PGHOST || "localhost",
-        port: Number(process.env.PGPORT || 5432),
-        user: process.env.PGUSER,
-        password: process.env.PGPASSWORD,
-        database: process.env.PGDATABASE,
-        ssl: sslMode === "require" ? "require" : undefined,
-        max: 10,
-        idle_timeout: 20,
-        connect_timeout: 10,
-      });
 
-      this.db = drizzle(client);
-      console.log("DB connected");
-    } catch (error) {
-      console.error("DB connection failed:", error);
-      throw error;
+  getDb(): ReturnType<typeof drizzle> {
+    if (!this.db) {
+      throw new Error("Database not initialized. Call create() first.");
     }
-    console.groupEnd();
+
+    return this.db;
+  }
+
+  getModel<T = unknown>(modelId: string): T | undefined {
+    return this.models.get(modelId) as T | undefined;
   }
 
   private async init(): Promise<void> {
@@ -104,15 +42,144 @@ class Environment {
     await this.registerDb();
   }
 
-  getDb(): ReturnType<typeof drizzle> {
-    if (!this.db) {
-      throw new Error("Database not initialized. Call init() first.");
+  private async registerModels(): Promise<void> {
+    console.log("Registering models...");
+
+    const moduleJsonPaths = this.collectModuleJsonPaths();
+    let loadedCount = 0;
+    let errorCount = 0;
+
+    for (const moduleJsonPath of moduleJsonPaths) {
+      const moduleDefinition = this.safeReadJson<{ models?: Record<string, string> }>(moduleJsonPath);
+      const configuredModels = moduleDefinition?.models;
+      if (!configuredModels) continue;
+
+      for (const [modelId, fileName] of Object.entries(configuredModels)) {
+        const modelPath = join(dirname(moduleJsonPath), "server", "models", fileName);
+
+        try {
+          const mod = await import(this.toImportPath(modelPath));
+          const ModelClass = mod?.default;
+          if (!ModelClass) {
+            throw new Error("Missing default export");
+          }
+
+          this.models.set(modelId, new ModelClass());
+          loadedCount++;
+        } catch (error) {
+          errorCount++;
+          console.error(`Failed to load model "${modelId}" from ${modelPath}:`, error);
+        }
+      }
     }
-    return this.db;
+
+    console.log(
+      `Model registry: ${loadedCount} loaded${errorCount ? `, ${errorCount} errors` : ""}`
+    );
   }
 
-  getModel(modelId: string): any {
-    return this.models.get(modelId);
+  private async registerDb(): Promise<void> {
+    console.log("Connecting to database...");
+
+    const schemas: SchemaRegistry = {};
+    const schemaEntryPoints = this.collectSchemaEntryPoints();
+
+    for (const schemaPath of schemaEntryPoints) {
+      try {
+        const schemaModule = await import(this.toImportPath(schemaPath));
+        Object.assign(schemas, schemaModule);
+      } catch (error) {
+        console.error(`Failed to load schema from ${schemaPath}:`, error);
+      }
+    }
+
+    try {
+      const client = this.createPgClient();
+      this.db = drizzle(client, { schema: schemas });
+      console.log("✅ DB connected with schema");
+    } catch (error) {
+      console.error("❌ DB connection failed:", error);
+      throw error;
+    }
+  }
+
+  private collectModuleJsonPaths(): string[] {
+    const paths: string[] = [];
+
+    const baseModuleJson = join(this.projectRoot, "module-base", "module.json");
+    if (existsSync(baseModuleJson)) {
+      paths.push(baseModuleJson);
+    }
+
+    const modulesRoot = join(this.projectRoot, "modules");
+    for (const dir of this.safeReadDir(modulesRoot)) {
+      const moduleJson = join(modulesRoot, dir, "module.json");
+      if (existsSync(moduleJson)) {
+        paths.push(moduleJson);
+      }
+    }
+
+    return paths;
+  }
+
+  private collectSchemaEntryPoints(): string[] {
+    const schemaPaths: string[] = [];
+
+    const baseSchema = join(this.projectRoot, "module-base", "server", "schemas", "index.ts");
+    if (existsSync(baseSchema)) {
+      schemaPaths.push(baseSchema);
+    }
+
+    const modulesRoot = join(this.projectRoot, "modules");
+    for (const dir of this.safeReadDir(modulesRoot)) {
+      const schemaPath = join(modulesRoot, dir, "server", "schemas", "index.ts");
+      if (existsSync(schemaPath)) {
+        schemaPaths.push(schemaPath);
+      }
+    }
+
+    return schemaPaths;
+  }
+
+  private safeReadDir(dirPath: string): string[] {
+    if (!existsSync(dirPath)) return [];
+
+    return readdirSync(dirPath, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name);
+  }
+
+  private safeReadJson<T>(filePath: string): T | null {
+    try {
+      const raw = readFileSync(filePath, "utf8");
+      return JSON.parse(raw) as T;
+    } catch (error) {
+      console.error(`Failed to parse JSON from ${filePath}:`, error);
+      return null;
+    }
+  }
+
+  private toImportPath(targetPath: string): string {
+    const relativePath = relative(this.projectRoot, targetPath).replace(/\\/g, "/");
+    return `@/${relativePath}`;
+  }
+
+  private createPgClient() {
+    const sslMode = process.env.PGSSLMODE || "disable";
+
+    return postgres({
+      host: process.env.PGHOST || "localhost",
+      port: Number(process.env.PGPORT || 5432),
+      user: process.env.PGUSER,
+      password: process.env.PGPASSWORD,
+      database: process.env.PGDATABASE,
+      ssl: sslMode === "require" ? "require" : undefined,
+      max: 10,
+      idle_timeout: 20,
+      connect_timeout: 10,
+    });
   }
 }
+
 export default Environment;
+

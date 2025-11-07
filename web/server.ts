@@ -23,15 +23,13 @@ const app = next({
 
 const handle = app.getRequestHandler();
 
-async function loadAllModels(): Promise<void> {
-  
-}
+
 
 async function startServer(): Promise<void> {
   try {
     await app.prepare();
 
-    const envProcess = new Environment();
+    const envProcess = await Environment.create();
    
 
     const server = http.createServer(async (req, res) => {

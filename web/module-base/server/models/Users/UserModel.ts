@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
-import getEnv from "../../env";
+
 import { table_user } from "../../schemas/user";
 import { BaseModel } from "../BaseModel";
+import { getEnv } from "../..";
 
 class UserModel extends BaseModel {
   constructor() {
@@ -9,7 +10,7 @@ class UserModel extends BaseModel {
   }
 
   getUserById = async (id: string) => {
-    const db = getEnv().getDb();
+   const db = getEnv()?.getDb();
     const user = await db.query.table_user.findFirst({
       where: eq(table_user.id, id),
     });
