@@ -1,5 +1,6 @@
-import { loadMenusFromModules } from "@/lib/menu-loader";
+
 import { NextResponse } from "next/server";
+import { loadMenusFromModules } from "../../loaders/menu-loader";
 
 export async function GET() {
   try {

@@ -1,5 +1,18 @@
 [
   {
+    "path": "/admin",
+    "routes": [
+      {
+        "path": "/model/get-model-list",
+        "handler": "/admin/model/get-model-list"
+      },
+      {
+        "path": "/model/reload-model",
+        "handler": "/admin/model/reload-model"
+      }
+    ]
+  },
+  {
     "path": "/view-list-data-table",
     "routes": [
       {

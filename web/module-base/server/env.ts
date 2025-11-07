@@ -4,6 +4,7 @@ import { dirname, join, relative } from "path";
 import postgres from "postgres";
 
 type ModelInstance = unknown;
+type ModelFactory = () => ModelInstance;
 type SchemaRegistry = Record<string, unknown>;
 
 interface EnvironmentOptions {
@@ -14,6 +15,8 @@ class Environment {
   private readonly projectRoot: string;
   private db: ReturnType<typeof drizzle> | null = null;
   private readonly models = new Map<string, ModelInstance>();
+  private readonly modelFactories = new Map<string, ModelFactory>();
+  private readonly modelPaths = new Map<string, string>();
 
   private constructor(projectRoot: string) {
     this.projectRoot = projectRoot;
@@ -35,10 +38,40 @@ class Environment {
 
   getModel<T extends object>(modelId: string): T | undefined {
     const model = this.models.get(modelId);
-    if (!model || typeof model !== 'object' || !(model instanceof Object)) {
+    if (!model || typeof model !== "object" || !(model instanceof Object)) {
       return undefined;
     }
     return model as T;
+  }
+  getModelKeys(): string[] {
+    return Array.from(this.models.keys()) as string[];
+  }
+
+  async reloadModel(modelId: string): Promise<boolean> {
+    const factory = this.modelFactories.get(modelId);
+    if (!factory) {
+      console.warn(`Model "${modelId}" is not registered.`);
+      return false;
+    }
+
+    try {
+      const instance = factory();
+      this.models.set(modelId, instance);
+
+      const sourcePath = this.modelPaths.get(modelId);
+      console.log(
+        `Model "${modelId}" reloaded${sourcePath ? ` from ${sourcePath}` : ""}`
+      );
+
+      return true;
+    } catch (error) {
+      const sourcePath = this.modelPaths.get(modelId);
+      console.error(
+        `Failed to reload model "${modelId}"${sourcePath ? ` from ${sourcePath}` : ""}:`,
+        error
+      );
+      return false;
+    }
   }
 
   private async init(): Promise<void> {
@@ -68,7 +101,8 @@ class Environment {
             throw new Error("Missing default export");
           }
 
-          this.models.set(modelId, new ModelClass());
+          const factory: ModelFactory = () => new ModelClass();
+          this.registerModel(modelId, factory, modelPath);
           loadedCount++;
         } catch (error) {
           errorCount++;
@@ -166,6 +200,13 @@ class Environment {
   private toImportPath(targetPath: string): string {
     const relativePath = relative(this.projectRoot, targetPath).replace(/\\/g, "/");
     return `@/${relativePath}`;
+  }
+
+  private registerModel(modelId: string, factory: ModelFactory, sourcePath: string): void {
+    const instance = factory();
+    this.modelFactories.set(modelId, factory);
+    this.modelPaths.set(modelId, sourcePath);
+    this.models.set(modelId, instance);
   }
 
   private createPgClient() {
