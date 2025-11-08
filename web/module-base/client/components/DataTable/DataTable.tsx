@@ -13,6 +13,7 @@ import {
 import type { ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 
+import clsx from "clsx";
 import {
   PAGINATION_DEFAULT_PAGE_SIZE,
   PAGINATION_PAGE_SIZE_OPTIONS,
@@ -237,7 +238,13 @@ export default function DataTable<T = any>({
                       className={column.frozenClassName}
                       style={column.frozenStyle}
                     >
-                      {column.renderValue(item, index)}
+                      <div
+                        className={clsx(
+                          `flex justify-${column.align || "start"}`
+                        )}
+                      >
+                        {column.renderValue(item, index)}
+                      </div>
                     </TableCell>
                   ))}
                 </TableRow>

@@ -31,4 +31,3 @@ export const table_product_variant = pgTable("product_variants", {
 
 export type TblProductVariant = typeof table_product_variant.$inferSelect;
 export type NewTblProductVariant = typeof table_product_variant.$inferInsert;
-

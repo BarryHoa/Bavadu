@@ -6,7 +6,7 @@ import {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
-import { table_product_category } from "../../schemas";
+import { table_product_category, table_unit_of_measure } from "../../schemas";
 import {
   table_product_master,
   TblProductMaster,
@@ -75,6 +75,10 @@ class ProductModel extends BaseModel implements ProductModelInterface {
         name: table_product_variant.name,
         description: table_product_variant.description,
         sku: table_product_variant.sku,
+        barcode: table_product_variant.barcode,
+        manufacturer: table_product_variant.manufacturer,
+        images: table_product_variant.images,
+        isActive: table_product_variant.isActive,
         // Product master fields (flat)
         productMasterId: table_product_master.id,
         productMasterName: table_product_master.name,
@@ -84,6 +88,11 @@ class ProductModel extends BaseModel implements ProductModelInterface {
         categoryId: table_product_category.id,
         categoryName: table_product_category.name,
         categoryCode: table_product_category.code,
+        baseUomId: table_product_variant.baseUomId,
+        baseUomName: table_unit_of_measure.name,
+
+        createdAt: table_product_variant.createdAt,
+        updatedAt: table_product_variant.updatedAt,
         // Total count using window function (same for all rows)
         total: sql<number>`count(*) over()::int`.as("total"),
       })
@@ -96,7 +105,12 @@ class ProductModel extends BaseModel implements ProductModelInterface {
         table_product_category,
         eq(table_product_master.categoryId, table_product_category.id)
       )
-      .limit(2)
+      .leftJoin(
+        table_unit_of_measure,
+        eq(table_product_variant.baseUomId, table_unit_of_measure.id)
+      )
+
+      .limit(limit)
       .offset(offset);
 
     // Extract total from first row (same for all rows due to window function)
@@ -108,6 +122,10 @@ class ProductModel extends BaseModel implements ProductModelInterface {
       name: row.name,
       description: row.description,
       sku: row.sku,
+      barcode: row.barcode,
+      manufacturer: row.manufacturer,
+      images: row.images,
+      isActive: row.isActive,
       productMaster: {
         id: row.productMasterId,
         name: row.productMasterName,
@@ -119,6 +137,12 @@ class ProductModel extends BaseModel implements ProductModelInterface {
           code: row.categoryCode,
         },
       },
+      baseUom: {
+        id: row.baseUomId,
+        name: row.baseUomName,
+      },
+      createdAt: row.createdAt?.getTime(),
+      updatedAt: row.updatedAt?.getTime(),
     }));
     return this.getPagination({
       data: list,
