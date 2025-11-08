@@ -27,7 +27,7 @@ async function main() {
   const conn = `postgres://${env.PGUSER}:${env.PGPASSWORD}@${env.PGHOST}:${env.PGPORT}/${env.PGDATABASE}?sslmode=${sslMode}${channelBinding ? `&channel_binding=${channelBinding}` : ""}`;
   const sql = postgres(conn, { max: 1 });
 
-  const migDir = path.join(root, "server/db/migrations");
+  const migDir = path.join(root, "modules-base/server/db/migrations");
   const files = fs
     .readdirSync(migDir)
     .filter((f) => /^01\d{2}_seed_.*\.sql$/.test(f))
@@ -62,5 +62,3 @@ main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
-
-

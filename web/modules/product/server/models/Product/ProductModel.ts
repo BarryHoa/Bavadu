@@ -84,6 +84,8 @@ class ProductModel extends BaseModel implements ProductModelInterface {
         productMasterName: table_product_master.name,
         productMasterType: table_product_master.type,
         productMasterBrand: table_product_master.brand,
+        productMasterFeatures: table_product_master.features,
+
         // Category fields (flat)
         categoryId: table_product_category.id,
         categoryName: table_product_category.name,
@@ -131,6 +133,7 @@ class ProductModel extends BaseModel implements ProductModelInterface {
         name: row.productMasterName,
         type: row.productMasterType,
         brand: row.productMasterBrand,
+        features: row.productMasterFeatures,
         category: {
           id: row.categoryId,
           name: row.categoryName,

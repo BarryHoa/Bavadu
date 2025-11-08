@@ -9,13 +9,12 @@ import Link from "next/link";
 
 import { Chip } from "@heroui/react";
 import React, { useMemo } from "react";
-import { ProductRow } from "../interface/Product";
-
-type LocaleValue = {
-  [key: string]: string | undefined;
-  en?: string;
-  vi?: string;
-};
+import { ProductMasterFeatures, ProductRow } from "../interface/Product";
+import {
+  convertProductMasterFeaturesToArrayKey,
+  getNameProductFeatures,
+} from "../ultils/getNameProductFeatures";
+import { getNameProductType } from "../ultils/getNameProductType";
 
 export default function ProductsListPage(): React.ReactNode {
   const localized = useLocalizedText();
@@ -40,25 +39,34 @@ export default function ProductsListPage(): React.ReactNode {
       {
         key: "sku",
         label: "SKU",
-        render: (value) => value ?? "-",
+        render: (value) => value,
       },
       {
         key: "barcode",
         label: "Barcode",
-        render: (value) => value ?? "-",
+        render: (value) => value,
       },
       {
-        key: "productMaster.brand",
-        label: "Brand",
-        render: (_, row) => localized(row.productMaster?.brand),
+        key: "baseUom.name",
+        label: "Base UOM",
+        render: (_, row) => localized(row.baseUom?.name),
       },
       {
-        key: "productMaster.category.name",
-        label: "Category",
-        render: (_, row) =>
-          localized(row.productMaster?.category?.name) ||
-          row.productMaster?.category?.code ||
-          "-",
+        key: "productMaster.type",
+        label: "Type",
+        render: (_, row) => getNameProductType(row.productMaster?.type),
+      },
+      {
+        key: "productMaster.features",
+        label: "Features",
+        render: (_, row) => {
+          const features = convertProductMasterFeaturesToArrayKey(
+            row.productMaster?.features
+          );
+          return getNameProductFeatures(
+            features as unknown as ProductMasterFeatures[]
+          );
+        },
       },
       {
         key: "status",
@@ -77,14 +85,21 @@ export default function ProductsListPage(): React.ReactNode {
         },
       },
       {
-        key: "baseUom.name",
-        label: "Base UOM",
-        render: (_, row) => localized(row.baseUom?.name),
+        key: "productMaster.category.name",
+        label: "Category",
+        render: (_, row) =>
+          localized(row.productMaster?.category?.name) ||
+          row.productMaster?.category?.code,
       },
       {
         key: "manufacturer.name",
         label: "Manufacturer",
         render: (_, row) => localized(row.manufacturer?.name),
+      },
+      {
+        key: "productMaster.brand",
+        label: "Brand",
+        render: (_, row) => localized(row.productMaster?.brand),
       },
 
       {
