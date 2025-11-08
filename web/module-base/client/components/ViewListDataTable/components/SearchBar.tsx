@@ -1,7 +1,6 @@
 "use client";
-
-import { Input } from "@heroui/input";
 import { Search } from "lucide-react";
+import InputBase from "../../Input";
 
 interface SearchBarProps {
   value: string;
@@ -15,7 +14,7 @@ export default function SearchBar({
   placeholder = "Search",
 }: SearchBarProps) {
   return (
-    <Input
+    <InputBase
       startContent={<Search size={16} className="text-default-400" />}
       placeholder={placeholder}
       value={value}

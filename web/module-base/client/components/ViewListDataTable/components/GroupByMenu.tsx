@@ -3,11 +3,11 @@
 import { Button } from "@heroui/button";
 import {
   Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
   DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
 } from "@heroui/dropdown";
-import { Users } from "lucide-react";
+import { Group } from "lucide-react";
 
 export interface GroupOption {
   key: string;
@@ -25,16 +25,15 @@ export default function GroupByMenu({
   currentGroupBy,
   onSelectGroupBy,
 }: GroupByMenuProps) {
-  if (!groupByOptions || groupByOptions.length === 0) {
-    return null;
-  }
-
   return (
     <Dropdown>
       <DropdownTrigger>
-        <Button variant="bordered" startContent={<Users size={16} />}>
-          Group by
-        </Button>
+        <Button
+          variant="bordered"
+          size="sm"
+          startContent={<Group size={16} />}
+          title="Group by"
+        />
       </DropdownTrigger>
       <DropdownMenu
         aria-label="Group by options"

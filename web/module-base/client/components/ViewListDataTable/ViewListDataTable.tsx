@@ -1,11 +1,12 @@
 "use client";
 
-import { Alert } from "@heroui/alert";
 import { useMemo } from "react";
 import { DataTable, DataTableProps } from "../DataTable";
 
+import { LocaleDataType } from "@/module-base/server/interfaces/Locale";
+import { Card, CardBody, Divider } from "@heroui/react";
+import { useLocalizedText } from "../../hooks/useLocalizedText";
 import ColumnVisibilityMenu from "./components/ColumnVisibilityMenu";
-import FavoriteFilter from "./components/FavoriteFilter";
 import FilterMenu, { FilterOption } from "./components/FilterMenu";
 import GroupByMenu, { GroupOption } from "./components/GroupByMenu";
 import SearchBar from "./components/SearchBar";
@@ -16,6 +17,7 @@ type ViewListDataTableProps<T = any> = Omit<
   DataTableProps<T>,
   "pagination" | "dataSource"
 > & {
+  title?: LocaleDataType<string> | string;
   model: string; // @module.model format (e.g., "product.variant")
   // Optional: Override fetched data
   dataSource?: T[];
@@ -25,30 +27,72 @@ type ViewListDataTableProps<T = any> = Omit<
   groupByOptions?: GroupOption[];
   // Optional: Override fetched favorite filter
   initialFavoriteFilter?: (row: T) => boolean;
+  search?: {
+    hidden?: boolean;
+    placeholder?: string;
+  };
+  filter?: {
+    hidden?: boolean;
+  };
+  groupBy?: {
+    hidden?: boolean;
+  };
+  favorite?: {
+    hidden?: boolean;
+  };
+  columnVisibility?: {
+    hidden?: boolean;
+  };
+  isDummyData?: boolean;
 };
 
-export default function ViewListDataTable<T = any>({
-  columns,
-  model,
-  ...dataTableProps
-}: ViewListDataTableProps<T>) {
+export default function ViewListDataTable<T = any>(
+  props: ViewListDataTableProps<T>
+) {
+  const {
+    columns,
+    model,
+    title,
+    search,
+    filter,
+    groupBy,
+    favorite,
+    columnVisibility,
+    isDummyData = true,
+    ...dataTableProps
+  } = props;
   // Use the store hook - each instance gets its own store
   const store = useViewListDataTableStore({
     columns,
   });
-
+  const getLocalizedText = useLocalizedText();
+  const isFilterHidden = filter?.hidden === true;
+  const isSearchHidden = search?.hidden === true;
+  const isGroupByHidden = groupBy?.hidden === true;
+  const isFavoriteHidden = favorite?.hidden === true;
+  const isColumnVisibilityHidden = columnVisibility?.hidden === true;
   // Fetch data using react-query
   const {
     data: dataSource,
-    filters: filterOptions,
-    groupByOptions: groupByOptions,
-    favoriteFilter: initialFavoriteFilter,
     isLoading,
     error: fetchError,
   } = useViewListDataTableQueries<T>({
     model,
+    isDummyData,
     // enabled: !propDataSource, // Only fetch if dataSource is not provided as prop
   });
+  const filterOptions = useMemo(() => {
+    return [];
+  }, []);
+  const groupByOptions = useMemo(() => {
+    return [];
+  }, []);
+  const initialFavoriteFilter = useMemo(() => {
+    return (row: T) => true;
+  }, []);
+  const favoriteFilter = useMemo(() => {
+    return [];
+  }, []);
 
   // Actual filtering logic
   const filteredData = useMemo(() => {
@@ -128,63 +172,60 @@ export default function ViewListDataTable<T = any>({
 
   // Render
   return (
-    <div>
+    <Card>
       {/* Actions Bar */}
-      <div className="flex gap-3 items-center mb-4 flex-wrap">
-        {/* Search */}
-        <SearchBar value={store.search} onChange={store.setSearch} />
-
-        {/* Show/Hide Columns */}
-        <ColumnVisibilityMenu
-          columns={columns}
-          visibleColumns={store.visibleColumns}
-          onToggleColumn={store.toggleColumn}
-        />
-
-        {/* Filter */}
-        <FilterMenu
-          filterOptions={filterOptions}
-          activeFilters={store.activeFilters}
-          onToggleFilter={store.toggleFilter}
-        />
-
-        {/* Group By */}
-        {groupByOptions && (
-          <GroupByMenu
-            groupByOptions={groupByOptions}
-            currentGroupBy={store.groupBy}
-            onSelectGroupBy={store.setGroupBy}
-          />
-        )}
-
-        {/* Favorite */}
-        {initialFavoriteFilter && (
-          <FavoriteFilter
-            isActive={store.showFavorite}
-            onToggle={store.toggleFavorite}
-          />
-        )}
-      </div>
-
-      {/* Error Display */}
-      {fetchError && (
-        <Alert
-          color="danger"
-          variant="flat"
-          title="Error loading data"
-          className="mb-4"
-        >
-          {fetchError}
-        </Alert>
+      {title && (
+        <div className="flex gap-2 flex-wrap flex-col px-3 py-2">
+          <h4 className="text-medium font-medium">{getLocalizedText(title)}</h4>
+          <Divider className="my-0" />
+        </div>
       )}
 
-      {/* Table */}
-      <DataTable
-        {...dataTableProps}
-        columns={displayColumns}
-        dataSource={processedData}
-        loading={isLoading || dataTableProps.loading}
-      />
-    </div>
+      <CardBody className={`${title ? "pt-0" : ""}`}>
+        <div className="flex gap-2 items-center mb-4 flex-wrap">
+          <div className="flex gap-2 flex-1 justify-start"></div>
+
+          <div className="flex gap-2 flex-1 justify-end">
+            {!isSearchHidden && (
+              <SearchBar
+                value={store.search}
+                onChange={store.setSearch}
+                placeholder={search?.placeholder}
+              />
+            )}
+            {!isFilterHidden && (
+              <FilterMenu
+                filterOptions={filterOptions}
+                activeFilters={store.activeFilters}
+                onToggleFilter={store.toggleFilter}
+              />
+            )}
+            {!isGroupByHidden && (
+              <GroupByMenu
+                groupByOptions={groupByOptions}
+                currentGroupBy={store.groupBy}
+                onSelectGroupBy={store.setGroupBy}
+              />
+            )}
+
+            {!isColumnVisibilityHidden && (
+              <ColumnVisibilityMenu
+                columns={columns}
+                visibleColumns={store.visibleColumns}
+                onToggleColumn={store.toggleColumn}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Table */}
+        <DataTable
+          {...dataTableProps}
+          columns={displayColumns}
+          dataSource={processedData}
+          loading={isLoading || dataTableProps.loading}
+        />
+      </CardBody>
+    </Card>
   );
 }

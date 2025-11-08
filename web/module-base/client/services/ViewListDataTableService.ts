@@ -1,3 +1,4 @@
+import { ListParamsResponse } from "@/module-base/server/models/interfaces/ListInterface";
 import ClientHttpService from "./ClientHttpService";
 
 type DataTableParams = {
@@ -11,7 +12,19 @@ class ViewListDataTableService extends ClientHttpService {
   }
 
   getData = async (req: DataTableParams) => {
-    return this.post<{ success: boolean; data: any[] }>(`/data`, req);
+    try {
+      const response = await this.post<{ data: ListParamsResponse<any> }>(
+        `/data`,
+        req
+      );
+      return {
+        data: response.data?.data,
+        total: response.data?.total,
+      };
+    } catch (error) {
+      console.error(error);
+      return { data: [], total: 0 };
+    }
   };
 
   getFilter = async (req: DataTableParams) => {

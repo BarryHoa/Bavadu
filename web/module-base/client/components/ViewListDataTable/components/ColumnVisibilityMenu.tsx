@@ -1,14 +1,14 @@
 "use client";
 
 import { Button } from "@heroui/button";
+import { Checkbox } from "@heroui/checkbox";
 import {
   Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
   DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
 } from "@heroui/dropdown";
-import { Checkbox } from "@heroui/checkbox";
-import { Eye, EyeOff } from "lucide-react";
+import { Table } from "lucide-react";
 import { DataTableColumn } from "../../DataTable";
 
 interface ColumnVisibilityMenuProps<T = any> {
@@ -22,17 +22,17 @@ export default function ColumnVisibilityMenu<T = any>({
   visibleColumns,
   onToggleColumn,
 }: ColumnVisibilityMenuProps<T>) {
-  const allVisible = visibleColumns.size === columns.length;
+  // const allVisible = visibleColumns.size === columns.length;
 
   return (
     <Dropdown>
       <DropdownTrigger>
         <Button
           variant="bordered"
-          startContent={allVisible ? <Eye size={16} /> : <EyeOff size={16} />}
-        >
-          Columns
-        </Button>
+          size="sm"
+          startContent={<Table size={16} />}
+          title="Column visibility"
+        />
       </DropdownTrigger>
       <DropdownMenu aria-label="Column visibility">
         {columns.map((col) => (

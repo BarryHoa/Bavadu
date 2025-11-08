@@ -1,13 +1,7 @@
 "use client";
 
 import { Button } from "@heroui/button";
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from "@heroui/dropdown";
-import { Checkbox } from "@heroui/checkbox";
+import { Dropdown, DropdownMenu, DropdownTrigger } from "@heroui/dropdown";
 import { Filter } from "lucide-react";
 
 export interface FilterOption<T = any> {
@@ -26,19 +20,18 @@ export default function FilterMenu<T = any>({
   activeFilters,
   onToggleFilter,
 }: FilterMenuProps<T>) {
-  if (!filterOptions || filterOptions.length === 0) {
-    return null;
-  }
-
   return (
     <Dropdown>
       <DropdownTrigger>
-        <Button variant="bordered" startContent={<Filter size={16} />}>
-          Filters
-        </Button>
+        <Button
+          variant="bordered"
+          size="sm"
+          startContent={<Filter size={16} />}
+          title="Filter"
+        />
       </DropdownTrigger>
-      <DropdownMenu aria-label="Filter options">
-        {filterOptions.map((opt) => (
+      <DropdownMenu aria-label="Filter options" className="min-w-[150px]">
+        {/* {filterOptions.map((opt) => (
           <DropdownItem key={opt.label} textValue={opt.label}>
             <Checkbox
               isSelected={activeFilters.has(opt.label)}
@@ -47,7 +40,7 @@ export default function FilterMenu<T = any>({
               {opt.label}
             </Checkbox>
           </DropdownItem>
-        ))}
+        ))} */}
       </DropdownMenu>
     </Dropdown>
   );

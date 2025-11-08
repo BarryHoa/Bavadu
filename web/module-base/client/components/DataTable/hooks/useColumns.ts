@@ -119,7 +119,18 @@ const useColumns = <T>(
   return useMemo(() => {
     const frozenMeta = computeFrozenMeta(columns);
 
-    return columns.map((column) => {
+    const numberColumn: ProcessedDataTableColumn<T> = {
+      key: "__row-number__",
+      label: "No.",
+      width: 64,
+      align: "center",
+      fixed: "left",
+      frozenStyle: getFrozenStyle("__row-number__", frozenMeta),
+      frozenClassName: getFrozenClassName("__row-number__", frozenMeta),
+      renderValue: (_record, index) => index + 1,
+    };
+
+    const processed = columns.map((column) => {
       const frozenStyle = getFrozenStyle(column.key, frozenMeta);
       const frozenClassName = getFrozenClassName(column.key, frozenMeta);
 
@@ -130,6 +141,7 @@ const useColumns = <T>(
         renderValue: buildRenderValue(column),
       } satisfies ProcessedDataTableColumn<T>;
     });
+    return [numberColumn, ...processed];
   }, [columns]);
 };
 
