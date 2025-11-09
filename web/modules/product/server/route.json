@@ -1,7 +1,6 @@
-
 [
   {
-    "path" : "/",
+    "path": "/",
     "routes": [
       {
         "path": "/",
@@ -19,6 +18,19 @@
       {
         "path": "/",
         "handler": "/products-types/get-list"
+      }
+    ]
+  },
+  {
+    "group": "categories",
+    "routes": [
+      {
+        "path": "/",
+        "handler": "/categories/create"
+      },
+      {
+        "path": "/[id]",
+        "handler": "/categories/get-by-id"
       }
     ]
   }

@@ -287,7 +287,7 @@ export default function DataTable<T = any>({
             ...classNames,
             tbody: "overflow-x-auto",
             wrapper: "p-2 rounded-none",
-            th: "bg-primary-600 text-white hover:bg-primary-700/80 px-0   ",
+            th: "bg-primary-600 text-white hover:bg-primary-700/80 px-0",
             tr: "hover:bg-primary-700/10 ",
             td: "rounded-none",
           }}

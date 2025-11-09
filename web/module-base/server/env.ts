@@ -5,6 +5,8 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { dirname, join, relative } from "path";
 import postgres from "postgres";
+import { MenuFactoryElm } from "./interfaces/Menu";
+import { loadMenusFromModules } from "./loaders/menu-loader";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Ho_Chi_Minh");
@@ -16,6 +18,7 @@ type ModelFactoryElm = {
   key: string;
   timestamp: string;
 };
+
 type SchemaRegistry = Record<string, unknown>;
 
 interface EnvironmentOptions {
@@ -26,6 +29,7 @@ class Environment {
   private readonly projectRoot: string;
   private db: ReturnType<typeof drizzle> | null = null;
   private readonly modelFactories = new Map<string, ModelFactoryElm>();
+  private readonly menuFactories: MenuFactoryElm[] = [];
 
   private constructor(projectRoot: string) {
     this.projectRoot = projectRoot;
@@ -77,6 +81,10 @@ class Environment {
     return Array.from(this.modelFactories.values());
   }
 
+  getMenuFactories(): MenuFactoryElm[] {
+    return this.menuFactories;
+  }
+
   async reloadModel(modelId: string): Promise<boolean> {
     const factoryElm = this.modelFactories.get(modelId);
     if (!factoryElm) {
@@ -124,6 +132,7 @@ class Environment {
   private async init(): Promise<void> {
     await this.registerModels();
     await this.registerDb();
+    await this.registerMenuStatic();
   }
 
   private async registerModels(): Promise<void> {
@@ -333,6 +342,13 @@ class Environment {
       idle_timeout: 20,
       connect_timeout: 10,
     });
+  }
+  private registerMenuStatic(): void {
+    console.log("Registering menus...");
+    const menus = loadMenusFromModules();
+    for (const menu of menus) {
+      this.menuFactories.push(menu);
+    }
   }
 }
 

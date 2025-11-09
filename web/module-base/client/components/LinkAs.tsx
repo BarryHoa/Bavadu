@@ -8,7 +8,7 @@ const LinkAs = (
     <Link
       {...props}
       className={clsx(
-        "text-sky-600 cursor-pointer hover:underline",
+        "text-primary-600 cursor-pointer hover:text-danger-400",
         props.className
       )}
     >

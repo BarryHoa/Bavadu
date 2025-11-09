@@ -30,8 +30,8 @@ export default function ProductsListPage(): React.ReactNode {
         render: (_, row) => {
           const { path, as } = getClientLink({
             mdl: "product",
-            path: "[id]",
-            as: row.id,
+            path: "view/[id]",
+            as: `view/${row.id}`,
           });
           return (
             <LinkAs href={path} as={as}>
@@ -123,13 +123,13 @@ export default function ProductsListPage(): React.ReactNode {
         render: (_, row) => {
           const viewLink = getClientLink({
             mdl: "product",
-            path: "[id]",
-            as: row.id,
+            path: "view/[id]",
+            as: `view/${row.id}`,
           });
           const editLink = getClientLink({
             mdl: "product",
-            path: "[id]",
-            as: row.id,
+            path: "edit/[id]",
+            as: `edit/${row.id}`,
           });
           return (
             <ActionMenu
@@ -155,7 +155,7 @@ export default function ProductsListPage(): React.ReactNode {
   }, []);
   return (
     <div>
-      <ViewListDataTable model="product" columns={columns} title="Sản phẩm" />
+      <ViewListDataTable model="product" columns={columns} />
     </div>
   );
 }

@@ -1,15 +1,21 @@
 {
-    "key": "products-main",
-    "name": "Products",
-    "icon": "Package",
-    "children": [
-      {
-        "key": "products-list",
-        "name": "All Products",
-        "path": "/",
-        "as": "/",
-        "icon": "Package"
-      }
-    ]
-  }
-  
+  "key": "products-main",
+  "name": "Product Management",
+  "icon": "Package",
+  "children": [
+    {
+      "key": "products-list",
+      "name": "Products",
+      "path": "/",
+      "as": "/",
+      "icon": "Package"
+    },
+    {
+      "key": "products-category",
+      "name": "Categories",
+      "path": "/categories",
+      "as": "/categories",
+      "icon": "Package"
+    }
+  ]
+}

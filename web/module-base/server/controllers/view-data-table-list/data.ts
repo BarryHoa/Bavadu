@@ -1,6 +1,4 @@
-
-import { NextRequest, NextResponse } from "next/server";
-import getEnv from "../../utils/getEnv";
+import { NextRequest } from "next/server";
 import getModuleQueryByModel from "../../utils/getModuleQueryByModel";
 
 // Example edge handler for /view-list-data-table/data route (GET)
@@ -12,9 +10,7 @@ export async function POST(request: NextRequest) {
 
   return await getModuleQueryByModel({
     modelId,
-    modelMethod: 'getViewDataList',
+    modelMethod: "getViewDataList",
     params,
   });
-
-
 }

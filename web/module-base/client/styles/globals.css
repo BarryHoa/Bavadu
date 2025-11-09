@@ -3,6 +3,7 @@
 
 html {
   scrollbar-gutter: unset !important;
+  --dropdown-hover: #e7f3ff;
 }
 
 body {
@@ -85,4 +86,13 @@ body {
 /* Ensure frozen columns maintain background on hover */
 .frozen-column {
   background-color: rgba(255, 255, 255, var(--glass-opacity, 0.3)) !important;
+}
+
+/* HeroUI dropdown hover override */
+[data-slot="list"] [data-hover="true"] {
+  background-color: var(--dropdown-hover, #e7f3ff) !important;
+  color: var(--heroui-foreground);
+}
+[data-slot="list"] [data-hover="true"] [data-slot="title"] {
+  color: var(--heroui-foreground);
 }

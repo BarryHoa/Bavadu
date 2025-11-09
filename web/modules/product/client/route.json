@@ -8,9 +8,10 @@
     ]
   },
   {
-    "path": "/category",
+    "path": "/categories",
     "routes": [
       { "path": "/", "page": "/Category/ProductCategoryListPage" },
+      { "path": "/create", "page": "/Category/ProductCategoryCreatePage" },
       { "path": "/view/[id]", "page": "/Category/ProductCategoryDetailPage" },
       { "path": "/edit/[id]", "page": "/Category/ProductCategoryEditPage" }
     ]

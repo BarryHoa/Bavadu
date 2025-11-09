@@ -8,13 +8,11 @@ type ModelId = string;
 
 interface UseViewListDataTableQueriesOptions<T = any> {
   model: ModelId;
-  enabled?: boolean;
   isDummyData?: boolean;
 }
 
 export function useViewListDataTableQueries<T = any>({
   model,
-  enabled = true,
   isDummyData = true,
 }: UseViewListDataTableQueriesOptions<T>) {
   const service = useMemo(() => new ViewListDataTableService(), []);
@@ -43,7 +41,7 @@ export function useViewListDataTableQueries<T = any>({
       }
       return [];
     },
-    enabled: enabled && !!model,
+    enabled: !!model,
   });
 
   return {

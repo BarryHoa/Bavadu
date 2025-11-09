@@ -9,7 +9,8 @@ import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { formatDate } from "@base/client/ultils/date/formatDate";
 
-import { Chip } from "@heroui/react";
+import { Button, Chip } from "@heroui/react";
+import { useRouter } from "next/navigation";
 import React, { useMemo } from "react";
 
 import LinkAs from "@base/client/components/LinkAs";
@@ -18,6 +19,7 @@ import { ProductCategoryRow } from "../../interface/ProductCategory";
 
 const ProductCategoryListPage = (): React.ReactNode => {
   const localized = useLocalizedText();
+  const router = useRouter();
 
   const columns = useMemo<DataTableColumn<ProductCategoryRow>[]>(() => {
     return [
@@ -28,8 +30,8 @@ const ProductCategoryListPage = (): React.ReactNode => {
         render: (_, row) => {
           const { path, as } = getClientLink({
             mdl: "product",
-            path: "category/[id]",
-            as: `category/${row.id}`,
+            path: "categories/view/[id]",
+            as: `categories/view/${row.id}`,
           });
           return (
             <LinkAs href={path} as={as}>
@@ -95,29 +97,55 @@ const ProductCategoryListPage = (): React.ReactNode => {
                 key: "view",
                 label: "View",
                 placement: "inline",
-                onPress: () => {},
+                onPress: () => {
+                  const { path, as } = getClientLink({
+                    mdl: "product",
+                    path: "categories/view/[id]",
+                    as: `categories/view/${row.id}`,
+                  });
+                  router.push(as ?? path);
+                },
                 variant: "bordered",
               },
               {
-                key: "deactivate",
-                label: row.isActive ? "Deactivate" : "Activate",
+                key: "edit",
+                label: "Edit",
                 placement: "menu",
-                onPress: () => {},
+                onPress: () => {
+                  const { path, as } = getClientLink({
+                    mdl: "product",
+                    path: "categories/edit/[id]",
+                    as: `categories/edit/${row.id}`,
+                  });
+                  router.push(as ?? path);
+                },
               },
             ]}
           />
         ),
       },
     ];
-  }, [localized]);
+  }, [localized, router]);
 
   return (
-    <div>
-      <ViewListDataTable
-        model="product.category"
-        columns={columns}
-        title="Product Categories"
-      />
+    <div className="flex flex-col gap-4">
+      <div className="flex justify-end">
+        <Button
+          color="primary"
+          onPress={() => {
+            const { path, as } = getClientLink({
+              mdl: "product",
+              path: "categories/create",
+            });
+            router.push(as ?? path);
+          }}
+          variant="solid"
+        >
+          New Category
+        </Button>
+      </div>
+
+      <ViewListDataTable model="product.category" columns={columns} />
     </div>
   );
 };

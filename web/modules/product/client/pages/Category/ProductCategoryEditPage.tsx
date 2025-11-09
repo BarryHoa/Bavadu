@@ -1,20 +1,26 @@
 "use client";
 
 import { Button } from "@heroui/button";
-import { Card, CardBody, Input } from "@heroui/react";
-import { Save, Undo2 } from "lucide-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { FormEvent, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
-const getParamValue = (value: string | string[] | undefined): string | undefined =>
-  Array.isArray(value) ? value[0] : value;
+import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import ProductCategoryForm, {
+  ProductCategoryFormValues,
+} from "../../components/Category/ProductCategoryForm";
+import type { ProductCategoryRow } from "../../interface/ProductCategory";
+
+const getParamValue = (
+  value: string | string[] | undefined
+): string | undefined => (Array.isArray(value) ? value[0] : value);
 
 const ProductCategoryEditPage = (): React.ReactNode => {
   const params = useParams();
   const router = useRouter();
-
-  const [name, setName] = useState("");
-  const [code, setCode] = useState("");
+  const localized = useLocalizedText();
+  const [error, setError] = useState<string | null>(null);
 
   const categoryId = useMemo(() => {
     const rawId = (params?.id ?? undefined) as string | string[] | undefined;
@@ -22,18 +28,104 @@ const ProductCategoryEditPage = (): React.ReactNode => {
     return getParamValue(rawId);
   }, [params]);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // TODO: Hook up to API mutation
+  const categoryQuery = useQuery({
+    queryKey: ["product-category-detail", categoryId],
+    enabled: Boolean(categoryId),
+    queryFn: async (): Promise<ProductCategoryRow> => {
+      if (!categoryId) {
+        throw new Error("Missing category id");
+      }
+
+      const response = await fetch(
+        `/api/modules/product/categories/${categoryId}`,
+        {
+          cache: "no-store",
+        }
+      );
+      const payload = await response.json();
+
+      if (!response.ok || payload?.success === false) {
+        throw new Error(payload?.message ?? "Failed to load category");
+      }
+
+      return payload.data as ProductCategoryRow;
+    },
+  });
+
+  const updateMutation = useMutation<
+    ProductCategoryRow,
+    Error,
+    ProductCategoryFormValues
+  >({
+    mutationFn: async (values: ProductCategoryFormValues) => {
+      if (!categoryId) {
+        throw new Error("Missing category id");
+      }
+
+      const response = await fetch(
+        `/api/modules/product/categories/${categoryId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            code: values.code,
+            name: values.name,
+            description: values.description,
+            parentId: values.parentId,
+            level: values.level,
+            isActive: values.isActive,
+          }),
+        }
+      );
+
+      const payload = await response.json();
+
+      if (!response.ok || payload?.success === false) {
+        throw new Error(payload?.message ?? "Failed to update category");
+      }
+
+      return payload.data as ProductCategoryRow;
+    },
+    onSuccess: (data) => {
+      router.push(`/workspace/modules/product/categories/view/${data.id}`);
+    },
+  });
+
+  const handleSubmit = async (values: ProductCategoryFormValues) => {
+    setError(null);
+    try {
+      await updateMutation.mutateAsync(values);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to update category"
+      );
+    }
   };
 
+  const initialValues: ProductCategoryFormValues | undefined =
+    categoryQuery.data
+      ? {
+          name: localized(categoryQuery.data.name) ?? "",
+          code: categoryQuery.data.code ?? "",
+          description: localized(categoryQuery.data.description) ?? "",
+          parentId: categoryQuery.data.parent?.id ?? "",
+          level: categoryQuery.data.level ?? null,
+          isActive:
+            categoryQuery.data.isActive === undefined
+              ? true
+              : Boolean(categoryQuery.data.isActive),
+        }
+      : undefined;
+
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+    <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
         <Button
           size="sm"
           variant="light"
-          startContent={<Undo2 size={14} />}
+          startContent={<ArrowLeft size={14} />}
           onPress={() => router.back()}
         >
           Back
@@ -45,40 +137,27 @@ const ProductCategoryEditPage = (): React.ReactNode => {
         )}
       </div>
 
-      <Card>
-        <CardBody className="space-y-4">
-          <div>
-            <h1 className="text-xl font-semibold">Edit Category</h1>
-            <p className="text-default-500 text-small">
-              Capture category metadata and synchronize it with your backend.
-            </p>
-          </div>
-
-          <Input
-            label="Category name"
-            placeholder="Electronics"
-            value={name}
-            onValueChange={setName}
-            variant="bordered"
-          />
-          <Input
-            label="Code"
-            placeholder="CAT-001"
-            value={code}
-            onValueChange={setCode}
-            variant="bordered"
-          />
-
-          <div className="flex justify-end">
-            <Button color="primary" endContent={<Save size={16} />} type="submit">
-              Save
-            </Button>
-          </div>
-        </CardBody>
-      </Card>
-    </form>
+      {categoryQuery.isLoading ? (
+        <p className="text-default-500">Loading category...</p>
+      ) : categoryQuery.isError ? (
+        <div className="rounded-medium border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-500">
+          {categoryQuery.error instanceof Error
+            ? categoryQuery.error.message
+            : "Failed to load category."}
+        </div>
+      ) : categoryQuery.data ? (
+        <ProductCategoryForm
+          title="Edit Category"
+          subtitle="Update the metadata for this category."
+          submitLabel="Save changes"
+          initialValues={initialValues}
+          loading={updateMutation.isPending}
+          error={error}
+          onSubmit={handleSubmit}
+        />
+      ) : null}
+    </div>
   );
 };
 
 export default ProductCategoryEditPage;
-

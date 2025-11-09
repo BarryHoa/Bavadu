@@ -1,11 +1,10 @@
-
 import { NextResponse } from "next/server";
-import { loadMenusFromModules } from "../../loaders/menu-loader";
+import getEnv from "../../utils/getEnv";
 
 export async function GET() {
   try {
-    const menus = loadMenusFromModules();
-
+    // const menus = loadMenusFromModules();
+    const menus = getEnv()?.getMenuFactories() ?? [];
     return NextResponse.json({
       success: true,
       data: menus,

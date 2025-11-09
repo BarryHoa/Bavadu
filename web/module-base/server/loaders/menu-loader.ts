@@ -1,74 +1,76 @@
 import fs from "fs";
 import path from "path";
+import { MenuFactoryElm } from "../interfaces/Menu";
 
-import { MenuWorkspaceElement } from "@base/client/interface/WorkspaceMenuInterface";
+export function loadMenusFromModules(): MenuFactoryElm[] {
+  const modulesDirectory = path.join(process.cwd(), "modules");
 
-export interface MenuItem {
-  name: string;
-  href: string;
-  icon: string;
-  badge?: string;
-  children?: MenuItem[];
-}
-
-export function loadMenusFromModules(): MenuWorkspaceElement[] {
-  const menus: MenuWorkspaceElement[] = [];
-  const modulesPath = path.join(process.cwd(), "modules");
-
-  if (!fs.existsSync(modulesPath)) {
-    return menus;
+  if (!fs.existsSync(modulesDirectory)) {
+    return [];
   }
 
   const moduleDirs = fs
-    .readdirSync(modulesPath, { withFileTypes: true })
+    .readdirSync(modulesDirectory, { withFileTypes: true })
     .filter((dirent) => dirent.isDirectory())
     .map((dirent) => dirent.name);
 
+  const normalizePath = (modulePrefix: string, segment?: string) => {
+    if (!segment) return undefined;
+
+    const cleaned = segment.startsWith("/")
+      ? segment
+      : segment.length > 0
+        ? `/${segment}`
+        : "/";
+
+    return `${modulePrefix}${cleaned.replace(/\/$/, "") || "/"}`;
+  };
+
+  const attachPrefix = (
+    items: MenuFactoryElm[] = [],
+    modulePrefix: string
+  ): MenuFactoryElm[] =>
+    items.map((item) => ({
+      ...item,
+      path: normalizePath(modulePrefix, item.path),
+      as: normalizePath(modulePrefix, item.as ?? item.path),
+      children: item.children
+        ? attachPrefix(item.children, modulePrefix)
+        : undefined,
+    }));
+
+  const menus: MenuFactoryElm[] = [];
+
   for (const moduleDir of moduleDirs) {
-    const routerPath = path.join(modulesPath, moduleDir, "client", "menu.json");
+    const menuFile = path.join(
+      modulesDirectory,
+      moduleDir,
+      "client",
+      "menu.json"
+    );
 
-    if (fs.existsSync(routerPath)) {
-      try {
-        const routerContent = fs.readFileSync(routerPath, "utf8");
-        const menuData = JSON.parse(routerContent);
+    if (!fs.existsSync(menuFile)) {
+      continue;
+    }
 
-        // Recursively update paths to prepend module path
-        const updatePaths = (
-          items: MenuWorkspaceElement[],
-          modulePrefix: string,
-        ): MenuWorkspaceElement[] => {
-          return items.map((item) => ({
-            ...item,
-            path: item.path ? `${modulePrefix}${item.path}` : undefined,
-            as: item.as ? `${modulePrefix}${item.as}` : undefined,
-            children: item.children
-              ? updatePaths(item.children, modulePrefix)
-              : undefined,
-          }));
-        };
+    try {
+      const raw = fs.readFileSync(menuFile, "utf8");
+      const menuData = JSON.parse(raw) as MenuFactoryElm;
+      const modulePrefix = `/workspace/modules/${moduleDir}`;
 
-        const modulePrefix = `/workspace/modules/${moduleDir}`;
-        const normalizePath = (path: string) => {
-          if (!path) {
-            return undefined;
-          }
-
-          // remove the last slash if it exists
-          return `${modulePrefix}${path.replace(/\/$/, "")}`;
-        };
-        const processedMenuData: MenuWorkspaceElement = {
-          ...menuData,
-          path: normalizePath(menuData.path),
-          as: normalizePath(menuData.as),
-          children: menuData.children
-            ? updatePaths(menuData.children, modulePrefix)
-            : undefined,
-        };
-
-        menus.push(processedMenuData);
-      } catch (error) {
-        console.error(`Error reading routers.json from ${moduleDir}:`, error);
-      }
+      menus.push({
+        ...menuData,
+        path: normalizePath(modulePrefix, menuData.path ?? "/"),
+        as: normalizePath(modulePrefix, menuData.as ?? menuData.path ?? "/"),
+        children: menuData.children
+          ? attachPrefix(menuData.children, modulePrefix)
+          : undefined,
+      });
+    } catch (error) {
+      console.error(
+        `Error parsing menu.json for module "${moduleDir}":`,
+        error
+      );
     }
   }
 
