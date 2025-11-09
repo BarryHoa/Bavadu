@@ -26,6 +26,10 @@
     "routes": [
       {
         "path": "/",
+        "handler": "/categories/get-list"
+      },
+      {
+        "path": "/",
         "handler": "/categories/create"
       },
       {

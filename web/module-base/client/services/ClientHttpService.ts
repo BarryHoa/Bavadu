@@ -68,6 +68,28 @@ class ClientHttpService {
     return response.json();
   }
 
+  async patch<T>(
+    url: string,
+    data?: unknown,
+    options?: RequestInit
+  ): Promise<T> {
+    const response = await fetch(this.getFullUrl(url), {
+      ...options,
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        ...(options?.headers || {}),
+      },
+      body: data !== undefined ? JSON.stringify(data) : undefined,
+    });
+    if (!response.ok) {
+      throw new Error(
+        `HTTP PATCH error: ${response.status} ${response.statusText}`
+      );
+    }
+    return response.json();
+  }
+
   async delete<T>(url: string, options?: RequestInit): Promise<T> {
     const response = await fetch(this.getFullUrl(url), {
       ...options,

@@ -10,6 +10,7 @@ import { useMemo } from "react";
 
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { formatDate } from "@base/client/ultils/date/formatDate";
+import ProductCategoryService from "../../services/ProductCategoryService";
 import type { ProductCategoryRow } from "../../interface/ProductCategory";
 
 const getParamValue = (
@@ -35,19 +36,7 @@ const ProductCategoryDetailPage = (): React.ReactNode => {
         throw new Error("Missing category id");
       }
 
-      const response = await fetch(
-        `/api/modules/product/categories/${categoryId}`,
-        {
-          cache: "no-store",
-        }
-      );
-      const payload = await response.json();
-
-      if (!response.ok || payload?.success === false) {
-        throw new Error(payload?.message ?? "Failed to load category");
-      }
-
-      return payload.data as ProductCategoryRow;
+      return ProductCategoryService.getById(categoryId);
     },
   });
 
