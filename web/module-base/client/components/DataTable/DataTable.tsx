@@ -22,7 +22,10 @@ import {
 } from "../Pagination/pagginationConts";
 import PaginationComponent from "../Pagination/Pagination";
 import usePagination from "../Pagination/usePagination";
-import { type DataTableColumnDefinition } from "./DataTableInterace";
+import {
+  type DataTableColumnDefinition,
+  type ProcessedDataTableColumn,
+} from "./DataTableInterace";
 import useColumns from "./hooks/useColumns";
 import useDataTableSelection, {
   type DataTableRowSelection,
@@ -38,6 +41,8 @@ export type DataTableProps<T = any> = TableProps & {
   dataSource: T[];
   rowKey?: string;
   tableLayout?: "auto" | "fixed";
+  isResizableColumns?: boolean;
+  isDraggableColumns?: boolean;
 
   // Pagination
   pagination?:
@@ -100,6 +105,8 @@ export default function DataTable<T = any>({
   classNames = {},
   emptyContent = "No data available",
   tableLayout = "auto",
+  isResizableColumns = true,
+  isDraggableColumns = true,
   ...rest
 }: DataTableProps<T>) {
   const isPagination = pagination && typeof pagination === "object";
@@ -201,22 +208,64 @@ export default function DataTable<T = any>({
     [onChangeTable, paginationInfo.currentPage, paginationInfo.pageSize]
   );
 
-  const renderSortIcon = useCallback(
-    (columnKey: string, sortable?: boolean) => {
-      if (!sortable) return null;
+  const renderTitleHeader = useCallback(
+    (col: ProcessedDataTableColumn<T>) => {
+      const isSortable = col.sortable;
+      const sortDirection = sortDescriptor?.direction as
+        | "ascending"
+        | "descending"
+        | "default";
+      const isSorted = sortDescriptor?.column === col.key;
+      const sortIcon = {
+        default: (
+          <ChevronsUpDown className="h-3.5 w-3.5 opacity-70" aria-hidden />
+        ),
+        ascending: <ChevronUp className="h-3.5 w-3.5 opacity-90" aria-hidden />,
+        descending: (
+          <ChevronDown className="h-3.5 w-3.5 opacity-90" aria-hidden />
+        ),
+      };
 
-      if (
-        !sortDescriptor ||
-        sortDescriptor.column?.toString() !== columnKey ||
-        !sortDescriptor.direction
-      ) {
-        return <ChevronsUpDown className="ml-1 h-3.5 w-3.5 opacity-70" />;
-      }
+      const isResizable = col.isResizable ?? isResizableColumns;
+      const isDraggable = col.isDraggable ?? isDraggableColumns;
 
-      return sortDescriptor.direction === "ascending" ? (
-        <ChevronUp className="ml-1 h-3.5 w-3.5 opacity-90" />
-      ) : (
-        <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-90" />
+      return (
+        <div className="inline-flex items-center w-full h-full">
+          {/** Drag handle */}
+          {/* <span className="inline-flex items-center w-2 h-full hover:bg-warning-400 hover:cursor-col-drag"></span> */}
+          <span
+            className={clsx(
+              "inline-flex items-center w-full px-2",
+              isSortable && "cursor-pointer"
+            )}
+            onClick={() => {
+              if (isSortable) {
+                handleSortChange({
+                  column: col.key,
+                  direction:
+                    sortDirection === "ascending" ? "descending" : "ascending",
+                });
+              }
+            }}
+          >
+            <span className="text-nowrap mr-2">
+              {col.label ?? col.title ?? ""}
+            </span>
+            {/** Sort icon */}
+            {isSortable ? (
+              <span className="inline-flex items-center justify-end">
+                {isSorted
+                  ? (sortIcon[sortDirection] ?? sortIcon.default)
+                  : sortIcon.default}
+              </span>
+            ) : null}
+          </span>
+
+          {/** Resize handle */}
+          {isResizable ? (
+            <span className="inline-flex hover:bg-warning-400/50 hover:cursor-col-resize w-2 h-full"></span>
+          ) : null}
+        </div>
       );
     },
     [sortDescriptor]
@@ -238,13 +287,12 @@ export default function DataTable<T = any>({
             ...classNames,
             tbody: "overflow-x-auto",
             wrapper: "p-2 rounded-none",
-            th: "bg-primary-700 text-white hover:bg-primary-700/80",
+            th: "bg-primary-600 text-white hover:bg-primary-700/80 px-0   ",
             tr: "hover:bg-primary-700/10 ",
             td: "rounded-none",
           }}
-          sortDescriptor={sortDescriptor}
-          onSortChange={handleSortChange}
-          // sortIcon={SortIcon}
+          // sortDescriptor={sortDescriptor}
+          // onSortChange={handleSortChange}
           {...rest}
         >
           <TableHeader>
@@ -252,15 +300,14 @@ export default function DataTable<T = any>({
               <TableColumn
                 key={col.key}
                 align={col.align || "start"}
-                allowsSorting={col.sortable}
-                className={col.frozenClassName}
+                allowsSorting={false}
+                className={clsx(col.frozenClassName)}
                 style={col.frozenStyle}
                 width={col.width}
+                minWidth={col.minWidth}
+                maxWidth={col.maxWidth}
               >
-                <div className="flex items-center">
-                  <span>{col.label ?? col.title ?? ""}</span>
-                  {renderSortIcon(col.key, col.sortable)}
-                </div>
+                {renderTitleHeader(col)}
               </TableColumn>
             ))}
           </TableHeader>

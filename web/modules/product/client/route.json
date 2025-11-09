@@ -4,33 +4,19 @@
     "routes": [
       { "path": "/", "page": "/Product/ProductsListPage" },
       { "path": "/view/[id]", "page": "/Product/ProductsViewPage" },
-      { "path": "/edit/[id]", "page": "/Product/ProductsEditPage" },
-      {
-        "path": "/category",
-        "routes": [
-          {
-            "path": "/",
-            "page": "/category/ProductCategoryListPage"
-          },
-          {
-            "path": "/view/[id]",
-            "page": "/category/ProductCategoryDetailPage"
-          },
-          {
-            "path": "/edit/[id]",
-            "page": "/category/ProductCategoryEditPage"
-          }
-        ]
-      },
-      {
-        "path": "/uom",
-        "routes": [
-          {
-            "path": "/",
-            "page": "/uom/UnitOfMeasureListPage"
-          }
-        ]
-      }
+      { "path": "/edit/[id]", "page": "/Product/ProductsEditPage" }
     ]
+  },
+  {
+    "path": "/category",
+    "routes": [
+      { "path": "/", "page": "/Category/ProductCategoryListPage" },
+      { "path": "/view/[id]", "page": "/Category/ProductCategoryDetailPage" },
+      { "path": "/edit/[id]", "page": "/Category/ProductCategoryEditPage" }
+    ]
+  },
+  {
+    "path": "/uom",
+    "routes": [{ "path": "/", "page": "/uom/UnitOfMeasureListPage" }]
   }
 ]

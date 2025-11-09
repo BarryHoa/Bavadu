@@ -1,6 +1,9 @@
 "use client";
 import ActionMenu from "@/module-base/client/components/ActionMenu/ActionMenu";
-import { DataTableColumn } from "@/module-base/client/components/DataTable";
+import {
+  DATA_TABLE_COLUMN_KEY_ACTION,
+  DataTableColumn,
+} from "@/module-base/client/components/DataTable";
 import ViewListDataTable from "@/module-base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@/module-base/client/hooks/useLocalizedText";
 import { formatDate } from "@/module-base/client/ultils/date/formatDate";
@@ -114,7 +117,7 @@ export default function ProductsListPage(): React.ReactNode {
         render: (_, row) => formatDate(row.updatedAt),
       },
       {
-        key: "--action--",
+        key: DATA_TABLE_COLUMN_KEY_ACTION,
         label: "Action",
         align: "end",
         render: (_, row) => {

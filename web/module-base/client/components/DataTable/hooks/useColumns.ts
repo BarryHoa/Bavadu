@@ -128,17 +128,27 @@ const useColumns = <T>(
       frozenStyle: getFrozenStyle("__row-number__", frozenMeta),
       frozenClassName: getFrozenClassName("__row-number__", frozenMeta),
       renderValue: (_record: T, index: number) => index + 1,
+      isResizable: false,
+      isDraggable: false,
     };
 
     const processed = columns.map((column) => {
       const frozenStyle = getFrozenStyle(column.key, frozenMeta);
       const frozenClassName = getFrozenClassName(column.key, frozenMeta);
 
+      // override isResizable and isDraggable for key action
+
       return {
         ...column,
         frozenStyle,
         frozenClassName,
         renderValue: buildRenderValue(column),
+        isResizable: ["__row-number__", "__action__"].includes(column.key)
+          ? false
+          : column.isResizable,
+        isDraggable: ["__row-number__", "__action__"].includes(column.key)
+          ? false
+          : column.isDraggable,
       } satisfies ProcessedDataTableColumn<T>;
     });
     return [numberColumn, ...processed];

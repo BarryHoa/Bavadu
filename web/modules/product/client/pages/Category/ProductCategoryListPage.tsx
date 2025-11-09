@@ -1,7 +1,10 @@
 "use client";
 
 import ActionMenu from "@/module-base/client/components/ActionMenu/ActionMenu";
-import { DataTableColumn } from "@/module-base/client/components/DataTable";
+import {
+  DATA_TABLE_COLUMN_KEY_ACTION,
+  DataTableColumn,
+} from "@/module-base/client/components/DataTable";
 import ViewListDataTable from "@/module-base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@/module-base/client/hooks/useLocalizedText";
 import { formatDate } from "@/module-base/client/ultils/date/formatDate";
@@ -69,7 +72,7 @@ const ProductCategoryListPage = (): React.ReactNode => {
         render: (_, row) => (row.updatedAt ? formatDate(row.updatedAt) : "-"),
       },
       {
-        key: "--actions--",
+        key: DATA_TABLE_COLUMN_KEY_ACTION,
         label: "Actions",
         align: "end",
         render: (_, row) => (
