@@ -1,6 +1,6 @@
 "use client";
 
-import Input from "@/module-base/client/components/Input";
+import Input from "@base/client/components/Input";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Slider } from "@heroui/slider";
 import { useTranslations } from "next-intl";

@@ -1,4 +1,4 @@
-import ClientHttpService from "@/module-base/client/services/ClientHttpService";
+import ClientHttpService from "@base/client/services/ClientHttpService";
 
 export type ModelRow = {
   key: string;

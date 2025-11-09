@@ -1,4 +1,4 @@
-import { ListParamsResponse } from "@/module-base/server/models/interfaces/ListInterface";
+import { ListParamsResponse } from "@base/server/models/interfaces/ListInterface";
 import ClientHttpService from "./ClientHttpService";
 
 type DataTableParams = {

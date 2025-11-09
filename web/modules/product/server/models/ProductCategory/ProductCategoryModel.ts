@@ -1,5 +1,5 @@
-import { BaseModel } from "@/module-base/server/models/BaseModel";
 import { getEnv } from "@base/server";
+import { BaseModel } from "@base/server/models/BaseModel";
 import {
   ListParamsRequest,
   ListParamsResponse,

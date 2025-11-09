@@ -7,9 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import MiniSearch from "minisearch";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import DataTable, {
-  DataTableColumn,
-} from "@/module-base/client/components/DataTable";
+import DataTable, { DataTableColumn } from "@base/client/components/DataTable";
 import { useTranslations } from "next-intl";
 
 import adminModelService, {

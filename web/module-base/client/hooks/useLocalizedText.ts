@@ -1,4 +1,4 @@
-import { LocaleDataType } from "@/module-base/server/interfaces/Locale";
+import { LocaleDataType } from "@base/server/interfaces/Locale";
 import { useLocale } from "next-intl";
 
 const DEFAULT_LOCALE = "en";

@@ -1,17 +1,19 @@
 "use client";
 
-import ActionMenu from "@/module-base/client/components/ActionMenu/ActionMenu";
+import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import {
   DATA_TABLE_COLUMN_KEY_ACTION,
   DataTableColumn,
-} from "@/module-base/client/components/DataTable";
-import ViewListDataTable from "@/module-base/client/components/ViewListDataTable";
-import { useLocalizedText } from "@/module-base/client/hooks/useLocalizedText";
-import { formatDate } from "@/module-base/client/ultils/date/formatDate";
+} from "@base/client/components/DataTable";
+import ViewListDataTable from "@base/client/components/ViewListDataTable";
+import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { formatDate } from "@base/client/ultils/date/formatDate";
 
 import { Chip } from "@heroui/react";
 import React, { useMemo } from "react";
 
+import LinkAs from "@base/client/components/LinkAs";
+import { getClientLink } from "@base/client/ultils/link/getClientLink";
 import { ProductCategoryRow } from "../../interface/ProductCategory";
 
 const ProductCategoryListPage = (): React.ReactNode => {
@@ -23,7 +25,18 @@ const ProductCategoryListPage = (): React.ReactNode => {
         key: "name",
         label: "Category Name",
         sortable: true,
-        render: (_, row) => localized(row.name) || row.code,
+        render: (_, row) => {
+          const { path, as } = getClientLink({
+            mdl: "product",
+            path: "category/[id]",
+            as: `category/${row.id}`,
+          });
+          return (
+            <LinkAs href={path} as={as}>
+              {localized(row.name) || row.code}
+            </LinkAs>
+          );
+        },
       },
       {
         key: "code",

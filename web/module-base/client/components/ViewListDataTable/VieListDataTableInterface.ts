@@ -1,4 +1,4 @@
-import { LocaleDataType } from "@/module-base/server";
+import { LocaleDataType } from "@base/server";
 import { DataTableProps } from "../DataTable/DataTable";
 import { FilterOption } from "./components/FilterMenu";
 import { GroupOption } from "./components/GroupByMenu";

@@ -7,7 +7,7 @@ import { useState } from "react";
 
 import { SettingsProvider } from "./context/SettingsContext";
 
-import { NavigationLoader } from "@/module-base/client/components/NavigationLoader";
+import { NavigationLoader } from "@base/client/components/NavigationLoader";
 import { GlobalSettingsProvider } from "@base/client/contexts/global-settings";
 
 export interface ProvidersProps {

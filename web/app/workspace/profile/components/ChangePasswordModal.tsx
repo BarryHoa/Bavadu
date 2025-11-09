@@ -1,6 +1,6 @@
 "use client";
 
-import InputBase from "@/module-base/client/components/Input";
+import InputBase from "@base/client/components/Input";
 import { Button } from "@heroui/button";
 import {
   Modal,

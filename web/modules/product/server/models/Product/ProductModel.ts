@@ -1,4 +1,4 @@
-import { BaseModel } from "@/module-base/server/models/BaseModel";
+import { BaseModel } from "@base/server/models/BaseModel";
 import { eq, sql } from "drizzle-orm";
 
 import { getEnv } from "@base/server";

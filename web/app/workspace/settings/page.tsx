@@ -1,6 +1,6 @@
 "use client";
 
-import Input from "@/module-base/client/components/Input";
+import Input from "@base/client/components/Input";
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Divider } from "@heroui/divider";

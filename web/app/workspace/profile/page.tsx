@@ -1,8 +1,8 @@
 "use client";
 
-import DatePickerBase from "@/module-base/client/components/DatePicker";
-import InputBase from "@/module-base/client/components/Input";
-import SelectBase from "@/module-base/client/components/Select";
+import DatePickerBase from "@base/client/components/DatePicker";
+import InputBase from "@base/client/components/Input";
+import SelectBase from "@base/client/components/Select";
 import { Avatar } from "@heroui/avatar";
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";

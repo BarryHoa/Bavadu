@@ -1,15 +1,15 @@
 "use client";
-import ActionMenu from "@/module-base/client/components/ActionMenu/ActionMenu";
+import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import {
   DATA_TABLE_COLUMN_KEY_ACTION,
   DataTableColumn,
-} from "@/module-base/client/components/DataTable";
-import ViewListDataTable from "@/module-base/client/components/ViewListDataTable";
-import { useLocalizedText } from "@/module-base/client/hooks/useLocalizedText";
-import { formatDate } from "@/module-base/client/ultils/date/formatDate";
-import { getClientLink } from "@/module-base/client/ultils/link/getClientLink";
-import Link from "next/link";
+} from "@base/client/components/DataTable";
+import ViewListDataTable from "@base/client/components/ViewListDataTable";
+import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { formatDate } from "@base/client/ultils/date/formatDate";
+import { getClientLink } from "@base/client/ultils/link/getClientLink";
 
+import LinkAs from "@base/client/components/LinkAs";
 import { Chip } from "@heroui/react";
 import React, { useMemo } from "react";
 import { ProductMasterFeatures, ProductRow } from "../../interface/Product";
@@ -34,9 +34,9 @@ export default function ProductsListPage(): React.ReactNode {
             as: row.id,
           });
           return (
-            <Link href={path} as={as} className="text-sky-600 hover:underline">
+            <LinkAs href={path} as={as}>
               {localized(row.name) || row.id}
-            </Link>
+            </LinkAs>
           );
         },
       },
