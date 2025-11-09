@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import {
   type DataTableColumnDefinition,
   type ProcessedDataTableColumn,
-} from "../DataTableColumn";
+} from "../DataTableInterace";
 
 type FrozenColumn = {
   key: string;
@@ -127,7 +127,7 @@ const useColumns = <T>(
       fixed: "left",
       frozenStyle: getFrozenStyle("__row-number__", frozenMeta),
       frozenClassName: getFrozenClassName("__row-number__", frozenMeta),
-      renderValue: (_record, index) => index + 1,
+      renderValue: (_record: T, index: number) => index + 1,
     };
 
     const processed = columns.map((column) => {

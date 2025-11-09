@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+
 import { Button } from "@heroui/button";
 import {
   Dropdown,
@@ -25,6 +27,15 @@ export default function GroupByMenu({
   currentGroupBy,
   onSelectGroupBy,
 }: GroupByMenuProps) {
+  if (!groupByOptions || groupByOptions.length === 0) {
+    return null;
+  }
+
+  const menuItems = useMemo(
+    () => [{ key: "__none__", label: "(None)" }, ...groupByOptions],
+    [groupByOptions]
+  );
+
   return (
     <Dropdown>
       <DropdownTrigger>
@@ -37,21 +48,23 @@ export default function GroupByMenu({
       </DropdownTrigger>
       <DropdownMenu
         aria-label="Group by options"
-        selectedKeys={currentGroupBy ? [currentGroupBy] : []}
+        selectedKeys={currentGroupBy ? [currentGroupBy] : ["__none__"]}
         selectionMode="single"
         onSelectionChange={(keys) => {
           const selectedKey = Array.from(keys)[0] as string | undefined;
-          onSelectGroupBy(selectedKey || null);
+          if (!selectedKey || selectedKey === "__none__") {
+            onSelectGroupBy(null);
+            return;
+          }
+          onSelectGroupBy(selectedKey);
         }}
+        items={menuItems}
       >
-        <DropdownItem key="none" textValue="(None)">
-          (None)
-        </DropdownItem>
-        {groupByOptions.map((opt) => (
-          <DropdownItem key={opt.key} textValue={opt.label}>
-            {opt.label}
+        {(item) => (
+          <DropdownItem key={item.key} textValue={item.label}>
+            {item.label}
           </DropdownItem>
-        ))}
+        )}
       </DropdownMenu>
     </Dropdown>
   );

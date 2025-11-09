@@ -9,12 +9,12 @@ import Link from "next/link";
 
 import { Chip } from "@heroui/react";
 import React, { useMemo } from "react";
-import { ProductMasterFeatures, ProductRow } from "../interface/Product";
+import { ProductMasterFeatures, ProductRow } from "../../interface/Product";
 import {
   convertProductMasterFeaturesToArrayKey,
   getNameProductFeatures,
-} from "../ultils/getNameProductFeatures";
-import { getNameProductType } from "../ultils/getNameProductType";
+} from "../../ultils/getNameProductFeatures";
+import { getNameProductType } from "../../ultils/getNameProductType";
 
 export default function ProductsListPage(): React.ReactNode {
   const localized = useLocalizedText();

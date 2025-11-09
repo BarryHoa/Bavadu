@@ -2,6 +2,8 @@
 
 import { useMemo } from "react";
 import { DataTable } from "../DataTable";
+import type { FilterOption } from "./components/FilterMenu";
+import type { GroupOption } from "./components/GroupByMenu";
 
 import { Card, CardBody, Divider } from "@heroui/react";
 import { useLocalizedText } from "../../hooks/useLocalizedText";
@@ -48,17 +50,16 @@ export default function ViewListDataTable<T = any>(
     isDummyData,
     // enabled: !propDataSource, // Only fetch if dataSource is not provided as prop
   });
-  const filterOptions = useMemo(() => {
+  const filterOptions = useMemo<FilterOption<T>[]>(() => {
     return [];
   }, []);
-  const groupByOptions = useMemo(() => {
+  const groupByOptions = useMemo<GroupOption[]>(() => {
     return [];
   }, []);
-  const initialFavoriteFilter = useMemo(() => {
-    return (row: T) => true;
-  }, []);
-  const favoriteFilter = useMemo(() => {
-    return [];
+  const initialFavoriteFilter = useMemo<
+    ((row: T) => boolean) | undefined
+  >(() => {
+    return undefined;
   }, []);
 
   // Actual filtering logic

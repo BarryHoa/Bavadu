@@ -18,8 +18,3 @@ export interface ProcessedDataTableColumn<T = any>
   frozenClassName?: string;
   renderValue: (record: T, index: number) => ReactNode;
 }
-
-export interface DataTableSortDescriptor<T = any> {
-  column?: keyof T;
-  direction?: "ascending" | "descending";
-}

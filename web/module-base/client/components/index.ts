@@ -2,8 +2,9 @@
 export { default as DataTable } from "./DataTable";
 export type {
   DataTableColumn,
-  DataTableSummary,
+  DataTableColumnDefinition,
   DataTableProps,
+  DataTableSummary,
 } from "./DataTable";
 export { default as usePagination } from "./Pagination/usePagination";
 export type {
@@ -18,13 +19,11 @@ export type { GroupOption } from "./ViewListDataTable/components/GroupByMenu";
 // Direct component exports
 export { default as DatePicker } from "./DatePicker";
 export { default as Input } from "./Input";
-export { default as Select } from "./Select";
-export { default as Table } from "./Table";
 export * from "./LoadingBar";
 export * from "./LoadingOverlay";
 export * from "./NavigationLoader";
+export { default as Select } from "./Select";
 
 // Icons and primitives
 export * from "./icons";
 export * from "./primitives";
-

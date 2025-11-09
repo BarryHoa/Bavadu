@@ -22,10 +22,7 @@ import {
 } from "../Pagination/pagginationConts";
 import PaginationComponent from "../Pagination/Pagination";
 import usePagination from "../Pagination/usePagination";
-import {
-  DataTableSortDescriptor,
-  type DataTableColumnDefinition,
-} from "./DataTableInterace";
+import { type DataTableColumnDefinition } from "./DataTableInterace";
 import useColumns from "./hooks/useColumns";
 import useDataTableSelection, {
   type DataTableRowSelection,
@@ -120,8 +117,9 @@ export default function DataTable<T = any>({
   });
 
   // const [currentPage, setCurrentPage] = useState(currentPage);
-  const [sortDescriptor, setSortDescriptor] =
-    useState<DataTableSortDescriptor<T> | null>(null);
+  const [sortDescriptor, setSortDescriptor] = useState<
+    SortDescriptor | undefined
+  >(undefined);
 
   // Get current page data
 
@@ -188,8 +186,8 @@ export default function DataTable<T = any>({
   );
 
   const handleSortChange = useCallback(
-    (descriptor: DataTableSortDescriptor<T>) => {
-      setSortDescriptor(descriptor ?? null);
+    (descriptor: SortDescriptor) => {
+      setSortDescriptor(descriptor);
 
       if (onChangeTable) {
         onChangeTable({
@@ -244,10 +242,8 @@ export default function DataTable<T = any>({
             tr: "hover:bg-primary-700/10 ",
             td: "rounded-none",
           }}
-          sortDescriptor={sortDescriptor as SortDescriptor | undefined}
-          onSortChange={
-            handleSortChange as (descriptor: SortDescriptor) => void
-          }
+          sortDescriptor={sortDescriptor}
+          onSortChange={handleSortChange}
           // sortIcon={SortIcon}
           {...rest}
         >
@@ -263,7 +259,7 @@ export default function DataTable<T = any>({
               >
                 <div className="flex items-center">
                   <span>{col.label ?? col.title ?? ""}</span>
-                  {/* {renderSortIcon(col.key, col.sortable)} */}
+                  {renderSortIcon(col.key, col.sortable)}
                 </div>
               </TableColumn>
             ))}

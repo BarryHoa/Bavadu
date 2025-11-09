@@ -1,14 +1,15 @@
 export { default as usePagination } from "../Pagination/usePagination";
-export { default as DataTable, default } from "./DataTable";
+export { default } from "./DataTable";
+export { default as DataTable } from "./DataTable";
 export { default as useColumns } from "./hooks/useColumns";
+
+export type { DataTableProps, DataTableSummary } from "./DataTable";
 
 export type {
   DataTableColumnDefinition,
-  DataTableProps,
-  DataTableSummary,
-} from "./DataTable";
-
-export type { DataTableColumnDefinition as DataTableColumn } from "./DataTableColumn";
+  DataTableColumnDefinition as DataTableColumn,
+  ProcessedDataTableColumn,
+} from "./DataTableInterace";
 
 export type {
   UsePaginationProps,
