@@ -1,11 +1,11 @@
 "use client";
 
 import { Button } from "@heroui/button";
+import { addToast } from "@heroui/toast";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import clsx from "clsx";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo } from "react";
 
 import { getClientLink } from "@/module-base/client/ultils/link/getClientLink";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
@@ -15,13 +15,6 @@ import ProductCategoryForm, {
 import type { ProductCategoryRow } from "../../interface/ProductCategory";
 import ProductCategoryService from "../../services/ProductCategoryService";
 
-type ToastState = {
-  message: string;
-  type: "success" | "error";
-} | null;
-
-const TOAST_DURATION = 3200;
-
 const getParamValue = (
   value: string | string[] | undefined
 ): string | undefined => (Array.isArray(value) ? value[0] : value);
@@ -30,8 +23,6 @@ const ProductCategoryEditPage = (): React.ReactNode => {
   const params = useParams();
   const router = useRouter();
   const localized = useLocalizedText();
-  const [toast, setToast] = useState<ToastState>(null);
-  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const listLink = useMemo(
     () =>
@@ -52,28 +43,9 @@ const ProductCategoryEditPage = (): React.ReactNode => {
     []
   );
 
-  useEffect(() => {
-    return () => {
-      if (toastTimeoutRef.current) {
-        clearTimeout(toastTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const showToast = useCallback(
-    (message: string, type: "success" | "error") => {
-      if (toastTimeoutRef.current) {
-        clearTimeout(toastTimeoutRef.current);
-      }
-
-      setToast({ message, type });
-      toastTimeoutRef.current = setTimeout(() => {
-        setToast(null);
-        toastTimeoutRef.current = null;
-      }, TOAST_DURATION);
-    },
-    []
-  );
+  const navigateToList = useCallback(() => {
+    router.push(listLink.as ?? listLink.path);
+  }, [listLink.as, listLink.path, router]);
 
   const categoryId = useMemo(() => {
     const rawId = (params?.id ?? undefined) as string | string[] | undefined;
@@ -108,7 +80,13 @@ const ProductCategoryEditPage = (): React.ReactNode => {
   const handleSubmit = async (values: ProductCategoryFormValues) => {
     try {
       const updated = await updateMutation.mutateAsync(values);
-      showToast("Category updated successfully", "success");
+      addToast({
+        title: "Category updated",
+        description: "Changes saved successfully.",
+        color: "success",
+        variant: "solid",
+        timeout: 4000,
+      });
       setTimeout(() => {
         const link = getCategoryViewLink(updated.id);
         router.push(link.as ?? link.path);
@@ -116,7 +94,13 @@ const ProductCategoryEditPage = (): React.ReactNode => {
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to update category";
-      showToast(message, "error");
+      addToast({
+        title: "Update failed",
+        description: message,
+        color: "danger",
+        variant: "solid",
+        timeout: 5000,
+      });
     }
   };
 
@@ -175,26 +159,11 @@ const ProductCategoryEditPage = (): React.ReactNode => {
               const link = getCategoryViewLink(categoryId);
               router.push(link.as ?? link.path);
             } else {
-              router.push(listLink.as ?? listLink.path);
+              navigateToList();
             }
           }}
           categoryId={categoryId}
         />
-      ) : null}
-
-      {toast ? (
-        <div className="fixed right-4 top-4 z-50 flex max-w-sm flex-col gap-2">
-          <div
-            className={clsx(
-              "rounded-medium px-4 py-3 text-sm shadow-large",
-              toast.type === "error"
-                ? "bg-danger-100 text-danger"
-                : "bg-success-100 text-success"
-            )}
-          >
-            {toast.message}
-          </div>
-        </div>
       ) : null}
     </div>
   );

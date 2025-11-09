@@ -1,6 +1,7 @@
 "use client";
 
 import { HeroUIProvider } from "@heroui/system";
+import { ToastProvider } from "@heroui/toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -42,6 +43,10 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <HeroUIProvider navigate={router.push}>
+        <ToastProvider
+          placement="top-right"
+          toastProps={{ variant: "solid" }}
+        />
         <GlobalSettingsProvider>
           <SettingsProvider>
             <NavigationLoader minLoadingTime={300} style="bar" />
