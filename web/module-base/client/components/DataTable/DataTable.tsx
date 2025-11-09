@@ -10,22 +10,26 @@ import {
   TableProps,
   TableRow,
 } from "@heroui/table";
+import type { SortDescriptor } from "@react-types/shared";
+import clsx from "clsx";
+import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";
 import type { ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import clsx from "clsx";
 import {
   PAGINATION_DEFAULT_PAGE_SIZE,
   PAGINATION_PAGE_SIZE_OPTIONS,
 } from "../Pagination/pagginationConts";
 import PaginationComponent from "../Pagination/Pagination";
 import usePagination from "../Pagination/usePagination";
-import { type DataTableColumnDefinition } from "./DataTableColumn";
+import {
+  DataTableSortDescriptor,
+  type DataTableColumnDefinition,
+} from "./DataTableInterace";
 import useColumns from "./hooks/useColumns";
 import useDataTableSelection, {
   type DataTableRowSelection,
 } from "./hooks/useDataTableSelection";
-export type { DataTableColumnDefinition } from "./DataTableColumn";
 
 export interface DataTableSummary {
   label?: string;
@@ -116,10 +120,8 @@ export default function DataTable<T = any>({
   });
 
   // const [currentPage, setCurrentPage] = useState(currentPage);
-  const [sortDescriptor, setSortDescriptor] = useState<{
-    column?: string;
-    direction?: "ascending" | "descending";
-  }>({});
+  const [sortDescriptor, setSortDescriptor] =
+    useState<DataTableSortDescriptor<T> | null>(null);
 
   // Get current page data
 
@@ -154,8 +156,8 @@ export default function DataTable<T = any>({
         onChangeTable({
           page: newPage,
           pageSize: paginationInfo.pageSize,
-          sortColumn: sortDescriptor.column,
-          sortDirection: sortDescriptor.direction,
+          sortColumn: sortDescriptor?.column?.toString(),
+          sortDirection: sortDescriptor?.direction,
         });
       }
     },
@@ -171,8 +173,8 @@ export default function DataTable<T = any>({
         onChangeTable({
           page: paginationInfo.currentPage,
           pageSize: newPageSize,
-          sortColumn: sortDescriptor.column,
-          sortDirection: sortDescriptor.direction,
+          sortColumn: sortDescriptor?.column?.toString(),
+          sortDirection: sortDescriptor?.direction,
         });
       }
     },
@@ -183,6 +185,43 @@ export default function DataTable<T = any>({
     rowSelection,
     dataSource,
     getRowKey
+  );
+
+  const handleSortChange = useCallback(
+    (descriptor: DataTableSortDescriptor<T>) => {
+      setSortDescriptor(descriptor ?? null);
+
+      if (onChangeTable) {
+        onChangeTable({
+          page: paginationInfo.currentPage,
+          pageSize: paginationInfo.pageSize,
+          sortColumn: descriptor?.column?.toString(),
+          sortDirection: descriptor?.direction,
+        });
+      }
+    },
+    [onChangeTable, paginationInfo.currentPage, paginationInfo.pageSize]
+  );
+
+  const renderSortIcon = useCallback(
+    (columnKey: string, sortable?: boolean) => {
+      if (!sortable) return null;
+
+      if (
+        !sortDescriptor ||
+        sortDescriptor.column?.toString() !== columnKey ||
+        !sortDescriptor.direction
+      ) {
+        return <ChevronsUpDown className="ml-1 h-3.5 w-3.5 opacity-70" />;
+      }
+
+      return sortDescriptor.direction === "ascending" ? (
+        <ChevronUp className="ml-1 h-3.5 w-3.5 opacity-90" />
+      ) : (
+        <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-90" />
+      );
+    },
+    [sortDescriptor]
   );
 
   return (
@@ -205,19 +244,27 @@ export default function DataTable<T = any>({
             tr: "hover:bg-primary-700/10 ",
             td: "rounded-none",
           }}
+          sortDescriptor={sortDescriptor as SortDescriptor | undefined}
+          onSortChange={
+            handleSortChange as (descriptor: SortDescriptor) => void
+          }
+          // sortIcon={SortIcon}
           {...rest}
         >
           <TableHeader>
-            {processedColumns.map((column) => (
+            {processedColumns.map((col) => (
               <TableColumn
-                key={column.key}
-                align={column.align || "start"}
-                allowsSorting={column.sortable}
-                className={column.frozenClassName}
-                style={column.frozenStyle}
-                width={column.width}
+                key={col.key}
+                align={col.align || "start"}
+                allowsSorting={col.sortable}
+                className={col.frozenClassName}
+                style={col.frozenStyle}
+                width={col.width}
               >
-                {column.label}
+                <div className="flex items-center">
+                  <span>{col.label ?? col.title ?? ""}</span>
+                  {/* {renderSortIcon(col.key, col.sortable)} */}
+                </div>
               </TableColumn>
             ))}
           </TableHeader>
@@ -232,18 +279,16 @@ export default function DataTable<T = any>({
 
               return (
                 <TableRow key={getRowKey(item, index)}>
-                  {processedColumns.map((column) => (
+                  {processedColumns.map((col) => (
                     <TableCell
-                      key={column.key}
-                      className={column.frozenClassName}
-                      style={column.frozenStyle}
+                      key={col.key}
+                      className={col.frozenClassName}
+                      style={col.frozenStyle}
                     >
                       <div
-                        className={clsx(
-                          `flex justify-${column.align || "start"}`
-                        )}
+                        className={clsx(`flex justify-${col.align || "start"}`)}
                       >
-                        {column.renderValue(item, index)}
+                        {col.renderValue(item, index)}
                       </div>
                     </TableCell>
                   ))}

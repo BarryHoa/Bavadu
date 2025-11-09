@@ -23,6 +23,7 @@ export default function ProductsListPage(): React.ReactNode {
       {
         key: "name",
         label: "Name",
+        sortable: true,
         render: (_, row) => {
           const { path, as } = getClientLink({
             mdl: "product",
