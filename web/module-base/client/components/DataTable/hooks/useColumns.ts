@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import {
   type DataTableColumnDefinition,
   type ProcessedDataTableColumn,
-} from "../DataTableInterace";
+} from "../DataTableInterface";
 
 type FrozenColumn = {
   key: string;

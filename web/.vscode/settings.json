@@ -107,5 +107,6 @@
     "**/node_modules/**": false,
     "**/.next/**": true,
     "**/app/**": false
-  }
+  },
+  "cSpell.words": ["heroui"]
 }

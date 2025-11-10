@@ -7,7 +7,6 @@ import {
   TableCell,
   TableColumn,
   TableHeader,
-  TableProps,
   TableRow,
 } from "@heroui/table";
 import type { SortDescriptor } from "@react-types/shared";
@@ -18,7 +17,6 @@ import {
   ChevronsUpDown,
   RefreshCw,
 } from "lucide-react";
-import type { ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 
 import PaginationComponent from "../Pagination/Pagination";
@@ -28,73 +26,11 @@ import {
 } from "../Pagination/paginationConsts";
 import usePagination from "../Pagination/usePagination";
 import {
-  type DataTableColumnDefinition,
+  type DataTableProps,
   type ProcessedDataTableColumn,
-} from "./DataTableInterace";
+} from "./DataTableInterface";
 import useColumns from "./hooks/useColumns";
-import useDataTableSelection, {
-  type DataTableRowSelection,
-} from "./hooks/useDataTableSelection";
-
-export interface DataTableSummary {
-  label?: string;
-  values: Record<string, ReactNode>;
-}
-
-export type DataTableProps<T = any> = TableProps & {
-  columns: DataTableColumnDefinition<T>[];
-  dataSource: T[];
-  total?: number;
-  rowKey?: string;
-  tableLayout?: "auto" | "fixed";
-  isResizableColumns?: boolean;
-  isDraggableColumns?: boolean;
-  isRefreshData?: boolean;
-
-  // Pagination
-  pagination?:
-    | {
-        pageSize?: number;
-        pageSizeOptions?: number[];
-        page?: number;
-        showTotal?: boolean;
-      }
-    | false;
-
-  // Table features
-  loading?: boolean;
-
-  // Summary
-  summary?: DataTableSummary;
-
-  // Selection
-  rowSelection?: false | DataTableRowSelection<T>;
-
-  // Events
-  onChangeTable?: (params: {
-    page: number;
-    pageSize: number;
-    sortColumn?: string;
-    sortDirection?: "ascending" | "descending";
-  }) => void;
-
-  // Styling
-  classNames?: {
-    wrapper?: string;
-    table?: string;
-    thead?: string;
-    tbody?: string;
-    tr?: string;
-    th?: string;
-    td?: string;
-    footer?: string;
-    pagination?: string;
-    selectedRow?: string; // Custom class for selected rows
-  };
-
-  // Custom empty state
-  emptyContent?: ReactNode;
-};
+import useDataTableSelection from "./hooks/useDataTableSelection";
 
 export default function DataTable<T = any>({
   columns,
@@ -104,7 +40,7 @@ export default function DataTable<T = any>({
   pagination = { pageSize: PAGINATION_DEFAULT_PAGE_SIZE, page: 1 },
   loading = false,
   color = "primary",
-  summary,
+  summary: _summary,
   rowSelection = false,
   onChangeTable,
   classNames = {},
@@ -121,7 +57,7 @@ export default function DataTable<T = any>({
     SortDescriptor | undefined
   >(undefined);
 
-  const notifyTableChange = useCallback(
+  const onInternalChangeTb = useCallback(
     (page: number, pageSize: number) => {
       if (!onChangeTable) {
         return;
@@ -165,7 +101,7 @@ export default function DataTable<T = any>({
   const paginationInfo = usePagination({
     ...paginationSettings,
     onChange: isPaginationEnabled
-      ? ({ page, pageSize }) => notifyTableChange(page, pageSize)
+      ? ({ page, pageSize }) => onInternalChangeTb(page, pageSize)
       : undefined,
   });
 
@@ -195,18 +131,18 @@ export default function DataTable<T = any>({
   const handlePageChange = useCallback(
     (page: number) => {
       const newPage = paginationInfo.handleChangePage(page);
-      notifyTableChange(newPage, paginationInfo.pageSize);
+      onInternalChangeTb(newPage, paginationInfo.pageSize);
     },
-    [notifyTableChange, paginationInfo]
+    [onInternalChangeTb, paginationInfo]
   );
 
   // Handle page size change
   const handlePageSizeChange = useCallback(
     (pageSize: number) => {
       const newPageSize = paginationInfo.handleChangePageSize(pageSize);
-      notifyTableChange(paginationInfo.currentPage, newPageSize);
+      onInternalChangeTb(paginationInfo.currentPage, newPageSize);
     },
-    [notifyTableChange, paginationInfo]
+    [onInternalChangeTb, paginationInfo]
   );
 
   const tableSelectionProps = useDataTableSelection(
@@ -218,9 +154,9 @@ export default function DataTable<T = any>({
   const handleSortChange = useCallback(
     (descriptor: SortDescriptor) => {
       setSortDescriptor(descriptor);
-      notifyTableChange(paginationInfo.currentPage, paginationInfo.pageSize);
+      onInternalChangeTb(paginationInfo.currentPage, paginationInfo.pageSize);
     },
-    [notifyTableChange, paginationInfo.currentPage, paginationInfo.pageSize]
+    [onInternalChangeTb, paginationInfo.currentPage, paginationInfo.pageSize]
   );
 
   const toggleSortForColumn = useCallback(
@@ -304,8 +240,8 @@ export default function DataTable<T = any>({
   );
 
   const handleRefresh = useCallback(() => {
-    notifyTableChange(paginationInfo.currentPage, paginationInfo.pageSize);
-  }, [notifyTableChange, paginationInfo.currentPage, paginationInfo.pageSize]);
+    onInternalChangeTb(paginationInfo.currentPage, paginationInfo.pageSize);
+  }, [onInternalChangeTb, paginationInfo.currentPage, paginationInfo.pageSize]);
 
   const paginationSummary = useMemo(() => {
     if (!isPaginationEnabled || !pagination) {
@@ -330,6 +266,11 @@ export default function DataTable<T = any>({
     paginationSettings.total,
   ]);
 
+  const shouldRenderFooter =
+    isRefreshData ||
+    Boolean(paginationSummary) ||
+    (isPaginationEnabled && paginationInfo.pages > 1);
+
   return (
     <div className={clsx("w-full bg-content1", classNames.wrapper)}>
       <div className="flex flex-1 flex-col gap-4">
@@ -340,6 +281,7 @@ export default function DataTable<T = any>({
           isStriped
           isCompact
           layout={tableLayout}
+          color={color}
           classNames={{
             ...classNames,
             tbody: clsx("overflow-x-auto", classNames.tbody),
@@ -405,36 +347,38 @@ export default function DataTable<T = any>({
         </Table>
       </div>
 
-      <div
-        className={clsx(
-          "flex flex-col items-center justify-between px-2 sm:flex-row",
-          classNames.pagination
-        )}
-      >
-        <div className="flex items-center py-2 text-small text-default-500">
-          {paginationSummary}
-          {isRefreshData && (
-            <button
-              type="button"
-              aria-label="Refresh data"
-              className="ml-2 inline-flex items-center rounded p-1 transition-colors hover:bg-default-100"
-              onClick={handleRefresh}
-            >
-              <RefreshCw className="h-4 w-4 text-default-500 hover:text-primary" />
-            </button>
+      {shouldRenderFooter && (
+        <div
+          className={clsx(
+            "flex flex-col items-center justify-between px-2 sm:flex-row",
+            classNames.pagination
+          )}
+        >
+          <div className="flex items-center py-2 text-small text-default-500">
+            {paginationSummary}
+            {isRefreshData && (
+              <button
+                type="button"
+                aria-label="Refresh data"
+                className="ml-2 inline-flex items-center rounded p-1 transition-colors hover:bg-default-100"
+                onClick={handleRefresh}
+              >
+                <RefreshCw className="h-4 w-4 text-default-500 hover:text-primary" />
+              </button>
+            )}
+          </div>
+
+          {isPaginationEnabled && paginationInfo.pages > 1 && (
+            <PaginationComponent
+              page={paginationInfo.currentPage}
+              pageSize={paginationInfo.pageSize}
+              pages={paginationInfo.pages}
+              onChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+            />
           )}
         </div>
-
-        {isPaginationEnabled && paginationInfo.pages > 1 && (
-          <PaginationComponent
-            page={paginationInfo.currentPage}
-            pageSize={paginationInfo.pageSize}
-            pages={paginationInfo.pages}
-            onChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
-          />
-        )}
-      </div>
+      )}
     </div>
   );
 }
