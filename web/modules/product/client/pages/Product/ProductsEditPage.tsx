@@ -1,83 +1,184 @@
 "use client";
 
 import { Button } from "@heroui/button";
-import { Card, CardBody, Input } from "@heroui/react";
-import { Save, Undo2 } from "lucide-react";
+import { Spinner } from "@heroui/spinner";
+import { addToast } from "@heroui/toast";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { FormEvent, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 
-const getParamValue = (value: string | string[] | undefined): string | undefined =>
-  Array.isArray(value) ? value[0] : value;
+import ProductForm from "../../components/Product/ProductForm";
+import {
+  ProductDetail,
+  ProductFormValues,
+} from "../../interface/Product";
+import ProductService from "../../services/ProductService";
+import {
+  mapDetailToFormValues,
+  mapFormValuesToPayload,
+} from "../../utils/productMapper";
+import { getClientLink } from "@/module-base/client/ultils/link/getClientLink";
+
+const getParamValue = (
+  value: string | string[] | undefined
+): string | undefined => (Array.isArray(value) ? value[0] : value);
 
 export default function ProductsEditPage(): React.ReactNode {
   const params = useParams();
   const router = useRouter();
 
-  const [name, setName] = useState("");
-  const [sku, setSku] = useState("");
-
   const productId = useMemo(() => {
     const rawId = (params?.id ?? undefined) as string | string[] | undefined;
-
     return getParamValue(rawId);
   }, [params]);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // TODO: Replace with mutation to update the product
+  const listLink = useMemo(
+    () =>
+      getClientLink({
+        mdl: "product",
+        path: "",
+      }),
+    []
+  );
+
+  const getViewLink = useCallback((id: string) => {
+    return getClientLink({
+      mdl: "product",
+      path: "view/[id]",
+      as: `view/${id}`,
+    });
+  }, []);
+
+  const productQuery = useQuery({
+    queryKey: ["product-detail", productId],
+    enabled: Boolean(productId),
+    queryFn: async () => {
+      if (!productId) {
+        throw new Error("Missing product id");
+      }
+      const response = await ProductService.getProductById(productId);
+      if (!response.success) {
+        throw new Error("Failed to load product");
+      }
+      return response.data as ProductDetail;
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, values }: { id: string; values: ProductFormValues }) => {
+      const payload = mapFormValuesToPayload(values);
+      const response = await ProductService.updateProduct(id, payload);
+      if (!response.success) {
+        throw new Error("Failed to update product");
+      }
+      return response.data;
+    },
+  });
+
+  const navigateToList = useCallback(() => {
+    router.push(listLink.as ?? listLink.path);
+  }, [listLink.as, listLink.path, router]);
+
+  const handleSubmit = async (values: ProductFormValues) => {
+    if (!productId) return;
+
+    try {
+      const updated = await updateMutation.mutateAsync({ id: productId, values });
+      addToast({
+        title: "Product updated",
+        description: "Changes saved successfully.",
+        color: "success",
+        variant: "solid",
+        timeout: 4000,
+      });
+
+      const link = getViewLink(productId);
+      setTimeout(() => {
+        router.push(link.as ?? link.path);
+      }, 500);
+
+      return updated;
+    } catch (error) {
+      addToast({
+        title: "Update failed",
+        description:
+          error instanceof Error ? error.message : "Failed to update product",
+        color: "danger",
+        variant: "solid",
+        timeout: 5000,
+      });
+      throw error;
+    }
   };
 
+  if (!productId) {
+    return (
+      <div className="space-y-4">
+        <Button size="sm" variant="light" onPress={navigateToList}>
+          Back to products
+        </Button>
+        <p className="text-default-500">No product selected.</p>
+      </div>
+    );
+  }
+
+  if (productQuery.isLoading) {
+    return (
+      <div className="flex items-center gap-2 text-default-500">
+        <Spinner size="sm" />
+        <span>Loading product...</span>
+      </div>
+    );
+  }
+
+  if (productQuery.isError) {
+    return (
+      <div className="space-y-4">
+        <Button size="sm" variant="light" onPress={navigateToList}>
+          Back to products
+        </Button>
+        <div className="rounded-medium border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-500">
+          {productQuery.error instanceof Error
+            ? productQuery.error.message
+            : "Failed to load product."}
+        </div>
+      </div>
+    );
+  }
+
+  const initialFormValues = mapDetailToFormValues(productQuery.data);
+
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+    <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
         <Button
           size="sm"
           variant="light"
-          startContent={<Undo2 size={14} />}
+          startContent={<ArrowLeft size={14} />}
           onPress={() => router.back()}
+          isDisabled={updateMutation.isPending}
         >
           Back
         </Button>
-        {productId && (
-          <span className="text-small text-default-500">Editing product #{productId}</span>
-        )}
+        <span className="text-small text-default-500">
+          Editing product #{productId}
+        </span>
       </div>
 
-      <Card>
-        <CardBody className="space-y-4">
-          <div>
-            <h1 className="text-xl font-semibold">Edit Product</h1>
-            <p className="text-default-500 text-small">
-              Update basic information for the selected product. Connect this form to
-              your API to persist changes.
-            </p>
-          </div>
-
-          <Input
-            label="Product name"
-            placeholder="Awesome Product"
-            value={name}
-            onValueChange={setName}
-            variant="bordered"
-          />
-          <Input
-            label="SKU"
-            placeholder="SKU-001"
-            value={sku}
-            onValueChange={setSku}
-            variant="bordered"
-          />
-
-          <div className="h-2" />
-
-          <div className="flex justify-end">
-            <Button color="primary" endContent={<Save size={16} />} type="submit">
-              Save Changes
-            </Button>
-          </div>
-        </CardBody>
-      </Card>
-    </form>
+      <ProductForm
+        title="Edit Product"
+        subtitle="Update master data, variant, packings, and attributes."
+        submitLabel="Save changes"
+        initialValues={initialFormValues}
+        loading={updateMutation.isPending}
+        onSubmit={handleSubmit}
+        onCancel={() => {
+          const viewLink = getViewLink(productId);
+          router.push(viewLink.as ?? viewLink.path);
+        }}
+      />
+    </div>
   );
 }
 

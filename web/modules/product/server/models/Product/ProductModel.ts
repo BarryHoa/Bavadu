@@ -7,7 +7,9 @@ import {
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import {
+  table_product_attribute,
   table_product_category,
+  table_product_packing,
   table_product_variant,
   table_unit_of_measure,
 } from "../../schemas";
@@ -17,7 +19,15 @@ import {
 } from "../../schemas/product-master";
 
 import { MasterProduct } from "../interfaces/ProductMaster";
-import { ProductFilter, ProductVariantElm } from "./ProductModelInterface";
+import {
+  ProductAttributeInput,
+  ProductCreateInput,
+  ProductDetail,
+  ProductFilter,
+  ProductPackingInput,
+  ProductVariantElm,
+  ProductUpdateInput,
+} from "./ProductModelInterface";
 
 class ProductModel extends BaseModel<typeof table_product_variant> {
   constructor() {
@@ -29,6 +39,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
       id: dbProduct.id,
       code: dbProduct.code,
       name: dbProduct.name as MasterProduct["name"],
+      description: dbProduct.description as MasterProduct["description"],
       type: dbProduct.type as MasterProduct["type"],
       features: dbProduct.features as MasterProduct["features"],
       isActive: dbProduct.isActive,
@@ -41,20 +52,337 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
     };
   }
 
-  getProductById = async (id: string): Promise<Record<string, any> | null> => {
-    const env = getEnv();
-    const products = await env
-      .getDb()
-      .select()
-      .from(this.table)
-      .where(eq(this.table.id, id))
-      .limit(1);
-
-    if (products.length === 0) {
+  private normalizeLocale(value: unknown) {
+    if (!value) {
       return null;
     }
 
-    return products[0] as unknown as MasterProduct;
+    if (typeof value === "string") {
+      return { en: value };
+    }
+
+    return value;
+  }
+
+  private async getProductDetailInternal(
+    id: string,
+    db = getEnv().getDb()
+  ): Promise<ProductDetail | null> {
+    const rows = await db
+      .select({
+        variant: this.table,
+        master: table_product_master,
+        category: table_product_category,
+        baseUom: table_unit_of_measure,
+      })
+      .from(this.table)
+      .innerJoin(
+        table_product_master,
+        eq(this.table.productMasterId, table_product_master.id)
+      )
+      .leftJoin(
+        table_product_category,
+        eq(table_product_master.categoryId, table_product_category.id)
+      )
+      .leftJoin(
+        table_unit_of_measure,
+        eq(this.table.baseUomId, table_unit_of_measure.id)
+      )
+      .where(eq(this.table.id, id))
+      .limit(1);
+
+    const record = rows[0];
+
+    if (!record) {
+      return null;
+    }
+
+    const packings = await db
+      .select()
+      .from(table_product_packing)
+      .where(eq(table_product_packing.productVariantId, id));
+
+    const attributes = await db
+      .select()
+      .from(table_product_attribute)
+      .where(eq(table_product_attribute.productVariantId, id));
+
+    return {
+      variant: {
+        id: record.variant.id,
+        productMasterId: record.variant.productMasterId,
+        name: record.variant.name as any,
+        description: record.variant.description as any,
+        images: record.variant.images as any,
+        sku: record.variant.sku ?? undefined,
+        barcode: record.variant.barcode ?? undefined,
+        manufacturer: record.variant.manufacturer as any,
+        baseUom: record.baseUom
+          ? {
+              id: record.baseUom.id,
+              name: record.baseUom.name as any,
+              symbol: record.baseUom.symbol ?? undefined,
+              isActive: record.baseUom.isActive ?? undefined,
+            }
+          : undefined,
+        isActive: record.variant.isActive,
+        attributes: [],
+        createdAt: record.variant.createdAt?.getTime(),
+        updatedAt: record.variant.updatedAt?.getTime(),
+      },
+      master: {
+        ...this.mapToMasterProduct(record.master),
+        category: record.category
+          ? {
+              id: record.category.id,
+              code: record.category.code ?? undefined,
+              name: record.category.name as any,
+            }
+          : undefined,
+      },
+      packings: packings.map((packing) => ({
+        id: packing.id,
+        name: packing.name as any,
+        description: packing.description as any,
+        isActive: packing.isActive,
+        createdAt: packing.createdAt?.getTime(),
+        updatedAt: packing.updatedAt?.getTime(),
+      })),
+      attributes: attributes.map((attr) => ({
+        id: attr.id,
+        code: attr.code,
+        name: attr.name as any,
+        value: attr.value ?? "",
+      })),
+    };
+  }
+
+  getProductDetail = async (id: string): Promise<ProductDetail | null> => {
+    const env = getEnv();
+    return this.getProductDetailInternal(id, env.getDb());
+  };
+
+  private ensurePackingValues(
+    packings: ProductPackingInput[] | undefined
+  ): ProductPackingInput[] {
+    return (packings ?? []).filter((packing) => Boolean(packing?.name));
+  }
+
+  private ensureAttributeValues(
+    attributes: ProductAttributeInput[] | undefined
+  ): ProductAttributeInput[] {
+    return (attributes ?? []).filter((attribute) =>
+      Boolean(attribute?.code && attribute?.name)
+    );
+  }
+
+  createProduct = async (payload: ProductCreateInput) => {
+    const env = getEnv();
+    const db = env.getDb();
+
+    const now = new Date();
+
+    const result = await db.transaction(async (tx) => {
+      const [master] = await tx
+        .insert(table_product_master)
+        .values({
+          code: payload.master.code.trim(),
+          name: this.normalizeLocale(payload.master.name) ?? {
+            en: payload.master.code.trim(),
+          },
+          description: this.normalizeLocale(payload.master.description),
+          type: payload.master.type,
+          features: payload.master.features ?? null,
+          isActive: payload.master.isActive ?? true,
+          brand: this.normalizeLocale(payload.master.brand),
+          categoryId: payload.master.categoryId || null,
+          createdAt: now,
+          updatedAt: now,
+        })
+        .returning({ id: table_product_master.id });
+
+      if (!master) {
+        throw new Error("Failed to create product master");
+      }
+
+      const [variant] = await tx
+        .insert(this.table)
+        .values({
+          productMasterId: master.id,
+          name: this.normalizeLocale(payload.variant.name) ?? {
+            en: payload.master.code.trim(),
+          },
+          description: this.normalizeLocale(payload.variant.description),
+          images: payload.variant.images ?? null,
+          sku: payload.variant.sku?.trim() || null,
+          barcode: payload.variant.barcode?.trim() || null,
+          manufacturer: payload.variant.manufacturer
+            ? {
+                name:
+                  this.normalizeLocale(payload.variant.manufacturer.name) ??
+                  undefined,
+                code: payload.variant.manufacturer.code?.trim() || undefined,
+              }
+            : null,
+          baseUomId: payload.variant.baseUomId || null,
+          isActive: payload.variant.isActive ?? true,
+          createdAt: now,
+          updatedAt: now,
+        })
+        .returning({ id: this.table.id });
+
+      if (!variant) {
+        throw new Error("Failed to create product variant");
+      }
+
+      const normalizedPackings = this.ensurePackingValues(payload.packings);
+
+      if (normalizedPackings.length) {
+        await tx.insert(table_product_packing).values(
+          normalizedPackings.map((packing) => ({
+            productVariantId: variant.id,
+            name: this.normalizeLocale(packing.name) ?? { en: packing.id ?? "" },
+            description: this.normalizeLocale(packing.description),
+            isActive: packing.isActive ?? true,
+            createdAt: now,
+            updatedAt: now,
+          }))
+        );
+      }
+
+      const normalizedAttributes = this.ensureAttributeValues(
+        payload.attributes
+      );
+
+      if (normalizedAttributes.length) {
+        await tx.insert(table_product_attribute).values(
+          normalizedAttributes.map((attribute) => ({
+            productVariantId: variant.id,
+            code: attribute.code.trim(),
+            name:
+              this.normalizeLocale(attribute.name) ?? {
+                en: attribute.code.trim(),
+              },
+            value: attribute.value,
+            createdAt: now,
+            updatedAt: now,
+          }))
+        );
+      }
+
+      return { id: variant.id };
+    });
+
+    return this.getProductDetail(result.id);
+  };
+
+  updateProduct = async (payload: ProductUpdateInput) => {
+    const env = getEnv();
+    const db = env.getDb();
+
+    const now = new Date();
+
+    const result = await db.transaction(async (tx) => {
+      const existingVariant = await tx
+        .select({ id: this.table.id, masterId: this.table.productMasterId })
+        .from(this.table)
+        .where(eq(this.table.id, payload.id))
+        .limit(1);
+
+      const variantRow = existingVariant[0];
+
+      if (!variantRow) {
+        throw new Error("Product variant not found");
+      }
+
+      await tx
+        .update(table_product_master)
+        .set({
+          code: payload.master.code.trim(),
+          name: this.normalizeLocale(payload.master.name) ?? {
+            en: payload.master.code.trim(),
+          },
+          description: this.normalizeLocale(payload.master.description),
+          type: payload.master.type,
+          features: payload.master.features ?? null,
+          isActive: payload.master.isActive ?? true,
+          brand: this.normalizeLocale(payload.master.brand),
+          categoryId: payload.master.categoryId || null,
+          updatedAt: now,
+        })
+        .where(eq(table_product_master.id, variantRow.masterId));
+
+      await tx
+        .update(this.table)
+        .set({
+          name: this.normalizeLocale(payload.variant.name) ?? {
+            en: payload.master.code.trim(),
+          },
+          description: this.normalizeLocale(payload.variant.description),
+          images: payload.variant.images ?? null,
+          sku: payload.variant.sku?.trim() || null,
+          barcode: payload.variant.barcode?.trim() || null,
+          manufacturer: payload.variant.manufacturer
+            ? {
+                name:
+                  this.normalizeLocale(payload.variant.manufacturer.name) ??
+                  undefined,
+                code: payload.variant.manufacturer.code?.trim() || undefined,
+              }
+            : null,
+          baseUomId: payload.variant.baseUomId || null,
+          isActive: payload.variant.isActive ?? true,
+          updatedAt: now,
+        })
+        .where(eq(this.table.id, payload.id));
+
+      await tx
+        .delete(table_product_packing)
+        .where(eq(table_product_packing.productVariantId, payload.id));
+
+      const normalizedPackings = this.ensurePackingValues(payload.packings);
+
+      if (normalizedPackings.length) {
+        await tx.insert(table_product_packing).values(
+          normalizedPackings.map((packing) => ({
+            productVariantId: payload.id,
+            name: this.normalizeLocale(packing.name) ?? { en: packing.id ?? "" },
+            description: this.normalizeLocale(packing.description),
+            isActive: packing.isActive ?? true,
+            createdAt: now,
+            updatedAt: now,
+          }))
+        );
+      }
+
+      await tx
+        .delete(table_product_attribute)
+        .where(eq(table_product_attribute.productVariantId, payload.id));
+
+      const normalizedAttributes = this.ensureAttributeValues(
+        payload.attributes
+      );
+
+      if (normalizedAttributes.length) {
+        await tx.insert(table_product_attribute).values(
+          normalizedAttributes.map((attribute) => ({
+            productVariantId: payload.id,
+            code: attribute.code.trim(),
+            name:
+              this.normalizeLocale(attribute.name) ?? {
+                en: attribute.code.trim(),
+              },
+            value: attribute.value,
+            createdAt: now,
+            updatedAt: now,
+          }))
+        );
+      }
+
+      return { id: payload.id };
+    });
+
+    return this.getProductDetail(result.id);
   };
 
   //handle for view data table list

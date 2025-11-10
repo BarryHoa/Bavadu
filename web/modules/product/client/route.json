@@ -3,6 +3,7 @@
     "path": "/",
     "routes": [
       { "path": "/", "page": "/Product/ProductsListPage" },
+      { "path": "/create", "page": "/Product/ProductsCreatePage" },
       { "path": "/view/[id]", "page": "/Product/ProductsViewPage" },
       { "path": "/edit/[id]", "page": "/Product/ProductsEditPage" }
     ]

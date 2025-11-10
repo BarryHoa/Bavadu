@@ -6,10 +6,14 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { table_product_variant } from "./product-variant";
 
 // Product Packing
 export const table_product_packing = pgTable("product_packings", {
   id: uuid("id").primaryKey().defaultRandom(),
+  productVariantId: uuid("product_variant_id")
+    .references(() => table_product_variant.id)
+    .notNull(),
   name: jsonb("name").notNull(), // LocaleDataType<string>
   description: jsonb("description"), // LocaleDataType<string>
   isActive: boolean("is_active").default(true).notNull(),

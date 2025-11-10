@@ -22,11 +22,11 @@ export async function GET(
 
     // ✅ Use env pattern (like Odoo env['product.product'])
     const env = getEnv();
-    const productModel = env.getModel("product.variant") as
+    const productModel = env.getModel("product") as
       | ProductModel
       | undefined; // Model ID từ ProductModel constructor
 
-    if (!productModel || typeof productModel.getProductById !== "function") {
+    if (!productModel || typeof (productModel as ProductModel).getProductDetail !== "function") {
       return NextResponse.json(
         {
           success: false,
@@ -37,9 +37,20 @@ export async function GET(
       );
     }
 
-    const product = await productModel.getProductById(id);
+    const product = await (productModel as ProductModel).getProductDetail(id);
 
-    return NextResponse.json(product);
+    if (!product) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Product not found",
+          message: `Product with id ${id} was not found`,
+        },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ success: true, data: product });
   } catch (error) {
     return NextResponse.json(
       {

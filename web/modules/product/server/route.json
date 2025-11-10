@@ -7,8 +7,16 @@
         "handler": "/products/get-list"
       },
       {
+        "path": "/create",
+        "handler": "/products/create"
+      },
+      {
         "path": "/[id]",
         "handler": "/products/get-by-id"
+      },
+      {
+        "path": "/[id]",
+        "handler": "/products/update"
       }
     ]
   },
@@ -35,6 +43,15 @@
       {
         "path": "/[id]",
         "handler": "/categories/get-by-id"
+      }
+    ]
+  },
+  {
+    "group": "uom",
+    "routes": [
+      {
+        "path": "/",
+        "handler": "/uom/get-list"
       }
     ]
   }

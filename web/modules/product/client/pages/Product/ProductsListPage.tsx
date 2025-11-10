@@ -11,6 +11,7 @@ import { getClientLink } from "@base/client/ultils/link/getClientLink";
 
 import LinkAs from "@base/client/components/LinkAs";
 import { Chip } from "@heroui/react";
+import { Button } from "@heroui/button";
 import React, { useMemo } from "react";
 import { ProductMasterFeatures, ProductRow } from "../../interface/Product";
 import {
@@ -153,8 +154,25 @@ export default function ProductsListPage(): React.ReactNode {
       },
     ];
   }, []);
+
+  const createLink = getClientLink({
+    mdl: "product",
+    path: "create",
+  });
+
   return (
-    <div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-end">
+        <Button
+          color="primary"
+          size="sm"
+          as={LinkAs as any}
+          href={createLink.path}
+        >
+          New product
+        </Button>
+      </div>
+
       <ViewListDataTable
         model="product"
         columns={columns}
