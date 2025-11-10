@@ -63,7 +63,7 @@ const config = {
               700: "#3F3F46",
               800: "#27272A",
               900: "#18181B",
-              DEFAULT: "#71717A",
+              DEFAULT: "#D4D4D8",
               foreground: "#18181B",
             },
             primary: {

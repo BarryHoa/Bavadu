@@ -76,18 +76,15 @@ export default function PaginationComponent({
   );
 
   return (
-    <div className="flex items-center gap-6">
+    <div className="flex items-center gap-4">
       <Pagination
         disableCursorAnimation
         disableAnimation
-        radius="none"
-        // variant="light"
         isCompact
         showControls
         size="sm"
         classNames={{
           base: "items-center p-0 overflow-hidden",
-          wrapper: "gap-1",
           item: clsx(
             paginationItemBase,
             "bg-transparent text-primary data-[hover=true]:bg-primary-50 data-[hover=true]:text-primary"
@@ -100,10 +97,7 @@ export default function PaginationComponent({
             paginationItemBase,
             "border border-transparent text-default-500 data-[hover=true]:border-primary data-[hover=true]:text-primary"
           ),
-          cursor: clsx(
-            paginationItemBase,
-            "border border-primary bg-primary-500 text-white "
-          ),
+          cursor: clsx(paginationItemBase, "bg-primary-500 text-white"),
         }}
         page={page}
         total={pages}
@@ -112,10 +106,10 @@ export default function PaginationComponent({
       <Dropdown placement="top">
         <DropdownTrigger>
           <Button
-            className="text-small font-medium px-2  h-6"
+            className="text-small font-medium px-2 h-6"
             endContent={<ChevronIcon className="text-small rotate-90" />}
             size="sm"
-            variant="bordered"
+            // variant=""
           >
             {pageSize}
           </Button>

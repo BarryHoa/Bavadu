@@ -327,7 +327,7 @@ export default function DataTable<T = any>({
               classNames.th
             ),
             tr: clsx("hover:bg-primary-700/10", classNames.tr),
-            td: clsx("rounded-none", classNames.td),
+            td: clsx("rounded-none py-1 px-2", classNames.td),
           }}
           // sortDescriptor={sortDescriptor}
           // onSortChange={handleSortChange}
