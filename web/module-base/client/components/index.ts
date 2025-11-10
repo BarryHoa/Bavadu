@@ -6,11 +6,6 @@ export type {
   DataTableProps,
   DataTableSummary,
 } from "./DataTable";
-export { default as usePagination } from "./Pagination/usePagination";
-export type {
-  UsePaginationProps,
-  UsePaginationReturn,
-} from "./Pagination/usePagination";
 
 export { default as ViewListDataTable } from "./ViewListDataTable";
 export type { FilterOption } from "./ViewListDataTable/components/FilterMenu";

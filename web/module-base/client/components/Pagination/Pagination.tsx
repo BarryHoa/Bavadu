@@ -6,6 +6,7 @@ import {
   DropdownTrigger,
 } from "@heroui/dropdown";
 import { Pagination } from "@heroui/pagination";
+import clsx from "clsx";
 import type { Key, SVGProps } from "react";
 import { useCallback, useMemo } from "react";
 
@@ -38,15 +39,29 @@ export default function PaginationComponent({
   pages,
   page,
   pageSize,
+  pageSizeOptions,
   onChange,
   onPageSizeChange,
 }: {
   pages: number;
   page: number;
   pageSize: number;
+  pageSizeOptions?: number[];
   onChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
 }) {
+  const options = useMemo(() => {
+    const baseOptions =
+      Array.isArray(pageSizeOptions) && pageSizeOptions.length > 0
+        ? pageSizeOptions
+        : PAGINATION_PAGE_SIZE_OPTIONS;
+
+    return baseOptions.filter((option) => option > 0).sort((a, b) => a - b);
+  }, [pageSizeOptions]);
+
+  const paginationItemBase =
+    "flex h-6 w-8 items-center justify-center rounded-full text-small font-medium transition-colors cursor-pointer";
+
   const selectedKeys = useMemo(() => new Set([String(pageSize)]), [pageSize]);
 
   const handlePageSizeChange = useCallback(
@@ -61,21 +76,34 @@ export default function PaginationComponent({
   );
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-6">
       <Pagination
         disableCursorAnimation
+        disableAnimation
+        radius="none"
+        // variant="light"
         isCompact
         showControls
         size="sm"
-        className="gap-3"
         classNames={{
-          base: "items-center",
+          base: "items-center p-0 overflow-hidden",
           wrapper: "gap-1",
-          item: "w-8 h-8 text-small font-medium text-primary flex items-center justify-center rounded-full bg-transparent data-[hover=true]:bg-primary-50 data-[hover=true]:text-primary",
-          next: "w-8 h-8 text-small text-default-500 flex items-center justify-center rounded-full border border-transparent data-[hover=true]:border-primary data-[hover=true]:text-primary",
-          prev: "w-8 h-8 text-small text-default-500 flex items-center justify-center rounded-full border border-transparent data-[hover=true]:border-primary data-[hover=true]:text-primary",
-          cursor:
-            "w-8 h-8 text-small font-semibold text-primary flex items-center justify-center rounded-full border border-primary bg-primary-50 shadow-none",
+          item: clsx(
+            paginationItemBase,
+            "bg-transparent text-primary data-[hover=true]:bg-primary-50 data-[hover=true]:text-primary"
+          ),
+          next: clsx(
+            paginationItemBase,
+            "border border-transparent text-default-500 data-[hover=true]:border-primary data-[hover=true]:text-primary"
+          ),
+          prev: clsx(
+            paginationItemBase,
+            "border border-transparent text-default-500 data-[hover=true]:border-primary data-[hover=true]:text-primary"
+          ),
+          cursor: clsx(
+            paginationItemBase,
+            "border border-primary bg-primary-500 text-white "
+          ),
         }}
         page={page}
         total={pages}
@@ -84,12 +112,12 @@ export default function PaginationComponent({
       <Dropdown placement="top">
         <DropdownTrigger>
           <Button
-            className="min-w-[90px] h-8 text-small font-medium"
+            className="text-small font-medium px-2  h-6"
             endContent={<ChevronIcon className="text-small rotate-90" />}
             size="sm"
             variant="bordered"
           >
-            {pageSize} / page
+            {pageSize}
           </Button>
         </DropdownTrigger>
         <DropdownMenu
@@ -105,7 +133,7 @@ export default function PaginationComponent({
             }
           }}
         >
-          {PAGINATION_PAGE_SIZE_OPTIONS.map((item) => (
+          {options.map((item) => (
             <DropdownItem key={String(item)} textValue={String(item)}>
               {item}
             </DropdownItem>

@@ -1,10 +1,34 @@
-import type { TableProps } from "@heroui/table";
+import type { SortDescriptor, TableProps } from "@heroui/table";
 import type { CSSProperties, ReactNode } from "react";
 
 import type { DataTableRowSelection } from "./hooks/useDataTableSelection";
 
 export const DATA_TABLE_COLUMN_KEY_ACTION = "__action__";
 export const DATA_TABLE_COLUMN_KEY_ROW_NUMBER = "__row-number__";
+
+export type DataTablePagination = {
+  pageSize?: number;
+  pageSizeOptions?: number[];
+  page?: number;
+  showTotal?: boolean;
+};
+
+export type DataTableOnChange = (params: {
+  page: number;
+  pageSize: number;
+  sort?: SortDescriptor;
+}) => void;
+type DataTableClassNames = {
+  wrapper?: string;
+  table?: string;
+  thead?: string;
+  tbody?: string;
+  tr?: string;
+  th?: string;
+  td?: string;
+  footer?: string;
+  pagination?: string;
+};
 
 export type DataTableColumnSortIcon =
   | ReactNode
@@ -43,30 +67,6 @@ export interface DataTableSummary {
   values: Record<string, ReactNode>;
 }
 
-type DataTablePagination = {
-  pageSize?: number;
-  pageSizeOptions?: number[];
-  page?: number;
-  showTotal?: boolean;
-};
-type DataTableOnChange = (params: {
-  page: number;
-  pageSize: number;
-  sortColumn?: string;
-  sortDirection?: "ascending" | "descending";
-}) => void;
-type DataTableClassNames = {
-  wrapper?: string;
-  table?: string;
-  thead?: string;
-  tbody?: string;
-  tr?: string;
-  th?: string;
-  td?: string;
-  footer?: string;
-  pagination?: string;
-};
-
 export type DataTableProps<T = any> = TableProps & {
   columns: DataTableColumnDefinition<T>[];
   dataSource: T[];
@@ -85,4 +85,5 @@ export type DataTableProps<T = any> = TableProps & {
   emptyContent?: ReactNode;
   //On change Table
   onChangeTable?: DataTableOnChange;
+  onRefresh?: () => void;
 };

@@ -19,12 +19,12 @@ import {
 } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 
+import { Tooltip } from "@heroui/react";
 import PaginationComponent from "../Pagination/Pagination";
 import {
   PAGINATION_DEFAULT_PAGE_SIZE,
   PAGINATION_PAGE_SIZE_OPTIONS,
 } from "../Pagination/paginationConsts";
-import usePagination from "../Pagination/usePagination";
 import {
   type DataTableProps,
   type ProcessedDataTableColumn,
@@ -49,61 +49,86 @@ export default function DataTable<T = any>({
   isResizableColumns = true,
   isDraggableColumns = true,
   isRefreshData = true,
+  onRefresh,
   ...rest
 }: DataTableProps<T>) {
-  const total = typeof totalProps === "number" ? totalProps : 0;
+  /* Pagination */
+  const isPaginationEnabled =
+    pagination !== false && typeof pagination === "object";
+  const total = Math.max(0, typeof totalProps === "number" ? totalProps : 0);
+
+  const paginationDefault = useMemo(() => {
+    if (!isPaginationEnabled) {
+      return {
+        page: 1,
+        pageSize: PAGINATION_DEFAULT_PAGE_SIZE,
+        pageSizeOptions: PAGINATION_PAGE_SIZE_OPTIONS,
+      };
+    }
+
+    return {
+      page: pagination?.page ?? 1,
+      pageSize: pagination?.pageSize ?? PAGINATION_DEFAULT_PAGE_SIZE,
+      pageSizeOptions:
+        pagination?.pageSizeOptions ?? PAGINATION_PAGE_SIZE_OPTIONS,
+    };
+  }, []);
+
+  const [page, setPage] = useState(paginationDefault.page);
+  const [pageSize, setPageSize] = useState(paginationDefault.pageSize);
+
+  // build pagination info
+  const paginationInfo = useMemo(() => {
+    return {
+      currentPage: page,
+      pageSize,
+      pages: Math.max(1, Math.ceil(total / pageSize)),
+      from: total === 0 ? 0 : (page - 1) * pageSize,
+      to: total === 0 ? 0 : Math.min(total, (page - 1) * pageSize + pageSize),
+      total: total,
+    };
+  }, [page, pageSize, total]);
+
+  /* End init Pagination */
+
   const processedColumns = useColumns(columns);
+
   const [sortDescriptor, setSortDescriptor] = useState<
     SortDescriptor | undefined
   >(undefined);
 
   const onInternalChangeTb = useCallback(
-    (page: number, pageSize: number) => {
+    ({
+      page,
+      pageSize,
+      sort,
+    }: {
+      page?: number;
+      pageSize?: number;
+      sort?: SortDescriptor;
+    }) => {
+      if (page) {
+        setPage(page);
+      }
+      if (pageSize) {
+        setPageSize(pageSize);
+      }
+      if (sort) {
+        setSortDescriptor(sort);
+      }
+
       if (!onChangeTable) {
         return;
       }
 
       onChangeTable({
-        page,
-        pageSize,
-        sortColumn: sortDescriptor?.column?.toString(),
-        sortDirection: sortDescriptor?.direction,
+        page: page ?? paginationDefault.page,
+        pageSize: pageSize ?? paginationDefault.pageSize,
+        sort: sort ?? undefined,
       });
     },
-    [onChangeTable, sortDescriptor]
+    [onChangeTable, sortDescriptor, page, pageSize]
   );
-
-  const isPaginationEnabled =
-    pagination && typeof pagination === "object" ? true : false;
-
-  const paginationSettings = useMemo(() => {
-    if (!isPaginationEnabled || !pagination) {
-      return {
-        pageSizeOptions: PAGINATION_PAGE_SIZE_OPTIONS,
-        defaultPageSize: PAGINATION_DEFAULT_PAGE_SIZE,
-        defaultPage: 1,
-        total: 0,
-      };
-    }
-
-    return {
-      pageSizeOptions:
-        pagination.pageSizeOptions ?? PAGINATION_PAGE_SIZE_OPTIONS,
-      defaultPageSize:
-        pagination.pageSize ??
-        pagination.pageSizeOptions?.[0] ??
-        PAGINATION_DEFAULT_PAGE_SIZE,
-      defaultPage: pagination.page ?? 1,
-      total,
-    };
-  }, [isPaginationEnabled, pagination, total]);
-
-  const paginationInfo = usePagination({
-    ...paginationSettings,
-    onChange: isPaginationEnabled
-      ? ({ page, pageSize }) => onInternalChangeTb(page, pageSize)
-      : undefined,
-  });
 
   const isExistingRowKey = useMemo(() => {
     return (
@@ -129,20 +154,40 @@ export default function DataTable<T = any>({
 
   // Handle page change
   const handlePageChange = useCallback(
-    (page: number) => {
-      const newPage = paginationInfo.handleChangePage(page);
-      onInternalChangeTb(newPage, paginationInfo.pageSize);
+    (nextPage: number) => {
+      if (!isPaginationEnabled) {
+        return;
+      }
+
+      const pages = Math.max(1, Math.ceil(total / paginationInfo.pageSize));
+      const adjustedPage = Math.min(Math.max(1, nextPage), pages);
+
+      onInternalChangeTb({
+        page: adjustedPage,
+      });
     },
-    [onInternalChangeTb, paginationInfo]
+    [isPaginationEnabled, onInternalChangeTb, paginationInfo.pageSize, total]
   );
 
   // Handle page size change
   const handlePageSizeChange = useCallback(
-    (pageSize: number) => {
-      const newPageSize = paginationInfo.handleChangePageSize(pageSize);
-      onInternalChangeTb(paginationInfo.currentPage, newPageSize);
+    (nextPageSize: number) => {
+      if (!isPaginationEnabled) {
+        return;
+      }
+
+      onInternalChangeTb({
+        page: 1,
+        pageSize: nextPageSize,
+      });
     },
-    [onInternalChangeTb, paginationInfo]
+    [
+      isPaginationEnabled,
+      onInternalChangeTb,
+      page,
+      total,
+      paginationDefault.pageSize,
+    ]
   );
 
   const tableSelectionProps = useDataTableSelection(
@@ -153,10 +198,12 @@ export default function DataTable<T = any>({
 
   const handleSortChange = useCallback(
     (descriptor: SortDescriptor) => {
-      setSortDescriptor(descriptor);
-      onInternalChangeTb(paginationInfo.currentPage, paginationInfo.pageSize);
+      onInternalChangeTb({
+        sort: descriptor,
+        page: 1,
+      });
     },
-    [onInternalChangeTb, paginationInfo.currentPage, paginationInfo.pageSize]
+    [onInternalChangeTb]
   );
 
   const toggleSortForColumn = useCallback(
@@ -239,37 +286,26 @@ export default function DataTable<T = any>({
     ]
   );
 
-  const handleRefresh = useCallback(() => {
-    onInternalChangeTb(paginationInfo.currentPage, paginationInfo.pageSize);
-  }, [onInternalChangeTb, paginationInfo.currentPage, paginationInfo.pageSize]);
-
   const paginationSummary = useMemo(() => {
-    if (!isPaginationEnabled || !pagination) {
-      return null;
+    const rowsTotal = paginationInfo.total ?? 0;
+
+    if (rowsTotal === 0) {
+      return "Showing 0 to 0 of 0 entries";
     }
 
-    const showTotal = pagination.showTotal ?? true;
-    if (!showTotal) {
-      return null;
-    }
+    const from = Math.min(paginationInfo.from + 1, rowsTotal);
+    const to = Math.min(paginationInfo.to, rowsTotal);
 
-    const from = paginationInfo.from + 1;
-    const to = paginationInfo.to;
-    const rowsTotal = paginationSettings.total;
+    return `Showing ${from} to ${to} of ${rowsTotal} entries`;
+  }, [paginationInfo.from, paginationInfo.to, paginationInfo.total]);
 
-    return `Showing ${Math.min(from, rowsTotal)} to ${to} of ${rowsTotal} entries`;
-  }, [
-    isPaginationEnabled,
-    pagination,
-    paginationInfo.from,
-    paginationInfo.to,
-    paginationSettings.total,
-  ]);
+  const showPaginationControls =
+    isPaginationEnabled && (paginationInfo.total ?? 0) > 0;
 
   const shouldRenderFooter =
     isRefreshData ||
     Boolean(paginationSummary) ||
-    (isPaginationEnabled && paginationInfo.pages > 1);
+    (showPaginationControls && paginationInfo.pages > 1);
 
   return (
     <div className={clsx("w-full bg-content1", classNames.wrapper)}>
@@ -357,22 +393,25 @@ export default function DataTable<T = any>({
           <div className="flex items-center py-2 text-small text-default-500">
             {paginationSummary}
             {isRefreshData && (
-              <button
-                type="button"
-                aria-label="Refresh data"
-                className="ml-2 inline-flex items-center rounded p-1 transition-colors hover:bg-default-100"
-                onClick={handleRefresh}
-              >
-                <RefreshCw className="h-4 w-4 text-default-500 hover:text-primary" />
-              </button>
+              <Tooltip content="Refresh data">
+                <button
+                  type="button"
+                  aria-label="Refresh data"
+                  className="ml-2 inline-flex items-center rounded p-1 transition-colors hover:bg-default-100"
+                  onClick={onRefresh}
+                >
+                  <RefreshCw className="h-4 w-4 text-default-500 hover:text-primary" />
+                </button>
+              </Tooltip>
             )}
           </div>
 
-          {isPaginationEnabled && paginationInfo.pages > 1 && (
+          {showPaginationControls && (
             <PaginationComponent
               page={paginationInfo.currentPage}
               pageSize={paginationInfo.pageSize}
               pages={paginationInfo.pages}
+              pageSizeOptions={paginationDefault.pageSizeOptions}
               onChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
             />

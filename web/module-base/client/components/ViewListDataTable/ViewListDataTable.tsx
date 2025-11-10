@@ -43,13 +43,17 @@ export default function ViewListDataTable<T = any>(
   // Fetch data using react-query
   const {
     data: dataSource,
+    total,
     isLoading,
+    isFetching,
     error: fetchError,
+    refresh,
   } = useViewListDataTableQueries<T>({
     model,
     isDummyData,
     // enabled: !propDataSource, // Only fetch if dataSource is not provided as prop
   });
+
   const filterOptions = useMemo<FilterOption<T>[]>(() => {
     return [];
   }, []);
@@ -135,7 +139,7 @@ export default function ViewListDataTable<T = any>(
 
   // Prepare columns list with only visible columns
   const displayColumns = useMemo(() => {
-    return columns.filter((col) => store.visibleColumns.has(col.key));
+    return columns.filter((col: any) => store.visibleColumns.has(col.key));
   }, [columns, store.visibleColumns]);
 
   // Render
@@ -189,9 +193,11 @@ export default function ViewListDataTable<T = any>(
         {/* Table */}
         <DataTable
           {...dataTableProps}
+          total={total}
           columns={displayColumns}
           dataSource={processedData}
-          loading={isLoading || dataTableProps.loading}
+          loading={isLoading || isFetching || dataTableProps.loading}
+          onRefresh={refresh}
         />
       </CardBody>
     </Card>

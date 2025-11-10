@@ -186,6 +186,7 @@ export default function ModelsListPage() {
       ? t("table.empty.search")
       : t("table.empty.default"));
 
+  console.log("filteredModels", filteredModels);
   return (
     <Card>
       <CardBody className="flex flex-col gap-4">
@@ -203,17 +204,6 @@ export default function ModelsListPage() {
               onClear={() => setSearchTerm("")}
               onValueChange={setSearchTerm}
             />
-            <Button
-              color="primary"
-              size="sm"
-              title={actionsT("refresh")}
-              variant="flat"
-              onPress={handleRefresh}
-              isLoading={loading}
-              isDisabled={loading || reloadModelMutation.isPending}
-            >
-              {actionsT("refresh")}
-            </Button>
           </div>
           <DataTable
             rowKey="key"
@@ -222,6 +212,8 @@ export default function ModelsListPage() {
             pagination={false}
             loading={loading}
             emptyContent={emptyStateMessage}
+            onRefresh={handleRefresh}
+            total={filteredModels.length}
           />
         </div>
         {toast && (

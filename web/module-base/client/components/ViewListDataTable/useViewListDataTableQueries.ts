@@ -30,21 +30,31 @@ export function useViewListDataTableQueries<T = any>({
         model: modelKey,
         params: {},
       });
+
       const dataResponse = response.data ?? [];
       if (response.total > 0) {
-        return dataResponse as T[];
+        return {
+          data: dataResponse as T[],
+          total: response.total,
+        };
       }
       if (isDummyData) {
-        return Array.from({ length: 4 }, (_, index) => ({})) as T[];
+        return {
+          data: Array.from({ length: 4 }, (_, index) => ({})) as T[],
+          total: 0,
+        };
       }
-      return [];
+      return { data: [], total: 0 };
     },
     enabled: !!modelKey,
   });
+  // No code required for "refest" as it provides no context or instructions.
+  // Allow consumers to refresh data manually using returned refetch
+  const refresh = () => dataQuery.refetch();
 
   return {
-    data: dataQuery.data ?? [],
-    dataQuery,
+    data: dataQuery.data?.data ?? [],
+    total: dataQuery.data?.total ?? 0,
     isLoading: dataQuery.isLoading,
     isFetching: dataQuery.isFetching,
     error: dataQuery.error
@@ -53,5 +63,6 @@ export function useViewListDataTableQueries<T = any>({
         : "Failed to fetch data"
       : null,
     queryKeys,
+    refresh,
   };
 }
