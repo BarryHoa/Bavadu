@@ -1,7 +1,7 @@
 "use client";
 
 import { NextIntlClientProvider } from "next-intl";
-
+const timeZone = "Asia/Ho_Chi_Minh";
 export default function ModuleI18nProvider({
   locale,
   messages,
@@ -12,7 +12,11 @@ export default function ModuleI18nProvider({
   children: React.ReactNode;
 }) {
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
+    <NextIntlClientProvider
+      locale={locale}
+      messages={messages}
+      timeZone={timeZone}
+    >
       {children}
     </NextIntlClientProvider>
   );

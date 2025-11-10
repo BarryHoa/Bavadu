@@ -20,12 +20,14 @@ import {
 import { useCallback, useMemo, useState } from "react";
 
 import { Tooltip } from "@heroui/react";
+import { useTranslations } from "next-intl";
 import PaginationComponent from "../Pagination/Pagination";
 import {
   PAGINATION_DEFAULT_PAGE_SIZE,
   PAGINATION_PAGE_SIZE_OPTIONS,
 } from "../Pagination/paginationConsts";
 import {
+  type DataTablePagination,
   type DataTableProps,
   type ProcessedDataTableColumn,
 } from "./DataTableInterface";
@@ -52,10 +54,15 @@ export default function DataTable<T = any>({
   onRefresh,
   ...rest
 }: DataTableProps<T>) {
+  const t = useTranslations("dataTable");
   /* Pagination */
   const isPaginationEnabled =
-    pagination !== false && typeof pagination === "object";
+    pagination && typeof pagination === "object" ? true : false;
   const total = Math.max(0, typeof totalProps === "number" ? totalProps : 0);
+
+  const paginationConfig = isPaginationEnabled
+    ? (pagination as DataTablePagination)
+    : undefined;
 
   const paginationDefault = useMemo(() => {
     if (!isPaginationEnabled) {
@@ -67,10 +74,10 @@ export default function DataTable<T = any>({
     }
 
     return {
-      page: pagination?.page ?? 1,
-      pageSize: pagination?.pageSize ?? PAGINATION_DEFAULT_PAGE_SIZE,
+      page: paginationConfig?.page ?? 1,
+      pageSize: paginationConfig?.pageSize ?? PAGINATION_DEFAULT_PAGE_SIZE,
       pageSizeOptions:
-        pagination?.pageSizeOptions ?? PAGINATION_PAGE_SIZE_OPTIONS,
+        paginationConfig?.pageSizeOptions ?? PAGINATION_PAGE_SIZE_OPTIONS,
     };
   }, []);
 
@@ -289,15 +296,11 @@ export default function DataTable<T = any>({
   const paginationSummary = useMemo(() => {
     const rowsTotal = paginationInfo.total ?? 0;
 
-    if (rowsTotal === 0) {
-      return "Showing 0 to 0 of 0 entries";
-    }
-
     const from = Math.min(paginationInfo.from + 1, rowsTotal);
     const to = Math.min(paginationInfo.to, rowsTotal);
 
-    return `Showing ${from} to ${to} of ${rowsTotal} entries`;
-  }, [paginationInfo.from, paginationInfo.to, paginationInfo.total]);
+    return t("summary", { from, to, total: rowsTotal });
+  }, [paginationInfo.from, paginationInfo.to, paginationInfo.total, t]);
 
   const showPaginationControls =
     isPaginationEnabled && (paginationInfo.total ?? 0) > 0;
@@ -307,11 +310,15 @@ export default function DataTable<T = any>({
     Boolean(paginationSummary) ||
     (showPaginationControls && paginationInfo.pages > 1);
 
+  const refreshLabel = t("refresh");
+  const resolvedEmptyContent = emptyContent ?? t("empty");
+  const loadingLabel = t("loading");
+
   return (
     <div className={clsx("w-full bg-content1", classNames.wrapper)}>
       <div className="flex flex-1 flex-col gap-4">
         <Table
-          aria-label="Data table"
+          aria-label={t("ariaLabel")}
           {...(tableSelectionProps ?? {})}
           isHeaderSticky
           isStriped
@@ -350,10 +357,10 @@ export default function DataTable<T = any>({
             ))}
           </TableHeader>
           <TableBody
-            emptyContent={emptyContent}
+            emptyContent={resolvedEmptyContent}
             isLoading={loading}
             items={dataSource}
-            loadingContent={<Spinner label="Loading..." />}
+            loadingContent={<Spinner label={loadingLabel} />}
           >
             {(item: T) => {
               const index = dataSource.indexOf(item);
@@ -393,10 +400,10 @@ export default function DataTable<T = any>({
           <div className="flex items-center py-2 text-small text-default-500">
             {paginationSummary}
             {isRefreshData && (
-              <Tooltip content="Refresh data">
+              <Tooltip content={refreshLabel}>
                 <button
                   type="button"
-                  aria-label="Refresh data"
+                  aria-label={refreshLabel}
                   className="ml-2 inline-flex items-center rounded p-1 transition-colors hover:bg-default-100"
                   onClick={onRefresh}
                 >
