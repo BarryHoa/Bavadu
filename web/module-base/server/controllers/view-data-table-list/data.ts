@@ -6,10 +6,10 @@ export async function POST(request: NextRequest) {
   // get body and validate
   const body = await request.json();
 
-  const { modelId, params } = body ?? {};
+  const { model, params } = body ?? {};
 
   return await getModuleQueryByModel({
-    modelId,
+    model,
     modelMethod: "getViewDataList",
     params,
   });

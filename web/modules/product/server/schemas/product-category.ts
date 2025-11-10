@@ -25,12 +25,12 @@ export const table_product_category = pgTable(
     createdBy: varchar("created_by", { length: 36 }), // uuid user id
     updatedBy: varchar("updated_by", { length: 36 }), // uuid user id
   },
-  (table) => ({
-    parentReference: foreignKey({
+  (table) => [
+    foreignKey({
       columns: [table.parentId],
       foreignColumns: [table.id],
     }),
-  })
+  ]
 );
 
 export type TblProductCategory = typeof table_product_category.$inferSelect;

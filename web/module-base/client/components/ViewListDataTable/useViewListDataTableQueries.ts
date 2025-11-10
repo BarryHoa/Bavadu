@@ -4,10 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import ViewListDataTableService from "../../services/ViewListDataTableService";
 
-type ModelId = string;
-
 interface UseViewListDataTableQueriesOptions<T = any> {
-  model: ModelId;
+  model: string;
   isDummyData?: boolean;
 }
 
@@ -17,11 +15,11 @@ export function useViewListDataTableQueries<T = any>({
 }: UseViewListDataTableQueriesOptions<T>) {
   const service = useMemo(() => new ViewListDataTableService(), []);
 
-  // Validate modelId format (should be module.model)
-  const modelId = model;
+  // Validate model format (should be module.model)
+  const modelKey = model;
 
   const queryKeys = {
-    data: ["viewListDataTable", "data", modelId] as const,
+    data: ["viewListDataTable", "data", modelKey] as const,
   };
 
   // Fetch data
@@ -29,7 +27,7 @@ export function useViewListDataTableQueries<T = any>({
     queryKey: queryKeys.data,
     queryFn: async () => {
       const response = await service.getData({
-        modelId,
+        model: modelKey,
         params: {},
       });
       const dataResponse = response.data ?? [];
@@ -41,7 +39,7 @@ export function useViewListDataTableQueries<T = any>({
       }
       return [];
     },
-    enabled: !!model,
+    enabled: !!modelKey,
   });
 
   return {

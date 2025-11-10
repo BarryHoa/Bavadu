@@ -58,5 +58,14 @@
         "handler": "/heath/ping"
       }
     ]
+  },
+  {
+    "path": "/utils",
+    "routes": [
+      {
+        "path": "/check-duplicate",
+        "handler": "/utils/check-duplicate"
+      }
+    ]
   }
 ]

@@ -2,7 +2,7 @@ import { ListParamsResponse } from "@base/server/models/interfaces/ListInterface
 import ClientHttpService from "./ClientHttpService";
 
 type DataTableParams = {
-  modelId: string;
+  model: string;
   params: any;
 };
 

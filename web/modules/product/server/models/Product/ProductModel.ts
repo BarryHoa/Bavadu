@@ -21,7 +21,7 @@ import {
 
 class ProductModel extends BaseModel implements ProductModelInterface {
   constructor() {
-    super();
+    super(table_product_variant);
   }
 
   private mapToMasterProduct(dbProduct: TblProductMaster): MasterProduct {

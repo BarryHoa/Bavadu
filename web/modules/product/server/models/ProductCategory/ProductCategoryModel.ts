@@ -38,7 +38,7 @@ export interface ProductCategoryInput {
 
 export default class ProductCategoryModel extends BaseModel {
   constructor() {
-    super();
+    super(table_product_category);
   }
 
   getViewDataList = async (
