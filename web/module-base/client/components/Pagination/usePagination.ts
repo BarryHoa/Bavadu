@@ -1,9 +1,9 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   PAGINATION_DEFAULT_PAGE_SIZE,
   PAGINATION_PAGE_SIZE_OPTIONS,
-} from "./pagginationConts";
+} from "./paginationConsts";
 
 export interface UsePaginationProps {
   pageSizeOptions?: number[];
@@ -13,7 +13,7 @@ export interface UsePaginationProps {
   onChange?: (params: { page: number; pageSize: number }) => void;
 }
 
-export interface UsePaginationReturn<T = any> {
+export interface UsePaginationReturn {
   // Current state
   currentPage: number;
   pageSize: number;
@@ -37,87 +37,113 @@ export default function usePagination({
   total = 0,
   onChange,
 }: UsePaginationProps): UsePaginationReturn {
-  const [currentPage, setCurrentPage] = useState(defaultPage);
-  const [pageSize, setPageSize] = useState(defaultPageSize);
-  const pageSizeBefore = useMemo(() => {
+  const resolvePageSize = useCallback(() => {
+    if (pageSizeOptions.length === 0) {
+      return PAGINATION_DEFAULT_PAGE_SIZE;
+    }
+
     return pageSizeOptions.includes(defaultPageSize)
       ? defaultPageSize
-      : pageSizeOptions[0] || PAGINATION_DEFAULT_PAGE_SIZE;
+      : pageSizeOptions[0];
   }, [defaultPageSize, pageSizeOptions]);
 
-  // Calculate total pages
+  const [pageSize, setPageSize] = useState(resolvePageSize);
+
+  useEffect(() => {
+    const nextPageSize = resolvePageSize();
+
+    if (nextPageSize !== pageSize) {
+      setPageSize(nextPageSize);
+    }
+  }, [pageSize, resolvePageSize]);
+
+  const safeTotal = Math.max(0, total);
+
   const pages = useMemo(() => {
-    return Math.ceil(total / pageSizeBefore) || 1;
-  }, [total, pageSizeBefore]);
+    return Math.max(1, Math.ceil(safeTotal / pageSize));
+  }, [pageSize, safeTotal]);
 
-  const currentPageBefore = useMemo(() => {
-    if (defaultPage > pages) {
-      return pages;
-    }
+  const clampPage = useCallback(
+    (value: number) => {
+      if (Number.isNaN(value) || !Number.isFinite(value)) {
+        return 1;
+      }
 
-    return defaultPage;
-  }, [defaultPage]);
+      return Math.min(Math.max(1, Math.trunc(value)), pages);
+    },
+    [pages],
+  );
+
+  const [currentPage, setCurrentPage] = useState(() =>
+    clampPage(defaultPage),
+  );
 
   useEffect(() => {
-    // update for page size
-    if (pageSizeBefore !== pageSize) {
-      setPageSize(pageSizeBefore);
+    const nextPage = clampPage(defaultPage);
+
+    if (nextPage !== currentPage) {
+      setCurrentPage(nextPage);
     }
-  }, [pageSizeBefore]);
+  }, [clampPage, currentPage, defaultPage]);
 
   useEffect(() => {
-    // update for current page
-    if (currentPageBefore !== currentPage) {
-      setPageSize(currentPageBefore);
+    const nextPage = clampPage(currentPage);
+
+    if (nextPage !== currentPage) {
+      setCurrentPage(nextPage);
     }
-  }, [currentPageBefore]);
-
-  // Check if has next/prev page
-  const hasNextPage = useMemo(() => {
-    return currentPage < pages;
-  }, [currentPage, pages]);
-
-  const hasPrevPage = useMemo(() => {
-    return currentPage > 1;
-  }, [currentPage]);
+  }, [clampPage, currentPage]);
 
   const from = useMemo(() => {
     return (currentPage - 1) * pageSize;
   }, [currentPage, pageSize]);
 
   const to = useMemo(() => {
-    return Math.min(from + pageSize, total);
-  }, [from, pageSize, total]);
+    return Math.min(from + pageSize, safeTotal);
+  }, [from, pageSize, safeTotal]);
+
+  const hasNextPage = currentPage < pages;
+  const hasPrevPage = currentPage > 1;
 
   const handleChangePage = useCallback(
-    (page: number) => {
-      if (page > pages || page < 1) {
-        setCurrentPage(pages);
+    (value: number) => {
+      const nextPage = clampPage(value);
 
-        return pages;
+      if (nextPage !== currentPage) {
+        setCurrentPage(nextPage);
       }
-      setCurrentPage(page);
 
-      return page;
+      return nextPage;
     },
-    [pages],
+    [clampPage, currentPage],
   );
+
   const handleChangePageSize = useCallback(
-    (pageSize: number) => {
-      if (!pageSizeOptions.includes(pageSize)) {
-        setPageSize(pageSizeOptions[0]);
+    (value: number) => {
+      const nextPageSize = pageSizeOptions.includes(value)
+        ? value
+        : resolvePageSize();
 
-        return pageSizeOptions[0];
+      if (nextPageSize !== pageSize) {
+        setPageSize(nextPageSize);
       }
-      setPageSize(pageSize);
 
-      return pageSize;
+      return nextPageSize;
     },
-    [pageSizeOptions],
+    [pageSize, pageSizeOptions, resolvePageSize],
   );
+
   const resetPage = useCallback(() => {
     setCurrentPage(1);
-  }, [currentPage]);
+  }, []);
+
+  useEffect(() => {
+    if (!onChange) {
+      return;
+    }
+
+    onChange({ page: currentPage, pageSize });
+  }, [currentPage, onChange, pageSize]);
 
   return {
     // State

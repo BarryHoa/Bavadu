@@ -1,15 +1,17 @@
-import { Pagination } from "@heroui/pagination";
+import { Button } from "@heroui/button";
 import {
   Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
   DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
 } from "@heroui/dropdown";
-import { Button } from "@heroui/button";
+import { Pagination } from "@heroui/pagination";
+import type { Key, SVGProps } from "react";
+import { useCallback, useMemo } from "react";
 
-import { PAGINATION_PAGE_SIZE_OPTIONS } from "./pagginationConts";
+import { PAGINATION_PAGE_SIZE_OPTIONS } from "./paginationConsts";
 
-export const ChevronIcon = (props: React.SVGProps<SVGSVGElement>) => {
+export const ChevronIcon = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       aria-hidden="true"
@@ -33,47 +35,56 @@ export const ChevronIcon = (props: React.SVGProps<SVGSVGElement>) => {
 };
 
 export default function PaginationComponent({
-  total,
+  pages,
   page,
   pageSize,
   onChange,
   onPageSizeChange,
 }: {
-  total: number;
+  pages: number;
   page: number;
   pageSize: number;
   onChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
 }) {
-  const handlePageSizeChange = (key: any) => {
-    const selectedValue = Number(key);
+  const selectedKeys = useMemo(() => new Set([String(pageSize)]), [pageSize]);
 
-    onPageSizeChange(selectedValue);
-  };
+  const handlePageSizeChange = useCallback(
+    (key: Key) => {
+      const selectedValue = Number(key);
+
+      if (!Number.isNaN(selectedValue)) {
+        onPageSizeChange(selectedValue);
+      }
+    },
+    [onPageSizeChange]
+  );
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-3">
       <Pagination
         disableCursorAnimation
         isCompact
         showControls
-        className="gap-2"
+        size="sm"
+        className="gap-3"
         classNames={{
-          base: "overflow-hidden",
-          wrapper: "gap-0 h-8 rounded-sm border border-divider",
-          item: "w-8 h-8 text-small rounded-none bg-transparent",
-          next: "w-8 h-8 text-small rounded-none bg-transparent",
-          prev: "w-8 h-8 text-small rounded-none bg-transparent",
-          cursor: "w-8 h-8 text-small rounded-none bg-transparent",
+          base: "items-center",
+          wrapper: "gap-1",
+          item: "w-8 h-8 text-small font-medium text-primary flex items-center justify-center rounded-full bg-transparent data-[hover=true]:bg-primary-50 data-[hover=true]:text-primary",
+          next: "w-8 h-8 text-small text-default-500 flex items-center justify-center rounded-full border border-transparent data-[hover=true]:border-primary data-[hover=true]:text-primary",
+          prev: "w-8 h-8 text-small text-default-500 flex items-center justify-center rounded-full border border-transparent data-[hover=true]:border-primary data-[hover=true]:text-primary",
+          cursor:
+            "w-8 h-8 text-small font-semibold text-primary flex items-center justify-center rounded-full border border-primary bg-primary-50 shadow-none",
         }}
         page={page}
-        total={total}
+        total={pages}
         onChange={onChange}
       />
       <Dropdown placement="top">
         <DropdownTrigger>
           <Button
-            className="min-w-[80px] h-8"
+            className="min-w-[90px] h-8 text-small font-medium"
             endContent={<ChevronIcon className="text-small rotate-90" />}
             size="sm"
             variant="bordered"
@@ -84,12 +95,12 @@ export default function PaginationComponent({
         <DropdownMenu
           aria-label="Page size selection"
           className="min-w-[60px]"
-          selectedKeys={[String(pageSize)]}
+          selectedKeys={selectedKeys}
           selectionMode="single"
           onSelectionChange={(keys) => {
-            const selectedKey = Array.from(keys)[0];
+            const [selectedKey] = Array.from(keys);
 
-            if (selectedKey) {
+            if (selectedKey != null) {
               handlePageSizeChange(selectedKey);
             }
           }}

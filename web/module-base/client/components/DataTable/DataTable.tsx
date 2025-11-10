@@ -12,15 +12,20 @@ import {
 } from "@heroui/table";
 import type { SortDescriptor } from "@react-types/shared";
 import clsx from "clsx";
-import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
+  RefreshCw,
+} from "lucide-react";
 import type { ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 
+import PaginationComponent from "../Pagination/Pagination";
 import {
   PAGINATION_DEFAULT_PAGE_SIZE,
   PAGINATION_PAGE_SIZE_OPTIONS,
-} from "../Pagination/pagginationConts";
-import PaginationComponent from "../Pagination/Pagination";
+} from "../Pagination/paginationConsts";
 import usePagination from "../Pagination/usePagination";
 import {
   type DataTableColumnDefinition,
@@ -39,10 +44,12 @@ export interface DataTableSummary {
 export type DataTableProps<T = any> = TableProps & {
   columns: DataTableColumnDefinition<T>[];
   dataSource: T[];
+  total?: number;
   rowKey?: string;
   tableLayout?: "auto" | "fixed";
   isResizableColumns?: boolean;
   isDraggableColumns?: boolean;
+  isRefreshData?: boolean;
 
   // Pagination
   pagination?:
@@ -50,7 +57,6 @@ export type DataTableProps<T = any> = TableProps & {
         pageSize?: number;
         pageSizeOptions?: number[];
         page?: number;
-        total?: number;
         showTotal?: boolean;
       }
     | false;
@@ -73,7 +79,6 @@ export type DataTableProps<T = any> = TableProps & {
   }) => void;
 
   // Styling
-  className?: string;
   classNames?: {
     wrapper?: string;
     table?: string;
@@ -94,6 +99,7 @@ export type DataTableProps<T = any> = TableProps & {
 export default function DataTable<T = any>({
   columns,
   dataSource,
+  total: totalProps = 0,
   rowKey = "id",
   pagination = { pageSize: PAGINATION_DEFAULT_PAGE_SIZE, page: 1 },
   loading = false,
@@ -101,36 +107,69 @@ export default function DataTable<T = any>({
   summary,
   rowSelection = false,
   onChangeTable,
-  className = "",
   classNames = {},
   emptyContent = "No data available",
   tableLayout = "auto",
   isResizableColumns = true,
   isDraggableColumns = true,
+  isRefreshData = true,
   ...rest
 }: DataTableProps<T>) {
-  const isPagination = pagination && typeof pagination === "object";
+  const total = typeof totalProps === "number" ? totalProps : 0;
   const processedColumns = useColumns(columns);
-
-  const paginationInfo = usePagination({
-    pageSizeOptions: isPagination
-      ? pagination?.pageSizeOptions
-      : PAGINATION_PAGE_SIZE_OPTIONS,
-    defaultPageSize: isPagination
-      ? pagination?.pageSize
-      : PAGINATION_DEFAULT_PAGE_SIZE,
-    defaultPage: isPagination ? pagination?.page : 1,
-    total: isPagination ? pagination?.total || 0 : 0,
-  });
-
-  // const [currentPage, setCurrentPage] = useState(currentPage);
   const [sortDescriptor, setSortDescriptor] = useState<
     SortDescriptor | undefined
   >(undefined);
 
-  // Get current page data
+  const notifyTableChange = useCallback(
+    (page: number, pageSize: number) => {
+      if (!onChangeTable) {
+        return;
+      }
 
-  const isExistRowKey = useMemo(() => {
+      onChangeTable({
+        page,
+        pageSize,
+        sortColumn: sortDescriptor?.column?.toString(),
+        sortDirection: sortDescriptor?.direction,
+      });
+    },
+    [onChangeTable, sortDescriptor]
+  );
+
+  const isPaginationEnabled =
+    pagination && typeof pagination === "object" ? true : false;
+
+  const paginationSettings = useMemo(() => {
+    if (!isPaginationEnabled || !pagination) {
+      return {
+        pageSizeOptions: PAGINATION_PAGE_SIZE_OPTIONS,
+        defaultPageSize: PAGINATION_DEFAULT_PAGE_SIZE,
+        defaultPage: 1,
+        total: 0,
+      };
+    }
+
+    return {
+      pageSizeOptions:
+        pagination.pageSizeOptions ?? PAGINATION_PAGE_SIZE_OPTIONS,
+      defaultPageSize:
+        pagination.pageSize ??
+        pagination.pageSizeOptions?.[0] ??
+        PAGINATION_DEFAULT_PAGE_SIZE,
+      defaultPage: pagination.page ?? 1,
+      total,
+    };
+  }, [isPaginationEnabled, pagination, total]);
+
+  const paginationInfo = usePagination({
+    ...paginationSettings,
+    onChange: isPaginationEnabled
+      ? ({ page, pageSize }) => notifyTableChange(page, pageSize)
+      : undefined,
+  });
+
+  const isExistingRowKey = useMemo(() => {
     return (
       typeof rowKey === "string" && rowKey in ((dataSource?.[0] as any) ?? {})
     );
@@ -139,7 +178,7 @@ export default function DataTable<T = any>({
   // Get row key
   const getRowKey = useCallback(
     (record: T, index: number) => {
-      if (isExistRowKey) {
+      if (isExistingRowKey) {
         const val = (record as any)[rowKey];
 
         if (typeof val === "string" || typeof val === "number") {
@@ -149,41 +188,25 @@ export default function DataTable<T = any>({
 
       return index;
     },
-    [rowKey, isExistRowKey]
+    [rowKey, isExistingRowKey]
   );
 
   // Handle page change
   const handlePageChange = useCallback(
     (page: number) => {
       const newPage = paginationInfo.handleChangePage(page);
-
-      if (onChangeTable) {
-        onChangeTable({
-          page: newPage,
-          pageSize: paginationInfo.pageSize,
-          sortColumn: sortDescriptor?.column?.toString(),
-          sortDirection: sortDescriptor?.direction,
-        });
-      }
+      notifyTableChange(newPage, paginationInfo.pageSize);
     },
-    [paginationInfo, sortDescriptor, onChangeTable]
+    [notifyTableChange, paginationInfo]
   );
 
   // Handle page size change
   const handlePageSizeChange = useCallback(
     (pageSize: number) => {
       const newPageSize = paginationInfo.handleChangePageSize(pageSize);
-
-      if (onChangeTable) {
-        onChangeTable({
-          page: paginationInfo.currentPage,
-          pageSize: newPageSize,
-          sortColumn: sortDescriptor?.column?.toString(),
-          sortDirection: sortDescriptor?.direction,
-        });
-      }
+      notifyTableChange(paginationInfo.currentPage, newPageSize);
     },
-    [paginationInfo, sortDescriptor, onChangeTable]
+    [notifyTableChange, paginationInfo]
   );
 
   const tableSelectionProps = useDataTableSelection(
@@ -195,85 +218,121 @@ export default function DataTable<T = any>({
   const handleSortChange = useCallback(
     (descriptor: SortDescriptor) => {
       setSortDescriptor(descriptor);
-
-      if (onChangeTable) {
-        onChangeTable({
-          page: paginationInfo.currentPage,
-          pageSize: paginationInfo.pageSize,
-          sortColumn: descriptor?.column?.toString(),
-          sortDirection: descriptor?.direction,
-        });
-      }
+      notifyTableChange(paginationInfo.currentPage, paginationInfo.pageSize);
     },
-    [onChangeTable, paginationInfo.currentPage, paginationInfo.pageSize]
+    [notifyTableChange, paginationInfo.currentPage, paginationInfo.pageSize]
+  );
+
+  const toggleSortForColumn = useCallback(
+    (col: ProcessedDataTableColumn<T>) => {
+      if (!col.sortable) {
+        return;
+      }
+
+      const isSameColumn = sortDescriptor?.column === col.key;
+      const nextDirection =
+        !isSameColumn || sortDescriptor?.direction === "descending"
+          ? "ascending"
+          : "descending";
+
+      handleSortChange({
+        column: col.key,
+        direction: nextDirection,
+      });
+    },
+    [handleSortChange, sortDescriptor]
+  );
+
+  const sortIcons = useMemo(
+    () => ({
+      default: (
+        <ChevronsUpDown className="h-3.5 w-3.5 opacity-70" aria-hidden />
+      ),
+      ascending: <ChevronUp className="h-3.5 w-3.5 opacity-90" aria-hidden />,
+      descending: (
+        <ChevronDown className="h-3.5 w-3.5 opacity-90" aria-hidden />
+      ),
+    }),
+    []
   );
 
   const renderTitleHeader = useCallback(
     (col: ProcessedDataTableColumn<T>) => {
-      const isSortable = col.sortable;
-      const sortDirection = sortDescriptor?.direction as
+      const isSortable = Boolean(col.sortable);
+      const isResizable = col.isResizable ?? isResizableColumns;
+      const isDraggable = col.isDraggable ?? isDraggableColumns;
+      const isSorted = sortDescriptor?.column === col.key;
+      const direction = (isSorted ? sortDescriptor?.direction : "default") as
         | "ascending"
         | "descending"
         | "default";
-      const isSorted = sortDescriptor?.column === col.key;
-      const sortIcon = {
-        default: (
-          <ChevronsUpDown className="h-3.5 w-3.5 opacity-70" aria-hidden />
-        ),
-        ascending: <ChevronUp className="h-3.5 w-3.5 opacity-90" aria-hidden />,
-        descending: (
-          <ChevronDown className="h-3.5 w-3.5 opacity-90" aria-hidden />
-        ),
-      };
-
-      const isResizable = col.isResizable ?? isResizableColumns;
-      const isDraggable = col.isDraggable ?? isDraggableColumns;
 
       return (
-        <div className="inline-flex items-center w-full h-full">
-          {/** Drag handle */}
-          {/* <span className="inline-flex items-center w-2 h-full hover:bg-warning-400 hover:cursor-col-drag"></span> */}
+        <div className="inline-flex h-full w-full items-center">
           <span
             className={clsx(
-              "inline-flex items-center w-full px-2",
-              isSortable && "cursor-pointer"
+              "inline-flex w-full items-center px-2",
+              isSortable && "cursor-pointer select-none"
             )}
-            onClick={() => {
-              if (isSortable) {
-                handleSortChange({
-                  column: col.key,
-                  direction:
-                    sortDirection === "ascending" ? "descending" : "ascending",
-                });
-              }
-            }}
+            onClick={() => toggleSortForColumn(col)}
+            role={isSortable ? "button" : undefined}
+            tabIndex={isSortable ? 0 : -1}
           >
-            <span className="text-nowrap mr-2">
+            <span className="mr-2 text-nowrap">
               {col.label ?? col.title ?? ""}
             </span>
-            {/** Sort icon */}
             {isSortable ? (
               <span className="inline-flex items-center justify-end">
-                {isSorted
-                  ? (sortIcon[sortDirection] ?? sortIcon.default)
-                  : sortIcon.default}
+                {sortIcons[direction] ?? sortIcons.default}
               </span>
             ) : null}
           </span>
 
-          {/** Resize handle */}
-          {isResizable ? (
-            <span className="inline-flex hover:bg-warning-400/50 hover:cursor-col-resize w-2 h-full"></span>
-          ) : null}
+          {isResizable && (
+            <span className="inline-flex h-full w-2 hover:cursor-col-resize hover:bg-warning-400/50" />
+          )}
         </div>
       );
     },
-    [sortDescriptor]
+    [
+      isDraggableColumns,
+      isResizableColumns,
+      sortDescriptor,
+      sortIcons,
+      toggleSortForColumn,
+    ]
   );
 
+  const handleRefresh = useCallback(() => {
+    notifyTableChange(paginationInfo.currentPage, paginationInfo.pageSize);
+  }, [notifyTableChange, paginationInfo.currentPage, paginationInfo.pageSize]);
+
+  const paginationSummary = useMemo(() => {
+    if (!isPaginationEnabled || !pagination) {
+      return null;
+    }
+
+    const showTotal = pagination.showTotal ?? true;
+    if (!showTotal) {
+      return null;
+    }
+
+    const from = paginationInfo.from + 1;
+    const to = paginationInfo.to;
+    const rowsTotal = paginationSettings.total;
+
+    return `Showing ${Math.min(from, rowsTotal)} to ${to} of ${rowsTotal} entries`;
+  }, [
+    isPaginationEnabled,
+    pagination,
+    paginationInfo.from,
+    paginationInfo.to,
+    paginationSettings.total,
+  ]);
+
   return (
-    <div className={`w-full bg-content1 ${classNames.wrapper || ""}`}>
-      <div className="flex flex-col gap-4 flex-1">
+    <div className={clsx("w-full bg-content1", classNames.wrapper)}>
+      <div className="flex flex-1 flex-col gap-4">
         <Table
           aria-label="Data table"
           {...(tableSelectionProps ?? {})}
@@ -281,15 +340,16 @@ export default function DataTable<T = any>({
           isStriped
           isCompact
           layout={tableLayout}
-          // bottomContent={bottomContent}
-          className={className}
           classNames={{
             ...classNames,
-            tbody: "overflow-x-auto",
-            wrapper: "p-2 rounded-none",
-            th: "bg-primary-600 text-white hover:bg-primary-700/80 px-0",
-            tr: "hover:bg-primary-700/10 ",
-            td: "rounded-none",
+            tbody: clsx("overflow-x-auto", classNames.tbody),
+            wrapper: clsx("rounded-none p-2", classNames.wrapper),
+            th: clsx(
+              "px-0 bg-primary-600 text-white hover:bg-primary-700/80",
+              classNames.th
+            ),
+            tr: clsx("hover:bg-primary-700/10", classNames.tr),
+            td: clsx("rounded-none", classNames.td),
           }}
           // sortDescriptor={sortDescriptor}
           // onSortChange={handleSortChange}
@@ -329,7 +389,10 @@ export default function DataTable<T = any>({
                       style={col.frozenStyle}
                     >
                       <div
-                        className={clsx(`flex justify-${col.align || "start"}`)}
+                        className={clsx(
+                          "flex",
+                          `justify-${col.align || "start"}`
+                        )}
                       >
                         {col.renderValue(item, index)}
                       </div>
@@ -341,29 +404,37 @@ export default function DataTable<T = any>({
           </TableBody>
         </Table>
       </div>
-      {isPagination && paginationInfo.pages > 1 && (
-        <div
-          className={`px-2 flex flex-col sm:flex-row justify-between items-center ${classNames.pagination || ""}`}
-        >
-          <div className="text-small text-default-500 py-2">
-            {isPagination && pagination.showTotal && (
-              <span>
-                Showing{" "}
-                {(paginationInfo.from + 1) * paginationInfo.pageSize + 1} to{" "}
-                {paginationInfo.to}
-                of {pagination.total} entries
-              </span>
-            )}
-          </div>
+
+      <div
+        className={clsx(
+          "flex flex-col items-center justify-between px-2 sm:flex-row",
+          classNames.pagination
+        )}
+      >
+        <div className="flex items-center py-2 text-small text-default-500">
+          {paginationSummary}
+          {isRefreshData && (
+            <button
+              type="button"
+              aria-label="Refresh data"
+              className="ml-2 inline-flex items-center rounded p-1 transition-colors hover:bg-default-100"
+              onClick={handleRefresh}
+            >
+              <RefreshCw className="h-4 w-4 text-default-500 hover:text-primary" />
+            </button>
+          )}
+        </div>
+
+        {isPaginationEnabled && paginationInfo.pages > 1 && (
           <PaginationComponent
             page={paginationInfo.currentPage}
             pageSize={paginationInfo.pageSize}
-            total={paginationInfo.pages}
+            pages={paginationInfo.pages}
             onChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
           />
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
