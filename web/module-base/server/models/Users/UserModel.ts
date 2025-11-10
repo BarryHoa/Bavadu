@@ -4,7 +4,7 @@ import { getEnv } from "../..";
 import { table_user } from "../../schemas/user";
 import { BaseModel } from "../BaseModel";
 
-class UserModel extends BaseModel {
+class UserModel extends BaseModel<typeof table_user> {
   constructor() {
     super(table_user);
   }
@@ -17,7 +17,7 @@ class UserModel extends BaseModel {
     const user = await db
       .select()
       .from(this.table)
-      .where(eq(table_user.id, id));
+      .where(eq(this.table.id, id));
     return user[0];
   };
 }

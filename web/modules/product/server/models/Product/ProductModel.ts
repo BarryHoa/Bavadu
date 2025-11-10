@@ -6,20 +6,20 @@ import {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
-import { table_product_category, table_unit_of_measure } from "../../schemas";
+import {
+  table_product_category,
+  table_product_variant,
+  table_unit_of_measure,
+} from "../../schemas";
 import {
   table_product_master,
   TblProductMaster,
 } from "../../schemas/product-master";
-import { table_product_variant } from "../../schemas/product-variant";
-import { MasterProduct } from "../interfaces/ProductMaster";
-import {
-  ProductFilter,
-  ProductModelInterface,
-  ProductVariantElm,
-} from "./ProductModelInterface";
 
-class ProductModel extends BaseModel implements ProductModelInterface {
+import { MasterProduct } from "../interfaces/ProductMaster";
+import { ProductFilter, ProductVariantElm } from "./ProductModelInterface";
+
+class ProductModel extends BaseModel<typeof table_product_variant> {
   constructor() {
     super(table_product_variant);
   }
@@ -41,20 +41,20 @@ class ProductModel extends BaseModel implements ProductModelInterface {
     };
   }
 
-  getProductById = async (id: string): Promise<MasterProduct | null> => {
+  getProductById = async (id: string): Promise<Record<string, any> | null> => {
     const env = getEnv();
     const products = await env
       .getDb()
       .select()
-      .from(table_product_master)
-      .where(eq(table_product_master.id, id))
+      .from(this.table)
+      .where(eq(this.table.id, id))
       .limit(1);
 
     if (products.length === 0) {
       return null;
     }
 
-    return this.mapToMasterProduct(products[0]);
+    return products[0] as unknown as MasterProduct;
   };
 
   //handle for view data table list
@@ -71,14 +71,14 @@ class ProductModel extends BaseModel implements ProductModelInterface {
     const products = await db
       .select({
         // Product variant fields
-        id: table_product_variant.id,
-        name: table_product_variant.name,
-        description: table_product_variant.description,
-        sku: table_product_variant.sku,
-        barcode: table_product_variant.barcode,
-        manufacturer: table_product_variant.manufacturer,
-        images: table_product_variant.images,
-        isActive: table_product_variant.isActive,
+        id: this.table.id,
+        name: this.table.name,
+        description: this.table.description,
+        sku: this.table.sku,
+        barcode: this.table.barcode,
+        manufacturer: this.table.manufacturer,
+        images: this.table.images,
+        isActive: this.table.isActive,
         // Product master fields (flat)
         productMasterId: table_product_master.id,
         productMasterName: table_product_master.name,
@@ -90,18 +90,18 @@ class ProductModel extends BaseModel implements ProductModelInterface {
         categoryId: table_product_category.id,
         categoryName: table_product_category.name,
         categoryCode: table_product_category.code,
-        baseUomId: table_product_variant.baseUomId,
+        baseUomId: this.table.baseUomId,
         baseUomName: table_unit_of_measure.name,
 
-        createdAt: table_product_variant.createdAt,
-        updatedAt: table_product_variant.updatedAt,
+        createdAt: this.table.createdAt,
+        updatedAt: this.table.updatedAt,
         // Total count using window function (same for all rows)
         total: sql<number>`count(*) over()::int`.as("total"),
       })
-      .from(table_product_variant)
+      .from(this.table)
       .innerJoin(
         table_product_master,
-        eq(table_product_variant.productMasterId, table_product_master.id)
+        eq(this.table.productMasterId, table_product_master.id)
       )
       .leftJoin(
         table_product_category,
@@ -109,7 +109,7 @@ class ProductModel extends BaseModel implements ProductModelInterface {
       )
       .leftJoin(
         table_unit_of_measure,
-        eq(table_product_variant.baseUomId, table_unit_of_measure.id)
+        eq(this.table.baseUomId, table_unit_of_measure.id)
       )
 
       .limit(limit)

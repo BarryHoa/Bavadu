@@ -36,7 +36,9 @@ export interface ProductCategoryInput {
   isActive?: boolean;
 }
 
-export default class ProductCategoryModel extends BaseModel {
+export default class ProductCategoryModel extends BaseModel<
+  typeof table_product_category
+> {
   constructor() {
     super(table_product_category);
   }
@@ -51,23 +53,20 @@ export default class ProductCategoryModel extends BaseModel {
 
     const categories = await db
       .select({
-        id: table_product_category.id,
-        code: table_product_category.code,
-        name: table_product_category.name,
-        description: table_product_category.description,
-        level: table_product_category.level,
-        isActive: table_product_category.isActive,
-        parentId: table_product_category.parentId,
+        id: this.table.id,
+        code: this.table.code,
+        name: this.table.name,
+        description: this.table.description,
+        level: this.table.level,
+        isActive: this.table.isActive,
+        parentId: this.table.parentId,
         parentName: parentCategory.name,
-        createdAt: table_product_category.createdAt,
-        updatedAt: table_product_category.updatedAt,
+        createdAt: this.table.createdAt,
+        updatedAt: this.table.updatedAt,
         total: sql<number>`count(*) over()::int`.as("total"),
       })
-      .from(table_product_category)
-      .leftJoin(
-        parentCategory,
-        eq(table_product_category.parentId, parentCategory.id)
-      )
+      .from(this.table)
+      .leftJoin(parentCategory, eq(this.table.parentId, parentCategory.id))
       .limit(limit)
       .offset(offset);
 
@@ -99,23 +98,20 @@ export default class ProductCategoryModel extends BaseModel {
 
     const result = await db
       .select({
-        id: table_product_category.id,
-        code: table_product_category.code,
-        name: table_product_category.name,
-        description: table_product_category.description,
-        level: table_product_category.level,
-        isActive: table_product_category.isActive,
-        parentId: table_product_category.parentId,
+        id: this.table.id,
+        code: this.table.code,
+        name: this.table.name,
+        description: this.table.description,
+        level: this.table.level,
+        isActive: this.table.isActive,
+        parentId: this.table.parentId,
         parentName: parentCategory.name,
-        createdAt: table_product_category.createdAt,
-        updatedAt: table_product_category.updatedAt,
+        createdAt: this.table.createdAt,
+        updatedAt: this.table.updatedAt,
       })
-      .from(table_product_category)
-      .leftJoin(
-        parentCategory,
-        eq(table_product_category.parentId, parentCategory.id)
-      )
-      .where(eq(table_product_category.id, id))
+      .from(this.table)
+      .leftJoin(parentCategory, eq(this.table.parentId, parentCategory.id))
+      .where(eq(this.table.id, id))
       .limit(1);
 
     const row = result[0];
@@ -167,9 +163,9 @@ export default class ProductCategoryModel extends BaseModel {
     }
 
     const [created] = await db
-      .insert(table_product_category)
+      .insert(this.table)
       .values(insertData)
-      .returning({ id: table_product_category.id });
+      .returning({ id: this.table.id });
 
     if (!created) {
       throw new Error("Failed to create product category");
@@ -191,7 +187,7 @@ export default class ProductCategoryModel extends BaseModel {
     const env = getEnv();
     const db = env.getDb();
 
-    const updateData: Partial<typeof table_product_category.$inferInsert> = {
+    const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
     };
 
@@ -208,10 +204,7 @@ export default class ProductCategoryModel extends BaseModel {
     }
     if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
 
-    await db
-      .update(table_product_category)
-      .set(updateData)
-      .where(eq(table_product_category.id, id));
+    await db.update(this.table).set(updateData).where(eq(this.table.id, id));
 
     return this.getCategoryById(id);
   };

@@ -1,9 +1,4 @@
-import {
-  ListParamsRequest,
-  ListParamsResponse,
-  ParamFilter,
-} from "@base/server";
-import { MasterProduct } from "../interfaces/ProductMaster";
+import { ParamFilter } from "@base/server";
 import { ProductVariant } from "../interfaces/ProductVariant";
 
 export interface ProductFilter extends ParamFilter {
@@ -15,10 +10,3 @@ export interface ProductFilter extends ParamFilter {
   manufacturer?: string;
 }
 export interface ProductVariantElm extends ProductVariant {}
-
-export interface ProductModelInterface {
-  getViewDataList(
-    request: ListParamsRequest<ProductFilter>
-  ): Promise<ListParamsResponse<ProductVariantElm>>;
-  getProductById(id: string): Promise<MasterProduct | null>;
-}
