@@ -205,7 +205,8 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
             label="Base UOM"
             value={
               detail.variant.baseUom
-                ? localized(detail.variant.baseUom.name) ?? detail.variant.baseUom.symbol ?? detail.variant.baseUom.id
+                ? localized(detail.variant.baseUom.name) ??
+                  detail.variant.baseUom.id
                 : "-"
             }
           />

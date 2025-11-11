@@ -111,7 +111,7 @@ const ProductCategoryEditPage = (): React.ReactNode => {
           code: categoryQuery.data.code ?? "",
           description: localized(categoryQuery.data.description) ?? "",
           parentId: categoryQuery.data.parent?.id ?? "",
-          level: categoryQuery.data.level ?? null,
+          level: categoryQuery.data.level ?? undefined,
           isActive:
             categoryQuery.data.isActive === undefined
               ? true

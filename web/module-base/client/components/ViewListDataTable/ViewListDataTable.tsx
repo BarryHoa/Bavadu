@@ -74,7 +74,7 @@ export default function ViewListDataTable<T = any>(
     if (store.search.trim()) {
       filtered = filtered.filter((row) =>
         columns.some(
-          (col) =>
+          (col: (typeof columns)[number]) =>
             store.visibleColumns.has(col.key) &&
             String((row as any)[col.key])
               .toLowerCase()

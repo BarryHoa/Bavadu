@@ -1,5 +1,5 @@
 import { LocaleDataType } from "@base/server";
-import { DataTableProps } from "../DataTable/DataTable";
+import type { DataTableProps } from "../DataTable/DataTableInterface";
 import { FilterOption } from "./components/FilterMenu";
 import { GroupOption } from "./components/GroupByMenu";
 

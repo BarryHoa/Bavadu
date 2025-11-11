@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import type ProductModel from "../../models/Product/ProductModel";
 import type { ProductCreateInput } from "../../models/Product/ProductModelInterface";
+import type { ProductMasterFeatures } from "../../models/interfaces/ProductMaster";
 
 export const normalizeLocaleInput = (value: unknown) => {
   if (!value) {
@@ -17,23 +18,54 @@ export const normalizeLocaleInput = (value: unknown) => {
     return { en: trimmed };
   }
 
-  return value;
+  if (typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    const result: Record<string, string> = {};
+
+    if (typeof record.en === "string" && record.en.trim()) {
+      result.en = record.en.trim();
+    }
+
+    if (typeof record.vi === "string" && record.vi.trim()) {
+      result.vi = record.vi.trim();
+    }
+
+    return Object.keys(result).length > 0 ? result : null;
+  }
+
+  return null;
 };
 
 export const normalizeFeaturePayload = (features: unknown) => {
   if (!features || typeof features !== "object") {
-    return {};
+    return null;
   }
 
-  return Object.entries(features as Record<string, unknown>).reduce(
-    (acc, [key, value]) => {
-      if (typeof value === "boolean") {
-        acc[key] = value;
-      }
-      return acc;
-    },
-    {} as Record<string, boolean>
-  );
+  const allowedKeys: Array<keyof ProductMasterFeatures> = [
+    "sale",
+    "purchase",
+    "manufacture",
+    "subcontract",
+    "stockable",
+    "maintenance",
+    "asset",
+    "accounting",
+  ];
+
+  const acc: Partial<ProductMasterFeatures> = {};
+
+  for (const [key, value] of Object.entries(
+    features as Record<string, unknown>
+  )) {
+    if (
+      allowedKeys.includes(key as keyof ProductMasterFeatures) &&
+      typeof value === "boolean"
+    ) {
+      acc[key as keyof ProductMasterFeatures] = value;
+    }
+  }
+
+  return Object.keys(acc).length > 0 ? acc : null;
 };
 
 export const normalizePackings = (raw: unknown) => {
@@ -42,8 +74,8 @@ export const normalizePackings = (raw: unknown) => {
   }
 
   return raw.map((item) => ({
-    name: normalizeLocaleInput((item as any)?.name) ?? null,
-    description: normalizeLocaleInput((item as any)?.description) ?? null,
+    name: normalizeLocaleInput((item as any)?.name),
+    description: normalizeLocaleInput((item as any)?.description),
     isActive:
       typeof (item as any)?.isActive === "boolean"
         ? (item as any)?.isActive
@@ -59,8 +91,9 @@ export const normalizeAttributes = (raw: unknown) => {
   return raw
     .map((item) => ({
       code: typeof (item as any)?.code === "string" ? (item as any).code : "",
-      name: normalizeLocaleInput((item as any)?.name) ?? null,
-      value: typeof (item as any)?.value === "string" ? (item as any).value : "",
+      name: normalizeLocaleInput((item as any)?.name),
+      value:
+        typeof (item as any)?.value === "string" ? (item as any).value : "",
     }))
     .filter((attr) => attr.code && attr.name);
 };
@@ -86,8 +119,7 @@ export const buildPayload = (body: any): ProductCreateInput => {
     description: normalizeLocaleInput(master.description) ?? null,
     type,
     features: normalizeFeaturePayload(master.features ?? {}),
-    isActive:
-      typeof master.isActive === "boolean" ? master.isActive : true,
+    isActive: typeof master.isActive === "boolean" ? master.isActive : true,
     brand: normalizeLocaleInput(master.brand) ?? null,
     categoryId:
       typeof master.categoryId === "string" && master.categoryId
@@ -105,7 +137,7 @@ export const buildPayload = (body: any): ProductCreateInput => {
     manufacturer:
       variant.manufacturer && typeof variant.manufacturer === "object"
         ? {
-            name: normalizeLocaleInput(variant.manufacturer.name) ?? null,
+            name: normalizeLocaleInput(variant.manufacturer.name),
             code:
               typeof variant.manufacturer.code === "string"
                 ? variant.manufacturer.code
@@ -116,8 +148,7 @@ export const buildPayload = (body: any): ProductCreateInput => {
       typeof variant.baseUomId === "string" && variant.baseUomId
         ? variant.baseUomId
         : null,
-    isActive:
-      typeof variant.isActive === "boolean" ? variant.isActive : true,
+    isActive: typeof variant.isActive === "boolean" ? variant.isActive : true,
     images: Array.isArray(variant.images) ? variant.images : undefined,
   };
 

@@ -11,8 +11,8 @@ export const convertProductMasterFeaturesToArrayKey = (
 
 export const getNameProductFeatures = (features: ProductMasterFeatures[]) => {
   if (!features) return [];
-  console.log(features);
-  const text = {
+
+  const text: Record<ProductMasterFeatures, string> = {
     [ProductMasterFeatures.SALE]: "Sale",
     [ProductMasterFeatures.PURCHASE]: "Purchase",
     [ProductMasterFeatures.MANUFACTURE]: "Manufacture",
@@ -20,6 +20,8 @@ export const getNameProductFeatures = (features: ProductMasterFeatures[]) => {
     [ProductMasterFeatures.STOCKABLE]: "Stockable",
     [ProductMasterFeatures.MAINTENANCE]: "Maintenance",
     [ProductMasterFeatures.ASSET]: "Asset",
+    [ProductMasterFeatures.ACCOUNTING]: "Accounting",
   };
+
   return features.map((feature) => text[feature]);
 };

@@ -13,14 +13,28 @@ import {
   Switch,
   Textarea,
 } from "@heroui/react";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
 import { Plus, Trash } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
+import type { Resolver, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import {
+  array,
+  boolean,
+  fallback,
+  minLength,
+  object,
+  optional,
+  picklist,
+  pipe,
+  record,
+  string,
+  trim,
+} from "valibot";
 
 import {
   LocaleFormValue,
-  ProductFormAttribute,
-  ProductFormPacking,
   ProductFormValues,
   ProductMasterFeatures,
   ProductMasterType,
@@ -28,6 +42,46 @@ import {
 import type { ProductCategoryRow } from "../../interface/ProductCategory";
 import ProductCategoryService from "../../services/ProductCategoryService";
 import UnitOfMeasureService from "../../services/UnitOfMeasureService";
+
+type LocaleFieldValue = {
+  en: string;
+  vi: string;
+};
+
+type ProductFormFieldValues = {
+  master: {
+    code: string;
+    name: LocaleFieldValue;
+    description: LocaleFieldValue;
+    type: ProductMasterType;
+    features: Record<ProductMasterFeatures, boolean>;
+    isActive: boolean;
+    brand: LocaleFieldValue;
+    categoryId?: string;
+  };
+  variant: {
+    name: LocaleFieldValue;
+    description: LocaleFieldValue;
+    sku: string;
+    barcode: string;
+    manufacturerName: LocaleFieldValue;
+    manufacturerCode: string;
+    baseUomId?: string;
+    isActive: boolean;
+  };
+  packings: Array<{
+    id?: string;
+    name: LocaleFieldValue;
+    description: LocaleFieldValue;
+    isActive: boolean;
+  }>;
+  attributes: Array<{
+    id?: string;
+    code: string;
+    name: LocaleFieldValue;
+    value: string;
+  }>;
+};
 
 const featureOptions: { key: ProductMasterFeatures; label: string }[] = [
   { key: ProductMasterFeatures.SALE, label: "Sale" },
@@ -50,9 +104,9 @@ const masterTypes: { key: ProductMasterType; label: string }[] = [
   { key: ProductMasterType.TOOL, label: "Tool" },
 ];
 
-const defaultLocaleValue = (): LocaleFormValue => ({ en: "", vi: "" });
+const defaultLocaleValue = (): LocaleFieldValue => ({ en: "", vi: "" });
 
-const createDefaultValues = (): ProductFormValues => ({
+const createDefaultValues = (): ProductFormFieldValues => ({
   master: {
     code: "",
     name: defaultLocaleValue(),
@@ -129,19 +183,184 @@ interface ProductFormProps {
 }
 
 const updateLocaleValue = (
-  value: LocaleFormValue,
-  locale: keyof LocaleFormValue,
+  value: LocaleFieldValue,
+  locale: keyof LocaleFieldValue,
   next: string
-): LocaleFormValue => ({
+): LocaleFieldValue => ({
   ...value,
   [locale]: next,
 });
 
 const ensureLocaleValue = (
   value?: LocaleFormValue | null
-): LocaleFormValue => ({
+): LocaleFieldValue => ({
   en: value?.en ?? "",
   vi: value?.vi ?? "",
+});
+
+const toLocaleFormValue = (value: LocaleFieldValue): LocaleFormValue => ({
+  en: value.en.trim() ? value.en : undefined,
+  vi: value.vi.trim() ? value.vi : undefined,
+});
+
+const mapToFieldValues = (
+  initialValues?: ProductFormValues
+): ProductFormFieldValues => {
+  const defaults = createDefaultValues();
+
+  if (!initialValues) {
+    return defaults;
+  }
+
+  const featureState = featureOptions.reduce(
+    (acc, feature) => ({
+      ...acc,
+      [feature.key]:
+        initialValues.master.features?.[feature.key] ??
+        defaults.master.features[feature.key],
+    }),
+    {} as Record<ProductMasterFeatures, boolean>
+  );
+
+  return {
+    master: {
+      code: initialValues.master.code ?? "",
+      name: ensureLocaleValue(initialValues.master.name),
+      description: ensureLocaleValue(initialValues.master.description),
+      type: initialValues.master.type || ProductMasterType.GOODS,
+      features: featureState,
+      isActive: initialValues.master.isActive ?? true,
+      brand: ensureLocaleValue(initialValues.master.brand),
+      categoryId: initialValues.master.categoryId ?? undefined,
+    },
+    variant: {
+      name: ensureLocaleValue(initialValues.variant.name),
+      description: ensureLocaleValue(initialValues.variant.description),
+      sku: initialValues.variant.sku ?? "",
+      barcode: initialValues.variant.barcode ?? "",
+      manufacturerName: ensureLocaleValue(
+        initialValues.variant.manufacturerName
+      ),
+      manufacturerCode: initialValues.variant.manufacturerCode ?? "",
+      baseUomId: initialValues.variant.baseUomId ?? undefined,
+      isActive: initialValues.variant.isActive ?? true,
+    },
+    packings:
+      initialValues.packings?.map((packing) => ({
+        id: packing.id,
+        name: ensureLocaleValue(packing.name),
+        description: ensureLocaleValue(packing.description),
+        isActive: packing.isActive ?? true,
+      })) ?? defaults.packings,
+    attributes:
+      initialValues.attributes?.map((attribute) => ({
+        id: attribute.id,
+        code: attribute.code ?? "",
+        name: ensureLocaleValue(attribute.name),
+        value: attribute.value ?? "",
+      })) ?? defaults.attributes,
+  };
+};
+
+const mapToProductFormValues = (
+  values: ProductFormFieldValues
+): ProductFormValues => ({
+  master: {
+    code: values.master.code,
+    name: toLocaleFormValue(values.master.name),
+    description: toLocaleFormValue(values.master.description),
+    type: values.master.type,
+    features: values.master.features,
+    isActive: values.master.isActive,
+    brand: toLocaleFormValue(values.master.brand),
+    categoryId: values.master.categoryId,
+  },
+  variant: {
+    name: toLocaleFormValue(values.variant.name),
+    description: toLocaleFormValue(values.variant.description),
+    sku: values.variant.sku,
+    barcode: values.variant.barcode,
+    manufacturerName: toLocaleFormValue(values.variant.manufacturerName),
+    manufacturerCode: values.variant.manufacturerCode,
+    baseUomId: values.variant.baseUomId,
+    isActive: values.variant.isActive,
+  },
+  packings: values.packings.map((packing) => ({
+    id: packing.id,
+    name: toLocaleFormValue(packing.name),
+    description: toLocaleFormValue(packing.description),
+    isActive: packing.isActive,
+  })),
+  attributes: values.attributes.map((attribute) => ({
+    id: attribute.id,
+    code: attribute.code,
+    name: toLocaleFormValue(attribute.name),
+    value: attribute.value,
+  })),
+});
+
+const localeSchema = object({
+  en: fallback(pipe(string(), trim()), ""),
+  vi: fallback(pipe(string(), trim()), ""),
+});
+
+const localeRequiredSchema = object({
+  en: pipe(
+    fallback(pipe(string(), trim()), ""),
+    minLength(1, "English name is required")
+  ),
+  vi: fallback(pipe(string(), trim()), ""),
+});
+
+const productFeatureValues = featureOptions.map((feature) => feature.key) as [
+  ProductMasterFeatures,
+  ...ProductMasterFeatures[],
+];
+
+const featuresSchema = record(picklist(productFeatureValues), boolean());
+
+const productMasterTypeValues = Object.values(ProductMasterType) as [
+  ProductMasterType,
+  ...ProductMasterType[],
+];
+
+const productFormSchema = object({
+  master: object({
+    code: pipe(string(), trim(), minLength(1, "Product code is required")),
+    name: localeRequiredSchema,
+    description: localeSchema,
+    type: picklist(productMasterTypeValues),
+    features: featuresSchema,
+    isActive: boolean(),
+    brand: localeSchema,
+    categoryId: optional(pipe(string(), trim())),
+  }),
+  variant: object({
+    name: localeSchema,
+    description: localeSchema,
+    sku: pipe(string(), trim()),
+    barcode: pipe(string(), trim()),
+    manufacturerName: localeSchema,
+    manufacturerCode: pipe(string(), trim()),
+    baseUomId: optional(pipe(string(), trim())),
+    isActive: boolean(),
+  }),
+  packings: array(
+    object({
+      id: optional(pipe(string(), trim())),
+      name: localeSchema,
+      description: localeSchema,
+      isActive: boolean(),
+    })
+  ),
+  attributes: array(
+    object({
+      id: optional(pipe(string(), trim())),
+      code: pipe(string(), trim()),
+      name: localeSchema,
+      value: pipe(string(), trim()),
+    })
+  ),
 });
 
 export default function ProductForm({
@@ -155,13 +374,23 @@ export default function ProductForm({
   onSubmitAndContinue,
   onCancel,
 }: ProductFormProps) {
-  const [values, setValues] = useState<ProductFormValues>(
-    initialValues ?? createDefaultValues()
-  );
+  const {
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    getValues,
+    formState: { errors, isSubmitting },
+  } = useForm<ProductFormFieldValues>({
+    defaultValues: mapToFieldValues(initialValues),
+    resolver: valibotResolver(
+      productFormSchema
+    ) as Resolver<ProductFormFieldValues>,
+  });
 
   useEffect(() => {
-    setValues(initialValues ?? createDefaultValues());
-  }, [initialValues]);
+    reset(mapToFieldValues(initialValues));
+  }, [initialValues, reset]);
 
   const categoryQuery = useQuery({
     queryKey: ["product-category-tree"],
@@ -180,59 +409,150 @@ export default function ProductForm({
 
   const uomOptions = useMemo(() => uomQuery.data?.data ?? [], [uomQuery.data]);
 
-  const handleFeatureToggle = (selected: Set<string>) => {
-    setValues((prev) => ({
-      ...prev,
-      master: {
-        ...prev.master,
-        features: featureOptions.reduce(
-          (acc, feature) => ({
-            ...acc,
-            [feature.key]: selected.has(feature.key),
-          }),
-          {} as Record<ProductMasterFeatures, boolean>
-        ),
-      },
-    }));
-  };
+  const values = watch();
+  const isBusy = loading || isSubmitting;
 
-  const updatePacking = (
-    index: number,
-    updater: (current: ProductFormPacking) => ProductFormPacking
-  ) => {
-    setValues((prev) => ({
-      ...prev,
-      packings: prev.packings.map((item, idx) =>
+  const handleFeatureToggle = useCallback(
+    (selected: Set<string>) => {
+      const nextFeatures = featureOptions.reduce(
+        (acc, feature) => ({
+          ...acc,
+          [feature.key]: selected.has(feature.key),
+        }),
+        {} as Record<ProductMasterFeatures, boolean>
+      );
+
+      setValue("master.features", nextFeatures, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    },
+    [setValue]
+  );
+
+  const updatePacking = useCallback(
+    (
+      index: number,
+      updater: (
+        current: ProductFormFieldValues["packings"][number]
+      ) => ProductFormFieldValues["packings"][number]
+    ) => {
+      const currentPackings = getValues("packings");
+      const nextPackings = currentPackings.map((item, idx) =>
         idx === index ? updater(item) : item
-      ),
-    }));
-  };
+      );
 
-  const updateAttribute = (
-    index: number,
-    updater: (current: ProductFormAttribute) => ProductFormAttribute
-  ) => {
-    setValues((prev) => ({
-      ...prev,
-      attributes: prev.attributes.map((item, idx) =>
+      setValue("packings", nextPackings, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    },
+    [getValues, setValue]
+  );
+
+  const updateAttribute = useCallback(
+    (
+      index: number,
+      updater: (
+        current: ProductFormFieldValues["attributes"][number]
+      ) => ProductFormFieldValues["attributes"][number]
+    ) => {
+      const currentAttributes = getValues("attributes");
+      const nextAttributes = currentAttributes.map((item, idx) =>
         idx === index ? updater(item) : item
-      ),
-    }));
+      );
+
+      setValue("attributes", nextAttributes, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    },
+    [getValues, setValue]
+  );
+
+  const addPacking = useCallback(() => {
+    const currentPackings = getValues("packings");
+    setValue(
+      "packings",
+      [
+        ...currentPackings,
+        {
+          id: undefined,
+          name: defaultLocaleValue(),
+          description: defaultLocaleValue(),
+          isActive: true,
+        },
+      ],
+      { shouldDirty: true, shouldValidate: true }
+    );
+  }, [getValues, setValue]);
+
+  const removePacking = useCallback(
+    (index: number) => {
+      const currentPackings = getValues("packings");
+      setValue(
+        "packings",
+        currentPackings.filter((_, idx) => idx !== index),
+        { shouldDirty: true, shouldValidate: true }
+      );
+    },
+    [getValues, setValue]
+  );
+
+  const addAttribute = useCallback(() => {
+    const currentAttributes = getValues("attributes");
+    setValue(
+      "attributes",
+      [
+        ...currentAttributes,
+        {
+          id: undefined,
+          code: "",
+          name: defaultLocaleValue(),
+          value: "",
+        },
+      ],
+      { shouldDirty: true, shouldValidate: true }
+    );
+  }, [getValues, setValue]);
+
+  const removeAttribute = useCallback(
+    (index: number) => {
+      const currentAttributes = getValues("attributes");
+      setValue(
+        "attributes",
+        currentAttributes.filter((_, idx) => idx !== index),
+        { shouldDirty: true, shouldValidate: true }
+      );
+    },
+    [getValues, setValue]
+  );
+
+  const handleValidSubmit: SubmitHandler<ProductFormFieldValues> = async (
+    formValues
+  ) => {
+    await onSubmit(mapToProductFormValues(formValues));
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    await onSubmit(values);
+  const handleValidSubmitAndContinue: SubmitHandler<
+    ProductFormFieldValues
+  > = async (formValues) => {
+    if (!onSubmitAndContinue) {
+      return;
+    }
+
+    await onSubmitAndContinue(mapToProductFormValues(formValues));
+    reset(createDefaultValues());
   };
 
-  const handleSubmitAndContinue = async () => {
-    if (!onSubmitAndContinue) return;
-    await onSubmitAndContinue(values);
-    setValues(createDefaultValues());
-  };
+  const submitForm = handleSubmit(handleValidSubmit);
+
+  const submitAndContinueForm = onSubmitAndContinue
+    ? handleSubmit(handleValidSubmitAndContinue)
+    : undefined;
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+    <form className="flex flex-col gap-4" onSubmit={submitForm}>
       <Card>
         <CardBody className="space-y-4">
           <div>
@@ -247,29 +567,31 @@ export default function ProductForm({
               label="Product code"
               value={values.master.code}
               onValueChange={(next) =>
-                setValues((prev) => ({
-                  ...prev,
-                  master: { ...prev.master, code: next },
-                }))
+                setValue("master.code", next, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
               }
               isRequired
-              isDisabled={loading}
+              isInvalid={Boolean(errors.master?.code)}
+              errorMessage={errors.master?.code?.message}
+              isDisabled={isBusy}
             />
             <Select
               label="Product type"
               selectedKeys={values.master.type ? [values.master.type] : []}
               onSelectionChange={(keys) => {
                 const [first] = Array.from(keys);
-                setValues((prev) => ({
-                  ...prev,
-                  master: {
-                    ...prev.master,
-                    type:
-                      (first as ProductMasterType) || ProductMasterType.GOODS,
-                  },
-                }));
+                const next =
+                  (first as ProductMasterType) || ProductMasterType.GOODS;
+                setValue("master.type", next, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
               }}
-              isDisabled={loading}
+              isInvalid={Boolean(errors.master?.type)}
+              errorMessage={errors.master?.type?.message}
+              isDisabled={isBusy}
             >
               {masterTypes.map((type) => (
                 <SelectItem key={type.key}>{type.label}</SelectItem>
@@ -279,38 +601,28 @@ export default function ProductForm({
               label="Name (English)"
               value={values.master.name.en ?? ""}
               onValueChange={(next) =>
-                setValues((prev) => ({
-                  ...prev,
-                  master: {
-                    ...prev.master,
-                    name: updateLocaleValue(
-                      ensureLocaleValue(prev.master.name),
-                      "en",
-                      next
-                    ),
-                  },
-                }))
+                setValue(
+                  "master.name",
+                  updateLocaleValue(values.master.name, "en", next),
+                  { shouldDirty: true, shouldValidate: true }
+                )
               }
               isRequired
-              isDisabled={loading}
+              isInvalid={Boolean(errors.master?.name?.en)}
+              errorMessage={errors.master?.name?.en?.message}
+              isDisabled={isBusy}
             />
             <Input
               label="Name (Vietnamese)"
               value={values.master.name.vi ?? ""}
               onValueChange={(next) =>
-                setValues((prev) => ({
-                  ...prev,
-                  master: {
-                    ...prev.master,
-                    name: updateLocaleValue(
-                      ensureLocaleValue(prev.master.name),
-                      "vi",
-                      next
-                    ),
-                  },
-                }))
+                setValue(
+                  "master.name",
+                  updateLocaleValue(values.master.name, "vi", next),
+                  { shouldDirty: true, shouldValidate: true }
+                )
               }
-              isDisabled={loading}
+              isDisabled={isBusy}
             />
           </div>
 
@@ -318,37 +630,25 @@ export default function ProductForm({
             label="Description (English)"
             value={values.master.description.en ?? ""}
             onValueChange={(next) =>
-              setValues((prev) => ({
-                ...prev,
-                master: {
-                  ...prev.master,
-                  description: updateLocaleValue(
-                    ensureLocaleValue(prev.master.description),
-                    "en",
-                    next
-                  ),
-                },
-              }))
+              setValue(
+                "master.description",
+                updateLocaleValue(values.master.description, "en", next),
+                { shouldDirty: true, shouldValidate: true }
+              )
             }
-            isDisabled={loading}
+            isDisabled={isBusy}
           />
           <Textarea
             label="Description (Vietnamese)"
             value={values.master.description.vi ?? ""}
             onValueChange={(next) =>
-              setValues((prev) => ({
-                ...prev,
-                master: {
-                  ...prev.master,
-                  description: updateLocaleValue(
-                    ensureLocaleValue(prev.master.description),
-                    "vi",
-                    next
-                  ),
-                },
-              }))
+              setValue(
+                "master.description",
+                updateLocaleValue(values.master.description, "vi", next),
+                { shouldDirty: true, shouldValidate: true }
+              )
             }
-            isDisabled={loading}
+            isDisabled={isBusy}
           />
 
           <div className="grid gap-4 md:grid-cols-2">
@@ -359,16 +659,19 @@ export default function ProductForm({
               }
               onSelectionChange={(keys) => {
                 const [first] = Array.from(keys);
-                setValues((prev) => ({
-                  ...prev,
-                  master: {
-                    ...prev.master,
-                    categoryId: typeof first === "string" ? first : undefined,
-                  },
-                }));
+                const nextValue =
+                  typeof first === "string" && first.length > 0
+                    ? first
+                    : undefined;
+                setValue("master.categoryId", nextValue, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
               }}
               isLoading={categoryQuery.isLoading}
-              isDisabled={loading || categoryQuery.isLoading}
+              isInvalid={Boolean(errors.master?.categoryId)}
+              errorMessage={errors.master?.categoryId?.message}
+              isDisabled={isBusy || categoryQuery.isLoading}
             >
               {categoryOptions.map((option) => (
                 <SelectItem key={option.id}>{option.label}</SelectItem>
@@ -379,37 +682,25 @@ export default function ProductForm({
               label="Brand (English)"
               value={values.master.brand.en ?? ""}
               onValueChange={(next) =>
-                setValues((prev) => ({
-                  ...prev,
-                  master: {
-                    ...prev.master,
-                    brand: updateLocaleValue(
-                      ensureLocaleValue(prev.master.brand),
-                      "en",
-                      next
-                    ),
-                  },
-                }))
+                setValue(
+                  "master.brand",
+                  updateLocaleValue(values.master.brand, "en", next),
+                  { shouldDirty: true, shouldValidate: true }
+                )
               }
-              isDisabled={loading}
+              isDisabled={isBusy}
             />
             <Input
               label="Brand (Vietnamese)"
               value={values.master.brand.vi ?? ""}
               onValueChange={(next) =>
-                setValues((prev) => ({
-                  ...prev,
-                  master: {
-                    ...prev.master,
-                    brand: updateLocaleValue(
-                      ensureLocaleValue(prev.master.brand),
-                      "vi",
-                      next
-                    ),
-                  },
-                }))
+                setValue(
+                  "master.brand",
+                  updateLocaleValue(values.master.brand, "vi", next),
+                  { shouldDirty: true, shouldValidate: true }
+                )
               }
-              isDisabled={loading}
+              isDisabled={isBusy}
             />
           </div>
 
@@ -423,12 +714,13 @@ export default function ProductForm({
               handleFeatureToggle(new Set(selected as string[]))
             }
             classNames={{ wrapper: "flex flex-wrap gap-3" }}
+            isDisabled={isBusy}
           >
             {featureOptions.map((feature) => (
               <Checkbox
                 key={feature.key}
                 value={feature.key}
-                isDisabled={loading}
+                isDisabled={isBusy}
               >
                 {feature.label}
               </Checkbox>
@@ -438,12 +730,12 @@ export default function ProductForm({
           <Switch
             isSelected={values.master.isActive}
             onValueChange={(next) =>
-              setValues((prev) => ({
-                ...prev,
-                master: { ...prev.master, isActive: next },
-              }))
+              setValue("master.isActive", next, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
             }
-            isDisabled={loading}
+            isDisabled={isBusy}
           >
             Master active
           </Switch>
@@ -455,143 +747,117 @@ export default function ProductForm({
               label="Variant name (English)"
               value={values.variant.name.en ?? ""}
               onValueChange={(next) =>
-                setValues((prev) => ({
-                  ...prev,
-                  variant: {
-                    ...prev.variant,
-                    name: updateLocaleValue(
-                      ensureLocaleValue(prev.variant.name),
-                      "en",
-                      next
-                    ),
-                  },
-                }))
+                setValue(
+                  "variant.name",
+                  updateLocaleValue(values.variant.name, "en", next),
+                  { shouldDirty: true, shouldValidate: true }
+                )
               }
               isRequired
-              isDisabled={loading}
+              isInvalid={Boolean(errors.variant?.name?.en)}
+              errorMessage={errors.variant?.name?.en?.message}
+              isDisabled={isBusy}
             />
             <Input
               label="Variant name (Vietnamese)"
               value={values.variant.name.vi ?? ""}
               onValueChange={(next) =>
-                setValues((prev) => ({
-                  ...prev,
-                  variant: {
-                    ...prev.variant,
-                    name: updateLocaleValue(
-                      ensureLocaleValue(prev.variant.name),
-                      "vi",
-                      next
-                    ),
-                  },
-                }))
+                setValue(
+                  "variant.name",
+                  updateLocaleValue(values.variant.name, "vi", next),
+                  { shouldDirty: true, shouldValidate: true }
+                )
               }
-              isDisabled={loading}
+              isDisabled={isBusy}
             />
             <Textarea
               label="Variant description (English)"
               value={values.variant.description.en ?? ""}
               onValueChange={(next) =>
-                setValues((prev) => ({
-                  ...prev,
-                  variant: {
-                    ...prev.variant,
-                    description: updateLocaleValue(
-                      ensureLocaleValue(prev.variant.description),
-                      "en",
-                      next
-                    ),
-                  },
-                }))
+                setValue(
+                  "variant.description",
+                  updateLocaleValue(values.variant.description, "en", next),
+                  { shouldDirty: true, shouldValidate: true }
+                )
               }
-              isDisabled={loading}
+              isDisabled={isBusy}
             />
             <Textarea
               label="Variant description (Vietnamese)"
               value={values.variant.description.vi ?? ""}
               onValueChange={(next) =>
-                setValues((prev) => ({
-                  ...prev,
-                  variant: {
-                    ...prev.variant,
-                    description: updateLocaleValue(
-                      ensureLocaleValue(prev.variant.description),
-                      "vi",
-                      next
-                    ),
-                  },
-                }))
+                setValue(
+                  "variant.description",
+                  updateLocaleValue(values.variant.description, "vi", next),
+                  { shouldDirty: true, shouldValidate: true }
+                )
               }
-              isDisabled={loading}
+              isDisabled={isBusy}
             />
             <Input
               label="SKU"
               value={values.variant.sku}
               onValueChange={(next) =>
-                setValues((prev) => ({
-                  ...prev,
-                  variant: { ...prev.variant, sku: next },
-                }))
+                setValue("variant.sku", next, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
               }
-              isDisabled={loading}
+              isDisabled={isBusy}
             />
             <Input
               label="Barcode"
               value={values.variant.barcode}
               onValueChange={(next) =>
-                setValues((prev) => ({
-                  ...prev,
-                  variant: { ...prev.variant, barcode: next },
-                }))
+                setValue("variant.barcode", next, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
               }
-              isDisabled={loading}
+              isDisabled={isBusy}
             />
             <Input
               label="Manufacturer name (English)"
               value={values.variant.manufacturerName.en ?? ""}
               onValueChange={(next) =>
-                setValues((prev) => ({
-                  ...prev,
-                  variant: {
-                    ...prev.variant,
-                    manufacturerName: updateLocaleValue(
-                      ensureLocaleValue(prev.variant.manufacturerName),
-                      "en",
-                      next
-                    ),
-                  },
-                }))
+                setValue(
+                  "variant.manufacturerName",
+                  updateLocaleValue(
+                    values.variant.manufacturerName,
+                    "en",
+                    next
+                  ),
+                  { shouldDirty: true, shouldValidate: true }
+                )
               }
-              isDisabled={loading}
+              isDisabled={isBusy}
             />
             <Input
               label="Manufacturer name (Vietnamese)"
               value={values.variant.manufacturerName.vi ?? ""}
               onValueChange={(next) =>
-                setValues((prev) => ({
-                  ...prev,
-                  variant: {
-                    ...prev.variant,
-                    manufacturerName: updateLocaleValue(
-                      ensureLocaleValue(prev.variant.manufacturerName),
-                      "vi",
-                      next
-                    ),
-                  },
-                }))
+                setValue(
+                  "variant.manufacturerName",
+                  updateLocaleValue(
+                    values.variant.manufacturerName,
+                    "vi",
+                    next
+                  ),
+                  { shouldDirty: true, shouldValidate: true }
+                )
               }
-              isDisabled={loading}
+              isDisabled={isBusy}
             />
             <Input
               label="Manufacturer code"
               value={values.variant.manufacturerCode}
               onValueChange={(next) =>
-                setValues((prev) => ({
-                  ...prev,
-                  variant: { ...prev.variant, manufacturerCode: next },
-                }))
+                setValue("variant.manufacturerCode", next, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
               }
-              isDisabled={loading}
+              isDisabled={isBusy}
             />
             <Select
               label="Base unit of measure"
@@ -600,16 +866,19 @@ export default function ProductForm({
               }
               onSelectionChange={(keys) => {
                 const [first] = Array.from(keys);
-                setValues((prev) => ({
-                  ...prev,
-                  variant: {
-                    ...prev.variant,
-                    baseUomId: typeof first === "string" ? first : undefined,
-                  },
-                }));
+                const nextValue =
+                  typeof first === "string" && first.length > 0
+                    ? first
+                    : undefined;
+                setValue("variant.baseUomId", nextValue, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
               }}
               isLoading={uomQuery.isLoading}
-              isDisabled={loading || uomQuery.isLoading}
+              isInvalid={Boolean(errors.variant?.baseUomId)}
+              errorMessage={errors.variant?.baseUomId?.message}
+              isDisabled={isBusy || uomQuery.isLoading}
             >
               {uomOptions.map((uom) => (
                 <SelectItem key={uom.id}>
@@ -626,12 +895,12 @@ export default function ProductForm({
           <Switch
             isSelected={values.variant.isActive}
             onValueChange={(next) =>
-              setValues((prev) => ({
-                ...prev,
-                variant: { ...prev.variant, isActive: next },
-              }))
+              setValue("variant.isActive", next, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
             }
-            isDisabled={loading}
+            isDisabled={isBusy}
           >
             Variant active
           </Switch>
@@ -651,21 +920,8 @@ export default function ProductForm({
               size="sm"
               variant="bordered"
               startContent={<Plus size={14} />}
-              onPress={() =>
-                setValues((prev) => ({
-                  ...prev,
-                  packings: [
-                    ...prev.packings,
-                    {
-                      id: undefined,
-                      name: defaultLocaleValue(),
-                      description: defaultLocaleValue(),
-                      isActive: true,
-                    },
-                  ],
-                }))
-              }
-              isDisabled={loading}
+              onPress={addPacking}
+              isDisabled={isBusy}
             >
               Add packing
             </Button>
@@ -688,15 +944,8 @@ export default function ProductForm({
                         size="sm"
                         variant="light"
                         startContent={<Trash size={14} />}
-                        onPress={() =>
-                          setValues((prev) => ({
-                            ...prev,
-                            packings: prev.packings.filter(
-                              (_, idx) => idx !== index
-                            ),
-                          }))
-                        }
-                        isDisabled={loading}
+                        onPress={() => removePacking(index)}
+                        isDisabled={isBusy}
                       >
                         Remove
                       </Button>
@@ -708,14 +957,10 @@ export default function ProductForm({
                         onValueChange={(next) =>
                           updatePacking(index, (current) => ({
                             ...current,
-                            name: updateLocaleValue(
-                              ensureLocaleValue(current.name),
-                              "en",
-                              next
-                            ),
+                            name: updateLocaleValue(current.name, "en", next),
                           }))
                         }
-                        isDisabled={loading}
+                        isDisabled={isBusy}
                       />
                       <Input
                         label="Name (Vietnamese)"
@@ -723,14 +968,10 @@ export default function ProductForm({
                         onValueChange={(next) =>
                           updatePacking(index, (current) => ({
                             ...current,
-                            name: updateLocaleValue(
-                              ensureLocaleValue(current.name),
-                              "vi",
-                              next
-                            ),
+                            name: updateLocaleValue(current.name, "vi", next),
                           }))
                         }
-                        isDisabled={loading}
+                        isDisabled={isBusy}
                       />
                     </div>
                     <Textarea
@@ -740,13 +981,13 @@ export default function ProductForm({
                         updatePacking(index, (current) => ({
                           ...current,
                           description: updateLocaleValue(
-                            ensureLocaleValue(current.description),
+                            current.description,
                             "en",
                             next
                           ),
                         }))
                       }
-                      isDisabled={loading}
+                      isDisabled={isBusy}
                     />
                     <Textarea
                       label="Description (Vietnamese)"
@@ -755,13 +996,13 @@ export default function ProductForm({
                         updatePacking(index, (current) => ({
                           ...current,
                           description: updateLocaleValue(
-                            ensureLocaleValue(current.description),
+                            current.description,
                             "vi",
                             next
                           ),
                         }))
                       }
-                      isDisabled={loading}
+                      isDisabled={isBusy}
                     />
                     <Switch
                       isSelected={packing.isActive}
@@ -771,7 +1012,7 @@ export default function ProductForm({
                           isActive: next,
                         }))
                       }
-                      isDisabled={loading}
+                      isDisabled={isBusy}
                     >
                       Packing active
                     </Switch>
@@ -796,21 +1037,8 @@ export default function ProductForm({
               size="sm"
               variant="bordered"
               startContent={<Plus size={14} />}
-              onPress={() =>
-                setValues((prev) => ({
-                  ...prev,
-                  attributes: [
-                    ...prev.attributes,
-                    {
-                      id: undefined,
-                      code: "",
-                      name: defaultLocaleValue(),
-                      value: "",
-                    },
-                  ],
-                }))
-              }
-              isDisabled={loading}
+              onPress={addAttribute}
+              isDisabled={isBusy}
             >
               Add attribute
             </Button>
@@ -833,15 +1061,8 @@ export default function ProductForm({
                         size="sm"
                         variant="light"
                         startContent={<Trash size={14} />}
-                        onPress={() =>
-                          setValues((prev) => ({
-                            ...prev,
-                            attributes: prev.attributes.filter(
-                              (_, idx) => idx !== index
-                            ),
-                          }))
-                        }
-                        isDisabled={loading}
+                        onPress={() => removeAttribute(index)}
+                        isDisabled={isBusy}
                       >
                         Remove
                       </Button>
@@ -855,7 +1076,9 @@ export default function ProductForm({
                           code: next,
                         }))
                       }
-                      isDisabled={loading}
+                      isInvalid={Boolean(errors.attributes?.[index]?.code)}
+                      errorMessage={errors.attributes?.[index]?.code?.message}
+                      isDisabled={isBusy}
                     />
                     <div className="grid gap-3 md:grid-cols-2">
                       <Input
@@ -864,14 +1087,10 @@ export default function ProductForm({
                         onValueChange={(next) =>
                           updateAttribute(index, (current) => ({
                             ...current,
-                            name: updateLocaleValue(
-                              ensureLocaleValue(current.name),
-                              "en",
-                              next
-                            ),
+                            name: updateLocaleValue(current.name, "en", next),
                           }))
                         }
-                        isDisabled={loading}
+                        isDisabled={isBusy}
                       />
                       <Input
                         label="Name (Vietnamese)"
@@ -879,14 +1098,10 @@ export default function ProductForm({
                         onValueChange={(next) =>
                           updateAttribute(index, (current) => ({
                             ...current,
-                            name: updateLocaleValue(
-                              ensureLocaleValue(current.name),
-                              "vi",
-                              next
-                            ),
+                            name: updateLocaleValue(current.name, "vi", next),
                           }))
                         }
-                        isDisabled={loading}
+                        isDisabled={isBusy}
                       />
                     </div>
                     <Input
@@ -898,7 +1113,9 @@ export default function ProductForm({
                           value: next,
                         }))
                       }
-                      isDisabled={loading}
+                      isInvalid={Boolean(errors.attributes?.[index]?.value)}
+                      errorMessage={errors.attributes?.[index]?.value?.message}
+                      isDisabled={isBusy}
                     />
                   </CardBody>
                 </Card>
@@ -914,7 +1131,7 @@ export default function ProductForm({
             variant="light"
             size="sm"
             onPress={onCancel}
-            isDisabled={loading}
+            isDisabled={isBusy}
           >
             Cancel
           </Button>
@@ -925,14 +1142,26 @@ export default function ProductForm({
             variant="bordered"
             size="sm"
             type="button"
-            onPress={handleSubmitAndContinue}
-            isDisabled={loading}
+            onPress={
+              submitAndContinueForm
+                ? async () => {
+                    await submitAndContinueForm();
+                  }
+                : undefined
+            }
+            isDisabled={isBusy}
           >
             {secondarySubmitLabel ?? "Save & add another"}
           </Button>
         ) : null}
 
-        <Button color="primary" size="sm" type="submit" isLoading={loading}>
+        <Button
+          color="primary"
+          size="sm"
+          type="submit"
+          isLoading={isBusy}
+          isDisabled={isBusy}
+        >
           {submitLabel}
         </Button>
       </div>

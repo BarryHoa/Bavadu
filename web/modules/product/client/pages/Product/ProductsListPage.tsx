@@ -173,15 +173,7 @@ export default function ProductsListPage(): React.ReactNode {
         </Button>
       </div>
 
-      <ViewListDataTable
-        model="product"
-        columns={columns}
-        pagination={{
-          pageSize: 2,
-          page: 1,
-          pageSizeOptions: [2, 4, 6, 8, 10],
-        }}
-      />
+      <ViewListDataTable model="product" columns={columns} />
     </div>
   );
 }

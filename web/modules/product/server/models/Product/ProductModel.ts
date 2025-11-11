@@ -39,7 +39,6 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
       id: dbProduct.id,
       code: dbProduct.code,
       name: dbProduct.name as MasterProduct["name"],
-      description: dbProduct.description as MasterProduct["description"],
       type: dbProduct.type as MasterProduct["type"],
       features: dbProduct.features as MasterProduct["features"],
       isActive: dbProduct.isActive,
@@ -135,8 +134,17 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
         category: record.category
           ? {
               id: record.category.id,
-              code: record.category.code ?? undefined,
+              code: record.category.code ?? "",
               name: record.category.name as any,
+              description: record.category.description as any,
+              parentId: record.category.parentId ?? undefined,
+              level: record.category.level ?? 1,
+              isActive:
+                record.category.isActive === undefined
+                  ? true
+                  : Boolean(record.category.isActive),
+              createdAt: record.category.createdAt?.getTime(),
+              updatedAt: record.category.updatedAt?.getTime(),
             }
           : undefined,
       },

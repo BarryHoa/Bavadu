@@ -80,11 +80,11 @@ export default function ProductsEditPage(): React.ReactNode {
     router.push(listLink.as ?? listLink.path);
   }, [listLink.as, listLink.path, router]);
 
-  const handleSubmit = async (values: ProductFormValues) => {
+  const handleSubmit = async (values: ProductFormValues): Promise<void> => {
     if (!productId) return;
 
     try {
-      const updated = await updateMutation.mutateAsync({ id: productId, values });
+      await updateMutation.mutateAsync({ id: productId, values });
       addToast({
         title: "Product updated",
         description: "Changes saved successfully.",
@@ -97,8 +97,6 @@ export default function ProductsEditPage(): React.ReactNode {
       setTimeout(() => {
         router.push(link.as ?? link.path);
       }, 500);
-
-      return updated;
     } catch (error) {
       addToast({
         title: "Update failed",
@@ -147,7 +145,20 @@ export default function ProductsEditPage(): React.ReactNode {
     );
   }
 
-  const initialFormValues = mapDetailToFormValues(productQuery.data);
+  const productDetail = productQuery.data;
+
+  if (!productDetail) {
+    return (
+      <div className="space-y-4">
+        <Button size="sm" variant="light" onPress={navigateToList}>
+          Back to products
+        </Button>
+        <p className="text-default-500">Product not found.</p>
+      </div>
+    );
+  }
+
+  const initialFormValues = mapDetailToFormValues(productDetail);
 
   return (
     <div className="flex flex-col gap-4">

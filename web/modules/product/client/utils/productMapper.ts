@@ -157,44 +157,64 @@ export const mapDetailToFormValues = (
 
 export const mapFormValuesToPayload = (
   values: ProductFormValues
-): ProductFormPayload => ({
-  master: {
-    code: values.master.code.trim(),
-    name: toLocaleRecord(ensureLocaleValue(values.master.name), values.master.code),
-    description: toLocaleRecord(
-      ensureLocaleValue(values.master.description),
-      values.master.code
-    ),
-    type:
-      (values.master.type as ProductMasterType) ?? ProductMasterType.GOODS,
-    features: values.master.features,
-    isActive: values.master.isActive,
-    brand: toLocaleRecord(ensureLocaleValue(values.master.brand)),
-    categoryId: values.master.categoryId ?? null,
-  },
-  variant: {
-    name: toLocaleRecord(
-      ensureLocaleValue(values.variant.name),
-      values.master.code
-    ) ?? { en: values.master.code.trim() },
-    description: toLocaleRecord(ensureLocaleValue(values.variant.description)),
-    sku: values.variant.sku ? values.variant.sku.trim() : null,
-    barcode: values.variant.barcode ? values.variant.barcode.trim() : null,
-    manufacturer:
-      values.variant.manufacturerName.en || values.variant.manufacturerName.vi || values.variant.manufacturerCode
-        ? {
-            name: toLocaleRecord(
-              ensureLocaleValue(values.variant.manufacturerName)
-            ),
-            code: values.variant.manufacturerCode
-              ? values.variant.manufacturerCode.trim()
-              : null,
-          }
-        : null,
-    baseUomId: values.variant.baseUomId || null,
-    isActive: values.variant.isActive,
-    images: undefined,
-  },
-  packings: sanitizePackings(values.packings),
-  attributes: sanitizeAttributes(values.attributes),
-});
+): ProductFormPayload => {
+  const trimmedCode = values.master.code.trim();
+  const masterNameRecord =
+    toLocaleRecord(ensureLocaleValue(values.master.name), trimmedCode) ?? {
+      en: trimmedCode,
+    };
+  const masterDescriptionRecord = toLocaleRecord(
+    ensureLocaleValue(values.master.description),
+    trimmedCode
+  );
+  const masterBrandRecord = toLocaleRecord(
+    ensureLocaleValue(values.master.brand)
+  );
+
+  const variantNameRecord =
+    toLocaleRecord(ensureLocaleValue(values.variant.name), trimmedCode) ?? {
+      en: trimmedCode,
+    };
+  const variantDescriptionRecord = toLocaleRecord(
+    ensureLocaleValue(values.variant.description)
+  );
+  const manufacturerNameRecord = toLocaleRecord(
+    ensureLocaleValue(values.variant.manufacturerName)
+  );
+
+  return {
+    master: {
+      code: trimmedCode,
+      name: masterNameRecord,
+      description: masterDescriptionRecord,
+      type:
+        (values.master.type as ProductMasterType) ?? ProductMasterType.GOODS,
+      features: values.master.features,
+      isActive: values.master.isActive,
+      brand: masterBrandRecord,
+      categoryId: values.master.categoryId ?? null,
+    },
+    variant: {
+      name: variantNameRecord,
+      description: variantDescriptionRecord,
+      sku: values.variant.sku ? values.variant.sku.trim() : null,
+      barcode: values.variant.barcode ? values.variant.barcode.trim() : null,
+      manufacturer:
+        manufacturerNameRecord ||
+        (values.variant.manufacturerCode &&
+          values.variant.manufacturerCode.trim())
+          ? {
+              name: manufacturerNameRecord,
+              code: values.variant.manufacturerCode
+                ? values.variant.manufacturerCode.trim()
+                : null,
+            }
+          : null,
+      baseUomId: values.variant.baseUomId || null,
+      isActive: values.variant.isActive,
+      images: undefined,
+    },
+    packings: sanitizePackings(values.packings),
+    attributes: sanitizeAttributes(values.attributes),
+  };
+};

@@ -108,5 +108,5 @@
     "**/.next/**": true,
     "**/app/**": false
   },
-  "cSpell.words": ["heroui"]
+  "cSpell.words": ["heroui", "STOCKABLE"]
 }
