@@ -3,44 +3,120 @@
 import Input from "@base/client/components/Input";
 import LinkAs from "@base/client/components/LinkAs";
 import { Button } from "@heroui/button";
-import {
-  Card,
-  CardBody,
-  Select,
-  SelectItem,
-  Textarea,
-} from "@heroui/react";
+import { Card, CardBody, Select, SelectItem, Textarea } from "@heroui/react";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Controller,
+  useFieldArray,
+  useForm,
+  type SubmitHandler,
+} from "react-hook-form";
+import {
+  array,
+  custom,
+  minLength,
+  object,
+  optional,
+  pipe,
+  string,
+  trim,
+} from "valibot";
 
 import StockService, {
   WarehouseDto,
 } from "@mdl/stock/client/services/StockService";
 import { salesOrderService } from "../../services/SalesOrderService";
 
-interface SalesOrderLineForm {
-  productId: string;
-  quantity: string;
-  unitPrice: string;
-  description: string;
-}
+const quantitySchema = pipe(
+  string(),
+  trim(),
+  minLength(1, "Quantity is required"),
+  custom(
+    (value) => !Number.isNaN(Number(value)) && Number(value) > 0,
+    "Quantity must be a positive number"
+  )
+);
+
+const unitPriceSchema = pipe(
+  string(),
+  trim(),
+  custom(
+    (value) =>
+      value === "" || (!Number.isNaN(Number(value)) && Number(value) >= 0),
+    "Unit price must be a number greater than or equal to 0"
+  )
+);
+
+const orderLineSchema = object({
+  productId: pipe(string(), trim(), minLength(1, "Product ID is required")),
+  quantity: quantitySchema,
+  unitPrice: unitPriceSchema,
+  description: optional(pipe(string(), trim())),
+});
+
+const salesOrderFormSchema = object({
+  customerName: pipe(
+    string(),
+    trim(),
+    minLength(1, "Customer name is required")
+  ),
+  warehouseId: optional(pipe(string(), trim())),
+  expectedDate: optional(pipe(string(), trim())),
+  currency: pipe(string(), trim(), minLength(1, "Currency is required")),
+  notes: optional(pipe(string(), trim())),
+  lines: pipe(
+    array(orderLineSchema),
+    minLength(1, "At least one order line is required")
+  ),
+});
+
+type SalesOrderFormValues = {
+  customerName: string;
+  warehouseId?: string;
+  expectedDate?: string;
+  currency: string;
+  notes?: string;
+  lines: Array<{
+    productId: string;
+    quantity: string;
+    unitPrice: string;
+    description?: string;
+  }>;
+};
+
+const defaultLine: SalesOrderFormValues["lines"][number] = {
+  productId: "",
+  quantity: "",
+  unitPrice: "",
+  description: "",
+};
 
 export default function SalesOrderCreatePage(): React.ReactNode {
   const router = useRouter();
   const [warehouses, setWarehouses] = useState<WarehouseDto[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const [form, setForm] = useState({
-    customerName: "",
-    warehouseId: "",
-    expectedDate: "",
-    currency: "USD",
-    notes: "",
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SalesOrderFormValues>({
+    resolver: valibotResolver(salesOrderFormSchema),
+    defaultValues: {
+      customerName: "",
+      warehouseId: "",
+      expectedDate: "",
+      currency: "USD",
+      notes: "",
+      lines: [defaultLine],
+    },
   });
-  const [lines, setLines] = useState<SalesOrderLineForm[]>([
-    { productId: "", quantity: "", unitPrice: "", description: "" },
-  ]);
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "lines",
+  });
 
   useEffect(() => {
     const fetchWarehouses = async () => {
@@ -54,75 +130,36 @@ export default function SalesOrderCreatePage(): React.ReactNode {
     fetchWarehouses();
   }, []);
 
-  const handleLineChange = (
-    index: number,
-    field: keyof SalesOrderLineForm,
-    value: string
-  ) => {
-    setLines((prev) => {
-      const next = [...prev];
-      next[index] = { ...next[index], [field]: value };
-      return next;
-    });
+  const onSubmit: SubmitHandler<SalesOrderFormValues> = async (values) => {
+    const payload = {
+      customerName: values.customerName.trim(),
+      warehouseId: values.warehouseId?.trim() || undefined,
+      expectedDate: values.expectedDate?.trim() || undefined,
+      currency: values.currency.trim(),
+      notes: values.notes?.trim() || undefined,
+      lines: values.lines
+        .map((line) => ({
+          productId: line.productId.trim(),
+          quantity: Number(line.quantity),
+          unitPrice: line.unitPrice ? Number(line.unitPrice) : undefined,
+          description: line.description?.trim() || undefined,
+        }))
+        .filter((line) => line.productId && line.quantity > 0),
+    };
+
+    const created = await salesOrderService.create(payload);
+    const newlyCreatedId = created.data.order.id;
+    router.push(`/workspace/modules/sale/view/${newlyCreatedId}`);
   };
 
-  const addLine = () => {
-    setLines((prev) => [
-      ...prev,
-      { productId: "", quantity: "", unitPrice: "", description: "" },
-    ]);
-  };
-
-  const removeLine = (index: number) => {
-    setLines((prev) => prev.filter((_, idx) => idx !== index));
-  };
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!form.customerName.trim()) {
-      setError("Customer name is required.");
-      return;
-    }
-
-    const preparedLines = lines
-      .map((line) => ({
-        productId: line.productId.trim(),
-        quantity: Number(line.quantity),
-        unitPrice: line.unitPrice ? Number(line.unitPrice) : undefined,
-        description: line.description.trim() || undefined,
-      }))
-      .filter((line) => line.productId && line.quantity > 0);
-
-    if (preparedLines.length === 0) {
-      setError("At least one valid order line is required.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      const response = await salesOrderService.create({
-        customerName: form.customerName,
-        warehouseId: form.warehouseId || undefined,
-        expectedDate: form.expectedDate || undefined,
-        currency: form.currency || undefined,
-        notes: form.notes || undefined,
-        lines: preparedLines,
-      });
-
-      const newlyCreatedId = response.data.order.id;
-      router.push(`/workspace/modules/sale/view/${newlyCreatedId}`);
-    } catch (err) {
-      console.error(err);
-      setError(
-        err instanceof Error ? err.message : "Failed to create sales order."
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const warehouseOptions = useMemo(
+    () =>
+      warehouses.map((warehouse) => ({
+        value: warehouse.id,
+        label: `${warehouse.code} — ${warehouse.name}`,
+      })),
+    [warehouses]
+  );
 
   return (
     <div className="space-y-6">
@@ -145,113 +182,176 @@ export default function SalesOrderCreatePage(): React.ReactNode {
 
       <Card>
         <CardBody>
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="grid gap-4 md:grid-cols-2">
-              <Input
-                label="Customer name"
-                value={form.customerName}
-                onValueChange={(value) =>
-                  setForm((prev) => ({ ...prev, customerName: value }))
-                }
-                isRequired
+              <Controller
+                name="customerName"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Input
+                    {...field}
+                    label="Customer name"
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    isRequired
+                    isInvalid={fieldState.invalid}
+                    errorMessage={fieldState.error?.message}
+                  />
+                )}
               />
-              <Select
-                label="Warehouse (optional)"
-                selectedKeys={
-                  form.warehouseId
-                    ? new Set([form.warehouseId])
-                    : new Set<string>()
-                }
-                onSelectionChange={(keys) => {
-                  const [first] = Array.from(keys);
-                  setForm((prev) => ({
-                    ...prev,
-                    warehouseId: typeof first === "string" ? first : "",
-                  }));
-                }}
-              >
-                {warehouses.map((warehouse) => (
-                  <SelectItem key={warehouse.id}>
-                    {warehouse.code} — {warehouse.name}
-                  </SelectItem>
-                ))}
-              </Select>
-              <Input
-                label="Expected date"
-                type="date"
-                value={form.expectedDate}
-                onValueChange={(value) =>
-                  setForm((prev) => ({ ...prev, expectedDate: value }))
-                }
+              <Controller
+                name="warehouseId"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Select
+                    label="Warehouse (optional)"
+                    selectedKeys={
+                      field.value ? new Set([field.value]) : new Set<string>()
+                    }
+                    onSelectionChange={(keys) => {
+                      const [first] = Array.from(keys);
+                      field.onChange(
+                        typeof first === "string" ? first : undefined
+                      );
+                    }}
+                    isInvalid={fieldState.invalid}
+                    errorMessage={fieldState.error?.message}
+                  >
+                    {warehouseOptions.map((option) => (
+                      <SelectItem key={option.value}>{option.label}</SelectItem>
+                    ))}
+                  </Select>
+                )}
               />
-              <Input
-                label="Currency"
-                value={form.currency}
-                onValueChange={(value) =>
-                  setForm((prev) => ({ ...prev, currency: value }))
-                }
+              <Controller
+                name="expectedDate"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Input
+                    {...field}
+                    type="date"
+                    label="Expected date"
+                    value={field.value ?? ""}
+                    onValueChange={field.onChange}
+                    isInvalid={fieldState.invalid}
+                    errorMessage={fieldState.error?.message}
+                  />
+                )}
+              />
+              <Controller
+                name="currency"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Input
+                    {...field}
+                    label="Currency"
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    isInvalid={fieldState.invalid}
+                    errorMessage={fieldState.error?.message}
+                  />
+                )}
               />
             </div>
 
-            <Textarea
-              label="Notes"
-              value={form.notes}
-              onValueChange={(value) =>
-                setForm((prev) => ({ ...prev, notes: value }))
-              }
+            <Controller
+              name="notes"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Textarea
+                  {...field}
+                  label="Notes"
+                  value={field.value ?? ""}
+                  onValueChange={field.onChange}
+                  isInvalid={fieldState.invalid}
+                  errorMessage={fieldState.error?.message}
+                />
+              )}
             />
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold">Order lines</h2>
-                <Button size="sm" variant="bordered" onPress={addLine}>
+                <Button
+                  size="sm"
+                  variant="bordered"
+                  onPress={() => append(defaultLine)}
+                >
                   Add line
                 </Button>
               </div>
 
-              {lines.map((line, index) => (
-                <Card key={index} className="border border-content3/40">
+              {fields.map((fieldItem, index) => (
+                <Card key={fieldItem.id} className="border border-content3/40">
                   <CardBody className="space-y-3">
                     <div className="grid gap-3 md:grid-cols-4">
-                      <Input
-                        label="Product ID"
-                        value={line.productId}
-                        onValueChange={(value) =>
-                          handleLineChange(index, "productId", value)
-                        }
-                        isRequired
+                      <Controller
+                        name={`lines.${index}.productId`}
+                        control={control}
+                        render={({ field, fieldState }) => (
+                          <Input
+                            {...field}
+                            label="Product ID"
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            isRequired
+                            isInvalid={fieldState.invalid}
+                            errorMessage={fieldState.error?.message}
+                          />
+                        )}
                       />
-                      <Input
-                        label="Quantity"
-                        type="number"
-                        value={line.quantity}
-                        onValueChange={(value) =>
-                          handleLineChange(index, "quantity", value)
-                        }
-                        isRequired
+                      <Controller
+                        name={`lines.${index}.quantity`}
+                        control={control}
+                        render={({ field, fieldState }) => (
+                          <Input
+                            {...field}
+                            label="Quantity"
+                            type="number"
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            isRequired
+                            isInvalid={fieldState.invalid}
+                            errorMessage={fieldState.error?.message}
+                          />
+                        )}
                       />
-                      <Input
-                        label="Unit price"
-                        type="number"
-                        value={line.unitPrice}
-                        onValueChange={(value) =>
-                          handleLineChange(index, "unitPrice", value)
-                        }
+                      <Controller
+                        name={`lines.${index}.unitPrice`}
+                        control={control}
+                        render={({ field, fieldState }) => (
+                          <Input
+                            {...field}
+                            label="Unit price"
+                            type="number"
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            isInvalid={fieldState.invalid}
+                            errorMessage={fieldState.error?.message}
+                          />
+                        )}
                       />
-                      <Input
-                        label="Description"
-                        value={line.description}
-                        onValueChange={(value) =>
-                          handleLineChange(index, "description", value)
-                        }
+                      <Controller
+                        name={`lines.${index}.description`}
+                        control={control}
+                        render={({ field, fieldState }) => (
+                          <Input
+                            {...field}
+                            label="Description"
+                            value={field.value ?? ""}
+                            onValueChange={field.onChange}
+                            isInvalid={fieldState.invalid}
+                            errorMessage={fieldState.error?.message}
+                          />
+                        )}
                       />
                     </div>
-                    {lines.length > 1 ? (
+                    {fields.length > 1 ? (
                       <div className="flex justify-end">
                         <Button
                           size="sm"
                           variant="light"
-                          onPress={() => removeLine(index)}
+                          onPress={() => remove(index)}
                         >
                           Remove
                         </Button>
@@ -260,13 +360,12 @@ export default function SalesOrderCreatePage(): React.ReactNode {
                   </CardBody>
                 </Card>
               ))}
+              {errors.lines?.message ? (
+                <p className="text-sm text-danger-600">
+                  {errors.lines.message as string}
+                </p>
+              ) : null}
             </div>
-
-            {error ? (
-              <div className="rounded-medium border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-600">
-                {error}
-              </div>
-            ) : null}
 
             <Button
               color="primary"
@@ -282,4 +381,3 @@ export default function SalesOrderCreatePage(): React.ReactNode {
     </div>
   );
 }
-
