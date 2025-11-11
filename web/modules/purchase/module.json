@@ -1,0 +1,12 @@
+{
+  "name": "purchase",
+  "title": "Purchasing",
+  "version": "0.1.0",
+  "description": "Procurement orders and receiving",
+  "category": "Operations",
+  "icon": "ShoppingCart",
+  "models": {
+    "purchase.order": "Purchase/PurchaseOrderModel"
+  }
+}
+

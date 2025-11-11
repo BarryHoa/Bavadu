@@ -1,0 +1,13 @@
+{
+  "name": "stock",
+  "title": "Stock",
+  "version": "0.1.0",
+  "description": "Inventory and warehouse management",
+  "category": "Operations",
+  "icon": "Boxes",
+  "models": {
+    "stock": "Stock/StockModel",
+    "stock.warehouse": "Stock/StockModel"
+  }
+}
+

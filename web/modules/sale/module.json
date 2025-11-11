@@ -1,0 +1,12 @@
+{
+  "name": "sale",
+  "title": "Sales",
+  "version": "0.1.0",
+  "description": "Sales orders and deliveries",
+  "category": "Operations",
+  "icon": "Receipt",
+  "models": {
+    "sale.order": "Sale/SalesOrderModel"
+  }
+}
+
