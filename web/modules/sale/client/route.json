@@ -1,0 +1,11 @@
+[
+  {
+    "path": "/",
+    "routes": [
+      { "path": "/", "page": "/Orders/SalesOrdersListPage" },
+      { "path": "/create", "page": "/Orders/SalesOrderCreatePage" },
+      { "path": "/view/[id]", "page": "/Orders/SalesOrderDetailPage" }
+    ]
+  }
+]
+

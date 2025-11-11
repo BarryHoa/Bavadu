@@ -1,0 +1,16 @@
+[
+  {
+    "path": "/",
+    "routes": [
+      { "path": "/", "page": "/Dashboard/StockDashboardPage" }
+    ]
+  },
+  {
+    "path": "/warehouses",
+    "routes": [
+      { "path": "/", "page": "/Warehouse/WarehouseListPage" },
+      { "path": "/create", "page": "/Warehouse/WarehouseCreatePage" }
+    ]
+  }
+]
+
