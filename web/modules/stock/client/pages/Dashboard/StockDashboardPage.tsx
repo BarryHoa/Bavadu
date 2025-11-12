@@ -90,11 +90,7 @@ export default function StockDashboardPage(): React.ReactNode {
   };
 
   const handleMovement = async (
-    action:
-      | "adjust"
-      | "inbound"
-      | "outbound"
-      | "transfer",
+    action: "adjust" | "inbound" | "outbound" | "transfer",
     payload: Record<string, string | number | undefined>
   ) => {
     try {
@@ -105,7 +101,9 @@ export default function StockDashboardPage(): React.ReactNode {
             productId: String(payload.productId),
             warehouseId: String(payload.warehouseId),
             quantityDelta: Number(payload.quantityDelta),
-            reference: payload.reference ? String(payload.reference) : undefined,
+            reference: payload.reference
+              ? String(payload.reference)
+              : undefined,
             note: payload.note ? String(payload.note) : undefined,
           });
           break;
@@ -114,7 +112,9 @@ export default function StockDashboardPage(): React.ReactNode {
             productId: String(payload.productId),
             warehouseId: String(payload.warehouseId),
             quantity: Number(payload.quantity),
-            reference: payload.reference ? String(payload.reference) : undefined,
+            reference: payload.reference
+              ? String(payload.reference)
+              : undefined,
             note: payload.note ? String(payload.note) : undefined,
           });
           break;
@@ -123,7 +123,9 @@ export default function StockDashboardPage(): React.ReactNode {
             productId: String(payload.productId),
             warehouseId: String(payload.warehouseId),
             quantity: Number(payload.quantity),
-            reference: payload.reference ? String(payload.reference) : undefined,
+            reference: payload.reference
+              ? String(payload.reference)
+              : undefined,
             note: payload.note ? String(payload.note) : undefined,
           });
           break;
@@ -133,7 +135,9 @@ export default function StockDashboardPage(): React.ReactNode {
             sourceWarehouseId: String(payload.sourceWarehouseId),
             targetWarehouseId: String(payload.targetWarehouseId),
             quantity: Number(payload.quantity),
-            reference: payload.reference ? String(payload.reference) : undefined,
+            reference: payload.reference
+              ? String(payload.reference)
+              : undefined,
             note: payload.note ? String(payload.note) : undefined,
           });
           break;
@@ -193,14 +197,20 @@ export default function StockDashboardPage(): React.ReactNode {
               placeholder="Optional product ID filter"
               value={filters.productId ?? ""}
               onValueChange={(value) =>
-                setFilters((prev) => ({ ...prev, productId: value || undefined }))
+                setFilters((prev) => ({
+                  ...prev,
+                  productId: value || undefined,
+                }))
               }
+              // isDisabled
             />
             <Select
               label="Warehouse"
-              selectedKeys={new Set<string>(
-                filters.warehouseId ? [filters.warehouseId] : []
-              )}
+              selectedKeys={
+                new Set<string>(
+                  filters.warehouseId ? [filters.warehouseId] : []
+                )
+              }
               onSelectionChange={(keys) => {
                 const [first] = Array.from(keys);
                 setFilters((prev) => ({
@@ -209,6 +219,7 @@ export default function StockDashboardPage(): React.ReactNode {
                 }));
               }}
               className="max-w-xs"
+              isDisabled
             >
               {warehouseOptions.map((option) => (
                 <SelectItem key={option.value}>{option.label}</SelectItem>
@@ -354,9 +365,7 @@ export default function StockDashboardPage(): React.ReactNode {
         <Button
           size="sm"
           variant="light"
-          onPress={() =>
-            router.push("/workspace/modules/purchase")
-          }
+          onPress={() => router.push("/workspace/modules/purchase")}
         >
           Go to Purchase Orders
         </Button>
@@ -458,9 +467,13 @@ function MovementCard({
         />
         <Select
           label="Warehouse"
-          selectedKeys={new Set<string>(
-            formValues.primaryWarehouseId ? [formValues.primaryWarehouseId] : []
-          )}
+          selectedKeys={
+            new Set<string>(
+              formValues.primaryWarehouseId
+                ? [formValues.primaryWarehouseId]
+                : []
+            )
+          }
           onSelectionChange={(keys) => {
             const [first] = Array.from(keys);
             handleChange(
@@ -478,11 +491,13 @@ function MovementCard({
         {requireSecondaryWarehouse ? (
           <Select
             label="Target Warehouse"
-            selectedKeys={new Set<string>(
-              formValues.secondaryWarehouseId
-                ? [formValues.secondaryWarehouseId]
-                : []
-            )}
+            selectedKeys={
+              new Set<string>(
+                formValues.secondaryWarehouseId
+                  ? [formValues.secondaryWarehouseId]
+                  : []
+              )
+            }
             onSelectionChange={(keys) => {
               const [first] = Array.from(keys);
               handleChange(
@@ -522,4 +537,3 @@ function MovementCard({
     </Card>
   );
 }
-

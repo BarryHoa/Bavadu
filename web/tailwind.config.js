@@ -47,7 +47,7 @@ const config = {
         light: {
           colors: {
             background: "#FFFFFF",
-            foreground: "#11181C",
+            foreground: "#71717A",
             content1: "#FFFFFF",
             content2: "#F4F4F5",
             content3: "#E4E4E7",
