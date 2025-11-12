@@ -1,12 +1,19 @@
 import {
+  SelectItem,
   Select as SelectPrimitive,
   SelectProps,
-  SelectItem,
 } from "@heroui/select";
 
 type SelectBaseProps = SelectProps & {};
 const SelectBase = (props: SelectBaseProps) => (
-  <SelectPrimitive labelPlacement="outside" size="sm" {...props} />
+  <SelectPrimitive
+    labelPlacement="outside"
+    variant="bordered"
+    size="sm"
+    {...props}
+    placeholder="Select an animal"
+    disabled
+  />
 );
 
 export default SelectBase;

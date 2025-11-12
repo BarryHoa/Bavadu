@@ -3,13 +3,12 @@
 
 import Input from "@base/client/components/Input";
 import LinkAs from "@base/client/components/LinkAs";
+import Select, { SelectItem } from "@base/client/components/Select";
 import { Button } from "@heroui/button";
 import {
   Card,
   CardBody,
   Divider,
-  Select,
-  SelectItem,
   Spinner,
   Table,
   TableBody,

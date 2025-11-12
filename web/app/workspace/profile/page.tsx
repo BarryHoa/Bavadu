@@ -2,12 +2,11 @@
 
 import DatePickerBase from "@base/client/components/DatePicker";
 import InputBase from "@base/client/components/Input";
-import SelectBase from "@base/client/components/Select";
+import SelectBase, { SelectItem } from "@base/client/components/Select";
 import { Avatar } from "@heroui/avatar";
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Textarea } from "@heroui/input";
-import { SelectItem } from "@heroui/select";
 import { parseDate } from "@internationalized/date";
 import {
   Briefcase,

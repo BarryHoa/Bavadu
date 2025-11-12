@@ -1,8 +1,7 @@
 "use client";
 
-import SelectBase from "@base/client/components/Select";
+import SelectBase, { SelectItem } from "@base/client/components/Select";
 import { Card, CardBody, CardHeader } from "@heroui/card";
-import { SelectItem } from "@heroui/select";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 

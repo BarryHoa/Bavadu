@@ -26,11 +26,23 @@ export function loadMenusFromModules(): MenuFactoryElm[] {
     return `${modulePrefix}${cleaned.replace(/\/$/, "") || "/"}`;
   };
 
+  const sortByOrder = (items: MenuFactoryElm[] = []) =>
+    [...items].sort((a, b) => {
+      const orderA = a.order ?? Number.MAX_SAFE_INTEGER;
+      const orderB = b.order ?? Number.MAX_SAFE_INTEGER;
+
+      if (orderA !== orderB) {
+        return orderA - orderB;
+      }
+
+      return a.name.localeCompare(b.name);
+    });
+
   const attachPrefix = (
     items: MenuFactoryElm[] = [],
     modulePrefix: string
   ): MenuFactoryElm[] =>
-    items.map((item) => ({
+    sortByOrder(items).map((item) => ({
       ...item,
       path: normalizePath(modulePrefix, item.path),
       as: normalizePath(modulePrefix, item.as ?? item.path),
@@ -74,5 +86,5 @@ export function loadMenusFromModules(): MenuFactoryElm[] {
     }
   }
 
-  return menus;
+  return sortByOrder(menus);
 }

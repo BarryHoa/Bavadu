@@ -2,6 +2,7 @@
   "key": "products-main",
   "name": "Product Management",
   "icon": "Package",
+  "order": 1,
   "children": [
     {
       "key": "products-list",

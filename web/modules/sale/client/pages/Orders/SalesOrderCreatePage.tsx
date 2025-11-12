@@ -2,8 +2,9 @@
 
 import Input from "@base/client/components/Input";
 import LinkAs from "@base/client/components/LinkAs";
+import Select, { SelectItem } from "@base/client/components/Select";
 import { Button } from "@heroui/button";
-import { Card, CardBody, Select, SelectItem, Textarea } from "@heroui/react";
+import { Card, CardBody, Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";

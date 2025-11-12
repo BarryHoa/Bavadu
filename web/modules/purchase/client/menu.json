@@ -1,0 +1,15 @@
+{
+  "key": "purchase-main",
+  "name": "Purchasing",
+  "icon": "ShoppingCart",
+  "order": 3,
+  "children": [
+    {
+      "key": "purchase-orders",
+      "name": "Purchase Orders",
+      "path": "/",
+      "as": "/",
+      "icon": "ClipboardList"
+    }
+  ]
+}

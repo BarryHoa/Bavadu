@@ -4,5 +4,6 @@ export type MenuFactoryElm = {
   path?: string;
   as?: string;
   icon?: string;
+  order?: number;
   children?: MenuFactoryElm[];
 };

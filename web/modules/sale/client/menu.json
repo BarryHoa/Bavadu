@@ -1,0 +1,15 @@
+{
+  "key": "sale-main",
+  "name": "Sales",
+  "icon": "TrendingUp",
+  "order": 2,
+  "children": [
+    {
+      "key": "sales-orders",
+      "name": "Sales Orders",
+      "path": "/",
+      "as": "/",
+      "icon": "ClipboardList"
+    }
+  ]
+}

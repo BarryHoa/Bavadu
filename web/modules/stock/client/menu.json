@@ -1,0 +1,22 @@
+{
+  "key": "stock-main",
+  "name": "Inventory",
+  "icon": "Boxes",
+  "order": 4,
+  "children": [
+    {
+      "key": "stock-dashboard",
+      "name": "Stock Dashboard",
+      "path": "/",
+      "as": "/",
+      "icon": "BarChart3"
+    },
+    {
+      "key": "stock-warehouses",
+      "name": "Warehouses",
+      "path": "/warehouses",
+      "as": "/warehouses",
+      "icon": "Building2"
+    }
+  ]
+}

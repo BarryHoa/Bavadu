@@ -96,3 +96,12 @@ body {
 [data-slot="list"] [data-hover="true"] [data-slot="title"] {
   color: var(--heroui-foreground);
 }
+
+/* Global placeholder color */
+input::placeholder,
+textarea::placeholder,
+select::placeholder,
+[data-slot="input"]::placeholder {
+  color: var(--heroui-gray-200);
+  opacity: 1;
+}

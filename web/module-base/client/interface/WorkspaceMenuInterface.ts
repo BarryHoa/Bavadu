@@ -8,6 +8,7 @@ export interface MenuWorkspaceElement<
   path?: string;
   as?: string;
   icon: string;
+  order?: number;
   badge?: string;
   children?: MenuWorkspaceElement<K>[];
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import Input from "@base/client/components/Input";
+import Select, { SelectItem } from "@base/client/components/Select";
 import { Button } from "@heroui/button";
 import {
   Card,
@@ -8,8 +9,6 @@ import {
   Checkbox,
   CheckboxGroup,
   Divider,
-  Select,
-  SelectItem,
   Switch,
   Textarea,
 } from "@heroui/react";
