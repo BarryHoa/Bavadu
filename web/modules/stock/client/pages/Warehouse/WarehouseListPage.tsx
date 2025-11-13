@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import Input from "@base/client/components/Input";
@@ -17,11 +16,36 @@ import {
   TableRow,
 } from "@heroui/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import StockService, {
-  WarehouseDto,
-} from "../../services/StockService";
+import StockService, { WarehouseDto } from "../../services/StockService";
+
+const statusColorMap: Record<string, "success" | "warning" | "danger"> = {
+  ACTIVE: "success",
+  MAINTENANCE: "warning",
+  SUSPENDED: "danger",
+  CLOSED: "danger",
+};
+
+const formatStatusLabel = (status: string) =>
+  status
+    .toLowerCase()
+    .replace(/_/g, " ")
+    .replace(/^\w/, (char) => char.toUpperCase());
+
+const formatLocation = (warehouse: WarehouseDto) => {
+  const parts = [warehouse.address.city, warehouse.address.country].filter(
+    (value) => value && value.trim().length > 0
+  );
+  return parts.length ? parts.join(", ") : "—";
+};
+
+const formatStockRange = (warehouse: WarehouseDto) => {
+  if (warehouse.maxStock === null || warehouse.maxStock === undefined) {
+    return `≥ ${warehouse.minStock}`;
+  }
+  return `${warehouse.minStock} - ${warehouse.maxStock}`;
+};
 
 export default function WarehouseListPage(): React.ReactNode {
   const router = useRouter();
@@ -32,7 +56,7 @@ export default function WarehouseListPage(): React.ReactNode {
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const loadWarehouses = async () => {
+  const loadWarehouses = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await StockService.listWarehouses();
@@ -44,11 +68,11 @@ export default function WarehouseListPage(): React.ReactNode {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadWarehouses();
-  }, []);
+  }, [loadWarehouses]);
 
   useEffect(() => {
     if (!search) {
@@ -56,22 +80,42 @@ export default function WarehouseListPage(): React.ReactNode {
       return;
     }
     const term = search.toLowerCase();
+
     setFilteredWarehouses(
-      warehouses.filter(
-        (warehouse) =>
-          warehouse.code.toLowerCase().includes(term) ||
-          warehouse.name.toLowerCase().includes(term) ||
-          (warehouse.description ?? "").toLowerCase().includes(term)
-      )
+      warehouses.filter((warehouse) => {
+        const candidates = [
+          warehouse.code,
+          warehouse.name,
+          warehouse.typeCode,
+          warehouse.status,
+          warehouse.notes ?? "",
+          warehouse.address?.city ?? "",
+          warehouse.address?.country ?? "",
+        ];
+
+        return candidates.some(
+          (value) =>
+            typeof value === "string" && value.toLowerCase().includes(term)
+        );
+      })
     );
   }, [search, warehouses]);
+
+  const handleEdit = useCallback(
+    (id: string) => {
+      router.push(`/workspace/modules/stock/warehouses/edit/${id}`);
+    },
+    [router]
+  );
 
   const rows = useMemo(
     () =>
       filteredWarehouses.map((warehouse) => ({
         ...warehouse,
-        codeAndName: `${warehouse.code} — ${warehouse.name}`,
-        description: warehouse.description || "—",
+        location: formatLocation(warehouse),
+        stockRange: formatStockRange(warehouse),
+        statusLabel: formatStatusLabel(warehouse.status),
+        statusColor: statusColorMap[warehouse.status] ?? "warning",
       })),
     [filteredWarehouses]
   );
@@ -99,7 +143,7 @@ export default function WarehouseListPage(): React.ReactNode {
         <CardBody className="space-y-4">
           <Input
             label="Search"
-            placeholder="Search by code, name or description"
+            placeholder="Search by code, name, type or location"
             value={search}
             onValueChange={setSearch}
           />
@@ -114,23 +158,37 @@ export default function WarehouseListPage(): React.ReactNode {
               <TableHeader>
                 <TableColumn>Code</TableColumn>
                 <TableColumn>Name</TableColumn>
-                <TableColumn>Description</TableColumn>
+                <TableColumn>Type</TableColumn>
+                <TableColumn>Location</TableColumn>
+                <TableColumn>Stock Range</TableColumn>
                 <TableColumn>Status</TableColumn>
+                <TableColumn>Actions</TableColumn>
               </TableHeader>
               <TableBody>
                 {rows.map((row) => (
                   <TableRow key={row.id}>
                     <TableCell>{row.code}</TableCell>
                     <TableCell>{row.name}</TableCell>
-                    <TableCell>{row.description}</TableCell>
+                    <TableCell>{row.typeCode}</TableCell>
+                    <TableCell>{row.location}</TableCell>
+                    <TableCell>{row.stockRange}</TableCell>
                     <TableCell>
                       <Chip
-                        color={row.isActive ? "success" : "danger"}
+                        color={row.statusColor}
                         variant="flat"
                         size="sm"
                       >
-                        {row.isActive ? "Active" : "Inactive"}
+                        {row.statusLabel}
                       </Chip>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        size="sm"
+                        variant="light"
+                        onPress={() => handleEdit(row.id)}
+                      >
+                        Edit
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

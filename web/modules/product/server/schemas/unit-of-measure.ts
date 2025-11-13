@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   boolean,
   decimal,
@@ -10,7 +11,7 @@ import {
 
 // Units of Measure
 export const table_unit_of_measure = pgTable("units_of_measure", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
   name: jsonb("name").notNull(), // LocaleDataType<string>
   symbol: varchar("symbol", { length: 20 }),
   isActive: boolean("is_active").default(true).notNull(),
@@ -25,7 +26,7 @@ export type NewTblUnitOfMeasure = typeof table_unit_of_measure.$inferInsert;
 
 // Unit of Measure Conversions
 export const table_uom_conversion = pgTable("uom_conversions", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
   uomId: uuid("uom_id")
     .references(() => table_unit_of_measure.id)
     .notNull(),

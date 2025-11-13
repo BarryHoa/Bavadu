@@ -3,7 +3,9 @@
     "group": "warehouses",
     "routes": [
       { "path": "/", "handler": "/warehouses/list" },
-      { "path": "/create", "handler": "/warehouses/create" }
+      { "path": "/create", "handler": "/warehouses/create" },
+      { "path": "/detail", "handler": "/warehouses/get-by-id" },
+      { "path": "/update", "handler": "/warehouses/update" }
     ]
   },
   {

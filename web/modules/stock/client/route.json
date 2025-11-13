@@ -9,7 +9,8 @@
     "path": "/warehouses",
     "routes": [
       { "path": "/", "page": "/Warehouse/WarehouseListPage" },
-      { "path": "/create", "page": "/Warehouse/WarehouseCreatePage" }
+      { "path": "/create", "page": "/Warehouse/WarehouseCreatePage" },
+      { "path": "/edit/[id]", "page": "/Warehouse/WarehouseEditPage" }
     ]
   }
 ]

@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   boolean,
   foreignKey,
@@ -13,7 +14,7 @@ import {
 export const table_dynamic_entity = pgTable(
   "dynamic_entities",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
     code: varchar("code", { length: 20 }).notNull(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
     description: jsonb("description"), // LocaleDataType<string>

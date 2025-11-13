@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   numeric,
   pgTable,
@@ -8,7 +9,9 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const table_purchase_order = pgTable("purchase_orders", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`uuid_generate_v7()`),
   code: varchar("code", { length: 64 }).notNull(),
   vendorName: varchar("vendor_name", { length: 128 }).notNull(),
   status: varchar("status", { length: 20 }).notNull().default("draft"),
@@ -26,4 +29,3 @@ export const table_purchase_order = pgTable("purchase_orders", {
 
 export type TblPurchaseOrder = typeof table_purchase_order.$inferSelect;
 export type NewTblPurchaseOrder = typeof table_purchase_order.$inferInsert;
-

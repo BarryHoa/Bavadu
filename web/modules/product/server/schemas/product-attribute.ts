@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   jsonb,
   pgTable,
@@ -10,7 +11,7 @@ import { table_product_variant } from "./product-variant";
 
 // Product Attributes (junction table)
 export const table_product_attribute = pgTable("product_attributes", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
   productVariantId: uuid("product_variant_id")
     .references(() => table_product_variant.id)
     .notNull(),

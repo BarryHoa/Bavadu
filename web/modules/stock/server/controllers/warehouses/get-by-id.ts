@@ -4,7 +4,7 @@ import { getEnv } from "@base/server";
 import type StockModel from "../../../server/models/Stock";
 import { serializeWarehouse } from "./utils";
 
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     const env = getEnv();
     const stockModel = env.getModel("stock") as StockModel | undefined;
@@ -16,14 +16,33 @@ export async function GET(_request: NextRequest) {
       );
     }
 
-    const warehouses = await stockModel.listWarehouses();
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, message: "Warehouse id is required" },
+        { status: 400 }
+      );
+    }
+
+    const warehouse = await stockModel.getWarehouse(id);
+
+    if (!warehouse) {
+      return NextResponse.json(
+        { success: false, message: "Warehouse not found" },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
-      data: warehouses.map(serializeWarehouse),
+      data: serializeWarehouse(warehouse),
     });
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Failed to fetch warehouses";
+      error instanceof Error ? error.message : "Failed to fetch warehouse";
     return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }
+

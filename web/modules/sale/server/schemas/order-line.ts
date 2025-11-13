@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   numeric,
   pgTable,
@@ -10,7 +11,7 @@ import { table_product_master } from "../../../product/server/schemas/product-ma
 import { table_sales_order } from "./order";
 
 export const table_sales_order_line = pgTable("sales_order_lines", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
   orderId: uuid("order_id")
     .notNull()
     .references(() => table_sales_order.id, { onDelete: "cascade" }),

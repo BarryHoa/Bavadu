@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   numeric,
   pgTable,
@@ -11,7 +12,7 @@ import { table_stock_warehouse } from "./warehouse";
 export const table_stock_level = pgTable(
   "stock_levels",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
     productId: uuid("product_id")
       .notNull()
       .references(() => table_product_master.id, {

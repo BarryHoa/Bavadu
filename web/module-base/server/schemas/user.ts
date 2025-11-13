@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   boolean,
   pgTable,
@@ -8,7 +9,7 @@ import {
 
 // Users
 export const table_user = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(), // UUID v7
+  id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`), // UUID v7
   avatar: varchar("avatar", { length: 512 }),
   gender: varchar("gender", { length: 10 }), // 'male', 'female', 'other'
   dateOfBirth: timestamp("date_of_birth", { withTimezone: true }),

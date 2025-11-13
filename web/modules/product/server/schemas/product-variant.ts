@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   boolean,
   jsonb,
@@ -11,7 +12,7 @@ import { table_unit_of_measure } from "./unit-of-measure";
 
 // Product Variants
 export const table_product_variant = pgTable("product_variants", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
   productMasterId: uuid("product_master_id")
     .references(() => table_product_master.id)
     .notNull(),

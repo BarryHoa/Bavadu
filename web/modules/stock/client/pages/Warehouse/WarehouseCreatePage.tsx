@@ -1,64 +1,32 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import Input from "@base/client/components/Input";
 import LinkAs from "@base/client/components/LinkAs";
 import { Button } from "@heroui/button";
-import { Card, CardBody, Checkbox } from "@heroui/react";
-import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useRouter } from "next/navigation";
-import { Controller, useForm } from "react-hook-form";
-import { boolean, minLength, object, optional, pipe, string, trim } from "valibot";
+import { useCallback } from "react";
 
+import type { WarehousePayload } from "../../services/StockService";
 import StockService from "../../services/StockService";
-
-const warehouseFormSchema = object({
-  code: pipe(string(), trim(), minLength(1, "Code is required")),
-  name: pipe(string(), trim(), minLength(1, "Name is required")),
-  description: optional(pipe(string(), trim())),
-  isActive: boolean(),
-});
-
-type WarehouseFormValues = {
-  code: string;
-  name: string;
-  description?: string;
-  isActive: boolean;
-};
+import WarehouseForm from "./components/WarehouseForm";
 
 export default function WarehouseCreatePage(): React.ReactNode {
   const router = useRouter();
 
-  const { control, handleSubmit, formState: { isSubmitting }, reset } =
-    useForm<WarehouseFormValues>({
-    resolver: valibotResolver(warehouseFormSchema),
-    defaultValues: {
-      code: "",
-      name: "",
-      description: "",
-      isActive: true,
+  const handleSubmit = useCallback(
+    async (payload: WarehousePayload) => {
+      await StockService.createWarehouse(payload);
+      router.push("/workspace/modules/stock/warehouses");
     },
-    });
-
-  const onSubmit = async (values: WarehouseFormValues) => {
-    await StockService.createWarehouse({
-      code: values.code.trim(),
-      name: values.name.trim(),
-      description: values.description?.trim() || undefined,
-      isActive: values.isActive,
-    });
-
-    reset();
-    router.push("/workspace/modules/stock/warehouses");
-  };
+    [router]
+  );
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Create Warehouse</h1>
           <p className="text-default-500">
-            Define the basic information for a new warehouse.
+            Define the core details and controls for a new warehouse location.
           </p>
         </div>
         <Button
@@ -71,82 +39,21 @@ export default function WarehouseCreatePage(): React.ReactNode {
         </Button>
       </div>
 
-      <Card>
-        <CardBody>
-          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-            <Controller
-              name="code"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Input
-                  {...field}
-                  label="Code"
-                  placeholder="Unique warehouse code"
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="name"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Input
-                  {...field}
-                  label="Name"
-                  placeholder="Warehouse name"
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="description"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Input
-                  {...field}
-                  label="Description"
-                  placeholder="Optional description"
-                  value={field.value ?? ""}
-                  onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="isActive"
-              control={control}
-              render={({ field }) => (
-                <Checkbox
-                  isSelected={field.value}
-                  onValueChange={field.onChange}
-                >
-                  Active
-                </Checkbox>
-              )}
-            />
-
-            <div className="flex items-center gap-3">
-              <Button
-                color="primary"
-                type="submit"
-                isLoading={isSubmitting}
-                disabled={isSubmitting}
-              >
-                Create
-              </Button>
-            </div>
-          </form>
-        </CardBody>
-      </Card>
+      <WarehouseForm
+        submitLabel="Create warehouse"
+        onSubmit={handleSubmit}
+        secondaryAction={
+          <Button
+            size="sm"
+            variant="light"
+            onPress={() =>
+              router.push("/workspace/modules/stock/warehouses")
+            }
+          >
+            Cancel
+          </Button>
+        }
+      />
     </div>
   );
 }

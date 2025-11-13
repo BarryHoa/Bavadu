@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   boolean,
   jsonb,
@@ -11,7 +12,7 @@ import { table_product_category } from "./product-category";
 
 // Product Masters
 export const table_product_master = pgTable("product_masters", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
   code: varchar("code", { length: 100 }).notNull().unique(),
   name: jsonb("name").notNull(), // LocaleDataType<string>
   image: text("image"),

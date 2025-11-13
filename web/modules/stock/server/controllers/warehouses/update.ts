@@ -10,7 +10,7 @@ import {
   serializeWarehouse,
 } from "./utils";
 
-export async function POST(request: NextRequest) {
+export async function PUT(request: NextRequest) {
   try {
     const env = getEnv();
     const stockModel = env.getModel("stock") as StockModel | undefined;
@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
     }
 
     const payload = await request.json();
+    const id = parseRequiredString(payload.id, "Warehouse id");
     const code = parseRequiredString(payload.code, "Code");
     const name = parseRequiredString(payload.name, "Name");
     const typeCode = parseRequiredString(payload.typeCode, "Type");
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
       throw new Error("Max stock must be greater than or equal to min stock");
     }
 
-    const record = await stockModel.createWarehouse({
+    const record = await stockModel.updateWarehouse(id, {
       code,
       name,
       typeCode,
@@ -52,13 +53,14 @@ export async function POST(request: NextRequest) {
       notes: parseString(payload.notes) ?? null,
     });
 
-    return NextResponse.json(
-      { success: true, data: serializeWarehouse(record) },
-      { status: 201 }
-    );
+    return NextResponse.json({
+      success: true,
+      data: serializeWarehouse(record),
+    });
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Failed to create warehouse";
+      error instanceof Error ? error.message : "Failed to update warehouse";
     return NextResponse.json({ success: false, message }, { status: 400 });
   }
 }
+
