@@ -362,8 +362,8 @@ export default function WarehouseForm({
               render={({ field, fieldState }) => (
                 <Input
                   {...field}
-                  label="Manager (employee ID)"
-                  placeholder="Optional manager employee ID"
+                  label="Manager (user ID)"
+                  placeholder="Optional manager user ID"
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
                   isInvalid={fieldState.invalid}
@@ -377,8 +377,8 @@ export default function WarehouseForm({
               render={({ field, fieldState }) => (
                 <Input
                   {...field}
-                  label="Contact (employee ID)"
-                  placeholder="Optional contact employee ID"
+                  label="Contact (user ID)"
+                  placeholder="Optional contact user ID"
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
                   isInvalid={fieldState.invalid}

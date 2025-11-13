@@ -12,7 +12,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { table_employee } from "@base/server/schemas/employee";
+import { table_user } from "@base/server/schemas/user";
 import {
   WarehouseAddress,
   WarehouseStatus,
@@ -32,10 +32,10 @@ export const table_stock_warehouse = pgTable(
       .notNull()
       .default("ACTIVE"),
     companyId: uuid("company_id"),
-    managerId: uuid("manager_id").references(() => table_employee.id, {
+    managerId: uuid("manager_id").references(() => table_user.id, {
       onDelete: "set null",
     }),
-    contactId: uuid("contact_id").references(() => table_employee.id, {
+    contactId: uuid("contact_id").references(() => table_user.id, {
       onDelete: "set null",
     }),
     address: jsonb("address").$type<WarehouseAddress>().notNull(),
