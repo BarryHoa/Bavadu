@@ -1,6 +1,7 @@
 import Input from "@base/client/components/Input";
+import Select, { SelectItem } from "@base/client/components/Select";
 import { Button } from "@heroui/button";
-import { Card, CardBody, Select, SelectItem, Textarea } from "@heroui/react";
+import { Card, CardBody, Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { type Key, type ReactNode, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -52,7 +53,29 @@ const warehouseFormSchema = object({
   notes: optional(pipe(string(), trim())),
 });
 
-type WarehouseFormValues = Input<typeof warehouseFormSchema>;
+type WarehouseFormValues = {
+  code: string;
+  name: string;
+  typeCode: string;
+  status: string;
+  companyId?: string;
+  managerId?: string;
+  contactId?: string;
+  address: {
+    line1: string;
+    line2?: string;
+    city: string;
+    state?: string;
+    postalCode?: string;
+    country: string;
+  };
+  valuationMethod: string;
+  minStock?: string;
+  maxStock?: string;
+  accountInventory?: string;
+  accountAdjustment?: string;
+  notes?: string;
+};
 
 const statusOptions = warehouseStatuses.map((status) => ({
   value: status,
@@ -96,6 +119,7 @@ interface WarehouseFormProps {
   onSubmit: (payload: WarehousePayload) => Promise<void>;
   submitLabel: string;
   secondaryAction?: ReactNode;
+  submitError?: string | null;
 }
 
 export default function WarehouseForm({
@@ -103,6 +127,7 @@ export default function WarehouseForm({
   onSubmit,
   submitLabel,
   secondaryAction,
+  submitError,
 }: WarehouseFormProps) {
   const defaultValues: WarehouseFormValues = useMemo(
     () => ({
@@ -217,6 +242,12 @@ export default function WarehouseForm({
           onSubmit={handleSubmit(handleFormSubmit)}
           noValidate
         >
+          {submitError ? (
+            <div className="rounded-large border border-danger-200 bg-danger-50 px-3 py-2 text-sm text-danger-600">
+              {submitError}
+            </div>
+          ) : null}
+
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <Controller
               name="code"

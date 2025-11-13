@@ -1,24 +1,10 @@
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 
 import { getEnv } from "@base/server";
 import { BaseModel } from "@base/server/models/BaseModel";
-import {
-  WarehouseAddress,
-  WarehouseStatus,
-  WarehouseValuationMethod,
-  warehouseStatuses,
-  warehouseValuationMethods,
-} from "../../../common/constants";
-import type {
-  NewTblStockWarehouse,
-  TblStockLevel,
-  TblStockWarehouse,
-} from "../../schemas";
-import {
-  table_stock_level,
-  table_stock_move,
-  table_stock_warehouse,
-} from "../../schemas";
+
+import type { TblStockLevel } from "../../schemas";
+import { table_stock_level, table_stock_move } from "../../schemas";
 
 type StockMovementKind = "inbound" | "outbound" | "adjustment" | "transfer";
 
@@ -50,28 +36,6 @@ interface TransferStockInput extends MovementBaseInput {
   quantity: number;
 }
 
-type WarehouseRecordInput = Omit<
-  NewTblStockWarehouse,
-  "id" | "createdAt" | "updatedAt"
->;
-
-interface WarehousePayload {
-  code: string;
-  name: string;
-  typeCode: string;
-  status?: string | null;
-  companyId?: string | null;
-  managerId?: string | null;
-  contactId?: string | null;
-  address: WarehouseAddress;
-  valuationMethod?: string | null;
-  minStock?: number | null;
-  maxStock?: number | null;
-  accountInventory?: string | null;
-  accountAdjustment?: string | null;
-  notes?: string | null;
-}
-
 interface StockSummaryFilter {
   productId?: string;
   warehouseId?: string;
@@ -80,113 +44,6 @@ interface StockSummaryFilter {
 export default class StockModel extends BaseModel<typeof table_stock_move> {
   constructor() {
     super(table_stock_move);
-  }
-
-  async listWarehouses(): Promise<TblStockWarehouse[]> {
-    const db = getEnv().getDb();
-    return db
-      .select()
-      .from(table_stock_warehouse)
-      .orderBy(asc(table_stock_warehouse.name));
-  }
-
-  async getWarehouse(id: string): Promise<TblStockWarehouse | null> {
-    const db = getEnv().getDb();
-    const [record] = await db
-      .select()
-      .from(table_stock_warehouse)
-      .where(eq(table_stock_warehouse.id, id))
-      .limit(1);
-    return record ?? null;
-  }
-
-  async createWarehouse(payload: WarehousePayload): Promise<TblStockWarehouse> {
-    const db = getEnv().getDb();
-    const insertPayload = this.normalizeWarehousePayload(payload);
-
-    const [record] = await db
-      .insert(table_stock_warehouse)
-      .values(insertPayload)
-      .returning();
-    return record;
-  }
-
-  async updateWarehouse(
-    id: string,
-    payload: WarehousePayload
-  ): Promise<TblStockWarehouse> {
-    const db = getEnv().getDb();
-    const [record] = await db
-      .update(table_stock_warehouse)
-      .set({
-        ...this.normalizeWarehousePayload(payload),
-        updatedAt: sql`now()`,
-      })
-      .where(eq(table_stock_warehouse.id, id))
-      .returning();
-
-    if (!record) {
-      throw new Error("Warehouse not found");
-    }
-
-    return record;
-  }
-
-  private normalizeWarehousePayload(
-    payload: WarehousePayload
-  ): WarehouseRecordInput {
-    return {
-      code: payload.code.trim(),
-      name: payload.name.trim(),
-      typeCode: payload.typeCode.trim(),
-      status: this.validateStatus(payload.status),
-      companyId: payload.companyId ?? null,
-      managerId: payload.managerId ?? null,
-      contactId: payload.contactId ?? null,
-      address: payload.address,
-      valuationMethod: this.validateValuationMethod(payload.valuationMethod),
-      minStock:
-        payload.minStock === undefined || payload.minStock === null
-          ? undefined
-          : payload.minStock.toString(),
-      maxStock:
-        payload.maxStock === undefined
-          ? undefined
-          : payload.maxStock === null
-            ? null
-            : payload.maxStock.toString(),
-      accountInventory: payload.accountInventory ?? null,
-      accountAdjustment: payload.accountAdjustment ?? null,
-      notes: payload.notes ?? null,
-    };
-  }
-
-  private validateStatus(status?: string | null): WarehouseStatus {
-    if (!status) {
-      return "ACTIVE";
-    }
-
-    const normalized = status.toUpperCase() as WarehouseStatus;
-    if (!warehouseStatuses.includes(normalized)) {
-      throw new Error(`Invalid warehouse status: ${status}`);
-    }
-
-    return normalized;
-  }
-
-  private validateValuationMethod(
-    value?: string | null
-  ): WarehouseValuationMethod {
-    if (!value) {
-      return "FIFO";
-    }
-
-    const normalized = value.toUpperCase() as WarehouseValuationMethod;
-    if (!warehouseValuationMethods.includes(normalized)) {
-      throw new Error(`Invalid warehouse valuation method: ${value}`);
-    }
-
-    return normalized;
   }
 
   async adjustStock(input: AdjustStockInput) {

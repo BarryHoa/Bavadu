@@ -31,13 +31,18 @@ export default class PurchaseOrderService extends ClientHttpService {
   }
 
   list() {
-    return this.get<{ success: boolean; data: PurchaseOrderDto[] }>("/");
+    return this.get<{
+      success: boolean;
+      data: PurchaseOrderDto[];
+      message?: string;
+    }>("/");
   }
 
   getById(id: string) {
     return this.get<{
       success: boolean;
       data: { order: PurchaseOrderDto; lines: PurchaseOrderLineDto[] };
+      message?: string;
     }>(`/detail?id=${id}`);
   }
 
@@ -58,14 +63,16 @@ export default class PurchaseOrderService extends ClientHttpService {
     return this.post<{
       success: boolean;
       data: { order: PurchaseOrderDto; lines: PurchaseOrderLineDto[] };
+      message?: string;
     }>("/create", payload);
   }
 
   confirm(orderId: string) {
-    return this.post<{ success: boolean; data: PurchaseOrderDto }>(
-      "/confirm",
-      { orderId }
-    );
+    return this.post<{
+      success: boolean;
+      data: PurchaseOrderDto;
+      message?: string;
+    }>("/confirm", { orderId });
   }
 
   receive(payload: {
@@ -76,10 +83,11 @@ export default class PurchaseOrderService extends ClientHttpService {
     userId?: string;
     lines: Array<{ lineId: string; quantity: number }>;
   }) {
-    return this.post<{ success: boolean; data: { order: PurchaseOrderDto; lines: PurchaseOrderLineDto[] } }>(
-      "/receive",
-      payload
-    );
+    return this.post<{
+      success: boolean;
+      data: { order: PurchaseOrderDto; lines: PurchaseOrderLineDto[] };
+      message?: string;
+    }>("/receive", payload);
   }
 }
 

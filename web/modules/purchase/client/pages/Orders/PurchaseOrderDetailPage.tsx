@@ -1,13 +1,14 @@
 "use client";
 
+import Input from "@base/client/components/Input";
 import LinkAs from "@base/client/components/LinkAs";
+import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { Button } from "@heroui/button";
 import {
   Card,
   CardBody,
   Chip,
   Divider,
-  Input as HeroInput,
   Spinner,
   Table,
   TableBody,
@@ -15,60 +16,60 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-  Textarea,
 } from "@heroui/react";
+import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
-  purchaseOrderService,
   PurchaseOrderDto,
   PurchaseOrderLineDto,
+  purchaseOrderService,
 } from "../../services/PurchaseOrderService";
 
 export default function PurchaseOrderDetailPage(): React.ReactNode {
   const params = useParams<{ id: string }>();
   const router = useRouter();
-  const orderId = params?.id;
+  const orderId = Array.isArray(params?.id) ? params?.id[0] : params?.id;
 
-  const [order, setOrder] = useState<PurchaseOrderDto | null>(null);
-  const [lines, setLines] = useState<PurchaseOrderLineDto[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [receiveNote, setReceiveNote] = useState("");
   const [receiveWarehouseId, setReceiveWarehouseId] = useState<string>("");
   const [quantities, setQuantities] = useState<Record<string, string>>({});
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
 
-  const loadOrder = useCallback(async () => {
-    if (!orderId) return;
+  const orderQuery = useQuery({
+    queryKey: ["purchaseOrder", orderId],
+    enabled: Boolean(orderId),
+    queryFn: async () => {
+      if (!orderId) {
+        throw new Error("Purchase order identifier is missing.");
+      }
 
-    setIsLoading(true);
-    setError(null);
-    try {
       const response = await purchaseOrderService.getById(orderId);
-      setOrder(response.data.order);
-      setLines(response.data.lines);
-      setReceiveWarehouseId(response.data.order.warehouseId ?? "");
-      setQuantities(
-        response.data.lines.reduce<Record<string, string>>((acc, line) => {
-          acc[line.id] = "0";
-          return acc;
-        }, {})
-      );
-    } catch (err) {
-      console.error(err);
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch purchase order."
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  }, [orderId]);
+      if (!response.success || !response.data) {
+        throw new Error("Failed to fetch purchase order.");
+      }
+
+      return response.data;
+    },
+  });
+
+  const order = orderQuery.data?.order ?? null;
+  const lines = orderQuery.data?.lines ?? [];
 
   useEffect(() => {
-    loadOrder();
-  }, [loadOrder]);
+    if (!order || lines.length === 0) {
+      return;
+    }
+
+    setReceiveWarehouseId(order.warehouseId ?? "");
+    setQuantities(
+      lines.reduce<Record<string, string>>((acc, line) => {
+        acc[line.id] = "0";
+        return acc;
+      }, {})
+    );
+  }, [order?.id, order?.warehouseId, lines]);
 
   const pendingLines = useMemo(
     () =>
@@ -79,64 +80,75 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
     [lines]
   );
 
-  const handleConfirm = async () => {
-    if (!orderId) return;
-    setIsProcessing(true);
-    try {
-      await purchaseOrderService.confirm(orderId);
-      await loadOrder();
-    } catch (err) {
-      console.error(err);
-      setError(
-        err instanceof Error ? err.message : "Failed to confirm purchase order."
-      );
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+  const {
+    handleSubmit: confirmOrder,
+    isPending: isConfirming,
+    error: confirmError,
+  } = useCreateUpdate<string, PurchaseOrderDto>({
+    mutationFn: async (id) => {
+      const response = await purchaseOrderService.confirm(id);
+      if (!response.success || !response.data) {
+        throw new Error("Failed to confirm purchase order.");
+      }
 
-  const handleReceive = async () => {
-    if (!orderId) return;
+      return response.data;
+    },
+    invalidateQueries: [["purchaseOrder", orderId], ["purchaseOrders"]],
+    onSuccess: () => {
+      orderQuery.refetch();
+    },
+  });
 
-    const payloadLines = Object.entries(quantities)
-      .map(([lineId, quantity]) => ({
-        lineId,
-        quantity: Number(quantity),
-      }))
-      .filter((line) => line.quantity > 0);
+  const {
+    handleSubmit: receiveOrder,
+    isPending: isReceiving,
+    error: receiveError,
+  } = useCreateUpdate<
+    {
+      orderId: string;
+      warehouseId?: string;
+      note?: string;
+      lines: Array<{ lineId: string; quantity: number }>;
+    },
+    { order: PurchaseOrderDto; lines: PurchaseOrderLineDto[] }
+  >({
+    mutationFn: async (payload) => {
+      const response = await purchaseOrderService.receive(payload);
+      if (!response.success || !response.data) {
+        throw new Error("Failed to receive products.");
+      }
 
-    if (payloadLines.length === 0) {
-      setError("Enter at least one quantity to receive.");
-      return;
-    }
-
-    setIsProcessing(true);
-    try {
-      await purchaseOrderService.receive({
-        orderId,
-        warehouseId: receiveWarehouseId || undefined,
-        note: receiveNote || undefined,
-        lines: payloadLines,
-      });
+      return response.data;
+    },
+    invalidateQueries: [["purchaseOrder", orderId], ["purchaseOrders"]],
+    onSuccess: () => {
       setReceiveNote("");
-      setQuantities((prev) =>
-        Object.keys(prev).reduce<Record<string, string>>((acc, key) => {
-          acc[key] = "0";
-          return acc;
-        }, {})
-      );
-      await loadOrder();
-    } catch (err) {
-      console.error(err);
-      setError(
-        err instanceof Error ? err.message : "Failed to receive products."
-      );
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+      setLocalError(null);
+      orderQuery.refetch();
+    },
+  });
 
-  if (isLoading) {
+  const actionError = confirmError ?? receiveError ?? localError;
+
+  if (!orderId) {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-medium border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-600">
+          Purchase order identifier is missing.
+        </div>
+        <Button
+          as={LinkAs as any}
+          size="sm"
+          variant="light"
+          href="/workspace/modules/purchase"
+        >
+          Back to list
+        </Button>
+      </div>
+    );
+  }
+
+  if (orderQuery.isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <Spinner label="Loading purchase order..." />
@@ -144,11 +156,13 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
     );
   }
 
-  if (error) {
+  if (orderQuery.isError) {
     return (
       <div className="space-y-4">
         <div className="rounded-medium border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-600">
-          {error}
+          {orderQuery.error instanceof Error
+            ? orderQuery.error.message
+            : "Failed to fetch purchase order."}
         </div>
         <Button
           as={LinkAs as any}
@@ -190,6 +204,12 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
           Back to list
         </Button>
       </div>
+
+      {actionError ? (
+        <div className="rounded-medium border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-600">
+          {actionError}
+        </div>
+      ) : null}
 
       <Card>
         <CardBody className="space-y-3">
@@ -234,8 +254,12 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
                 <TableRow key={line.id}>
                   <TableCell>{line.productId}</TableCell>
                   <TableCell>{line.description || "—"}</TableCell>
-                  <TableCell>{Number(line.quantityOrdered).toFixed(2)}</TableCell>
-                  <TableCell>{Number(line.quantityReceived).toFixed(2)}</TableCell>
+                  <TableCell>
+                    {Number(line.quantityOrdered).toFixed(2)}
+                  </TableCell>
+                  <TableCell>
+                    {Number(line.quantityReceived).toFixed(2)}
+                  </TableCell>
                   <TableCell>
                     {Number(line.unitPrice).toLocaleString(undefined, {
                       style: "currency",
@@ -253,9 +277,9 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
         <Button
           color="primary"
           size="sm"
-          onPress={handleConfirm}
+          onPress={() => confirmOrder(orderId)}
           isDisabled={order.status !== "draft"}
-          isLoading={isProcessing}
+          isLoading={isConfirming}
         >
           Confirm order
         </Button>
@@ -275,18 +299,18 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
           <div>
             <h2 className="text-lg font-semibold">Receive products</h2>
             <p className="text-default-500">
-              Record products received from the vendor. Enter only the quantities
-              being received now.
+              Record products received from the vendor. Enter only the
+              quantities being received now.
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
-            <HeroInput
+            <Input
               label="Warehouse"
               placeholder="Warehouse ID (fallback to order warehouse)"
               value={receiveWarehouseId}
               onValueChange={setReceiveWarehouseId}
             />
-            <HeroInput
+            <Input
               label="Reference"
               placeholder="Optional reference"
               value={receiveNote}
@@ -314,25 +338,25 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
                         Remaining: {openQty.toFixed(2)}
                       </p>
                     </div>
-                    <HeroInput
+                    <Input
                       label="Quantity to receive"
                       type="number"
                       value={quantities[line.id] ?? "0"}
                       min={0}
                       max={openQty}
-                      onValueChange={(value) =>
+                      onValueChange={(value: string) =>
                         setQuantities((prev) => ({
                           ...prev,
                           [line.id]: value,
                         }))
                       }
                     />
-                    <HeroInput
+                    <Input
                       label="Description"
                       value={line.description ?? ""}
                       isReadOnly
                     />
-                    <HeroInput
+                    <Input
                       label="Ordered / Received"
                       value={`${Number(line.quantityOrdered).toFixed(
                         2
@@ -347,9 +371,30 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
 
           <Button
             color="primary"
-            onPress={handleReceive}
+            onPress={async () => {
+              if (!orderId) return;
+
+              const payloadLines = Object.entries(quantities)
+                .map(([lineId, quantity]) => ({
+                  lineId,
+                  quantity: Number(quantity),
+                }))
+                .filter((line) => line.quantity > 0);
+
+              if (payloadLines.length === 0) {
+                setLocalError("Enter at least one quantity to receive.");
+                return;
+              }
+
+              await receiveOrder({
+                orderId,
+                warehouseId: receiveWarehouseId || undefined,
+                note: receiveNote || undefined,
+                lines: payloadLines,
+              });
+            }}
             isDisabled={pendingLines.length === 0}
-            isLoading={isProcessing}
+            isLoading={isReceiving}
           >
             Receive selected quantities
           </Button>
@@ -358,4 +403,3 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
     </div>
   );
 }
-

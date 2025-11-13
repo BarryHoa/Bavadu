@@ -1,13 +1,14 @@
 "use client";
 
+import Input from "@base/client/components/Input";
 import LinkAs from "@base/client/components/LinkAs";
+import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { Button } from "@heroui/button";
 import {
   Card,
   CardBody,
   Chip,
   Divider,
-  Input as HeroInput,
   Spinner,
   Table,
   TableBody,
@@ -17,58 +18,57 @@ import {
   TableRow,
   Textarea,
 } from "@heroui/react";
+import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
-  salesOrderService,
   SalesOrderDto,
   SalesOrderLineDto,
+  salesOrderService,
 } from "../../services/SalesOrderService";
 
 export default function SalesOrderDetailPage(): React.ReactNode {
   const params = useParams<{ id: string }>();
   const router = useRouter();
-  const orderId = params?.id;
+  const orderId = Array.isArray(params?.id) ? params?.id[0] : params?.id;
 
-  const [order, setOrder] = useState<SalesOrderDto | null>(null);
-  const [lines, setLines] = useState<SalesOrderLineDto[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [deliverNote, setDeliverNote] = useState("");
   const [deliverWarehouseId, setDeliverWarehouseId] = useState<string>("");
   const [quantities, setQuantities] = useState<Record<string, string>>({});
-  const [isProcessing, setIsProcessing] = useState(false);
 
-  const loadOrder = useCallback(async () => {
-    if (!orderId) return;
-
-    setIsLoading(true);
-    setError(null);
-    try {
+  const orderQuery = useQuery({
+    queryKey: ["salesOrder", orderId],
+    enabled: Boolean(orderId),
+    queryFn: async () => {
+      if (!orderId) {
+        throw new Error("Sales order identifier is missing.");
+      }
       const response = await salesOrderService.getById(orderId);
-      setOrder(response.data.order);
-      setLines(response.data.lines);
-      setDeliverWarehouseId(response.data.order.warehouseId ?? "");
-      setQuantities(
-        response.data.lines.reduce<Record<string, string>>((acc, line) => {
-          acc[line.id] = "0";
-          return acc;
-        }, {})
-      );
-    } catch (err) {
-      console.error(err);
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch sales order."
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  }, [orderId]);
+      if (!response.success || !response.data) {
+        throw new Error(response.message ?? "Failed to fetch sales order.");
+      }
+
+      return response.data;
+    },
+  });
+
+  const order = orderQuery.data?.order ?? null;
+  const lines = orderQuery.data?.lines ?? [];
 
   useEffect(() => {
-    loadOrder();
-  }, [loadOrder]);
+    if (!order || lines.length === 0) {
+      return;
+    }
+
+    setDeliverWarehouseId(order.warehouseId ?? "");
+    setQuantities(
+      lines.reduce<Record<string, string>>((acc, line) => {
+        acc[line.id] = "0";
+        return acc;
+      }, {})
+    );
+  }, [order?.id, order?.warehouseId, lines]);
 
   const pendingLines = useMemo(
     () =>
@@ -79,64 +79,73 @@ export default function SalesOrderDetailPage(): React.ReactNode {
     [lines]
   );
 
-  const handleConfirm = async () => {
-    if (!orderId) return;
-    setIsProcessing(true);
-    try {
-      await salesOrderService.confirm(orderId);
-      await loadOrder();
-    } catch (err) {
-      console.error(err);
-      setError(
-        err instanceof Error ? err.message : "Failed to confirm sales order."
-      );
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+  const {
+    handleSubmit: confirmOrder,
+    isPending: isConfirming,
+    error: confirmError,
+  } = useCreateUpdate<string, SalesOrderDto>({
+    mutationFn: async (id) => {
+      const response = await salesOrderService.confirm(id);
+      if (!response.success || !response.data) {
+        throw new Error(response.message ?? "Failed to confirm sales order.");
+      }
+      return response.data;
+    },
+    invalidateQueries: [["salesOrder", orderId], ["salesOrders"]],
+    onSuccess: () => {
+      orderQuery.refetch();
+    },
+  });
 
-  const handleDeliver = async () => {
-    if (!orderId) return;
+  const {
+    handleSubmit: deliverOrder,
+    isPending: isDelivering,
+    error: deliverError,
+  } = useCreateUpdate<
+    {
+      orderId: string;
+      warehouseId?: string;
+      note?: string;
+      lines: Array<{ lineId: string; quantity: number }>;
+    },
+    { order: SalesOrderDto; lines: SalesOrderLineDto[] }
+  >({
+    mutationFn: async (payload) => {
+      const response = await salesOrderService.deliver(payload);
+      if (!response.success || !response.data) {
+        throw new Error(response.message ?? "Failed to deliver products.");
+      }
 
-    const payloadLines = Object.entries(quantities)
-      .map(([lineId, quantity]) => ({
-        lineId,
-        quantity: Number(quantity),
-      }))
-      .filter((line) => line.quantity > 0);
-
-    if (payloadLines.length === 0) {
-      setError("Enter at least one quantity to deliver.");
-      return;
-    }
-
-    setIsProcessing(true);
-    try {
-      await salesOrderService.deliver({
-        orderId,
-        warehouseId: deliverWarehouseId || undefined,
-        note: deliverNote || undefined,
-        lines: payloadLines,
-      });
+      return response.data;
+    },
+    invalidateQueries: [["salesOrder", orderId], ["salesOrders"]],
+    onSuccess: () => {
       setDeliverNote("");
-      setQuantities((prev) =>
-        Object.keys(prev).reduce<Record<string, string>>((acc, key) => {
-          acc[key] = "0";
-          return acc;
-        }, {})
-      );
-      await loadOrder();
-    } catch (err) {
-      console.error(err);
-      setError(
-        err instanceof Error ? err.message : "Failed to deliver products."
-      );
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+      orderQuery.refetch();
+    },
+  });
 
-  if (isLoading) {
+  const actionError = confirmError ?? deliverError;
+
+  if (!orderId) {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-medium border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-600">
+          Sales order identifier is missing.
+        </div>
+        <Button
+          as={LinkAs as any}
+          size="sm"
+          variant="light"
+          href="/workspace/modules/sale"
+        >
+          Back to list
+        </Button>
+      </div>
+    );
+  }
+
+  if (orderQuery.isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <Spinner label="Loading sales order..." />
@@ -144,11 +153,13 @@ export default function SalesOrderDetailPage(): React.ReactNode {
     );
   }
 
-  if (error) {
+  if (orderQuery.isError) {
     return (
       <div className="space-y-4">
         <div className="rounded-medium border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-600">
-          {error}
+          {orderQuery.error instanceof Error
+            ? orderQuery.error.message
+            : "Failed to fetch sales order."}
         </div>
         <Button
           as={LinkAs as any}
@@ -190,6 +201,12 @@ export default function SalesOrderDetailPage(): React.ReactNode {
           Back to list
         </Button>
       </div>
+
+      {actionError ? (
+        <div className="rounded-medium border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-600">
+          {actionError}
+        </div>
+      ) : null}
 
       <Card>
         <CardBody className="space-y-3">
@@ -234,7 +251,9 @@ export default function SalesOrderDetailPage(): React.ReactNode {
                 <TableRow key={line.id}>
                   <TableCell>{line.productId}</TableCell>
                   <TableCell>{line.description || "—"}</TableCell>
-                  <TableCell>{Number(line.quantityOrdered).toFixed(2)}</TableCell>
+                  <TableCell>
+                    {Number(line.quantityOrdered).toFixed(2)}
+                  </TableCell>
                   <TableCell>
                     {Number(line.quantityDelivered).toFixed(2)}
                   </TableCell>
@@ -251,13 +270,13 @@ export default function SalesOrderDetailPage(): React.ReactNode {
         </CardBody>
       </Card>
 
-  <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3">
         <Button
           color="primary"
           size="sm"
-          onPress={handleConfirm}
+          onPress={() => confirmOrder(orderId)}
           isDisabled={order.status !== "draft"}
-          isLoading={isProcessing}
+          isLoading={isConfirming}
         >
           Confirm order
         </Button>
@@ -281,7 +300,7 @@ export default function SalesOrderDetailPage(): React.ReactNode {
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
-            <HeroInput
+            <Input
               label="Warehouse"
               placeholder="Warehouse ID"
               value={deliverWarehouseId}
@@ -296,9 +315,7 @@ export default function SalesOrderDetailPage(): React.ReactNode {
           </div>
 
           {pendingLines.length === 0 ? (
-            <p className="text-default-500">
-              All lines have been delivered.
-            </p>
+            <p className="text-default-500">All lines have been delivered.</p>
           ) : (
             <div className="space-y-3">
               {pendingLines.map((line) => {
@@ -315,25 +332,25 @@ export default function SalesOrderDetailPage(): React.ReactNode {
                         Remaining: {openQty.toFixed(2)}
                       </p>
                     </div>
-                    <HeroInput
+                    <Input
                       label="Quantity to deliver"
                       type="number"
                       value={quantities[line.id] ?? "0"}
                       min={0}
                       max={openQty}
-                      onValueChange={(value) =>
+                      onValueChange={(value: string) =>
                         setQuantities((prev) => ({
                           ...prev,
                           [line.id]: value,
                         }))
                       }
                     />
-                    <HeroInput
+                    <Input
                       label="Description"
                       value={line.description ?? ""}
                       isReadOnly
                     />
-                    <HeroInput
+                    <Input
                       label="Ordered / Delivered"
                       value={`${Number(line.quantityOrdered).toFixed(
                         2
@@ -348,9 +365,25 @@ export default function SalesOrderDetailPage(): React.ReactNode {
 
           <Button
             color="primary"
-            onPress={handleDeliver}
+            onPress={async () => {
+              if (!orderId) return;
+
+              const payloadLines = Object.entries(quantities)
+                .map(([lineId, quantity]) => ({
+                  lineId,
+                  quantity: Number(quantity),
+                }))
+                .filter((line) => line.quantity > 0);
+
+              await deliverOrder({
+                orderId,
+                warehouseId: deliverWarehouseId || undefined,
+                note: deliverNote || undefined,
+                lines: payloadLines,
+              });
+            }}
             isDisabled={pendingLines.length === 0}
-            isLoading={isProcessing}
+            isLoading={isDelivering}
           >
             Deliver selected quantities
           </Button>
@@ -359,4 +392,3 @@ export default function SalesOrderDetailPage(): React.ReactNode {
     </div>
   );
 }
-

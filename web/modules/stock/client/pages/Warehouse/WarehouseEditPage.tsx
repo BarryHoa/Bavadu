@@ -1,9 +1,11 @@
 "use client";
 
+import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Spinner } from "@heroui/react";
+import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 
 import type {
   WarehouseDto,
@@ -15,9 +17,6 @@ import WarehouseForm from "./components/WarehouseForm";
 export default function WarehouseEditPage(): React.ReactNode {
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const [warehouse, setWarehouse] = useState<WarehouseDto | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const warehouseId = useMemo(() => {
     const value = params?.id;
@@ -25,49 +24,50 @@ export default function WarehouseEditPage(): React.ReactNode {
     return Array.isArray(value) ? value[0] : value;
   }, [params]);
 
-  useEffect(() => {
-    if (warehouseId) {
-      return;
-    }
-    setIsLoading(false);
-    setWarehouse(null);
-    setErrorMessage("Warehouse identifier is missing.");
-  }, [warehouseId]);
-
-  useEffect(() => {
-    if (!warehouseId) return;
-
-    const loadWarehouse = async () => {
-      setIsLoading(true);
-      setErrorMessage(null);
-      try {
-        const response = await StockService.getWarehouseById(warehouseId);
-        if (response.success && response.data) {
-          setWarehouse(response.data);
-          setErrorMessage(null);
-        } else {
-          setWarehouse(null);
-          setErrorMessage(response.message ?? "Unable to load warehouse");
-        }
-      } catch (error) {
-        console.error(error);
-        setWarehouse(null);
-        setErrorMessage("Failed to load warehouse");
-      } finally {
-        setIsLoading(false);
+  const warehouseQuery = useQuery({
+    queryKey: ["warehouses", warehouseId],
+    enabled: Boolean(warehouseId),
+    queryFn: async () => {
+      if (!warehouseId) {
+        throw new Error("Warehouse identifier is missing.");
       }
-    };
 
-    loadWarehouse();
-  }, [warehouseId]);
+      const response = await StockService.getWarehouseById(warehouseId);
+      if (!response.success || !response.data) {
+        throw new Error(response.message ?? "Unable to load warehouse.");
+      }
 
-  const handleSubmit = useCallback(
-    async (payload: WarehousePayload) => {
-      if (!warehouseId) return;
-      await StockService.updateWarehouse({ ...payload, id: warehouseId });
+      return response.data;
+    },
+  });
+
+  const { handleSubmit, error } = useCreateUpdate<
+    WarehousePayload & { id: string },
+    WarehouseDto
+  >({
+    mutationFn: async (payload) => {
+      const response = await StockService.updateWarehouse(payload);
+      if (!response.success || !response.data) {
+        throw new Error(response.message ?? "Failed to update warehouse.");
+      }
+
+      return response.data;
+    },
+    invalidateQueries: [["warehouses"], ["warehouses", warehouseId]],
+    onSuccess: () => {
       router.push("/workspace/modules/stock/warehouses");
     },
-    [router, warehouseId]
+  });
+
+  const handleFormSubmit = useCallback(
+    async (payload: WarehousePayload) => {
+      if (!warehouseId) {
+        return;
+      }
+
+      await handleSubmit({ ...payload, id: warehouseId });
+    },
+    [handleSubmit, warehouseId]
   );
 
   return (
@@ -82,17 +82,34 @@ export default function WarehouseEditPage(): React.ReactNode {
         </Button>
       </div>
 
-      {isLoading ? (
+      {warehouseQuery.isLoading ? (
         <Card>
           <CardBody className="flex items-center justify-center py-10">
             <Spinner label="Loading warehouse..." />
           </CardBody>
         </Card>
-      ) : warehouse ? (
+      ) : warehouseQuery.isError ? (
+        <Card>
+          <CardBody className="space-y-3">
+            <p className="text-default-500">
+              {warehouseQuery.error instanceof Error
+                ? warehouseQuery.error.message
+                : "Failed to load warehouse."}
+            </p>
+            <Button
+              size="sm"
+              onPress={() => router.push("/workspace/modules/stock/warehouses")}
+            >
+              Back to list
+            </Button>
+          </CardBody>
+        </Card>
+      ) : warehouseQuery.data ? (
         <WarehouseForm
-          initialData={warehouse}
+          initialData={warehouseQuery.data}
           submitLabel="Save changes"
-          onSubmit={handleSubmit}
+          onSubmit={handleFormSubmit}
+          submitError={error}
           secondaryAction={
             <Button
               size="sm"
@@ -103,21 +120,7 @@ export default function WarehouseEditPage(): React.ReactNode {
             </Button>
           }
         />
-      ) : (
-        <Card>
-          <CardBody className="space-y-3">
-            <p className="text-default-500">
-              {errorMessage ?? "Warehouse not found or has been removed."}
-            </p>
-            <Button
-              size="sm"
-              onPress={() => router.push("/workspace/modules/stock/warehouses")}
-            >
-              Back to list
-            </Button>
-          </CardBody>
-        </Card>
-      )}
+      ) : null}
     </div>
   );
 }

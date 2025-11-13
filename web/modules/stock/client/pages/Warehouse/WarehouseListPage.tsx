@@ -1,24 +1,16 @@
 "use client";
 
-import Input from "@base/client/components/Input";
 import LinkAs from "@base/client/components/LinkAs";
-import { Button } from "@heroui/button";
+import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import {
-  Card,
-  CardBody,
-  Chip,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from "@heroui/react";
+  DATA_TABLE_COLUMN_KEY_ACTION,
+  type DataTableColumn,
+} from "@base/client/components/DataTable";
+import { Button, Chip } from "@heroui/react";
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
 
-import StockService, { WarehouseDto } from "../../services/StockService";
+import type { WarehouseDto } from "../../services/StockService";
 
 const statusColorMap: Record<string, "success" | "warning" | "danger"> = {
   ACTIVE: "success",
@@ -31,7 +23,7 @@ const formatStatusLabel = (status: string) =>
   status
     .toLowerCase()
     .replace(/_/g, " ")
-    .replace(/^\w/, (char) => char.toUpperCase());
+    .replace(/^[a-z]/, (char) => char.toUpperCase());
 
 const formatLocation = (warehouse: WarehouseDto) => {
   const parts = [warehouse.address.city, warehouse.address.country].filter(
@@ -49,76 +41,67 @@ const formatStockRange = (warehouse: WarehouseDto) => {
 
 export default function WarehouseListPage(): React.ReactNode {
   const router = useRouter();
-  const [warehouses, setWarehouses] = useState<WarehouseDto[]>([]);
-  const [filteredWarehouses, setFilteredWarehouses] = useState<WarehouseDto[]>(
-    []
-  );
-  const [search, setSearch] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
-  const loadWarehouses = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const response = await StockService.listWarehouses();
-      const list = response.data ?? [];
-      setWarehouses(list);
-      setFilteredWarehouses(list);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadWarehouses();
-  }, [loadWarehouses]);
-
-  useEffect(() => {
-    if (!search) {
-      setFilteredWarehouses(warehouses);
-      return;
-    }
-    const term = search.toLowerCase();
-
-    setFilteredWarehouses(
-      warehouses.filter((warehouse) => {
-        const candidates = [
-          warehouse.code,
-          warehouse.name,
-          warehouse.typeCode,
-          warehouse.status,
-          warehouse.notes ?? "",
-          warehouse.address?.city ?? "",
-          warehouse.address?.country ?? "",
-        ];
-
-        return candidates.some(
-          (value) =>
-            typeof value === "string" && value.toLowerCase().includes(term)
-        );
-      })
-    );
-  }, [search, warehouses]);
-
-  const handleEdit = useCallback(
-    (id: string) => {
-      router.push(`/workspace/modules/stock/warehouses/edit/${id}`);
-    },
-    [router]
-  );
-
-  const rows = useMemo(
-    () =>
-      filteredWarehouses.map((warehouse) => ({
-        ...warehouse,
-        location: formatLocation(warehouse),
-        stockRange: formatStockRange(warehouse),
-        statusLabel: formatStatusLabel(warehouse.status),
-        statusColor: statusColorMap[warehouse.status] ?? "warning",
-      })),
-    [filteredWarehouses]
-  );
+  const columns = useMemo<DataTableColumn<WarehouseDto>[]>(() => {
+    return [
+      {
+        key: "code",
+        label: "Code",
+        render: (_, row) => (
+          <LinkAs href={`/workspace/modules/stock/warehouses/edit/${row.id}`}>
+            {row.code}
+          </LinkAs>
+        ),
+      },
+      {
+        key: "name",
+        label: "Name",
+      },
+      {
+        key: "typeCode",
+        label: "Type",
+      },
+      {
+        key: "address",
+        label: "Location",
+        render: (_, row) => formatLocation(row),
+      },
+      {
+        key: "stockRange",
+        label: "Stock Range",
+        render: (_, row) => formatStockRange(row),
+      },
+      {
+        key: "status",
+        label: "Status",
+        render: (_, row) => (
+          <Chip
+            size="sm"
+            variant="flat"
+            color={statusColorMap[row.status] ?? "warning"}
+          >
+            {formatStatusLabel(row.status)}
+          </Chip>
+        ),
+      },
+      {
+        key: DATA_TABLE_COLUMN_KEY_ACTION,
+        label: "Actions",
+        align: "end",
+        render: (_, row) => (
+          <Button
+            size="sm"
+            variant="light"
+            onPress={() =>
+              router.push(`/workspace/modules/stock/warehouses/edit/${row.id}`)
+            }
+          >
+            Edit
+          </Button>
+        ),
+      },
+    ];
+  }, [router]);
 
   return (
     <div className="space-y-6">
@@ -133,64 +116,11 @@ export default function WarehouseListPage(): React.ReactNode {
         </Button>
       </div>
 
-      <Card>
-        <CardBody className="space-y-4">
-          <Input
-            label="Search"
-            placeholder="Search by code, name, type or location"
-            value={search}
-            onValueChange={setSearch}
-          />
-          {isLoading ? (
-            <div className="flex items-center justify-center py-10">
-              <Spinner label="Loading warehouses..." />
-            </div>
-          ) : rows.length === 0 ? (
-            <p className="text-default-500">No warehouses found.</p>
-          ) : (
-            <Table aria-label="Warehouse list" removeWrapper>
-              <TableHeader>
-                <TableColumn>Code</TableColumn>
-                <TableColumn>Name</TableColumn>
-                <TableColumn>Type</TableColumn>
-                <TableColumn>Location</TableColumn>
-                <TableColumn>Stock Range</TableColumn>
-                <TableColumn>Status</TableColumn>
-                <TableColumn>Actions</TableColumn>
-              </TableHeader>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell>{row.code}</TableCell>
-                    <TableCell>{row.name}</TableCell>
-                    <TableCell>{row.typeCode}</TableCell>
-                    <TableCell>{row.location}</TableCell>
-                    <TableCell>{row.stockRange}</TableCell>
-                    <TableCell>
-                      <Chip
-                        color={row.statusColor}
-                        variant="flat"
-                        size="sm"
-                      >
-                        {row.statusLabel}
-                      </Chip>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        size="sm"
-                        variant="light"
-                        onPress={() => handleEdit(row.id)}
-                      >
-                        Edit
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardBody>
-      </Card>
+      <ViewListDataTable<WarehouseDto>
+        model="stock.warehouse"
+        columns={columns}
+        isDummyData={false}
+      />
 
       <div className="flex justify-end">
         <Button
@@ -204,4 +134,3 @@ export default function WarehouseListPage(): React.ReactNode {
     </div>
   );
 }
-

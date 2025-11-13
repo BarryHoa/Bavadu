@@ -3,7 +3,7 @@
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Badge } from "@heroui/badge";
-import { Input } from "@heroui/input";
+import Input from "@base/client/components/Input";
 import {
   Search,
   Package,
@@ -152,7 +152,7 @@ export default function ModuleManagementsPage() {
               size="sm"
               startContent={<Search size={16} />}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onValueChange={setSearchTerm}
             />
             <Button color="primary" size="sm" title="Add module" variant="flat">
               Add

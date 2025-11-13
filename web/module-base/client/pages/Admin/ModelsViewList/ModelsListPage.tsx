@@ -2,7 +2,7 @@
 
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/card";
-import { Input } from "@heroui/input";
+import Input from "@base/client/components/Input";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import MiniSearch from "minisearch";
 import { useCallback, useEffect, useMemo, useState } from "react";

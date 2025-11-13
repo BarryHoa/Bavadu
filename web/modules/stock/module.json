@@ -7,7 +7,7 @@
   "icon": "Boxes",
   "models": {
     "stock": "Stock/StockModel",
-    "stock.warehouse": "Stock/StockModel"
+    "stock.warehouse": "Warehouse/WarehouseModel"
   }
 }
 

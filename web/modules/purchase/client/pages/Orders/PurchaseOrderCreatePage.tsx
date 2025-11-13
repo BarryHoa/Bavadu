@@ -3,11 +3,13 @@
 import Input from "@base/client/components/Input";
 import LinkAs from "@base/client/components/LinkAs";
 import Select, { SelectItem } from "@base/client/components/Select";
+import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   Controller,
   useFieldArray,
@@ -25,9 +27,7 @@ import {
   trim,
 } from "valibot";
 
-import StockService, {
-  WarehouseDto,
-} from "@mdl/stock/client/services/StockService";
+import StockService from "@mdl/stock/client/services/StockService";
 import { purchaseOrderService } from "../../services/PurchaseOrderService";
 
 const quantitySchema = pipe(
@@ -101,7 +101,6 @@ const defaultLine: PurchaseOrderFormValues["lines"][number] = {
 
 export default function PurchaseOrderCreatePage(): React.ReactNode {
   const router = useRouter();
-  const [warehouses, setWarehouses] = useState<WarehouseDto[]>([]);
 
   const {
     control,
@@ -124,17 +123,48 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
     name: "lines",
   });
 
-  useEffect(() => {
-    const fetchWarehouses = async () => {
-      try {
-        const response = await StockService.listWarehouses();
-        setWarehouses(response.data ?? []);
-      } catch (err) {
-        console.error(err);
+  const warehousesQuery = useQuery({
+    queryKey: ["warehouses"],
+    queryFn: async () => {
+      const response = await StockService.listWarehouses();
+      if (!response.success) {
+        throw new Error(response.message ?? "Failed to load warehouses.");
       }
-    };
-    fetchWarehouses();
-  }, []);
+      return response.data ?? [];
+    },
+  });
+
+  const { handleSubmit: submitOrder, error: submitError } = useCreateUpdate<
+    {
+      vendorName: string;
+      warehouseId?: string;
+      expectedDate?: string;
+      currency?: string;
+      notes?: string;
+      lines: Array<{
+        productId: string;
+        quantity: number;
+        unitPrice?: number;
+        description?: string;
+      }>;
+    },
+    {
+      order: { id: string };
+    }
+  >({
+    mutationFn: async (payload) => {
+      const response = await purchaseOrderService.create(payload);
+      if (!response.success || !response.data) {
+        throw new Error(response.message ?? "Failed to create purchase order.");
+      }
+
+      return response.data;
+    },
+    invalidateQueries: [["purchaseOrders"]],
+    onSuccess: (data) => {
+      router.push(`/workspace/modules/purchase/view/${data.order.id}`);
+    },
+  });
 
   const onSubmit: SubmitHandler<PurchaseOrderFormValues> = async (values) => {
     const payload = {
@@ -153,18 +183,16 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
         .filter((line) => line.productId && line.quantity > 0),
     };
 
-    const created = await purchaseOrderService.create(payload);
-    const newlyCreatedId = created.data.order.id;
-    router.push(`/workspace/modules/purchase/view/${newlyCreatedId}`);
+    await submitOrder(payload);
   };
 
   const warehouseOptions = useMemo(
     () =>
-      warehouses.map((warehouse) => ({
+      (warehousesQuery.data ?? []).map((warehouse) => ({
         value: warehouse.id,
         label: `${warehouse.code} — ${warehouse.name}`,
       })),
-    [warehouses]
+    [warehousesQuery.data]
   );
 
   return (
@@ -182,6 +210,18 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
 
       <Card>
         <CardBody>
+          {submitError ? (
+            <div className="mb-4 rounded-large border border-danger-200 bg-danger-50 px-3 py-2 text-sm text-danger-600">
+              {submitError}
+            </div>
+          ) : null}
+          {warehousesQuery.isError ? (
+            <div className="mb-4 rounded-large border border-warning-200 bg-warning-50 px-3 py-2 text-sm text-warning-600">
+              {warehousesQuery.error instanceof Error
+                ? warehousesQuery.error.message
+                : "Unable to load warehouses. You can continue without selecting one."}
+            </div>
+          ) : null}
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="grid gap-4 md:grid-cols-2">
               <Controller
@@ -216,6 +256,7 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
                     }}
                     isInvalid={fieldState.invalid}
                     errorMessage={fieldState.error?.message}
+                    isDisabled={warehousesQuery.isLoading}
                   >
                     {warehouseOptions.map((option) => (
                       <SelectItem key={option.value}>{option.label}</SelectItem>

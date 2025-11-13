@@ -31,13 +31,18 @@ export default class SalesOrderService extends ClientHttpService {
   }
 
   list() {
-    return this.get<{ success: boolean; data: SalesOrderDto[] }>("/");
+    return this.get<{
+      success: boolean;
+      data: SalesOrderDto[];
+      message?: string;
+    }>("/");
   }
 
   getById(id: string) {
     return this.get<{
       success: boolean;
       data: { order: SalesOrderDto; lines: SalesOrderLineDto[] };
+      message?: string;
     }>(`/detail?id=${id}`);
   }
 
@@ -58,14 +63,16 @@ export default class SalesOrderService extends ClientHttpService {
     return this.post<{
       success: boolean;
       data: { order: SalesOrderDto; lines: SalesOrderLineDto[] };
+      message?: string;
     }>("/create", payload);
   }
 
   confirm(orderId: string) {
-    return this.post<{ success: boolean; data: SalesOrderDto }>(
-      "/confirm",
-      { orderId }
-    );
+    return this.post<{
+      success: boolean;
+      data: SalesOrderDto;
+      message?: string;
+    }>("/confirm", { orderId });
   }
 
   deliver(payload: {
@@ -76,10 +83,11 @@ export default class SalesOrderService extends ClientHttpService {
     userId?: string;
     lines: Array<{ lineId: string; quantity: number }>;
   }) {
-    return this.post<{ success: boolean; data: { order: SalesOrderDto; lines: SalesOrderLineDto[] } }>(
-      "/deliver",
-      payload
-    );
+    return this.post<{
+      success: boolean;
+      data: { order: SalesOrderDto; lines: SalesOrderLineDto[] };
+      message?: string;
+    }>("/deliver", payload);
   }
 }
 

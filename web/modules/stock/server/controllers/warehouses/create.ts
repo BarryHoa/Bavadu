@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { getEnv } from "@base/server";
-import type StockModel from "../../../server/models/Stock";
+import type WarehouseModel from "../../../server/models/Warehouse";
 import {
   parseAddress,
   parseNullableNumber,
@@ -13,9 +13,11 @@ import {
 export async function POST(request: NextRequest) {
   try {
     const env = getEnv();
-    const stockModel = env.getModel("stock") as StockModel | undefined;
+    const warehouseModel = env.getModel("stock.warehouse") as
+      | WarehouseModel
+      | undefined;
 
-    if (!stockModel) {
+    if (!warehouseModel) {
       return NextResponse.json(
         { success: false, message: "Stock model not available" },
         { status: 500 }
@@ -35,7 +37,7 @@ export async function POST(request: NextRequest) {
       throw new Error("Max stock must be greater than or equal to min stock");
     }
 
-    const record = await stockModel.createWarehouse({
+    const record = await warehouseModel.createWarehouse({
       code,
       name,
       typeCode,

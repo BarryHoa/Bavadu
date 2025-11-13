@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import Input from "@base/client/components/Input";
@@ -17,8 +16,9 @@ import {
   TableHeader,
   TableRow,
 } from "@heroui/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import StockService, {
   StockSummaryItem,
@@ -32,143 +32,217 @@ interface MovementResult {
 
 export default function StockDashboardPage(): React.ReactNode {
   const router = useRouter();
-  const [warehouses, setWarehouses] = useState<WarehouseDto[]>([]);
-  const [summary, setSummary] = useState<StockSummaryItem[]>([]);
   const [filters, setFilters] = useState<{
     productId?: string;
     warehouseId?: string;
   }>({});
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [appliedFilters, setAppliedFilters] = useState<{
+    productId?: string;
+    warehouseId?: string;
+  }>({});
   const [movementResult, setMovementResult] = useState<MovementResult | null>(
     null
   );
 
-  const loadWarehouses = useCallback(async () => {
-    try {
+  const queryClient = useQueryClient();
+
+  const warehousesQuery = useQuery({
+    queryKey: ["warehouses"],
+    queryFn: async () => {
       const response = await StockService.listWarehouses();
-      setWarehouses(response.data ?? []);
-    } catch (error) {
-      console.error(error);
-    }
+      if (!response.success) {
+        throw new Error(response.message ?? "Failed to load warehouses.");
+      }
+
+      return response.data ?? [];
+    },
+  });
+
+  const stockSummaryQuery = useQuery({
+    queryKey: ["stockSummary", appliedFilters],
+    queryFn: async () => {
+      const response = await StockService.getStockSummary(appliedFilters);
+      if (!response.success) {
+        throw new Error(response.message ?? "Failed to load stock summary.");
+      }
+
+      return (response.data ?? []).map((item) => ({
+        ...item,
+        quantity: Number(item.quantity),
+        reservedQuantity: Number(item.reservedQuantity),
+      }));
+    },
+  });
+
+  const handleFilterChange = useCallback(() => {
+    setAppliedFilters(filters);
+  }, [filters]);
+
+  const handleResetFilters = useCallback(() => {
+    setFilters({});
+    setAppliedFilters({});
   }, []);
 
-  const loadSummary = useCallback(
-    async (override?: { productId?: string; warehouseId?: string }) => {
-      setIsLoading(true);
-      try {
-        const response = await StockService.getStockSummary(
-          override ?? filters
-        );
-        setSummary(
-          (response.data ?? []).map((item) => ({
-            ...item,
-            quantity: Number(item.quantity),
-            reservedQuantity: Number(item.reservedQuantity),
-          }))
-        );
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
+  const onMovementSuccess = useCallback(() => {
+    setMovementResult({
+      type: "success",
+      message: "Stock movement recorded successfully.",
+    });
+    queryClient.invalidateQueries({ queryKey: ["stockSummary"] });
+  }, [queryClient]);
+
+  const onMovementError = useCallback((error: unknown) => {
+    setMovementResult({
+      type: "error",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Failed to process stock movement.",
+    });
+  }, []);
+
+  type AdjustPayload = {
+    productId: string;
+    warehouseId: string;
+    quantityDelta: number;
+    reference?: string;
+    note?: string;
+  };
+
+  type InOutPayload = {
+    productId: string;
+    warehouseId: string;
+    quantity: number;
+    reference?: string;
+    note?: string;
+  };
+
+  type TransferPayload = {
+    productId: string;
+    sourceWarehouseId: string;
+    targetWarehouseId: string;
+    quantity: number;
+    reference?: string;
+    note?: string;
+  };
+
+  const adjustMutation = useMutation({
+    mutationFn: async (payload: AdjustPayload) => {
+      const response = await StockService.adjustStock(payload);
+      if (!response.success) {
+        throw new Error(response.message ?? "Failed to adjust stock.");
       }
     },
-    [filters]
-  );
+    onSuccess: onMovementSuccess,
+    onError: onMovementError,
+  });
 
-  useEffect(() => {
-    loadWarehouses();
-    loadSummary();
-  }, []);
-
-  const handleFilterChange = async () => {
-    await loadSummary();
-  };
-
-  const handleResetFilters = async () => {
-    setFilters({});
-    await loadSummary({});
-  };
-
-  const handleMovement = async (
-    action: "adjust" | "inbound" | "outbound" | "transfer",
-    payload: Record<string, string | number | undefined>
-  ) => {
-    try {
-      setMovementResult(null);
-      switch (action) {
-        case "adjust":
-          await StockService.adjustStock({
-            productId: String(payload.productId),
-            warehouseId: String(payload.warehouseId),
-            quantityDelta: Number(payload.quantityDelta),
-            reference: payload.reference
-              ? String(payload.reference)
-              : undefined,
-            note: payload.note ? String(payload.note) : undefined,
-          });
-          break;
-        case "inbound":
-          await StockService.receiveStock({
-            productId: String(payload.productId),
-            warehouseId: String(payload.warehouseId),
-            quantity: Number(payload.quantity),
-            reference: payload.reference
-              ? String(payload.reference)
-              : undefined,
-            note: payload.note ? String(payload.note) : undefined,
-          });
-          break;
-        case "outbound":
-          await StockService.issueStock({
-            productId: String(payload.productId),
-            warehouseId: String(payload.warehouseId),
-            quantity: Number(payload.quantity),
-            reference: payload.reference
-              ? String(payload.reference)
-              : undefined,
-            note: payload.note ? String(payload.note) : undefined,
-          });
-          break;
-        case "transfer":
-          await StockService.transferStock({
-            productId: String(payload.productId),
-            sourceWarehouseId: String(payload.sourceWarehouseId),
-            targetWarehouseId: String(payload.targetWarehouseId),
-            quantity: Number(payload.quantity),
-            reference: payload.reference
-              ? String(payload.reference)
-              : undefined,
-            note: payload.note ? String(payload.note) : undefined,
-          });
-          break;
-        default:
-          break;
+  const receiveMutation = useMutation({
+    mutationFn: async (payload: InOutPayload) => {
+      const response = await StockService.receiveStock(payload);
+      if (!response.success) {
+        throw new Error(response.message ?? "Failed to receive stock.");
       }
-      setMovementResult({
-        type: "success",
-        message: "Stock movement recorded successfully.",
-      });
-      await loadSummary();
-    } catch (error) {
-      console.error(error);
-      setMovementResult({
-        type: "error",
-        message:
-          error instanceof Error
-            ? error.message
-            : "Failed to process stock movement.",
-      });
-    }
-  };
+    },
+    onSuccess: onMovementSuccess,
+    onError: onMovementError,
+  });
+
+  const issueMutation = useMutation({
+    mutationFn: async (payload: InOutPayload) => {
+      const response = await StockService.issueStock(payload);
+      if (!response.success) {
+        throw new Error(response.message ?? "Failed to issue stock.");
+      }
+    },
+    onSuccess: onMovementSuccess,
+    onError: onMovementError,
+  });
+
+  const transferMutation = useMutation({
+    mutationFn: async (payload: TransferPayload) => {
+      const response = await StockService.transferStock(payload);
+      if (!response.success) {
+        throw new Error(response.message ?? "Failed to transfer stock.");
+      }
+    },
+    onSuccess: onMovementSuccess,
+    onError: onMovementError,
+  });
+
+  const handleMovement = useCallback(
+    async (
+      action: "adjust" | "inbound" | "outbound" | "transfer",
+      payload: Record<string, string | number | undefined>
+    ) => {
+      setMovementResult(null);
+      try {
+        switch (action) {
+          case "adjust":
+            await adjustMutation.mutateAsync({
+              productId: String(payload.productId),
+              warehouseId: String(payload.warehouseId),
+              quantityDelta: Number(payload.quantityDelta),
+              reference: payload.reference
+                ? String(payload.reference)
+                : undefined,
+              note: payload.note ? String(payload.note) : undefined,
+            });
+            break;
+          case "inbound":
+            await receiveMutation.mutateAsync({
+              productId: String(payload.productId),
+              warehouseId: String(payload.warehouseId),
+              quantity: Number(payload.quantity),
+              reference: payload.reference
+                ? String(payload.reference)
+                : undefined,
+              note: payload.note ? String(payload.note) : undefined,
+            });
+            break;
+          case "outbound":
+            await issueMutation.mutateAsync({
+              productId: String(payload.productId),
+              warehouseId: String(payload.warehouseId),
+              quantity: Number(payload.quantity),
+              reference: payload.reference
+                ? String(payload.reference)
+                : undefined,
+              note: payload.note ? String(payload.note) : undefined,
+            });
+            break;
+          case "transfer":
+            await transferMutation.mutateAsync({
+              productId: String(payload.productId),
+              sourceWarehouseId: String(payload.sourceWarehouseId),
+              targetWarehouseId: String(payload.targetWarehouseId),
+              quantity: Number(payload.quantity),
+              reference: payload.reference
+                ? String(payload.reference)
+                : undefined,
+              note: payload.note ? String(payload.note) : undefined,
+            });
+            break;
+          default:
+            break;
+        }
+      } catch {
+        // error handled in onError
+      }
+    },
+    [adjustMutation, issueMutation, receiveMutation, transferMutation]
+  );
 
   const warehouseOptions = useMemo(
     () =>
-      warehouses.map((warehouse) => ({
+      (warehousesQuery.data ?? []).map((warehouse) => ({
         value: warehouse.id,
         label: `${warehouse.code} — ${warehouse.name}`,
       })),
-    [warehouses]
+    [warehousesQuery.data]
   );
+
+  const summary = stockSummaryQuery.data ?? [];
 
   return (
     <div className="space-y-6">
@@ -196,7 +270,6 @@ export default function StockDashboardPage(): React.ReactNode {
                   productId: value || undefined,
                 }))
               }
-              // isDisabled
             />
             <Select
               label="Warehouse"
@@ -213,7 +286,9 @@ export default function StockDashboardPage(): React.ReactNode {
                 }));
               }}
               className="max-w-xs"
-              isDisabled
+              isDisabled={
+                warehousesQuery.isLoading || warehouseOptions.length === 0
+              }
             >
               {warehouseOptions.map((option) => (
                 <SelectItem key={option.value}>{option.label}</SelectItem>
@@ -231,10 +306,16 @@ export default function StockDashboardPage(): React.ReactNode {
 
           <Divider />
 
-          {isLoading ? (
+          {stockSummaryQuery.isLoading ? (
             <div className="flex items-center justify-center py-6">
               <Spinner label="Loading stock summary..." />
             </div>
+          ) : stockSummaryQuery.isError ? (
+            <p className="text-danger-500">
+              {stockSummaryQuery.error instanceof Error
+                ? stockSummaryQuery.error.message
+                : "Failed to load stock summary."}
+            </p>
           ) : summary.length === 0 ? (
             <p className="text-default-500">No stock data available.</p>
           ) : (
@@ -290,7 +371,7 @@ export default function StockDashboardPage(): React.ReactNode {
               title="Adjust Stock"
               description="Modify the on-hand quantity for a single warehouse."
               actionLabel="Adjust"
-              warehouses={warehouses}
+              warehouses={warehousesQuery.data ?? []}
               onSubmit={(data) =>
                 handleMovement("adjust", {
                   productId: data.productId,
@@ -306,7 +387,8 @@ export default function StockDashboardPage(): React.ReactNode {
               title="Receive Stock"
               description="Register incoming inventory for purchase receipts."
               actionLabel="Receive"
-              warehouses={warehouses}
+              warehouses={warehousesQuery.data ?? []}
+              submitting={receiveMutation.isPending}
               onSubmit={(data) =>
                 handleMovement("inbound", {
                   productId: data.productId,
@@ -322,7 +404,8 @@ export default function StockDashboardPage(): React.ReactNode {
               title="Issue Stock"
               description="Deduct inventory for sales or consumption."
               actionLabel="Issue"
-              warehouses={warehouses}
+              warehouses={warehousesQuery.data ?? []}
+              submitting={issueMutation.isPending}
               onSubmit={(data) =>
                 handleMovement("outbound", {
                   productId: data.productId,
@@ -338,7 +421,8 @@ export default function StockDashboardPage(): React.ReactNode {
               title="Transfer Stock"
               description="Move inventory between two warehouses."
               actionLabel="Transfer"
-              warehouses={warehouses}
+              warehouses={warehousesQuery.data ?? []}
+              submitting={transferMutation.isPending}
               requireSecondaryWarehouse
               onSubmit={(data) =>
                 handleMovement("transfer", {
@@ -382,6 +466,7 @@ interface MovementCardProps {
   actionLabel: string;
   warehouses: WarehouseDto[];
   requireSecondaryWarehouse?: boolean;
+  submitting?: boolean;
   onSubmit: (payload: {
     productId: string;
     quantity: string;
@@ -398,6 +483,7 @@ function MovementCard({
   actionLabel,
   warehouses,
   requireSecondaryWarehouse,
+  submitting = false,
   onSubmit,
 }: MovementCardProps) {
   const [formValues, setFormValues] = useState({
@@ -408,7 +494,6 @@ function MovementCard({
     reference: "",
     note: "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (field: string, value: string) => {
     setFormValues((prev) => ({ ...prev, [field]: value }));
@@ -424,7 +509,6 @@ function MovementCard({
       return;
     }
 
-    setIsSubmitting(true);
     try {
       await onSubmit(formValues);
       setFormValues({
@@ -436,7 +520,7 @@ function MovementCard({
         note: "",
       });
     } finally {
-      setIsSubmitting(false);
+      // handled by parent
     }
   };
 
@@ -522,7 +606,7 @@ function MovementCard({
         <Button
           color="primary"
           size="sm"
-          isLoading={isSubmitting}
+          isLoading={submitting}
           onPress={handleSubmit}
         >
           {actionLabel}
