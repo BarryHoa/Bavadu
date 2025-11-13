@@ -122,13 +122,7 @@ export default function WarehouseListPage(): React.ReactNode {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Warehouses</h1>
-          <p className="text-default-500">
-            Manage available warehouses and their basic configuration.
-          </p>
-        </div>
+      <div className="flex justify-end">
         <Button
           color="primary"
           size="sm"

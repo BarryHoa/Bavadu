@@ -169,13 +169,7 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">New Purchase Order</h1>
-          <p className="text-default-500">
-            Capture vendor information and the products to be procured.
-          </p>
-        </div>
+      <div className="flex justify-end">
         <Button
           as={LinkAs as any}
           size="sm"

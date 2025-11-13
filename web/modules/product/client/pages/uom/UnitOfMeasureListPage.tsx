@@ -15,15 +15,6 @@ const UnitOfMeasureListPage = (): React.ReactNode => {
 
       <Card>
         <CardBody className="space-y-4">
-          <div>
-            <h1 className="text-xl font-semibold">Units of Measure</h1>
-            <p className="text-small text-default-500">
-              Manage the units that power product conversions and inventory counts.
-            </p>
-          </div>
-
-          <Divider />
-
           <p className="text-default-500">
             Hook this page up to your data source to render the full unit of measure
             catalogue. You can plug it into `ViewListDataTable` once the model service

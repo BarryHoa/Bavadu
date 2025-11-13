@@ -180,13 +180,7 @@ export default function SalesOrderDetailPage(): React.ReactNode {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Sales Order {order.code}</h1>
-          <p className="text-default-500">
-            Customer: <strong>{order.customerName}</strong>
-          </p>
-        </div>
+      <div className="flex justify-end">
         <Button
           as={LinkAs as any}
           size="sm"
@@ -216,6 +210,7 @@ export default function SalesOrderDetailPage(): React.ReactNode {
                 currency: order.currency || "USD",
               })}
             </Chip>
+            <Chip variant="flat">Customer: {order.customerName}</Chip>
           </div>
           {order.notes ? (
             <p className="text-default-500">Notes: {order.notes}</p>

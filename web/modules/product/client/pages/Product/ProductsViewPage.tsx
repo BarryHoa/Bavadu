@@ -108,9 +108,10 @@ export default function ProductsViewPage(): React.ReactNode {
 
       <Card>
         <CardBody className="space-y-4">
-          <div>
-            <h1 className="text-xl font-semibold">Product Detail</h1>
-            <p className="text-small text-default-500">Product ID: {productId}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <Chip variant="flat" size="sm">
+              Product ID: {productId}
+            </Chip>
           </div>
 
           {productQuery.isLoading ? (

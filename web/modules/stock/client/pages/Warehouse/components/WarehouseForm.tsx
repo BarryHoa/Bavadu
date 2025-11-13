@@ -1,12 +1,6 @@
 import Input from "@base/client/components/Input";
 import { Button } from "@heroui/button";
-import {
-  Card,
-  CardBody,
-  Select,
-  SelectItem,
-  Textarea,
-} from "@heroui/react";
+import { Card, CardBody, Select, SelectItem, Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { type Key, type ReactNode, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -21,31 +15,10 @@ import {
 } from "valibot";
 
 import {
-  WarehouseDto,
-  WarehousePayload,
-} from "../../../services/StockService";
-import {
-  WarehouseAddress,
   warehouseStatuses,
   warehouseValuationMethods,
 } from "../../../../common/constants";
-
-type WarehouseFormValues = {
-  code: string;
-  name: string;
-  typeCode: string;
-  status: string;
-  companyId?: string;
-  managerId?: string;
-  contactId?: string;
-  address: WarehouseAddress;
-  valuationMethod: string;
-  minStock?: string;
-  maxStock?: string;
-  accountInventory?: string;
-  accountAdjustment?: string;
-  notes?: string;
-};
+import { WarehouseDto, WarehousePayload } from "../../../services/StockService";
 
 const warehouseFormSchema = object({
   code: pipe(string(), trim(), minLength(1, "Code is required")),
@@ -79,6 +52,8 @@ const warehouseFormSchema = object({
   notes: optional(pipe(string(), trim())),
 });
 
+type WarehouseFormValues = Input<typeof warehouseFormSchema>;
+
 const statusOptions = warehouseStatuses.map((status) => ({
   value: status,
   label: status.charAt(0) + status.slice(1).toLowerCase(),
@@ -89,7 +64,7 @@ const valuationOptions = warehouseValuationMethods.map((method) => ({
   label: method,
 }));
 
-const toNullableString = (value?: string | null) => {
+const toNullableString = (value?: string) => {
   if (!value) return undefined;
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : undefined;
@@ -388,40 +363,6 @@ export default function WarehouseForm({
             />
           </div>
 
-          <Controller
-            name="notes"
-            control={control}
-            render={({ field, fieldState }) => (
-              <Textarea
-                {...field}
-                label="Notes"
-                placeholder="Internal notes (optional)"
-                value={field.value ?? ""}
-                onValueChange={field.onChange}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
-              />
-            )}
-          />
-
-          <div className="flex flex-col-reverse gap-3 md:flex-row md:items-center md:justify-between">
-            {secondaryAction && <div>{secondaryAction}</div>}
-            <div className="flex gap-3">
-              <Button
-                type="submit"
-                color="primary"
-                isLoading={isSubmitting}
-                disabled={isSubmitting}
-              >
-                {submitLabel}
-              </Button>
-            </div>
-          </div>
-        </form>
-      </CardBody>
-    </Card>
-  );
-}
           <div>
             <h2 className="text-lg font-semibold">Address</h2>
             <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -529,9 +470,9 @@ export default function WarehouseForm({
                     label="Minimum stock"
                     type="number"
                     value={field.value ?? ""}
-                  onValueChange={(value) =>
-                    field.onChange(value === "" ? undefined : value)
-                  }
+                    onValueChange={(value) =>
+                      field.onChange(value === "" ? undefined : value)
+                    }
                     isRequired
                     isInvalid={fieldState.invalid}
                     errorMessage={
@@ -549,9 +490,9 @@ export default function WarehouseForm({
                     label="Maximum stock"
                     type="number"
                     value={field.value ?? ""}
-                  onValueChange={(value) =>
-                    field.onChange(value === "" ? undefined : value)
-                  }
+                    onValueChange={(value) =>
+                      field.onChange(value === "" ? undefined : value)
+                    }
                     isInvalid={fieldState.invalid}
                     errorMessage={fieldState.error?.message}
                   />
@@ -590,5 +531,37 @@ export default function WarehouseForm({
             </div>
           </div>
 
-  ***
+          <Controller
+            name="notes"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Textarea
+                {...field}
+                label="Notes"
+                placeholder="Internal notes (optional)"
+                value={field.value ?? ""}
+                onValueChange={field.onChange}
+                isInvalid={fieldState.invalid}
+                errorMessage={fieldState.error?.message}
+              />
+            )}
+          />
 
+          <div className="flex flex-col-reverse gap-3 md:flex-row md:items-center md:justify-between">
+            {secondaryAction && <div>{secondaryAction}</div>}
+            <div className="flex gap-3">
+              <Button
+                type="submit"
+                color="primary"
+                isLoading={isSubmitting}
+                disabled={isSubmitting}
+              >
+                {submitLabel}
+              </Button>
+            </div>
+          </div>
+        </form>
+      </CardBody>
+    </Card>
+  );
+}

@@ -172,13 +172,7 @@ export default function StockDashboardPage(): React.ReactNode {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Stock Dashboard</h1>
-          <p className="text-default-500">
-            Monitor inventory levels and execute quick stock operations.
-          </p>
-        </div>
+      <div className="flex justify-end">
         <Button
           as={LinkAs as any}
           size="sm"

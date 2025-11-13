@@ -164,13 +164,7 @@ export default function SalesOrderCreatePage(): React.ReactNode {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">New Sales Order</h1>
-          <p className="text-default-500">
-            Capture customer requirements and plan product delivery.
-          </p>
-        </div>
+      <div className="flex justify-end">
         <Button
           as={LinkAs as any}
           size="sm"

@@ -1,6 +1,5 @@
 "use client";
 
-import LinkAs from "@base/client/components/LinkAs";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Spinner } from "@heroui/react";
 import { useParams, useRouter } from "next/navigation";
@@ -73,18 +72,11 @@ export default function WarehouseEditPage(): React.ReactNode {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Edit Warehouse</h1>
-          <p className="text-default-500">
-            Update warehouse details, contacts and stock control limits.
-          </p>
-        </div>
+      <div className="flex justify-end">
         <Button
-          as={LinkAs as any}
           size="sm"
           variant="light"
-          href="/workspace/modules/stock/warehouses"
+          onPress={() => router.push("/workspace/modules/stock/warehouses")}
         >
           Back to list
         </Button>
@@ -105,9 +97,7 @@ export default function WarehouseEditPage(): React.ReactNode {
             <Button
               size="sm"
               variant="light"
-              onPress={() =>
-                router.push("/workspace/modules/stock/warehouses")
-              }
+              onPress={() => router.push("/workspace/modules/stock/warehouses")}
             >
               Cancel
             </Button>
@@ -131,4 +121,3 @@ export default function WarehouseEditPage(): React.ReactNode {
     </div>
   );
 }
-
