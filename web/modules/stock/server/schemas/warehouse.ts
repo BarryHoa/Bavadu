@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   check,
+  index,
   jsonb,
   numeric,
   pgTable,
@@ -56,31 +57,34 @@ export const table_stock_warehouse = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => ({
-    codeUniqueIdx: uniqueIndex("stock_warehouses_code_unique").on(table.code),
-    statusCheck: check(
+  (table) => [
+    uniqueIndex("stock_warehouses_code_unique").on(table.code),
+    index("stock_warehouses_company_idx").on(table.companyId),
+    index("stock_warehouses_status_idx").on(table.status),
+    index("stock_warehouses_type_idx").on(table.typeCode),
+    check(
       "stock_warehouses_status_check",
       sql`${table.status} IN (${sql.join(
         warehouseStatuses.map((status) => sql`${status}`),
         sql`, `
       )})`
     ),
-    valuationCheck: check(
+    check(
       "stock_warehouses_valuation_check",
       sql`${table.valuationMethod} IN (${sql.join(
         warehouseValuationMethods.map((method) => sql`${method}`),
         sql`, `
       )})`
     ),
-    minStockCheck: check(
+    check(
       "stock_warehouses_min_stock_check",
       sql`${table.minStock}::numeric >= 0`
     ),
-    minMaxCheck: check(
+    check(
       "stock_warehouses_min_max_check",
       sql`(${table.maxStock} IS NULL) OR (${table.maxStock}::numeric >= ${table.minStock}::numeric)`
     ),
-  })
+  ]
 );
 
 export type TblStockWarehouse = typeof table_stock_warehouse.$inferSelect;

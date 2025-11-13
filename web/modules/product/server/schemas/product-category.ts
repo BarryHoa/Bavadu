@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   foreignKey,
+  index,
   integer,
   jsonb,
   pgTable,
@@ -14,7 +15,9 @@ import {
 export const table_product_category = pgTable(
   "product_categories",
   {
-    id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuid_generate_v7()`),
     code: varchar("code", { length: 100 }).notNull().unique(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
     description: jsonb("description"), // LocaleDataType<string>
@@ -31,6 +34,8 @@ export const table_product_category = pgTable(
       columns: [table.parentId],
       foreignColumns: [table.id],
     }),
+    index("product_categories_parent_idx").on(table.parentId),
+    index("product_categories_active_idx").on(table.isActive),
   ]
 );
 

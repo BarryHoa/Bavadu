@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  index,
   numeric,
   pgTable,
   timestamp,
@@ -12,7 +13,9 @@ import { table_stock_warehouse } from "./warehouse";
 export const table_stock_level = pgTable(
   "stock_levels",
   {
-    id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuid_generate_v7()`),
     productId: uuid("product_id")
       .notNull()
       .references(() => table_product_master.id, {
@@ -35,11 +38,14 @@ export const table_stock_level = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
-  (table) => ({
-    uniqueProductWarehouse: uniqueIndex(
-      "stock_levels_product_warehouse_unique"
-    ).on(table.productId, table.warehouseId),
-  })
+  (table) => [
+    uniqueIndex("stock_levels_product_warehouse_unique").on(
+      table.productId,
+      table.warehouseId
+    ),
+    index("stock_levels_product_idx").on(table.productId),
+    index("stock_levels_warehouse_idx").on(table.warehouseId),
+  ]
 );
 
 export type TblStockLevel = typeof table_stock_level.$inferSelect;

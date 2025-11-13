@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   foreignKey,
+  index,
   integer,
   jsonb,
   pgTable,
@@ -38,6 +39,9 @@ export const table_dynamic_entity = pgTable(
       columns: [table.parentId],
       foreignColumns: [table.id],
     }),
+    index("dynamic_entities_model_idx").on(table.model),
+    index("dynamic_entities_parent_idx").on(table.parentId),
+    index("dynamic_entities_active_idx").on(table.isActive),
   ]
 );
 
