@@ -1,6 +1,5 @@
 import { sql } from "drizzle-orm";
 import {
-  boolean,
   check,
   index,
   jsonb,
@@ -16,8 +15,6 @@ import {
 import { table_user } from "@base/server/schemas/user";
 import {
   WarehouseAddress,
-  WarehouseStatus,
-  WarehouseValuationMethod,
   warehouseStatuses,
   warehouseValuationMethods,
 } from "../../common/constants";
@@ -25,13 +22,13 @@ import {
 export const table_stock_warehouse = pgTable(
   "stock_warehouses",
   {
-    id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuid_generate_v7()`),
     code: varchar("code", { length: 64 }).notNull(),
     name: varchar("name", { length: 128 }).notNull(),
     typeCode: varchar("type_code", { length: 30 }).notNull(),
-    status: varchar("status", { length: 20 })
-      .notNull()
-      .default("ACTIVE"),
+    status: varchar("status", { length: 20 }).notNull().default("ACTIVE"),
     companyId: uuid("company_id"),
     managerId: uuid("manager_id").references(() => table_user.id, {
       onDelete: "set null",
@@ -65,14 +62,14 @@ export const table_stock_warehouse = pgTable(
     check(
       "stock_warehouses_status_check",
       sql`${table.status} IN (${sql.join(
-        warehouseStatuses.map((status) => sql`${status}`),
+        warehouseStatuses.map((status) => sql.raw(`'${status}'`)),
         sql`, `
       )})`
     ),
     check(
       "stock_warehouses_valuation_check",
       sql`${table.valuationMethod} IN (${sql.join(
-        warehouseValuationMethods.map((method) => sql`${method}`),
+        warehouseValuationMethods.map((method) => sql.raw(`'${method}'`)),
         sql`, `
       )})`
     ),

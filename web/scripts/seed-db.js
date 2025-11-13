@@ -17,17 +17,48 @@ function loadEnv(filePath) {
   return out;
 }
 
+function cleanValue(value, fallback) {
+  if (value === undefined || value === null || value === "") {
+    return fallback;
+  }
+
+  return value.replace(/^['"]|['"]$/g, "");
+}
+
 async function main() {
   const root = path.join(__dirname, "..");
   const envPath = path.join(root, ".env");
   const env = loadEnv(envPath);
 
-  const sslMode = env.PGSSLMODE || "disable";
-  const channelBinding = env.PGCHANNELBINDING || "";
-  const conn = `postgres://${env.PGUSER}:${env.PGPASSWORD}@${env.PGHOST}:${env.PGPORT}/${env.PGDATABASE}?sslmode=${sslMode}${channelBinding ? `&channel_binding=${channelBinding}` : ""}`;
+  const sslMode = cleanValue(
+    env.PGSSLMODE,
+    cleanValue(process.env.PGSSLMODE, "disable")
+  );
+  const channelBinding = cleanValue(
+    env.PGCHANNELBINDING,
+    cleanValue(process.env.PGCHANNELBINDING, "")
+  );
+  const user = cleanValue(env.PGUSER, process.env.PGUSER);
+  const password = cleanValue(env.PGPASSWORD, process.env.PGPASSWORD);
+  const host = cleanValue(env.PGHOST, process.env.PGHOST);
+  const dbName = cleanValue(env.PGDATABASE, process.env.PGDATABASE);
+  const portRaw =
+    cleanValue(env.PGPORT, process.env.PGPORT) ||
+    (process.env.PGPORT !== undefined ? process.env.PGPORT : undefined);
+  const port = portRaw ? Number(portRaw) : 5432;
+
+  if (!user || !password || !host || !dbName) {
+    throw new Error(
+      "Missing database credentials (PGUSER, PGPASSWORD, PGHOST, PGDATABASE)"
+    );
+  }
+
+  const conn = `postgres://${encodeURIComponent(user)}:${encodeURIComponent(
+    password
+  )}@${host}:${port}/${dbName}?sslmode=${sslMode}${channelBinding ? `&channel_binding=${channelBinding}` : ""}`;
   const sql = postgres(conn, { max: 1 });
 
-  const migDir = path.join(root, "modules-base/server/db/migrations");
+  const migDir = path.join(root, "server/db/migrations");
   const files = fs
     .readdirSync(migDir)
     .filter((f) => /^01\d{2}_seed_.*\.sql$/.test(f))
