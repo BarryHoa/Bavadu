@@ -40,7 +40,7 @@ export default function WarehouseCreatePage(): React.ReactNode {
   );
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="w-full space-y-6">
       <WarehouseForm
         submitLabel="Create warehouse"
         onSubmit={handleFormSubmit}

@@ -1,13 +1,5 @@
+import { Address } from "@base/client/interface/Address";
 import ClientHttpService from "@base/client/services/ClientHttpService";
-
-export interface WarehouseAddressDto {
-  line1: string;
-  line2?: string | null;
-  city: string;
-  state?: string | null;
-  postalCode?: string | null;
-  country: string;
-}
 
 export interface WarehouseDto {
   id: string;
@@ -18,7 +10,7 @@ export interface WarehouseDto {
   companyId: string | null;
   managerId: string | null;
   contactId: string | null;
-  address: WarehouseAddressDto;
+  address: Address[];
   valuationMethod: string;
   minStock: number;
   maxStock: number | null;
@@ -38,7 +30,7 @@ export interface WarehousePayload {
   companyId?: string | null;
   managerId?: string | null;
   contactId?: string | null;
-  address: WarehouseAddressDto;
+  address: Address[];
   valuationMethod?: string | null;
   minStock?: number | null;
   maxStock?: number | null;

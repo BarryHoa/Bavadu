@@ -71,7 +71,7 @@ export default function WarehouseEditPage(): React.ReactNode {
   );
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="w-full space-y-6">
       <div className="flex justify-end">
         <Button
           size="sm"

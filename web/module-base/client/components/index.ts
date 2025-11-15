@@ -12,6 +12,7 @@ export type { FilterOption } from "./ViewListDataTable/components/FilterMenu";
 export type { GroupOption } from "./ViewListDataTable/components/GroupByMenu";
 
 // Direct component exports
+export { default as AddressPicker } from "./AddressPicker/AddressPicker";
 export { default as DatePicker } from "./DatePicker";
 export { default as Input } from "./Input";
 export * from "./LoadingBar";

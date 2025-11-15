@@ -1,11 +1,13 @@
+import AddressPicker from "@/module-base/client/components/AddressPicker/AddressPicker";
 import Input from "@base/client/components/Input";
 import Select, { SelectItem } from "@base/client/components/Select";
 import { Button } from "@heroui/button";
-import { Card, CardBody, Textarea } from "@heroui/react";
+import { Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { type Key, type ReactNode, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
+  any,
   minLength,
   object,
   optional,
@@ -15,6 +17,8 @@ import {
   trim,
 } from "valibot";
 
+import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { Address } from "@base/client/interface/Address";
 import {
   warehouseStatuses,
   warehouseValuationMethods,
@@ -33,14 +37,8 @@ const warehouseFormSchema = object({
   companyId: optional(pipe(string(), trim())),
   managerId: optional(pipe(string(), trim())),
   contactId: optional(pipe(string(), trim())),
-  address: object({
-    line1: pipe(string(), trim(), minLength(1, "Address line 1 is required")),
-    line2: optional(pipe(string(), trim())),
-    city: pipe(string(), trim(), minLength(1, "City is required")),
-    state: optional(pipe(string(), trim())),
-    postalCode: optional(pipe(string(), trim())),
-    country: pipe(string(), trim(), minLength(1, "Country is required")),
-  }),
+  address1: any(), // Address object, validated manually
+  address2: optional(any()), // Address object, optional
   valuationMethod: pipe(
     string(),
     trim(),
@@ -61,14 +59,8 @@ type WarehouseFormValues = {
   companyId?: string;
   managerId?: string;
   contactId?: string;
-  address: {
-    line1: string;
-    line2?: string;
-    city: string;
-    state?: string;
-    postalCode?: string;
-    country: string;
-  };
+  address1: Address;
+  address2?: Address;
   valuationMethod: string;
   minStock?: string;
   maxStock?: string;
@@ -129,6 +121,7 @@ export default function WarehouseForm({
   secondaryAction,
   submitError,
 }: WarehouseFormProps) {
+  const getLocalizedName = useLocalizedText();
   const defaultValues: WarehouseFormValues = useMemo(
     () => ({
       code: initialData?.code ?? "",
@@ -138,14 +131,18 @@ export default function WarehouseForm({
       companyId: initialData?.companyId ?? "",
       managerId: initialData?.managerId ?? "",
       contactId: initialData?.contactId ?? "",
-      address: {
-        line1: initialData?.address.line1 ?? "",
-        line2: initialData?.address.line2 ?? "",
-        city: initialData?.address.city ?? "",
-        state: initialData?.address.state ?? "",
-        postalCode: initialData?.address.postalCode ?? "",
-        country: initialData?.address.country ?? "",
+      address1: initialData?.address?.[0] ?? {
+        street: "",
+        postalCode: "",
+        country: {
+          id: "VN",
+          name: { vi: "Việt Nam", en: "Vietnam" },
+          code: "VN",
+        },
+        administrativeUnits: [],
+        formattedAddress: "",
       },
+      address2: initialData?.address?.[1],
       valuationMethod: initialData?.valuationMethod ?? "FIFO",
       minStock:
         initialData?.minStock !== undefined
@@ -173,6 +170,15 @@ export default function WarehouseForm({
   });
 
   const handleFormSubmit = async (values: WarehouseFormValues) => {
+    // Validate address1
+    if (!values.address1 || !values.address1.formattedAddress) {
+      setError("address1", {
+        type: "manual",
+        message: "Address 1 is required",
+      });
+      return;
+    }
+
     let minStock = 0;
     if (values.minStock !== undefined) {
       try {
@@ -208,22 +214,17 @@ export default function WarehouseForm({
     }
 
     const payload: WarehousePayload = {
-      code: values.code.trim(),
+      code: values.code.trim().toUpperCase(),
       name: values.name.trim(),
       typeCode: values.typeCode.trim(),
-      status: values.status.toUpperCase(),
+      status: values.status.trim().toUpperCase(),
       companyId: toNullableString(values.companyId) ?? null,
       managerId: toNullableString(values.managerId) ?? null,
       contactId: toNullableString(values.contactId) ?? null,
-      address: {
-        line1: values.address.line1.trim(),
-        line2: toNullableString(values.address.line2) ?? null,
-        city: values.address.city.trim(),
-        state: toNullableString(values.address.state) ?? null,
-        postalCode: toNullableString(values.address.postalCode) ?? null,
-        country: values.address.country.trim(),
-      },
-      valuationMethod: values.valuationMethod.toUpperCase(),
+      address: [values.address1, values.address2].filter(
+        (x) => x !== undefined
+      ) as Address[],
+      valuationMethod: values.valuationMethod.trim().toUpperCase(),
       minStock,
       maxStock,
       accountInventory: toNullableString(values.accountInventory) ?? null,
@@ -235,341 +236,125 @@ export default function WarehouseForm({
   };
 
   return (
-    <Card>
-      <CardBody>
-        <form
-          className="space-y-6"
-          onSubmit={handleSubmit(handleFormSubmit)}
-          noValidate
-        >
-          {submitError ? (
-            <div className="rounded-large border border-danger-200 bg-danger-50 px-3 py-2 text-sm text-danger-600">
-              {submitError}
-            </div>
-          ) : null}
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Controller
-              name="code"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Input
-                  {...field}
-                  label="Code"
-                  placeholder="Unique warehouse code"
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="name"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Input
-                  {...field}
-                  label="Name"
-                  placeholder="Warehouse name"
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="typeCode"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Input
-                  {...field}
-                  label="Type"
-                  placeholder="e.g. RAW_MATERIAL, FINISHED_GOODS"
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="status"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Select
-                  label="Status"
-                  selectedKeys={new Set([field.value])}
-                  onSelectionChange={(keys) => {
-                    const value = getSingleSelectionValue(
-                      keys as SingleSelection
-                    );
-                    if (value) {
-                      field.onChange(value);
-                    }
-                  }}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  isRequired
-                >
-                  {statusOptions.map((option) => (
-                    <SelectItem key={option.value}>{option.label}</SelectItem>
-                  ))}
-                </Select>
-              )}
-            />
-            <Controller
-              name="valuationMethod"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Select
-                  label="Valuation method"
-                  selectedKeys={new Set([field.value])}
-                  onSelectionChange={(keys) => {
-                    const value = getSingleSelectionValue(
-                      keys as SingleSelection
-                    );
-                    if (value) {
-                      field.onChange(value);
-                    }
-                  }}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  isRequired
-                >
-                  {valuationOptions.map((option) => (
-                    <SelectItem key={option.value}>{option.label}</SelectItem>
-                  ))}
-                </Select>
-              )}
-            />
-            <Controller
-              name="companyId"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Input
-                  {...field}
-                  label="Company ID"
-                  placeholder="Optional company relationship"
-                  value={field.value ?? ""}
-                  onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="managerId"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Input
-                  {...field}
-                  label="Manager (user ID)"
-                  placeholder="Optional manager user ID"
-                  value={field.value ?? ""}
-                  onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="contactId"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Input
-                  {...field}
-                  label="Contact (user ID)"
-                  placeholder="Optional contact user ID"
-                  value={field.value ?? ""}
-                  onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                />
-              )}
-            />
+    <div className="w-full">
+      <form
+        className="space-y-6"
+        onSubmit={handleSubmit(handleFormSubmit)}
+        noValidate
+      >
+        {submitError ? (
+          <div className="rounded-large border border-danger-200 bg-danger-50 px-3 py-2 text-sm text-danger-600">
+            {submitError}
           </div>
+        ) : null}
 
-          <div>
-            <h2 className="text-lg font-semibold">Address</h2>
-            <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Controller
-                name="address.line1"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Input
-                    {...field}
-                    label="Address line 1"
-                    placeholder="Street, building"
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    isRequired
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
-                  />
-                )}
-              />
-              <Controller
-                name="address.line2"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Input
-                    {...field}
-                    label="Address line 2"
-                    placeholder="Suite, block (optional)"
-                    value={field.value ?? ""}
-                    onValueChange={field.onChange}
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
-                  />
-                )}
-              />
-              <Controller
-                name="address.city"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Input
-                    {...field}
-                    label="City"
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    isRequired
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
-                  />
-                )}
-              />
-              <Controller
-                name="address.state"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Input
-                    {...field}
-                    label="State/Province"
-                    value={field.value ?? ""}
-                    onValueChange={field.onChange}
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
-                  />
-                )}
-              />
-              <Controller
-                name="address.postalCode"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Input
-                    {...field}
-                    label="Postal code"
-                    value={field.value ?? ""}
-                    onValueChange={field.onChange}
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
-                  />
-                )}
-              />
-              <Controller
-                name="address.country"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Input
-                    {...field}
-                    label="Country"
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    isRequired
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
-                  />
-                )}
-              />
-            </div>
-          </div>
-
-          <div>
-            <h2 className="text-lg font-semibold">Inventory Controls</h2>
-            <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Controller
-                name="minStock"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Input
-                    {...field}
-                    label="Minimum stock"
-                    type="number"
-                    value={field.value ?? ""}
-                    onValueChange={(value) =>
-                      field.onChange(value === "" ? undefined : value)
-                    }
-                    isRequired
-                    isInvalid={fieldState.invalid}
-                    errorMessage={
-                      fieldState.error?.message ?? errors.minStock?.message
-                    }
-                  />
-                )}
-              />
-              <Controller
-                name="maxStock"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Input
-                    {...field}
-                    label="Maximum stock"
-                    type="number"
-                    value={field.value ?? ""}
-                    onValueChange={(value) =>
-                      field.onChange(value === "" ? undefined : value)
-                    }
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
-                  />
-                )}
-              />
-              <Controller
-                name="accountInventory"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Input
-                    {...field}
-                    label="Inventory account"
-                    placeholder="Optional account code"
-                    value={field.value ?? ""}
-                    onValueChange={field.onChange}
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
-                  />
-                )}
-              />
-              <Controller
-                name="accountAdjustment"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Input
-                    {...field}
-                    label="Adjustment account"
-                    placeholder="Optional adjustment account"
-                    value={field.value ?? ""}
-                    onValueChange={field.onChange}
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
-                  />
-                )}
-              />
-            </div>
-          </div>
-
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Controller
-            name="notes"
+            name="code"
             control={control}
             render={({ field, fieldState }) => (
-              <Textarea
+              <Input
                 {...field}
-                label="Notes"
-                placeholder="Internal notes (optional)"
+                label="Code"
+                placeholder="Unique warehouse code"
+                value={field.value}
+                onValueChange={field.onChange}
+                isRequired
+                isInvalid={fieldState.invalid}
+                errorMessage={fieldState.error?.message}
+              />
+            )}
+          />
+          <Controller
+            name="name"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Input
+                {...field}
+                label="Name"
+                placeholder="Warehouse name"
+                value={field.value}
+                onValueChange={field.onChange}
+                isRequired
+                isInvalid={fieldState.invalid}
+                errorMessage={fieldState.error?.message}
+              />
+            )}
+          />
+          <Controller
+            name="typeCode"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Input
+                {...field}
+                label="Type"
+                placeholder="e.g. RAW_MATERIAL, FINISHED_GOODS"
+                value={field.value}
+                onValueChange={field.onChange}
+                isRequired
+                isInvalid={fieldState.invalid}
+                errorMessage={fieldState.error?.message}
+              />
+            )}
+          />
+          <Controller
+            name="status"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Select
+                label="Status"
+                selectedKeys={new Set([field.value])}
+                onSelectionChange={(keys) => {
+                  const value = getSingleSelectionValue(
+                    keys as SingleSelection
+                  );
+                  if (value) {
+                    field.onChange(value);
+                  }
+                }}
+                isInvalid={fieldState.invalid}
+                errorMessage={fieldState.error?.message}
+                isRequired
+              >
+                {statusOptions.map((option) => (
+                  <SelectItem key={option.value}>{option.label}</SelectItem>
+                ))}
+              </Select>
+            )}
+          />
+          <Controller
+            name="valuationMethod"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Select
+                label="Valuation method"
+                selectedKeys={new Set([field.value])}
+                onSelectionChange={(keys) => {
+                  const value = getSingleSelectionValue(
+                    keys as SingleSelection
+                  );
+                  if (value) {
+                    field.onChange(value);
+                  }
+                }}
+                isInvalid={fieldState.invalid}
+                errorMessage={fieldState.error?.message}
+                isRequired
+              >
+                {valuationOptions.map((option) => (
+                  <SelectItem key={option.value}>{option.label}</SelectItem>
+                ))}
+              </Select>
+            )}
+          />
+          <Controller
+            name="companyId"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Input
+                {...field}
+                label="Company ID"
+                placeholder="Optional company relationship"
                 value={field.value ?? ""}
                 onValueChange={field.onChange}
                 isInvalid={fieldState.invalid}
@@ -577,22 +362,215 @@ export default function WarehouseForm({
               />
             )}
           />
+          <Controller
+            name="managerId"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Input
+                {...field}
+                label="Manager (user ID)"
+                placeholder="Optional manager user ID"
+                value={field.value ?? ""}
+                onValueChange={field.onChange}
+                isInvalid={fieldState.invalid}
+                errorMessage={fieldState.error?.message}
+              />
+            )}
+          />
+          <Controller
+            name="contactId"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Input
+                {...field}
+                label="Contact (user ID)"
+                placeholder="Optional contact user ID"
+                value={field.value ?? ""}
+                onValueChange={field.onChange}
+                isInvalid={fieldState.invalid}
+                errorMessage={fieldState.error?.message}
+              />
+            )}
+          />
+        </div>
 
-          <div className="flex flex-col-reverse gap-3 md:flex-row md:items-center md:justify-between">
-            {secondaryAction && <div>{secondaryAction}</div>}
-            <div className="flex gap-3">
-              <Button
-                type="submit"
-                color="primary"
-                isLoading={isSubmitting}
-                disabled={isSubmitting}
-              >
-                {submitLabel}
-              </Button>
-            </div>
+        <div>
+          <h2 className="text-lg font-semibold mb-4">Address</h2>
+          <div className="space-y-4">
+            <Controller
+              name="address1"
+              control={control}
+              render={({ field, fieldState }) => (
+                <div className="flex gap-2 justify-between items-end">
+                  <div className="flex-1">
+                    <Input
+                      isRequired
+                      label="Main"
+                      placeholder="Main address"
+                      value={getLocalizedName(field.value.formattedAddress)}
+                      isInvalid={fieldState.invalid}
+                      errorMessage={fieldState.error?.message}
+                      disabled={true}
+                      isReadOnly={true}
+                    />
+                  </div>
+                  <AddressPicker
+                    value={field.value}
+                    onChange={(addressString) => {
+                      // AddressPicker returns string, but we need to update the Address object
+                      // For now, we'll update the formattedAddress in the existing Address object
+                      if (field.value) {
+                        field.onChange({
+                          ...field.value,
+                          formattedAddress: addressString,
+                        });
+                      }
+                    }}
+                    label="Main"
+                  />
+                </div>
+              )}
+            />
+            <Controller
+              name="address2"
+              control={control}
+              render={({ field, fieldState }) => (
+                <div className="flex gap-2 justify-between items-end">
+                  <div className="flex-1">
+                    <Input
+                      label="Secondary"
+                      placeholder="Secondary address"
+                      value={getLocalizedName(
+                        field.value?.formattedAddress ?? ""
+                      )}
+                      isInvalid={fieldState.invalid}
+                      errorMessage={fieldState.error?.message}
+                      disabled
+                    />
+                  </div>
+                  <AddressPicker
+                    value={field.value}
+                    onChange={(addressString) => {
+                      // AddressPicker returns string, but we need to update the Address object
+                      // For now, we'll update the formattedAddress in the existing Address object
+                      if (field.value) {
+                        field.onChange({
+                          ...field.value,
+                          formattedAddress: addressString,
+                        });
+                      }
+                    }}
+                    label="Secondary"
+                  />
+                </div>
+              )}
+            />
           </div>
-        </form>
-      </CardBody>
-    </Card>
+        </div>
+
+        <div>
+          <h2 className="text-lg font-semibold">Inventory Controls</h2>
+          <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
+            <Controller
+              name="minStock"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Input
+                  {...field}
+                  label="Minimum stock"
+                  type="number"
+                  value={field.value ?? ""}
+                  onValueChange={(value) =>
+                    field.onChange(value === "" ? undefined : value)
+                  }
+                  isRequired
+                  isInvalid={fieldState.invalid}
+                  errorMessage={
+                    fieldState.error?.message ?? errors.minStock?.message
+                  }
+                />
+              )}
+            />
+            <Controller
+              name="maxStock"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Input
+                  {...field}
+                  label="Maximum stock"
+                  type="number"
+                  value={field.value ?? ""}
+                  onValueChange={(value) =>
+                    field.onChange(value === "" ? undefined : value)
+                  }
+                  isInvalid={fieldState.invalid}
+                  errorMessage={fieldState.error?.message}
+                />
+              )}
+            />
+            <Controller
+              name="accountInventory"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Input
+                  {...field}
+                  label="Inventory account"
+                  placeholder="Optional account code"
+                  value={field.value ?? ""}
+                  onValueChange={field.onChange}
+                  isInvalid={fieldState.invalid}
+                  errorMessage={fieldState.error?.message}
+                />
+              )}
+            />
+            <Controller
+              name="accountAdjustment"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Input
+                  {...field}
+                  label="Adjustment account"
+                  placeholder="Optional adjustment account"
+                  value={field.value ?? ""}
+                  onValueChange={field.onChange}
+                  isInvalid={fieldState.invalid}
+                  errorMessage={fieldState.error?.message}
+                />
+              )}
+            />
+          </div>
+        </div>
+
+        <Controller
+          name="notes"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Textarea
+              {...field}
+              label="Notes"
+              placeholder="Internal notes (optional)"
+              value={field.value ?? ""}
+              onValueChange={field.onChange}
+              isInvalid={fieldState.invalid}
+              errorMessage={fieldState.error?.message}
+            />
+          )}
+        />
+
+        <div className="flex flex-col-reverse gap-3 md:flex-row md:items-center md:justify-between">
+          {secondaryAction && <div>{secondaryAction}</div>}
+          <div className="flex gap-3">
+            <Button
+              type="submit"
+              color="primary"
+              isLoading={isSubmitting}
+              disabled={isSubmitting}
+            >
+              {submitLabel}
+            </Button>
+          </div>
+        </div>
+      </form>
+    </div>
   );
 }
