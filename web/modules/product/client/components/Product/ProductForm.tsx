@@ -1,7 +1,10 @@
 "use client";
 
 import { IBaseInput } from "@base/client/components";
-import { IBaseSelect, SelectItem } from "@base/client/components";
+import {
+  IBaseSelectWithSearch,
+  SelectItemOption,
+} from "@base/client/components";
 import { Button } from "@heroui/button";
 import {
   Card,
@@ -93,14 +96,14 @@ const featureOptions: { key: ProductMasterFeatures; label: string }[] = [
   { key: ProductMasterFeatures.ACCOUNTING, label: "Accounting" },
 ];
 
-const masterTypes: { key: ProductMasterType; label: string }[] = [
-  { key: ProductMasterType.GOODS, label: "Goods" },
-  { key: ProductMasterType.SERVICE, label: "Service" },
-  { key: ProductMasterType.FINISHED_GOOD, label: "Finished good" },
-  { key: ProductMasterType.RAW_MATERIAL, label: "Raw material" },
-  { key: ProductMasterType.CONSUMABLE, label: "Consumable" },
-  { key: ProductMasterType.ASSET, label: "Asset" },
-  { key: ProductMasterType.TOOL, label: "Tool" },
+const masterTypes: SelectItemOption[] = [
+  { value: ProductMasterType.GOODS, label: "Goods" },
+  { value: ProductMasterType.SERVICE, label: "Service" },
+  { value: ProductMasterType.FINISHED_GOOD, label: "Finished good" },
+  { value: ProductMasterType.RAW_MATERIAL, label: "Raw material" },
+  { value: ProductMasterType.CONSUMABLE, label: "Consumable" },
+  { value: ProductMasterType.ASSET, label: "Asset" },
+  { value: ProductMasterType.TOOL, label: "Tool" },
 ];
 
 const defaultLocaleValue = (): LocaleFieldValue => ({ en: "", vi: "" });
@@ -401,12 +404,26 @@ export default function ProductForm({
     queryFn: () => UnitOfMeasureService.getList(),
   });
 
-  const categoryOptions = useMemo(() => {
+  const categoryOptions = useMemo<SelectItemOption[]>(() => {
     if (!categoryQuery.data) return [];
-    return buildHierarchyOptions(categoryQuery.data);
+    return buildHierarchyOptions(categoryQuery.data).map((option) => ({
+      value: option.id,
+      label: option.label,
+    }));
   }, [categoryQuery.data]);
 
-  const uomOptions = useMemo(() => uomQuery.data?.data ?? [], [uomQuery.data]);
+  const uomOptions = useMemo<SelectItemOption[]>(() => {
+    if (!uomQuery.data?.data) return [];
+    return uomQuery.data.data.map((uom) => ({
+      value: uom.id,
+      label:
+        typeof uom.name === "string"
+          ? uom.name
+          : ((uom.name as Record<string, string>)?.en ??
+            uom.symbol ??
+            uom.id),
+    }));
+  }, [uomQuery.data]);
 
   const values = watch();
   const isBusy = loading || isSubmitting;
@@ -576,11 +593,13 @@ export default function ProductForm({
               errorMessage={errors.master?.code?.message}
               isDisabled={isBusy}
             />
-            <IBaseSelect
+            <IBaseSelectWithSearch
               label="Product type"
+              items={masterTypes}
               selectedKeys={values.master.type ? [values.master.type] : []}
               onSelectionChange={(keys) => {
-                const [first] = Array.from(keys);
+                const keySet = keys as Set<string>;
+                const [first] = Array.from(keySet);
                 const next =
                   (first as ProductMasterType) || ProductMasterType.GOODS;
                 setValue("master.type", next, {
@@ -591,11 +610,7 @@ export default function ProductForm({
               isInvalid={Boolean(errors.master?.type)}
               errorMessage={errors.master?.type?.message}
               isDisabled={isBusy}
-            >
-              {masterTypes.map((type) => (
-                <IBaseSelectItem key={type.key}>{type.label}</SelectItem>
-              ))}
-            </IBaseSelect>
+            />
             <IBaseInput
               label="Name (English)"
               value={values.master.name.en ?? ""}
@@ -651,13 +666,15 @@ export default function ProductForm({
           />
 
           <div className="grid gap-4 md:grid-cols-2">
-            <IBaseSelect
+            <IBaseSelectWithSearch
               label="Category"
+              items={categoryOptions}
               selectedKeys={
                 values.master.categoryId ? [values.master.categoryId] : []
               }
               onSelectionChange={(keys) => {
-                const [first] = Array.from(keys);
+                const keySet = keys as Set<string>;
+                const [first] = Array.from(keySet);
                 const nextValue =
                   typeof first === "string" && first.length > 0
                     ? first
@@ -671,11 +688,7 @@ export default function ProductForm({
               isInvalid={Boolean(errors.master?.categoryId)}
               errorMessage={errors.master?.categoryId?.message}
               isDisabled={isBusy || categoryQuery.isLoading}
-            >
-              {categoryOptions.map((option) => (
-                <IBaseSelectItem key={option.id}>{option.label}</SelectItem>
-              ))}
-            </IBaseSelect>
+            />
 
             <IBaseInput
               label="Brand (English)"
@@ -858,13 +871,15 @@ export default function ProductForm({
               }
               isDisabled={isBusy}
             />
-            <IBaseSelect
+            <IBaseSelectWithSearch
               label="Base unit of measure"
+              items={uomOptions}
               selectedKeys={
                 values.variant.baseUomId ? [values.variant.baseUomId] : []
               }
               onSelectionChange={(keys) => {
-                const [first] = Array.from(keys);
+                const keySet = keys as Set<string>;
+                const [first] = Array.from(keySet);
                 const nextValue =
                   typeof first === "string" && first.length > 0
                     ? first
@@ -878,17 +893,7 @@ export default function ProductForm({
               isInvalid={Boolean(errors.variant?.baseUomId)}
               errorMessage={errors.variant?.baseUomId?.message}
               isDisabled={isBusy || uomQuery.isLoading}
-            >
-              {uomOptions.map((uom) => (
-                <IBaseSelectItem key={uom.id}>
-                  {typeof uom.name === "string"
-                    ? uom.name
-                    : ((uom.name as Record<string, string>)?.en ??
-                      uom.symbol ??
-                      uom.id)}
-                </SelectItem>
-              ))}
-            </IBaseSelect>
+            />
           </div>
 
           <Switch

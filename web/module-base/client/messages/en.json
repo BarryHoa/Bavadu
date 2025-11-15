@@ -74,6 +74,20 @@
         "label": "Postal code",
         "placeholder": "Enter postal code"
       }
+    },
+    "vietnam": {
+      "province": {
+        "label": "Province/City",
+        "placeholder": "Select province or city"
+      },
+      "ward": {
+        "label": "Ward/Commune/Township",
+        "placeholder": "Select ward, commune or township (under province/city)"
+      },
+      "street": {
+        "label": "Street address",
+        "placeholder": "House number, street name"
+      }
     }
   }
 }

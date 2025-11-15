@@ -1,5 +1,9 @@
 import AddressPicker from "@/module-base/client/components/AddressPicker/AddressPicker";
-import { IBaseInput, IBaseSelect, SelectItem } from "@base/client/components";
+import {
+  IBaseInput,
+  IBaseSelectWithSearch,
+  SelectItemOption,
+} from "@base/client/components";
 import { Button } from "@heroui/button";
 import { Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
@@ -68,15 +72,17 @@ type WarehouseFormValues = {
   notes?: string;
 };
 
-const statusOptions = warehouseStatuses.map((status) => ({
+const statusOptions: SelectItemOption[] = warehouseStatuses.map((status) => ({
   value: status,
   label: status.charAt(0) + status.slice(1).toLowerCase(),
 }));
 
-const valuationOptions = warehouseValuationMethods.map((method) => ({
-  value: method,
-  label: method,
-}));
+const valuationOptions: SelectItemOption[] = warehouseValuationMethods.map(
+  (method) => ({
+    value: method,
+    label: method,
+  })
+);
 
 const toNullableString = (value?: string) => {
   if (!value) return undefined;
@@ -300,50 +306,42 @@ export default function WarehouseForm({
             name="status"
             control={control}
             render={({ field, fieldState }) => (
-              <IBaseSelect
+              <IBaseSelectWithSearch
                 label="Status"
+                items={statusOptions}
                 selectedKeys={new Set([field.value])}
                 onSelectionChange={(keys) => {
-                  const value = getSingleSelectionValue(
-                    keys as SingleSelection
-                  );
-                  if (value) {
-                    field.onChange(value);
+                  const keySet = keys as Set<string>;
+                  const [first] = Array.from(keySet);
+                  if (first) {
+                    field.onChange(first);
                   }
                 }}
                 isInvalid={fieldState.invalid}
                 errorMessage={fieldState.error?.message}
                 isRequired
-              >
-                {statusOptions.map((option) => (
-                  <SelectItem key={option.value}>{option.label}</SelectItem>
-                ))}
-              </IBaseSelect>
+              />
             )}
           />
           <Controller
             name="valuationMethod"
             control={control}
             render={({ field, fieldState }) => (
-              <IBaseSelect
+              <IBaseSelectWithSearch
                 label="Valuation method"
+                items={valuationOptions}
                 selectedKeys={new Set([field.value])}
                 onSelectionChange={(keys) => {
-                  const value = getSingleSelectionValue(
-                    keys as SingleSelection
-                  );
-                  if (value) {
-                    field.onChange(value);
+                  const keySet = keys as Set<string>;
+                  const [first] = Array.from(keySet);
+                  if (first) {
+                    field.onChange(first);
                   }
                 }}
                 isInvalid={fieldState.invalid}
                 errorMessage={fieldState.error?.message}
                 isRequired
-              >
-                {valuationOptions.map((option) => (
-                  <SelectItem key={option.value}>{option.label}</SelectItem>
-                ))}
-              </IBaseSelect>
+              />
             )}
           />
           <Controller

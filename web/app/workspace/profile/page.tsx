@@ -2,7 +2,10 @@
 
 import DatePickerBase from "@base/client/components/DatePicker";
 import { IBaseInput } from "@base/client/components";
-import { IBaseSelect, SelectItem } from "@base/client/components";
+import {
+  IBaseSelectWithSearch,
+  SelectItemOption,
+} from "@base/client/components";
 import { Avatar } from "@heroui/avatar";
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
@@ -122,18 +125,16 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">Gender</label>
-                  <IBaseSelect
+                  <IBaseSelectWithSearch
+                    items={[
+                      { value: "male", label: "Male" },
+                      { value: "female", label: "Female" },
+                      { value: "other", label: "Other" },
+                      { value: "prefer-not-to-say", label: "Prefer not to say" },
+                    ]}
                     defaultSelectedKeys={["male"]}
                     placeholder="Select gender"
-                    variant="bordered"
-                  >
-                    <SelectItem key="male">Male</SelectItem>
-                    <SelectItem key="female">Female</SelectItem>
-                    <SelectItem key="other">Other</SelectItem>
-                    <SelectItem key="prefer-not-to-say">
-                      Prefer not to say
-                    </SelectItem>
-                  </IBaseSelect>
+                  />
                 </div>
 
                 <div className="flex flex-col gap-2">

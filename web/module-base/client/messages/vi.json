@@ -74,6 +74,20 @@
         "label": "Mã bưu điện",
         "placeholder": "Nhập mã bưu điện"
       }
+    },
+    "vietnam": {
+      "province": {
+        "label": "Tỉnh/Thành phố",
+        "placeholder": "Chọn tỉnh hoặc thành phố"
+      },
+      "ward": {
+        "label": "Phường/Xã/Thị trấn",
+        "placeholder": "Chọn phường, xã hoặc thị trấn (trực thuộc tỉnh/TP)"
+      },
+      "street": {
+        "label": "Địa chỉ đường",
+        "placeholder": "Số nhà, tên đường"
+      }
     }
   }
 }

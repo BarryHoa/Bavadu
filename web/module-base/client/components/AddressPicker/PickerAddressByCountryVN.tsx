@@ -1,6 +1,10 @@
 "use client";
 
-import { IBaseInput, IBaseSelect, SelectItem } from "@base/client/components";
+import {
+  IBaseInput,
+  IBaseSelectWithSearch,
+  SelectItemOption,
+} from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import type {
   Address,
@@ -10,7 +14,7 @@ import type {
 import locationService from "@base/client/services/LocationService";
 import { createAdministrativeUnit } from "@base/client/utils/address/addressUtils";
 import { useQuery } from "@tanstack/react-query";
-import MiniSearch from "minisearch";
+import { useTranslations } from "next-intl";
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 
 interface PickerAddressByCountryVNProps {
@@ -19,19 +23,13 @@ interface PickerAddressByCountryVNProps {
   setTempAddress: Dispatch<SetStateAction<Address>>;
 }
 
-interface SearchableLocation {
-  id: string;
-  nameVi: string;
-  nameEn: string;
-  name: string; // localized name for search
-}
-
 const PickerAddressByCountryVN = ({
   countryCode = "VN",
   tempAddress,
   setTempAddress,
 }: PickerAddressByCountryVNProps) => {
   const getLocalizedName = useLocalizedText();
+  const t = useTranslations("addressPicker.vietnam");
   const [selectedProvinceId, setSelectedProvinceId] = useState<string>("");
   const [selectedWardId, setSelectedWardId] = useState<string>("");
 
@@ -68,75 +66,35 @@ const PickerAddressByCountryVN = ({
     enabled: !!selectedProvinceId,
   });
 
-  // Create MiniSearch for provinces
-  const provinceSearch = useMemo(() => {
-    const searchableProvinces: SearchableLocation[] = provinces.map(
-      (province) => {
-        const name = getLocalizedName(province.name as Record<string, string>);
-        const nameObj = province.name as Record<string, string>;
-        return {
-          id: province.id,
-          nameVi: nameObj.vi || "",
-          nameEn: nameObj.en || "",
-          name: name,
-        };
-      }
-    );
-
-    const ms = new MiniSearch<SearchableLocation>({
-      fields: ["name", "nameVi", "nameEn"],
-      storeFields: ["id", "name", "nameVi", "nameEn"],
-      idField: "id",
-    });
-
-    if (searchableProvinces.length) {
-      ms.addAll(searchableProvinces);
-    }
-
-    return ms;
-  }, [provinces, getLocalizedName]);
-
-  // Create MiniSearch for wards
-  const wardSearch = useMemo(() => {
-    const searchableWards: SearchableLocation[] = wards.map((ward) => {
-      const name = getLocalizedName(ward.name as Record<string, string>);
-      const nameObj = ward.name as Record<string, string>;
+  // Convert provinces to SelectItemOption format
+  const provinceItems = useMemo<SelectItemOption[]>(() => {
+    return provinces.map((province) => {
+      const name = getLocalizedName(province.name as Record<string, string>);
+      const nameObj = province.name as Record<string, string>;
+      // Include both Vietnamese and English names for better search
+      const searchText = `${name} ${nameObj.vi || ""} ${nameObj.en || ""}`;
       return {
-        id: ward.id,
-        nameVi: nameObj.vi || "",
-        nameEn: nameObj.en || "",
-        name: name,
+        value: province.id,
+        label: name,
+        searchText: searchText,
       };
     });
+  }, [provinces, getLocalizedName]);
 
-    const ms = new MiniSearch<SearchableLocation>({
-      fields: ["name", "nameVi", "nameEn"],
-      storeFields: ["id", "name", "nameVi", "nameEn"],
-      idField: "id",
+  // Convert wards to SelectItemOption format
+  const wardItems = useMemo<SelectItemOption[]>(() => {
+    return wards.map((ward) => {
+      const name = getLocalizedName(ward.name as Record<string, string>);
+      const nameObj = ward.name as Record<string, string>;
+      // Include both Vietnamese and English names for better search
+      const searchText = `${name} ${nameObj.vi || ""} ${nameObj.en || ""}`;
+      return {
+        value: ward.id,
+        label: name,
+        searchText: searchText,
+      };
     });
-
-    if (searchableWards.length) {
-      ms.addAll(searchableWards);
-    }
-
-    return ms;
   }, [wards, getLocalizedName]);
-
-  // Filter provinces using MiniSearch (when user types in Select)
-  const filteredProvinces = useMemo(() => {
-    // HeroUI Select handles search internally, but we can use MiniSearch
-    // for more advanced filtering if needed. For now, return all provinces
-    // as HeroUI Select will handle the search with textValue
-    return provinces;
-  }, [provinces]);
-
-  // Filter wards using MiniSearch (when user types in Select)
-  const filteredWards = useMemo(() => {
-    // HeroUI Select handles search internally, but we can use MiniSearch
-    // for more advanced filtering if needed. For now, return all wards
-    // as HeroUI Select will handle the search with textValue
-    return wards;
-  }, [wards]);
 
   // Helper function để build và update administrativeUnits và formattedAddress
   const updateAdministrativeUnits = (provinceId: string, wardId: string) => {
@@ -181,11 +139,10 @@ const PickerAddressByCountryVN = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <IBaseSelect
-        selectionMode="single"
-        label="Tỉnh/Thành phố"
-        size="sm"
-        placeholder="Chọn tỉnh hoặc thành phố"
+      <IBaseSelectWithSearch
+        label={t("province.label")}
+        placeholder={t("province.placeholder")}
+        items={provinceItems}
         selectedKeys={
           selectedProvinceId ? new Set([selectedProvinceId]) : new Set()
         }
@@ -199,31 +156,13 @@ const PickerAddressByCountryVN = ({
           updateAdministrativeUnits(newProvinceId, "");
         }}
         disallowEmptySelection={false}
-        classNames={{
-          popoverContent: "max-w-full",
-        }}
-      >
-        {filteredProvinces.map((province) => {
-          const name = getLocalizedName(
-            province.name as Record<string, string>
-          );
-          const nameObj = province.name as Record<string, string>;
-          // Include both Vietnamese and English names for better search
-          const searchText = `${name} ${nameObj.vi || ""} ${nameObj.en || ""}`;
-          return (
-            <SelectItem key={province.id} textValue={searchText}>
-              {name}
-            </SelectItem>
-          );
-        })}
-      </IBaseSelect>
+      />
 
       {/* Phường/Xã/Thị trấn - Required (trực thuộc tỉnh/TP) */}
-      <IBaseSelect
-        selectionMode="single"
-        label="Phường/Xã/Thị trấn"
-        size="sm"
-        placeholder="Chọn phường, xã hoặc thị trấn (trực thuộc tỉnh/TP)"
+      <IBaseSelectWithSearch
+        label={t("ward.label")}
+        placeholder={t("ward.placeholder")}
+        items={wardItems}
         selectedKeys={selectedWardId ? new Set([selectedWardId]) : new Set()}
         onSelectionChange={(keys) => {
           const selected = Array.from(keys)[0] as string;
@@ -234,27 +173,12 @@ const PickerAddressByCountryVN = ({
         }}
         isDisabled={!selectedProvinceId}
         disallowEmptySelection={false}
-        classNames={{
-          popoverContent: "max-w-full",
-        }}
-      >
-        {filteredWards.map((ward) => {
-          const name = getLocalizedName(ward.name as Record<string, string>);
-          const nameObj = ward.name as Record<string, string>;
-          // Include both Vietnamese and English names for better search
-          const searchText = `${name} ${nameObj.vi || ""} ${nameObj.en || ""}`;
-          return (
-            <SelectItem key={ward.id} textValue={searchText}>
-              {name}
-            </SelectItem>
-          );
-        })}
-      </IBaseSelect>
+      />
 
       {/* Địa chỉ đường */}
       <IBaseInput
-        label="Địa chỉ đường"
-        placeholder="Số nhà, tên đường"
+        label={t("street.label")}
+        placeholder={t("street.placeholder")}
         value={
           typeof tempAddress.street === "string"
             ? tempAddress.street

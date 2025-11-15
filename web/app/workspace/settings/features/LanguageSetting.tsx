@@ -1,15 +1,18 @@
 "use client";
 
-import { IBaseSelect, SelectItem } from "@base/client/components";
+import {
+  IBaseSelectWithSearch,
+  SelectItemOption,
+} from "@base/client/components";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { useSettings } from "@/app/context/SettingsContext";
 
-const languages = [
-  { code: "en", name: "English", flag: "🇺🇸" },
-  { code: "vi", name: "Tiếng Việt", flag: "🇻🇳" },
+const languages: SelectItemOption[] = [
+  { value: "en", label: "English 🇺🇸", searchText: "English en" },
+  { value: "vi", label: "Tiếng Việt 🇻🇳", searchText: "Tiếng Việt vi Vietnamese" },
 ];
 
 export default function LanguageSetting() {
@@ -34,24 +37,19 @@ export default function LanguageSetting() {
         </div>
       </CardHeader>
       <CardBody className="pt-2">
-        <IBaseSelect
+        <IBaseSelectWithSearch
           label={t("currentLanguage")}
-          labelPlacement="outside"
           placeholder={t("selectPlaceholder")}
+          items={languages}
           selectedKeys={[locale]}
-          size="sm"
-          variant="bordered"
-          onChange={(e) => handleLanguageChange(e.target.value)}
-        >
-          {languages.map((lang) => (
-            <SelectItem key={lang.code} textValue={lang.name}>
-              <div className="flex items-center gap-2">
-                <span className="text-lg">{lang.flag}</span>
-                <span>{lang.name}</span>
-              </div>
-            </SelectItem>
-          ))}
-        </IBaseSelect>
+          onSelectionChange={(keys) => {
+            const keySet = keys as Set<string>;
+            const [first] = Array.from(keySet);
+            if (first) {
+              handleLanguageChange(first);
+            }
+          }}
+        />
       </CardBody>
     </Card>
   );

@@ -1,6 +1,10 @@
 "use client";
 
-import { IBaseInput, IBaseSelect, SelectItem } from "@base/client/components";
+import {
+  IBaseInput,
+  IBaseSelectWithSearch,
+  SelectItemOption,
+} from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import type { Address, countryCode } from "@base/client/interface/Address";
 import locationService from "@base/client/services/LocationService";
@@ -19,7 +23,7 @@ import { useQuery } from "@tanstack/react-query";
 import { MapPin } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 // @ts-ignore
 // dynamic import PickerAddressByCountryUS
 const PickerAddressByCountryUS = dynamic(
@@ -56,6 +60,18 @@ export default function AddressPicker({
       return response.data || [];
     },
   });
+
+  const countryItems = useMemo<SelectItemOption[]>(() => {
+    return countries.map((country) => {
+      const name = getLocalizedName(country.name as Record<string, string>);
+      const nameObj = country.name as Record<string, string>;
+      return {
+        value: country.code,
+        label: name,
+        searchText: `${name} ${nameObj.vi || ""} ${nameObj.en || ""}`,
+      };
+    });
+  }, [countries, getLocalizedName]);
 
   const [selectedCountryCode, setSelectedCountryCode] = useState<countryCode>(
     value?.country?.code ?? "VN"
@@ -203,11 +219,10 @@ export default function AddressPicker({
               </ModalHeader>
               <ModalBody>
                 <div className="flex flex-col gap-4">
-                  <IBaseSelect
-                    selectionMode="single"
+                  <IBaseSelectWithSearch
                     label={t("modal.country.label")}
-                    size="sm"
                     placeholder={t("modal.country.placeholder")}
+                    items={countryItems}
                     isRequired
                     selectedKeys={
                       selectedCountryCode
@@ -215,7 +230,8 @@ export default function AddressPicker({
                         : new Set(["VN"])
                     }
                     onSelectionChange={(keys) => {
-                      const selected = Array.from(keys)[0] as string;
+                      const keySet = keys as Set<string>;
+                      const selected = Array.from(keySet)[0] as string;
                       // Prevent deselection - at least one item must be selected
                       if (selected) {
                         setSelectedCountryCode(selected as countryCode);
@@ -225,18 +241,7 @@ export default function AddressPicker({
                     classNames={{
                       popoverContent: "max-w-full",
                     }}
-                  >
-                    {countries.map((country) => {
-                      const name = getLocalizedName(
-                        country.name as Record<string, string>
-                      );
-                      return (
-                        <SelectItem key={country.code} textValue={name}>
-                          {name}
-                        </SelectItem>
-                      );
-                    })}
-                  </IBaseSelect>
+                  />
 
                   {renderPickerAddressByCountry(selectedCountryCode)}
 

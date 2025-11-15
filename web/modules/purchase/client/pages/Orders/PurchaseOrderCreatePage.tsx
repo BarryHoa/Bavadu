@@ -1,8 +1,11 @@
 "use client";
 
-import { IBaseInput } from "@base/client/components";
+import {
+  IBaseInput,
+  IBaseSelectWithSearch,
+  SelectItemOption,
+} from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
-import { IBaseSelect, SelectItem } from "@base/client/components";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Textarea } from "@heroui/react";
@@ -45,29 +48,20 @@ const unitPriceSchema = pipe(
   trim(),
   custom(
     (value) =>
-      value === "" ||
-      (!Number.isNaN(Number(value)) && Number(value) >= 0),
+      value === "" || (!Number.isNaN(Number(value)) && Number(value) >= 0),
     "Unit price must be a number greater than or equal to 0"
   )
 );
 
 const orderLineSchema = object({
-  productId: pipe(
-    string(),
-    trim(),
-    minLength(1, "Product ID is required")
-  ),
+  productId: pipe(string(), trim(), minLength(1, "Product ID is required")),
   quantity: quantitySchema,
   unitPrice: unitPriceSchema,
   description: optional(pipe(string(), trim())),
 });
 
 const purchaseOrderFormSchema = object({
-  vendorName: pipe(
-    string(),
-    trim(),
-    minLength(1, "Vendor name is required")
-  ),
+  vendorName: pipe(string(), trim(), minLength(1, "Vendor name is required")),
   warehouseId: optional(pipe(string(), trim())),
   expectedDate: optional(pipe(string(), trim())),
   currency: pipe(string(), trim(), minLength(1, "Currency is required")),
@@ -186,7 +180,7 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
     await submitOrder(payload);
   };
 
-  const warehouseOptions = useMemo(
+  const warehouseOptions = useMemo<SelectItemOption[]>(
     () =>
       (warehousesQuery.data ?? []).map((warehouse) => ({
         value: warehouse.id,
@@ -243,13 +237,15 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
                 name="warehouseId"
                 control={control}
                 render={({ field, fieldState }) => (
-                  <IBaseSelect
+                  <IBaseSelectWithSearch
                     label="Warehouse (optional)"
+                    items={warehouseOptions}
                     selectedKeys={
                       field.value ? new Set([field.value]) : new Set<string>()
                     }
                     onSelectionChange={(keys) => {
-                      const [first] = Array.from(keys);
+                      const keySet = keys as Set<string>;
+                      const [first] = Array.from(keySet);
                       field.onChange(
                         typeof first === "string" ? first : undefined
                       );
@@ -257,11 +253,7 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
                     isInvalid={fieldState.invalid}
                     errorMessage={fieldState.error?.message}
                     isDisabled={warehousesQuery.isLoading}
-                  >
-                    {warehouseOptions.map((option) => (
-                      <IBaseSelectItem key={option.value}>{option.label}</SelectItem>
-                    ))}
-                  </IBaseSelect>
+                  />
                 )}
               />
               <Controller
@@ -422,4 +414,3 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
     </div>
   );
 }
-

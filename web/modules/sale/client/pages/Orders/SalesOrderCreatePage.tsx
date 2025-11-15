@@ -181,7 +181,7 @@ export default function SalesOrderCreatePage(): React.ReactNode {
     await submitOrder(payload);
   };
 
-  const warehouseOptions = useMemo(
+  const warehouseOptions = useMemo<SelectItemOption[]>(
     () =>
       (warehousesQuery.data ?? []).map((warehouse) => ({
         value: warehouse.id,
@@ -238,13 +238,15 @@ export default function SalesOrderCreatePage(): React.ReactNode {
                 name="warehouseId"
                 control={control}
                 render={({ field, fieldState }) => (
-                  <IBaseSelect
+                  <IBaseSelectWithSearch
                     label="Warehouse (optional)"
+                    items={warehouseOptions}
                     selectedKeys={
                       field.value ? new Set([field.value]) : new Set<string>()
                     }
                     onSelectionChange={(keys) => {
-                      const [first] = Array.from(keys);
+                      const keySet = keys as Set<string>;
+                      const [first] = Array.from(keySet);
                       field.onChange(
                         typeof first === "string" ? first : undefined
                       );
@@ -252,11 +254,7 @@ export default function SalesOrderCreatePage(): React.ReactNode {
                     isInvalid={fieldState.invalid}
                     errorMessage={fieldState.error?.message}
                     isDisabled={warehousesQuery.isLoading}
-                  >
-                    {warehouseOptions.map((option) => (
-                      <IBaseSelectItem key={option.value}>{option.label}</SelectItem>
-                    ))}
-                  </IBaseSelect>
+                  />
                 )}
               />
               <Controller

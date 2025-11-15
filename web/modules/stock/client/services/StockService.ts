@@ -41,9 +41,14 @@ export interface WarehousePayload {
 
 export interface StockSummaryItem {
   productId: string;
+  productCode: string;
+  productName: string;
   warehouseId: string;
+  warehouseCode: string;
+  warehouseName: string;
   quantity: number;
   reservedQuantity: number;
+  minStock: number | null;
 }
 
 type ApiResponse<T> = {
