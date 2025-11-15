@@ -7,11 +7,10 @@ import {
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { Button, Chip } from "@heroui/react";
-import { Plus } from "lucide-react";
+import { Chip } from "@heroui/react";
 import { useMemo } from "react";
 
-import { getClientLink } from "@base/client/ultils/link/getClientLink";
+import { getClientLink } from "@base/client/utils/link/getClientLink";
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
 
 interface UnitOfMeasureRow {
@@ -72,28 +71,29 @@ const UnitOfMeasureListPage = (): React.ReactNode => {
     ];
   }, [localized]);
 
-  const { as: createHref } = getClientLink({
+  const createLink = getClientLink({
     mdl: "product",
     path: "uom/create",
   });
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
-        <Button
-          color="primary"
-          startContent={<Plus size={16} />}
-          as={LinkAs as any}
-          href={createHref}
-        >
-          Add UOM
-        </Button>
-      </div>
-
+    <div className="space-y-4">
       <ViewListDataTable<UnitOfMeasureRow>
         model="product.uom"
         columns={columns}
         isDummyData={false}
+        actionsRight={[
+          {
+            key: "new",
+            title: "Add UOM",
+            type: "link",
+            color: "primary",
+            props: {
+              href: createLink.path,
+              hrefAs: createLink.as as any,
+            },
+          },
+        ]}
       />
     </div>
   );

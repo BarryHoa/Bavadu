@@ -7,7 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 
-import { getClientLink } from "@/module-base/client/ultils/link/getClientLink";
+import { getClientLink } from "@/module-base/client/utils/link/getClientLink";
 import ProductCategoryForm, {
   ProductCategoryFormValues,
 } from "../../components/Category/ProductCategoryForm";

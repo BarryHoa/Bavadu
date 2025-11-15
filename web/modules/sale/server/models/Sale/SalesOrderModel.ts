@@ -56,15 +56,15 @@ export default class SalesOrderModel extends BaseModel<
     super(table_sales_order);
   }
 
-  async list(): Promise<TblSalesOrder[]> {
+  list = async (): Promise<TblSalesOrder[]> => {
     const db = getEnv().getDb();
     return db
       .select()
       .from(table_sales_order)
       .orderBy(desc(table_sales_order.createdAt));
-  }
+  };
 
-  async getById(id: string) {
+  getById = async (id: string) => {
     const db = getEnv().getDb();
     const [order] = await db
       .select()
@@ -79,9 +79,9 @@ export default class SalesOrderModel extends BaseModel<
       .from(table_sales_order_line)
       .where(eq(table_sales_order_line.orderId, order.id));
     return { order, lines };
-  }
+  };
 
-  async create(input: CreateSalesOrderInput) {
+  create = async (input: CreateSalesOrderInput) => {
     if (!input.lines?.length) {
       throw new Error("Sales order requires at least one line");
     }
@@ -150,9 +150,9 @@ export default class SalesOrderModel extends BaseModel<
       }
       return result;
     });
-  }
+  };
 
-  async confirm(orderId: string) {
+  confirm = async (orderId: string) => {
     const db = getEnv().getDb();
     const [updated] = await db
       .update(table_sales_order)
@@ -168,9 +168,9 @@ export default class SalesOrderModel extends BaseModel<
     }
 
     return updated;
-  }
+  };
 
-  async deliver(input: DeliverSalesOrderInput) {
+  deliver = async (input: DeliverSalesOrderInput) => {
     const db = getEnv().getDb();
     const env = getEnv();
     const stockModel = env.getModel("stock") as StockModel | undefined;
@@ -264,9 +264,9 @@ export default class SalesOrderModel extends BaseModel<
     });
 
     return this.getById(order.id);
-  }
+  };
 
-  async cancel(orderId: string) {
+  cancel = async (orderId: string) => {
     const db = getEnv().getDb();
     const [updated] = await db
       .update(table_sales_order)
@@ -282,7 +282,7 @@ export default class SalesOrderModel extends BaseModel<
     }
 
     return updated;
-  }
+  };
 
   getViewDataList = async (
     params: ListParamsRequest

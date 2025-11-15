@@ -13,7 +13,7 @@ import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
 import type { ProductDetail } from "../../interface/Product";
 import ProductService from "../../services/ProductService";
-import { getClientLink } from "@/module-base/client/ultils/link/getClientLink";
+import { getClientLink } from "@/module-base/client/utils/link/getClientLink";
 
 const getParamValue = (value: string | string[] | undefined): string | undefined =>
   Array.isArray(value) ? value[0] : value;

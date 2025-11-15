@@ -7,8 +7,7 @@ import {
   DATA_TABLE_COLUMN_KEY_ACTION,
   DataTableColumn,
 } from "@base/client/components/DataTable";
-import { formatDate } from "@base/client/ultils/date/formatDate";
-import { Button } from "@heroui/button";
+import { formatDate } from "@base/client/utils/date/formatDate";
 import { Chip } from "@heroui/react";
 import { useMemo } from "react";
 
@@ -85,22 +84,22 @@ export default function SalesOrdersListPage(): React.ReactNode {
   }, []);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-end">
-        <Button
-          color="primary"
-          size="sm"
-          as={LinkAs as any}
-          href="/workspace/modules/sale/create"
-        >
-          New sales order
-        </Button>
-      </div>
-
+    <div className="space-y-4">
       <ViewListDataTable<SalesOrderRow>
         model="sale.order"
         columns={columns}
         isDummyData={false}
+        actionsRight={[
+          {
+            key: "new",
+            title: "New sales order",
+            type: "link",
+            color: "primary",
+            props: {
+              href: "/workspace/modules/sale/create",
+            },
+          },
+        ]}
       />
     </div>
   );

@@ -7,8 +7,7 @@ import {
 } from "@base/client/components/DataTable";
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
-import { formatDate } from "@base/client/ultils/date/formatDate";
-import { Button } from "@heroui/button";
+import { formatDate } from "@base/client/utils/date/formatDate";
 import { Chip } from "@heroui/react";
 import { useMemo } from "react";
 
@@ -85,22 +84,22 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
   }, []);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-end">
-        <Button
-          color="primary"
-          size="sm"
-          as={LinkAs as any}
-          href="/workspace/modules/purchase/create"
-        >
-          New purchase order
-        </Button>
-      </div>
-
+    <div className="space-y-4">
       <ViewListDataTable<PurchaseOrderRow>
         model="purchase.order"
         columns={columns}
         isDummyData={false}
+        actionsRight={[
+          {
+            key: "new",
+            title: "New purchase order",
+            type: "link",
+            color: "primary",
+            props: {
+              href: "/workspace/modules/purchase/create",
+            },
+          },
+        ]}
       />
     </div>
   );

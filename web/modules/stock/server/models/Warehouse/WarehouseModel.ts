@@ -61,15 +61,15 @@ export default class WarehouseModel extends BaseModel<
     super(table_stock_warehouse);
   }
 
-  async listWarehouses(): Promise<TblStockWarehouse[]> {
+  listWarehouses = async (): Promise<TblStockWarehouse[]> => {
     const db = getEnv().getDb();
     return db
       .select()
       .from(table_stock_warehouse)
       .orderBy(asc(table_stock_warehouse.name));
-  }
+  };
 
-  async getWarehouse(id: string): Promise<TblStockWarehouse | null> {
+  getWarehouse = async (id: string): Promise<TblStockWarehouse | null> => {
     const db = getEnv().getDb();
     const [record] = await db
       .select()
@@ -78,9 +78,11 @@ export default class WarehouseModel extends BaseModel<
       .limit(1);
 
     return record ?? null;
-  }
+  };
 
-  async createWarehouse(payload: WarehousePayload): Promise<TblStockWarehouse> {
+  createWarehouse = async (
+    payload: WarehousePayload
+  ): Promise<TblStockWarehouse> => {
     const db = getEnv().getDb();
     const insertPayload = this.normalizeWarehousePayload(payload);
 
@@ -90,12 +92,12 @@ export default class WarehouseModel extends BaseModel<
       .returning();
 
     return record;
-  }
+  };
 
-  async updateWarehouse(
+  updateWarehouse = async (
     id: string,
     payload: WarehousePayload
-  ): Promise<TblStockWarehouse> {
+  ): Promise<TblStockWarehouse> => {
     const db = getEnv().getDb();
     const [record] = await db
       .update(table_stock_warehouse)
@@ -111,11 +113,17 @@ export default class WarehouseModel extends BaseModel<
     }
 
     return record;
-  }
+  };
 
-  async getViewDataList(
+  getViewDataList = async (
     params: ListParamsRequest = {}
-  ): Promise<ListParamsResponse<WarehouseViewRow>> {
+  ): Promise<ListParamsResponse<WarehouseViewRow>> => {
+    console.log(
+      "getViewDataList",
+      this.table.name,
+      params,
+      this.getDefaultParamsForList
+    );
     const { offset, limit, search } = this.getDefaultParamsForList(params);
     const db = getEnv().getDb();
 
@@ -206,11 +214,11 @@ export default class WarehouseModel extends BaseModel<
     }));
 
     return this.getPagination({ data, total });
-  }
+  };
 
-  private normalizeWarehousePayload(
+  private normalizeWarehousePayload = (
     payload: WarehousePayload
-  ): Omit<NewTblStockWarehouse, "id" | "createdAt" | "updatedAt"> {
+  ): Omit<NewTblStockWarehouse, "id" | "createdAt" | "updatedAt"> => {
     return {
       code: payload.code.trim(),
       name: payload.name.trim(),
@@ -235,9 +243,9 @@ export default class WarehouseModel extends BaseModel<
       accountAdjustment: payload.accountAdjustment ?? null,
       notes: payload.notes ?? null,
     };
-  }
+  };
 
-  private validateStatus(status?: string | null): WarehouseStatus {
+  private validateStatus = (status?: string | null): WarehouseStatus => {
     if (!status) {
       return "ACTIVE";
     }
@@ -248,11 +256,11 @@ export default class WarehouseModel extends BaseModel<
     }
 
     return normalized;
-  }
+  };
 
-  private validateValuationMethod(
+  private validateValuationMethod = (
     value?: string | null
-  ): WarehouseValuationMethod {
+  ): WarehouseValuationMethod => {
     if (!value) {
       return "FIFO";
     }
@@ -263,5 +271,5 @@ export default class WarehouseModel extends BaseModel<
     }
 
     return normalized;
-  }
+  };
 }

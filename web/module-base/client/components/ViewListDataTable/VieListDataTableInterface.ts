@@ -1,8 +1,21 @@
 import { LocaleDataType } from "@base/server";
+import { ButtonProps, LinkProps } from "@heroui/react";
+import { ReactNode } from "react";
 import type { DataTableProps } from "../DataTable/DataTableInterface";
 import { FilterOption } from "./components/FilterMenu";
 import { GroupOption } from "./components/GroupByMenu";
 
+export type ActionElm = {
+  key: string;
+  title: ReactNode;
+  type: "button" | "link";
+  color?: ButtonProps["color"];
+  variant?: ButtonProps["variant"];
+  size?: ButtonProps["size"];
+  props?:
+    | Omit<ButtonProps, "color" | "variant" | "size">
+    | (Omit<LinkProps, "as"> & { hrefAs?: any });
+};
 export type ViewListDataTableProps<T = any> = Omit<
   DataTableProps<T>,
   "pagination" | "dataSource"
@@ -16,7 +29,10 @@ export type ViewListDataTableProps<T = any> = Omit<
   // Optional: Override fetched group by options
   groupByOptions?: GroupOption[];
   // Optional: Override fetched favorite filter
-  initialFavoriteFilter?: (row: T) => boolean;
+
+  // others actions
+  actionsLeft?: ActionElm[];
+  actionsRight?: ActionElm[];
   search?: {
     hidden?: boolean;
     placeholder?: string;

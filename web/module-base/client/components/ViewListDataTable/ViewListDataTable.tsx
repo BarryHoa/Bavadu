@@ -1,19 +1,20 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { DataTable } from "../DataTable";
 import type { FilterOption } from "./components/FilterMenu";
 import type { GroupOption } from "./components/GroupByMenu";
 
-import { Card, CardBody, Divider } from "@heroui/react";
+import { Button, Card, CardBody, Divider, LinkProps } from "@heroui/react";
 import { useLocalizedText } from "../../hooks/useLocalizedText";
+import LinkAs from "../LinkAs";
 import ColumnVisibilityMenu from "./components/ColumnVisibilityMenu";
 import FilterMenu from "./components/FilterMenu";
 import GroupByMenu from "./components/GroupByMenu";
 import SearchBar from "./components/SearchBar";
 import { useViewListDataTableQueries } from "./useViewListDataTableQueries";
 import { useViewListDataTableStore } from "./useViewListDataTableStore";
-import { ViewListDataTableProps } from "./VieListDataTableInterface";
+import { ActionElm, ViewListDataTableProps } from "./VieListDataTableInterface";
 
 export default function ViewListDataTable<T = any>(
   props: ViewListDataTableProps<T>
@@ -28,6 +29,8 @@ export default function ViewListDataTable<T = any>(
     favorite,
     columnVisibility,
     isDummyData = true,
+    actionsLeft,
+    actionsRight,
     ...dataTableProps
   } = props;
   // Use the store hook - each instance gets its own store
@@ -142,6 +145,53 @@ export default function ViewListDataTable<T = any>(
     return columns.filter((col: any) => store.visibleColumns.has(col.key));
   }, [columns, store.visibleColumns]);
 
+  const renderActions = useCallback(
+    (acts: ActionElm[]) => {
+      return acts?.map((action) => {
+        const size = action.size ?? "sm";
+        const variant = action.variant ?? "solid";
+        const color = action.color ?? "default";
+        switch (action.type) {
+          case "button":
+            return (
+              <Button
+                isIconOnly
+                key={action.key}
+                size={size}
+                variant={variant}
+                color={color}
+                {...(action.props as any)}
+              >
+                {action.title}
+              </Button>
+            );
+          case "link":
+            const linkProps = action.props as Omit<LinkProps, "as"> & {
+              hrefAs?: any;
+            };
+
+            return (
+              <Button
+                key={action.key}
+                variant={variant}
+                color={color}
+                size={size}
+                as={LinkAs as any}
+                href={linkProps.href as string}
+                hrefAs={linkProps.hrefAs as any}
+                // {...(linkProps as any)}
+              >
+                {action.title}
+              </Button>
+            );
+          default:
+            return null;
+        }
+      });
+    },
+    [actionsLeft, actionsRight]
+  );
+
   // Render
   return (
     <Card>
@@ -155,7 +205,9 @@ export default function ViewListDataTable<T = any>(
 
       <CardBody className={`${title ? "pt-0" : ""}`}>
         <div className="flex gap-2 items-center mb-4 flex-wrap">
-          <div className="flex gap-2 flex-1 justify-start"></div>
+          <div className="flex gap-2 flex-1 justify-start">
+            {renderActions(actionsLeft ?? [])}
+          </div>
 
           <div className="flex gap-2 flex-1 justify-end">
             {!isSearchHidden && (
@@ -179,6 +231,7 @@ export default function ViewListDataTable<T = any>(
                 onSelectGroupBy={store.setGroupBy}
               />
             )}
+            {renderActions(actionsRight ?? [])}
 
             {!isColumnVisibilityHidden && (
               <ColumnVisibilityMenu

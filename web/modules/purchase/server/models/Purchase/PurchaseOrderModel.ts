@@ -56,15 +56,15 @@ export default class PurchaseOrderModel extends BaseModel<
     super(table_purchase_order);
   }
 
-  async list(): Promise<TblPurchaseOrder[]> {
+  list = async (): Promise<TblPurchaseOrder[]> => {
     const db = getEnv().getDb();
     return db
       .select()
       .from(table_purchase_order)
       .orderBy(desc(table_purchase_order.createdAt));
-  }
+  };
 
-  async getById(id: string) {
+  getById = async (id: string) => {
     const db = getEnv().getDb();
     const [order] = await db
       .select()
@@ -79,9 +79,9 @@ export default class PurchaseOrderModel extends BaseModel<
       .from(table_purchase_order_line)
       .where(eq(table_purchase_order_line.orderId, order.id));
     return { order, lines };
-  }
+  };
 
-  async create(input: CreatePurchaseOrderInput) {
+  create = async (input: CreatePurchaseOrderInput) => {
     if (!input.lines?.length) {
       throw new Error("Purchase order requires at least one line");
     }
@@ -150,9 +150,9 @@ export default class PurchaseOrderModel extends BaseModel<
       }
       return result;
     });
-  }
+  };
 
-  async confirm(orderId: string) {
+  confirm = async (orderId: string) => {
     const db = getEnv().getDb();
     const [updated] = await db
       .update(table_purchase_order)
@@ -168,9 +168,9 @@ export default class PurchaseOrderModel extends BaseModel<
     }
 
     return updated;
-  }
+  };
 
-  async receive(input: ReceivePurchaseOrderInput) {
+  receive = async (input: ReceivePurchaseOrderInput) => {
     const db = getEnv().getDb();
     const env = getEnv();
     const stockModel = env.getModel("stock") as StockModel | undefined;
@@ -266,9 +266,9 @@ export default class PurchaseOrderModel extends BaseModel<
     });
 
     return this.getById(order.id);
-  }
+  };
 
-  async cancel(orderId: string) {
+  cancel = async (orderId: string) => {
     const db = getEnv().getDb();
     const [updated] = await db
       .update(table_purchase_order)
@@ -284,7 +284,7 @@ export default class PurchaseOrderModel extends BaseModel<
     }
 
     return updated;
-  }
+  };
 
   getViewDataList = async (
     params: ListParamsRequest

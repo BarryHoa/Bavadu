@@ -6,9 +6,8 @@ import {
   DATA_TABLE_COLUMN_KEY_ACTION,
   type DataTableColumn,
 } from "@base/client/components/DataTable";
-import { Button, Chip } from "@heroui/react";
+import { Chip } from "@heroui/react";
 import { useMemo } from "react";
-import { useRouter } from "next/navigation";
 
 import type { WarehouseDto } from "../../services/StockService";
 
@@ -40,7 +39,6 @@ const formatStockRange = (warehouse: WarehouseDto) => {
 };
 
 export default function WarehouseListPage(): React.ReactNode {
-  const router = useRouter();
 
   const columns = useMemo<DataTableColumn<WarehouseDto>[]>(() => {
     return [
@@ -89,48 +87,32 @@ export default function WarehouseListPage(): React.ReactNode {
         label: "Actions",
         align: "end",
         render: (_, row) => (
-          <Button
-            size="sm"
-            variant="light"
-            onPress={() =>
-              router.push(`/workspace/modules/stock/warehouses/edit/${row.id}`)
-            }
-          >
+          <LinkAs href={`/workspace/modules/stock/warehouses/edit/${row.id}`}>
             Edit
-          </Button>
+          </LinkAs>
         ),
       },
     ];
-  }, [router]);
+  }, []);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-end">
-        <Button
-          color="primary"
-          size="sm"
-          as={LinkAs as any}
-          href="/workspace/modules/stock/warehouses/create"
-        >
-          New warehouse
-        </Button>
-      </div>
-
+    <div className="space-y-4">
       <ViewListDataTable<WarehouseDto>
         model="stock.warehouse"
         columns={columns}
         isDummyData={false}
+        actionsRight={[
+          {
+            key: "new",
+            title: "New warehouse",
+            type: "link",
+            color: "primary",
+            props: {
+              href: "/workspace/modules/stock/warehouses/create",
+            },
+          },
+        ]}
       />
-
-      <div className="flex justify-end">
-        <Button
-          size="sm"
-          variant="light"
-          onPress={() => router.push("/workspace/modules/stock")}
-        >
-          Back to Stock Dashboard
-        </Button>
-      </div>
     </div>
   );
 }

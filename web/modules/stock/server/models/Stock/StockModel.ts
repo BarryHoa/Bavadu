@@ -46,7 +46,7 @@ export default class StockModel extends BaseModel<typeof table_stock_move> {
     super(table_stock_move);
   }
 
-  async adjustStock(input: AdjustStockInput) {
+  adjustStock = async (input: AdjustStockInput) => {
     if (!input.quantityDelta) {
       return this.getStockLevel(input.productId, input.warehouseId);
     }
@@ -55,9 +55,9 @@ export default class StockModel extends BaseModel<typeof table_stock_move> {
       ...input,
       type: "adjustment",
     });
-  }
+  };
 
-  async receiveStock(input: InboundStockInput) {
+  receiveStock = async (input: InboundStockInput) => {
     if (input.quantity <= 0) {
       throw new Error("Inbound quantity must be positive");
     }
@@ -68,9 +68,9 @@ export default class StockModel extends BaseModel<typeof table_stock_move> {
       quantityDelta: input.quantity,
       type: "inbound",
     });
-  }
+  };
 
-  async issueStock(input: OutboundStockInput) {
+  issueStock = async (input: OutboundStockInput) => {
     if (input.quantity <= 0) {
       throw new Error("Outbound quantity must be positive");
     }
@@ -81,9 +81,9 @@ export default class StockModel extends BaseModel<typeof table_stock_move> {
       quantityDelta: -Math.abs(input.quantity),
       type: "outbound",
     });
-  }
+  };
 
-  async transferStock(input: TransferStockInput) {
+  transferStock = async (input: TransferStockInput) => {
     if (input.sourceWarehouseId === input.targetWarehouseId) {
       throw new Error("Source and destination warehouses must be different");
     }
@@ -123,12 +123,12 @@ export default class StockModel extends BaseModel<typeof table_stock_move> {
 
       return true;
     });
-  }
+  };
 
-  async getStockLevel(
+  getStockLevel = async (
     productId: string,
     warehouseId: string
-  ): Promise<TblStockLevel | null> {
+  ): Promise<TblStockLevel | null> => {
     const db = getEnv().getDb();
     const [record] = await db
       .select()
@@ -142,9 +142,9 @@ export default class StockModel extends BaseModel<typeof table_stock_move> {
       .limit(1);
 
     return record ?? null;
-  }
+  };
 
-  async getStockSummary(filter: StockSummaryFilter = {}) {
+  getStockSummary = async (filter: StockSummaryFilter = {}) => {
     const db = getEnv().getDb();
 
     const whereClauses = [];
@@ -182,15 +182,15 @@ export default class StockModel extends BaseModel<typeof table_stock_move> {
       quantity: Number(row.quantity),
       reservedQuantity: Number(row.reservedQuantity),
     }));
-  }
+  };
 
-  private async applyDelta(
+  private applyDelta = async (
     input: AdjustStockInput & {
       type: StockMovementKind;
       relatedWarehouseId?: string;
     },
     tx?: any
-  ) {
+  ) => {
     const now = new Date();
     const quantityDelta = Number(input.quantityDelta);
     const db = tx ?? getEnv().getDb();
@@ -254,5 +254,5 @@ export default class StockModel extends BaseModel<typeof table_stock_move> {
       .returning();
 
     return moveRecord;
-  }
+  };
 }

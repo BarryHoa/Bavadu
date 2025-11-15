@@ -18,7 +18,7 @@ import {
   mapDetailToFormValues,
   mapFormValuesToPayload,
 } from "../../utils/productMapper";
-import { getClientLink } from "@/module-base/client/ultils/link/getClientLink";
+import { getClientLink } from "@/module-base/client/utils/link/getClientLink";
 
 const getParamValue = (
   value: string | string[] | undefined

@@ -87,12 +87,12 @@ export class BaseModel<TTable extends PgTable<any> = PgTable<any>> {
   };
 
   /**Get pagination data */
-  getPagination(options: { data?: any; total?: number }) {
+  getPagination = (options: { data?: any; total?: number }) => {
     const { data, total = 0 } = options;
 
     return {
       data,
       total,
     };
-  }
+  };
 }

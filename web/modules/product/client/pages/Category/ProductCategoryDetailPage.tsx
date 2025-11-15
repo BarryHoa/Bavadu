@@ -9,7 +9,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useMemo } from "react";
 
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { formatDate } from "@base/client/ultils/date/formatDate";
+import { formatDate } from "@base/client/utils/date/formatDate";
 import ProductCategoryService from "../../services/ProductCategoryService";
 import type { ProductCategoryRow } from "../../interface/ProductCategory";
 

@@ -6,19 +6,18 @@ import {
 } from "@base/client/components/DataTable";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { formatDate } from "@base/client/ultils/date/formatDate";
-import { getClientLink } from "@base/client/ultils/link/getClientLink";
+import { formatDate } from "@base/client/utils/date/formatDate";
+import { getClientLink } from "@base/client/utils/link/getClientLink";
 
 import LinkAs from "@base/client/components/LinkAs";
 import { Chip } from "@heroui/react";
-import { Button } from "@heroui/button";
 import React, { useMemo } from "react";
 import { ProductMasterFeatures, ProductRow } from "../../interface/Product";
 import {
   convertProductMasterFeaturesToArrayKey,
   getNameProductFeatures,
-} from "../../ultils/getNameProductFeatures";
-import { getNameProductType } from "../../ultils/getNameProductType";
+} from "../../utils/getNameProductFeatures";
+import { getNameProductType } from "../../utils/getNameProductType";
 
 export default function ProductsListPage(): React.ReactNode {
   const localized = useLocalizedText();
@@ -162,18 +161,22 @@ export default function ProductsListPage(): React.ReactNode {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-end">
-        <Button
-          color="primary"
-          size="sm"
-          as={LinkAs as any}
-          href={createLink.path}
-        >
-          New product
-        </Button>
-      </div>
-
-      <ViewListDataTable model="product" columns={columns} />
+      <ViewListDataTable
+        model="product"
+        columns={columns}
+        actionsRight={[
+          {
+            key: "new",
+            title: "New Product",
+            type: "link",
+            color: "primary",
+            props: {
+              href: createLink.path,
+              as: createLink.as as any,
+            },
+          },
+        ]}
+      />
     </div>
   );
 }

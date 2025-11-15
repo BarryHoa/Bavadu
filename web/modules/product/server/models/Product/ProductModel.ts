@@ -25,8 +25,8 @@ import {
   ProductDetail,
   ProductFilter,
   ProductPackingInput,
-  ProductVariantElm,
   ProductUpdateInput,
+  ProductVariantElm,
 } from "./ProductModelInterface";
 
 class ProductModel extends BaseModel<typeof table_product_variant> {
@@ -34,7 +34,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
     super(table_product_variant);
   }
 
-  private mapToMasterProduct(dbProduct: TblProductMaster): MasterProduct {
+  private mapToMasterProduct = (dbProduct: TblProductMaster): MasterProduct => {
     return {
       id: dbProduct.id,
       code: dbProduct.code,
@@ -49,9 +49,9 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
       // They would need to be resolved to User objects if needed
       // For now, we omit them as they're optional
     };
-  }
+  };
 
-  private normalizeLocale(value: unknown) {
+  private normalizeLocale = (value: unknown) => {
     if (!value) {
       return null;
     }
@@ -61,12 +61,12 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
     }
 
     return value;
-  }
+  };
 
-  private async getProductDetailInternal(
+  private getProductDetailInternal = async (
     id: string,
     db = getEnv().getDb()
-  ): Promise<ProductDetail | null> {
+  ): Promise<ProductDetail | null> => {
     const rows = await db
       .select({
         variant: this.table,
@@ -163,26 +163,26 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
         value: attr.value ?? "",
       })),
     };
-  }
+  };
 
   getProductDetail = async (id: string): Promise<ProductDetail | null> => {
     const env = getEnv();
     return this.getProductDetailInternal(id, env.getDb());
   };
 
-  private ensurePackingValues(
+  private ensurePackingValues = (
     packings: ProductPackingInput[] | undefined
-  ): ProductPackingInput[] {
+  ): ProductPackingInput[] => {
     return (packings ?? []).filter((packing) => Boolean(packing?.name));
-  }
+  };
 
-  private ensureAttributeValues(
+  private ensureAttributeValues = (
     attributes: ProductAttributeInput[] | undefined
-  ): ProductAttributeInput[] {
+  ): ProductAttributeInput[] => {
     return (attributes ?? []).filter((attribute) =>
       Boolean(attribute?.code && attribute?.name)
     );
-  }
+  };
 
   createProduct = async (payload: ProductCreateInput) => {
     const env = getEnv();
@@ -249,7 +249,9 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
         await tx.insert(table_product_packing).values(
           normalizedPackings.map((packing) => ({
             productVariantId: variant.id,
-            name: this.normalizeLocale(packing.name) ?? { en: packing.id ?? "" },
+            name: this.normalizeLocale(packing.name) ?? {
+              en: packing.id ?? "",
+            },
             description: this.normalizeLocale(packing.description),
             isActive: packing.isActive ?? true,
             createdAt: now,
@@ -267,10 +269,9 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
           normalizedAttributes.map((attribute) => ({
             productVariantId: variant.id,
             code: attribute.code.trim(),
-            name:
-              this.normalizeLocale(attribute.name) ?? {
-                en: attribute.code.trim(),
-              },
+            name: this.normalizeLocale(attribute.name) ?? {
+              en: attribute.code.trim(),
+            },
             value: attribute.value,
             createdAt: now,
             updatedAt: now,
@@ -354,7 +355,9 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
         await tx.insert(table_product_packing).values(
           normalizedPackings.map((packing) => ({
             productVariantId: payload.id,
-            name: this.normalizeLocale(packing.name) ?? { en: packing.id ?? "" },
+            name: this.normalizeLocale(packing.name) ?? {
+              en: packing.id ?? "",
+            },
             description: this.normalizeLocale(packing.description),
             isActive: packing.isActive ?? true,
             createdAt: now,
@@ -376,10 +379,9 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
           normalizedAttributes.map((attribute) => ({
             productVariantId: payload.id,
             code: attribute.code.trim(),
-            name:
-              this.normalizeLocale(attribute.name) ?? {
-                en: attribute.code.trim(),
-              },
+            name: this.normalizeLocale(attribute.name) ?? {
+              en: attribute.code.trim(),
+            },
             value: attribute.value,
             createdAt: now,
             updatedAt: now,

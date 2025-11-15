@@ -102,6 +102,7 @@ export default function ColumnVisibilityMenu<T = any>({
     >
       <DropdownTrigger>
         <Button
+          isIconOnly
           variant="bordered"
           size="sm"
           startContent={<Table size={16} />}
