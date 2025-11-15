@@ -1,8 +1,8 @@
 "use client";
 
-import Input from "@base/client/components/Input";
+import { IBaseInput } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
-import Select, { SelectItem } from "@base/client/components/Select";
+import { IBaseSelect, SelectItem } from "@base/client/components";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Textarea } from "@heroui/react";
@@ -223,7 +223,7 @@ export default function SalesOrderCreatePage(): React.ReactNode {
                 name="customerName"
                 control={control}
                 render={({ field, fieldState }) => (
-                  <Input
+                  <IBaseInput
                     {...field}
                     label="Customer name"
                     value={field.value}
@@ -238,7 +238,7 @@ export default function SalesOrderCreatePage(): React.ReactNode {
                 name="warehouseId"
                 control={control}
                 render={({ field, fieldState }) => (
-                  <Select
+                  <IBaseSelect
                     label="Warehouse (optional)"
                     selectedKeys={
                       field.value ? new Set([field.value]) : new Set<string>()
@@ -254,16 +254,16 @@ export default function SalesOrderCreatePage(): React.ReactNode {
                     isDisabled={warehousesQuery.isLoading}
                   >
                     {warehouseOptions.map((option) => (
-                      <SelectItem key={option.value}>{option.label}</SelectItem>
+                      <IBaseSelectItem key={option.value}>{option.label}</SelectItem>
                     ))}
-                  </Select>
+                  </IBaseSelect>
                 )}
               />
               <Controller
                 name="expectedDate"
                 control={control}
                 render={({ field, fieldState }) => (
-                  <Input
+                  <IBaseInput
                     {...field}
                     type="date"
                     label="Expected date"
@@ -278,7 +278,7 @@ export default function SalesOrderCreatePage(): React.ReactNode {
                 name="currency"
                 control={control}
                 render={({ field, fieldState }) => (
-                  <Input
+                  <IBaseInput
                     {...field}
                     label="Currency"
                     value={field.value}
@@ -325,7 +325,7 @@ export default function SalesOrderCreatePage(): React.ReactNode {
                         name={`lines.${index}.productId`}
                         control={control}
                         render={({ field, fieldState }) => (
-                          <Input
+                          <IBaseInput
                             {...field}
                             label="Product ID"
                             value={field.value}
@@ -340,7 +340,7 @@ export default function SalesOrderCreatePage(): React.ReactNode {
                         name={`lines.${index}.quantity`}
                         control={control}
                         render={({ field, fieldState }) => (
-                          <Input
+                          <IBaseInput
                             {...field}
                             label="Quantity"
                             type="number"
@@ -356,7 +356,7 @@ export default function SalesOrderCreatePage(): React.ReactNode {
                         name={`lines.${index}.unitPrice`}
                         control={control}
                         render={({ field, fieldState }) => (
-                          <Input
+                          <IBaseInput
                             {...field}
                             label="Unit price"
                             type="number"
@@ -371,7 +371,7 @@ export default function SalesOrderCreatePage(): React.ReactNode {
                         name={`lines.${index}.description`}
                         control={control}
                         render={({ field, fieldState }) => (
-                          <Input
+                          <IBaseInput
                             {...field}
                             label="Description"
                             value={field.value ?? ""}

@@ -5,28 +5,25 @@ import {
 } from "@heroui/select";
 import clsx from "clsx";
 
-type SelectBaseProps = SelectProps & {};
-const SelectBase = (props: SelectBaseProps) => {
+type IBaseSelectProps = SelectProps & {};
+const IBaseSelect = (props: IBaseSelectProps) => {
   const { isDisabled } = props;
   return (
     <SelectPrimitive
       classNames={{
         base: "max-w opacity-100",
         label: "text-small text-default-600",
-        mainWrapper: clsx(
-          "cursor-not-allowed",
-          isDisabled && "opacity-50 bg-content2  "
-        ),
+        mainWrapper: clsx("cursor-not-allowed", isDisabled && "bg-default-200"),
+        trigger: "placeholder:text-default-400 italic text-sm",
       }}
       labelPlacement="outside"
       variant="bordered"
       size="sm"
-      placeholder="Select an animal"
+      placeholder="Please select..."
       {...props}
-      isDisabled={isDisabled}
     />
   );
 };
 
-export default SelectBase;
+export default IBaseSelect;
 export { SelectItem };

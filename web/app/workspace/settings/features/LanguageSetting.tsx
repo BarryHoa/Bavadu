@@ -1,6 +1,6 @@
 "use client";
 
-import SelectBase, { SelectItem } from "@base/client/components/Select";
+import { IBaseSelect, SelectItem } from "@base/client/components";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -34,7 +34,7 @@ export default function LanguageSetting() {
         </div>
       </CardHeader>
       <CardBody className="pt-2">
-        <SelectBase
+        <IBaseSelect
           label={t("currentLanguage")}
           labelPlacement="outside"
           placeholder={t("selectPlaceholder")}
@@ -51,7 +51,7 @@ export default function LanguageSetting() {
               </div>
             </SelectItem>
           ))}
-        </SelectBase>
+        </IBaseSelect>
       </CardBody>
     </Card>
   );

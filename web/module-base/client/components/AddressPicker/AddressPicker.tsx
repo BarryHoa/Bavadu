@@ -1,7 +1,6 @@
 "use client";
 
-import Input from "@base/client/components/Input";
-import Select, { SelectItem } from "@base/client/components/Select";
+import { IBaseInput, IBaseSelect, SelectItem } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import type { Address, countryCode } from "@base/client/interface/Address";
 import locationService from "@base/client/services/LocationService";
@@ -13,11 +12,12 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Tooltip,
   useDisclosure,
 } from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
 import { MapPin } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 // @ts-ignore
@@ -32,17 +32,19 @@ const PickerAddressByCountryVN = dynamic(
 interface AddressPickerProps {
   value?: Address | null;
   onChange: (value: string) => void;
-  label?: string;
+  isShowPostalCode?: boolean;
 }
 
 export default function AddressPicker({
   value,
   onChange,
-  label = "Địa chỉ",
+  isShowPostalCode = false,
 }: AddressPickerProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const getLocalizedName = useLocalizedText();
   const locale = useLocale();
+  const t = useTranslations("addressPicker");
+  const tCommon = useTranslations("common");
   const isChangeAddress =
     !!value?.formattedAddress && value.formattedAddress !== "";
 
@@ -115,8 +117,36 @@ export default function AddressPicker({
     onClose();
   };
 
-  const handleCancel = () => {
+  const handleClose = () => {
+    // Reset state when closing modal
+    const initialCountryCode = value?.country?.code ?? "VN";
+    setSelectedCountryCode(initialCountryCode);
+
+    if (value) {
+      setTempAddress(value);
+    } else {
+      setTempAddress({
+        country: {
+          id: initialCountryCode,
+          name: countries.find((c) => c.id === initialCountryCode)?.name || {
+            vi: "",
+            en: "",
+          },
+          code: initialCountryCode,
+        },
+        administrativeUnits: [],
+        street: "",
+        postalCode: "",
+        latitude: undefined,
+        longitude: undefined,
+        formattedAddress: "",
+      });
+    }
     onClose();
+  };
+
+  const handleCancel = () => {
+    handleClose();
   };
 
   const renderPickerAddressByCountry = (countryCode: countryCode) => {
@@ -143,86 +173,105 @@ export default function AddressPicker({
   return (
     <>
       <div className="flex flex-col gap-2">
-        <Button
-          type="button"
-          size="sm"
-          variant="bordered"
-          onPress={handleOpen}
-          startContent={<MapPin size={16} />}
+        <Tooltip
+          content={isChangeAddress ? t("tooltip.change") : t("tooltip.select")}
+          placement="top"
         >
-          {isChangeAddress ? "Thay đổi" : "Chọn"}
-        </Button>
+          <Button
+            isIconOnly
+            type="button"
+            size="sm"
+            variant="bordered"
+            onPress={handleOpen}
+            startContent={<MapPin size={16} />}
+            color="primary"
+          />
+        </Tooltip>
       </div>
 
       <Modal
         isOpen={isOpen}
-        onClose={onClose}
+        onClose={handleClose}
         size="2xl"
         scrollBehavior="inside"
       >
         <ModalContent>
-          {(onClose) => (
+          {() => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Chọn địa chỉ
+                {t("modal.title")}
               </ModalHeader>
               <ModalBody>
                 <div className="flex flex-col gap-4">
-                  <Select
+                  <IBaseSelect
                     selectionMode="single"
-                    label="Quốc gia"
+                    label={t("modal.country.label")}
                     size="sm"
-                    placeholder="Chọn quốc gia"
+                    placeholder={t("modal.country.placeholder")}
                     isRequired
                     selectedKeys={
                       selectedCountryCode
                         ? new Set([selectedCountryCode])
-                        : new Set()
+                        : new Set(["VN"])
                     }
                     onSelectionChange={(keys) => {
                       const selected = Array.from(keys)[0] as string;
-                      setSelectedCountryCode(selected as countryCode);
+                      // Prevent deselection - at least one item must be selected
+                      if (selected) {
+                        setSelectedCountryCode(selected as countryCode);
+                      }
+                    }}
+                    disallowEmptySelection
+                    classNames={{
+                      popoverContent: "max-w-full",
                     }}
                   >
                     {countries.map((country) => {
                       const name = getLocalizedName(
                         country.name as Record<string, string>
                       );
-                      return <SelectItem key={country.code}>{name}</SelectItem>;
+                      return (
+                        <SelectItem key={country.code} textValue={name}>
+                          {name}
+                        </SelectItem>
+                      );
                     })}
-                  </Select>
+                  </IBaseSelect>
 
                   {renderPickerAddressByCountry(selectedCountryCode)}
 
-                  <Input
-                    label="Mã bưu điện"
-                    placeholder="Nhập mã bưu điện"
-                    value={tempAddress.postalCode || ""}
-                    onValueChange={(value) =>
-                      setTempAddress((prev) => ({
-                        ...prev,
-                        postalCode: value,
-                      }))
-                    }
-                  />
+                  {isShowPostalCode && (
+                    <IBaseInput
+                      label={t("modal.postalCode.label")}
+                      placeholder={t("modal.postalCode.placeholder")}
+                      value={tempAddress.postalCode || ""}
+                      onValueChange={(value) =>
+                        setTempAddress((prev) => ({
+                          ...prev,
+                          postalCode: value,
+                        }))
+                      }
+                    />
+                  )}
 
                   {/* show is formattedAddress is a string */}
 
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 text-sm text-default-400 italic">
                     {fullAddress as string}
                   </div>
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="light" onPress={handleCancel}>
-                  Hủy
+                <Button variant="bordered" onPress={handleCancel} size="sm">
+                  {tCommon("modal.buttons.cancel")}
                 </Button>
                 <Button
                   color="primary"
                   onPress={handleSave}
                   isDisabled={!selectedCountryCode}
+                  size="sm"
                 >
-                  Áp dụng
+                  {tCommon("modal.buttons.apply")}
                 </Button>
               </ModalFooter>
             </>

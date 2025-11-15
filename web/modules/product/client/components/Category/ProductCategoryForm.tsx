@@ -1,6 +1,6 @@
 "use client";
 
-import Input from "@base/client/components/Input";
+import { IBaseInput } from "@base/client/components";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Switch, Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
@@ -263,7 +263,7 @@ export default function ProductCategoryForm({
             control={control}
             name="name"
             render={({ field }) => (
-              <Input
+              <IBaseInput
                 {...field}
                 label="Name"
                 placeholder="Electronics"
@@ -282,7 +282,7 @@ export default function ProductCategoryForm({
             control={control}
             name="code"
             render={({ field }) => (
-              <Input
+              <IBaseInput
                 {...field}
                 label="Code"
                 placeholder="CAT-001"

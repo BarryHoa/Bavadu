@@ -17,6 +17,14 @@
       "refresh": "Refresh",
       "search": "Search",
       "action": "Action"
+    },
+    "modal": {
+      "buttons": {
+        "close": "Close",
+        "save": "Save",
+        "cancel": "Cancel",
+        "apply": "Apply"
+      }
     }
   },
   "dataTable": {
@@ -48,6 +56,23 @@
         "reloadSuccess": "Reloaded model {key} successfully.",
         "reloadError": "Failed to reload model {key}.",
         "loadError": "Failed to load model list."
+      }
+    }
+  },
+  "addressPicker": {
+    "tooltip": {
+      "change": "Change address",
+      "select": "Select address"
+    },
+    "modal": {
+      "title": "Select address",
+      "country": {
+        "label": "Country",
+        "placeholder": "Select country"
+      },
+      "postalCode": {
+        "label": "Postal code",
+        "placeholder": "Enter postal code"
       }
     }
   }

@@ -1,6 +1,6 @@
 "use client";
 
-import Input from "@base/client/components/Input";
+import { IBaseInput } from "@base/client/components";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Slider } from "@heroui/slider";
 import { useTranslations } from "next-intl";
@@ -129,7 +129,7 @@ export default function NumberSetting() {
 
         {/* Separators in 2 columns */}
         <div className="grid grid-cols-2 gap-3">
-          <Input
+          <IBaseInput
             isRequired
             errorMessage={decimalError}
             isInvalid={!!decimalError}
@@ -141,7 +141,7 @@ export default function NumberSetting() {
             variant="bordered"
             onValueChange={handleDecimalSeparatorChange}
           />
-          <Input
+          <IBaseInput
             isRequired
             errorMessage={thousandError}
             isInvalid={!!thousandError}

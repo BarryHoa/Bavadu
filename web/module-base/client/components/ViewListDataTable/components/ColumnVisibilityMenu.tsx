@@ -12,7 +12,7 @@ import { Table } from "lucide-react";
 import MiniSearch from "minisearch";
 import { useMemo, useState } from "react";
 import { DataTableColumn } from "../../DataTable";
-import Input from "../../Input";
+import { IBaseInput } from "@base/client/components";
 
 interface ColumnVisibilityMenuProps<T = any> {
   columns: DataTableColumn<T>[];
@@ -124,7 +124,7 @@ export default function ColumnVisibilityMenu<T = any>({
           textValue="Search columns"
           className="sticky top-0 z-10 pointer-events-auto data-[hover=true]:bg-transparent bg-content1"
         >
-          <Input
+          <IBaseInput
             autoFocus
             value={searchTerm}
             onValueChange={setSearchTerm}

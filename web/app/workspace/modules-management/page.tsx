@@ -3,7 +3,7 @@
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Badge } from "@heroui/badge";
-import Input from "@base/client/components/Input";
+import { IBaseInput } from "@base/client/components";
 import {
   Search,
   Package,
@@ -146,7 +146,7 @@ export default function ModuleManagementsPage() {
       <Card>
         <CardBody>
           <div className="flex items-center space-x-2">
-            <Input
+            <IBaseInput
               className="flex-1"
               placeholder="Search modules..."
               size="sm"

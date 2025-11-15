@@ -14,11 +14,15 @@ export type { GroupOption } from "./ViewListDataTable/components/GroupByMenu";
 // Direct component exports
 export { default as AddressPicker } from "./AddressPicker/AddressPicker";
 export { default as DatePicker } from "./DatePicker";
-export { default as Input } from "./Input";
+export { default as IBaseInput, default as Input } from "./IBaseInput";
+export {
+  default as IBaseSelect,
+  default as Select,
+  SelectItem,
+} from "./IBaseSelect";
 export * from "./LoadingBar";
 export * from "./LoadingOverlay";
 export * from "./NavigationLoader";
-export { default as Select } from "./Select";
 
 // Icons and primitives
 export * from "./icons";

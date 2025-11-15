@@ -1,6 +1,6 @@
 "use client";
 
-import InputBase from "@base/client/components/Input";
+import { IBaseInput } from "@base/client/components";
 import { Button } from "@heroui/button";
 import {
   Modal,
@@ -52,7 +52,7 @@ export default function ChangePasswordModal() {
                   <label className="text-sm font-medium">
                     Current Password
                   </label>
-                  <InputBase
+                  <IBaseInput
                     placeholder="Enter current password"
                     startContent={<Lock className="text-gray-400" size={16} />}
                     type="password"
@@ -62,7 +62,7 @@ export default function ChangePasswordModal() {
 
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">New Password</label>
-                  <InputBase
+                  <IBaseInput
                     placeholder="Enter new password"
                     startContent={<Lock className="text-gray-400" size={16} />}
                     type="password"
@@ -74,7 +74,7 @@ export default function ChangePasswordModal() {
                   <label className="text-sm font-medium">
                     Confirm New Password
                   </label>
-                  <InputBase
+                  <IBaseInput
                     placeholder="Confirm new password"
                     startContent={<Lock className="text-gray-400" size={16} />}
                     type="password"

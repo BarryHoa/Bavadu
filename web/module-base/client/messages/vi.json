@@ -17,6 +17,14 @@
       "refresh": "Làm mới",
       "search": "Tìm kiếm",
       "action": "Thao tác"
+    },
+    "modal": {
+      "buttons": {
+        "close": "Đóng",
+        "save": "Lưu",
+        "cancel": "Hủy",
+        "apply": "Áp dụng"
+      }
     }
   },
   "dataTable": {
@@ -48,6 +56,23 @@
         "reloadSuccess": "Tải lại mô hình {key} thành công.",
         "reloadError": "Không thể tải lại mô hình {key}.",
         "loadError": "Không thể tải danh sách mô hình."
+      }
+    }
+  },
+  "addressPicker": {
+    "tooltip": {
+      "change": "Thay đổi địa chỉ",
+      "select": "Chọn địa chỉ"
+    },
+    "modal": {
+      "title": "Chọn địa chỉ",
+      "country": {
+        "label": "Quốc gia",
+        "placeholder": "Chọn quốc gia"
+      },
+      "postalCode": {
+        "label": "Mã bưu điện",
+        "placeholder": "Nhập mã bưu điện"
       }
     }
   }

@@ -2,7 +2,7 @@
 
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/card";
-import Input from "@base/client/components/Input";
+import { IBaseInput } from "@base/client/components";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import MiniSearch from "minisearch";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -192,7 +192,7 @@ export default function ModelsListPage() {
       <CardBody className="flex flex-col gap-4">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <Input
+            <IBaseInput
               classNames={{
                 input: "text-sm",
               }}

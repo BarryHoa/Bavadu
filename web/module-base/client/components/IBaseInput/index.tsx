@@ -1,8 +1,8 @@
 import { Input as HeroUIInput, InputProps } from "@heroui/input";
 import clsx from "clsx";
 
-type InputBaseType = InputProps & {};
-const InputBase = (props: InputBaseType) => {
+type IBaseInputProps = InputProps & {};
+const IBaseInput = (props: IBaseInputProps) => {
   const { isDisabled } = props;
   return (
     <HeroUIInput
@@ -11,8 +11,9 @@ const InputBase = (props: InputBaseType) => {
         label: "text-small text-default-600",
         mainWrapper: clsx(
           "cursor-not-allowed",
-          isDisabled && "opacity-50 bg-content2  "
+          isDisabled ? "bg-default-200" : ""
         ),
+        input: "placeholder:text-default-400 italic text-sm",
       }}
       variant="bordered"
       labelPlacement="outside-top"
@@ -23,4 +24,5 @@ const InputBase = (props: InputBaseType) => {
   );
 };
 
-export default InputBase;
+export default IBaseInput;
+

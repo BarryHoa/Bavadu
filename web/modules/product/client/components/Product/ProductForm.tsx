@@ -1,7 +1,7 @@
 "use client";
 
-import Input from "@base/client/components/Input";
-import Select, { SelectItem } from "@base/client/components/Select";
+import { IBaseInput } from "@base/client/components";
+import { IBaseSelect, SelectItem } from "@base/client/components";
 import { Button } from "@heroui/button";
 import {
   Card,
@@ -562,7 +562,7 @@ export default function ProductForm({
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Input
+            <IBaseInput
               label="Product code"
               value={values.master.code}
               onValueChange={(next) =>
@@ -576,7 +576,7 @@ export default function ProductForm({
               errorMessage={errors.master?.code?.message}
               isDisabled={isBusy}
             />
-            <Select
+            <IBaseSelect
               label="Product type"
               selectedKeys={values.master.type ? [values.master.type] : []}
               onSelectionChange={(keys) => {
@@ -593,10 +593,10 @@ export default function ProductForm({
               isDisabled={isBusy}
             >
               {masterTypes.map((type) => (
-                <SelectItem key={type.key}>{type.label}</SelectItem>
+                <IBaseSelectItem key={type.key}>{type.label}</SelectItem>
               ))}
-            </Select>
-            <Input
+            </IBaseSelect>
+            <IBaseInput
               label="Name (English)"
               value={values.master.name.en ?? ""}
               onValueChange={(next) =>
@@ -611,7 +611,7 @@ export default function ProductForm({
               errorMessage={errors.master?.name?.en?.message}
               isDisabled={isBusy}
             />
-            <Input
+            <IBaseInput
               label="Name (Vietnamese)"
               value={values.master.name.vi ?? ""}
               onValueChange={(next) =>
@@ -651,7 +651,7 @@ export default function ProductForm({
           />
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Select
+            <IBaseSelect
               label="Category"
               selectedKeys={
                 values.master.categoryId ? [values.master.categoryId] : []
@@ -673,11 +673,11 @@ export default function ProductForm({
               isDisabled={isBusy || categoryQuery.isLoading}
             >
               {categoryOptions.map((option) => (
-                <SelectItem key={option.id}>{option.label}</SelectItem>
+                <IBaseSelectItem key={option.id}>{option.label}</SelectItem>
               ))}
-            </Select>
+            </IBaseSelect>
 
-            <Input
+            <IBaseInput
               label="Brand (English)"
               value={values.master.brand.en ?? ""}
               onValueChange={(next) =>
@@ -689,7 +689,7 @@ export default function ProductForm({
               }
               isDisabled={isBusy}
             />
-            <Input
+            <IBaseInput
               label="Brand (Vietnamese)"
               value={values.master.brand.vi ?? ""}
               onValueChange={(next) =>
@@ -742,7 +742,7 @@ export default function ProductForm({
           <Divider />
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Input
+            <IBaseInput
               label="Variant name (English)"
               value={values.variant.name.en ?? ""}
               onValueChange={(next) =>
@@ -757,7 +757,7 @@ export default function ProductForm({
               errorMessage={errors.variant?.name?.en?.message}
               isDisabled={isBusy}
             />
-            <Input
+            <IBaseInput
               label="Variant name (Vietnamese)"
               value={values.variant.name.vi ?? ""}
               onValueChange={(next) =>
@@ -793,7 +793,7 @@ export default function ProductForm({
               }
               isDisabled={isBusy}
             />
-            <Input
+            <IBaseInput
               label="SKU"
               value={values.variant.sku}
               onValueChange={(next) =>
@@ -804,7 +804,7 @@ export default function ProductForm({
               }
               isDisabled={isBusy}
             />
-            <Input
+            <IBaseInput
               label="Barcode"
               value={values.variant.barcode}
               onValueChange={(next) =>
@@ -815,7 +815,7 @@ export default function ProductForm({
               }
               isDisabled={isBusy}
             />
-            <Input
+            <IBaseInput
               label="Manufacturer name (English)"
               value={values.variant.manufacturerName.en ?? ""}
               onValueChange={(next) =>
@@ -831,7 +831,7 @@ export default function ProductForm({
               }
               isDisabled={isBusy}
             />
-            <Input
+            <IBaseInput
               label="Manufacturer name (Vietnamese)"
               value={values.variant.manufacturerName.vi ?? ""}
               onValueChange={(next) =>
@@ -847,7 +847,7 @@ export default function ProductForm({
               }
               isDisabled={isBusy}
             />
-            <Input
+            <IBaseInput
               label="Manufacturer code"
               value={values.variant.manufacturerCode}
               onValueChange={(next) =>
@@ -858,7 +858,7 @@ export default function ProductForm({
               }
               isDisabled={isBusy}
             />
-            <Select
+            <IBaseSelect
               label="Base unit of measure"
               selectedKeys={
                 values.variant.baseUomId ? [values.variant.baseUomId] : []
@@ -880,7 +880,7 @@ export default function ProductForm({
               isDisabled={isBusy || uomQuery.isLoading}
             >
               {uomOptions.map((uom) => (
-                <SelectItem key={uom.id}>
+                <IBaseSelectItem key={uom.id}>
                   {typeof uom.name === "string"
                     ? uom.name
                     : ((uom.name as Record<string, string>)?.en ??
@@ -888,7 +888,7 @@ export default function ProductForm({
                       uom.id)}
                 </SelectItem>
               ))}
-            </Select>
+            </IBaseSelect>
           </div>
 
           <Switch
@@ -950,7 +950,7 @@ export default function ProductForm({
                       </Button>
                     </div>
                     <div className="grid gap-3 md:grid-cols-2">
-                      <Input
+                      <IBaseInput
                         label="Name (English)"
                         value={packing.name.en ?? ""}
                         onValueChange={(next) =>
@@ -961,7 +961,7 @@ export default function ProductForm({
                         }
                         isDisabled={isBusy}
                       />
-                      <Input
+                      <IBaseInput
                         label="Name (Vietnamese)"
                         value={packing.name.vi ?? ""}
                         onValueChange={(next) =>
@@ -1066,7 +1066,7 @@ export default function ProductForm({
                         Remove
                       </Button>
                     </div>
-                    <Input
+                    <IBaseInput
                       label="Code"
                       value={attribute.code}
                       onValueChange={(next) =>
@@ -1080,7 +1080,7 @@ export default function ProductForm({
                       isDisabled={isBusy}
                     />
                     <div className="grid gap-3 md:grid-cols-2">
-                      <Input
+                      <IBaseInput
                         label="Name (English)"
                         value={attribute.name.en ?? ""}
                         onValueChange={(next) =>
@@ -1091,7 +1091,7 @@ export default function ProductForm({
                         }
                         isDisabled={isBusy}
                       />
-                      <Input
+                      <IBaseInput
                         label="Name (Vietnamese)"
                         value={attribute.name.vi ?? ""}
                         onValueChange={(next) =>
@@ -1103,7 +1103,7 @@ export default function ProductForm({
                         isDisabled={isBusy}
                       />
                     </div>
-                    <Input
+                    <IBaseInput
                       label="Value"
                       value={attribute.value}
                       onValueChange={(next) =>

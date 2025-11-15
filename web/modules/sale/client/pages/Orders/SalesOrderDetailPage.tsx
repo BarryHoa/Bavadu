@@ -1,6 +1,6 @@
 "use client";
 
-import Input from "@base/client/components/Input";
+import { IBaseInput } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { Button } from "@heroui/button";
@@ -300,7 +300,7 @@ export default function SalesOrderDetailPage(): React.ReactNode {
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
-            <Input
+            <IBaseInput
               label="Warehouse"
               placeholder="Warehouse ID"
               value={deliverWarehouseId}
@@ -332,7 +332,7 @@ export default function SalesOrderDetailPage(): React.ReactNode {
                         Remaining: {openQty.toFixed(2)}
                       </p>
                     </div>
-                    <Input
+                    <IBaseInput
                       label="Quantity to deliver"
                       type="number"
                       value={quantities[line.id] ?? "0"}
@@ -345,12 +345,12 @@ export default function SalesOrderDetailPage(): React.ReactNode {
                         }))
                       }
                     />
-                    <Input
+                    <IBaseInput
                       label="Description"
                       value={line.description ?? ""}
                       isReadOnly
                     />
-                    <Input
+                    <IBaseInput
                       label="Ordered / Delivered"
                       value={`${Number(line.quantityOrdered).toFixed(
                         2

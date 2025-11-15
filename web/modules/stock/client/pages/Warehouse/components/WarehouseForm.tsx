@@ -1,6 +1,5 @@
 import AddressPicker from "@/module-base/client/components/AddressPicker/AddressPicker";
-import Input from "@base/client/components/Input";
-import Select, { SelectItem } from "@base/client/components/Select";
+import { IBaseInput, IBaseSelect, SelectItem } from "@base/client/components";
 import { Button } from "@heroui/button";
 import { Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
@@ -253,7 +252,7 @@ export default function WarehouseForm({
             name="code"
             control={control}
             render={({ field, fieldState }) => (
-              <Input
+              <IBaseInput
                 {...field}
                 label="Code"
                 placeholder="Unique warehouse code"
@@ -269,7 +268,7 @@ export default function WarehouseForm({
             name="name"
             control={control}
             render={({ field, fieldState }) => (
-              <Input
+              <IBaseInput
                 {...field}
                 label="Name"
                 placeholder="Warehouse name"
@@ -285,7 +284,7 @@ export default function WarehouseForm({
             name="typeCode"
             control={control}
             render={({ field, fieldState }) => (
-              <Input
+              <IBaseInput
                 {...field}
                 label="Type"
                 placeholder="e.g. RAW_MATERIAL, FINISHED_GOODS"
@@ -301,7 +300,7 @@ export default function WarehouseForm({
             name="status"
             control={control}
             render={({ field, fieldState }) => (
-              <Select
+              <IBaseSelect
                 label="Status"
                 selectedKeys={new Set([field.value])}
                 onSelectionChange={(keys) => {
@@ -319,14 +318,14 @@ export default function WarehouseForm({
                 {statusOptions.map((option) => (
                   <SelectItem key={option.value}>{option.label}</SelectItem>
                 ))}
-              </Select>
+              </IBaseSelect>
             )}
           />
           <Controller
             name="valuationMethod"
             control={control}
             render={({ field, fieldState }) => (
-              <Select
+              <IBaseSelect
                 label="Valuation method"
                 selectedKeys={new Set([field.value])}
                 onSelectionChange={(keys) => {
@@ -344,14 +343,14 @@ export default function WarehouseForm({
                 {valuationOptions.map((option) => (
                   <SelectItem key={option.value}>{option.label}</SelectItem>
                 ))}
-              </Select>
+              </IBaseSelect>
             )}
           />
           <Controller
             name="companyId"
             control={control}
             render={({ field, fieldState }) => (
-              <Input
+              <IBaseInput
                 {...field}
                 label="Company ID"
                 placeholder="Optional company relationship"
@@ -366,7 +365,7 @@ export default function WarehouseForm({
             name="managerId"
             control={control}
             render={({ field, fieldState }) => (
-              <Input
+              <IBaseInput
                 {...field}
                 label="Manager (user ID)"
                 placeholder="Optional manager user ID"
@@ -381,7 +380,7 @@ export default function WarehouseForm({
             name="contactId"
             control={control}
             render={({ field, fieldState }) => (
-              <Input
+              <IBaseInput
                 {...field}
                 label="Contact (user ID)"
                 placeholder="Optional contact user ID"
@@ -403,15 +402,14 @@ export default function WarehouseForm({
               render={({ field, fieldState }) => (
                 <div className="flex gap-2 justify-between items-end">
                   <div className="flex-1">
-                    <Input
+                    <IBaseInput
                       isRequired
                       label="Main"
-                      placeholder="Main address"
+                      placeholder="Please select address"
                       value={getLocalizedName(field.value.formattedAddress)}
                       isInvalid={fieldState.invalid}
                       errorMessage={fieldState.error?.message}
-                      disabled={true}
-                      isReadOnly={true}
+                      isDisabled
                     />
                   </div>
                   <AddressPicker
@@ -426,7 +424,6 @@ export default function WarehouseForm({
                         });
                       }
                     }}
-                    label="Main"
                   />
                 </div>
               )}
@@ -437,15 +434,15 @@ export default function WarehouseForm({
               render={({ field, fieldState }) => (
                 <div className="flex gap-2 justify-between items-end">
                   <div className="flex-1">
-                    <Input
+                    <IBaseInput
                       label="Secondary"
-                      placeholder="Secondary address"
+                      placeholder="Please select address"
                       value={getLocalizedName(
                         field.value?.formattedAddress ?? ""
                       )}
                       isInvalid={fieldState.invalid}
                       errorMessage={fieldState.error?.message}
-                      disabled
+                      isDisabled
                     />
                   </div>
                   <AddressPicker
@@ -460,7 +457,6 @@ export default function WarehouseForm({
                         });
                       }
                     }}
-                    label="Secondary"
                   />
                 </div>
               )}
@@ -475,7 +471,7 @@ export default function WarehouseForm({
               name="minStock"
               control={control}
               render={({ field, fieldState }) => (
-                <Input
+                <IBaseInput
                   {...field}
                   label="Minimum stock"
                   type="number"
@@ -495,7 +491,7 @@ export default function WarehouseForm({
               name="maxStock"
               control={control}
               render={({ field, fieldState }) => (
-                <Input
+                <IBaseInput
                   {...field}
                   label="Maximum stock"
                   type="number"
@@ -512,7 +508,7 @@ export default function WarehouseForm({
               name="accountInventory"
               control={control}
               render={({ field, fieldState }) => (
-                <Input
+                <IBaseInput
                   {...field}
                   label="Inventory account"
                   placeholder="Optional account code"
@@ -527,7 +523,7 @@ export default function WarehouseForm({
               name="accountAdjustment"
               control={control}
               render={({ field, fieldState }) => (
-                <Input
+                <IBaseInput
                   {...field}
                   label="Adjustment account"
                   placeholder="Optional adjustment account"

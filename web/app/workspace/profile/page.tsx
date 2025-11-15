@@ -1,8 +1,8 @@
 "use client";
 
 import DatePickerBase from "@base/client/components/DatePicker";
-import InputBase from "@base/client/components/Input";
-import SelectBase, { SelectItem } from "@base/client/components/Select";
+import { IBaseInput } from "@base/client/components";
+import { IBaseSelect, SelectItem } from "@base/client/components";
 import { Avatar } from "@heroui/avatar";
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
@@ -84,7 +84,7 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">First Name</label>
-                  <InputBase
+                  <IBaseInput
                     defaultValue="John"
                     placeholder="Enter first name"
                     startContent={<User className="text-gray-400" size={16} />}
@@ -94,7 +94,7 @@ export default function ProfilePage() {
 
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">Last Name</label>
-                  <InputBase
+                  <IBaseInput
                     defaultValue="Doe"
                     placeholder="Enter last name"
                     startContent={<User className="text-gray-400" size={16} />}
@@ -108,7 +108,7 @@ export default function ProfilePage() {
                 <label className="text-sm font-medium">
                   Nickname / Display Name
                 </label>
-                <InputBase
+                <IBaseInput
                   defaultValue="JD"
                   placeholder="Enter nickname or display name"
                   startContent={
@@ -122,7 +122,7 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">Gender</label>
-                  <SelectBase
+                  <IBaseSelect
                     defaultSelectedKeys={["male"]}
                     placeholder="Select gender"
                     variant="bordered"
@@ -133,7 +133,7 @@ export default function ProfilePage() {
                     <SelectItem key="prefer-not-to-say">
                       Prefer not to say
                     </SelectItem>
-                  </SelectBase>
+                  </IBaseSelect>
                 </div>
 
                 <div className="flex flex-col gap-2">
@@ -151,7 +151,7 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">Email Address</label>
-                  <InputBase
+                  <IBaseInput
                     defaultValue="john.doe@example.com"
                     placeholder="Enter email address"
                     startContent={<Mail className="text-gray-400" size={16} />}
@@ -162,7 +162,7 @@ export default function ProfilePage() {
 
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">Phone Number</label>
-                  <InputBase
+                  <IBaseInput
                     defaultValue="+1 (555) 123-4567"
                     placeholder="Enter phone number"
                     startContent={<Phone className="text-gray-400" size={16} />}
@@ -175,7 +175,7 @@ export default function ProfilePage() {
               {/* Address */}
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">Address</label>
-                <InputBase
+                <IBaseInput
                   defaultValue="123 Main Street, San Francisco, CA 94102"
                   placeholder="Enter full address"
                   startContent={<MapPin className="text-gray-400" size={16} />}
@@ -186,7 +186,7 @@ export default function ProfilePage() {
               {/* Job Title */}
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">Job Title</label>
-                <InputBase
+                <IBaseInput
                   defaultValue="Senior Developer"
                   placeholder="Enter job title"
                   startContent={
@@ -221,7 +221,7 @@ export default function ProfilePage() {
             <CardBody className="space-y-3">
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">Website</label>
-                <InputBase
+                <IBaseInput
                   defaultValue="https://johndoe.com"
                   placeholder="https://yourwebsite.com"
                   startContent={<Globe className="text-gray-400" size={16} />}
@@ -233,7 +233,7 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">GitHub</label>
-                  <InputBase
+                  <IBaseInput
                     defaultValue="github.com/johndoe"
                     placeholder="github.com/username"
                     startContent={
@@ -245,7 +245,7 @@ export default function ProfilePage() {
 
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">LinkedIn</label>
-                  <InputBase
+                  <IBaseInput
                     defaultValue="linkedin.com/in/johndoe"
                     placeholder="linkedin.com/in/username"
                     startContent={
@@ -258,7 +258,7 @@ export default function ProfilePage() {
 
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">Twitter</label>
-                <InputBase
+                <IBaseInput
                   defaultValue="@johndoe"
                   placeholder="@username"
                   startContent={<Twitter className="text-gray-400" size={16} />}

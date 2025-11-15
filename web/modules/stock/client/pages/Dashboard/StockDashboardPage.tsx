@@ -1,8 +1,8 @@
 "use client";
 
-import Input from "@base/client/components/Input";
+import { IBaseInput } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
-import Select, { SelectItem } from "@base/client/components/Select";
+import { IBaseSelect, SelectItem } from "@base/client/components";
 import { Button } from "@heroui/button";
 import {
   Card,
@@ -260,7 +260,7 @@ export default function StockDashboardPage(): React.ReactNode {
       <Card>
         <CardBody className="space-y-4">
           <div className="flex flex-col gap-3 md:flex-row md:items-end">
-            <Input
+            <IBaseInput
               label="Product ID"
               placeholder="Optional product ID filter"
               value={filters.productId ?? ""}
@@ -271,7 +271,7 @@ export default function StockDashboardPage(): React.ReactNode {
                 }))
               }
             />
-            <Select
+            <IBaseSelect
               label="Warehouse"
               selectedKeys={
                 new Set<string>(
@@ -291,9 +291,9 @@ export default function StockDashboardPage(): React.ReactNode {
               }
             >
               {warehouseOptions.map((option) => (
-                <SelectItem key={option.value}>{option.label}</SelectItem>
+                <IBaseSelectItem key={option.value}>{option.label}</SelectItem>
               ))}
-            </Select>
+              </IBaseSelect>
             <div className="flex items-center gap-2">
               <Button color="primary" onPress={handleFilterChange} size="sm">
                 Apply
@@ -531,13 +531,13 @@ function MovementCard({
           <h3 className="text-base font-semibold">{title}</h3>
           <p className="text-sm text-default-500">{description}</p>
         </div>
-        <Input
+        <IBaseInput
           label="Product ID"
           placeholder="Product identifier"
           value={formValues.productId}
           onValueChange={(value) => handleChange("productId", value)}
         />
-        <Input
+        <IBaseInput
           label="Quantity"
           type="number"
           value={formValues.quantity}
@@ -561,11 +561,11 @@ function MovementCard({
           }}
         >
           {warehouses.map((warehouse) => (
-            <SelectItem key={warehouse.id}>
+            <IBaseSelectItem key={warehouse.id}>
               {warehouse.code} — {warehouse.name}
             </SelectItem>
           ))}
-        </Select>
+              </IBaseSelect>
         {requireSecondaryWarehouse ? (
           <Select
             label="Target Warehouse"
@@ -585,19 +585,19 @@ function MovementCard({
             }}
           >
             {warehouses.map((warehouse) => (
-              <SelectItem key={warehouse.id}>
+              <IBaseSelectItem key={warehouse.id}>
                 {warehouse.code} — {warehouse.name}
               </SelectItem>
             ))}
-          </Select>
+              </IBaseSelect>
         ) : null}
-        <Input
+        <IBaseInput
           label="Reference"
           placeholder="Optional reference"
           value={formValues.reference}
           onValueChange={(value) => handleChange("reference", value)}
         />
-        <Input
+        <IBaseInput
           label="Note"
           placeholder="Optional note"
           value={formValues.note}

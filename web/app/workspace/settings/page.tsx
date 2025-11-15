@@ -1,6 +1,6 @@
 "use client";
 
-import Input from "@base/client/components/Input";
+import { IBaseInput } from "@base/client/components";
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Divider } from "@heroui/divider";
@@ -30,7 +30,7 @@ export default function WorkspaceSettings() {
           <CardBody className="space-y-4">
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Workspace Name</label>
-              <Input
+              <IBaseInput
                 defaultValue="My Workspace"
                 placeholder="Enter workspace name"
                 variant="bordered"
@@ -39,7 +39,7 @@ export default function WorkspaceSettings() {
 
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Description</label>
-              <Input
+              <IBaseInput
                 defaultValue=""
                 placeholder="Enter workspace description"
                 variant="bordered"
@@ -138,7 +138,7 @@ export default function WorkspaceSettings() {
               <label className="text-sm font-medium">
                 Session Timeout Duration
               </label>
-              <Input
+              <IBaseInput
                 defaultValue="30"
                 endContent={
                   <div className="pointer-events-none flex items-center">
