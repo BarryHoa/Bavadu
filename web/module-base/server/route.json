@@ -67,5 +67,22 @@
         "handler": "/utils/check-duplicate"
       }
     ]
+  },
+  {
+    "path": "/location",
+    "routes": [
+      {
+        "path": "/countries",
+        "handler": "/location/get-countries"
+      },
+      {
+        "path": "/by-country-code",
+        "handler": "/location/get-location-by-country-code"
+      },
+      {
+        "path": "/by",
+        "handler": "/location/get-location-by"
+      }
+    ]
   }
 ]

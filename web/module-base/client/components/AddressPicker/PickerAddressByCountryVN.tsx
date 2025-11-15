@@ -8,6 +8,7 @@ import type {
   AdministrativeUnit,
   countryCode,
 } from "@base/client/interface/Address";
+import locationService from "@base/client/services/LocationService";
 import { createAdministrativeUnit } from "@base/client/utils/address/addressUtils";
 import { useQuery } from "@tanstack/react-query";
 import { Dispatch, SetStateAction, useState } from "react";
@@ -27,106 +28,35 @@ const PickerAddressByCountryVN = ({
   const [selectedProvinceId, setSelectedProvinceId] = useState<string>("");
   const [selectedWardId, setSelectedWardId] = useState<string>("");
 
-  // Fetch provinces
-  const { data: provinces = [] } = useQuery<
-    Array<{
-      id: string;
-      code: string;
-      name: { vi: string; en: string };
-    }>
-  >({
-    queryKey: ["provinces", "VN"],
+  // Fetch provinces (level 1, no parent)
+  const { data: provinces = [] } = useQuery({
+    queryKey: ["provinces", countryCode],
     queryFn: async () => {
-      // TODO: Replace with actual API call
-      // const response = await fetch("/api/administrative-units/provinces?countryCode=VN");
-      // return response.json();
-
-      // Mock data
-      return [
+      const response = await locationService.getLocationByCountryCode(
+        countryCode,
         {
-          id: "01",
-          code: "01",
-          name: { vi: "Hà Nội", en: "Hanoi" },
-        },
-        {
-          id: "79",
-          code: "79",
-          name: { vi: "TP. Hồ Chí Minh", en: "Ho Chi Minh City" },
-        },
-        {
-          id: "31",
-          code: "31",
-          name: { vi: "Hải Phòng", en: "Hai Phong" },
-        },
-      ];
+          parentId: null,
+          level: 1,
+        }
+      );
+      return response.data || [];
     },
   });
 
-  // Fetch wards trực tiếp theo province (cấu trúc mới)
-  const { data: wards = [] } = useQuery<
-    Array<{
-      id: string;
-      code: string;
-      name: { vi: string; en: string };
-      type: "ward" | "commune" | "township";
-      provinceCode: string;
-    }>
-  >({
+  // Fetch wards/communes/townships trực tiếp theo province (cấu trúc mới - level 3)
+  const { data: wards = [] } = useQuery({
     queryKey: ["wards", selectedProvinceId],
     queryFn: async () => {
       if (!selectedProvinceId) {
         return [];
       }
 
-      // TODO: Replace with actual API call
-      // const response = await fetch(`/api/administrative-units/provinces/${selectedProvinceId}/wards`);
-      // return response.json();
-
-      // Mock data
-      if (selectedProvinceId === "01") {
-        return [
-          {
-            id: "00001",
-            code: "00001",
-            name: { vi: "Phường Điện Biên", en: "Dien Bien Ward" },
-            type: "ward",
-            provinceCode: "01",
-          },
-          {
-            id: "00002",
-            code: "00002",
-            name: { vi: "Phường Đội Cấn", en: "Doi Can Ward" },
-            type: "ward",
-            provinceCode: "01",
-          },
-          {
-            id: "00003",
-            code: "00003",
-            name: { vi: "Xã An Bình", en: "An Binh Commune" },
-            type: "commune",
-            provinceCode: "01",
-          },
-        ];
-      }
-      if (selectedProvinceId === "79") {
-        return [
-          {
-            id: "26734",
-            code: "26734",
-            name: { vi: "Phường Bến Nghé", en: "Ben Nghe Ward" },
-            type: "ward",
-            provinceCode: "79",
-          },
-          {
-            id: "26735",
-            code: "26735",
-            name: { vi: "Phường Đa Kao", en: "Da Kao Ward" },
-            type: "ward",
-            provinceCode: "79",
-          },
-        ];
-      }
-      return [];
+      // Get all level 3 units (ward, commune, township) under the selected province
+      const response = await locationService.getLocationBy(
+        selectedProvinceId,
+        "ward"
+      );
+      return response.data || [];
     },
     enabled: !!selectedProvinceId,
   });
@@ -140,7 +70,11 @@ const PickerAddressByCountryVN = ({
       const province = provinces.find((p) => p.id === provinceId);
       if (province) {
         units.push(
-          createAdministrativeUnit(province.id, province.name, "province")
+          createAdministrativeUnit(
+            province.id,
+            province.name as Record<string, string>,
+            "province"
+          )
         );
       }
     }
@@ -149,7 +83,13 @@ const PickerAddressByCountryVN = ({
     if (wardId) {
       const ward = wards.find((w) => w.id === wardId);
       if (ward) {
-        units.push(createAdministrativeUnit(ward.id, ward.name, ward.type));
+        units.push(
+          createAdministrativeUnit(
+            ward.id,
+            ward.name as Record<string, string>,
+            ward.type as "ward" | "commune" | "township"
+          )
+        );
       }
     }
 
@@ -184,7 +124,9 @@ const PickerAddressByCountryVN = ({
         }}
       >
         {provinces.map((province) => {
-          const name = getLocalizedName(province.name);
+          const name = getLocalizedName(
+            province.name as Record<string, string>
+          );
           return <SelectItem key={province.id}>{name}</SelectItem>;
         })}
       </Select>
@@ -207,7 +149,7 @@ const PickerAddressByCountryVN = ({
         isDisabled={!selectedProvinceId}
       >
         {wards.map((ward) => {
-          const name = getLocalizedName(ward.name);
+          const name = getLocalizedName(ward.name as Record<string, string>);
           return <SelectItem key={ward.id}>{name}</SelectItem>;
         })}
       </Select>

@@ -4,6 +4,7 @@ import Input from "@base/client/components/Input";
 import Select, { SelectItem } from "@base/client/components/Select";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import type { Address, countryCode } from "@base/client/interface/Address";
+import locationService from "@base/client/services/LocationService";
 import { buildAddressString } from "@base/client/utils/address/addressUtils";
 import { Button } from "@heroui/button";
 import {
@@ -45,31 +46,12 @@ export default function AddressPicker({
   const isChangeAddress =
     !!value?.formattedAddress && value.formattedAddress !== "";
 
-  // get contries from database
-  const { data: countries = [] } = useQuery<
-    {
-      id: string;
-      name: { vi: string; en: string };
-      code: countryCode;
-    }[]
-  >({
+  // get countries from database
+  const { data: countries = [] } = useQuery({
     queryKey: ["countries"],
-    queryFn: () => {
-      return [
-        { id: "VN", name: { vi: "Việt Nam", en: "Vietnam" }, code: "VN" },
-        { id: "US", name: { vi: "Mỹ", en: "United States" }, code: "US" },
-        { id: "UK", name: { vi: "Anh", en: "United Kingdom" }, code: "UK" },
-        { id: "CA", name: { vi: "Canada", en: "Canada" }, code: "CA" },
-        { id: "AU", name: { vi: "Úc", en: "Australia" }, code: "AU" },
-        {
-          id: "NZ",
-          name: { vi: "New Zealand", en: "New Zealand" },
-          code: "NZ",
-        },
-        { id: "SG", name: { vi: "Singapore", en: "Singapore" }, code: "SG" },
-        { id: "MY", name: { vi: "Malaysia", en: "Malaysia" }, code: "MY" },
-        { id: "ID", name: { vi: "Indonesia", en: "Indonesia" }, code: "ID" },
-      ];
+    queryFn: async () => {
+      const response = await locationService.getCountries();
+      return response.data || [];
     },
   });
 
@@ -202,19 +184,12 @@ export default function AddressPicker({
                       setSelectedCountryCode(selected as countryCode);
                     }}
                   >
-                    {countries.map(
-                      (country: {
-                        id: string;
-                        name: { vi: string; en: string };
-                        code: countryCode;
-                      }) => {
-                        const name =
-                          typeof country.name === "string"
-                            ? country.name
-                            : country.name.vi || country.name.en || "";
-                        return <SelectItem key={country.id}>{name}</SelectItem>;
-                      }
-                    )}
+                    {countries.map((country) => {
+                      const name = getLocalizedName(
+                        country.name as Record<string, string>
+                      );
+                      return <SelectItem key={country.code}>{name}</SelectItem>;
+                    })}
                   </Select>
 
                   {renderPickerAddressByCountry(selectedCountryCode)}

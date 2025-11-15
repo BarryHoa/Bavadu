@@ -8,7 +8,8 @@ export default defineConfig({
     url: (() => {
       const sslMode = process.env.PGSSLMODE || "disable";
       const channelBinding = process.env.PGCHANNELBINDING || "";
-      return `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}?sslmode=${sslMode}${channelBinding ? `&channel_binding=${channelBinding}` : ""}`;
+      const port = process.env.PGPORT || "5432";
+      return `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${port}/${process.env.PGDATABASE}?sslmode=${sslMode}${channelBinding ? `&channel_binding=${channelBinding}` : ""}`;
     })(),
   },
   verbose: true,

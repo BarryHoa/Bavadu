@@ -5,6 +5,7 @@
   "category": "System",
   "icon": "Package",
   "models": {
-    "user": "Users/UserModel"
+    "user": "Users/UserModel",
+    "location": "Locations/LocationModel"
   }
 }
