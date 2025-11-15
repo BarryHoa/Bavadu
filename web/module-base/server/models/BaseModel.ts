@@ -3,7 +3,6 @@ import { and, eq } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { isEmpty } from "lodash";
 import { getEnv } from "..";
-import { ListParamsRequest } from "./interfaces/ListInterface";
 
 export class BaseModel<TTable extends PgTable<any> = PgTable<any>> {
   /**Main table of the model */
@@ -72,27 +71,5 @@ export class BaseModel<TTable extends PgTable<any> = PgTable<any>> {
     return result?.length > 0
       ? { isExist: true, data: result[0] }
       : { isExist: false, data: null };
-  };
-
-  /**Get default parameters for list */
-  getDefaultParamsForList = (params?: ListParamsRequest) => {
-    const { offset, limit, search, filters, sorts } = params || {};
-    return {
-      offset: offset || 0,
-      limit: limit || 10,
-      search: search || undefined,
-      filters: filters || undefined,
-      sorts: sorts || undefined,
-    };
-  };
-
-  /**Get pagination data */
-  getPagination = (options: { data?: any; total?: number }) => {
-    const { data, total = 0 } = options;
-
-    return {
-      data,
-      total,
-    };
   };
 }

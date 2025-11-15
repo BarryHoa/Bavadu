@@ -7,6 +7,8 @@
   "icon": "Package",
   "models": {
     "product": "Product/ProductModel",
-    "product.category": "ProductCategory/ProductCategoryModel"
+    "product.category": "ProductCategory/ProductCategoryModel",
+    "list.product": "Product/ListProductModel",
+    "list.product.category": "ProductCategory/ListProductCategoryModel"
   }
 }

@@ -6,7 +6,8 @@
   "category": "Operations",
   "icon": "Receipt",
   "models": {
-    "sale.order": "Sale/SalesOrderModel"
+    "sale.order": "Sale/SalesOrderModel",
+    "list.sale.order": "Sale/ListSalesOrderModel"
   }
 }
 

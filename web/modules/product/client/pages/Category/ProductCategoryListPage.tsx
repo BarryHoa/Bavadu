@@ -130,7 +130,7 @@ const ProductCategoryListPage = (): React.ReactNode => {
   return (
     <div className="space-y-4">
       <ViewListDataTable
-        model="product.category"
+        model="list.product.category"
         columns={columns}
         actionsRight={[
           {

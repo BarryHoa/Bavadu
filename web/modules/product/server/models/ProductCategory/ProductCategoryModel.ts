@@ -1,11 +1,7 @@
 import { getEnv } from "@base/server";
 import { LocaleDataType } from "@base/server/interfaces/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
-import {
-  ListParamsRequest,
-  ListParamsResponse,
-} from "@base/server/models/interfaces/ListInterface";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { NewTblProductCategory, table_product_category } from "../../schemas";
@@ -43,54 +39,6 @@ export default class ProductCategoryModel extends BaseModel<
     super(table_product_category);
   }
 
-  getViewDataList = async (
-    params: ListParamsRequest
-  ): Promise<ListParamsResponse<ProductCategoryRow>> => {
-    const env = getEnv();
-    const db = env.getDb();
-
-    const { offset, limit } = this.getDefaultParamsForList(params);
-
-    const categories = await db
-      .select({
-        id: this.table.id,
-        code: this.table.code,
-        name: this.table.name,
-        description: this.table.description,
-        level: this.table.level,
-        isActive: this.table.isActive,
-        parentId: this.table.parentId,
-        parentName: parentCategory.name,
-        createdAt: this.table.createdAt,
-        updatedAt: this.table.updatedAt,
-        total: sql<number>`count(*) over()::int`.as("total"),
-      })
-      .from(this.table)
-      .leftJoin(parentCategory, eq(this.table.parentId, parentCategory.id))
-      .limit(limit)
-      .offset(offset);
-
-    const total = categories.length > 0 ? categories[0].total : 0;
-
-    const list: ProductCategoryRow[] = categories.map((row) => ({
-      id: row.id,
-      code: row.code,
-      name: row.name,
-      description: row.description,
-      level: row.level ?? undefined,
-      isActive: row.isActive ?? undefined,
-      parent: row.parentId
-        ? {
-            id: row.parentId,
-            name: row.parentName ?? undefined,
-          }
-        : null,
-      createdAt: row.createdAt?.getTime(),
-      updatedAt: row.updatedAt?.getTime(),
-    }));
-
-    return this.getPagination({ data: list, total });
-  };
 
   getCategoryById = async (id: string): Promise<ProductCategoryRow | null> => {
     const env = getEnv();

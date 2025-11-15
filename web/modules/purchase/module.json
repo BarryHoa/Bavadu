@@ -6,7 +6,8 @@
   "category": "Operations",
   "icon": "ShoppingCart",
   "models": {
-    "purchase.order": "Purchase/PurchaseOrderModel"
+    "purchase.order": "Purchase/PurchaseOrderModel",
+    "list.purchase.order": "Purchase/ListPurchaseOrderModel"
   }
 }
 

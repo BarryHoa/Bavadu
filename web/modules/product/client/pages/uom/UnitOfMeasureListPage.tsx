@@ -7,7 +7,7 @@ import {
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { Chip } from "@heroui/react";
+import { Button, Chip } from "@heroui/react";
 import { useMemo } from "react";
 
 import { getClientLink } from "@base/client/utils/link/getClientLink";
