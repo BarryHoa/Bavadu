@@ -3,9 +3,8 @@
 import { WorkspaceProvider } from "@base/client/contexts/workspace";
 import { MenuWorkspaceElement } from "@base/client/interface/WorkspaceMenuInterface";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import Breadcrumb, { BreadcrumbItem } from "@base/client/layouts/workspace/components/Breadcrumb";
 import Content from "@base/client/layouts/workspace/components/Content";
 import MenuPanel from "@base/client/layouts/workspace/components/Menu";
 import Nav from "@base/client/layouts/workspace/components/Nav";
@@ -38,32 +37,51 @@ export default function WorkspaceLayoutClient({
     .filter((p) => p !== "modules");
 
   let acc = "";
-  const autoCrumbs: BreadcrumbItem[] = parts.map((p) => {
-    acc += `/${p}`;
-    const label = p.charAt(0).toUpperCase() + p.slice(1);
+  // const autoCrumbs: BreadcrumbItem[] = parts.map((p) => {
+  //   acc += `/${p}`;
+  //   const label = p.charAt(0).toUpperCase() + p.slice(1);
 
-    return { label, href: acc };
-  });
+  //   return { label, href: acc };
+  // });
 
-  const initialCrumbs = [...autoCrumbs];
+  // const initialCrumbs = [...autoCrumbs];
 
-  // console.log(moduleMenus);
+  // Đọc trạng thái pin sidebar từ localStorage (mặc định là mở)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const stored = window.localStorage.getItem("workspace_sidebar_pinned");
+    setSidebarOpen(stored === "false" ? false : true);
+  }, []);
+
+  const handleToggleSidebar = () => {
+    setSidebarOpen((prev) => {
+      const next = !prev;
+
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("workspace_sidebar_pinned", String(next));
+      }
+
+      return next;
+    });
+  };
+
   return (
-    <WorkspaceProvider initialBreadcrumbs={initialCrumbs}>
+    <WorkspaceProvider initialBreadcrumbs={[]}>
       <div
         className="w-full h-screen flex flex-col flex-1 overflow-hidden bg-slate-50"
         id="workspace-layout"
       >
         {/* Top header */}
-        <Nav onOpenSidebar={() => setSidebarOpen(true)} />
+        <Nav />
         <div className="flex min-h-0 flex-1">
           <MenuPanel
             isOpen={sidebarOpen}
             items={navigationItems as unknown as MenuWorkspaceElement[]}
             moduleMenus={moduleMenus}
-            sidebarOpen={sidebarOpen}
-            onClose={() => setSidebarOpen(false)}
-            onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+            // Desktop menu: không auto đóng, giữ nguyên trạng thái pin/unpin
+            onClose={() => {}}
+            onToggleSidebar={handleToggleSidebar}
           />
 
           {/* Mobile sidebar overlay */}
@@ -71,9 +89,9 @@ export default function WorkspaceLayoutClient({
           <div className="w-full min-h-0 flex flex-1 h-full overflow-auto scroll-overlay">
             <div className="min-w-3xl flex flex-col flex-1">
               {/* Breadcrumb */}
-              <div className="p-2">
+              {/* <div className="p-2">
                 <Breadcrumb items={initialCrumbs} />
-              </div>
+              </div> */}
 
               {/* Page content */}
               <div className="flex-1 p-2">

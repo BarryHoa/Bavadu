@@ -1,19 +1,22 @@
 "use client";
 
 import { MenuWorkspaceElement } from "@base/client/interface/WorkspaceMenuInterface";
+import { Avatar } from "@heroui/avatar";
+import { Divider } from "@heroui/divider";
 import { ScrollShadow } from "@heroui/scroll-shadow";
+import { Tooltip } from "@heroui/tooltip";
 import clsx from "clsx";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Pin, PinOff } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+const KEY_WORKSPACE_LAST_MENU_PATH = "last_menu_key";
 interface MenuProps {
   items: MenuWorkspaceElement[];
   isOpen: boolean;
   onClose: () => void;
   moduleMenus?: MenuWorkspaceElement[];
-  sidebarOpen?: boolean;
   onToggleSidebar?: () => void;
 }
 
@@ -26,7 +29,11 @@ export default function Menu({
 }: MenuProps) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [isHoverOpen, setIsHoverOpen] = useState(false);
+  const [activeKey, setActiveKey] = useState<string | null>(null);
   const activeItemRef = useRef<HTMLDivElement>(null);
+
+  const effectiveOpen = isOpen || isHoverOpen;
 
   const toggleExpanded = (itemName: string) => {
     setExpandedItems((prev) =>
@@ -36,29 +43,30 @@ export default function Menu({
     );
   };
 
-  const isActive = (path: string) => {
-    return pathname === path || pathname.startsWith(path + "/");
+  const normalizePath = (value: string) => {
+    if (!value) return "/";
+
+    const withLeading = value.startsWith("/") ? value : `/${value}`;
+    const trimmed = withLeading.replace(/\/+$/, "");
+
+    return trimmed || "/";
   };
 
-  const hasActiveChild = (item: MenuWorkspaceElement): boolean => {
-    if (item.path && isActive(item.path)) return true;
-    if (item.children) {
-      return item.children.some((child) => hasActiveChild(child));
-    }
-
-    return false;
-  };
-
-  // Find all parent items that need to be expanded for the current path
-  const findParentItemsToExpand = (
+  // Tìm tất cả các item cha cần expand theo một đường dẫn bất kỳ
+  const findParentItemsToExpandByPath = (
     items: MenuWorkspaceElement[],
     path: string
   ): string[] => {
     const parentsToExpand: string[] = [];
 
     const checkItem = (item: MenuWorkspaceElement): boolean => {
-      if (item.path && isActive(item.path)) {
-        return true;
+      if (item.path && path) {
+        const normalized = normalizePath(path);
+        const itemPath = normalizePath(item.path);
+
+        if (normalized === itemPath || normalized.startsWith(`${itemPath}/`)) {
+          return true;
+        }
       }
 
       if (item.children) {
@@ -79,171 +87,310 @@ export default function Menu({
     return parentsToExpand;
   };
 
-  // Auto-expand menu items and scroll to active item on path change
+  const findParentsByKey = (
+    items: MenuWorkspaceElement[],
+    key: string
+  ): string[] => {
+    const parentsToExpand: string[] = [];
+
+    const checkItem = (item: MenuWorkspaceElement): boolean => {
+      if (item.key === key) {
+        // Nếu chính item này là menu group thì expand nó
+        parentsToExpand.push(item.name);
+
+        return true;
+      }
+
+      if (item.children) {
+        const hasMatchChild = item.children.some((child) => checkItem(child));
+
+        if (hasMatchChild) {
+          parentsToExpand.push(item.name);
+        }
+
+        return hasMatchChild;
+      }
+
+      return false;
+    };
+
+    items.forEach((item) => checkItem(item));
+
+    // Loại bỏ trùng lặp, nhưng giữ thứ tự
+    return Array.from(new Set(parentsToExpand));
+  };
+
+  const findKeyByPath = (
+    items: MenuWorkspaceElement[],
+    path: string
+  ): string | null => {
+    const normalized = normalizePath(path);
+    let foundKey: string | null = null;
+
+    const checkItem = (item: MenuWorkspaceElement): boolean => {
+      if (item.path) {
+        const itemPath = normalizePath(item.path);
+
+        if (normalized === itemPath || normalized.startsWith(`${itemPath}/`)) {
+          foundKey = item.key;
+
+          return true;
+        }
+      }
+
+      if (item.children) {
+        return item.children.some((child) => checkItem(child));
+      }
+
+      return false;
+    };
+
+    items.forEach((item) => checkItem(item));
+
+    return foundKey;
+  };
+
+  const hasActiveChildByKey = (
+    item: MenuWorkspaceElement,
+    key: string | null
+  ): boolean => {
+    if (!key || !item.children) return false;
+
+    return item.children.some(
+      (child) => child.key === key || hasActiveChildByKey(child, key)
+    );
+  };
+
+  // Tự expand menu và highlight item đang active (ưu tiên theo localStorage)
   useEffect(() => {
     const allItems = [...items, ...moduleMenus];
-    const parentsToExpand = findParentItemsToExpand(allItems, pathname);
+
+    // Server-side: fallback theo URL hiện tại
+    if (typeof window === "undefined") {
+      const parentsFromPath = findParentItemsToExpandByPath(allItems, pathname);
+      const derivedKey = findKeyByPath(allItems, pathname);
+
+      if (parentsFromPath.length > 0) {
+        setExpandedItems((prev) =>
+          Array.from(new Set([...prev, ...parentsFromPath]))
+        );
+      }
+
+      if (derivedKey) {
+        setActiveKey(derivedKey);
+      }
+
+      return;
+    }
+
+    const storedKey =
+      window.localStorage.getItem(KEY_WORKSPACE_LAST_MENU_PATH) || "";
+
+    let parentsToExpand: string[] = [];
+
+    if (storedKey) {
+      parentsToExpand = findParentsByKey(allItems, storedKey);
+      setActiveKey(storedKey);
+    }
+
+    // Nếu key trong localStorage không còn tồn tại trong menu, fallback theo URL hiện tại
+    if (parentsToExpand.length === 0) {
+      parentsToExpand = findParentItemsToExpandByPath(allItems, pathname);
+
+      const derivedKey = findKeyByPath(allItems, pathname);
+
+      if (derivedKey) {
+        setActiveKey(derivedKey);
+      }
+    }
 
     if (parentsToExpand.length > 0) {
-      setExpandedItems((prev) => {
-        const newExpanded = Array.from(new Set([...prev, ...parentsToExpand]));
-
-        return newExpanded;
-      });
-
-      // Scroll to active item after a short delay to allow expansion
-      // setTimeout(() => {
-      //   if (activeItemRef.current) {
-      //     activeItemRef.current.scrollIntoView({
-      //       behavior: "smooth",
-      //       block: "center",
-      //     });
-      //   }
-      // }, 100);
+      setExpandedItems((prev) =>
+        Array.from(new Set([...prev, ...parentsToExpand]))
+      );
     }
   }, [pathname, items, moduleMenus]);
+
+  const renderIcon = (label: string, isHighlighted: boolean) => {
+    const letter = label?.charAt(0)?.toUpperCase() ?? "?";
+
+    return (
+      <Avatar
+        size="sm"
+        radius="sm"
+        className={clsx(
+          "text-[11px] font-semibold flex-shrink-0",
+          isHighlighted
+            ? "bg-blue-600 text-white shadow-sm"
+            : "bg-slate-100 text-slate-600 group-hover:bg-blue-50 group-hover:text-blue-500"
+        )}
+      >
+        {letter}
+      </Avatar>
+    );
+  };
 
   // Render menu item (workspace hoặc module)
   const renderMenuItem = (item: MenuWorkspaceElement) => {
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems.includes(item.name);
     const itemPath = item.path;
-    const isItemActive = itemPath ? isActive(itemPath) : false;
-    const hasActiveChildren = hasChildren && hasActiveChild(item);
+    const isItemActive = activeKey === item.key;
+    const hasActiveChildren =
+      hasChildren && hasActiveChildByKey(item, activeKey);
+    const isHighlighted = isItemActive || hasActiveChildren;
+
+    const content = (
+      <div
+        ref={isItemActive ? activeItemRef : null}
+        className={clsx(
+          "group flex items-center justify-between px-2 py-1.5 rounded-xl cursor-pointer transition-all duration-200",
+          "border border-transparent",
+          isHighlighted
+            ? "bg-blue-50 text-blue-700 border-blue-100 shadow-[0_0_0_1px_rgba(59,130,246,0.15)]"
+            : "text-slate-700 hover:bg-slate-50 hover:text-blue-600"
+        )}
+        onClick={() => {
+          if (hasChildren) {
+            toggleExpanded(item.name);
+          }
+        }}
+        aria-expanded={hasChildren ? isExpanded : undefined}
+        aria-current={isItemActive ? "page" : undefined}
+      >
+        <div className="flex items-center flex-1 gap-2">
+          {renderIcon(item.icon || item.name, Boolean(isHighlighted))}
+          <span
+            className={clsx(
+              "text-xs font-semibold tracking-wide uppercase",
+              "whitespace-nowrap overflow-hidden text-ellipsis",
+              "transition-all duration-300",
+              effectiveOpen
+                ? "opacity-100 translate-x-0 max-w-[160px]"
+                : "opacity-0 -translate-x-1 max-w-0"
+            )}
+          >
+            {item.name}
+          </span>
+        </div>
+
+        {hasChildren && (
+          <div
+            className={clsx(
+              "transition-all duration-200",
+              effectiveOpen ? "opacity-100" : "opacity-0 hidden"
+            )}
+          >
+            {isExpanded ? (
+              <ChevronDown size={14} className="text-slate-400" />
+            ) : (
+              <ChevronRight size={14} className="text-slate-400" />
+            )}
+          </div>
+        )}
+      </div>
+    );
 
     return (
       <div key={item.name} className="mb-1">
-        <div
-          ref={isItemActive ? activeItemRef : null}
-          className={`flex items-center justify-between px-1 py-1 rounded-xl transition-all duration-200 group ${
-            isItemActive
-              ? "bg-blue-50 text-blue-600"
-              : hasActiveChildren
-                ? "bg-blue-50 text-blue-600"
-                : "hover:bg-blue-50 hover:text-blue-600 text-gray-700"
-          }`}
-          onClick={() => {
-            if (hasChildren) {
-              toggleExpanded(item.name);
-            }
-          }}
-        >
-          <div className="flex items-center flex-1">
-            {hasChildren ? (
-              <div
-                className={`flex items-center flex-1 text-sm font-medium cursor-pointer ${
-                  isItemActive
-                    ? "text-blue-600"
-                    : "text-gray-700 group-hover:text-blue-600"
-                }`}
-              >
-                <div className="w-5 h-5 bg-gray-300 rounded flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs font-bold">
-                    {item.icon.charAt(0)}
-                  </span>
-                </div>
-                <span
-                  className={`ml-3 transition-opacity duration-300 ${
-                    isOpen ? "opacity-100" : "opacity-0"
-                  }`}
-                >
-                  {item.name}
-                </span>
-              </div>
+        {hasChildren ? (
+          <>
+            {effectiveOpen ? (
+              content
             ) : (
-              <Link
-                className={`flex items-center flex-1 text-sm font-medium ${
-                  isItemActive
-                    ? "text-blue-600"
-                    : "text-gray-700 group-hover:text-blue-600"
-                }`}
-                href={itemPath || "#"}
-                onClick={onClose}
-              >
-                <div className="w-5 h-5 bg-gray-300 rounded flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs font-bold">
-                    {item.icon.charAt(0)}
-                  </span>
-                </div>
-                <span
-                  className={`ml-3 transition-opacity duration-300 ${
-                    isOpen ? "opacity-100" : "opacity-0"
-                  }`}
-                >
-                  {item.name}
-                </span>
-              </Link>
+              <Tooltip content={item.name} placement="right">
+                {content}
+              </Tooltip>
             )}
-          </div>
-          {hasChildren && (
-            <div
-              className={`transition-opacity duration-300 ${
-                isOpen ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              {isExpanded ? (
-                <ChevronDown size={14} />
-              ) : (
-                <ChevronRight size={14} />
-              )}
-            </div>
-          )}
-        </div>
+          </>
+        ) : (
+          <Link
+            href={itemPath || "#"}
+            onClick={() => {
+              if (typeof window !== "undefined" && item.key) {
+                window.localStorage.setItem(
+                  KEY_WORKSPACE_LAST_MENU_PATH,
+                  item.key
+                );
+              }
+
+              setActiveKey(item.key);
+
+              onClose();
+            }}
+            className="block"
+          >
+            {effectiveOpen ? (
+              content
+            ) : (
+              <Tooltip content={item.name} placement="right">
+                {content}
+              </Tooltip>
+            )}
+          </Link>
+        )}
 
         {hasChildren && isExpanded && (
           <div
-            className={`ml-6 py-1 space-y-1 transition-all duration-300 ${
-              isOpen
-                ? "opacity-100 max-h-96"
+            className={clsx(
+              "mt-1 ml-3 space-y-1 border-l border-slate-100 pl-3",
+              "transition-all duration-200",
+              effectiveOpen
+                ? "opacity-100"
                 : "opacity-0 max-h-0 overflow-hidden"
-            }`}
+            )}
           >
             {item.children?.map((child) => {
               const childPath = child.path;
               const childAs = child.as;
-              const isChildActive = childPath && isActive(childPath);
+              const isChildActive = activeKey === child.key;
 
               return (
-                <div
+                <Link
                   key={child.name}
-                  ref={isChildActive ? activeItemRef : null}
-                  className={`flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-all duration-200 ${
+                  as={childAs || childPath}
+                  href={childPath || "#"}
+                  onClick={() => {
+                    if (typeof window !== "undefined" && child.key) {
+                      window.localStorage.setItem(
+                        KEY_WORKSPACE_LAST_MENU_PATH,
+                        child.key
+                      );
+                    }
+
+                    setActiveKey(child.key);
+
+                    onClose();
+                  }}
+                  className={clsx(
+                    "flex items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-all duration-150",
                     isChildActive
-                      ? "bg-blue-100 text-blue-600"
-                      : "hover:bg-blue-50 text-gray-600 hover:text-blue-600"
-                  }`}
+                      ? "bg-blue-100 text-blue-700 font-medium"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-blue-600"
+                  )}
                 >
-                  <Link
-                    as={childAs || childPath}
-                    className="flex items-center flex-1"
-                    href={childPath || "#"}
-                    onClick={onClose}
-                  >
-                    <div className="flex items-center">
-                      <div className="w-4 h-4 mr-2 bg-gray-300 rounded flex items-center justify-center">
-                        <span className="text-xs font-bold">
-                          {child.icon.charAt(0)}
-                        </span>
-                      </div>
-                      <span
-                        className={`transition-opacity duration-300 ${
-                          isOpen ? "opacity-100" : "opacity-0"
-                        }`}
-                      >
-                        {child.name}
-                      </span>
-                    </div>
-                  </Link>
-                  {child.badge && (
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex h-4 w-4 items-center justify-center rounded bg-slate-100 text-[10px] font-semibold text-slate-500">
+                      {child.icon?.charAt(0) ?? "•"}
+                    </span>
                     <span
-                      className={`bg-blue-100 text-blue-600 text-xs font-semibold px-2 py-1 rounded-full transition-opacity duration-300 ${
-                        isOpen ? "opacity-100" : "opacity-0"
-                      }`}
+                      className={clsx(
+                        "transition-all duration-300 whitespace-nowrap overflow-hidden text-ellipsis",
+                        effectiveOpen
+                          ? "opacity-100 translate-x-0 max-w-[160px]"
+                          : "opacity-0 -translate-x-1 max-w-0"
+                      )}
                     >
+                      {child.name}
+                    </span>
+                  </div>
+
+                  {child.badge && effectiveOpen && (
+                    <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-600">
                       {child.badge}
                     </span>
                   )}
-                </div>
+                </Link>
               );
             })}
           </div>
@@ -256,49 +403,77 @@ export default function Menu({
     <>
       {/* Desktop sidebar */}
       <aside
-        className={`hidden lg:flex lg:flex-col bg-white shadow-xl flex-shrink-0 transition-all duration-300 ease-in-out ${
-          isOpen ? "w-64" : "w-16"
-        }`}
+        className={clsx(
+          "hidden lg:flex lg:flex-col flex-shrink-0 transition-all duration-300 ease-in-out",
+          "bg-white/90 backdrop-blur border-r border-slate-100 shadow-sm",
+          effectiveOpen ? "w-64" : "w-[4.25rem]"
+        )}
+        aria-label="Workspace navigation"
+        onMouseEnter={() => {
+          if (!isOpen) {
+            setIsHoverOpen(true);
+          }
+        }}
+        onMouseLeave={() => {
+          if (!isOpen) {
+            setIsHoverOpen(false);
+          }
+        }}
       >
-        <ScrollShadow className="flex-1 px-2 pb-4 pt-1">
+        <ScrollShadow className="flex-1 px-2 pb-4 pt-2">
+          {/* Header + toggle */}
           <div
-            className={`flex flex-1 gap-2 items-center ${isOpen ? "justify-between" : "justify-center"}`}
+            className={clsx(
+              "mb-2 flex items-center gap-2 rounded-xl px-2 py-1.5",
+              "bg-slate-50/80 border border-slate-100"
+            )}
           >
             <div
-              className={`flex-auto text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 transition-opacity duration-300 ${
-                isOpen ? "inline-block" : "hidden"
-              }`}
+              className={clsx(
+                "flex-auto text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500",
+                "transition-all duration-300 whitespace-nowrap overflow-hidden",
+                effectiveOpen
+                  ? "opacity-100 translate-x-0 max-w-[160px]"
+                  : "opacity-0 -translate-x-1 max-w-0"
+              )}
             >
               Main
             </div>
 
             <button
-              className={`rounded-md flex-end cursor-pointer hover:bg-gray-100 p-1`}
+              type="button"
+              className="cursor-pointer inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all"
               onClick={onToggleSidebar}
+              aria-label={isOpen ? "Bỏ ghim menu" : "Ghim menu"}
             >
-              <ChevronRight
-                className={clsx(
-                  "transition-transform",
-                  isOpen ? "rotate-180" : ""
-                )}
-                size={20}
-              />
+              {isOpen ? (
+                <Pin className="h-4 w-4" />
+              ) : (
+                <PinOff className="h-4 w-4" />
+              )}
             </button>
           </div>
 
-          {items.map(renderMenuItem)}
+          <div className="space-y-1">{items.map(renderMenuItem)}</div>
 
           {moduleMenus.length > 0 && (
-            <div className="mt-4">
-              <div
-                className={`text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-3 transition-opacity duration-300 ${
-                  isOpen ? "opacity-100" : "opacity-0"
-                }`}
-              >
-                Module
+            <>
+              <Divider className="my-3 bg-slate-100" />
+              <div className="space-y-1">
+                <div
+                  className={clsx(
+                    "px-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400",
+                    "transition-all duration-300 whitespace-nowrap overflow-hidden",
+                    effectiveOpen
+                      ? "opacity-100 translate-x-0 max-w-[160px]"
+                      : "opacity-0 -translate-x-1 max-w-0"
+                  )}
+                >
+                  Module
+                </div>
+                {moduleMenus.map(renderMenuItem)}
               </div>
-              {moduleMenus.map(renderMenuItem)}
-            </div>
+            </>
           )}
         </ScrollShadow>
       </aside>

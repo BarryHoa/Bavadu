@@ -1,17 +1,16 @@
 "use client";
 
-import { Button } from "@heroui/button";
 import { Avatar } from "@heroui/avatar";
+import { Button } from "@heroui/button";
 import {
   Navbar as HeroNavbar,
   NavbarBrand,
   NavbarContent,
   NavbarItem,
-  NavbarMenuToggle,
 } from "@heroui/navbar";
-import { Sun, Bell, Menu as MenuIcon } from "lucide-react";
+import { Bell, Sun } from "lucide-react";
 
-export default function Nav({ onOpenSidebar }: { onOpenSidebar: () => void }) {
+export default function Nav() {
   return (
     <HeroNavbar
       shouldHideOnScroll
@@ -27,13 +26,6 @@ export default function Nav({ onOpenSidebar }: { onOpenSidebar: () => void }) {
           <h1 className="text-xl font-bold text-orange-600">Seven Admin</h1>
         </div>
       </NavbarBrand>
-      <NavbarContent className="lg:hidden" justify="start">
-        <NavbarMenuToggle
-          aria-label="Open sidebar"
-          icon={<MenuIcon size={20} />}
-          onClick={onOpenSidebar}
-        />
-      </NavbarContent>
 
       <NavbarContent className="hidden md:flex" justify="end">
         <NavbarItem className="hidden sm:flex">
