@@ -1,17 +1,44 @@
 "use client";
 
 import { MenuWorkspaceElement } from "@base/client/interface/WorkspaceMenuInterface";
-import { Avatar } from "@heroui/avatar";
 import { Divider } from "@heroui/divider";
 import { ScrollShadow } from "@heroui/scroll-shadow";
 import { Tooltip } from "@heroui/tooltip";
 import clsx from "clsx";
-import { ChevronDown, ChevronRight, Pin, PinOff } from "lucide-react";
+import {
+  BarChart3,
+  Boxes,
+  Building2,
+  ChevronDown,
+  ChevronRight,
+  Circle,
+  ClipboardList,
+  Package,
+  Pin,
+  PinOff,
+  Settings,
+  ShoppingCart,
+  TrendingUp,
+  User,
+  type LucideIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 const KEY_WORKSPACE_LAST_MENU_PATH = "last_menu_key";
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  Package,
+  TrendingUp,
+  ClipboardList,
+  ShoppingCart,
+  Boxes,
+  BarChart3,
+  Building2,
+  Settings,
+  User,
+};
 interface MenuProps {
   items: MenuWorkspaceElement[];
   isOpen: boolean;
@@ -211,22 +238,20 @@ export default function Menu({
     }
   }, [pathname, items, moduleMenus]);
 
-  const renderIcon = (label: string, isHighlighted: boolean) => {
-    const letter = label?.charAt(0)?.toUpperCase() ?? "?";
+  const renderIcon = (iconName: string | undefined, isHighlighted: boolean) => {
+    const IconComponent = (iconName && ICON_MAP[iconName]) || Circle;
 
     return (
-      <Avatar
-        size="sm"
-        radius="sm"
+      <span
         className={clsx(
-          "text-[11px] font-semibold flex-shrink-0",
+          "inline-flex h-7 w-7 items-center justify-center rounded-lg border text-[11px] flex-shrink-0",
           isHighlighted
-            ? "bg-blue-600 text-white shadow-sm"
-            : "bg-slate-100 text-slate-600 group-hover:bg-blue-50 group-hover:text-blue-500"
+            ? "bg-blue-600 border-blue-600 text-white shadow-sm"
+            : "bg-slate-50 border-slate-200 text-slate-500 group-hover:bg-blue-50 group-hover:border-blue-200 group-hover:text-blue-500"
         )}
       >
-        {letter}
-      </Avatar>
+        <IconComponent className="h-4 w-4" />
+      </span>
     );
   };
 
@@ -244,7 +269,7 @@ export default function Menu({
       <div
         ref={isItemActive ? activeItemRef : null}
         className={clsx(
-          "group flex items-center justify-between px-2 py-1.5 rounded-xl cursor-pointer transition-all duration-200",
+          "group flex items-center justify-between px-2 py-1 rounded-xl cursor-pointer transition-all duration-200",
           "border border-transparent",
           isHighlighted
             ? "bg-blue-50 text-blue-700 border-blue-100 shadow-[0_0_0_1px_rgba(59,130,246,0.15)]"
@@ -259,7 +284,7 @@ export default function Menu({
         aria-current={isItemActive ? "page" : undefined}
       >
         <div className="flex items-center flex-1 gap-2">
-          {renderIcon(item.icon || item.name, Boolean(isHighlighted))}
+          {renderIcon(item.icon, Boolean(isHighlighted))}
           <span
             className={clsx(
               "text-xs font-semibold tracking-wide uppercase",
@@ -370,9 +395,6 @@ export default function Menu({
                   )}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex h-4 w-4 items-center justify-center rounded bg-slate-100 text-[10px] font-semibold text-slate-500">
-                      {child.icon?.charAt(0) ?? "•"}
-                    </span>
                     <span
                       className={clsx(
                         "transition-all duration-300 whitespace-nowrap overflow-hidden text-ellipsis",

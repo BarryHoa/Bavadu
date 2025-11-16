@@ -9,7 +9,7 @@ const navigationItems = [
   {
     name: "Profile",
     href: "/workspace/profile",
-    icon: "UserCircle",
+    icon: "User",
     badge: null,
   },
   {
