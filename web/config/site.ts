@@ -1,8 +1,8 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "Bavadu Solution Admin",
-  description: "Bavadu Solution Admin",
+  name: "Fimolink",
+  description: "Fimolink",
   navItems: [
     {
       label: "Home",

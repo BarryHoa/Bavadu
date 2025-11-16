@@ -1,0 +1,17 @@
+{
+  "key": "report-main",
+  "name": "Reports",
+  "icon": "BarChart3",
+  "order": 5,
+  "children": [
+    {
+      "key": "report-center",
+      "name": "Report Center",
+      "path": "/",
+      "as": "/",
+      "icon": "BarChart3"
+    }
+  ]
+}
+
+

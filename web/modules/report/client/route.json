@@ -1,0 +1,6 @@
+[
+  {
+    "path": "/",
+    "routes": [{ "path": "/", "page": "/ReportCenterPage" }]
+  }
+]

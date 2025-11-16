@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { Avatar } from "@heroui/avatar";
 import { Button } from "@heroui/button";
 import {
@@ -9,6 +11,8 @@ import {
   NavbarItem,
 } from "@heroui/navbar";
 import { Bell, Sun } from "lucide-react";
+
+import { siteConfig } from "@/config/site";
 
 export default function Nav() {
   return (
@@ -20,10 +24,17 @@ export default function Nav() {
     >
       <NavbarBrand as="li" className="gap-3 max-w-fit">
         <div className="flex items-center">
-          <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-3">
-            <span className="text-orange-600 font-bold text-lg">D</span>
-          </div>
-          <h1 className="text-xl font-bold text-orange-600">Seven Admin</h1>
+          <Image
+            src="/favicon/logo.png"
+            alt={siteConfig.name}
+            width={32}
+            height={32}
+            className="mr-3 rounded-lg bg-white"
+            priority
+          />
+          <h1 className="text-xl font-bold text-orange-600">
+            {siteConfig.name}
+          </h1>
         </div>
       </NavbarBrand>
 
