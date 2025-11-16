@@ -36,11 +36,6 @@ interface TransferStockInput extends MovementBaseInput {
   quantity: number;
 }
 
-interface StockSummaryFilter {
-  productId?: string;
-  warehouseId?: string;
-}
-
 export default class StockModel extends BaseModel<typeof table_stock_move> {
   constructor() {
     super(table_stock_move);
@@ -142,46 +137,6 @@ export default class StockModel extends BaseModel<typeof table_stock_move> {
       .limit(1);
 
     return record ?? null;
-  };
-
-  getStockSummary = async (filter: StockSummaryFilter = {}) => {
-    const db = getEnv().getDb();
-
-    const whereClauses = [];
-
-    if (filter.productId) {
-      whereClauses.push(eq(table_stock_level.productId, filter.productId));
-    }
-
-    if (filter.warehouseId) {
-      whereClauses.push(eq(table_stock_level.warehouseId, filter.warehouseId));
-    }
-
-    let query = db
-      .select({
-        productId: table_stock_level.productId,
-        warehouseId: table_stock_level.warehouseId,
-        quantity: table_stock_level.quantity,
-        reservedQuantity: table_stock_level.reservedQuantity,
-      })
-      .from(table_stock_level) as any;
-
-    if (whereClauses.length > 0) {
-      query = query.where(and(...whereClauses));
-    }
-
-    const rows = (await query) as Array<{
-      productId: string;
-      warehouseId: string;
-      quantity: string;
-      reservedQuantity: string;
-    }>;
-
-    return rows.map((row) => ({
-      ...row,
-      quantity: Number(row.quantity),
-      reservedQuantity: Number(row.reservedQuantity),
-    }));
   };
 
   private applyDelta = async (

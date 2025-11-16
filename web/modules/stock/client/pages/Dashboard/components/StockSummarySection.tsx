@@ -25,9 +25,6 @@ interface StockSummarySectionProps {
   onResetFilters: () => void;
   warehouses: WarehouseDto[];
   warehousesLoading: boolean;
-  summary: StockSummaryItem[];
-  summaryLoading: boolean;
-  summaryError: Error | null;
 }
 
 export default function StockSummarySection({
@@ -37,9 +34,6 @@ export default function StockSummarySection({
   onResetFilters,
   warehouses,
   warehousesLoading,
-  summary,
-  summaryLoading,
-  summaryError,
 }: StockSummarySectionProps) {
   const warehouseItems = useMemo<SelectItemOption[]>(
     () =>
@@ -155,30 +149,17 @@ export default function StockSummarySection({
 
         <Divider />
 
-        {summaryError ? (
-          <p className="text-danger-500">
-            {summaryError instanceof Error
-              ? summaryError.message
-              : "Failed to load stock summary."}
-          </p>
-        ) : (
-          <ViewListDataTable<StockSummaryItem & { id: string }>
-            model="list.stock.summary"
-            columns={columns}
-            dataSource={summary.map((item, index) => ({
-              ...item,
-              id: `${item.productId}-${item.warehouseId}-${index}`,
-            }))}
-            loading={summaryLoading}
-            isDummyData={false}
-            search={{ hidden: true }}
-            filter={{ hidden: true }}
-            groupBy={{ hidden: true }}
-            favorite={{ hidden: true }}
-            columnVisibility={{ hidden: true }}
-            rowKey="id"
-          />
-        )}
+        <ViewListDataTable<StockSummaryItem & { id: string }>
+          model="list.stock.summary"
+          columns={columns}
+          isDummyData={false}
+          search={{ hidden: true }}
+          filter={{ hidden: true }}
+          groupBy={{ hidden: true }}
+          favorite={{ hidden: true }}
+          columnVisibility={{ hidden: true }}
+          rowKey="id"
+        />
       </CardBody>
     </Card>
   );

@@ -19,9 +19,7 @@
   },
   {
     "group": "stock",
-    "routes": [
-      { "path": "/summary", "handler": "/stock/summary" }
-    ]
+    "routes": []
   }
 ]
 

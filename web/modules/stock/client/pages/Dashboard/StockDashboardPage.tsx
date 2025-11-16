@@ -6,7 +6,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
-import StockService from "../../services/StockService";
 import QuickActionsSection from "./components/QuickActionsSection";
 import StockSummarySection from "./components/StockSummarySection";
 import { useStockMutations } from "./hooks/useStockMutations";
@@ -31,28 +30,12 @@ export default function StockDashboardPage(): React.ReactNode {
   const warehousesQuery = useQuery({
     queryKey: ["warehouses"],
     queryFn: async () => {
-      const response = await StockService.listWarehouses();
-      if (!response.success) {
-        throw new Error(response.message ?? "Failed to load warehouses.");
+      const res = await fetch("/api/modules/stock/warehouses");
+      const json = await res.json();
+      if (!json.success) {
+        throw new Error(json.message ?? "Failed to load warehouses.");
       }
-
-      return response.data ?? [];
-    },
-  });
-
-  const stockSummaryQuery = useQuery({
-    queryKey: ["stockSummary", appliedFilters],
-    queryFn: async () => {
-      const response = await StockService.getStockSummary(appliedFilters);
-      if (!response.success) {
-        throw new Error(response.message ?? "Failed to load stock summary.");
-      }
-
-      return (response.data ?? []).map((item) => ({
-        ...item,
-        quantity: Number(item.quantity),
-        reservedQuantity: Number(item.reservedQuantity),
-      }));
+      return json.data ?? [];
     },
   });
 
@@ -182,9 +165,6 @@ export default function StockDashboardPage(): React.ReactNode {
         onResetFilters={handleResetFilters}
         warehouses={warehousesQuery.data ?? []}
         warehousesLoading={warehousesQuery.isLoading}
-        summary={stockSummaryQuery.data ?? []}
-        summaryLoading={stockSummaryQuery.isLoading}
-        summaryError={stockSummaryQuery.error as Error | null}
       />
 
       <QuickActionsSection

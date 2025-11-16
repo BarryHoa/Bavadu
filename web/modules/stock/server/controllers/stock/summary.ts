@@ -5,11 +5,15 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
 
   return getModuleQueryByModel({
-    model: "stock",
-    modelMethod: "getStockSummary",
+    model: "list.stock.summary",
+    modelMethod: "getData",
     params: {
-      productId: searchParams.get("productId") ?? undefined,
-      warehouseId: searchParams.get("warehouseId") ?? undefined,
+      offset: 0,
+      limit: 1000,
+      filters: {
+        productId: searchParams.get("productId") ?? undefined,
+        warehouseId: searchParams.get("warehouseId") ?? undefined,
+      },
     },
   });
 }
