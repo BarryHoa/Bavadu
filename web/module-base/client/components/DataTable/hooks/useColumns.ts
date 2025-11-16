@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 
 import {
+  DATA_TABLE_COLUMN_KEY_ROW_NUMBER,
   type DataTableColumnDefinition,
   type ProcessedDataTableColumn,
 } from "../DataTableInterface";
@@ -120,13 +121,16 @@ const useColumns = <T>(
     const frozenMeta = computeFrozenMeta(columns);
 
     const numberColumn: ProcessedDataTableColumn<T> = {
-      key: "__row-number__",
+      key: DATA_TABLE_COLUMN_KEY_ROW_NUMBER,
       label: "No.",
       width: 64,
       align: "center",
       fixed: "left",
-      frozenStyle: getFrozenStyle("__row-number__", frozenMeta),
-      frozenClassName: getFrozenClassName("__row-number__", frozenMeta),
+      frozenStyle: getFrozenStyle(DATA_TABLE_COLUMN_KEY_ROW_NUMBER, frozenMeta),
+      frozenClassName: getFrozenClassName(
+        DATA_TABLE_COLUMN_KEY_ROW_NUMBER,
+        frozenMeta
+      ),
       renderValue: (_record: T, index: number) => index + 1,
       isResizable: false,
       isDraggable: false,
@@ -143,10 +147,14 @@ const useColumns = <T>(
         frozenStyle,
         frozenClassName,
         renderValue: buildRenderValue(column),
-        isResizable: ["__row-number__", "__action__"].includes(column.key)
+        isResizable: [DATA_TABLE_COLUMN_KEY_ROW_NUMBER, "__action__"].includes(
+          column.key
+        )
           ? false
           : column.isResizable,
-        isDraggable: ["__row-number__", "__action__"].includes(column.key)
+        isDraggable: [DATA_TABLE_COLUMN_KEY_ROW_NUMBER, "__action__"].includes(
+          column.key
+        )
           ? false
           : column.isDraggable,
       } satisfies ProcessedDataTableColumn<T>;

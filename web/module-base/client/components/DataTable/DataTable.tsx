@@ -27,6 +27,7 @@ import {
   PAGINATION_PAGE_SIZE_OPTIONS,
 } from "../Pagination/paginationConsts";
 import {
+  DATA_TABLE_COLUMN_KEY_ROW_NUMBER,
   type DataTablePagination,
   type DataTableProps,
   type ProcessedDataTableColumn,
@@ -379,7 +380,9 @@ export default function DataTable<T = any>({
                           `justify-${col.align || "start"}`
                         )}
                       >
-                        {col.renderValue(item, index)}
+                        {col.key === DATA_TABLE_COLUMN_KEY_ROW_NUMBER
+                          ? paginationInfo.from + index + 1
+                          : col.renderValue(item, index)}
                       </div>
                     </TableCell>
                   ))}

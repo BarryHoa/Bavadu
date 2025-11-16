@@ -1,6 +1,6 @@
+import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 import { getEnv } from "@base/server";
 import { NextRequest, NextResponse } from "next/server";
-import type ProductCategoryModel from "../../models/ProductCategory/ProductCategoryModel";
 
 const normalizeLocaleInput = (value: unknown) => {
   if (!value) return null;
@@ -27,36 +27,13 @@ export async function GET(
       );
     }
 
-    const env = getEnv();
-    const categoryModel = env.getModel("product.category") as
-      | ProductCategoryModel
-      | undefined;
+    const response = await getModuleQueryByModel({
+      model: "product.category",
+      modelMethod: "getDataById",
+      params: { id },
+    });
 
-    if (!categoryModel || typeof categoryModel.getCategoryById !== "function") {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Category model not available",
-          message: "The product category model is not registered or invalid.",
-        },
-        { status: 500 }
-      );
-    }
-
-    const category = await categoryModel.getCategoryById(id);
-
-    if (!category) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Category not found",
-          message: `Category with id ${id} was not found`,
-        },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({ success: true, data: category });
+    return response;
   } catch (error) {
     return NextResponse.json(
       {
@@ -89,20 +66,7 @@ export async function PATCH(
 
     const payload = await request.json();
     const env = getEnv();
-    const categoryModel = env.getModel("product.category") as
-      | ProductCategoryModel
-      | undefined;
-
-    if (!categoryModel || typeof categoryModel.updateCategory !== "function") {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Category model not available",
-          message: "The product category model is not registered or invalid.",
-        },
-        { status: 500 }
-      );
-    }
+    const categoryModel = env.getModel("product.category") as any;
 
     const updatePayload: any = {};
 

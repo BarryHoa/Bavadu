@@ -1,6 +1,7 @@
-import { and, asc, eq, ilike, or, sql } from "drizzle-orm";
+import type { Column } from "drizzle-orm";
+import { and, eq, ilike, sql } from "drizzle-orm";
 
-import { getEnv } from "@base/server";
+import { ParamFilter } from "@base/server";
 import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
@@ -8,7 +9,6 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 
 import { table_product_master } from "../../../../product/server/schemas/product-master";
-import type { TblStockLevel } from "../../schemas";
 import { table_stock_level, table_stock_warehouse } from "../../schemas";
 
 export interface StockSummaryViewRow {
@@ -24,7 +24,7 @@ export interface StockSummaryViewRow {
   minStock: number | null;
 }
 
-interface StockSummaryFilter {
+interface StockSummaryFilter extends ParamFilter {
   productId?: string;
   warehouseId?: string;
 }
@@ -34,115 +34,157 @@ class ListStockSummaryModel extends BaseViewListModel<
   StockSummaryViewRow,
   StockSummaryFilter
 > {
-  constructor() {
-    super(table_stock_level);
+  protected declarationColumns() {
+    return new Map<
+      string,
+      {
+        column: Column<any>;
+        sort?: boolean;
+      }
+    >([
+      [
+        "productId",
+        {
+          column: table_stock_level.productId,
+          sort: true,
+        },
+      ],
+      [
+        "productCode",
+        {
+          column: table_product_master.code,
+          sort: true,
+        },
+      ],
+      [
+        "productName",
+        {
+          column: table_product_master.name,
+          sort: true,
+        },
+      ],
+      [
+        "warehouseId",
+        {
+          column: table_stock_level.warehouseId,
+          sort: true,
+        },
+      ],
+      [
+        "warehouseCode",
+        {
+          column: table_stock_warehouse.code,
+          sort: true,
+        },
+      ],
+      [
+        "warehouseName",
+        {
+          column: table_stock_warehouse.name,
+          sort: true,
+        },
+      ],
+      [
+        "quantity",
+        {
+          column: table_stock_level.quantity,
+          sort: true,
+        },
+      ],
+      [
+        "reservedQuantity",
+        {
+          column: table_stock_level.reservedQuantity,
+          sort: true,
+        },
+      ],
+      [
+        "minStock",
+        {
+          column: table_stock_warehouse.minStock,
+          sort: true,
+        },
+      ],
+    ]);
   }
 
-  getViewDataList = async (
+  constructor() {
+    super({
+      table: table_stock_level,
+      sortDefault: [
+        {
+          column: "productId",
+          direction: "ascending",
+        },
+      ],
+    });
+  }
+
+  protected declarationSearch() {
+    return [
+      (text: string) => ilike(table_stock_level.productId, text),
+      (text: string) => ilike(table_product_master.code, text),
+      (text: string) => ilike(sql`${table_product_master.name}::text`, text),
+      (text: string) => ilike(table_stock_level.warehouseId, text),
+      (text: string) => ilike(table_stock_warehouse.code, text),
+      (text: string) => ilike(table_stock_warehouse.name, text),
+    ];
+  }
+
+  protected declarationFilter() {
+    return [
+      (filters: StockSummaryFilter | undefined) => {
+        const conditions: any[] = [];
+        if (filters?.productId) {
+          conditions.push(eq(table_stock_level.productId, filters.productId));
+        }
+        if (filters?.warehouseId) {
+          conditions.push(
+            eq(table_stock_level.warehouseId, filters.warehouseId)
+          );
+        }
+        if (conditions.length === 0) {
+          return undefined;
+        }
+        return and(...conditions);
+      },
+    ];
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected declarationMappingData(row: any): StockSummaryViewRow {
+    return {
+      id: `${row.productId}-${row.warehouseId}`,
+      productId: row.productId,
+      productCode: row.productCode || row.productId,
+      productName:
+        typeof row.productName === "string"
+          ? row.productName
+          : row.productName?.en || row.productName?.vi || row.productId,
+      warehouseId: row.warehouseId,
+      warehouseCode: row.warehouseCode || row.warehouseId,
+      warehouseName: row.warehouseName || row.warehouseId,
+      quantity: Number(row.quantity),
+      reservedQuantity: Number(row.reservedQuantity),
+      minStock: row.minStock ? Number(row.minStock) : null,
+    };
+  }
+
+  getData = async (
     params: ListParamsRequest<StockSummaryFilter> = {}
   ): Promise<ListParamsResponse<StockSummaryViewRow>> => {
-    const { offset, limit, search, filters } =
-      this.getDefaultParamsForList(params);
-    const db = getEnv().getDb();
-
-    const whereClauses = [];
-
-    // Apply filters
-    if (filters?.productId) {
-      whereClauses.push(eq(table_stock_level.productId, filters.productId));
-    }
-
-    if (filters?.warehouseId) {
-      whereClauses.push(
-        eq(table_stock_level.warehouseId, filters.warehouseId)
-      );
-    }
-
-    // Apply search
-    if (search) {
-      const term = `%${String(search).trim()}%`;
-      whereClauses.push(
-        or(
-          ilike(table_stock_level.productId, term),
-          ilike(table_product_master.code, term),
-          ilike(sql`${table_product_master.name}::text`, term),
-          ilike(table_stock_level.warehouseId, term),
-          ilike(table_stock_warehouse.code, term),
-          ilike(table_stock_warehouse.name, term)
+    return this.buildQueryDataList(params, (query) =>
+      query
+        .leftJoin(
+          table_product_master,
+          eq(table_stock_level.productId, table_product_master.id)
         )
-      );
-    }
-
-    const baseQuery = db
-      .select({
-        id: sql<string>`concat(${table_stock_level.productId}, '-', ${table_stock_level.warehouseId})`.as(
-          "id"
-        ),
-        productId: table_stock_level.productId,
-        productCode: table_product_master.code,
-        productName: table_product_master.name,
-        warehouseId: table_stock_level.warehouseId,
-        warehouseCode: table_stock_warehouse.code,
-        warehouseName: table_stock_warehouse.name,
-        quantity: table_stock_level.quantity,
-        reservedQuantity: table_stock_level.reservedQuantity,
-        minStock: table_stock_warehouse.minStock,
-        total: sql<number>`count(*) over()::int`.as("total"),
-      })
-      .from(table_stock_level)
-      .leftJoin(
-        table_product_master,
-        eq(table_stock_level.productId, table_product_master.id)
-      )
-      .leftJoin(
-        table_stock_warehouse,
-        eq(table_stock_level.warehouseId, table_stock_warehouse.id)
-      );
-
-    let query: any = baseQuery;
-
-    if (whereClauses.length > 0) {
-      query = query.where(and(...whereClauses));
-    }
-
-    const records = (await query
-      .orderBy(asc(table_stock_level.productId))
-      .limit(limit)
-      .offset(offset)) as Array<{
-      id: string;
-      productId: string;
-      productCode: string | null;
-      productName: Record<string, string> | null;
-      warehouseId: string;
-      warehouseCode: string | null;
-      warehouseName: string | null;
-      quantity: string;
-      reservedQuantity: string;
-      minStock: string | null;
-      total: number;
-    }>;
-
-    const total = records.length > 0 ? records[0].total : 0;
-
-    const data: StockSummaryViewRow[] = records.map((record) => ({
-      id: record.id,
-      productId: record.productId,
-      productCode: record.productCode || record.productId,
-      productName:
-        typeof record.productName === "string"
-          ? record.productName
-          : record.productName?.en || record.productName?.vi || record.productId,
-      warehouseId: record.warehouseId,
-      warehouseCode: record.warehouseCode || record.warehouseId,
-      warehouseName: record.warehouseName || record.warehouseId,
-      quantity: Number(record.quantity),
-      reservedQuantity: Number(record.reservedQuantity),
-      minStock: record.minStock ? Number(record.minStock) : null,
-    }));
-
-    return this.getPagination({ data, total });
+        .leftJoin(
+          table_stock_warehouse,
+          eq(table_stock_level.warehouseId, table_stock_warehouse.id)
+        )
+    );
   };
 }
 
 export default ListStockSummaryModel;
-

@@ -18,7 +18,7 @@ export type ActionElm = {
 };
 export type ViewListDataTableProps<T = any> = Omit<
   DataTableProps<T>,
-  "pagination" | "dataSource"
+  "dataSource"
 > & {
   title?: LocaleDataType<string> | string;
   model: string; // @module.model format (e.g., "product.variant")

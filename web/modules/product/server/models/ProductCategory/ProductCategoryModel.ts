@@ -86,6 +86,11 @@ export default class ProductCategoryModel extends BaseModel<
     };
   };
 
+  // Helper for API dispatcher (getModuleQueryByModel) - expects params object
+  getDataById = async (params: { id: string }): Promise<ProductCategoryRow | null> => {
+    return this.getCategoryById(params.id);
+  };
+
   createCategory = async (
     payload: ProductCategoryInput
   ): Promise<ProductCategoryRow> => {

@@ -3,7 +3,6 @@
 // Export models
 export { BaseModel } from "./models/BaseModel";
 export { BaseViewListModel } from "./models/BaseViewListModel";
-export type { IBaseViewListModel } from "./models/interfaces/IBaseViewListModel";
 export { default as getEnv } from "./utils/getEnv";
 
 // Export interfaces

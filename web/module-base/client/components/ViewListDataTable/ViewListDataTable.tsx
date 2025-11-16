@@ -7,7 +7,9 @@ import type { GroupOption } from "./components/GroupByMenu";
 
 import { Button, Card, CardBody, Divider, LinkProps } from "@heroui/react";
 import { useLocalizedText } from "../../hooks/useLocalizedText";
+import { DataTablePagination } from "../DataTable/DataTableInterface";
 import LinkAs from "../LinkAs";
+import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 import ColumnVisibilityMenu from "./components/ColumnVisibilityMenu";
 import FilterMenu from "./components/FilterMenu";
 import GroupByMenu from "./components/GroupByMenu";
@@ -31,6 +33,10 @@ export default function ViewListDataTable<T = any>(
     isDummyData = true,
     actionsLeft,
     actionsRight,
+    pagination: _pagination = {
+      page: 1,
+      pageSize: PAGINATION_DEFAULT_PAGE_SIZE,
+    },
     ...dataTableProps
   } = props;
   // Use the store hook - each instance gets its own store
@@ -51,9 +57,11 @@ export default function ViewListDataTable<T = any>(
     isFetching,
     error: fetchError,
     refresh,
+    onChangeTable,
   } = useViewListDataTableQueries<T>({
     model,
     isDummyData,
+    pagination: _pagination as DataTablePagination,
     // enabled: !propDataSource, // Only fetch if dataSource is not provided as prop
   });
 
@@ -251,6 +259,8 @@ export default function ViewListDataTable<T = any>(
           dataSource={processedData}
           loading={isLoading || isFetching || dataTableProps.loading}
           onRefresh={refresh}
+          onChangeTable={onChangeTable}
+          pagination={_pagination}
         />
       </CardBody>
     </Card>

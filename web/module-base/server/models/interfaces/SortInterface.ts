@@ -1,7 +1,6 @@
-export type SortDirection = "asc" | "desc";
+export type SortDirection = "ascending" | "descending";
 export type ParamSortSingle = {
-  field: string;
-  direction: SortDirection;
+  column: string;
+  direction?: SortDirection;
 };
 export type ParamSortMultiple = Array<ParamSortSingle>;
-

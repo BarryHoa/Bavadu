@@ -1,10 +1,10 @@
-import { getEnv } from "@base/server";
 import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
-import { eq, sql } from "drizzle-orm";
+import type { Column } from "drizzle-orm";
+import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { table_product_category } from "../../schemas";
@@ -30,40 +30,47 @@ class ListProductCategoryModel extends BaseViewListModel<
   typeof table_product_category,
   ProductCategoryRow
 > {
-  constructor() {
-    super(table_product_category);
+  protected declarationColumns() {
+    return new Map<
+      string,
+      {
+        column: Column<any>;
+        sort?: boolean;
+      }
+    >([
+      ["id", { column: table_product_category.id, sort: true }],
+      ["code", { column: table_product_category.code, sort: true }],
+      ["name", { column: table_product_category.name, sort: true }],
+      [
+        "description",
+        { column: table_product_category.description, sort: false },
+      ],
+      ["level", { column: table_product_category.level, sort: true }],
+      ["isActive", { column: table_product_category.isActive, sort: true }],
+      ["parentId", { column: table_product_category.parentId, sort: true }],
+      ["createdAt", { column: table_product_category.createdAt, sort: true }],
+      ["updatedAt", { column: table_product_category.updatedAt, sort: true }],
+    ]);
   }
 
-  getViewDataList = async (
-    params: ListParamsRequest
-  ): Promise<ListParamsResponse<ProductCategoryRow>> => {
-    const env = getEnv();
-    const db = env.getDb();
+  constructor() {
+    super({ table: table_product_category });
+  }
 
-    const { offset, limit } = this.getDefaultParamsForList(params);
+  protected declarationSearch() {
+    return [
+      (text: string) => ilike(table_product_category.code, text),
+      (text: string) => ilike(table_product_category.name, text),
+    ];
+  }
 
-    const categories = await db
-      .select({
-        id: this.table.id,
-        code: this.table.code,
-        name: this.table.name,
-        description: this.table.description,
-        level: this.table.level,
-        isActive: this.table.isActive,
-        parentId: this.table.parentId,
-        parentName: parentCategory.name,
-        createdAt: this.table.createdAt,
-        updatedAt: this.table.updatedAt,
-        total: sql<number>`count(*) over()::int`.as("total"),
-      })
-      .from(this.table)
-      .leftJoin(parentCategory, eq(this.table.parentId, parentCategory.id))
-      .limit(limit)
-      .offset(offset);
+  protected declarationFilter() {
+    return [];
+  }
 
-    const total = categories.length > 0 ? categories[0].total : 0;
-
-    const list: ProductCategoryRow[] = categories.map((row) => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected declarationMappingData(row: any): ProductCategoryRow {
+    return {
       id: row.id,
       code: row.code,
       name: row.name,
@@ -78,11 +85,16 @@ class ListProductCategoryModel extends BaseViewListModel<
         : null,
       createdAt: row.createdAt?.getTime(),
       updatedAt: row.updatedAt?.getTime(),
-    }));
+    };
+  }
 
-    return this.getPagination({ data: list, total });
+  getData = async (
+    params: ListParamsRequest
+  ): Promise<ListParamsResponse<ProductCategoryRow>> => {
+    return this.buildQueryDataList(params, (query) =>
+      query.leftJoin(parentCategory, eq(this.table.parentId, parentCategory.id))
+    );
   };
 }
 
 export default ListProductCategoryModel;
-

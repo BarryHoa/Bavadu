@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
 
   return await getModuleQueryByModel({
     model,
-    modelMethod: "getViewDataList",
+    modelMethod: "getData",
     params,
   });
 }

@@ -1,62 +1,85 @@
-import { desc, eq, sql } from "drizzle-orm";
+import type { Column } from "drizzle-orm";
+import { ilike } from "drizzle-orm";
 
 import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
-import { getEnv } from "@base/server";
 import {
   table_sales_order,
 } from "../../schemas";
 
 class ListSalesOrderModel extends BaseViewListModel<
-  typeof table_sales_order
+  typeof table_sales_order,
+  any
 > {
   constructor() {
-    super(table_sales_order);
+    super({
+      table: table_sales_order,
+      sortDefault: [
+        {
+          column: "createdAt",
+          direction: "descending",
+        },
+      ],
+    });
   }
 
-  getViewDataList = async (
-    params: ListParamsRequest
-  ): Promise<ListParamsResponse<any>> => {
-    const env = getEnv();
-    const db = env.getDb();
+  protected declarationColumns() {
+    return new Map<
+      string,
+      {
+        column: Column<any>;
+        sort?: boolean;
+      }
+    >([
+      ["id", { column: table_sales_order.id, sort: true }],
+      ["code", { column: table_sales_order.code, sort: true }],
+      [
+        "customerName",
+        { column: table_sales_order.customerName, sort: true },
+      ],
+      ["status", { column: table_sales_order.status, sort: true }],
+      [
+        "warehouseId",
+        { column: table_sales_order.warehouseId, sort: true },
+      ],
+      [
+        "expectedDate",
+        { column: table_sales_order.expectedDate, sort: true },
+      ],
+      [
+        "totalAmount",
+        { column: table_sales_order.totalAmount, sort: true },
+      ],
+      ["currency", { column: table_sales_order.currency, sort: true }],
+      ["notes", { column: table_sales_order.notes, sort: false }],
+      [
+        "createdAt",
+        { column: table_sales_order.createdAt, sort: true },
+      ],
+      [
+        "updatedAt",
+        { column: table_sales_order.updatedAt, sort: true },
+      ],
+    ]);
+  }
 
-    const { offset, limit, search } = this.getDefaultParamsForList(params);
+  protected declarationSearch() {
+    return [
+      (text: string) => ilike(table_sales_order.code, text),
+      (text: string) => ilike(table_sales_order.customerName, text),
+    ];
+  }
 
-    const baseQuery = db
-      .select({
-        id: table_sales_order.id,
-        code: table_sales_order.code,
-        customerName: table_sales_order.customerName,
-        status: table_sales_order.status,
-        warehouseId: table_sales_order.warehouseId,
-        expectedDate: table_sales_order.expectedDate,
-        totalAmount: table_sales_order.totalAmount,
-        currency: table_sales_order.currency,
-        notes: table_sales_order.notes,
-        createdAt: table_sales_order.createdAt,
-        updatedAt: table_sales_order.updatedAt,
-        total: sql<number>`count(*) over()::int`.as("total"),
-      })
-      .from(table_sales_order);
+  protected declarationFilter() {
+    return [];
+  }
 
-    let composedQuery = baseQuery;
-    if (search) {
-      composedQuery = composedQuery.where(
-        sql`(${table_sales_order.code} ILIKE ${`%${search}%`} OR ${table_sales_order.customerName} ILIKE ${`%${search}%`})`
-      ) as typeof composedQuery;
-    }
-
-    const results = await composedQuery
-      .orderBy(desc(table_sales_order.createdAt))
-      .limit(limit)
-      .offset(offset);
-
-    const total = results.length > 0 ? results[0].total : 0;
-
-    const list = results.map((row) => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected declarationMappingData(row: any): any {
+    return {
       id: row.id,
       code: row.code,
       customerName: row.customerName,
@@ -68,12 +91,13 @@ class ListSalesOrderModel extends BaseViewListModel<
       notes: row.notes ?? undefined,
       createdAt: row.createdAt?.getTime(),
       updatedAt: row.updatedAt?.getTime(),
-    }));
+    };
+  }
 
-    return this.getPagination({
-      data: list,
-      total,
-    });
+  getData = async (
+    params: ListParamsRequest
+  ): Promise<ListParamsResponse<any>> => {
+    return this.buildQueryDataList(params);
   };
 }
 

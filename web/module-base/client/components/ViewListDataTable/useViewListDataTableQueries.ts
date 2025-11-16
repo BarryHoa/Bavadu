@@ -1,34 +1,54 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { SortDescriptor } from "@heroui/react";
+import { useMutation } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import ViewListDataTableService from "../../services/ViewListDataTableService";
+import { DataTablePagination } from "../DataTable/DataTableInterface";
+import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 
 interface UseViewListDataTableQueriesOptions<T = any> {
   model: string;
   isDummyData?: boolean;
+  pagination: DataTablePagination;
 }
 
 export function useViewListDataTableQueries<T = any>({
   model,
   isDummyData = true,
+  pagination,
 }: UseViewListDataTableQueriesOptions<T>) {
   const service = useMemo(() => new ViewListDataTableService(), []);
+  const [params, setParams] = useState<{
+    page: number;
+    pageSize: number;
+    sort?: SortDescriptor;
+  }>({
+    page: pagination?.page ?? 1,
+    pageSize: pagination?.pageSize ?? PAGINATION_DEFAULT_PAGE_SIZE,
+  });
 
   // Validate model format (should be module.model)
   const modelKey = model;
 
-  const queryKeys = {
-    data: ["viewListDataTable", "data", modelKey] as const,
-  };
+  const [dataState, setDataState] = useState<{
+    data: T[];
+    total: number;
+  }>({
+    data: [],
+    total: 0,
+  });
 
-  // Fetch data
-  const dataQuery = useQuery({
-    queryKey: queryKeys.data,
-    queryFn: async () => {
+  const fetchMutation = useMutation({
+    mutationFn: async () => {
+      const offset = (params.page - 1) * params.pageSize;
       const response = await service.getData({
         model: modelKey,
-        params: {},
+        params: {
+          offset,
+          limit: params.pageSize,
+          sorts: params.sort ? [params.sort] : [],
+        },
       });
 
       const dataResponse = response.data ?? [];
@@ -40,29 +60,52 @@ export function useViewListDataTableQueries<T = any>({
       }
       if (isDummyData) {
         return {
-          data: Array.from({ length: 4 }, (_, index) => ({})) as T[],
+          data: Array.from({ length: 4 }, () => ({})) as T[],
           total: 0,
         };
       }
       return { data: [], total: 0 };
     },
-    enabled: !!modelKey,
+    onSuccess: (result) => {
+      setDataState(result);
+    },
   });
-  // No code required for "refest" as it provides no context or instructions.
-  // Allow consumers to refresh data manually using returned refetch
-  const refresh = () => dataQuery.refetch();
+
+  // Initial fetch
+  useEffect(() => {
+    if (!modelKey) return;
+    fetchMutation.mutate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modelKey]);
+
+  const refresh = () => {
+    if (!modelKey) return;
+    fetchMutation.mutate();
+  };
+
+  const onChangeTable = (next: {
+    page: number;
+    pageSize: number;
+    sort?: SortDescriptor;
+  }) => {
+    setParams(next);
+    if (!modelKey) return;
+    // Mỗi lần change table là gọi API mới
+    fetchMutation.mutate();
+  };
 
   return {
-    data: dataQuery.data?.data ?? [],
-    total: dataQuery.data?.total ?? 0,
-    isLoading: dataQuery.isLoading,
-    isFetching: dataQuery.isFetching,
-    error: dataQuery.error
-      ? dataQuery.error instanceof Error
-        ? dataQuery.error.message
+    data: dataState.data,
+    total: dataState.total,
+    isLoading: fetchMutation.isPending && dataState.data.length === 0,
+    isFetching: fetchMutation.isPending,
+    error: fetchMutation.error
+      ? fetchMutation.error instanceof Error
+        ? fetchMutation.error.message
         : "Failed to fetch data"
       : null,
-    queryKeys,
+    queryKeys: undefined,
     refresh,
+    onChangeTable,
   };
 }
