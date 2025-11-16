@@ -1,7 +1,5 @@
-import { getEnv } from "@base/server";
 import { NextRequest, NextResponse } from "next/server";
-
-import type ProductModel from "../../models/Product/ProductModel";
+import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 import type { ProductUpdateInput } from "../../models/Product/ProductModelInterface";
 
 import { buildPayload as buildCreatePayload } from "./create";
@@ -38,26 +36,16 @@ export async function PATCH(
       );
     }
 
-    const env = getEnv();
-    const productModel = env.getModel("product") as ProductModel | undefined;
-
-    if (!productModel || typeof productModel.updateProduct !== "function") {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Product model not available",
-          message: "The product model is not registered or invalid.",
-        },
-        { status: 500 }
-      );
-    }
-
     const body = await request.json();
     const payload = buildUpdatePayload(body, id);
 
-    const product = await productModel.updateProduct(payload);
+    const response = await getModuleQueryByModel({
+      model: "product",
+      modelMethod: "updateProduct",
+      params: payload,
+    });
 
-    return NextResponse.json({ success: true, data: product });
+    return response;
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to update product";

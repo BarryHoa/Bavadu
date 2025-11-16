@@ -1,6 +1,5 @@
-import { getEnv } from "@base/server";
+import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 import { NextRequest, NextResponse } from "next/server";
-import type LocationModel from "../../models/Locations/LocationModel";
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,26 +19,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const env = getEnv();
-    const locationModel = env.getModel("location") as
-      | LocationModel
-      | undefined;
-
-    if (
-      !locationModel ||
-      typeof (locationModel as LocationModel).getLocationByCountryCode !==
-        "function"
-    ) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Location model not available",
-          message: "The location model is not registered or invalid.",
-        },
-        { status: 500 }
-      );
-    }
-
     const params: {
       parentId?: string | null;
       level?: number;
@@ -52,15 +31,16 @@ export async function GET(request: NextRequest) {
       params.level = parseInt(level, 10);
     }
 
-    const administrativeUnits = await (
-      locationModel as LocationModel
-    ).getLocationByCountryCode(countryCode, params);
-
-    return NextResponse.json({
-      success: true,
-      data: administrativeUnits,
-      message: "Administrative units retrieved successfully",
+    const response = await getModuleQueryByModel({
+      model: "location",
+      modelMethod: "getLocationByCountryCode",
+      params: {
+        countryCode,
+        ...params,
+      },
     });
+
+    return response;
   } catch (error) {
     console.error("Error getting location by country code:", error);
 
@@ -74,4 +54,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-

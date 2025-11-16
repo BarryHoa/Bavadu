@@ -39,6 +39,12 @@ export default class ProductCategoryModel extends BaseModel<
     super(table_product_category);
   }
 
+  private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
+    if (!value) return null;
+    if (typeof value === "string") return { en: value };
+    if (typeof value === "object") return value as LocaleDataType<string>;
+    return null;
+  }
 
   getCategoryById = async (id: string): Promise<ProductCategoryRow | null> => {
     const env = getEnv();
@@ -87,7 +93,9 @@ export default class ProductCategoryModel extends BaseModel<
   };
 
   // Helper for API dispatcher (getModuleQueryByModel) - expects params object
-  getDataById = async (params: { id: string }): Promise<ProductCategoryRow | null> => {
+  getDataById = async (params: {
+    id: string;
+  }): Promise<ProductCategoryRow | null> => {
     return this.getCategoryById(params.id);
   };
 
@@ -160,5 +168,47 @@ export default class ProductCategoryModel extends BaseModel<
     await db.update(this.table).set(updateData).where(eq(this.table.id, id));
 
     return this.getCategoryById(id);
+  };
+
+  /**
+   * Wrapper used by getModuleQueryByModel for update via API
+   * Accepts raw payload from controller and applies normalization logic.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  updateData = async (params: { id: string; payload: any }) => {
+    const { id, payload } = params;
+
+    const normalizedPayload: Partial<ProductCategoryInput> = {};
+
+    if (payload.code !== undefined) {
+      normalizedPayload.code = String(payload.code);
+    }
+    if (payload.name !== undefined) {
+      normalizedPayload.name = this.normalizeLocaleInput(payload.name) ?? {
+        en: "",
+      };
+    }
+    if (payload.description !== undefined) {
+      normalizedPayload.description = this.normalizeLocaleInput(
+        payload.description
+      );
+    }
+    if (payload.parentId !== undefined) {
+      normalizedPayload.parentId =
+        payload.parentId === null || payload.parentId === ""
+          ? null
+          : String(payload.parentId);
+    }
+    if (payload.level !== undefined) {
+      normalizedPayload.level =
+        payload.level === null || payload.level === ""
+          ? null
+          : Number(payload.level);
+    }
+    if (payload.isActive !== undefined) {
+      normalizedPayload.isActive = Boolean(payload.isActive);
+    }
+
+    return this.updateCategory(id, normalizedPayload);
   };
 }

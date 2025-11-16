@@ -1,7 +1,6 @@
-import { getEnv } from "@base/server";
+import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
 import { NextRequest, NextResponse } from "next/server";
-import type ProductCategoryModel from "../../models/ProductCategory/ProductCategoryModel";
 
 const normalizeLocaleInput = (
   value: unknown
@@ -32,22 +31,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const env = getEnv();
-    const categoryModel = env.getModel("product.category") as
-      | ProductCategoryModel
-      | undefined;
-
-    if (!categoryModel || typeof categoryModel.createCategory !== "function") {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Category model not available",
-          message: "The product category model is not registered or invalid.",
-        },
-        { status: 500 }
-      );
-    }
-
     const payload = {
       code: String(code).trim(),
       name: normalizeLocaleInput(name) ?? { en: String(name) },
@@ -67,9 +50,13 @@ export async function POST(request: NextRequest) {
             : Boolean(isActive),
     };
 
-    const category = await categoryModel.createCategory(payload);
+    const response = await getModuleQueryByModel({
+      model: "product.category",
+      modelMethod: "createCategory",
+      params: payload,
+    });
 
-    return NextResponse.json({ success: true, data: category });
+    return response;
   } catch (error) {
     return NextResponse.json(
       {

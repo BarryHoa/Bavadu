@@ -1,6 +1,5 @@
-import { getEnv } from "@base/server";
+import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 import { NextRequest, NextResponse } from "next/server";
-import type LocationModel from "../../models/Locations/LocationModel";
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,37 +18,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const env = getEnv();
-    const locationModel = env.getModel("location") as
-      | LocationModel
-      | undefined;
-
-    if (
-      !locationModel ||
-      typeof (locationModel as LocationModel).getLocationBy !== "function"
-    ) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Location model not available",
-          message: "The location model is not registered or invalid.",
-        },
-        { status: 500 }
-      );
-    }
-
-    const administrativeUnits = await (locationModel as LocationModel).getLocationBy(
-      {
+    const response = await getModuleQueryByModel({
+      model: "location",
+      modelMethod: "getLocationBy",
+      params: {
         parentId,
         type,
-      }
-    );
-
-    return NextResponse.json({
-      success: true,
-      data: administrativeUnits,
-      message: "Administrative units retrieved successfully",
+      },
     });
+
+    return response;
   } catch (error) {
     console.error("Error getting location by parent and type:", error);
 
@@ -63,4 +41,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-

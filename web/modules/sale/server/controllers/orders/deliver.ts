@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-import { getEnv } from "@base/server";
-import type SalesOrderModel from "../../../server/models/Sale";
+import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,29 +17,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const env = getEnv();
-    const salesModel = env.getModel("sale.order") as SalesOrderModel | undefined;
-
-    if (!salesModel) {
-      return NextResponse.json(
-        { success: false, message: "Sales model not available" },
-        { status: 500 }
-      );
-    }
-
-    const result = await salesModel.deliver({
-      orderId,
-      warehouseId: payload.warehouseId ?? undefined,
-      reference: payload.reference ?? undefined,
-      note: payload.note ?? undefined,
-      userId: payload.userId ?? undefined,
-      lines: lines.map((line: any) => ({
-        lineId: String(line.lineId),
-        quantity: Number(line.quantity ?? 0),
-      })),
+    const response = await getModuleQueryByModel({
+      model: "sale.order",
+      modelMethod: "deliver",
+      params: {
+        orderId,
+        warehouseId: payload.warehouseId ?? undefined,
+        reference: payload.reference ?? undefined,
+        note: payload.note ?? undefined,
+        userId: payload.userId ?? undefined,
+        lines: lines.map((line: any) => ({
+          lineId: String(line.lineId),
+          quantity: Number(line.quantity ?? 0),
+        })),
+      },
     });
 
-    return NextResponse.json({ success: true, data: result });
+    return response;
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to deliver sales order";

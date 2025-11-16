@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-import { getEnv } from "@base/server";
-import type PurchaseOrderModel from "../../../server/models/Purchase";
+import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,20 +13,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const env = getEnv();
-    const purchaseModel = env.getModel(
-      "purchase.order"
-    ) as PurchaseOrderModel | undefined;
+    const response = await getModuleQueryByModel({
+      model: "purchase.order",
+      modelMethod: "confirm",
+      params: { orderId },
+    });
 
-    if (!purchaseModel) {
-      return NextResponse.json(
-        { success: false, message: "Purchase model not available" },
-        { status: 500 }
-      );
-    }
-
-    const result = await purchaseModel.confirm(orderId);
-    return NextResponse.json({ success: true, data: result });
+    return response;
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to confirm purchase order";

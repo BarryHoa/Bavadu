@@ -6,9 +6,7 @@ import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
-import {
-  table_sales_order,
-} from "../../schemas";
+import { table_sales_order } from "../../schemas";
 
 class ListSalesOrderModel extends BaseViewListModel<
   typeof table_sales_order,
@@ -36,33 +34,15 @@ class ListSalesOrderModel extends BaseViewListModel<
     >([
       ["id", { column: table_sales_order.id, sort: true }],
       ["code", { column: table_sales_order.code, sort: true }],
-      [
-        "customerName",
-        { column: table_sales_order.customerName, sort: true },
-      ],
+      ["customerName", { column: table_sales_order.customerName, sort: true }],
       ["status", { column: table_sales_order.status, sort: true }],
-      [
-        "warehouseId",
-        { column: table_sales_order.warehouseId, sort: true },
-      ],
-      [
-        "expectedDate",
-        { column: table_sales_order.expectedDate, sort: true },
-      ],
-      [
-        "totalAmount",
-        { column: table_sales_order.totalAmount, sort: true },
-      ],
+      ["warehouseId", { column: table_sales_order.warehouseId, sort: true }],
+      ["expectedDate", { column: table_sales_order.expectedDate, sort: true }],
+      ["totalAmount", { column: table_sales_order.totalAmount, sort: true }],
       ["currency", { column: table_sales_order.currency, sort: true }],
       ["notes", { column: table_sales_order.notes, sort: false }],
-      [
-        "createdAt",
-        { column: table_sales_order.createdAt, sort: true },
-      ],
-      [
-        "updatedAt",
-        { column: table_sales_order.updatedAt, sort: true },
-      ],
+      ["createdAt", { column: table_sales_order.createdAt, sort: true }],
+      ["updatedAt", { column: table_sales_order.updatedAt, sort: true }],
     ]);
   }
 
@@ -102,4 +82,3 @@ class ListSalesOrderModel extends BaseViewListModel<
 }
 
 export default ListSalesOrderModel;
-

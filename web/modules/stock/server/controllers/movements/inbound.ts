@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-import { getEnv } from "@base/server";
-import type StockModel from "../../../server/models/Stock";
+import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,26 +19,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const env = getEnv();
-    const stockModel = env.getModel("stock") as StockModel | undefined;
-
-    if (!stockModel) {
-      return NextResponse.json(
-        { success: false, message: "Stock model not available" },
-        { status: 500 }
-      );
-    }
-
-    const move = await stockModel.receiveStock({
-      productId,
-      warehouseId,
-      quantity,
-      reference: payload.reference ? String(payload.reference) : undefined,
-      note: payload.note ? String(payload.note) : undefined,
-      userId: payload.userId ? String(payload.userId) : undefined,
+    const response = await getModuleQueryByModel({
+      model: "stock",
+      modelMethod: "receiveStock",
+      params: {
+        productId,
+        warehouseId,
+        quantity,
+        reference: payload.reference ? String(payload.reference) : undefined,
+        note: payload.note ? String(payload.note) : undefined,
+        userId: payload.userId ? String(payload.userId) : undefined,
+      },
     });
 
-    return NextResponse.json({ success: true, data: move }, { status: 201 });
+    return response;
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to register inbound stock";

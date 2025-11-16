@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-import { getEnv } from "@base/server";
-import type WarehouseModel from "../../../server/models/Warehouse";
+import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 import {
   parseAddress,
   parseNullableNumber,
@@ -12,18 +10,6 @@ import {
 
 export async function POST(request: NextRequest) {
   try {
-    const env = getEnv();
-    const warehouseModel = env.getModel("stock.warehouse") as
-      | WarehouseModel
-      | undefined;
-
-    if (!warehouseModel) {
-      return NextResponse.json(
-        { success: false, message: "Stock model not available" },
-        { status: 500 }
-      );
-    }
-
     const payload = await request.json();
     const code = parseRequiredString(payload.code, "Code");
     const name = parseRequiredString(payload.name, "Name");
@@ -37,27 +23,28 @@ export async function POST(request: NextRequest) {
       throw new Error("Max stock must be greater than or equal to min stock");
     }
 
-    const record = await warehouseModel.createWarehouse({
-      code,
-      name,
-      typeCode,
-      status: parseString(payload.status),
-      companyId: parseString(payload.companyId) ?? null,
-      managerId: parseString(payload.managerId) ?? null,
-      contactId: parseString(payload.contactId) ?? null,
-      address,
-      valuationMethod: parseString(payload.valuationMethod),
-      minStock,
-      maxStock,
-      accountInventory: parseString(payload.accountInventory) ?? null,
-      accountAdjustment: parseString(payload.accountAdjustment) ?? null,
-      notes: parseString(payload.notes) ?? null,
+    const response = await getModuleQueryByModel({
+      model: "stock.warehouse",
+      modelMethod: "createWarehouse",
+      params: {
+        code,
+        name,
+        typeCode,
+        status: parseString(payload.status),
+        companyId: parseString(payload.companyId) ?? null,
+        managerId: parseString(payload.managerId) ?? null,
+        contactId: parseString(payload.contactId) ?? null,
+        address,
+        valuationMethod: parseString(payload.valuationMethod),
+        minStock,
+        maxStock,
+        accountInventory: parseString(payload.accountInventory) ?? null,
+        accountAdjustment: parseString(payload.accountAdjustment) ?? null,
+        notes: parseString(payload.notes) ?? null,
+      },
     });
 
-    return NextResponse.json(
-      { success: true, data: serializeWarehouse(record) },
-      { status: 201 }
-    );
+    return response;
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to create warehouse";

@@ -1,22 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-
-import { getEnv } from "@base/server";
-import type PurchaseOrderModel from "../../../server/models/Purchase";
+import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 
 export async function GET(request: NextRequest) {
   try {
-    const env = getEnv();
-    const purchaseModel = env.getModel(
-      "purchase.order"
-    ) as PurchaseOrderModel | undefined;
-
-    if (!purchaseModel) {
-      return NextResponse.json(
-        { success: false, message: "Purchase model not available" },
-        { status: 500 }
-      );
-    }
-
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     if (!id) {
@@ -26,15 +12,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const result = await purchaseModel.getById(id);
-    if (!result) {
-      return NextResponse.json(
-        { success: false, message: "Purchase order not found" },
-        { status: 404 }
-      );
-    }
+    const response = await getModuleQueryByModel({
+      model: "purchase.order",
+      modelMethod: "getById",
+      params: { id },
+    });
 
-    return NextResponse.json({ success: true, data: result });
+    return response;
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to fetch purchase order";

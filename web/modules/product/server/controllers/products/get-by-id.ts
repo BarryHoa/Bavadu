@@ -1,9 +1,8 @@
-import { getEnv } from "@base/server";
 import { NextRequest, NextResponse } from "next/server";
-import type ProductModel from "../../models/Product/ProductModel";
+import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -20,37 +19,13 @@ export async function GET(
       );
     }
 
-    // ✅ Use env pattern (like Odoo env['product.product'])
-    const env = getEnv();
-    const productModel = env.getModel("product") as
-      | ProductModel
-      | undefined; // Model ID từ ProductModel constructor
+    const response = await getModuleQueryByModel({
+      model: "product",
+      modelMethod: "getProductDetail",
+      params: { id },
+    });
 
-    if (!productModel || typeof (productModel as ProductModel).getProductDetail !== "function") {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Product model not available",
-          message: "The product model is not registered or invalid.",
-        },
-        { status: 500 }
-      );
-    }
-
-    const product = await (productModel as ProductModel).getProductDetail(id);
-
-    if (!product) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Product not found",
-          message: `Product with id ${id} was not found`,
-        },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({ success: true, data: product });
+    return response;
   } catch (error) {
     return NextResponse.json(
       {

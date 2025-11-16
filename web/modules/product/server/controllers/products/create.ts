@@ -1,7 +1,5 @@
-import { getEnv } from "@base/server";
+import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 import { NextRequest, NextResponse } from "next/server";
-
-import type ProductModel from "../../models/Product/ProductModel";
 import type { ProductCreateInput } from "../../models/Product/ProductModelInterface";
 import type { ProductMasterFeatures } from "../../models/interfaces/ProductMaster";
 
@@ -162,26 +160,16 @@ export const buildPayload = (body: any): ProductCreateInput => {
 
 export async function POST(request: NextRequest) {
   try {
-    const env = getEnv();
-    const productModel = env.getModel("product") as ProductModel | undefined;
-
-    if (!productModel || typeof productModel.createProduct !== "function") {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Product model not available",
-          message: "The product model is not registered or invalid.",
-        },
-        { status: 500 }
-      );
-    }
-
     const body = await request.json();
     const payload = buildPayload(body);
 
-    const product = await productModel.createProduct(payload);
+    const response = await getModuleQueryByModel({
+      model: "product",
+      modelMethod: "createProduct",
+      params: payload,
+    });
 
-    return NextResponse.json({ success: true, data: product }, { status: 201 });
+    return response;
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to create product";

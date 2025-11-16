@@ -4,7 +4,7 @@ import type {
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
-import { ilike, sql } from "drizzle-orm";
+import { eq, ilike, sql } from "drizzle-orm";
 import {
   table_product_category,
   table_product_variant,
@@ -132,7 +132,21 @@ class ListProductModel extends BaseViewListModel<
     params: ListParamsRequest<ProductFilter>
   ): Promise<ListParamsResponse<ProductVariantElm>> => {
     // delegate to shared dataList (which already applies mapping)
-    const result = await this.buildQueryDataList(params);
+    const result = await this.buildQueryDataList(params, (query) => {
+      return query
+        .innerJoin(
+          table_product_master,
+          eq(this.table.productMasterId, table_product_master.id)
+        )
+        .leftJoin(
+          table_product_category,
+          eq(table_product_master.categoryId, table_product_category.id)
+        )
+        .leftJoin(
+          table_unit_of_measure,
+          eq(this.table.baseUomId, table_unit_of_measure.id)
+        );
+    });
     return result as ListParamsResponse<ProductVariantElm>;
   };
 }

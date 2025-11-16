@@ -1,13 +1,5 @@
 import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
-import { getEnv } from "@base/server";
 import { NextRequest, NextResponse } from "next/server";
-
-const normalizeLocaleInput = (value: unknown) => {
-  if (!value) return null;
-  if (typeof value === "string") return { en: value };
-  if (typeof value === "object") return value;
-  return null;
-};
 
 export async function GET(
   request: NextRequest,
@@ -65,48 +57,17 @@ export async function PATCH(
     }
 
     const payload = await request.json();
-    const env = getEnv();
-    const categoryModel = env.getModel("product.category") as any;
 
-    const updatePayload: any = {};
+    const response = await getModuleQueryByModel({
+      model: "product.category",
+      modelMethod: "updateData",
+      params: {
+        id,
+        payload,
+      },
+    });
 
-    if (payload.code !== undefined) updatePayload.code = String(payload.code);
-    if (payload.name !== undefined)
-      updatePayload.name = normalizeLocaleInput(payload.name);
-    if (payload.description !== undefined)
-      updatePayload.description = normalizeLocaleInput(payload.description);
-    if (payload.parentId !== undefined)
-      updatePayload.parentId =
-        payload.parentId === null || payload.parentId === ""
-          ? null
-          : String(payload.parentId);
-    if (payload.level !== undefined) {
-      updatePayload.level =
-        payload.level === null || payload.level === ""
-          ? null
-          : Number(payload.level);
-    }
-    if (payload.isActive !== undefined) {
-      updatePayload.isActive = Boolean(payload.isActive);
-    }
-
-    const updatedCategory = await categoryModel.updateCategory(
-      id,
-      updatePayload
-    );
-
-    if (!updatedCategory) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Category not found",
-          message: `Category with id ${id} was not found`,
-        },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({ success: true, data: updatedCategory });
+    return response;
   } catch (error) {
     return NextResponse.json(
       {

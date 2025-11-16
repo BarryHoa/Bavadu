@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-import { getEnv } from "@base/server";
-import type SalesOrderModel from "../../../server/models/Sale";
+import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,18 +13,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const env = getEnv();
-    const salesModel = env.getModel("sale.order") as SalesOrderModel | undefined;
+    const response = await getModuleQueryByModel({
+      model: "sale.order",
+      modelMethod: "confirm",
+      params: { orderId },
+    });
 
-    if (!salesModel) {
-      return NextResponse.json(
-        { success: false, message: "Sales model not available" },
-        { status: 500 }
-      );
-    }
-
-    const result = await salesModel.confirm(orderId);
-    return NextResponse.json({ success: true, data: result });
+    return response;
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to confirm sales order";
