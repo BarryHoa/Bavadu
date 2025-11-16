@@ -1,0 +1,27 @@
+{
+  "purchase": {
+    "orders": {
+      "list": {
+        "columns": {
+          "code": "Code",
+          "vendor": "Vendor",
+          "status": "Status",
+          "expectedDate": "Expected",
+          "totalAmount": "Total"
+        },
+        "actions": {
+          "new": "New order",
+          "view": "View"
+        },
+        "status": {
+          "draft": "Draft",
+          "confirmed": "Confirmed",
+          "completed": "Completed",
+          "cancelled": "Cancelled",
+          "closed": "Closed",
+          "received": "Received"
+        }
+      }
+    }
+  }
+}

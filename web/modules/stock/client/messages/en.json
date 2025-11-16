@@ -1,0 +1,29 @@
+{
+  "stock": {
+    "warehouse": {
+      "list": {
+        "columns": {
+          "code": "Code",
+          "name": "Name",
+          "type": "Type",
+          "location": "Location",
+          "stockRange": "Stock Range",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "actions": {
+          "new": "New warehouse",
+          "edit": "Edit"
+        },
+        "status": {
+          "ACTIVE": "Active",
+          "MAINTENANCE": "Maintenance",
+          "SUSPENDED": "Suspended",
+          "CLOSED": "Closed"
+        }
+      }
+    }
+  }
+}
+
+

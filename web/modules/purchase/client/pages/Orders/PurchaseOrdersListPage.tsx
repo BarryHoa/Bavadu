@@ -9,6 +9,7 @@ import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { Chip } from "@heroui/react";
+import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 
 import { PurchaseOrder } from "../../interface/PurchaseOrder";
@@ -19,11 +20,13 @@ type PurchaseOrderRow = PurchaseOrder & {
 };
 
 export default function PurchaseOrdersListPage(): React.ReactNode {
-  const columns = useMemo<DataTableColumn<PurchaseOrderRow>[]>(() => {
-    return [
+  const t = useTranslations("purchase.orders.list");
+
+  const columns = useMemo<DataTableColumn<PurchaseOrderRow>[]>(
+    () => [
       {
         key: "code",
-        label: "Code",
+        label: t("columns.code"),
         render: (value, row) => {
           if (!row?.id) return value;
           return (
@@ -35,25 +38,25 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
       },
       {
         key: "vendorName",
-        label: "Vendor",
+        label: t("columns.vendor"),
       },
       {
         key: "status",
-        label: "Status",
+        label: t("columns.status"),
         render: (value) => (
           <Chip size="sm" variant="flat" className="capitalize">
-            {value || "draft"}
+            {t(`status.${value || "draft"}`)}
           </Chip>
         ),
       },
       {
         key: "expectedDate",
-        label: "Expected",
+        label: t("columns.expectedDate"),
         render: (value) => formatDate(value),
       },
       {
         key: "totalAmount",
-        label: "Total",
+        label: t("columns.totalAmount"),
         render: (_, row) =>
           new Intl.NumberFormat(undefined, {
             style: "currency",
@@ -62,7 +65,7 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
       },
       {
         key: DATA_TABLE_COLUMN_KEY_ACTION,
-        label: "Action",
+        label: t("columns.action"),
         align: "end",
         render: (_, row) => {
           if (!row?.id) return null;
@@ -72,7 +75,7 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
               actions={[
                 {
                   key: "view",
-                  label: "View",
+                  label: t("actions.view"),
                   href: viewLink,
                 },
               ]}
@@ -80,8 +83,9 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
           );
         },
       },
-    ];
-  }, []);
+    ],
+    [t]
+  );
 
   return (
     <div className="space-y-4">
@@ -92,7 +96,7 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
         actionsRight={[
           {
             key: "new",
-            title: "New purchase order",
+            title: t("actions.new"),
             type: "link",
             color: "primary",
             props: {

@@ -9,6 +9,7 @@ import {
 } from "@base/client/components/DataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { Chip } from "@heroui/react";
+import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 
 import { SalesOrder } from "../../interface/SalesOrder";
@@ -19,11 +20,13 @@ type SalesOrderRow = SalesOrder & {
 };
 
 export default function SalesOrdersListPage(): React.ReactNode {
-  const columns = useMemo<DataTableColumn<SalesOrderRow>[]>(() => {
-    return [
+  const t = useTranslations("sale.orders.list");
+
+  const columns = useMemo<DataTableColumn<SalesOrderRow>[]>(
+    () => [
       {
         key: "code",
-        label: "Code",
+        label: t("columns.code"),
         render: (value, row) => {
           if (!row?.id) return value;
           return (
@@ -35,25 +38,25 @@ export default function SalesOrdersListPage(): React.ReactNode {
       },
       {
         key: "customerName",
-        label: "Customer",
+        label: t("columns.customer"),
       },
       {
         key: "status",
-        label: "Status",
+        label: t("columns.status"),
         render: (value) => (
           <Chip size="sm" variant="flat" className="capitalize">
-            {value || "draft"}
+            {t(`status.${value || "draft"}`)}
           </Chip>
         ),
       },
       {
         key: "expectedDate",
-        label: "Expected",
+        label: t("columns.expectedDate"),
         render: (value) => formatDate(value),
       },
       {
         key: "totalAmount",
-        label: "Total",
+        label: t("columns.totalAmount"),
         render: (_, row) =>
           new Intl.NumberFormat(undefined, {
             style: "currency",
@@ -62,7 +65,7 @@ export default function SalesOrdersListPage(): React.ReactNode {
       },
       {
         key: DATA_TABLE_COLUMN_KEY_ACTION,
-        label: "Action",
+        label: t("columns.action"),
         align: "end",
         render: (_, row) => {
           if (!row?.id) return null;
@@ -72,7 +75,7 @@ export default function SalesOrdersListPage(): React.ReactNode {
               actions={[
                 {
                   key: "view",
-                  label: "View",
+                  label: t("actions.view"),
                   href: viewLink,
                 },
               ]}
@@ -80,8 +83,9 @@ export default function SalesOrdersListPage(): React.ReactNode {
           );
         },
       },
-    ];
-  }, []);
+    ],
+    [t]
+  );
 
   return (
     <div className="space-y-4">
@@ -92,7 +96,7 @@ export default function SalesOrdersListPage(): React.ReactNode {
         actionsRight={[
           {
             key: "new",
-            title: "New sales order",
+            title: t("actions.new"),
             type: "link",
             color: "primary",
             props: {

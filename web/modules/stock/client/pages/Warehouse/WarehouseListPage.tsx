@@ -7,6 +7,7 @@ import {
   type DataTableColumn,
 } from "@base/client/components/DataTable";
 import { Chip } from "@heroui/react";
+import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 
 import type { WarehouseDto } from "../../services/StockService";
@@ -17,12 +18,6 @@ const statusColorMap: Record<string, "success" | "warning" | "danger"> = {
   SUSPENDED: "danger",
   CLOSED: "danger",
 };
-
-const formatStatusLabel = (status: string) =>
-  status
-    .toLowerCase()
-    .replace(/_/g, " ")
-    .replace(/^[a-z]/, (char) => char.toUpperCase());
 
 const formatLocation = (warehouse: WarehouseDto) => {
   const parts = [warehouse.address.city, warehouse.address.country].filter(
@@ -39,12 +34,13 @@ const formatStockRange = (warehouse: WarehouseDto) => {
 };
 
 export default function WarehouseListPage(): React.ReactNode {
+  const t = useTranslations("stock.warehouse.list");
 
-  const columns = useMemo<DataTableColumn<WarehouseDto>[]>(() => {
-    return [
+  const columns = useMemo<DataTableColumn<WarehouseDto>[]>(
+    () => [
       {
         key: "code",
-        label: "Code",
+        label: t("columns.code"),
         render: (_, row) => (
           <LinkAs href={`/workspace/modules/stock/warehouses/edit/${row.id}`}>
             {row.code}
@@ -53,47 +49,48 @@ export default function WarehouseListPage(): React.ReactNode {
       },
       {
         key: "name",
-        label: "Name",
+        label: t("columns.name"),
       },
       {
         key: "typeCode",
-        label: "Type",
+        label: t("columns.type"),
       },
       {
         key: "address",
-        label: "Location",
+        label: t("columns.location"),
         render: (_, row) => formatLocation(row),
       },
       {
         key: "stockRange",
-        label: "Stock Range",
+        label: t("columns.stockRange"),
         render: (_, row) => formatStockRange(row),
       },
       {
         key: "status",
-        label: "Status",
+        label: t("columns.status"),
         render: (_, row) => (
           <Chip
             size="sm"
             variant="flat"
             color={statusColorMap[row.status] ?? "warning"}
           >
-            {formatStatusLabel(row.status)}
+            {t(`status.${row.status}`)}
           </Chip>
         ),
       },
       {
         key: DATA_TABLE_COLUMN_KEY_ACTION,
-        label: "Actions",
+        label: t("columns.actions"),
         align: "end",
         render: (_, row) => (
           <LinkAs href={`/workspace/modules/stock/warehouses/edit/${row.id}`}>
-            Edit
+            {t("actions.edit")}
           </LinkAs>
         ),
       },
-    ];
-  }, []);
+    ],
+    [t]
+  );
 
   return (
     <div className="space-y-4">
@@ -104,7 +101,7 @@ export default function WarehouseListPage(): React.ReactNode {
         actionsRight={[
           {
             key: "new",
-            title: "New warehouse",
+            title: t("actions.new"),
             type: "link",
             color: "primary",
             props: {

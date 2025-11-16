@@ -1,0 +1,27 @@
+{
+  "purchase": {
+    "orders": {
+      "list": {
+        "columns": {
+          "code": "Mã đơn",
+          "vendor": "Nhà cung cấp",
+          "status": "Trạng thái",
+          "expectedDate": "Dự kiến",
+          "totalAmount": "Tổng tiền"
+        },
+        "actions": {
+          "new": "Tạo đơn",
+          "view": "Xem chi tiết"
+        },
+        "status": {
+          "draft": "Nháp",
+          "confirmed": "Đã xác nhận",
+          "completed": "Đã hoàn thành",
+          "cancelled": "Đã hủy",
+          "closed": "Đã đóng",
+          "received": "Đã nhận"
+        }
+      }
+    }
+  }
+}

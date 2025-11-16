@@ -1,0 +1,29 @@
+{
+  "stock": {
+    "warehouse": {
+      "list": {
+        "columns": {
+          "code": "Mã kho",
+          "name": "Tên kho",
+          "type": "Loại",
+          "location": "Vị trí",
+          "stockRange": "Khoảng tồn",
+          "status": "Trạng thái",
+          "actions": "Thao tác"
+        },
+        "actions": {
+          "new": "Tạo kho mới",
+          "edit": "Sửa"
+        },
+        "status": {
+          "ACTIVE": "Đang hoạt động",
+          "MAINTENANCE": "Bảo trì",
+          "SUSPENDED": "Tạm dừng",
+          "CLOSED": "Đã đóng"
+        }
+      }
+    }
+  }
+}
+
+

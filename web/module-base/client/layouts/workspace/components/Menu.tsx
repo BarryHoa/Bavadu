@@ -447,7 +447,8 @@ export default function Menu({
           <div
             className={clsx(
               "mb-2 flex items-center gap-2 rounded-xl px-2 py-1.5",
-              "bg-slate-50/80 border border-slate-100"
+              "bg-slate-50/80 border border-slate-100",
+              effectiveOpen ? "justify-between" : "justify-center"
             )}
           >
             <div
@@ -471,7 +472,7 @@ export default function Menu({
               {isOpen ? (
                 <Pin className="h-4 w-4" />
               ) : (
-                <PinOff className="h-4 w-4" />
+                <PinOff className="h-4 w-4 text-warning-500" />
               )}
             </button>
           </div>
@@ -481,20 +482,7 @@ export default function Menu({
           {moduleMenus.length > 0 && (
             <>
               <Divider className="my-3 bg-slate-100" />
-              <div className="space-y-1">
-                <div
-                  className={clsx(
-                    "px-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400",
-                    "transition-all duration-300 whitespace-nowrap overflow-hidden",
-                    effectiveOpen
-                      ? "opacity-100 translate-x-0 max-w-[160px]"
-                      : "opacity-0 -translate-x-1 max-w-0"
-                  )}
-                >
-                  Module
-                </div>
-                {moduleMenus.map(renderMenuItem)}
-              </div>
+              <div className="space-y-1">{moduleMenus.map(renderMenuItem)}</div>
             </>
           )}
         </ScrollShadow>
