@@ -1,31 +1,20 @@
 "use client";
 
-import {
-  IBaseInput,
-  IBaseInputMultipleLang,
-  IBaseSelectWithSearch,
-  SelectItemOption,
-} from "@base/client/components";
+import { SelectItemOption } from "@base/client/components";
 import { Button } from "@heroui/button";
-import {
-  Card,
-  CardBody,
-  Checkbox,
-  CheckboxGroup,
-  Divider,
-  Switch,
-  Textarea,
-} from "@heroui/react";
+import { Card, CardBody } from "@heroui/react";
+import { Tab, Tabs } from "@heroui/tabs";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
-import { Plus, Trash } from "lucide-react";
-import { useCallback, useEffect, useMemo } from "react";
+import { Plus } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Resolver, SubmitHandler } from "react-hook-form";
 import { useForm, useWatch } from "react-hook-form";
 import {
   array,
   boolean,
   fallback,
+  maxLength,
   minLength,
   object,
   optional,
@@ -45,11 +34,9 @@ import {
 import type { ProductCategoryRow } from "../../interface/ProductCategory";
 import ProductCategoryService from "../../services/ProductCategoryService";
 import UnitOfMeasureService from "../../services/UnitOfMeasureService";
-
-type LocaleFieldValue = {
-  en: string;
-  vi: string;
-};
+import MasterTab from "./MasterTab";
+import VariantTab from "./VariantTab";
+import type { LocaleFieldValue, VariantFieldValue } from "./types";
 
 type ProductFormFieldValues = {
   master: {
@@ -62,28 +49,7 @@ type ProductFormFieldValues = {
     brand: string;
     categoryId?: string;
   };
-  variant: {
-    name: LocaleFieldValue;
-    description: string;
-    sku: string;
-    barcode: string;
-    manufacturerName: string;
-    manufacturerCode: string;
-    baseUomId?: string;
-    isActive: boolean;
-  };
-  packings: Array<{
-    id?: string;
-    name: LocaleFieldValue;
-    description: LocaleFieldValue;
-    isActive: boolean;
-  }>;
-  attributes: Array<{
-    id?: string;
-    code: string;
-    name: LocaleFieldValue;
-    value: string;
-  }>;
+  variants: VariantFieldValue[];
 };
 
 const featureOptions: { key: ProductMasterFeatures; label: string }[] = [
@@ -109,6 +75,19 @@ const masterTypes: SelectItemOption[] = [
 
 const defaultLocaleValue = (): LocaleFieldValue => ({ en: "", vi: "" });
 
+const createDefaultVariant = (): VariantFieldValue => ({
+  name: defaultLocaleValue(),
+  description: "",
+  sku: "",
+  barcode: "",
+  manufacturerName: "",
+  manufacturerCode: "",
+  baseUomId: undefined,
+  isActive: true,
+  packings: [],
+  attributes: [],
+});
+
 const createDefaultValues = (): ProductFormFieldValues => ({
   master: {
     code: "",
@@ -126,18 +105,7 @@ const createDefaultValues = (): ProductFormFieldValues => ({
     brand: "",
     categoryId: undefined,
   },
-  variant: {
-    name: defaultLocaleValue(),
-    description: "",
-    sku: "",
-    barcode: "",
-    manufacturerName: "",
-    manufacturerCode: "",
-    baseUomId: undefined,
-    isActive: true,
-  },
-  packings: [],
-  attributes: [],
+  variants: [createDefaultVariant()],
 });
 
 const buildHierarchyOptions = (categories: ProductCategoryRow[]) => {
@@ -185,15 +153,6 @@ interface ProductFormProps {
   onCancel?: () => void;
 }
 
-const updateLocaleValue = (
-  value: LocaleFieldValue,
-  locale: keyof LocaleFieldValue,
-  next: string
-): LocaleFieldValue => ({
-  ...value,
-  [locale]: next,
-});
-
 const ensureLocaleValue = (
   value?: LocaleFormValue | null
 ): LocaleFieldValue => ({
@@ -225,6 +184,38 @@ const mapToFieldValues = (
     {} as Record<ProductMasterFeatures, boolean>
   );
 
+  // Map single variant from initialValues to variants array
+  const variant: VariantFieldValue = {
+    name: ensureLocaleValue(initialValues.variant.name),
+    description:
+      typeof initialValues.variant.description === "string"
+        ? initialValues.variant.description
+        : "",
+    sku: initialValues.variant.sku ?? "",
+    barcode: initialValues.variant.barcode ?? "",
+    manufacturerName:
+      typeof initialValues.variant.manufacturerName === "string"
+        ? initialValues.variant.manufacturerName
+        : "",
+    manufacturerCode: initialValues.variant.manufacturerCode ?? "",
+    baseUomId: initialValues.variant.baseUomId ?? undefined,
+    isActive: initialValues.variant.isActive ?? true,
+    packings:
+      initialValues.packings?.map((packing) => ({
+        id: packing.id,
+        name: ensureLocaleValue(packing.name),
+        description: ensureLocaleValue(packing.description),
+        isActive: packing.isActive ?? true,
+      })) ?? [],
+    attributes:
+      initialValues.attributes?.map((attribute) => ({
+        id: attribute.id,
+        code: attribute.code ?? "",
+        name: ensureLocaleValue(attribute.name),
+        value: attribute.value ?? "",
+      })) ?? [],
+  };
+
   return {
     master: {
       code: initialValues.master.code ?? "",
@@ -242,43 +233,16 @@ const mapToFieldValues = (
           : "",
       categoryId: initialValues.master.categoryId ?? undefined,
     },
-    variant: {
-      name: ensureLocaleValue(initialValues.variant.name),
-      description:
-        typeof initialValues.variant.description === "string"
-          ? initialValues.variant.description
-          : "",
-      sku: initialValues.variant.sku ?? "",
-      barcode: initialValues.variant.barcode ?? "",
-      manufacturerName:
-        typeof initialValues.variant.manufacturerName === "string"
-          ? initialValues.variant.manufacturerName
-          : "",
-      manufacturerCode: initialValues.variant.manufacturerCode ?? "",
-      baseUomId: initialValues.variant.baseUomId ?? undefined,
-      isActive: initialValues.variant.isActive ?? true,
-    },
-    packings:
-      initialValues.packings?.map((packing) => ({
-        id: packing.id,
-        name: ensureLocaleValue(packing.name),
-        description: ensureLocaleValue(packing.description),
-        isActive: packing.isActive ?? true,
-      })) ?? defaults.packings,
-    attributes:
-      initialValues.attributes?.map((attribute) => ({
-        id: attribute.id,
-        code: attribute.code ?? "",
-        name: ensureLocaleValue(attribute.name),
-        value: attribute.value ?? "",
-      })) ?? defaults.attributes,
+    variants: [variant],
   };
 };
 
 const mapToProductFormValues = (
   values: ProductFormFieldValues
 ): ProductFormValues => {
-  // This function receives the full form values, so we can use it directly
+  // Take the first variant for now (API expects single variant)
+  const firstVariant = values.variants[0] || createDefaultVariant();
+
   return {
     master: {
       code: values.master.code,
@@ -291,22 +255,22 @@ const mapToProductFormValues = (
       categoryId: values.master.categoryId,
     },
     variant: {
-      name: toLocaleFormValue(values.variant.name),
-      description: values.variant.description.trim() || "",
-      sku: values.variant.sku,
-      barcode: values.variant.barcode,
-      manufacturerName: values.variant.manufacturerName.trim() || "",
-      manufacturerCode: values.variant.manufacturerCode,
-      baseUomId: values.variant.baseUomId,
-      isActive: values.variant.isActive,
+      name: toLocaleFormValue(firstVariant.name),
+      description: firstVariant.description.trim() || "",
+      sku: firstVariant.sku,
+      barcode: firstVariant.barcode,
+      manufacturerName: firstVariant.manufacturerName.trim() || "",
+      manufacturerCode: firstVariant.manufacturerCode,
+      baseUomId: firstVariant.baseUomId,
+      isActive: firstVariant.isActive,
     },
-    packings: values.packings.map((packing) => ({
+    packings: firstVariant.packings.map((packing) => ({
       id: packing.id,
       name: toLocaleFormValue(packing.name),
       description: toLocaleFormValue(packing.description),
       isActive: packing.isActive,
     })),
-    attributes: values.attributes.map((attribute) => ({
+    attributes: firstVariant.attributes.map((attribute) => ({
       id: attribute.id,
       code: attribute.code,
       name: toLocaleFormValue(attribute.name),
@@ -340,27 +304,19 @@ const productMasterTypeValues = Object.values(ProductMasterType) as [
   ...ProductMasterType[],
 ];
 
-const productFormSchema = object({
-  master: object({
-    code: pipe(string(), trim(), minLength(1, "Product code is required")),
-    name: localeRequiredSchema,
-    description: fallback(pipe(string(), trim()), ""),
-    type: picklist(productMasterTypeValues),
-    features: featuresSchema,
-    isActive: boolean(),
-    brand: fallback(pipe(string(), trim()), ""),
-    categoryId: optional(pipe(string(), trim())),
-  }),
-  variant: object({
-    name: localeSchema,
-    description: fallback(pipe(string(), trim()), ""),
-    sku: pipe(string(), trim()),
-    barcode: pipe(string(), trim()),
-    manufacturerName: fallback(pipe(string(), trim()), ""),
-    manufacturerCode: pipe(string(), trim()),
-    baseUomId: optional(pipe(string(), trim())),
-    isActive: boolean(),
-  }),
+const variantSchema = object({
+  name: localeRequiredSchema,
+  description: fallback(pipe(string(), trim()), ""),
+  sku: pipe(string(), trim(), minLength(1, "SKU is required")),
+  barcode: pipe(string(), trim(), minLength(1, "Barcode is required")),
+  manufacturerName: fallback(pipe(string(), trim()), ""),
+  manufacturerCode: pipe(string(), trim()),
+  baseUomId: pipe(
+    string(),
+    trim(),
+    minLength(1, "Base unit of measure is required")
+  ),
+  isActive: boolean(),
   packings: array(
     object({
       id: optional(pipe(string(), trim())),
@@ -376,6 +332,24 @@ const productFormSchema = object({
       name: localeSchema,
       value: pipe(string(), trim()),
     })
+  ),
+});
+
+const productFormSchema = object({
+  master: object({
+    code: pipe(string(), trim(), minLength(1, "Product code is required")),
+    name: localeRequiredSchema,
+    description: fallback(pipe(string(), trim()), ""),
+    type: picklist(productMasterTypeValues),
+    features: featuresSchema,
+    isActive: boolean(),
+    brand: fallback(pipe(string(), trim()), ""),
+    categoryId: optional(pipe(string(), trim())),
+  }),
+  variants: pipe(
+    array(variantSchema),
+    minLength(1, "At least one variant is required"),
+    maxLength(20, "Maximum 20 variants allowed")
   ),
 });
 
@@ -445,23 +419,8 @@ export default function ProductForm({
   const masterDescription = useWatch({ control, name: "master.description" });
   const masterBrand = useWatch({ control, name: "master.brand" });
   const masterFeatures = useWatch({ control, name: "master.features" });
-  const masterIsActive = useWatch({ control, name: "master.isActive" });
-  const variantName = useWatch({ control, name: "variant.name" });
-  const variantDescription = useWatch({ control, name: "variant.description" });
-  const variantSku = useWatch({ control, name: "variant.sku" });
-  const variantBarcode = useWatch({ control, name: "variant.barcode" });
-  const variantManufacturerName = useWatch({
-    control,
-    name: "variant.manufacturerName",
-  });
-  const variantManufacturerCode = useWatch({
-    control,
-    name: "variant.manufacturerCode",
-  });
-  const variantBaseUomId = useWatch({ control, name: "variant.baseUomId" });
-  const variantIsActive = useWatch({ control, name: "variant.isActive" });
-  const packings = useWatch({ control, name: "packings" });
-  const attributes = useWatch({ control, name: "attributes" });
+  const variants = useWatch({ control, name: "variants" });
+  const [selectedTab, setSelectedTab] = useState<string>("master");
 
   const isBusy = loading || isSubmitting;
 
@@ -483,102 +442,150 @@ export default function ProductForm({
     [setValue]
   );
 
-  const updatePacking = useCallback(
-    (
-      index: number,
-      updater: (
-        current: ProductFormFieldValues["packings"][number]
-      ) => ProductFormFieldValues["packings"][number]
-    ) => {
-      const currentPackings = getValues("packings");
-      const nextPackings = currentPackings.map((item, idx) =>
-        idx === index ? updater(item) : item
-      );
+  const addVariant = useCallback(() => {
+    const currentVariants = getValues("variants");
+    if (currentVariants.length >= 20) return;
+    const newIndex = currentVariants.length;
+    setValue("variants", [...currentVariants, createDefaultVariant()], {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    // Switch to the new variant tab
+    setSelectedTab(`variant-${newIndex}`);
+  }, [getValues, setValue]);
 
-      setValue("packings", nextPackings, {
+  const removeVariant = useCallback(
+    (index: number) => {
+      const currentVariants = getValues("variants");
+      if (currentVariants.length <= 1) return; // At least one variant required
+      const newVariants = currentVariants.filter((_, idx) => idx !== index);
+      setValue("variants", newVariants, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      // If we're on the removed tab, switch to master or another variant
+      if (selectedTab === `variant-${index}`) {
+        if (index === 0 && newVariants.length > 0) {
+          setSelectedTab("variant-0");
+        } else if (index > 0) {
+          setSelectedTab(`variant-${index - 1}`);
+        } else {
+          setSelectedTab("master");
+        }
+      }
+    },
+    [getValues, setValue, selectedTab]
+  );
+
+  const updateVariant = useCallback(
+    (
+      variantIndex: number,
+      updater: (current: VariantFieldValue) => VariantFieldValue
+    ) => {
+      const currentVariants = getValues("variants");
+      const nextVariants = currentVariants.map((variant, idx) =>
+        idx === variantIndex ? updater(variant) : variant
+      );
+      setValue("variants", nextVariants, {
         shouldDirty: true,
         shouldValidate: true,
       });
     },
     [getValues, setValue]
+  );
+
+  const updatePacking = useCallback(
+    (
+      variantIndex: number,
+      packingIndex: number,
+      updater: (
+        current: VariantFieldValue["packings"][number]
+      ) => VariantFieldValue["packings"][number]
+    ) => {
+      updateVariant(variantIndex, (variant) => ({
+        ...variant,
+        packings: variant.packings.map((item, idx) =>
+          idx === packingIndex ? updater(item) : item
+        ),
+      }));
+    },
+    [updateVariant]
+  );
+
+  const addPacking = useCallback(
+    (variantIndex: number) => {
+      updateVariant(variantIndex, (variant) => ({
+        ...variant,
+        packings: [
+          ...variant.packings,
+          {
+            id: undefined,
+            name: defaultLocaleValue(),
+            description: defaultLocaleValue(),
+            isActive: true,
+          },
+        ],
+      }));
+    },
+    [updateVariant]
+  );
+
+  const removePacking = useCallback(
+    (variantIndex: number, packingIndex: number) => {
+      updateVariant(variantIndex, (variant) => ({
+        ...variant,
+        packings: variant.packings.filter((_, idx) => idx !== packingIndex),
+      }));
+    },
+    [updateVariant]
   );
 
   const updateAttribute = useCallback(
     (
-      index: number,
+      variantIndex: number,
+      attributeIndex: number,
       updater: (
-        current: ProductFormFieldValues["attributes"][number]
-      ) => ProductFormFieldValues["attributes"][number]
+        current: VariantFieldValue["attributes"][number]
+      ) => VariantFieldValue["attributes"][number]
     ) => {
-      const currentAttributes = getValues("attributes");
-      const nextAttributes = currentAttributes.map((item, idx) =>
-        idx === index ? updater(item) : item
-      );
-
-      setValue("attributes", nextAttributes, {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
+      updateVariant(variantIndex, (variant) => ({
+        ...variant,
+        attributes: variant.attributes.map((item, idx) =>
+          idx === attributeIndex ? updater(item) : item
+        ),
+      }));
     },
-    [getValues, setValue]
+    [updateVariant]
   );
 
-  const addPacking = useCallback(() => {
-    const currentPackings = getValues("packings");
-    setValue(
-      "packings",
-      [
-        ...currentPackings,
-        {
-          id: undefined,
-          name: defaultLocaleValue(),
-          description: defaultLocaleValue(),
-          isActive: true,
-        },
-      ],
-      { shouldDirty: true, shouldValidate: true }
-    );
-  }, [getValues, setValue]);
-
-  const removePacking = useCallback(
-    (index: number) => {
-      const currentPackings = getValues("packings");
-      setValue(
-        "packings",
-        currentPackings.filter((_, idx) => idx !== index),
-        { shouldDirty: true, shouldValidate: true }
-      );
+  const addAttribute = useCallback(
+    (variantIndex: number) => {
+      updateVariant(variantIndex, (variant) => ({
+        ...variant,
+        attributes: [
+          ...variant.attributes,
+          {
+            id: undefined,
+            code: "",
+            name: defaultLocaleValue(),
+            value: "",
+          },
+        ],
+      }));
     },
-    [getValues, setValue]
+    [updateVariant]
   );
-
-  const addAttribute = useCallback(() => {
-    const currentAttributes = getValues("attributes");
-    setValue(
-      "attributes",
-      [
-        ...currentAttributes,
-        {
-          id: undefined,
-          code: "",
-          name: defaultLocaleValue(),
-          value: "",
-        },
-      ],
-      { shouldDirty: true, shouldValidate: true }
-    );
-  }, [getValues, setValue]);
 
   const removeAttribute = useCallback(
-    (index: number) => {
-      const currentAttributes = getValues("attributes");
-      setValue(
-        "attributes",
-        currentAttributes.filter((_, idx) => idx !== index),
-        { shouldDirty: true, shouldValidate: true }
-      );
+    (variantIndex: number, attributeIndex: number) => {
+      updateVariant(variantIndex, (variant) => ({
+        ...variant,
+        attributes: variant.attributes.filter(
+          (_, idx) => idx !== attributeIndex
+        ),
+      }));
     },
-    [getValues, setValue]
+    [updateVariant]
   );
 
   const handleValidSubmit: SubmitHandler<ProductFormFieldValues> = async (
@@ -608,535 +615,143 @@ export default function ProductForm({
     <form className="flex flex-col gap-4" onSubmit={submitForm}>
       <Card>
         <CardBody className="space-y-4">
-          <div>
-            <h1 className="text-xl font-semibold">{title}</h1>
-            {subtitle ? (
-              <p className="text-small text-default-500">{subtitle}</p>
-            ) : null}
-          </div>
+          <div className="flex gap-2 justify-between">
+            <div className="justify-start">
+              <Button
+                size="sm"
+                variant="light"
+                color="primary"
+                startContent={<Plus size={14} />}
+                onPress={addVariant}
+                isDisabled={isBusy || (variants?.length ?? 0) >= 20}
+              >
+                Add Variant
+              </Button>
+            </div>
+            <div className="justify-end space-x-2">
+              {onCancel ? (
+                <Button
+                  variant="light"
+                  size="sm"
+                  onPress={onCancel}
+                  isDisabled={isBusy}
+                >
+                  Cancel
+                </Button>
+              ) : null}
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <IBaseInput
-              label="Product code"
-              value={masterCode ?? ""}
-              onValueChange={(next) =>
-                setValue("master.code", next, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                })
-              }
-              isRequired
-              isInvalid={Boolean(errors.master?.code)}
-              errorMessage={errors.master?.code?.message}
-              isDisabled={isBusy}
-            />
-            <IBaseSelectWithSearch
-              label="Product type"
-              items={masterTypes}
-              selectedKeys={masterType ? [masterType] : []}
-              onSelectionChange={(keys) => {
-                const keySet = keys as Set<string>;
-                const [first] = Array.from(keySet);
-                const next =
-                  (first as ProductMasterType) || ProductMasterType.GOODS;
-                setValue("master.type", next, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-              }}
-              isInvalid={Boolean(errors.master?.type)}
-              errorMessage={errors.master?.type?.message}
-              isDisabled={isBusy}
-            />
-            <IBaseInputMultipleLang
-              label="Name"
-              value={masterName}
-              onValueChange={(langs) =>
-                setValue("master.name", langs as LocaleFieldValue, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                })
-              }
-              isRequired
-              isInvalid={Boolean(errors.master?.name?.en)}
-              errorMessage={errors.master?.name?.en?.message}
-              isDisabled={isBusy}
-            />
-          </div>
+              {onSubmitAndContinue ? (
+                <Button
+                  variant="bordered"
+                  size="sm"
+                  type="button"
+                  onPress={
+                    submitAndContinueForm
+                      ? async () => {
+                          await submitAndContinueForm();
+                        }
+                      : undefined
+                  }
+                  isDisabled={isBusy}
+                >
+                  {secondarySubmitLabel ?? "Save & add another"}
+                </Button>
+              ) : null}
 
-          <Textarea
-            label="Description"
-            value={masterDescription ?? ""}
-            onValueChange={(next) =>
-              setValue("master.description", next, {
-                shouldDirty: true,
-                shouldValidate: true,
-              })
-            }
-            isDisabled={isBusy}
-          />
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <IBaseSelectWithSearch
-              label="Category"
-              items={categoryOptions}
-              selectedKeys={masterCategoryId ? [masterCategoryId] : []}
-              onSelectionChange={(keys) => {
-                const keySet = keys as Set<string>;
-                const [first] = Array.from(keySet);
-                const nextValue =
-                  typeof first === "string" && first.length > 0
-                    ? first
-                    : undefined;
-                setValue("master.categoryId", nextValue, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-              }}
-              isLoading={categoryQuery.isLoading}
-              isInvalid={Boolean(errors.master?.categoryId)}
-              errorMessage={errors.master?.categoryId?.message}
-              isDisabled={isBusy || categoryQuery.isLoading}
-            />
-
-            <IBaseInput
-              label="Brand"
-              value={masterBrand ?? ""}
-              onValueChange={(next) =>
-                setValue("master.brand", next, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                })
-              }
-              isDisabled={isBusy}
-            />
-          </div>
-
-          <CheckboxGroup
-            label="Product features"
-            orientation="horizontal"
-            value={featureOptions
-              .filter((feature) => masterFeatures?.[feature.key])
-              .map((feature) => feature.key)}
-            onChange={(selected) =>
-              handleFeatureToggle(new Set(selected as string[]))
-            }
-            classNames={{ wrapper: "flex flex-wrap gap-3" }}
-            isDisabled={isBusy}
-          >
-            {featureOptions.map((feature) => (
-              <Checkbox
-                key={feature.key}
-                value={feature.key}
+              <Button
+                color="primary"
+                size="sm"
+                type="submit"
+                isLoading={isBusy}
                 isDisabled={isBusy}
               >
-                {feature.label}
-              </Checkbox>
-            ))}
-          </CheckboxGroup>
-
-          <Switch
-            isSelected={masterIsActive ?? false}
-            onValueChange={(next) =>
-              setValue("master.isActive", next, {
-                shouldDirty: true,
-                shouldValidate: true,
-              })
-            }
-            isDisabled={isBusy}
-          >
-            Master active
-          </Switch>
-
-          <Divider />
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <IBaseInput
-              label="Variant name (English)"
-              value={variantName?.en ?? ""}
-              onValueChange={(next) =>
-                setValue(
-                  "variant.name",
-                  updateLocaleValue(
-                    variantName ?? { en: "", vi: "" },
-                    "en",
-                    next
-                  ),
-                  { shouldDirty: true, shouldValidate: true }
-                )
-              }
-              isRequired
-              isInvalid={Boolean(errors.variant?.name?.en)}
-              errorMessage={errors.variant?.name?.en?.message}
-              isDisabled={isBusy}
-            />
-            <IBaseInput
-              label="Variant name (Vietnamese)"
-              value={variantName?.vi ?? ""}
-              onValueChange={(next) =>
-                setValue(
-                  "variant.name",
-                  updateLocaleValue(
-                    variantName ?? { en: "", vi: "" },
-                    "vi",
-                    next
-                  ),
-                  { shouldDirty: true, shouldValidate: true }
-                )
-              }
-              isDisabled={isBusy}
-            />
-            <Textarea
-              label="Variant description"
-              value={variantDescription ?? ""}
-              onValueChange={(next) =>
-                setValue("variant.description", next, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                })
-              }
-              isDisabled={isBusy}
-            />
-            <IBaseInput
-              label="SKU"
-              value={variantSku ?? ""}
-              onValueChange={(next) =>
-                setValue("variant.sku", next, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                })
-              }
-              isDisabled={isBusy}
-            />
-            <IBaseInput
-              label="Barcode"
-              value={variantBarcode ?? ""}
-              onValueChange={(next) =>
-                setValue("variant.barcode", next, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                })
-              }
-              isDisabled={isBusy}
-            />
-            <IBaseInput
-              label="Manufacturer name"
-              value={variantManufacturerName ?? ""}
-              onValueChange={(next) =>
-                setValue("variant.manufacturerName", next, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                })
-              }
-              isDisabled={isBusy}
-            />
-            <IBaseInput
-              label="Manufacturer code"
-              value={variantManufacturerCode ?? ""}
-              onValueChange={(next) =>
-                setValue("variant.manufacturerCode", next, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                })
-              }
-              isDisabled={isBusy}
-            />
-            <IBaseSelectWithSearch
-              label="Base unit of measure"
-              items={uomOptions}
-              selectedKeys={variantBaseUomId ? [variantBaseUomId] : []}
-              onSelectionChange={(keys) => {
-                const keySet = keys as Set<string>;
-                const [first] = Array.from(keySet);
-                const nextValue =
-                  typeof first === "string" && first.length > 0
-                    ? first
-                    : undefined;
-                setValue("variant.baseUomId", nextValue, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-              }}
-              isLoading={uomQuery.isLoading}
-              isInvalid={Boolean(errors.variant?.baseUomId)}
-              errorMessage={errors.variant?.baseUomId?.message}
-              isDisabled={isBusy || uomQuery.isLoading}
-            />
+                {submitLabel}
+              </Button>
+            </div>
           </div>
 
-          <Switch
-            isSelected={variantIsActive ?? false}
-            onValueChange={(next) =>
-              setValue("variant.isActive", next, {
-                shouldDirty: true,
-                shouldValidate: true,
-              })
-            }
-            isDisabled={isBusy}
-          >
-            Variant active
-          </Switch>
-        </CardBody>
-      </Card>
-
-      <Card>
-        <CardBody className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">Packings</h2>
-              <p className="text-small text-default-500">
-                Define packaging options associated with this product.
-              </p>
-            </div>
-            <Button
-              size="sm"
-              variant="bordered"
-              startContent={<Plus size={14} />}
-              onPress={addPacking}
-              isDisabled={isBusy}
-            >
-              Add packing
-            </Button>
-          </div>
-
-          {!packings || packings.length === 0 ? (
-            <p className="text-small text-default-500">
-              No packing entries yet.
-            </p>
-          ) : (
-            <div className="space-y-4">
-              {(packings ?? []).map((packing, index) => (
-                <Card key={index} className="border border-default-200">
-                  <CardBody className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-medium font-medium">
-                        Packing #{index + 1}
-                      </h3>
-                      <Button
-                        size="sm"
-                        variant="light"
-                        startContent={<Trash size={14} />}
-                        onPress={() => removePacking(index)}
-                        isDisabled={isBusy}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                    <div className="grid gap-3 md:grid-cols-2">
-                      <IBaseInput
-                        label="Name (English)"
-                        value={packing.name.en ?? ""}
-                        onValueChange={(next) =>
-                          updatePacking(index, (current) => ({
-                            ...current,
-                            name: updateLocaleValue(current.name, "en", next),
-                          }))
-                        }
-                        isDisabled={isBusy}
-                      />
-                      <IBaseInput
-                        label="Name (Vietnamese)"
-                        value={packing.name.vi ?? ""}
-                        onValueChange={(next) =>
-                          updatePacking(index, (current) => ({
-                            ...current,
-                            name: updateLocaleValue(current.name, "vi", next),
-                          }))
-                        }
-                        isDisabled={isBusy}
-                      />
-                    </div>
-                    <Textarea
-                      label="Description (English)"
-                      value={packing.description?.en ?? ""}
-                      onValueChange={(next) =>
-                        updatePacking(index, (current) => ({
-                          ...current,
-                          description: updateLocaleValue(
-                            current.description,
-                            "en",
-                            next
-                          ),
-                        }))
-                      }
-                      isDisabled={isBusy}
-                    />
-                    <Textarea
-                      label="Description (Vietnamese)"
-                      value={packing.description?.vi ?? ""}
-                      onValueChange={(next) =>
-                        updatePacking(index, (current) => ({
-                          ...current,
-                          description: updateLocaleValue(
-                            current.description,
-                            "vi",
-                            next
-                          ),
-                        }))
-                      }
-                      isDisabled={isBusy}
-                    />
-                    <Switch
-                      isSelected={packing.isActive}
-                      onValueChange={(next) =>
-                        updatePacking(index, (current) => ({
-                          ...current,
-                          isActive: next,
-                        }))
-                      }
-                      isDisabled={isBusy}
-                    >
-                      Packing active
-                    </Switch>
-                  </CardBody>
-                </Card>
-              ))}
-            </div>
-          )}
-        </CardBody>
-      </Card>
-
-      <Card>
-        <CardBody className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">Attributes</h2>
-              <p className="text-small text-default-500">
-                Capture additional attributes such as color, material, or size.
-              </p>
-            </div>
-            <Button
-              size="sm"
-              variant="bordered"
-              startContent={<Plus size={14} />}
-              onPress={addAttribute}
-              isDisabled={isBusy}
-            >
-              Add attribute
-            </Button>
-          </div>
-
-          {!attributes || attributes.length === 0 ? (
-            <p className="text-small text-default-500">
-              No attribute entries yet.
-            </p>
-          ) : (
-            <div className="space-y-4">
-              {(attributes ?? []).map((attribute, index) => (
-                <Card key={index} className="border border-default-200">
-                  <CardBody className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-medium font-medium">
-                        Attribute #{index + 1}
-                      </h3>
-                      <Button
-                        size="sm"
-                        variant="light"
-                        startContent={<Trash size={14} />}
-                        onPress={() => removeAttribute(index)}
-                        isDisabled={isBusy}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                    <IBaseInput
-                      label="Code"
-                      value={attribute.code}
-                      onValueChange={(next) =>
-                        updateAttribute(index, (current) => ({
-                          ...current,
-                          code: next,
-                        }))
-                      }
-                      isInvalid={Boolean(errors.attributes?.[index]?.code)}
-                      errorMessage={errors.attributes?.[index]?.code?.message}
-                      isDisabled={isBusy}
-                    />
-                    <div className="grid gap-3 md:grid-cols-2">
-                      <IBaseInput
-                        label="Name (English)"
-                        value={attribute.name.en ?? ""}
-                        onValueChange={(next) =>
-                          updateAttribute(index, (current) => ({
-                            ...current,
-                            name: updateLocaleValue(current.name, "en", next),
-                          }))
-                        }
-                        isDisabled={isBusy}
-                      />
-                      <IBaseInput
-                        label="Name (Vietnamese)"
-                        value={attribute.name.vi ?? ""}
-                        onValueChange={(next) =>
-                          updateAttribute(index, (current) => ({
-                            ...current,
-                            name: updateLocaleValue(current.name, "vi", next),
-                          }))
-                        }
-                        isDisabled={isBusy}
-                      />
-                    </div>
-                    <IBaseInput
-                      label="Value"
-                      value={attribute.value}
-                      onValueChange={(next) =>
-                        updateAttribute(index, (current) => ({
-                          ...current,
-                          value: next,
-                        }))
-                      }
-                      isInvalid={Boolean(errors.attributes?.[index]?.value)}
-                      errorMessage={errors.attributes?.[index]?.value?.message}
-                      isDisabled={isBusy}
-                    />
-                  </CardBody>
-                </Card>
-              ))}
-            </div>
-          )}
-        </CardBody>
-      </Card>
-
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-        {onCancel ? (
-          <Button
-            variant="light"
+          <Tabs
+            aria-label="Product form tabs"
+            color="primary"
+            // variant="bordered"
             size="sm"
-            onPress={onCancel}
-            isDisabled={isBusy}
+            className="w-full"
+            selectedKey={selectedTab}
+            onSelectionChange={(key) => setSelectedTab(key as string)}
+            classNames={{
+              tabList: "gap-0 overflow-x-auto mb-0",
+              tab: "max-w-[80px]",
+              tabContent: "max-w-[80px] truncate",
+              base: "mb-0",
+            }}
           >
-            Cancel
-          </Button>
-        ) : null}
+            <Tab key="master" title="Master">
+              <MasterTab
+                value={{
+                  name: masterName ?? { en: "", vi: "" },
+                  code: masterCode ?? "",
+                  categoryId: masterCategoryId,
+                  brand: masterBrand ?? "",
+                  type: masterType ?? ProductMasterType.GOODS,
+                  description: masterDescription ?? "",
+                  features: masterFeatures ?? {},
+                  isActive: true,
+                }}
+                categoryOptions={categoryOptions}
+                masterTypes={masterTypes}
+                featureOptions={featureOptions}
+                errors={errors.master}
+                isBusy={isBusy}
+                categoryQueryLoading={categoryQuery.isLoading}
+                onUpdate={(updater) => {
+                  const current = {
+                    name: masterName ?? { en: "", vi: "" },
+                    code: masterCode ?? "",
+                    categoryId: masterCategoryId,
+                    brand: masterBrand ?? "",
+                    type: masterType ?? ProductMasterType.GOODS,
+                    description: masterDescription ?? "",
+                    features: masterFeatures ?? {},
+                    isActive: true,
+                  };
+                  const updated = updater(current);
+                  setValue("master", updated, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  });
+                }}
+              />
+            </Tab>
 
-        {onSubmitAndContinue ? (
-          <Button
-            variant="bordered"
-            size="sm"
-            type="button"
-            onPress={
-              submitAndContinueForm
-                ? async () => {
-                    await submitAndContinueForm();
-                  }
-                : undefined
-            }
-            isDisabled={isBusy}
-          >
-            {secondarySubmitLabel ?? "Save & add another"}
-          </Button>
-        ) : null}
-
-        <Button
-          color="primary"
-          size="sm"
-          type="submit"
-          isLoading={isBusy}
-          isDisabled={isBusy}
-        >
-          {submitLabel}
-        </Button>
-      </div>
+            {(variants ?? []).map((variant, variantIndex) => {
+              const variantErrors = errors.variants?.[variantIndex];
+              const tabTitle = variant.sku?.trim()
+                ? variant.sku
+                : `Variant ${variantIndex + 1}`;
+              // Truncate title if too long (approximately 50px = ~10-12 chars)
+              const truncatedTitle =
+                tabTitle.length > 12
+                  ? `${tabTitle.substring(0, 12)}...`
+                  : tabTitle;
+              return (
+                <Tab key={`variant-${variantIndex}`} title={truncatedTitle}>
+                  <VariantTab
+                    value={variant}
+                    variantIndex={variantIndex}
+                    variantErrors={variantErrors as any}
+                    uomOptions={uomOptions}
+                    isBusy={isBusy}
+                    uomQueryLoading={uomQuery.isLoading}
+                    canRemove={(variants?.length ?? 0) > 1}
+                    onRemove={() => removeVariant(variantIndex)}
+                    onUpdate={(updater) => updateVariant(variantIndex, updater)}
+                  />
+                </Tab>
+              );
+            })}
+          </Tabs>
+        </CardBody>
+      </Card>
     </form>
   );
 }
