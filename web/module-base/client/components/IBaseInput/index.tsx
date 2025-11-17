@@ -5,7 +5,12 @@ import React from "react";
 type IBaseInputProps = InputProps & {};
 const IBaseInput = React.forwardRef<HTMLInputElement, IBaseInputProps>(
   (props, ref) => {
-    const { isDisabled } = props;
+    const {
+      isDisabled,
+      size = "sm",
+      labelPlacement = "outside",
+      placeholder = "Nhập thông tin...",
+    } = props;
     return (
       <HeroUIInput
         ref={ref}
@@ -19,8 +24,9 @@ const IBaseInput = React.forwardRef<HTMLInputElement, IBaseInputProps>(
           input: "placeholder:text-default-400 italic text-sm",
         }}
         variant="bordered"
-        labelPlacement="outside"
-        size="sm"
+        size={size}
+        labelPlacement={labelPlacement}
+        placeholder={placeholder ?? "Nhập thông tin..."}
         {...props}
         isDisabled={isDisabled}
       />

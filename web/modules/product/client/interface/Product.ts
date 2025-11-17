@@ -29,11 +29,11 @@ export type ProductRow = {
   id: string;
   productMasterId?: string;
   name?: LocaleDataType<string> | string;
-  description?: LocaleDataType<string> | string;
+  description?: string;
   sku?: string;
   barcode?: string;
   manufacturer?: {
-    name?: LocaleDataType<string> | string;
+    name?: string;
     code?: string;
   };
   images?: { url: string; alt?: string }[];
@@ -41,7 +41,7 @@ export type ProductRow = {
   productMaster?: {
     id: string;
     name?: LocaleDataType<string> | string;
-    brand?: LocaleDataType<string> | string;
+    brand?: string;
     features?: Record<ProductMasterFeatures, boolean>;
     type?: ProductMasterType;
     category?: {
@@ -78,11 +78,11 @@ export type ProductDetail = {
     id: string;
     code: string;
     name: LocaleDataType<string> | string;
-    description?: LocaleDataType<string> | string;
+    description?: string;
     type?: ProductMasterType;
     features?: Record<string, boolean> | null;
     isActive?: boolean;
-    brand?: LocaleDataType<string> | string;
+    brand?: string;
     category?: {
       id: string;
       code?: string;
@@ -112,19 +112,19 @@ export type ProductFormValues = {
   master: {
     code: string;
     name: LocaleFormValue;
-    description: LocaleFormValue;
+    description: string;
     type: ProductMasterType | "";
     features: Record<ProductMasterFeatures, boolean>;
     isActive: boolean;
-    brand: LocaleFormValue;
+    brand: string;
     categoryId?: string;
   };
   variant: {
     name: LocaleFormValue;
-    description: LocaleFormValue;
+    description: string;
     sku: string;
     barcode: string;
-    manufacturerName: LocaleFormValue;
+    manufacturerName: string;
     manufacturerCode: string;
     baseUomId?: string;
     isActive: boolean;
@@ -137,20 +137,20 @@ export type ProductFormPayload = {
   master: {
     code: string;
     name: LocaleDataType<string>;
-    description?: LocaleDataType<string> | null;
+    description?: string | null;
     type: ProductMasterType;
     features?: Partial<Record<ProductMasterFeatures, boolean>> | null;
     isActive?: boolean;
-    brand?: LocaleDataType<string> | null;
+    brand?: string | null;
     categoryId?: string | null;
   };
   variant: {
     name: LocaleDataType<string>;
-    description?: LocaleDataType<string> | null;
+    description?: string | null;
     sku?: string | null;
     barcode?: string | null;
     manufacturer?: {
-      name?: LocaleDataType<string> | null;
+      name?: string | null;
       code?: string | null;
     } | null;
     baseUomId?: string | null;

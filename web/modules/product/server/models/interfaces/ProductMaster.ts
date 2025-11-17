@@ -63,7 +63,7 @@ export interface MasterProduct {
     isActive: boolean;
 
     // Metadata
-    brand?: LocaleDataType<string>;
+    brand?: string;
     category?: ProductCategory;
 
     createdAt?: number; // unix timestamp (ms)

@@ -17,6 +17,7 @@ export { default as DatePicker } from "./DatePicker";
 export { default as IBaseDigitViewer } from "./IBaseDigitViewer";
 export type { IBaseDigitViewerProps } from "./IBaseDigitViewer";
 export { default as IBaseInput, default as Input } from "./IBaseInput";
+export { default as IBaseInputMultipleLang } from "./IBaseInputMultipleLang";
 export {
   default as IBaseSelect,
   default as Select,

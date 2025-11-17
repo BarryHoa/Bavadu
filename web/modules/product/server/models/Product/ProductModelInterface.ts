@@ -25,22 +25,22 @@ export interface ProductMasterInput {
   id?: string;
   code: string;
   name: LocaleInput;
-  description?: LocaleInput;
+  description?: string | null;
   type: ProductMasterEnum;
   features?: Partial<ProductMasterFeatures> | null;
   isActive?: boolean;
-  brand?: LocaleInput;
+  brand?: string | null;
   categoryId?: string | null;
 }
 
 export interface ProductVariantInput {
   id?: string;
   name: LocaleInput;
-  description?: LocaleInput;
+  description?: string | null;
   sku?: string | null;
   barcode?: string | null;
   manufacturer?: {
-    name?: LocaleInput;
+    name?: string | null;
     code?: string | null;
   } | null;
   baseUomId?: string | null;

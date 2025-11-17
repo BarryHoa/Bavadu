@@ -36,7 +36,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
       type: dbProduct.type as MasterProduct["type"],
       features: dbProduct.features as MasterProduct["features"],
       isActive: dbProduct.isActive,
-      brand: dbProduct.brand as MasterProduct["brand"],
+      brand: dbProduct.brand ?? undefined,
       createdAt: dbProduct.createdAt?.getTime(),
       updatedAt: dbProduct.updatedAt?.getTime(),
       // Note: createdBy and updatedBy are stored as user IDs (strings) in DB
@@ -105,7 +105,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
         id: record.variant.id,
         productMasterId: record.variant.productMasterId,
         name: record.variant.name as any,
-        description: record.variant.description as any,
+        description: record.variant.description ?? undefined,
         images: record.variant.images as any,
         sku: record.variant.sku ?? undefined,
         barcode: record.variant.barcode ?? undefined,
@@ -192,11 +192,11 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
           name: this.normalizeLocale(payload.master.name) ?? {
             en: payload.master.code.trim(),
           },
-          description: this.normalizeLocale(payload.master.description),
+          description: payload.master.description?.trim() || null,
           type: payload.master.type,
           features: payload.master.features ?? null,
           isActive: payload.master.isActive ?? true,
-          brand: this.normalizeLocale(payload.master.brand),
+          brand: payload.master.brand?.trim() || null,
           categoryId: payload.master.categoryId || null,
           createdAt: now,
           updatedAt: now,
@@ -214,15 +214,13 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
           name: this.normalizeLocale(payload.variant.name) ?? {
             en: payload.master.code.trim(),
           },
-          description: this.normalizeLocale(payload.variant.description),
+          description: payload.variant.description?.trim() || null,
           images: payload.variant.images ?? null,
           sku: payload.variant.sku?.trim() || null,
           barcode: payload.variant.barcode?.trim() || null,
           manufacturer: payload.variant.manufacturer
             ? {
-                name:
-                  this.normalizeLocale(payload.variant.manufacturer.name) ??
-                  undefined,
+                name: payload.variant.manufacturer.name?.trim() || undefined,
                 code: payload.variant.manufacturer.code?.trim() || undefined,
               }
             : null,
@@ -305,11 +303,11 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
           name: this.normalizeLocale(payload.master.name) ?? {
             en: payload.master.code.trim(),
           },
-          description: this.normalizeLocale(payload.master.description),
+          description: payload.master.description?.trim() || null,
           type: payload.master.type,
           features: payload.master.features ?? null,
           isActive: payload.master.isActive ?? true,
-          brand: this.normalizeLocale(payload.master.brand),
+          brand: payload.master.brand?.trim() || null,
           categoryId: payload.master.categoryId || null,
           updatedAt: now,
         })
@@ -321,15 +319,13 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
           name: this.normalizeLocale(payload.variant.name) ?? {
             en: payload.master.code.trim(),
           },
-          description: this.normalizeLocale(payload.variant.description),
+          description: payload.variant.description?.trim() || null,
           images: payload.variant.images ?? null,
           sku: payload.variant.sku?.trim() || null,
           barcode: payload.variant.barcode?.trim() || null,
           manufacturer: payload.variant.manufacturer
             ? {
-                name:
-                  this.normalizeLocale(payload.variant.manufacturer.name) ??
-                  undefined,
+                name: payload.variant.manufacturer.name?.trim() || undefined,
                 code: payload.variant.manufacturer.code?.trim() || undefined,
               }
             : null,

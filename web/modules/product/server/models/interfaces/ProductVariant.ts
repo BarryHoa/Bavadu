@@ -8,12 +8,12 @@ export interface ProductVariant {
   id: string; // uuid v7
   productMasterId: MasterProductId;
   name: LocaleDataType<string>;
-  description?: LocaleDataType<string>;
+  description?: string;
   images?: { url: string; alt?: string }[];
   sku?: string;
   barcode?: string;
   manufacturer?: {
-    name?: LocaleDataType<string>;
+    name?: string;
     code?: string;
   };
 

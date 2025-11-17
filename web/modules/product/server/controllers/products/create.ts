@@ -114,11 +114,17 @@ export const buildPayload = (body: any): ProductCreateInput => {
   const masterPayload = {
     code,
     name: normalizeLocaleInput(master.name) ?? { en: code },
-    description: normalizeLocaleInput(master.description) ?? null,
+    description:
+      typeof master.description === "string" && master.description.trim()
+        ? master.description.trim()
+        : null,
     type,
     features: normalizeFeaturePayload(master.features ?? {}),
     isActive: typeof master.isActive === "boolean" ? master.isActive : true,
-    brand: normalizeLocaleInput(master.brand) ?? null,
+    brand:
+      typeof master.brand === "string" && master.brand.trim()
+        ? master.brand.trim()
+        : null,
     categoryId:
       typeof master.categoryId === "string" && master.categoryId
         ? master.categoryId
@@ -129,13 +135,20 @@ export const buildPayload = (body: any): ProductCreateInput => {
 
   const variantPayload = {
     name: variantNameSource ?? { en: code },
-    description: normalizeLocaleInput(variant.description) ?? null,
+    description:
+      typeof variant.description === "string" && variant.description.trim()
+        ? variant.description.trim()
+        : null,
     sku: typeof variant.sku === "string" ? variant.sku : null,
     barcode: typeof variant.barcode === "string" ? variant.barcode : null,
     manufacturer:
       variant.manufacturer && typeof variant.manufacturer === "object"
         ? {
-            name: normalizeLocaleInput(variant.manufacturer.name),
+            name:
+              typeof variant.manufacturer.name === "string" &&
+              variant.manufacturer.name.trim()
+                ? variant.manufacturer.name.trim()
+                : null,
             code:
               typeof variant.manufacturer.code === "string"
                 ? variant.manufacturer.code

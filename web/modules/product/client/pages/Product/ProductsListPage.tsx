@@ -98,12 +98,18 @@ export default function ProductsListPage(): React.ReactNode {
       {
         key: "manufacturer.name",
         label: "Manufacturer",
-        render: (_, row) => localized(row.manufacturer?.name),
+        render: (_, row) =>
+          typeof row.manufacturer?.name === "string"
+            ? row.manufacturer.name
+            : row.manufacturer?.code ?? "-",
       },
       {
         key: "productMaster.brand",
         label: "Brand",
-        render: (_, row) => localized(row.productMaster?.brand),
+        render: (_, row) =>
+          typeof row.productMaster?.brand === "string"
+            ? row.productMaster.brand
+            : "-",
       },
 
       {

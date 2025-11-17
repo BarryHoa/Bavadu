@@ -21,13 +21,13 @@ export const table_product_master = pgTable(
     code: varchar("code", { length: 100 }).notNull().unique(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
     image: text("image"),
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // string
     type: varchar("type", {
       length: 20,
     }).notNull(), // ProductMasterType: goods, service, finished_good, raw_material, consumable, asset, tool
     features: jsonb("features"), // Partial<ProductMasterFeatures>
     isActive: boolean("is_active").default(true).notNull(),
-    brand: jsonb("brand"), // LocaleDataType<string>
+    brand: text("brand"), // string
     categoryId: uuid("category_id").references(() => table_product_category.id),
     createdAt: timestamp("created_at", { withTimezone: true }),
     updatedAt: timestamp("updated_at", { withTimezone: true }),

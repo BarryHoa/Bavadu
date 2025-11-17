@@ -1,10 +1,8 @@
-import { LocaleDataType } from "@base/server/interfaces/Locale";
 import { useLocale } from "next-intl";
-
-const DEFAULT_LOCALE = "en";
+import { DEFAULT_LANG, LocalizeText } from "../interface/LocalizeText";
 
 const getLocalizedValue = (
-  text: LocaleDataType<string> | string | undefined | null,
+  text: LocalizeText | string | undefined | null,
   locale: string
 ) => {
   if (!text) return "";
@@ -18,20 +16,15 @@ const getLocalizedValue = (
 };
 
 export const useLocalizedText = (locale?: string) => {
-  let detectedLocale = locale ?? DEFAULT_LOCALE;
+  let detectedLocale = locale ?? DEFAULT_LANG;
 
   try {
     const contextLocale = useLocale();
-    detectedLocale = locale ?? contextLocale ?? DEFAULT_LOCALE;
+    detectedLocale = locale ?? contextLocale ?? DEFAULT_LANG;
   } catch (error) {
-    detectedLocale = locale ?? DEFAULT_LOCALE;
+    detectedLocale = locale ?? DEFAULT_LANG;
   }
 
-  return (text: LocaleDataType<string> | string | undefined | null) =>
+  return (text: LocalizeText | string | undefined | null) =>
     getLocalizedValue(text, detectedLocale);
 };
-
-export const localizeText = (
-  text: LocaleDataType<string> | string | undefined | null,
-  locale: string = DEFAULT_LOCALE
-) => getLocalizedValue(text, locale);

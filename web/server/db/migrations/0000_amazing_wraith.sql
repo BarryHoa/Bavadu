@@ -78,11 +78,11 @@ CREATE TABLE "product_masters" (
 	"code" varchar(100) NOT NULL,
 	"name" jsonb NOT NULL,
 	"image" text,
-	"description" jsonb,
+	"description" text,
 	"type" varchar(20) NOT NULL,
 	"features" jsonb,
 	"is_active" boolean DEFAULT true NOT NULL,
-	"brand" jsonb,
+	"brand" text,
 	"category_id" uuid,
 	"created_at" timestamp with time zone,
 	"updated_at" timestamp with time zone,
@@ -95,7 +95,7 @@ CREATE TABLE "product_variants" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"product_master_id" uuid NOT NULL,
 	"name" jsonb NOT NULL,
-	"description" jsonb,
+	"description" text,
 	"images" jsonb,
 	"sku" varchar(100),
 	"barcode" varchar(100),
@@ -269,6 +269,33 @@ CREATE TABLE "stock_moves" (
 	"created_by" varchar(36)
 );
 --> statement-breakpoint
+CREATE TABLE "location_countries" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
+	"code" varchar(2) NOT NULL,
+	"name" jsonb NOT NULL,
+	"is_active" boolean DEFAULT true NOT NULL,
+	"created_at" timestamp with time zone,
+	"updated_at" timestamp with time zone,
+	"created_by" varchar(36),
+	"updated_by" varchar(36),
+	CONSTRAINT "location_countries_code_unique" UNIQUE("code")
+);
+--> statement-breakpoint
+CREATE TABLE "location_administrative_units" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
+	"country_id" uuid NOT NULL,
+	"code" varchar(50),
+	"name" jsonb NOT NULL,
+	"type" varchar(20) NOT NULL,
+	"level" integer NOT NULL,
+	"parent_id" uuid,
+	"is_active" boolean DEFAULT true NOT NULL,
+	"created_at" timestamp with time zone,
+	"updated_at" timestamp with time zone,
+	"created_by" varchar(36),
+	"updated_by" varchar(36)
+);
+--> statement-breakpoint
 ALTER TABLE "users_login" ADD CONSTRAINT "users_login_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "dynamic_entities" ADD CONSTRAINT "dynamic_entities_parent_id_dynamic_entities_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."dynamic_entities"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_masters" ADD CONSTRAINT "product_masters_category_id_product_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."product_categories"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
@@ -277,6 +304,8 @@ ALTER TABLE "product_variants" ADD CONSTRAINT "product_variants_base_uom_id_unit
 ALTER TABLE "product_packings" ADD CONSTRAINT "product_packings_product_variant_id_product_variants_id_fk" FOREIGN KEY ("product_variant_id") REFERENCES "public"."product_variants"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_attributes" ADD CONSTRAINT "product_attributes_product_variant_id_product_variants_id_fk" FOREIGN KEY ("product_variant_id") REFERENCES "public"."product_variants"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_categories" ADD CONSTRAINT "product_categories_parent_id_product_categories_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."product_categories"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "location_administrative_units" ADD CONSTRAINT "location_administrative_units_country_id_location_countries_id_fk" FOREIGN KEY ("country_id") REFERENCES "public"."location_countries"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "location_administrative_units" ADD CONSTRAINT "location_administrative_units_parent_id_location_administrative_units_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."location_administrative_units"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "uom_conversions" ADD CONSTRAINT "uom_conversions_uom_id_units_of_measure_id_fk" FOREIGN KEY ("uom_id") REFERENCES "public"."units_of_measure"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "purchase_order_lines" ADD CONSTRAINT "purchase_order_lines_order_id_purchase_orders_id_fk" FOREIGN KEY ("order_id") REFERENCES "public"."purchase_orders"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "purchase_order_lines" ADD CONSTRAINT "purchase_order_lines_product_id_product_masters_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."product_masters"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
@@ -343,4 +372,11 @@ CREATE INDEX "stock_moves_product_idx" ON "stock_moves" USING btree ("product_id
 CREATE INDEX "stock_moves_type_idx" ON "stock_moves" USING btree ("type");--> statement-breakpoint
 CREATE INDEX "stock_moves_source_idx" ON "stock_moves" USING btree ("source_warehouse_id");--> statement-breakpoint
 CREATE INDEX "stock_moves_target_idx" ON "stock_moves" USING btree ("target_warehouse_id");--> statement-breakpoint
-CREATE INDEX "stock_moves_created_idx" ON "stock_moves" USING btree ("created_at");
+CREATE INDEX "stock_moves_created_idx" ON "stock_moves" USING btree ("created_at");--> statement-breakpoint
+CREATE INDEX "location_administrative_units_country_idx" ON "location_administrative_units" USING btree ("country_id");--> statement-breakpoint
+CREATE INDEX "location_administrative_units_parent_idx" ON "location_administrative_units" USING btree ("parent_id");--> statement-breakpoint
+CREATE INDEX "location_administrative_units_level_idx" ON "location_administrative_units" USING btree ("level");--> statement-breakpoint
+CREATE INDEX "location_administrative_units_type_idx" ON "location_administrative_units" USING btree ("type");--> statement-breakpoint
+CREATE INDEX "location_administrative_units_active_idx" ON "location_administrative_units" USING btree ("is_active");--> statement-breakpoint
+CREATE INDEX "location_countries_code_idx" ON "location_countries" USING btree ("code");--> statement-breakpoint
+CREATE INDEX "location_countries_is_active_idx" ON "location_countries" USING btree ("is_active");

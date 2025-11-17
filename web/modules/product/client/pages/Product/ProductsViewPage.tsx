@@ -150,7 +150,11 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
           />
           <InfoRow
             label="Brand"
-            value={localized(detail.master.brand) ?? "-"}
+            value={
+              typeof detail.master.brand === "string"
+                ? detail.master.brand
+                : "-"
+            }
           />
           <InfoRow
             label="Category"
@@ -163,7 +167,11 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
         </div>
         <InfoRow
           label="Description"
-          value={localized(detail.master.description) ?? "-"}
+          value={
+            typeof detail.master.description === "string"
+              ? detail.master.description
+              : "-"
+          }
         />
         <div className="flex flex-wrap gap-2">
           <span className="text-xs uppercase text-default-400">Features</span>
@@ -196,9 +204,9 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
             label="Manufacturer"
             value={
               detail.variant.manufacturer
-                ? localized(detail.variant.manufacturer.name) ??
-                  detail.variant.manufacturer.code ??
-                  "-"
+                ? (typeof detail.variant.manufacturer.name === "string"
+                    ? detail.variant.manufacturer.name
+                    : detail.variant.manufacturer.code) ?? "-"
                 : "-"
             }
           />
@@ -214,7 +222,11 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
         </div>
         <InfoRow
           label="Description"
-          value={localized(detail.variant.description) ?? "-"}
+          value={
+            typeof detail.variant.description === "string"
+              ? detail.variant.description
+              : "-"
+          }
         />
       </section>
 

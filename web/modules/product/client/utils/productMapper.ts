@@ -133,19 +133,29 @@ export const mapDetailToFormValues = (
     master: {
       code: detail.master.code,
       name: toLocaleFormValue(detail.master.name),
-      description: toLocaleFormValue(detail.master.description),
+      description:
+        typeof detail.master.description === "string"
+          ? detail.master.description
+          : "",
       type: (detail.master.type as ProductMasterType) ?? ProductMasterType.GOODS,
       features,
       isActive: detail.master.isActive ?? true,
-      brand: toLocaleFormValue(detail.master.brand),
+      brand:
+        typeof detail.master.brand === "string" ? detail.master.brand : "",
       categoryId: detail.master.category?.id,
     },
     variant: {
       name: toLocaleFormValue(detail.variant.name),
-      description: toLocaleFormValue(detail.variant.description),
+      description:
+        typeof detail.variant.description === "string"
+          ? detail.variant.description
+          : "",
       sku: detail.variant.sku ?? "",
       barcode: detail.variant.barcode ?? "",
-      manufacturerName: toLocaleFormValue(detail.variant.manufacturer?.name),
+      manufacturerName:
+        typeof detail.variant.manufacturer?.name === "string"
+          ? detail.variant.manufacturer.name
+          : "",
       manufacturerCode: detail.variant.manufacturer?.code ?? "",
       baseUomId: detail.variant.baseUom?.id,
       isActive: detail.variant.isActive ?? true,
@@ -163,48 +173,39 @@ export const mapFormValuesToPayload = (
     toLocaleRecord(ensureLocaleValue(values.master.name), trimmedCode) ?? {
       en: trimmedCode,
     };
-  const masterDescriptionRecord = toLocaleRecord(
-    ensureLocaleValue(values.master.description),
-    trimmedCode
-  );
-  const masterBrandRecord = toLocaleRecord(
-    ensureLocaleValue(values.master.brand)
-  );
+  const masterDescription = values.master.description.trim() || null;
+  const masterBrand = values.master.brand.trim() || null;
 
   const variantNameRecord =
     toLocaleRecord(ensureLocaleValue(values.variant.name), trimmedCode) ?? {
       en: trimmedCode,
     };
-  const variantDescriptionRecord = toLocaleRecord(
-    ensureLocaleValue(values.variant.description)
-  );
-  const manufacturerNameRecord = toLocaleRecord(
-    ensureLocaleValue(values.variant.manufacturerName)
-  );
+  const variantDescription = values.variant.description.trim() || null;
+  const manufacturerName = values.variant.manufacturerName.trim() || null;
 
   return {
     master: {
       code: trimmedCode,
       name: masterNameRecord,
-      description: masterDescriptionRecord,
+      description: masterDescription,
       type:
         (values.master.type as ProductMasterType) ?? ProductMasterType.GOODS,
       features: values.master.features,
       isActive: values.master.isActive,
-      brand: masterBrandRecord,
+      brand: masterBrand,
       categoryId: values.master.categoryId ?? null,
     },
     variant: {
       name: variantNameRecord,
-      description: variantDescriptionRecord,
+      description: variantDescription,
       sku: values.variant.sku ? values.variant.sku.trim() : null,
       barcode: values.variant.barcode ? values.variant.barcode.trim() : null,
       manufacturer:
-        manufacturerNameRecord ||
+        manufacturerName ||
         (values.variant.manufacturerCode &&
           values.variant.manufacturerCode.trim())
           ? {
-              name: manufacturerNameRecord,
+              name: manufacturerName,
               code: values.variant.manufacturerCode
                 ? values.variant.manufacturerCode.trim()
                 : null,

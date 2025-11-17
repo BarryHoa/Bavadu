@@ -1,7 +1,8 @@
 "use client";
 
-import { IBaseInput } from "@base/client/components";
 import {
+  IBaseInput,
+  IBaseInputMultipleLang,
   IBaseSelectWithSearch,
   SelectItemOption,
 } from "@base/client/components";
@@ -20,7 +21,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Plus, Trash } from "lucide-react";
 import { useCallback, useEffect, useMemo } from "react";
 import type { Resolver, SubmitHandler } from "react-hook-form";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import {
   array,
   boolean,
@@ -54,19 +55,19 @@ type ProductFormFieldValues = {
   master: {
     code: string;
     name: LocaleFieldValue;
-    description: LocaleFieldValue;
+    description: string;
     type: ProductMasterType;
     features: Record<ProductMasterFeatures, boolean>;
     isActive: boolean;
-    brand: LocaleFieldValue;
+    brand: string;
     categoryId?: string;
   };
   variant: {
     name: LocaleFieldValue;
-    description: LocaleFieldValue;
+    description: string;
     sku: string;
     barcode: string;
-    manufacturerName: LocaleFieldValue;
+    manufacturerName: string;
     manufacturerCode: string;
     baseUomId?: string;
     isActive: boolean;
@@ -112,7 +113,7 @@ const createDefaultValues = (): ProductFormFieldValues => ({
   master: {
     code: "",
     name: defaultLocaleValue(),
-    description: defaultLocaleValue(),
+    description: "",
     type: ProductMasterType.GOODS,
     features: featureOptions.reduce(
       (acc, feature) => ({
@@ -122,15 +123,15 @@ const createDefaultValues = (): ProductFormFieldValues => ({
       {} as Record<ProductMasterFeatures, boolean>
     ),
     isActive: true,
-    brand: defaultLocaleValue(),
+    brand: "",
     categoryId: undefined,
   },
   variant: {
     name: defaultLocaleValue(),
-    description: defaultLocaleValue(),
+    description: "",
     sku: "",
     barcode: "",
-    manufacturerName: defaultLocaleValue(),
+    manufacturerName: "",
     manufacturerCode: "",
     baseUomId: undefined,
     isActive: true,
@@ -228,21 +229,31 @@ const mapToFieldValues = (
     master: {
       code: initialValues.master.code ?? "",
       name: ensureLocaleValue(initialValues.master.name),
-      description: ensureLocaleValue(initialValues.master.description),
+      description:
+        typeof initialValues.master.description === "string"
+          ? initialValues.master.description
+          : "",
       type: initialValues.master.type || ProductMasterType.GOODS,
       features: featureState,
       isActive: initialValues.master.isActive ?? true,
-      brand: ensureLocaleValue(initialValues.master.brand),
+      brand:
+        typeof initialValues.master.brand === "string"
+          ? initialValues.master.brand
+          : "",
       categoryId: initialValues.master.categoryId ?? undefined,
     },
     variant: {
       name: ensureLocaleValue(initialValues.variant.name),
-      description: ensureLocaleValue(initialValues.variant.description),
+      description:
+        typeof initialValues.variant.description === "string"
+          ? initialValues.variant.description
+          : "",
       sku: initialValues.variant.sku ?? "",
       barcode: initialValues.variant.barcode ?? "",
-      manufacturerName: ensureLocaleValue(
-        initialValues.variant.manufacturerName
-      ),
+      manufacturerName:
+        typeof initialValues.variant.manufacturerName === "string"
+          ? initialValues.variant.manufacturerName
+          : "",
       manufacturerCode: initialValues.variant.manufacturerCode ?? "",
       baseUomId: initialValues.variant.baseUomId ?? undefined,
       isActive: initialValues.variant.isActive ?? true,
@@ -266,40 +277,43 @@ const mapToFieldValues = (
 
 const mapToProductFormValues = (
   values: ProductFormFieldValues
-): ProductFormValues => ({
-  master: {
-    code: values.master.code,
-    name: toLocaleFormValue(values.master.name),
-    description: toLocaleFormValue(values.master.description),
-    type: values.master.type,
-    features: values.master.features,
-    isActive: values.master.isActive,
-    brand: toLocaleFormValue(values.master.brand),
-    categoryId: values.master.categoryId,
-  },
-  variant: {
-    name: toLocaleFormValue(values.variant.name),
-    description: toLocaleFormValue(values.variant.description),
-    sku: values.variant.sku,
-    barcode: values.variant.barcode,
-    manufacturerName: toLocaleFormValue(values.variant.manufacturerName),
-    manufacturerCode: values.variant.manufacturerCode,
-    baseUomId: values.variant.baseUomId,
-    isActive: values.variant.isActive,
-  },
-  packings: values.packings.map((packing) => ({
-    id: packing.id,
-    name: toLocaleFormValue(packing.name),
-    description: toLocaleFormValue(packing.description),
-    isActive: packing.isActive,
-  })),
-  attributes: values.attributes.map((attribute) => ({
-    id: attribute.id,
-    code: attribute.code,
-    name: toLocaleFormValue(attribute.name),
-    value: attribute.value,
-  })),
-});
+): ProductFormValues => {
+  // This function receives the full form values, so we can use it directly
+  return {
+    master: {
+      code: values.master.code,
+      name: toLocaleFormValue(values.master.name),
+      description: values.master.description.trim() || "",
+      type: values.master.type,
+      features: values.master.features,
+      isActive: values.master.isActive,
+      brand: values.master.brand.trim() || "",
+      categoryId: values.master.categoryId,
+    },
+    variant: {
+      name: toLocaleFormValue(values.variant.name),
+      description: values.variant.description.trim() || "",
+      sku: values.variant.sku,
+      barcode: values.variant.barcode,
+      manufacturerName: values.variant.manufacturerName.trim() || "",
+      manufacturerCode: values.variant.manufacturerCode,
+      baseUomId: values.variant.baseUomId,
+      isActive: values.variant.isActive,
+    },
+    packings: values.packings.map((packing) => ({
+      id: packing.id,
+      name: toLocaleFormValue(packing.name),
+      description: toLocaleFormValue(packing.description),
+      isActive: packing.isActive,
+    })),
+    attributes: values.attributes.map((attribute) => ({
+      id: attribute.id,
+      code: attribute.code,
+      name: toLocaleFormValue(attribute.name),
+      value: attribute.value,
+    })),
+  };
+};
 
 const localeSchema = object({
   en: fallback(pipe(string(), trim()), ""),
@@ -330,19 +344,19 @@ const productFormSchema = object({
   master: object({
     code: pipe(string(), trim(), minLength(1, "Product code is required")),
     name: localeRequiredSchema,
-    description: localeSchema,
+    description: fallback(pipe(string(), trim()), ""),
     type: picklist(productMasterTypeValues),
     features: featuresSchema,
     isActive: boolean(),
-    brand: localeSchema,
+    brand: fallback(pipe(string(), trim()), ""),
     categoryId: optional(pipe(string(), trim())),
   }),
   variant: object({
     name: localeSchema,
-    description: localeSchema,
+    description: fallback(pipe(string(), trim()), ""),
     sku: pipe(string(), trim()),
     barcode: pipe(string(), trim()),
-    manufacturerName: localeSchema,
+    manufacturerName: fallback(pipe(string(), trim()), ""),
     manufacturerCode: pipe(string(), trim()),
     baseUomId: optional(pipe(string(), trim())),
     isActive: boolean(),
@@ -379,7 +393,7 @@ export default function ProductForm({
   const {
     handleSubmit,
     reset,
-    watch,
+    control,
     setValue,
     getValues,
     formState: { errors, isSubmitting },
@@ -419,13 +433,36 @@ export default function ProductForm({
       label:
         typeof uom.name === "string"
           ? uom.name
-          : ((uom.name as Record<string, string>)?.en ??
-            uom.symbol ??
-            uom.id),
+          : ((uom.name as Record<string, string>)?.en ?? uom.symbol ?? uom.id),
     }));
   }, [uomQuery.data]);
 
-  const values = watch();
+  // Watch only specific fields instead of entire form to improve performance
+  const masterCode = useWatch({ control, name: "master.code" });
+  const masterType = useWatch({ control, name: "master.type" });
+  const masterName = useWatch({ control, name: "master.name" });
+  const masterCategoryId = useWatch({ control, name: "master.categoryId" });
+  const masterDescription = useWatch({ control, name: "master.description" });
+  const masterBrand = useWatch({ control, name: "master.brand" });
+  const masterFeatures = useWatch({ control, name: "master.features" });
+  const masterIsActive = useWatch({ control, name: "master.isActive" });
+  const variantName = useWatch({ control, name: "variant.name" });
+  const variantDescription = useWatch({ control, name: "variant.description" });
+  const variantSku = useWatch({ control, name: "variant.sku" });
+  const variantBarcode = useWatch({ control, name: "variant.barcode" });
+  const variantManufacturerName = useWatch({
+    control,
+    name: "variant.manufacturerName",
+  });
+  const variantManufacturerCode = useWatch({
+    control,
+    name: "variant.manufacturerCode",
+  });
+  const variantBaseUomId = useWatch({ control, name: "variant.baseUomId" });
+  const variantIsActive = useWatch({ control, name: "variant.isActive" });
+  const packings = useWatch({ control, name: "packings" });
+  const attributes = useWatch({ control, name: "attributes" });
+
   const isBusy = loading || isSubmitting;
 
   const handleFeatureToggle = useCallback(
@@ -581,7 +618,7 @@ export default function ProductForm({
           <div className="grid gap-4 md:grid-cols-2">
             <IBaseInput
               label="Product code"
-              value={values.master.code}
+              value={masterCode ?? ""}
               onValueChange={(next) =>
                 setValue("master.code", next, {
                   shouldDirty: true,
@@ -596,7 +633,7 @@ export default function ProductForm({
             <IBaseSelectWithSearch
               label="Product type"
               items={masterTypes}
-              selectedKeys={values.master.type ? [values.master.type] : []}
+              selectedKeys={masterType ? [masterType] : []}
               onSelectionChange={(keys) => {
                 const keySet = keys as Set<string>;
                 const [first] = Array.from(keySet);
@@ -611,56 +648,30 @@ export default function ProductForm({
               errorMessage={errors.master?.type?.message}
               isDisabled={isBusy}
             />
-            <IBaseInput
-              label="Name (English)"
-              value={values.master.name.en ?? ""}
-              onValueChange={(next) =>
-                setValue(
-                  "master.name",
-                  updateLocaleValue(values.master.name, "en", next),
-                  { shouldDirty: true, shouldValidate: true }
-                )
+            <IBaseInputMultipleLang
+              label="Name"
+              value={masterName}
+              onValueChange={(langs) =>
+                setValue("master.name", langs as LocaleFieldValue, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
               }
               isRequired
               isInvalid={Boolean(errors.master?.name?.en)}
               errorMessage={errors.master?.name?.en?.message}
               isDisabled={isBusy}
             />
-            <IBaseInput
-              label="Name (Vietnamese)"
-              value={values.master.name.vi ?? ""}
-              onValueChange={(next) =>
-                setValue(
-                  "master.name",
-                  updateLocaleValue(values.master.name, "vi", next),
-                  { shouldDirty: true, shouldValidate: true }
-                )
-              }
-              isDisabled={isBusy}
-            />
           </div>
 
           <Textarea
-            label="Description (English)"
-            value={values.master.description.en ?? ""}
+            label="Description"
+            value={masterDescription ?? ""}
             onValueChange={(next) =>
-              setValue(
-                "master.description",
-                updateLocaleValue(values.master.description, "en", next),
-                { shouldDirty: true, shouldValidate: true }
-              )
-            }
-            isDisabled={isBusy}
-          />
-          <Textarea
-            label="Description (Vietnamese)"
-            value={values.master.description.vi ?? ""}
-            onValueChange={(next) =>
-              setValue(
-                "master.description",
-                updateLocaleValue(values.master.description, "vi", next),
-                { shouldDirty: true, shouldValidate: true }
-              )
+              setValue("master.description", next, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
             }
             isDisabled={isBusy}
           />
@@ -669,9 +680,7 @@ export default function ProductForm({
             <IBaseSelectWithSearch
               label="Category"
               items={categoryOptions}
-              selectedKeys={
-                values.master.categoryId ? [values.master.categoryId] : []
-              }
+              selectedKeys={masterCategoryId ? [masterCategoryId] : []}
               onSelectionChange={(keys) => {
                 const keySet = keys as Set<string>;
                 const [first] = Array.from(keySet);
@@ -691,26 +700,13 @@ export default function ProductForm({
             />
 
             <IBaseInput
-              label="Brand (English)"
-              value={values.master.brand.en ?? ""}
+              label="Brand"
+              value={masterBrand ?? ""}
               onValueChange={(next) =>
-                setValue(
-                  "master.brand",
-                  updateLocaleValue(values.master.brand, "en", next),
-                  { shouldDirty: true, shouldValidate: true }
-                )
-              }
-              isDisabled={isBusy}
-            />
-            <IBaseInput
-              label="Brand (Vietnamese)"
-              value={values.master.brand.vi ?? ""}
-              onValueChange={(next) =>
-                setValue(
-                  "master.brand",
-                  updateLocaleValue(values.master.brand, "vi", next),
-                  { shouldDirty: true, shouldValidate: true }
-                )
+                setValue("master.brand", next, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
               }
               isDisabled={isBusy}
             />
@@ -720,7 +716,7 @@ export default function ProductForm({
             label="Product features"
             orientation="horizontal"
             value={featureOptions
-              .filter((feature) => values.master.features[feature.key])
+              .filter((feature) => masterFeatures?.[feature.key])
               .map((feature) => feature.key)}
             onChange={(selected) =>
               handleFeatureToggle(new Set(selected as string[]))
@@ -740,7 +736,7 @@ export default function ProductForm({
           </CheckboxGroup>
 
           <Switch
-            isSelected={values.master.isActive}
+            isSelected={masterIsActive ?? false}
             onValueChange={(next) =>
               setValue("master.isActive", next, {
                 shouldDirty: true,
@@ -757,11 +753,15 @@ export default function ProductForm({
           <div className="grid gap-4 md:grid-cols-2">
             <IBaseInput
               label="Variant name (English)"
-              value={values.variant.name.en ?? ""}
+              value={variantName?.en ?? ""}
               onValueChange={(next) =>
                 setValue(
                   "variant.name",
-                  updateLocaleValue(values.variant.name, "en", next),
+                  updateLocaleValue(
+                    variantName ?? { en: "", vi: "" },
+                    "en",
+                    next
+                  ),
                   { shouldDirty: true, shouldValidate: true }
                 )
               }
@@ -772,43 +772,34 @@ export default function ProductForm({
             />
             <IBaseInput
               label="Variant name (Vietnamese)"
-              value={values.variant.name.vi ?? ""}
+              value={variantName?.vi ?? ""}
               onValueChange={(next) =>
                 setValue(
                   "variant.name",
-                  updateLocaleValue(values.variant.name, "vi", next),
+                  updateLocaleValue(
+                    variantName ?? { en: "", vi: "" },
+                    "vi",
+                    next
+                  ),
                   { shouldDirty: true, shouldValidate: true }
                 )
               }
               isDisabled={isBusy}
             />
             <Textarea
-              label="Variant description (English)"
-              value={values.variant.description.en ?? ""}
+              label="Variant description"
+              value={variantDescription ?? ""}
               onValueChange={(next) =>
-                setValue(
-                  "variant.description",
-                  updateLocaleValue(values.variant.description, "en", next),
-                  { shouldDirty: true, shouldValidate: true }
-                )
-              }
-              isDisabled={isBusy}
-            />
-            <Textarea
-              label="Variant description (Vietnamese)"
-              value={values.variant.description.vi ?? ""}
-              onValueChange={(next) =>
-                setValue(
-                  "variant.description",
-                  updateLocaleValue(values.variant.description, "vi", next),
-                  { shouldDirty: true, shouldValidate: true }
-                )
+                setValue("variant.description", next, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
               }
               isDisabled={isBusy}
             />
             <IBaseInput
               label="SKU"
-              value={values.variant.sku}
+              value={variantSku ?? ""}
               onValueChange={(next) =>
                 setValue("variant.sku", next, {
                   shouldDirty: true,
@@ -819,7 +810,7 @@ export default function ProductForm({
             />
             <IBaseInput
               label="Barcode"
-              value={values.variant.barcode}
+              value={variantBarcode ?? ""}
               onValueChange={(next) =>
                 setValue("variant.barcode", next, {
                   shouldDirty: true,
@@ -829,40 +820,19 @@ export default function ProductForm({
               isDisabled={isBusy}
             />
             <IBaseInput
-              label="Manufacturer name (English)"
-              value={values.variant.manufacturerName.en ?? ""}
+              label="Manufacturer name"
+              value={variantManufacturerName ?? ""}
               onValueChange={(next) =>
-                setValue(
-                  "variant.manufacturerName",
-                  updateLocaleValue(
-                    values.variant.manufacturerName,
-                    "en",
-                    next
-                  ),
-                  { shouldDirty: true, shouldValidate: true }
-                )
-              }
-              isDisabled={isBusy}
-            />
-            <IBaseInput
-              label="Manufacturer name (Vietnamese)"
-              value={values.variant.manufacturerName.vi ?? ""}
-              onValueChange={(next) =>
-                setValue(
-                  "variant.manufacturerName",
-                  updateLocaleValue(
-                    values.variant.manufacturerName,
-                    "vi",
-                    next
-                  ),
-                  { shouldDirty: true, shouldValidate: true }
-                )
+                setValue("variant.manufacturerName", next, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
               }
               isDisabled={isBusy}
             />
             <IBaseInput
               label="Manufacturer code"
-              value={values.variant.manufacturerCode}
+              value={variantManufacturerCode ?? ""}
               onValueChange={(next) =>
                 setValue("variant.manufacturerCode", next, {
                   shouldDirty: true,
@@ -874,9 +844,7 @@ export default function ProductForm({
             <IBaseSelectWithSearch
               label="Base unit of measure"
               items={uomOptions}
-              selectedKeys={
-                values.variant.baseUomId ? [values.variant.baseUomId] : []
-              }
+              selectedKeys={variantBaseUomId ? [variantBaseUomId] : []}
               onSelectionChange={(keys) => {
                 const keySet = keys as Set<string>;
                 const [first] = Array.from(keySet);
@@ -897,7 +865,7 @@ export default function ProductForm({
           </div>
 
           <Switch
-            isSelected={values.variant.isActive}
+            isSelected={variantIsActive ?? false}
             onValueChange={(next) =>
               setValue("variant.isActive", next, {
                 shouldDirty: true,
@@ -931,13 +899,13 @@ export default function ProductForm({
             </Button>
           </div>
 
-          {values.packings.length === 0 ? (
+          {!packings || packings.length === 0 ? (
             <p className="text-small text-default-500">
               No packing entries yet.
             </p>
           ) : (
             <div className="space-y-4">
-              {values.packings.map((packing, index) => (
+              {(packings ?? []).map((packing, index) => (
                 <Card key={index} className="border border-default-200">
                   <CardBody className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -1048,13 +1016,13 @@ export default function ProductForm({
             </Button>
           </div>
 
-          {values.attributes.length === 0 ? (
+          {!attributes || attributes.length === 0 ? (
             <p className="text-small text-default-500">
               No attribute entries yet.
             </p>
           ) : (
             <div className="space-y-4">
-              {values.attributes.map((attribute, index) => (
+              {(attributes ?? []).map((attribute, index) => (
                 <Card key={index} className="border border-default-200">
                   <CardBody className="space-y-3">
                     <div className="flex items-center justify-between">

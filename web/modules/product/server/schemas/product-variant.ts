@@ -4,6 +4,7 @@ import {
   index,
   jsonb,
   pgTable,
+  text,
   timestamp,
   uuid,
   varchar,
@@ -22,11 +23,11 @@ export const table_product_variant = pgTable(
       .references(() => table_product_master.id)
       .notNull(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // string
     images: jsonb("images"), // string[]
     sku: varchar("sku", { length: 100 }),
     barcode: varchar("barcode", { length: 100 }),
-    manufacturer: jsonb("manufacturer"), // { name?: LocaleDataType<string>, code?: string }
+    manufacturer: jsonb("manufacturer"), // { name?: string, code?: string }
     baseUomId: uuid("base_uom_id").references(() => table_unit_of_measure.id),
     isActive: boolean("is_active").default(true).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }),
