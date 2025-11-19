@@ -1,16 +1,13 @@
--- Seed data for product type specific tables
--- This seed file populates data for product_type_* tables based on product_variants
+-- Seed data for product type specific tables and stock-related tables
+-- This seed file populates data based on existing seed data from 0100_seed_initial_data.sql
 
 -- Product Type: Goods
 WITH variants AS (
-  SELECT id, product_master_id, ROW_NUMBER() OVER (ORDER BY sku) AS rn
-  FROM "product_variants"
-  WHERE EXISTS (
-    SELECT 1 FROM "product_masters" pm
-    WHERE pm.id = product_variants.product_master_id
-    AND pm.type = 'goods'
-  )
-  LIMIT 10
+  SELECT pv.id, pv.product_master_id, pm.type, ROW_NUMBER() OVER (ORDER BY pm.code, pv.sku) AS rn
+  FROM "product_variants" pv
+  INNER JOIN "product_masters" pm ON pm.id = pv.product_master_id
+  WHERE pm.type = 'goods'
+  ORDER BY pm.code, pv.sku
 )
 INSERT INTO "product_type_goods" (
   "product_variant_id",
@@ -31,7 +28,7 @@ SELECT
   (100 + rn * 10)::numeric(18, 4),
   (80 + rn * 8)::numeric(18, 4),
   (1.5 + rn * 0.2)::numeric(10, 2),
-  jsonb_build_object('length', 10 + rn, 'width', 5 + rn, 'height', 3 + rn),
+  jsonb_build_object('length', 10 + rn, 'width', 5 + rn, 'height', 3 + rn, 'unit', 'cm'),
   (ARRAY['Red', 'Blue', 'Green', 'Black', 'White'])[((rn - 1) % 5) + 1],
   (ARRAY['Modern', 'Classic', 'Vintage', 'Sport'])[((rn - 1) % 4) + 1],
   CASE WHEN rn % 3 = 0 THEN NOW() + (rn * 30 || ' days')::INTERVAL ELSE NULL END,
@@ -43,14 +40,11 @@ FROM variants;
 
 -- Product Type: Raw Material
 WITH variants AS (
-  SELECT id, product_master_id, ROW_NUMBER() OVER (ORDER BY sku) AS rn
-  FROM "product_variants"
-  WHERE EXISTS (
-    SELECT 1 FROM "product_masters" pm
-    WHERE pm.id = product_variants.product_master_id
-    AND pm.type = 'raw_material'
-  )
-  LIMIT 5
+  SELECT pv.id, pv.product_master_id, pm.type, ROW_NUMBER() OVER (ORDER BY pm.code, pv.sku) AS rn
+  FROM "product_variants" pv
+  INNER JOIN "product_masters" pm ON pm.id = pv.product_master_id
+  WHERE pm.type = 'raw_material'
+  ORDER BY pm.code, pv.sku
 )
 INSERT INTO "product_type_raw_material" (
   "product_variant_id",
@@ -70,7 +64,8 @@ SELECT
   jsonb_build_object(
     'purity', (95 + rn)::text || '%',
     'moisture', (5 - rn * 0.1)::text || '%',
-    'grade', 'A'
+    'grade', 'A',
+    'unit', 'kg'
   ),
   'ISO 9001:2015',
   NULL,
@@ -83,14 +78,11 @@ FROM variants;
 
 -- Product Type: Finished Good
 WITH variants AS (
-  SELECT id, product_master_id, ROW_NUMBER() OVER (ORDER BY sku) AS rn
-  FROM "product_variants"
-  WHERE EXISTS (
-    SELECT 1 FROM "product_masters" pm
-    WHERE pm.id = product_variants.product_master_id
-    AND pm.type = 'finished_good'
-  )
-  LIMIT 5
+  SELECT pv.id, pv.product_master_id, pm.type, ROW_NUMBER() OVER (ORDER BY pm.code, pv.sku) AS rn
+  FROM "product_variants" pv
+  INNER JOIN "product_masters" pm ON pm.id = pv.product_master_id
+  WHERE pm.type = 'finished_good'
+  ORDER BY pm.code, pv.sku
 )
 INSERT INTO "product_type_finished_good" (
   "product_variant_id",
@@ -117,14 +109,11 @@ FROM variants;
 
 -- Product Type: Consumable
 WITH variants AS (
-  SELECT id, product_master_id, ROW_NUMBER() OVER (ORDER BY sku) AS rn
-  FROM "product_variants"
-  WHERE EXISTS (
-    SELECT 1 FROM "product_masters" pm
-    WHERE pm.id = product_variants.product_master_id
-    AND pm.type = 'consumable'
-  )
-  LIMIT 5
+  SELECT pv.id, pv.product_master_id, pm.type, ROW_NUMBER() OVER (ORDER BY pm.code, pv.sku) AS rn
+  FROM "product_variants" pv
+  INNER JOIN "product_masters" pm ON pm.id = pv.product_master_id
+  WHERE pm.type = 'consumable'
+  ORDER BY pm.code, pv.sku
 )
 INSERT INTO "product_type_consumable" (
   "product_variant_id",
@@ -151,14 +140,11 @@ FROM variants;
 
 -- Product Type: Tool
 WITH variants AS (
-  SELECT id, product_master_id, ROW_NUMBER() OVER (ORDER BY sku) AS rn
-  FROM "product_variants"
-  WHERE EXISTS (
-    SELECT 1 FROM "product_masters" pm
-    WHERE pm.id = product_variants.product_master_id
-    AND pm.type = 'tool'
-  )
-  LIMIT 5
+  SELECT pv.id, pv.product_master_id, pm.type, ROW_NUMBER() OVER (ORDER BY pm.code, pv.sku) AS rn
+  FROM "product_variants" pv
+  INNER JOIN "product_masters" pm ON pm.id = pv.product_master_id
+  WHERE pm.type = 'tool'
+  ORDER BY pm.code, pv.sku
 )
 INSERT INTO "product_type_tool" (
   "product_variant_id",
@@ -195,14 +181,11 @@ FROM variants;
 
 -- Product Type: Asset
 WITH variants AS (
-  SELECT id, product_master_id, ROW_NUMBER() OVER (ORDER BY sku) AS rn
-  FROM "product_variants"
-  WHERE EXISTS (
-    SELECT 1 FROM "product_masters" pm
-    WHERE pm.id = product_variants.product_master_id
-    AND pm.type = 'asset'
-  )
-  LIMIT 5
+  SELECT pv.id, pv.product_master_id, pm.type, ROW_NUMBER() OVER (ORDER BY pm.code, pv.sku) AS rn
+  FROM "product_variants" pv
+  INNER JOIN "product_masters" pm ON pm.id = pv.product_master_id
+  WHERE pm.type = 'asset'
+  ORDER BY pm.code, pv.sku
 )
 INSERT INTO "product_type_asset" (
   "product_variant_id",
@@ -239,14 +222,11 @@ FROM variants;
 
 -- Product Type: Service
 WITH variants AS (
-  SELECT id, product_master_id, ROW_NUMBER() OVER (ORDER BY sku) AS rn
-  FROM "product_variants"
-  WHERE EXISTS (
-    SELECT 1 FROM "product_masters" pm
-    WHERE pm.id = product_variants.product_master_id
-    AND pm.type = 'service'
-  )
-  LIMIT 5
+  SELECT pv.id, pv.product_master_id, pm.type, ROW_NUMBER() OVER (ORDER BY pm.code, pv.sku) AS rn
+  FROM "product_variants" pv
+  INNER JOIN "product_masters" pm ON pm.id = pv.product_master_id
+  WHERE pm.type = 'service'
+  ORDER BY pm.code, pv.sku
 )
 INSERT INTO "product_type_service" (
   "product_variant_id",
@@ -263,13 +243,13 @@ SELECT
   (150 + rn * 15)::numeric(18, 4),
   (ARRAY['hour', 'day', 'session', 'project'])[((rn - 1) % 4) + 1],
   60 + rn * 15,
-  CONCAT('Detailed service description for service ', rn),
+  CONCAT('Detailed service description for service ', rn, '. This service includes comprehensive support and consultation.'),
   CONCAT('Special requirements: ', (ARRAY['None', 'Certification required', 'Equipment needed'])[((rn - 1) % 3) + 1]),
   NOW(),
   NOW()
 FROM variants;
 
--- Stock Settings
+-- Stock Settings (based on product_masters and stock_warehouses)
 WITH products AS (
   SELECT id, ROW_NUMBER() OVER (ORDER BY code) AS rn
   FROM "product_masters"
@@ -303,18 +283,28 @@ SELECT
   NOW()
 FROM products p
 CROSS JOIN warehouses w
-WHERE (p.rn + w.rn) % 3 = 0; -- Only create settings for some combinations
+WHERE (p.rn + w.rn) % 3 = 0; -- Create settings for some product-warehouse combinations
 
--- Stock Lots
-WITH variants AS (
-  SELECT id, ROW_NUMBER() OVER (ORDER BY sku) AS rn
-  FROM "product_variants"
-  LIMIT 20
+-- Stock Lots (based on product_variants and stock_warehouses)
+-- Only create lots for stockable products (goods, raw_material, consumable, finished_good)
+WITH stockable_variants AS (
+  SELECT pv.id AS variant_id, pv.product_master_id, pm.type, ROW_NUMBER() OVER (ORDER BY pm.code, pv.sku) AS rn
+  FROM "product_variants" pv
+  INNER JOIN "product_masters" pm ON pm.id = pv.product_master_id
+  WHERE pm.type IN ('goods', 'raw_material', 'consumable', 'finished_good')
+  ORDER BY pm.code, pv.sku
+  LIMIT 15
 ),
 warehouses AS (
   SELECT id, ROW_NUMBER() OVER (ORDER BY code) AS rn
   FROM "stock_warehouses"
   ORDER BY code
+  LIMIT 20
+),
+purchase_order_lines AS (
+  SELECT id, ROW_NUMBER() OVER (ORDER BY created_at) AS rn
+  FROM "purchase_order_lines"
+  ORDER BY created_at
   LIMIT 20
 )
 INSERT INTO "stock_lots" (
@@ -335,11 +325,11 @@ INSERT INTO "stock_lots" (
   "updated_at"
 )
 SELECT
-  v.id,
+  v.variant_id,
   w.id,
   CONCAT('LOT-', LPAD((v.rn + w.rn)::text, 6, '0')),
   CONCAT('BATCH-', LPAD((v.rn * 10 + w.rn)::text, 6, '0')),
-  NULL,
+  CASE WHEN pol.id IS NOT NULL THEN pol.id ELSE NULL END,
   NOW() - ((v.rn + w.rn) * 5 || ' days')::INTERVAL,
   (50 + v.rn * 5)::numeric(18, 4),
   (100 + v.rn * 10)::numeric(14, 2),
@@ -350,21 +340,23 @@ SELECT
   (ARRAY['active', 'active', 'expired', 'depleted'])[((v.rn + w.rn - 1) % 4) + 1],
   NOW(),
   NOW()
-FROM variants v
+FROM stockable_variants v
 CROSS JOIN warehouses w
-WHERE (v.rn + w.rn) % 4 = 0; -- Only create some lots
+LEFT JOIN purchase_order_lines pol ON pol.rn = ((v.rn + w.rn - 1) % 20) + 1
+WHERE (v.rn + w.rn) % 4 = 0; -- Create some lots
 
--- Stock Lot Moves
-WITH lot_moves AS (
+-- Stock Lot Moves (based on stock_lots and stock_moves)
+WITH lot_move_data AS (
   SELECT 
     sl.id AS lot_id,
     sm.id AS move_id,
+    sl.product_variant_id,
+    sm.product_id,
     ROW_NUMBER() OVER (ORDER BY sl.created_at, sm.created_at) AS rn
   FROM "stock_lots" sl
-  CROSS JOIN "stock_moves" sm
-  WHERE sm.product_id = (
-    SELECT product_master_id FROM "product_variants" WHERE id = sl.product_variant_id
-  )
+  INNER JOIN "product_variants" pv ON pv.id = sl.product_variant_id
+  INNER JOIN "stock_moves" sm ON sm.product_id = pv.product_master_id
+  WHERE sm.type IN ('inbound', 'outbound')
   LIMIT 30
 )
 INSERT INTO "stock_lot_moves" (
@@ -382,14 +374,24 @@ SELECT
   (5 + rn * 2)::numeric(14, 2),
   (50 + rn * 3)::numeric(18, 4),
   ((5 + rn * 2) * (50 + rn * 3))::numeric(18, 4),
-  (ARRAY['inbound', 'outbound', 'transfer'])[((rn - 1) % 3) + 1],
+  (SELECT type FROM "stock_moves" WHERE id = move_id),
   NOW() - (rn || ' hours')::INTERVAL
-FROM lot_moves;
+FROM lot_move_data;
 
--- Cost Variances
-WITH variants AS (
-  SELECT id, ROW_NUMBER() OVER (ORDER BY sku) AS rn
-  FROM "product_variants"
+-- Cost Variances (based on product_variants with standard cost method)
+WITH variants_with_standard_cost AS (
+  SELECT 
+    pv.id AS variant_id,
+    pv.standard_cost,
+    ROW_NUMBER() OVER (ORDER BY pv.sku) AS rn
+  FROM "product_variants" pv
+  WHERE pv.cost_method = 'standard' AND pv.standard_cost IS NOT NULL
+  LIMIT 15
+),
+purchase_order_lines AS (
+  SELECT id, ROW_NUMBER() OVER (ORDER BY created_at) AS rn
+  FROM "purchase_order_lines"
+  ORDER BY created_at
   LIMIT 15
 )
 INSERT INTO "cost_variances" (
@@ -403,13 +405,13 @@ INSERT INTO "cost_variances" (
   "created_at"
 )
 SELECT
-  id,
-  NULL,
-  (50 + rn * 5)::numeric(18, 4),
-  (52 + rn * 5.2)::numeric(18, 4),
-  (2 + rn * 0.2)::numeric(18, 4),
-  (100 + rn * 10)::numeric(14, 2),
-  ((2 + rn * 0.2) * (100 + rn * 10))::numeric(18, 4),
-  NOW() - (rn || ' days')::INTERVAL
-FROM variants;
-
+  v.variant_id,
+  CASE WHEN pol.id IS NOT NULL THEN pol.id ELSE NULL END,
+  v.standard_cost,
+  (v.standard_cost * 1.05)::numeric(18, 4), -- Actual cost is 5% higher
+  (v.standard_cost * 0.05)::numeric(18, 4), -- Variance is 5% of standard
+  (100 + v.rn * 10)::numeric(14, 2),
+  ((v.standard_cost * 0.05) * (100 + v.rn * 10))::numeric(18, 4),
+  NOW() - (v.rn || ' days')::INTERVAL
+FROM variants_with_standard_cost v
+LEFT JOIN purchase_order_lines pol ON pol.rn = v.rn;
