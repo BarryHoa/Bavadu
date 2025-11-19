@@ -28,6 +28,25 @@ export type ProductFeaturesResponse = {
   data: ProductFeatureOption[];
 };
 
+export type OptionalFieldDefinition = {
+  field: string;
+  type: "string" | "number" | "boolean" | "date" | "json" | "integer";
+  label: LocaleDataType<string>;
+  description?: LocaleDataType<string>;
+  isRequired: boolean;
+  validation?: {
+    min?: number;
+    max?: number;
+    pattern?: string;
+    maxLength?: number;
+  };
+};
+
+export type OptionalFieldsResponse = {
+  success: boolean;
+  data: OptionalFieldDefinition[];
+};
+
 class ProductService extends ClientHttpService {
   constructor() {
     const BASE_URL = "/api/modules/product";
@@ -64,6 +83,12 @@ class ProductService extends ClientHttpService {
 
   async getProductFeatures() {
     return this.get<ProductFeaturesResponse>(`/features`);
+  }
+
+  async getOptionalFieldsByProductType(type: string) {
+    return this.get<OptionalFieldsResponse>(
+      `/optional-fields?type=${encodeURIComponent(type)}`
+    );
   }
 }
 
