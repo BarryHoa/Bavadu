@@ -1,13 +1,11 @@
-
 // ========================================
 // Product Master Type
 // ========================================
 
 import { LocaleDataType } from "@base/server/interfaces/Locale";
 import { User } from "@base/server/interfaces/User";
-import { ProductCategory } from "./ProductCategory";
 import { ProductAttribute } from "./ProductAttribute";
-
+import { ProductCategory } from "./ProductCategory";
 
 export enum ProductMasterEnum {
   GOODS = "goods", // Hàng hóa thông thường
@@ -23,16 +21,18 @@ export type ProductMasterType = `${ProductMasterEnum}`;
 // ========================================
 // Product Features (Module Gates)
 // ========================================
-export interface ProductMasterFeatures {
-  sale: boolean; // Có thể bán
-  purchase: boolean; // Có thể mua
-  manufacture: boolean; // Có thể sản xuất (make)
-  subcontract: boolean; // Có thể gia công ngoài
-  stockable: boolean; // Có thể lưu kho
-  maintenance: boolean; // Có thể bảo trì,
-  asset: boolean; // Có thể là tài sản,
-  accounting: boolean; // Khấu hao lâu dài
+export enum ProductMasterFeaturesEnum {
+  SALE = "sale",
+  PURCHASE = "purchase",
+  MANUFACTURE = "manufacture",
+  SUBCONTRACT = "subcontract",
+  STOCKABLE = "stockable",
+  MAINTENANCE = "maintenance",
+  ASSET = "asset",
+  ACCOUNTING = "accounting",
 }
+export type ProductMasterFeatures = Record<ProductMasterFeaturesEnum, boolean>;
+
 /**
  * | Trường hợp               | product.type    | Module chính               | Mục tiêu                  |
 | ------------------------ | --------------- | -------------------------- | ------------------------- |
@@ -46,30 +46,28 @@ export interface ProductMasterFeatures {
 
  */
 
-
 // ========================================
 // Layer 1: Master Product (Template/Identity)
 // ========================================
 export type MasterProductId = string; // uuid v7
 export interface MasterProduct {
-    id: MasterProductId;
-    code: string; // Unique product code
-    name: LocaleDataType<string>;
-    // Core classification
-    type: ProductMasterType;
-    // Business features (module gates)
-    features: Partial<ProductMasterFeatures>;
-    // Status
-    isActive: boolean;
+  id: MasterProductId;
+  code: string; // Unique product code
+  name: LocaleDataType<string>;
+  // Core classification
+  type: ProductMasterType;
+  // Business features (module gates)
+  features: Partial<ProductMasterFeatures>;
+  // Status
+  isActive: boolean;
 
-    // Metadata
-    brand?: string;
-    category?: ProductCategory;
+  // Metadata
+  brand?: string;
+  category?: ProductCategory;
 
-    createdAt?: number; // unix timestamp (ms)
-    updatedAt?: number; // unix timestamp (ms)
-    createdBy?: User;
-    updatedBy?: User;
-    attributes?: ProductAttribute[];
-  }
-
+  createdAt?: number; // unix timestamp (ms)
+  updatedAt?: number; // unix timestamp (ms)
+  createdBy?: User;
+  updatedBy?: User;
+  attributes?: ProductAttribute[];
+}

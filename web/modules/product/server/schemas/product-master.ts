@@ -38,6 +38,13 @@ export const table_product_master = pgTable(
     index("product_masters_category_idx").on(table.categoryId),
     index("product_masters_type_idx").on(table.type),
     index("product_masters_active_idx").on(table.isActive),
+    // Composite index for common query: get active products by type
+    index("product_masters_type_active_idx").on(table.type, table.isActive),
+    // Composite index for category and active status
+    index("product_masters_category_active_idx").on(
+      table.categoryId,
+      table.isActive
+    ),
   ]
 );
 

@@ -38,6 +38,22 @@ export const table_stock_move = pgTable(
     index("stock_moves_source_idx").on(table.sourceWarehouseId),
     index("stock_moves_target_idx").on(table.targetWarehouseId),
     index("stock_moves_created_idx").on(table.createdAt),
+    // Composite index for common query: get moves by product and type
+    index("stock_moves_product_type_idx").on(table.productId, table.type),
+    // Composite index for date range queries with product
+    index("stock_moves_product_created_idx").on(
+      table.productId,
+      table.createdAt
+    ),
+    // Composite index for warehouse queries
+    index("stock_moves_source_created_idx").on(
+      table.sourceWarehouseId,
+      table.createdAt
+    ),
+    index("stock_moves_target_created_idx").on(
+      table.targetWarehouseId,
+      table.createdAt
+    ),
   ]
 );
 

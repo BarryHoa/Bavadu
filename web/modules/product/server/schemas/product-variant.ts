@@ -3,6 +3,7 @@ import {
   boolean,
   index,
   jsonb,
+  numeric,
   pgTable,
   text,
   timestamp,
@@ -29,6 +30,15 @@ export const table_product_variant = pgTable(
     barcode: varchar("barcode", { length: 100 }),
     manufacturer: jsonb("manufacturer"), // { name?: string, code?: string }
     baseUomId: uuid("base_uom_id").references(() => table_unit_of_measure.id),
+    
+    // Cost calculation method
+    costMethod: varchar("cost_method", { length: 20 })
+      .notNull()
+      .default("average"), // "average" | "fifo" | "lifo" | "standard"
+    
+    // Standard cost (only used when costMethod = "standard")
+    standardCost: numeric("standard_cost", { precision: 18, scale: 4 }),
+    
     isActive: boolean("is_active").default(true).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }),
     updatedAt: timestamp("updated_at", { withTimezone: true }),
@@ -41,6 +51,13 @@ export const table_product_variant = pgTable(
     index("product_variants_barcode_idx").on(table.barcode),
     index("product_variants_active_idx").on(table.isActive),
     index("product_variants_base_uom_idx").on(table.baseUomId),
+    // Composite index for common query: get active variants by master
+    index("product_variants_master_active_idx").on(
+      table.productMasterId,
+      table.isActive
+    ),
+    // Index for cost method filtering
+    index("product_variants_cost_method_idx").on(table.costMethod),
   ]
 );
 

@@ -1,0 +1,59 @@
+import { sql } from "drizzle-orm";
+import {
+  boolean,
+  index,
+  jsonb,
+  numeric,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
+import { table_product_variant } from "./product-variant";
+
+// Product Type: Goods - Hàng hóa mua bán
+export const table_product_type_goods = pgTable(
+  "product_type_goods",
+  {
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
+    productVariantId: uuid("product_variant_id")
+      .references(() => table_product_variant.id, { onDelete: "cascade" })
+      .notNull()
+      .unique(), // 1 variant = 1 goods record
+
+    // Pricing (default values, actual prices in transactions)
+    defaultSalePrice: numeric("default_sale_price", {
+      precision: 18,
+      scale: 4,
+    }), // Giá bán mặc định (chỉ để tham khảo)
+    defaultPurchasePrice: numeric("default_purchase_price", {
+      precision: 18,
+      scale: 4,
+    }), // Giá mua mặc định (chỉ để tham khảo)
+
+    // Physical attributes
+    weight: numeric("weight", { precision: 10, scale: 2 }), // kg
+    dimensions: jsonb("dimensions"), // { length, width, height, unit }
+    color: varchar("color", { length: 50 }),
+    style: varchar("style", { length: 100 }),
+
+    // Expiry & Storage
+    expiryDate: timestamp("expiry_date", { withTimezone: true }),
+    expiryTracking: boolean("expiry_tracking").default(false),
+    storageConditions: text("storage_conditions"), // "Nhiệt độ phòng", "Tủ lạnh", etc.
+
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  },
+  (table) => [
+    index("product_type_goods_variant_idx").on(table.productVariantId),
+    index("product_type_goods_expiry_idx").on(table.expiryDate),
+  ]
+);
+
+export type TblProductTypeGoods =
+  typeof table_product_type_goods.$inferSelect;
+export type NewTblProductTypeGoods =
+  typeof table_product_type_goods.$inferInsert;
+

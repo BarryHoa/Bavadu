@@ -11,6 +11,14 @@
         "handler": "/products/create"
       },
       {
+        "path": "/types",
+        "handler": "/products/get-product-types"
+      },
+      {
+        "path": "/features",
+        "handler": "/products/get-product-features"
+      },
+      {
         "path": "/[id]",
         "handler": "/products/get-by-id"
       },
@@ -33,7 +41,7 @@
     "group": "categories",
     "routes": [
       {
-        "path": "/",
+        "path": "/get-list",
         "handler": "/categories/get-list"
       },
       {

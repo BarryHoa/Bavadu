@@ -121,8 +121,6 @@ const ProductsCreatePage = (): React.ReactNode => {
       </div>
 
       <ProductForm
-        title="Create Product"
-        subtitle="Define master data, variants, packings, and attributes."
         submitLabel="Create"
         secondarySubmitLabel="Create & add another"
         loading={createMutation.isPending}

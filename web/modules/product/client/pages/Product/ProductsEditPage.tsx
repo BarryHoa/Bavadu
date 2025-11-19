@@ -178,8 +178,6 @@ export default function ProductsEditPage(): React.ReactNode {
       </div>
 
       <ProductForm
-        title="Edit Product"
-        subtitle="Update master data, variant, packings, and attributes."
         submitLabel="Save changes"
         initialValues={initialFormValues}
         loading={updateMutation.isPending}

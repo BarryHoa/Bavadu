@@ -1,7 +1,14 @@
 import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 import { NextRequest, NextResponse } from "next/server";
 import type { ProductCreateInput } from "../../models/Product/ProductModelInterface";
-import type { ProductMasterFeatures } from "../../models/interfaces/ProductMaster";
+import {
+  ProductMasterFeaturesEnum,
+  type ProductMasterFeatures,
+} from "../../models/interfaces/ProductMaster";
+import {
+  normalizeProductFeatures,
+  validateProductFeatures,
+} from "../../utils/product-features-validator";
 
 export const normalizeLocaleInput = (value: unknown) => {
   if (!value) {
@@ -40,14 +47,14 @@ export const normalizeFeaturePayload = (features: unknown) => {
   }
 
   const allowedKeys: Array<keyof ProductMasterFeatures> = [
-    "sale",
-    "purchase",
-    "manufacture",
-    "subcontract",
-    "stockable",
-    "maintenance",
-    "asset",
-    "accounting",
+    ProductMasterFeaturesEnum.SALE,
+    ProductMasterFeaturesEnum.PURCHASE,
+    ProductMasterFeaturesEnum.MANUFACTURE,
+    ProductMasterFeaturesEnum.SUBCONTRACT,
+    ProductMasterFeaturesEnum.STOCKABLE,
+    ProductMasterFeaturesEnum.MAINTENANCE,
+    ProductMasterFeaturesEnum.ASSET,
+    ProductMasterFeaturesEnum.ACCOUNTING,
   ];
 
   const acc: Partial<ProductMasterFeatures> = {};
@@ -111,6 +118,24 @@ export const buildPayload = (body: any): ProductCreateInput => {
     throw new Error("Product code is required");
   }
 
+  // Normalize and validate features based on product type
+  const rawFeatures = normalizeFeaturePayload(master.features ?? {});
+  const normalizedFeatures = normalizeProductFeatures(
+    type as any,
+    rawFeatures ?? {}
+  );
+
+  // Validate features
+  const validationErrors = validateProductFeatures(
+    type as any,
+    normalizedFeatures
+  );
+  if (validationErrors.length > 0) {
+    throw new Error(
+      `Invalid features for product type "${type}": ${validationErrors.join(", ")}`
+    );
+  }
+
   const masterPayload = {
     code,
     name: normalizeLocaleInput(master.name) ?? { en: code },
@@ -119,7 +144,7 @@ export const buildPayload = (body: any): ProductCreateInput => {
         ? master.description.trim()
         : null,
     type,
-    features: normalizeFeaturePayload(master.features ?? {}),
+    features: normalizedFeatures,
     isActive: typeof master.isActive === "boolean" ? master.isActive : true,
     brand:
       typeof master.brand === "string" && master.brand.trim()

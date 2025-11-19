@@ -18,6 +18,7 @@ type MasterTabProps = {
   categoryOptions: SelectItemOption[];
   masterTypes: SelectItemOption[];
   featureOptions: { key: ProductMasterFeatures; label: string }[];
+  disabledFeatures?: Set<string>;
   errors?: {
     name?: { en?: { message?: string } };
     code?: { message?: string };
@@ -34,6 +35,7 @@ export default function MasterTab({
   categoryOptions,
   masterTypes,
   featureOptions,
+  disabledFeatures = new Set(),
   errors,
   isBusy,
   categoryQueryLoading,
@@ -56,7 +58,7 @@ export default function MasterTab({
         isDisabled={isBusy}
       />
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 items-start">
         <IBaseInput
           label="Code"
           value={value.code ?? ""}
@@ -72,7 +74,11 @@ export default function MasterTab({
         <IBaseSelectWithSearch
           label="Product type"
           items={masterTypes}
-          selectedKeys={value.type ? [value.type] : []}
+          selectedKeys={
+            value.type && masterTypes.some((item) => item.value === value.type)
+              ? [value.type]
+              : []
+          }
           onSelectionChange={(keys) => {
             const keySet = keys as Set<string>;
             const [first] = Array.from(keySet);
@@ -86,7 +92,7 @@ export default function MasterTab({
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 items-start">
         <IBaseSelectWithSearch
           label="Category"
           items={categoryOptions}
@@ -127,7 +133,10 @@ export default function MasterTab({
             features: featureOptions.reduce(
               (acc, feature) => ({
                 ...acc,
-                [feature.key]: selectedSet.has(feature.key),
+                // If feature is disabled, keep it false
+                [feature.key]: disabledFeatures.has(feature.key)
+                  ? false
+                  : selectedSet.has(feature.key),
               }),
               {} as Record<ProductMasterFeatures, boolean>
             ),
@@ -137,7 +146,11 @@ export default function MasterTab({
         isDisabled={isBusy}
       >
         {featureOptions.map((feature) => (
-          <Checkbox key={feature.key} value={feature.key} isDisabled={isBusy}>
+          <Checkbox
+            key={feature.key}
+            value={feature.key}
+            isDisabled={isBusy || disabledFeatures.has(feature.key)}
+          >
             {feature.label}
           </Checkbox>
         ))}

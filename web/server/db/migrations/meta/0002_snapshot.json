@@ -1,6 +1,6 @@
 {
-  "id": "c7d0f9b1-86ac-41ae-ad16-8afeb1245135",
-  "prevId": "cf1d0424-f597-4515-a191-051625f51130",
+  "id": "65086a3f-e7b7-4950-aa3c-6f1a44c9d2e8",
+  "prevId": "c7d0f9b1-86ac-41ae-ad16-8afeb1245135",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -998,6 +998,48 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "product_masters_type_active_idx": {
+          "name": "product_masters_type_active_idx",
+          "columns": [
+            {
+              "expression": "type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "is_active",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "product_masters_category_active_idx": {
+          "name": "product_masters_category_active_idx",
+          "columns": [
+            {
+              "expression": "category_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "is_active",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -1199,6 +1241,42 @@
           "columns": [
             {
               "expression": "base_uom_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "product_variants_master_active_idx": {
+          "name": "product_variants_master_active_idx",
+          "columns": [
+            {
+              "expression": "product_master_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "is_active",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "product_variants_cost_method_idx": {
+          "name": "product_variants_cost_method_idx",
+          "columns": [
+            {
+              "expression": "cost_method",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -2038,6 +2116,27 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "product_type_raw_material_supplier_reorder_idx": {
+          "name": "product_type_raw_material_supplier_reorder_idx",
+          "columns": [
+            {
+              "expression": "primary_supplier_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "default_reorder_point",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -2472,6 +2571,48 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "product_type_tool_status_next_maintenance_idx": {
+          "name": "product_type_tool_status_next_maintenance_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "next_maintenance_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "product_type_tool_assigned_status_idx": {
+          "name": "product_type_tool_assigned_status_idx",
+          "columns": [
+            {
+              "expression": "assigned_to_user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -2644,6 +2785,27 @@
           "columns": [
             {
               "expression": "assigned_to_user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "product_type_asset_assigned_location_idx": {
+          "name": "product_type_asset_assigned_location_idx",
+          "columns": [
+            {
+              "expression": "assigned_to_user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "location",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -3768,6 +3930,27 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "stock_levels_warehouse_quantity_idx": {
+          "name": "stock_levels_warehouse_quantity_idx",
+          "columns": [
+            {
+              "expression": "warehouse_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "quantity",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -3935,6 +4118,90 @@
         "stock_moves_created_idx": {
           "name": "stock_moves_created_idx",
           "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "stock_moves_product_type_idx": {
+          "name": "stock_moves_product_type_idx",
+          "columns": [
+            {
+              "expression": "product_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "stock_moves_product_created_idx": {
+          "name": "stock_moves_product_created_idx",
+          "columns": [
+            {
+              "expression": "product_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "stock_moves_source_created_idx": {
+          "name": "stock_moves_source_created_idx",
+          "columns": [
+            {
+              "expression": "source_warehouse_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "stock_moves_target_created_idx": {
+          "name": "stock_moves_target_created_idx",
+          "columns": [
+            {
+              "expression": "target_warehouse_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
             {
               "expression": "created_at",
               "isExpression": false,
@@ -4114,6 +4381,27 @@
           "columns": [
             {
               "expression": "min_stock_level",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "stock_settings_warehouse_reorder_idx": {
+          "name": "stock_settings_warehouse_reorder_idx",
+          "columns": [
+            {
+              "expression": "warehouse_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "reorder_point",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -4352,6 +4640,69 @@
           "columns": [
             {
               "expression": "purchase_order_line_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "stock_lots_status_expiry_idx": {
+          "name": "stock_lots_status_expiry_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "expiry_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "stock_lots_variant_status_idx": {
+          "name": "stock_lots_variant_status_idx",
+          "columns": [
+            {
+              "expression": "product_variant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "stock_lots_warehouse_status_idx": {
+          "name": "stock_lots_warehouse_status_idx",
+          "columns": [
+            {
+              "expression": "warehouse_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -4628,6 +4979,27 @@
           "columns": [
             {
               "expression": "purchase_order_line_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "cost_variance_variant_created_idx": {
+          "name": "cost_variance_variant_created_idx",
+          "columns": [
+            {
+              "expression": "product_variant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"

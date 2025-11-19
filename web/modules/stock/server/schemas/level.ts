@@ -35,6 +35,15 @@ export const table_stock_level = pgTable(
     })
       .notNull()
       .default("0"),
+    
+    // Average Cost fields (used for average cost method)
+    averageCost: numeric("average_cost", { precision: 18, scale: 4 })
+      .notNull()
+      .default("0"),
+    totalCostValue: numeric("total_cost_value", { precision: 18, scale: 4 })
+      .notNull()
+      .default("0"),
+    
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
@@ -45,6 +54,11 @@ export const table_stock_level = pgTable(
     ),
     index("stock_levels_product_idx").on(table.productId),
     index("stock_levels_warehouse_idx").on(table.warehouseId),
+    // Composite index for low stock queries (quantity < threshold)
+    index("stock_levels_warehouse_quantity_idx").on(
+      table.warehouseId,
+      table.quantity
+    ),
   ]
 );
 

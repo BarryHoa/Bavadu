@@ -1,12 +1,13 @@
 "use client";
 
 import { SelectItemOption } from "@base/client/components";
+import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/react";
+import { Card, CardBody, Tooltip } from "@heroui/react";
 import { Tab, Tabs } from "@heroui/tabs";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
+import { HelpCircle, Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Resolver, SubmitHandler } from "react-hook-form";
 import { useForm, useWatch } from "react-hook-form";
@@ -26,6 +27,11 @@ import {
 } from "valibot";
 
 import {
+  FORBIDDEN_FEATURES_BY_TYPE,
+  REQUIRED_FEATURES_BY_TYPE,
+  getDefaultFeaturesForType,
+} from "../../../server/utils/product-features-validator";
+import {
   LocaleFormValue,
   ProductFormValues,
   ProductMasterFeatures,
@@ -33,10 +39,53 @@ import {
 } from "../../interface/Product";
 import type { ProductCategoryRow } from "../../interface/ProductCategory";
 import ProductCategoryService from "../../services/ProductCategoryService";
+import ProductService from "../../services/ProductService";
 import UnitOfMeasureService from "../../services/UnitOfMeasureService";
 import MasterTab from "./MasterTab";
+import ProductFormGuideModal from "./ProductFormGuideModal";
 import VariantTab from "./VariantTab";
 import type { LocaleFieldValue, VariantFieldValue } from "./types";
+
+/**
+ * Get features for a product type based on constraints
+ * @param productType - The product type
+ * @param featureOptions - Available feature options
+ * @param currentFeatures - Current features state (optional)
+ * @returns New features object with required/forbidden features applied
+ */
+const getFeaturesByProductType = (
+  productType: ProductMasterType,
+  featureOptions: { key: ProductMasterFeatures; label: string }[],
+  currentFeatures?: Record<ProductMasterFeatures, boolean>
+): Record<ProductMasterFeatures, boolean> => {
+  const defaultFeatures = getDefaultFeaturesForType(productType);
+  const requiredFeatures = REQUIRED_FEATURES_BY_TYPE[productType] || [];
+  const forbiddenFeatures = FORBIDDEN_FEATURES_BY_TYPE[productType] || [];
+
+  return featureOptions.reduce(
+    (acc, feature) => {
+      const featureKey = feature.key as string;
+
+      // If feature is required, set to true
+      if (requiredFeatures.includes(featureKey as any)) {
+        acc[feature.key] = true;
+      }
+      // If feature is forbidden, set to false
+      else if (forbiddenFeatures.includes(featureKey as any)) {
+        acc[feature.key] = false;
+      }
+      // Otherwise, keep current value or use default
+      else {
+        acc[feature.key] =
+          currentFeatures?.[feature.key] ??
+          defaultFeatures[featureKey as keyof typeof defaultFeatures] ??
+          false;
+      }
+      return acc;
+    },
+    {} as Record<ProductMasterFeatures, boolean>
+  );
+};
 
 type ProductFormFieldValues = {
   master: {
@@ -51,27 +100,6 @@ type ProductFormFieldValues = {
   };
   variants: VariantFieldValue[];
 };
-
-const featureOptions: { key: ProductMasterFeatures; label: string }[] = [
-  { key: ProductMasterFeatures.SALE, label: "Sale" },
-  { key: ProductMasterFeatures.PURCHASE, label: "Purchase" },
-  { key: ProductMasterFeatures.MANUFACTURE, label: "Manufacture" },
-  { key: ProductMasterFeatures.SUBCONTRACT, label: "Subcontract" },
-  { key: ProductMasterFeatures.STOCKABLE, label: "Stockable" },
-  { key: ProductMasterFeatures.MAINTENANCE, label: "Maintenance" },
-  { key: ProductMasterFeatures.ASSET, label: "Asset" },
-  { key: ProductMasterFeatures.ACCOUNTING, label: "Accounting" },
-];
-
-const masterTypes: SelectItemOption[] = [
-  { value: ProductMasterType.GOODS, label: "Goods" },
-  { value: ProductMasterType.SERVICE, label: "Service" },
-  { value: ProductMasterType.FINISHED_GOOD, label: "Finished good" },
-  { value: ProductMasterType.RAW_MATERIAL, label: "Raw material" },
-  { value: ProductMasterType.CONSUMABLE, label: "Consumable" },
-  { value: ProductMasterType.ASSET, label: "Asset" },
-  { value: ProductMasterType.TOOL, label: "Tool" },
-];
 
 const defaultLocaleValue = (): LocaleFieldValue => ({ en: "", vi: "" });
 
@@ -88,7 +116,10 @@ const createDefaultVariant = (): VariantFieldValue => ({
   attributes: [],
 });
 
-const createDefaultValues = (): ProductFormFieldValues => ({
+// Helper function to create default values with feature options
+const createDefaultValues = (
+  featureOptions: { key: ProductMasterFeatures; label: string }[]
+): ProductFormFieldValues => ({
   master: {
     code: "",
     name: defaultLocaleValue(),
@@ -142,8 +173,6 @@ const buildHierarchyOptions = (categories: ProductCategoryRow[]) => {
 };
 
 interface ProductFormProps {
-  title: string;
-  subtitle?: string;
   submitLabel?: string;
   secondarySubmitLabel?: string;
   loading?: boolean;
@@ -165,10 +194,12 @@ const toLocaleFormValue = (value: LocaleFieldValue): LocaleFormValue => ({
   vi: value.vi.trim() ? value.vi : undefined,
 });
 
+// Helper function to map initial values with feature options
 const mapToFieldValues = (
-  initialValues?: ProductFormValues
+  initialValues: ProductFormValues | undefined,
+  featureOptions: { key: ProductMasterFeatures; label: string }[]
 ): ProductFormFieldValues => {
-  const defaults = createDefaultValues();
+  const defaults = createDefaultValues(featureOptions);
 
   if (!initialValues) {
     return defaults;
@@ -292,7 +323,8 @@ const localeRequiredSchema = object({
   vi: fallback(pipe(string(), trim()), ""),
 });
 
-const productFeatureValues = featureOptions.map((feature) => feature.key) as [
+// Schema validation uses enum values directly
+const productFeatureValues = Object.values(ProductMasterFeatures) as [
   ProductMasterFeatures,
   ...ProductMasterFeatures[],
 ];
@@ -354,8 +386,6 @@ const productFormSchema = object({
 });
 
 export default function ProductForm({
-  title,
-  subtitle,
   submitLabel = "Save",
   secondarySubmitLabel,
   loading = false,
@@ -364,6 +394,43 @@ export default function ProductForm({
   onSubmitAndContinue,
   onCancel,
 }: ProductFormProps) {
+  const getLocalizedText = useLocalizedText();
+
+  const productTypesQuery = useQuery({
+    queryKey: ["product-types"],
+    queryFn: () => ProductService.getProductTypes(),
+  });
+
+  const productFeaturesQuery = useQuery({
+    queryKey: ["product-features"],
+    queryFn: () => ProductService.getProductFeatures(),
+  });
+
+  const featureOptions = useMemo(() => {
+    if (!productFeaturesQuery.data?.data) {
+      return [];
+    }
+    return productFeaturesQuery.data.data.map((option) => {
+      const enumKey = Object.entries(ProductMasterFeatures).find(
+        ([, value]) => value === option.key
+      )?.[1] as ProductMasterFeatures | undefined;
+      return {
+        key: enumKey || (option.key as ProductMasterFeatures),
+        label: getLocalizedText(option.label as any) || option.key,
+      };
+    });
+  }, [productFeaturesQuery.data]);
+
+  const masterTypes = useMemo<SelectItemOption[]>(() => {
+    if (!productTypesQuery.data?.data) {
+      return [];
+    }
+    return productTypesQuery.data.data.map((type) => ({
+      value: type.value,
+      label: getLocalizedText(type.label as any) || type.value,
+    }));
+  }, [productTypesQuery.data]);
+
   const {
     handleSubmit,
     reset,
@@ -372,15 +439,17 @@ export default function ProductForm({
     getValues,
     formState: { errors, isSubmitting },
   } = useForm<ProductFormFieldValues>({
-    defaultValues: mapToFieldValues(initialValues),
+    defaultValues: mapToFieldValues(initialValues, featureOptions),
     resolver: valibotResolver(
       productFormSchema
     ) as Resolver<ProductFormFieldValues>,
+    mode: "onSubmit",
+    reValidateMode: "onChange",
   });
 
   useEffect(() => {
-    reset(mapToFieldValues(initialValues));
-  }, [initialValues, reset]);
+    reset(mapToFieldValues(initialValues, featureOptions));
+  }, [initialValues, reset, featureOptions]);
 
   const categoryQuery = useQuery({
     queryKey: ["product-category-tree"],
@@ -421,26 +490,16 @@ export default function ProductForm({
   const masterFeatures = useWatch({ control, name: "master.features" });
   const variants = useWatch({ control, name: "variants" });
   const [selectedTab, setSelectedTab] = useState<string>("master");
+  const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
 
   const isBusy = loading || isSubmitting;
 
-  const handleFeatureToggle = useCallback(
-    (selected: Set<string>) => {
-      const nextFeatures = featureOptions.reduce(
-        (acc, feature) => ({
-          ...acc,
-          [feature.key]: selected.has(feature.key),
-        }),
-        {} as Record<ProductMasterFeatures, boolean>
-      );
-
-      setValue("master.features", nextFeatures, {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-    },
-    [setValue]
-  );
+  // Calculate disabled features based on product type
+  const disabledFeatures = useMemo(() => {
+    if (!masterType) return new Set<string>();
+    const forbidden = FORBIDDEN_FEATURES_BY_TYPE[masterType] || [];
+    return new Set(forbidden.map((f) => f as string));
+  }, [masterType]);
 
   const addVariant = useCallback(() => {
     const currentVariants = getValues("variants");
@@ -448,7 +507,7 @@ export default function ProductForm({
     const newIndex = currentVariants.length;
     setValue("variants", [...currentVariants, createDefaultVariant()], {
       shouldDirty: true,
-      shouldValidate: true,
+      shouldValidate: false,
     });
     // Switch to the new variant tab
     setSelectedTab(`variant-${newIndex}`);
@@ -461,7 +520,7 @@ export default function ProductForm({
       const newVariants = currentVariants.filter((_, idx) => idx !== index);
       setValue("variants", newVariants, {
         shouldDirty: true,
-        shouldValidate: true,
+        shouldValidate: false,
       });
       // If we're on the removed tab, switch to master or another variant
       if (selectedTab === `variant-${index}`) {
@@ -488,104 +547,10 @@ export default function ProductForm({
       );
       setValue("variants", nextVariants, {
         shouldDirty: true,
-        shouldValidate: true,
+        shouldValidate: false,
       });
     },
     [getValues, setValue]
-  );
-
-  const updatePacking = useCallback(
-    (
-      variantIndex: number,
-      packingIndex: number,
-      updater: (
-        current: VariantFieldValue["packings"][number]
-      ) => VariantFieldValue["packings"][number]
-    ) => {
-      updateVariant(variantIndex, (variant) => ({
-        ...variant,
-        packings: variant.packings.map((item, idx) =>
-          idx === packingIndex ? updater(item) : item
-        ),
-      }));
-    },
-    [updateVariant]
-  );
-
-  const addPacking = useCallback(
-    (variantIndex: number) => {
-      updateVariant(variantIndex, (variant) => ({
-        ...variant,
-        packings: [
-          ...variant.packings,
-          {
-            id: undefined,
-            name: defaultLocaleValue(),
-            description: defaultLocaleValue(),
-            isActive: true,
-          },
-        ],
-      }));
-    },
-    [updateVariant]
-  );
-
-  const removePacking = useCallback(
-    (variantIndex: number, packingIndex: number) => {
-      updateVariant(variantIndex, (variant) => ({
-        ...variant,
-        packings: variant.packings.filter((_, idx) => idx !== packingIndex),
-      }));
-    },
-    [updateVariant]
-  );
-
-  const updateAttribute = useCallback(
-    (
-      variantIndex: number,
-      attributeIndex: number,
-      updater: (
-        current: VariantFieldValue["attributes"][number]
-      ) => VariantFieldValue["attributes"][number]
-    ) => {
-      updateVariant(variantIndex, (variant) => ({
-        ...variant,
-        attributes: variant.attributes.map((item, idx) =>
-          idx === attributeIndex ? updater(item) : item
-        ),
-      }));
-    },
-    [updateVariant]
-  );
-
-  const addAttribute = useCallback(
-    (variantIndex: number) => {
-      updateVariant(variantIndex, (variant) => ({
-        ...variant,
-        attributes: [
-          ...variant.attributes,
-          {
-            id: undefined,
-            code: "",
-            name: defaultLocaleValue(),
-            value: "",
-          },
-        ],
-      }));
-    },
-    [updateVariant]
-  );
-
-  const removeAttribute = useCallback(
-    (variantIndex: number, attributeIndex: number) => {
-      updateVariant(variantIndex, (variant) => ({
-        ...variant,
-        attributes: variant.attributes.filter(
-          (_, idx) => idx !== attributeIndex
-        ),
-      }));
-    },
-    [updateVariant]
   );
 
   const handleValidSubmit: SubmitHandler<ProductFormFieldValues> = async (
@@ -602,7 +567,7 @@ export default function ProductForm({
     }
 
     await onSubmitAndContinue(mapToProductFormValues(formValues));
-    reset(createDefaultValues());
+    reset(createDefaultValues(featureOptions));
   };
 
   const submitForm = handleSubmit(handleValidSubmit);
@@ -628,7 +593,19 @@ export default function ProductForm({
                 Add Variant
               </Button>
             </div>
-            <div className="justify-end space-x-2">
+            <div className="justify-end flex items-center gap-2">
+              <Tooltip content="Thông tin cần biết" placement="top">
+                <Button
+                  isIconOnly
+                  variant="light"
+                  size="sm"
+                  onPress={() => setIsGuideModalOpen(true)}
+                  isDisabled={isBusy}
+                  aria-label="Hướng dẫn sử dụng"
+                >
+                  <HelpCircle size={18} className="text-default-500" />
+                </Button>
+              </Tooltip>
               {onCancel ? (
                 <Button
                   variant="light"
@@ -640,18 +617,14 @@ export default function ProductForm({
                 </Button>
               ) : null}
 
-              {onSubmitAndContinue ? (
+              {onSubmitAndContinue && submitAndContinueForm ? (
                 <Button
                   variant="bordered"
                   size="sm"
                   type="button"
-                  onPress={
-                    submitAndContinueForm
-                      ? async () => {
-                          await submitAndContinueForm();
-                        }
-                      : undefined
-                  }
+                  onPress={async () => {
+                    await submitAndContinueForm();
+                  }}
                   isDisabled={isBusy}
                 >
                   {secondarySubmitLabel ?? "Save & add another"}
@@ -700,6 +673,7 @@ export default function ProductForm({
                 categoryOptions={categoryOptions}
                 masterTypes={masterTypes}
                 featureOptions={featureOptions}
+                disabledFeatures={disabledFeatures}
                 errors={errors.master}
                 isBusy={isBusy}
                 categoryQueryLoading={categoryQuery.isLoading}
@@ -715,9 +689,22 @@ export default function ProductForm({
                     isActive: true,
                   };
                   const updated = updater(current);
+
+                  // If product type changed, reset features using getFeaturesByProductType
+                  if (
+                    updated.type !== current.type &&
+                    featureOptions.length > 0
+                  ) {
+                    updated.features = getFeaturesByProductType(
+                      updated.type,
+                      featureOptions,
+                      current.features
+                    );
+                  }
+
                   setValue("master", updated, {
                     shouldDirty: true,
-                    shouldValidate: true,
+                    shouldValidate: false,
                   });
                 }}
               />
@@ -725,10 +712,8 @@ export default function ProductForm({
 
             {(variants ?? []).map((variant, variantIndex) => {
               const variantErrors = errors.variants?.[variantIndex];
-              const tabTitle = variant.sku?.trim()
-                ? variant.sku
-                : `Variant ${variantIndex + 1}`;
-              // Truncate title if too long (approximately 50px = ~10-12 chars)
+              const tabTitle =
+                variant.sku?.trim() || `Variant ${variantIndex + 1}`;
               const truncatedTitle =
                 tabTitle.length > 12
                   ? `${tabTitle.substring(0, 12)}...`
@@ -752,6 +737,11 @@ export default function ProductForm({
           </Tabs>
         </CardBody>
       </Card>
+
+      <ProductFormGuideModal
+        isOpen={isGuideModalOpen}
+        onClose={() => setIsGuideModalOpen(false)}
+      />
     </form>
   );
 }

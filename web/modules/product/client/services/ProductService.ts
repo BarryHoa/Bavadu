@@ -1,10 +1,32 @@
 import ClientHttpService from "@base/client/services/ClientHttpService";
+import type { LocaleDataType } from "@base/server/interfaces/Locale";
 
+import type { SelectItemOption } from "@base/client/components";
 import type {
   ProductDetail,
   ProductFormPayload,
   ProductFormUpdatePayload,
 } from "../interface/Product";
+
+export type ProductTypeOption = {
+  value: string;
+  label: LocaleDataType<string>;
+};
+
+export type ProductFeatureOption = {
+  key: string;
+  label: LocaleDataType<string>;
+};
+
+export type ProductTypesResponse = {
+  success: boolean;
+  data: ProductTypeOption[];
+};
+
+export type ProductFeaturesResponse = {
+  success: boolean;
+  data: ProductFeatureOption[];
+};
 
 class ProductService extends ClientHttpService {
   constructor() {
@@ -34,6 +56,14 @@ class ProductService extends ClientHttpService {
       `/${id}`,
       payload
     );
+  }
+
+  async getProductTypes() {
+    return this.get<ProductTypesResponse>(`/types`);
+  }
+
+  async getProductFeatures() {
+    return this.get<ProductFeaturesResponse>(`/features`);
   }
 }
 
