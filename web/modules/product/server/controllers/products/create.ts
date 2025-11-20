@@ -1,5 +1,4 @@
-import type { AuthenticatedRequest } from "@/module-base/server/middleware/auth";
-import { withAuth } from "@/module-base/server/middleware/auth";
+import { getAuthenticatedUser } from "@/module-base/server/utils/auth-helpers";
 import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 import { validateRequest } from "@/module-base/server/validation/middleware";
 import { productCreateInputSchema } from "@/module-base/server/validation/schemas/product";
@@ -194,7 +193,7 @@ export const buildPayload = (body: any): ProductCreateInput => {
   };
 };
 
-async function handlePOST(request: AuthenticatedRequest) {
+async function handlePOST(request: NextRequest) {
   try {
     // Validate request body
     const validation = await validateRequest(request, productCreateInputSchema);
@@ -230,14 +229,21 @@ async function handlePOST(request: AuthenticatedRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  // Authentication check in Data Access Layer (route handler)
-  // This is where real authentication happens, not in proxy
-  const authResult = await withAuth(request, { required: true });
+  // Authentication is handled by proxy.ts
+  // User info is available in headers if authenticated
+  const user = getAuthenticatedUser(request);
 
-  if (!authResult.authenticated) {
-    return authResult.response;
+  if (!user) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Authentication required",
+        message: "You must be authenticated to perform this action",
+      },
+      { status: 401 }
+    );
   }
 
-  // Call handler with authenticated request
-  return handlePOST(authResult.request);
+  // Call handler
+  return handlePOST(request);
 }

@@ -1,15 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth } from "../../middleware/auth";
+import { getAuthenticatedUser } from "../../utils/auth-helpers";
 
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await withAuth(request, { required: true });
+    // Authentication is handled by proxy.ts
+    // User info is available in headers if authenticated
+    const user = getAuthenticatedUser(request);
 
-    if (!authResult.authenticated) {
-      return authResult.response;
+    if (!user) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Authentication required",
+          message: "You must be authenticated to access this resource",
+        },
+        { status: 401 }
+      );
     }
-
-    const { user } = authResult.request;
 
     return NextResponse.json({
       success: true,

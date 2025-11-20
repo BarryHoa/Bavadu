@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { destroySession } from "../../utils/session";
-import { withAuth } from "../../middleware/auth";
+import { getSessionInfo } from "../../utils/auth-helpers";
 
 const SESSION_COOKIE_NAME = "session_token";
 
 export async function POST(request: NextRequest) {
   try {
-    // Check if user is authenticated
-    const authResult = await withAuth(request, { required: false });
-
-    // Get session token from cookie
-    const sessionToken = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+    // Get session token from headers (injected by proxy) or cookie
+    const sessionInfo = getSessionFromHeaders(request);
+    const sessionToken =
+      sessionInfo?.token || request.cookies.get(SESSION_COOKIE_NAME)?.value;
 
     if (sessionToken) {
       // Destroy session
