@@ -1,7 +1,7 @@
+import type { AuthenticatedRequest } from "@/module-base/server/middleware/auth";
 import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 import { withAuthHandler } from "@/module-base/server/utils/withAuthHandler";
-import { NextRequest, NextResponse } from "next/server";
-import type { AuthenticatedRequest } from "@/module-base/server/middleware/auth";
+import { NextResponse } from "next/server";
 import type { ProductCreateInput } from "../../models/Product/ProductModelInterface";
 import {
   ProductMasterFeaturesEnum,
@@ -194,8 +194,14 @@ export const buildPayload = (body: any): ProductCreateInput => {
 
 async function handlePOST(request: AuthenticatedRequest) {
   try {
-    const body = await request.json();
-    const payload = buildPayload(body);
+    // Validate request body
+    const validation = await validateRequest(request, productCreateInputSchema);
+    if (!validation.valid) {
+      return validation.response;
+    }
+
+    // Build payload from validated data
+    const payload = buildPayload(validation.data);
 
     const response = await getModuleQueryByModel({
       model: "product",
