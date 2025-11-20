@@ -1,11 +1,8 @@
+import { verifyCsrfToken } from "@/module-base/server/utils/csrf-token";
+import { rateLimitStore } from "@/module-base/server/utils/rate-limit-store";
+import { validateSession } from "@/module-base/server/utils/session";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { validateSession } from "@/module-base/server/utils/session";
-import { rateLimitStore } from "@/module-base/server/utils/rate-limit-store";
-import {
-  verifyCsrfToken,
-  extractCsrfToken,
-} from "@/module-base/server/utils/csrf-token";
 
 // Public routes that don't require authentication
 const PUBLIC_ROUTES = [
@@ -98,7 +95,9 @@ function checkRateLimit(
           "X-RateLimit-Limit": String(config.max),
           "X-RateLimit-Remaining": "0",
           "X-RateLimit-Reset": String(resetTime),
-          "Retry-After": String(Math.ceil(rateLimitStore.getTimeUntilReset(key) / 1000)),
+          "Retry-After": String(
+            Math.ceil(rateLimitStore.getTimeUntilReset(key) / 1000)
+          ),
         },
       }
     );
@@ -110,9 +109,7 @@ function checkRateLimit(
 /**
  * Check CSRF protection for state-changing requests
  */
-function checkCsrfProtection(
-  request: NextRequest
-): NextResponse | null {
+function checkCsrfProtection(request: NextRequest): NextResponse | null {
   const method = request.method;
 
   // Skip CSRF check for safe methods
