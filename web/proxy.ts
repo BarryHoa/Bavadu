@@ -1,8 +1,10 @@
-import { verifyCsrfToken } from "@/module-base/server/utils/csrf-token";
-import { rateLimitStore } from "@/module-base/server/utils/rate-limit-store";
-import { validateSession } from "@/module-base/server/utils/session";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { checkRateLimit } from "./middleware/rate-limit";
+import { checkCsrfProtection } from "./middleware/csrf";
+import { authenticateRequest } from "./middleware/auth";
+import { addSecurityHeaders } from "./middleware/security-headers";
+import { addPageHeaders } from "./middleware/page-headers";
 
 // Public routes that don't require authentication
 const PUBLIC_ROUTES = [
@@ -14,25 +16,6 @@ const PUBLIC_ROUTES = [
 
 // Routes that should be excluded from proxy
 const EXCLUDED_PATHS = ["/_next", "/static", "/favicon"];
-
-// Rate limiting configuration
-const RATE_LIMIT_CONFIG = {
-  // Authentication endpoints - stricter limits
-  auth: {
-    max: 5,
-    windowMs: 15 * 60 * 1000, // 15 minutes
-  },
-  // General API endpoints
-  api: {
-    max: 100,
-    windowMs: 60 * 1000, // 1 minute
-  },
-};
-
-// CSRF configuration
-const CSRF_COOKIE_NAME = "csrf-token";
-const CSRF_HEADER_NAME = "X-CSRF-Token";
-const SAFE_METHODS = ["GET", "HEAD", "OPTIONS"];
 
 /**
  * Check if a path is a public route
@@ -46,161 +29,6 @@ function isPublicRoute(pathname: string): boolean {
  */
 function isExcludedPath(pathname: string): boolean {
   return EXCLUDED_PATHS.some((path) => pathname.startsWith(path));
-}
-
-/**
- * Get client IP address from request
- */
-function getClientIp(request: NextRequest): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) {
-    return forwarded.split(",")[0].trim();
-  }
-  const realIp = request.headers.get("x-real-ip");
-  if (realIp) {
-    return realIp;
-  }
-  return "unknown";
-}
-
-/**
- * Check rate limit for request
- */
-function checkRateLimit(
-  request: NextRequest,
-  pathname: string
-): NextResponse | null {
-  const ip = getClientIp(request);
-  const isAuthRoute = pathname.startsWith("/api/base/auth/");
-  const config = isAuthRoute ? RATE_LIMIT_CONFIG.auth : RATE_LIMIT_CONFIG.api;
-
-  const key = `rate-limit:${ip}`;
-  const count = rateLimitStore.increment(key, config.windowMs);
-
-  if (count > config.max) {
-    const resetTime = Math.ceil(
-      (rateLimitStore.getTimeUntilReset(key) + Date.now()) / 1000
-    );
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Rate limit exceeded",
-        message: "Too many requests, please try again later",
-        retryAfter: Math.ceil(rateLimitStore.getTimeUntilReset(key) / 1000),
-      },
-      {
-        status: 429,
-        headers: {
-          "X-RateLimit-Limit": String(config.max),
-          "X-RateLimit-Remaining": "0",
-          "X-RateLimit-Reset": String(resetTime),
-          "Retry-After": String(
-            Math.ceil(rateLimitStore.getTimeUntilReset(key) / 1000)
-          ),
-        },
-      }
-    );
-  }
-
-  return null;
-}
-
-/**
- * Check CSRF protection for state-changing requests
- */
-function checkCsrfProtection(request: NextRequest): NextResponse | null {
-  const method = request.method;
-
-  // Skip CSRF check for safe methods
-  if (SAFE_METHODS.includes(method)) {
-    return null;
-  }
-
-  // Get CSRF token from header or cookie
-  const headerToken = request.headers.get(CSRF_HEADER_NAME);
-  const cookieToken = request.cookies.get(CSRF_COOKIE_NAME)?.value;
-
-  const csrfToken = headerToken || cookieToken;
-
-  if (!csrfToken) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: "CSRF token validation failed",
-        message: "CSRF token is required",
-      },
-      { status: 403 }
-    );
-  }
-
-  // Verify CSRF token
-  const verification = verifyCsrfToken(csrfToken);
-
-  if (!verification.valid) {
-    if (verification.expired) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "CSRF token validation failed",
-          message: "CSRF token has expired",
-        },
-        { status: 403 }
-      );
-    }
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: "CSRF token validation failed",
-        message: "Invalid CSRF token",
-      },
-      { status: 403 }
-    );
-  }
-
-  return null;
-}
-
-/**
- * Add security headers to response
- */
-function addSecurityHeaders(response: NextResponse): NextResponse {
-  const isProduction = process.env.NODE_ENV === "production";
-
-  // Content Security Policy
-  response.headers.set(
-    "Content-Security-Policy",
-    "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self';"
-  );
-
-  // X-Frame-Options
-  response.headers.set("X-Frame-Options", "DENY");
-
-  // X-Content-Type-Options
-  response.headers.set("X-Content-Type-Options", "nosniff");
-
-  // Referrer-Policy
-  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-
-  // Permissions-Policy
-  response.headers.set(
-    "Permissions-Policy",
-    "geolocation=(), microphone=(), camera=()"
-  );
-
-  // X-XSS-Protection
-  response.headers.set("X-XSS-Protection", "1; mode=block");
-
-  // Strict-Transport-Security (only in production)
-  if (isProduction) {
-    response.headers.set(
-      "Strict-Transport-Security",
-      "max-age=31536000; includeSubDomains; preload"
-    );
-  }
-
-  return response;
 }
 
 /**
@@ -228,13 +56,13 @@ async function handleApiRoute(
   pathname: string,
   nextHeaders: Headers
 ): Promise<NextResponse | null> {
-  // 1. Rate Limiting - Check before processing
+  // 1. Rate Limiting
   const rateLimitResponse = checkRateLimit(req, pathname);
   if (rateLimitResponse) {
     return addSecurityHeaders(rateLimitResponse);
   }
 
-  // 2. CSRF Protection - For state-changing requests
+  // 2. CSRF Protection (skip for public routes)
   if (!isPublicRoute(pathname)) {
     const csrfResponse = checkCsrfProtection(req);
     if (csrfResponse) {
@@ -242,59 +70,11 @@ async function handleApiRoute(
     }
   }
 
-  // 3. Authentication - Validate session for protected routes
+  // 3. Authentication (skip for public routes)
   if (!isPublicRoute(pathname)) {
-    const sessionToken = req.cookies.get("session_token")?.value;
-
-    if (!sessionToken) {
-      const response = NextResponse.json(
-        {
-          success: false,
-          error: "Authentication required",
-          message: "Session token is required",
-        },
-        { status: 401 }
-      );
-      return addSecurityHeaders(response);
-    }
-
-    // Validate session token
-    try {
-      const validationResult = await validateSession(sessionToken);
-
-      if (!validationResult.valid || !validationResult.session) {
-        const response = NextResponse.json(
-          {
-            success: false,
-            error: "Authentication failed",
-            message: "Invalid or expired session",
-          },
-          { status: 401 }
-        );
-        return addSecurityHeaders(response);
-      }
-
-      // Inject user info into headers for route handlers
-      if (validationResult.user) {
-        nextHeaders.set("x-user-id", validationResult.user.id);
-        nextHeaders.set("x-username", validationResult.user.username);
-        if (validationResult.user.avatar) {
-          nextHeaders.set("x-user-avatar", validationResult.user.avatar);
-        }
-      }
-      nextHeaders.set("x-session-id", validationResult.session.id);
-      nextHeaders.set("x-session-token", sessionToken);
-    } catch (error) {
-      console.error("Authentication error:", error);
-      const response = NextResponse.json(
-        {
-          success: false,
-          error: "Authentication failed",
-          message: "Failed to validate session",
-        },
-        { status: 500 }
-      );
-      return addSecurityHeaders(response);
+    const authResponse = await authenticateRequest(req, nextHeaders);
+    if (authResponse) {
+      return addSecurityHeaders(authResponse);
     }
   }
 
@@ -305,53 +85,14 @@ async function handleApiRoute(
  * Handle page routes
  * - No rate limiting (handled by CDN/edge)
  * - No CSRF protection (pages are rendered, not API calls)
- * - Optional authentication check (for redirects)
  * - Locale and workspace headers
  */
 function handlePageRoute(
   req: NextRequest,
   pathname: string,
   nextHeaders: Headers
-): NextResponse | null {
-  // For page routes, we can optionally check authentication
-  // and redirect to login if needed, but we don't block the request
-  // Pages will handle their own authentication logic
-
-  // Get locale from cookie and set it to x-locale header
-  const cookie = req.headers.get("cookie");
-  let locale = "en";
-
-  if (cookie) {
-    const localeMatch = cookie
-      .split(";")
-      .map((c) => c.trim())
-      .find((c) => c.startsWith("NEXT_LOCALE="));
-    if (localeMatch) {
-      const localeCookie = localeMatch.split("=")[1];
-      if (localeCookie) {
-        locale = localeCookie;
-      }
-    }
-  }
-  nextHeaders.set("x-locale", locale);
-
-  // Handle workspace module header
-  if (pathname.startsWith("/workspace/modules/")) {
-    const match = pathname.match(/^\/workspace\/modules\/([^/]+)/);
-    if (match?.[1]) {
-      nextHeaders.set("x-workspace-module", match[1]);
-    }
-  }
-
-  // Optionally inject user info for pages (if authenticated)
-  const sessionToken = req.cookies.get("session_token")?.value;
-  if (sessionToken) {
-    // Don't validate here, just pass token to page
-    // Pages can validate if needed
-    nextHeaders.set("x-session-token", sessionToken);
-  }
-
-  return null; // Continue processing
+): void {
+  addPageHeaders(req, nextHeaders, pathname);
 }
 
 /**
@@ -382,10 +123,7 @@ export async function proxy(req: NextRequest) {
 
   // Handle page routes
   if (isPageRoute(pathname)) {
-    const pageResponse = handlePageRoute(req, pathname, nextHeaders);
-    if (pageResponse) {
-      return addSecurityHeaders(pageResponse);
-    }
+    handlePageRoute(req, pathname, nextHeaders);
   }
 
   // Continue with modified headers
