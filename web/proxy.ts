@@ -204,36 +204,38 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
 }
 
 /**
- * Next.js 16 Proxy - Centralized Security Handler
- *
- * This proxy handles all security concerns:
- * 1. Authentication - Validates session tokens
- * 2. Rate Limiting - Prevents abuse
- * 3. CSRF Protection - Validates tokens for state-changing requests
- * 4. Security Headers - Adds security headers to responses
- * 5. Locale & Workspace headers - Application-specific headers
+ * Check if pathname is an API route
  */
-export async function proxy(req: NextRequest) {
-  const { nextUrl, headers } = req;
-  const pathname = nextUrl.pathname;
-  const method = req.method;
-  const nextHeaders = new Headers(headers);
+function isApiRoute(pathname: string): boolean {
+  return pathname.startsWith("/api/");
+}
 
-  // Skip excluded paths (static files, Next.js internals)
-  if (isExcludedPath(pathname)) {
-    return NextResponse.next();
-  }
+/**
+ * Check if pathname is a page route
+ */
+function isPageRoute(pathname: string): boolean {
+  return !isApiRoute(pathname) && !isExcludedPath(pathname);
+}
 
+/**
+ * Handle API routes security
+ * - Rate limiting
+ * - CSRF protection
+ * - Authentication
+ */
+async function handleApiRoute(
+  req: NextRequest,
+  pathname: string,
+  nextHeaders: Headers
+): Promise<NextResponse | null> {
   // 1. Rate Limiting - Check before processing
-  if (pathname.startsWith("/api/")) {
-    const rateLimitResponse = checkRateLimit(req, pathname);
-    if (rateLimitResponse) {
-      return addSecurityHeaders(rateLimitResponse);
-    }
+  const rateLimitResponse = checkRateLimit(req, pathname);
+  if (rateLimitResponse) {
+    return addSecurityHeaders(rateLimitResponse);
   }
 
   // 2. CSRF Protection - For state-changing requests
-  if (pathname.startsWith("/api/") && !isPublicRoute(pathname)) {
+  if (!isPublicRoute(pathname)) {
     const csrfResponse = checkCsrfProtection(req);
     if (csrfResponse) {
       return addSecurityHeaders(csrfResponse);
@@ -241,7 +243,7 @@ export async function proxy(req: NextRequest) {
   }
 
   // 3. Authentication - Validate session for protected routes
-  if (pathname.startsWith("/api/") && !isPublicRoute(pathname)) {
+  if (!isPublicRoute(pathname)) {
     const sessionToken = req.cookies.get("session_token")?.value;
 
     if (!sessionToken) {
@@ -296,8 +298,27 @@ export async function proxy(req: NextRequest) {
     }
   }
 
-  // 4. Get locale from cookie and set it to x-locale header
-  const cookie = headers.get("cookie");
+  return null; // Continue processing
+}
+
+/**
+ * Handle page routes
+ * - No rate limiting (handled by CDN/edge)
+ * - No CSRF protection (pages are rendered, not API calls)
+ * - Optional authentication check (for redirects)
+ * - Locale and workspace headers
+ */
+function handlePageRoute(
+  req: NextRequest,
+  pathname: string,
+  nextHeaders: Headers
+): NextResponse | null {
+  // For page routes, we can optionally check authentication
+  // and redirect to login if needed, but we don't block the request
+  // Pages will handle their own authentication logic
+
+  // Get locale from cookie and set it to x-locale header
+  const cookie = req.headers.get("cookie");
   let locale = "en";
 
   if (cookie) {
@@ -314,7 +335,7 @@ export async function proxy(req: NextRequest) {
   }
   nextHeaders.set("x-locale", locale);
 
-  // 5. Handle workspace module header
+  // Handle workspace module header
   if (pathname.startsWith("/workspace/modules/")) {
     const match = pathname.match(/^\/workspace\/modules\/([^/]+)/);
     if (match?.[1]) {
@@ -322,10 +343,55 @@ export async function proxy(req: NextRequest) {
     }
   }
 
+  // Optionally inject user info for pages (if authenticated)
+  const sessionToken = req.cookies.get("session_token")?.value;
+  if (sessionToken) {
+    // Don't validate here, just pass token to page
+    // Pages can validate if needed
+    nextHeaders.set("x-session-token", sessionToken);
+  }
+
+  return null; // Continue processing
+}
+
+/**
+ * Next.js 16 Proxy - Centralized Security Handler
+ *
+ * This proxy handles all security concerns:
+ * - API Routes: Rate limiting, CSRF protection, Authentication
+ * - Page Routes: Locale headers, workspace headers, optional auth info
+ * - All Routes: Security headers
+ */
+export async function proxy(req: NextRequest) {
+  const { nextUrl, headers } = req;
+  const pathname = nextUrl.pathname;
+  const nextHeaders = new Headers(headers);
+
+  // Skip excluded paths (static files, Next.js internals)
+  if (isExcludedPath(pathname)) {
+    return NextResponse.next();
+  }
+
+  // Handle API routes
+  if (isApiRoute(pathname)) {
+    const apiResponse = await handleApiRoute(req, pathname, nextHeaders);
+    if (apiResponse) {
+      return apiResponse; // Rate limit, CSRF, or auth error
+    }
+  }
+
+  // Handle page routes
+  if (isPageRoute(pathname)) {
+    const pageResponse = handlePageRoute(req, pathname, nextHeaders);
+    if (pageResponse) {
+      return addSecurityHeaders(pageResponse);
+    }
+  }
+
   // Continue with modified headers
   const response = NextResponse.next({ request: { headers: nextHeaders } });
 
-  // 6. Add security headers to response
+  // Add security headers to all responses
   return addSecurityHeaders(response);
 }
 
