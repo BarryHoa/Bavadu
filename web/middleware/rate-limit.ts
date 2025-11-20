@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { rateLimitStore } from "@/module-base/server/stores/rate-limit-store";
+import { rateLimitStore } from "@/module-base/server/stores";
 
 // Rate limiting configuration
 const RATE_LIMIT_CONFIG = {
