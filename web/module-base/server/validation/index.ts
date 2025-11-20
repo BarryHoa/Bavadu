@@ -4,5 +4,6 @@
  */
 
 export * from "./schemas/common";
+export * from "./schemas/product";
 export * from "./middleware";
 
