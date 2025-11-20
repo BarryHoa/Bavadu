@@ -87,7 +87,7 @@ export function withRateLimit(
   } = config;
 
   return async (request: NextRequest): Promise<NextResponse | null> => {
-    const key = defaultKeyGenerator(request);
+    const key = keyGenerator ? keyGenerator(request) : defaultKeyGenerator(request);
     const count = rateLimitStore.increment(key, windowMs);
 
     // Create response headers
@@ -211,7 +211,9 @@ export function applyRateLimit(
     const response = await handler(request);
 
     // Add rate limit headers to response
-    const key = defaultKeyGenerator(request);
+    const key = config.keyGenerator
+      ? config.keyGenerator(request)
+      : defaultKeyGenerator(request);
     const count = rateLimitStore.get(key);
     const remaining = Math.max(0, config.max - count);
     const resetTime = Math.ceil(

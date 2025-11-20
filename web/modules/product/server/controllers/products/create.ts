@@ -1,9 +1,9 @@
 import type { AuthenticatedRequest } from "@/module-base/server/middleware/auth";
+import { withAuth } from "@/module-base/server/middleware/auth";
 import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
-import { withAuthHandler } from "@/module-base/server/utils/withAuthHandler";
 import { validateRequest } from "@/module-base/server/validation/middleware";
 import { productCreateInputSchema } from "@/module-base/server/validation/schemas/product";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import type { ProductCreateInput } from "../../models/Product/ProductModelInterface";
 import {
   ProductMasterFeaturesEnum,
@@ -229,4 +229,15 @@ async function handlePOST(request: AuthenticatedRequest) {
   }
 }
 
-export const POST = withAuthHandler(handlePOST);
+export async function POST(request: NextRequest) {
+  // Authentication check in Data Access Layer (route handler)
+  // This is where real authentication happens, not in proxy
+  const authResult = await withAuth(request, { required: true });
+
+  if (!authResult.authenticated) {
+    return authResult.response;
+  }
+
+  // Call handler with authenticated request
+  return handlePOST(authResult.request);
+}

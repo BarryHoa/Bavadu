@@ -126,4 +126,3 @@ class RateLimitStore {
 
 // Singleton instance
 export const rateLimitStore = new RateLimitStore();
-

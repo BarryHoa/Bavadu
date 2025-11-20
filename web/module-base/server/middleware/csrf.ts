@@ -228,10 +228,10 @@ export function withCsrfProtectionParams<T extends Record<string, string>>(
  */
 export function setCsrfTokenCookie(
   response: NextResponse,
-  config: CsrfTokenConfig = {}
+  config: CsrfProtectionConfig = {}
 ): NextResponse {
   const finalConfig = { ...defaultConfig, ...config };
-  const { signedToken, expiresAt } = createSignedCsrfToken(finalConfig);
+  const { signedToken } = createSignedCsrfToken(finalConfig);
 
   const isProduction = process.env.NODE_ENV === "production";
 
@@ -252,7 +252,7 @@ export function setCsrfTokenCookie(
  */
 export function getCsrfTokenForClient(
   request: NextRequest,
-  config: CsrfTokenConfig = {}
+  config: CsrfProtectionConfig = {}
 ): string | null {
   const finalConfig = { ...defaultConfig, ...config };
   const cookieToken = request.cookies.get(finalConfig.cookieName)?.value;

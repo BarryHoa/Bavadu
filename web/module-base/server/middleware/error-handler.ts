@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { handleError, createErrorResponse, ErrorType } from "../utils/errors";
+import { createErrorResponse, ErrorType, handleError } from "../utils/errors";
 
 /**
  * Error handling middleware options
@@ -89,4 +89,3 @@ export function safeErrorResponse(
 ): NextResponse {
   return createErrorResponse(error, type, userMessage);
 }
-

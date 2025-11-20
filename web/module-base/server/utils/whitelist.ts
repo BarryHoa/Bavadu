@@ -32,7 +32,7 @@ export function whitelistFields<T extends Record<string, unknown>>(
  */
 export function whitelistFieldsTyped<
   T extends Record<string, unknown>,
-  K extends keyof T
+  K extends keyof T,
 >(data: T, allowedFields: readonly K[]): Pick<T, K> {
   const result = {} as Pick<T, K>;
 
@@ -52,9 +52,10 @@ export function whitelistFieldsTyped<
  * @param fieldWhitelist - Object mapping field names to their allowed sub-fields
  * @returns Object with whitelisted fields and nested fields
  */
-export function whitelistNestedFields<
-  T extends Record<string, unknown>
->(data: T, fieldWhitelist: Record<string, string[]>): Partial<T> {
+export function whitelistNestedFields<T extends Record<string, unknown>>(
+  data: T,
+  fieldWhitelist: Record<string, string[]>
+): Partial<T> {
   const result: Partial<T> = {};
 
   for (const [field, allowedSubFields] of Object.entries(fieldWhitelist)) {
@@ -103,9 +104,7 @@ export function createWhitelistFunction<T extends Record<string, unknown>>(
  * @param allowedFields - Array of field names that are allowed
  * @returns Array of objects with only whitelisted fields
  */
-export function whitelistArrayFields<
-  T extends Record<string, unknown>
->(
+export function whitelistArrayFields<T extends Record<string, unknown>>(
   dataArray: T[],
   allowedFields: (keyof T)[]
 ): Array<Partial<T>> {
@@ -166,7 +165,7 @@ export function getNonWhitelistedFields<T extends Record<string, unknown>>(
  */
 export function whitelistWithDefaults<
   T extends Record<string, unknown>,
-  D extends Partial<T>
+  D extends Partial<T>,
 >(data: T, allowedFields: (keyof T)[], defaults: D): Partial<T> & D {
   const whitelisted = whitelistFields(data, allowedFields);
 
@@ -175,4 +174,3 @@ export function whitelistWithDefaults<
     ...whitelisted,
   };
 }
-

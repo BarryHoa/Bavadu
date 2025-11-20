@@ -282,9 +282,9 @@ export function handleError(error: unknown): NextResponse {
 /**
  * Safe error handler wrapper for async route handlers
  */
-export function withErrorHandler<T extends (...args: any[]) => Promise<NextResponse>>(
-  handler: T
-): T {
+export function withErrorHandler<
+  T extends (...args: any[]) => Promise<NextResponse>,
+>(handler: T): T {
   return (async (...args: Parameters<T>) => {
     try {
       return await handler(...args);
@@ -293,4 +293,3 @@ export function withErrorHandler<T extends (...args: any[]) => Promise<NextRespo
     }
   }) as T;
 }
-
