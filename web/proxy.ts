@@ -1,10 +1,10 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { checkRateLimit } from "./middleware/rate-limit";
-import { checkCsrfProtection } from "./middleware/csrf";
 import { authenticateRequest } from "./middleware/auth";
-import { addSecurityHeaders } from "./middleware/security-headers";
+import { checkCsrfProtection } from "./middleware/csrf";
 import { addPageHeaders } from "./middleware/page-headers";
+import { checkRateLimit } from "./middleware/rate-limit";
+import { addSecurityHeaders } from "./middleware/security-headers";
 
 // Public routes that don't require authentication
 const PUBLIC_ROUTES = [
