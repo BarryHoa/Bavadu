@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { validateSession } from "@/module-base/server/utils/session";
+import SessionModel from "@/module-base/server/models/Sessions/SessionModel";
 
 /**
  * Authenticate request and inject user info into headers
@@ -23,7 +23,8 @@ export async function authenticateRequest(
   }
 
   try {
-    const validationResult = await validateSession(sessionToken);
+    const sessionModel = new SessionModel();
+    const validationResult = await sessionModel.validateSession(sessionToken);
 
     if (!validationResult.valid || !validationResult.session) {
       return NextResponse.json(

@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
 import { compare } from "bcryptjs";
-import getEnv from "../../utils/getEnv";
+import { eq } from "drizzle-orm";
+import { NextRequest, NextResponse } from "next/server";
+import SessionModel from "../../models/Sessions/SessionModel";
 import { table_user, table_user_login } from "../../schemas/user";
-import { createSession } from "../../utils/session";
+import getEnv from "../../utils/getEnv";
 
 interface LoginRequest {
   username?: string;
@@ -119,7 +119,8 @@ export async function POST(request: NextRequest) {
     // Create session
     const ipAddress = getClientIp(request);
     const userAgent = getUserAgent(request);
-    const session = await createSession({
+    const sessionModel = new SessionModel();
+    const session = await sessionModel.createSession({
       userId: user.id,
       ipAddress,
       userAgent,
@@ -172,4 +173,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
