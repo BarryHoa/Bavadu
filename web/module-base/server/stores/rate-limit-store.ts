@@ -94,15 +94,15 @@ class RateLimitStore {
     const now = Date.now();
     const keysToDelete: string[] = [];
 
-    for (const [key, entry] of this.store.entries()) {
+    this.store.forEach((entry, key) => {
       if (now > entry.resetTime) {
         keysToDelete.push(key);
       }
-    }
+    });
 
-    for (const key of keysToDelete) {
+    keysToDelete.forEach((key) => {
       this.store.delete(key);
-    }
+    });
   }
 
   /**
