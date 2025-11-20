@@ -60,14 +60,7 @@ class RateLimitStore {
   }
 
   /**
-   * Reset count for a key
-   */
-  reset(key: string): void {
-    this.store.delete(key);
-  }
-
-  /**
-   * Get time until reset for a key
+   * Get time until reset (in milliseconds)
    */
   getTimeUntilReset(key: string): number {
     const entry = this.store.get(key);
@@ -77,7 +70,21 @@ class RateLimitStore {
     }
 
     const remaining = entry.resetTime - Date.now();
-    return remaining > 0 ? remaining : 0;
+    return Math.max(0, remaining);
+  }
+
+  /**
+   * Reset count for a key
+   */
+  reset(key: string): void {
+    this.store.delete(key);
+  }
+
+  /**
+   * Clear all entries
+   */
+  clear(): void {
+    this.store.clear();
   }
 
   /**
@@ -87,11 +94,11 @@ class RateLimitStore {
     const now = Date.now();
     const keysToDelete: string[] = [];
 
-    this.store.forEach((entry, key) => {
+    for (const [key, entry] of this.store.entries()) {
       if (now > entry.resetTime) {
         keysToDelete.push(key);
       }
-    });
+    }
 
     for (const key of keysToDelete) {
       this.store.delete(key);
@@ -99,14 +106,7 @@ class RateLimitStore {
   }
 
   /**
-   * Clear all entries (useful for testing)
-   */
-  clear(): void {
-    this.store.clear();
-  }
-
-  /**
-   * Get store size (useful for monitoring)
+   * Get store size (for monitoring)
    */
   size(): number {
     return this.store.size;
@@ -124,5 +124,8 @@ class RateLimitStore {
   }
 }
 
-// Singleton instance
+// Export singleton instance
 export const rateLimitStore = new RateLimitStore();
+
+// Export class for testing
+export { RateLimitStore };
