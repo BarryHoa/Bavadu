@@ -80,7 +80,7 @@ export const normalizePackings = (raw: unknown) => {
 
   return raw.map((item) => ({
     name: normalizeLocaleInput((item as any)?.name),
-    description: normalizeLocaleInput((item as any)?.description),
+    description: (item as any)?.description?.trim() || null,
     isActive:
       typeof (item as any)?.isActive === "boolean"
         ? (item as any)?.isActive
@@ -139,10 +139,7 @@ export const buildPayload = (body: any): ProductCreateInput => {
   const masterPayload = {
     code,
     name: normalizeLocaleInput(master.name) ?? { en: code },
-    description:
-      typeof master.description === "string" && master.description.trim()
-        ? master.description.trim()
-        : null,
+    description: master.description?.trim() || null,
     type,
     features: normalizedFeatures,
     isActive: typeof master.isActive === "boolean" ? master.isActive : true,
@@ -160,10 +157,7 @@ export const buildPayload = (body: any): ProductCreateInput => {
 
   const variantPayload = {
     name: variantNameSource ?? { en: code },
-    description:
-      typeof variant.description === "string" && variant.description.trim()
-        ? variant.description.trim()
-        : null,
+    description: variant.description?.trim() || null,
     sku: typeof variant.sku === "string" ? variant.sku : null,
     barcode: typeof variant.barcode === "string" ? variant.barcode : null,
     manufacturer:

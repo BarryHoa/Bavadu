@@ -1,6 +1,36 @@
 {
   "mdl-product": {
     "title": "Products",
-    "description": "Products module"
+    "description": "Products module",
+    "productType": "Loại sản phẩm",
+    "productFeatures": "Tính năng sản phẩm",
+    "baseUnitOfMeasure": "Đơn vị đo cơ bản",
+    "unitOfMeasure": "Đơn vị đo",
+    "manufacturerName": "Tên nhà sản xuất",
+    "manufacturerCode": "Mã nhà sản xuất",
+    "manufacture": "Sản xuất",
+    "packing": "Đóng gói",
+    "packings": "Đóng gói",
+    "attribute": "Thuộc tính",
+    "attributes": "Thuộc tính",
+    "removeVariant": "Xóa biến thể",
+    "addPacking": "Thêm đóng gói",
+    "addAttribute": "Thêm thuộc tính",
+    "noPackingEntries": "Chưa có mục đóng gói nào",
+    "noAttributeEntries": "Chưa có thuộc tính nào",
+    "guideTooltip": "Thông tin cần biết",
+    "guideAriaLabel": "Hướng dẫn sử dụng",
+    "definePackaging": "Định nghĩa các tùy chọn đóng gói cho biến thể này",
+    "captureAttributes": "Thu thập các thuộc tính bổ sung cho biến thể này",
+    "nameEnglish": "Tên (Tiếng Anh)",
+    "nameVietnamese": "Tên (Tiếng Việt)",
+    "descriptionEnglish": "Mô tả (Tiếng Anh)",
+    "descriptionVietnamese": "Mô tả (Tiếng Việt)",
+    "errors": {
+      "productCodeRequired": "Mã sản phẩm là bắt buộc",
+      "baseUnitOfMeasureRequired": "Đơn vị đo cơ bản là bắt buộc",
+      "atLeastOneVariantRequired": "Cần ít nhất một biến thể",
+      "maxVariantsAllowed": "Tối đa {count} biến thể"
+    }
   }
 }

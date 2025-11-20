@@ -8,6 +8,7 @@ import { Tab, Tabs } from "@heroui/tabs";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
 import { HelpCircle, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Resolver, SubmitHandler } from "react-hook-form";
 import { useForm, useWatch } from "react-hook-form";
@@ -194,6 +195,15 @@ const toLocaleFormValue = (value: LocaleFieldValue): LocaleFormValue => ({
   vi: value.vi.trim() ? value.vi : undefined,
 });
 
+// Helper to convert locale description to string (prefer English, fallback to Vietnamese)
+const descriptionLocaleToString = (
+  value?: LocaleFormValue | string | null
+): string => {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  return value.en?.trim() || value.vi?.trim() || "";
+};
+
 // Helper function to map initial values with feature options
 const mapToFieldValues = (
   initialValues: ProductFormValues | undefined,
@@ -218,10 +228,7 @@ const mapToFieldValues = (
   // Map single variant from initialValues to variants array
   const variant: VariantFieldValue = {
     name: ensureLocaleValue(initialValues.variant.name),
-    description:
-      typeof initialValues.variant.description === "string"
-        ? initialValues.variant.description
-        : "",
+    description: initialValues.variant.description || "",
     sku: initialValues.variant.sku ?? "",
     barcode: initialValues.variant.barcode ?? "",
     manufacturerName:
@@ -235,7 +242,7 @@ const mapToFieldValues = (
       initialValues.packings?.map((packing) => ({
         id: packing.id,
         name: ensureLocaleValue(packing.name),
-        description: ensureLocaleValue(packing.description),
+        description: descriptionLocaleToString(packing.description),
         isActive: packing.isActive ?? true,
       })) ?? [],
     attributes:
@@ -251,10 +258,7 @@ const mapToFieldValues = (
     master: {
       code: initialValues.master.code ?? "",
       name: ensureLocaleValue(initialValues.master.name),
-      description:
-        typeof initialValues.master.description === "string"
-          ? initialValues.master.description
-          : "",
+      description: initialValues.master.description || "",
       type: initialValues.master.type || ProductMasterType.GOODS,
       features: featureState,
       isActive: initialValues.master.isActive ?? true,
@@ -298,7 +302,7 @@ const mapToProductFormValues = (
     packings: firstVariant.packings.map((packing) => ({
       id: packing.id,
       name: toLocaleFormValue(packing.name),
-      description: toLocaleFormValue(packing.description),
+      description: packing.description.trim() || "",
       isActive: packing.isActive,
     })),
     attributes: firstVariant.attributes.map((attribute) => ({
@@ -315,13 +319,15 @@ const localeSchema = object({
   vi: fallback(pipe(string(), trim()), ""),
 });
 
-const localeRequiredSchema = object({
-  en: pipe(
-    fallback(pipe(string(), trim()), ""),
-    minLength(1, "English name is required")
-  ),
-  vi: fallback(pipe(string(), trim()), ""),
-});
+// Note: Validation messages will be translated in the component using t()
+const createLocaleRequiredSchema = (t: (key: string) => string) =>
+  object({
+    en: pipe(
+      fallback(pipe(string(), trim()), ""),
+      minLength(1, t("errors.required"))
+    ),
+    vi: fallback(pipe(string(), trim()), ""),
+  });
 
 // Schema validation uses enum values directly
 const productFeatureValues = Object.values(ProductMasterFeatures) as [
@@ -336,57 +342,73 @@ const productMasterTypeValues = Object.values(ProductMasterType) as [
   ...ProductMasterType[],
 ];
 
-const variantSchema = object({
-  name: localeRequiredSchema,
-  description: fallback(pipe(string(), trim()), ""),
-  sku: pipe(string(), trim(), minLength(1, "SKU is required")),
-  barcode: pipe(string(), trim(), minLength(1, "Barcode is required")),
-  manufacturerName: fallback(pipe(string(), trim()), ""),
-  manufacturerCode: pipe(string(), trim()),
-  baseUomId: pipe(
-    string(),
-    trim(),
-    minLength(1, "Base unit of measure is required")
-  ),
-  isActive: boolean(),
-  packings: array(
-    object({
-      id: optional(pipe(string(), trim())),
-      name: localeSchema,
-      description: localeSchema,
-      isActive: boolean(),
-    })
-  ),
-  attributes: array(
-    object({
-      id: optional(pipe(string(), trim())),
-      code: pipe(string(), trim()),
-      name: localeSchema,
-      value: pipe(string(), trim()),
-    })
-  ),
-});
-
-const productFormSchema = object({
-  master: object({
-    code: pipe(string(), trim(), minLength(1, "Product code is required")),
-    name: localeRequiredSchema,
+// Note: These schemas will be created inside the component to access t()
+const createVariantSchema = (
+  t: (key: string) => string,
+  tProduct: (key: string) => string
+) =>
+  object({
+    name: createLocaleRequiredSchema(t),
     description: fallback(pipe(string(), trim()), ""),
-    type: picklist(productMasterTypeValues),
-    features: featuresSchema,
+    sku: pipe(string(), trim(), minLength(1, t("errors.skuRequired"))),
+    barcode: pipe(string(), trim(), minLength(1, t("errors.barcodeRequired"))),
+    manufacturerName: fallback(pipe(string(), trim()), ""),
+    manufacturerCode: pipe(string(), trim()),
+    baseUomId: pipe(
+      string(),
+      trim(),
+      minLength(1, tProduct("errors.baseUnitOfMeasureRequired"))
+    ),
     isActive: boolean(),
-    brand: fallback(pipe(string(), trim()), ""),
-    categoryId: optional(pipe(string(), trim())),
-  }),
-  variants: pipe(
-    array(variantSchema),
-    minLength(1, "At least one variant is required"),
-    maxLength(20, "Maximum 20 variants allowed")
-  ),
-});
+    packings: array(
+      object({
+        id: optional(pipe(string(), trim())),
+        name: localeSchema,
+        description: localeSchema,
+        isActive: boolean(),
+      })
+    ),
+    attributes: array(
+      object({
+        id: optional(pipe(string(), trim())),
+        code: pipe(string(), trim()),
+        name: localeSchema,
+        value: pipe(string(), trim()),
+      })
+    ),
+  });
+
+const createProductFormSchema = (
+  t: (key: string) => string,
+  tProduct: (key: string) => string
+) =>
+  object({
+    master: object({
+      code: pipe(
+        string(),
+        trim(),
+        minLength(1, tProduct("errors.productCodeRequired"))
+      ),
+      name: createLocaleRequiredSchema(t),
+      description: fallback(pipe(string(), trim()), ""),
+      type: picklist(productMasterTypeValues),
+      features: featuresSchema,
+      isActive: boolean(),
+      brand: fallback(pipe(string(), trim()), ""),
+      categoryId: optional(pipe(string(), trim())),
+    }),
+    variants: pipe(
+      array(createVariantSchema(t, tProduct)),
+      minLength(1, tProduct("errors.atLeastOneVariantRequired")),
+      maxLength(
+        20,
+        tProduct("errors.maxVariantsAllowed").replace("{count}", "20")
+      )
+    ),
+  });
 
 export default function ProductForm({
-  submitLabel = "Save",
+  submitLabel,
   secondarySubmitLabel,
   loading = false,
   initialValues,
@@ -395,6 +417,8 @@ export default function ProductForm({
   onCancel,
 }: ProductFormProps) {
   const getLocalizedText = useLocalizedText();
+  const t = useTranslations("common");
+  const tProduct = useTranslations("mdl-product");
 
   const productTypesQuery = useQuery({
     queryKey: ["product-types"],
@@ -441,7 +465,7 @@ export default function ProductForm({
   } = useForm<ProductFormFieldValues>({
     defaultValues: mapToFieldValues(initialValues, featureOptions),
     resolver: valibotResolver(
-      productFormSchema
+      createProductFormSchema(t, tProduct)
     ) as Resolver<ProductFormFieldValues>,
     mode: "onSubmit",
     reValidateMode: "onChange",
@@ -590,18 +614,18 @@ export default function ProductForm({
                 onPress={addVariant}
                 isDisabled={isBusy || (variants?.length ?? 0) >= 20}
               >
-                Add Variant
+                {t("actions.add")} {t("variant")}
               </Button>
             </div>
             <div className="justify-end flex items-center gap-2">
-              <Tooltip content="Thông tin cần biết" placement="top">
+              <Tooltip content={tProduct("guideTooltip")} placement="top">
                 <Button
                   isIconOnly
                   variant="light"
                   size="sm"
                   onPress={() => setIsGuideModalOpen(true)}
                   isDisabled={isBusy}
-                  aria-label="Hướng dẫn sử dụng"
+                  aria-label={tProduct("guideAriaLabel")}
                 >
                   <HelpCircle size={18} className="text-default-500" />
                 </Button>
@@ -613,7 +637,7 @@ export default function ProductForm({
                   onPress={onCancel}
                   isDisabled={isBusy}
                 >
-                  Cancel
+                  {t("actions.cancel")}
                 </Button>
               ) : null}
 
@@ -627,7 +651,8 @@ export default function ProductForm({
                   }}
                   isDisabled={isBusy}
                 >
-                  {secondarySubmitLabel ?? "Save & add another"}
+                  {secondarySubmitLabel ??
+                    `${t("actions.save")} & ${t("actions.add")} ${t("another")}`}
                 </Button>
               ) : null}
 
@@ -638,7 +663,7 @@ export default function ProductForm({
                 isLoading={isBusy}
                 isDisabled={isBusy}
               >
-                {submitLabel}
+                {submitLabel ?? t("actions.save")}
               </Button>
             </div>
           </div>
@@ -658,7 +683,7 @@ export default function ProductForm({
               base: "mb-0",
             }}
           >
-            <Tab key="master" title="Master">
+            <Tab key="master" title={t("master")}>
               <MasterTab
                 value={{
                   name: masterName ?? { en: "", vi: "" },
@@ -713,7 +738,7 @@ export default function ProductForm({
             {(variants ?? []).map((variant, variantIndex) => {
               const variantErrors = errors.variants?.[variantIndex];
               const tabTitle =
-                variant.sku?.trim() || `Variant ${variantIndex + 1}`;
+                variant.sku?.trim() || `${t("variant")} ${variantIndex + 1}`;
               const truncatedTitle =
                 tabTitle.length > 12
                   ? `${tabTitle.substring(0, 12)}...`

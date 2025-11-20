@@ -9,6 +9,7 @@ import {
 import { Button } from "@heroui/button";
 import { Card, CardBody, Divider, Textarea } from "@heroui/react";
 import { Plus, Trash } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { LocaleFieldValue, VariantFieldValue } from "./types";
 import { updateLocaleValue } from "./types";
 
@@ -48,10 +49,15 @@ export default function VariantTab({
   onRemove,
   onUpdate,
 }: VariantTabProps) {
+  const t = useTranslations("common");
+  const tProduct = useTranslations("mdl-product");
+
   return (
     <div className="flex flex-col gap-4 pt-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Variant {variantIndex + 1}</h2>
+        <h2 className="text-lg font-semibold">
+          {t("variant")} {variantIndex + 1}
+        </h2>
         <Button
           size="sm"
           variant="light"
@@ -59,12 +65,12 @@ export default function VariantTab({
           onPress={onRemove}
           isDisabled={isBusy || !canRemove}
         >
-          Remove Variant
+          {tProduct("removeVariant")}
         </Button>
       </div>
 
       <IBaseInputMultipleLang
-        label="Name"
+        label={t("name")}
         value={value.name}
         onValueChange={(langs) =>
           onUpdate((current) => ({
@@ -80,7 +86,7 @@ export default function VariantTab({
 
       <div className="grid gap-4 md:grid-cols-2">
         <IBaseInput
-          label="SKU"
+          label={t("sku")}
           value={value.sku ?? ""}
           onValueChange={(next) =>
             onUpdate((current) => ({ ...current, sku: next }))
@@ -91,7 +97,7 @@ export default function VariantTab({
           isDisabled={isBusy}
         />
         <IBaseInput
-          label="Barcode"
+          label={t("barcode")}
           value={value.barcode ?? ""}
           onValueChange={(next) =>
             onUpdate((current) => ({ ...current, barcode: next }))
@@ -105,7 +111,7 @@ export default function VariantTab({
 
       <div className="grid gap-4 md:grid-cols-2">
         <IBaseInput
-          label="Manufacture name"
+          label={tProduct("manufacturerName")}
           value={value.manufacturerName ?? ""}
           onValueChange={(next) =>
             onUpdate((current) => ({ ...current, manufacturerName: next }))
@@ -115,7 +121,7 @@ export default function VariantTab({
           isDisabled={isBusy}
         />
         <IBaseInput
-          label="Manufacture code"
+          label={tProduct("manufacturerCode")}
           value={value.manufacturerCode ?? ""}
           onValueChange={(next) =>
             onUpdate((current) => ({ ...current, manufacturerCode: next }))
@@ -127,7 +133,7 @@ export default function VariantTab({
       </div>
 
       <IBaseSelectWithSearch
-        label="Base Unit of measure"
+        label={tProduct("baseUnitOfMeasure")}
         items={uomOptions}
         selectedKeys={value.baseUomId ? [value.baseUomId] : []}
         onSelectionChange={(keys) => {
@@ -149,9 +155,9 @@ export default function VariantTab({
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-medium font-medium">Packings</h4>
+            <h4 className="text-medium font-medium">{tProduct("packings")}</h4>
             <p className="text-small text-default-500">
-              Define packaging options for this variant.
+              {tProduct("definePackaging")}
             </p>
           </div>
           <Button
@@ -165,7 +171,7 @@ export default function VariantTab({
                   ...(current.packings || []),
                   {
                     name: { en: "", vi: "" },
-                    description: { en: "", vi: "" },
+                    description: "",
                     isActive: true,
                   },
                 ],
@@ -173,12 +179,14 @@ export default function VariantTab({
             }
             isDisabled={isBusy}
           >
-            Add packing
+            {tProduct("addPacking")}
           </Button>
         </div>
 
         {!value.packings || value.packings.length === 0 ? (
-          <p className="text-small text-default-500">No packing entries yet.</p>
+          <p className="text-small text-default-500">
+            {tProduct("noPackingEntries")}
+          </p>
         ) : (
           <div className="flex flex-col gap-3">
             {value.packings.map((packing, packingIndex) => (
@@ -202,12 +210,12 @@ export default function VariantTab({
                       }
                       isDisabled={isBusy}
                     >
-                      Remove
+                      {t("actions.remove")}
                     </Button>
                   </div>
                   <div className="grid gap-3 md:grid-cols-2">
                     <IBaseInput
-                      label="Name (English)"
+                      label={tProduct("nameEnglish")}
                       value={packing.name.en ?? ""}
                       onValueChange={(next) =>
                         onUpdate((current) => ({
@@ -225,7 +233,7 @@ export default function VariantTab({
                       isDisabled={isBusy}
                     />
                     <IBaseInput
-                      label="Name (Vietnamese)"
+                      label={tProduct("nameVietnamese")}
                       value={packing.name.vi ?? ""}
                       onValueChange={(next) =>
                         onUpdate((current) => ({
@@ -244,8 +252,8 @@ export default function VariantTab({
                     />
                   </div>
                   <Textarea
-                    label="Description (English)"
-                    value={packing.description?.en ?? ""}
+                    label={t("description")}
+                    value={packing.description ?? ""}
                     onValueChange={(next) =>
                       onUpdate((current) => ({
                         ...current,
@@ -253,33 +261,7 @@ export default function VariantTab({
                           idx === packingIndex
                             ? {
                                 ...p,
-                                description: updateLocaleValue(
-                                  p.description,
-                                  "en",
-                                  next
-                                ),
-                              }
-                            : p
-                        ),
-                      }))
-                    }
-                    isDisabled={isBusy}
-                  />
-                  <Textarea
-                    label="Description (Vietnamese)"
-                    value={packing.description?.vi ?? ""}
-                    onValueChange={(next) =>
-                      onUpdate((current) => ({
-                        ...current,
-                        packings: current.packings.map((p, idx) =>
-                          idx === packingIndex
-                            ? {
-                                ...p,
-                                description: updateLocaleValue(
-                                  p.description,
-                                  "vi",
-                                  next
-                                ),
+                                description: next,
                               }
                             : p
                         ),
@@ -299,9 +281,11 @@ export default function VariantTab({
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-medium font-medium">Attributes</h4>
+            <h4 className="text-medium font-medium">
+              {tProduct("attributes")}
+            </h4>
             <p className="text-small text-default-500">
-              Capture additional attributes for this variant.
+              {tProduct("captureAttributes")}
             </p>
           </div>
           <Button
@@ -323,13 +307,13 @@ export default function VariantTab({
             }
             isDisabled={isBusy}
           >
-            Add attribute
+            {tProduct("addAttribute")}
           </Button>
         </div>
 
         {!value.attributes || value.attributes.length === 0 ? (
           <p className="text-small text-default-500">
-            No attribute entries yet.
+            {tProduct("noAttributeEntries")}
           </p>
         ) : (
           <div className="flex flex-col gap-3">
@@ -354,11 +338,11 @@ export default function VariantTab({
                       }
                       isDisabled={isBusy}
                     >
-                      Remove
+                      {t("actions.remove")}
                     </Button>
                   </div>
                   <IBaseInput
-                    label="Code"
+                    label={t("code")}
                     value={attribute.code}
                     onValueChange={(next) =>
                       onUpdate((current) => ({
@@ -378,7 +362,7 @@ export default function VariantTab({
                   />
                   <div className="grid gap-3 md:grid-cols-2">
                     <IBaseInput
-                      label="Name (English)"
+                      label={tProduct("nameEnglish")}
                       value={attribute.name.en ?? ""}
                       onValueChange={(next) =>
                         onUpdate((current) => ({
@@ -396,7 +380,7 @@ export default function VariantTab({
                       isDisabled={isBusy}
                     />
                     <IBaseInput
-                      label="Name (Vietnamese)"
+                      label={tProduct("nameVietnamese")}
                       value={attribute.name.vi ?? ""}
                       onValueChange={(next) =>
                         onUpdate((current) => ({
@@ -415,7 +399,7 @@ export default function VariantTab({
                     />
                   </div>
                   <IBaseInput
-                    label="Value"
+                    label={t("value")}
                     value={attribute.value}
                     onValueChange={(next) =>
                       onUpdate((current) => ({
@@ -442,7 +426,7 @@ export default function VariantTab({
       </div>
 
       <Textarea
-        label="Description"
+        label={t("description")}
         value={value.description ?? ""}
         onValueChange={(next) =>
           onUpdate((current) => ({ ...current, description: next }))

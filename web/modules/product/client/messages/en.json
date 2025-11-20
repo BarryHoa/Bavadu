@@ -1,6 +1,36 @@
 {
   "mdl-product": {
     "title": "Products",
-    "description": "Products module"
+    "description": "Products module",
+    "productType": "Product type",
+    "productFeatures": "Product features",
+    "baseUnitOfMeasure": "Base unit of measure",
+    "unitOfMeasure": "Unit of measure",
+    "manufacturerName": "Manufacturer name",
+    "manufacturerCode": "Manufacturer code",
+    "manufacture": "Manufacture",
+    "packing": "Packing",
+    "packings": "Packings",
+    "attribute": "Attribute",
+    "attributes": "Attributes",
+    "removeVariant": "Remove variant",
+    "addPacking": "Add packing",
+    "addAttribute": "Add attribute",
+    "noPackingEntries": "No packing entries yet",
+    "noAttributeEntries": "No attribute entries yet",
+    "guideTooltip": "Information needed",
+    "guideAriaLabel": "User guide",
+    "definePackaging": "Define packaging options for this variant",
+    "captureAttributes": "Capture additional attributes for this variant",
+    "nameEnglish": "Name (English)",
+    "nameVietnamese": "Name (Vietnamese)",
+    "descriptionEnglish": "Description (English)",
+    "descriptionVietnamese": "Description (Vietnamese)",
+    "errors": {
+      "productCodeRequired": "Product code is required",
+      "baseUnitOfMeasureRequired": "Base unit of measure is required",
+      "atLeastOneVariantRequired": "At least one variant is required",
+      "maxVariantsAllowed": "Maximum {count} variants allowed"
+    }
   }
 }

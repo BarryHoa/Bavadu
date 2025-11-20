@@ -17,7 +17,7 @@ export type VariantFieldValue = {
   packings: Array<{
     id?: string;
     name: LocaleFieldValue;
-    description: LocaleFieldValue;
+    description: string;
     isActive: boolean;
   }>;
   attributes: Array<{

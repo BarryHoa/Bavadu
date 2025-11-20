@@ -51,7 +51,7 @@ export interface ProductVariantInput {
 export interface ProductPackingInput {
   id?: string;
   name: LocaleInput;
-  description?: LocaleInput;
+  description?: string | null;
   isActive?: boolean;
 }
 

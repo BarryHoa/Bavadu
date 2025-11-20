@@ -65,7 +65,7 @@ const sanitizePackings = (
     .map((packing) => ({
       ...packing,
       name: ensureLocaleValue(packing.name),
-      description: ensureLocaleValue(packing.description),
+      description: packing.description || "",
     }))
     .filter((packing) =>
       Boolean(packing.name.en?.trim() || packing.name.vi?.trim())
@@ -73,7 +73,7 @@ const sanitizePackings = (
     .map((packing) => ({
       id: packing.id,
       name: toLocaleRecord(packing.name) ?? { en: packing.id ?? "" },
-      description: toLocaleRecord(packing.description),
+      description: packing.description?.trim() || null,
       isActive: packing.isActive,
     }));
 };
@@ -115,7 +115,7 @@ export const mapDetailToFormValues = (
     packings.map((packing) => ({
       id: packing.id,
       name: toLocaleFormValue(packing.name),
-      description: toLocaleFormValue(packing.description),
+      description: packing.description || "",
       isActive: packing.isActive ?? true,
     }));
 
@@ -133,10 +133,7 @@ export const mapDetailToFormValues = (
     master: {
       code: detail.master.code,
       name: toLocaleFormValue(detail.master.name),
-      description:
-        typeof detail.master.description === "string"
-          ? detail.master.description
-          : "",
+      description: detail.master.description || "",
       type: (detail.master.type as ProductMasterType) ?? ProductMasterType.GOODS,
       features,
       isActive: detail.master.isActive ?? true,
@@ -146,10 +143,7 @@ export const mapDetailToFormValues = (
     },
     variant: {
       name: toLocaleFormValue(detail.variant.name),
-      description:
-        typeof detail.variant.description === "string"
-          ? detail.variant.description
-          : "",
+      description: detail.variant.description || "",
       sku: detail.variant.sku ?? "",
       barcode: detail.variant.barcode ?? "",
       manufacturerName:

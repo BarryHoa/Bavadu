@@ -4,7 +4,7 @@ import { User } from "@base/server/interfaces/User";
 export interface ProductPacking {
   id: string; // uuid v7
   name: LocaleDataType<string>;
-  description?: LocaleDataType<string>;
+  description?: string; // string, not localized
   isActive: boolean;
   createdAt?: number; // unix timestamp (ms)
   updatedAt?: number; // unix timestamp (ms)

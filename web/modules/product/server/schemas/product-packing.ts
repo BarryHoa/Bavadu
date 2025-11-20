@@ -4,6 +4,7 @@ import {
   index,
   jsonb,
   pgTable,
+  text,
   timestamp,
   uuid,
   varchar,
@@ -21,7 +22,7 @@ export const table_product_packing = pgTable(
       .references(() => table_product_variant.id)
       .notNull(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // string
     isActive: boolean("is_active").default(true).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }),
     updatedAt: timestamp("updated_at", { withTimezone: true }),

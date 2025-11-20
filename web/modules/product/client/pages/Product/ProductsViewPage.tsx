@@ -167,11 +167,7 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
         </div>
         <InfoRow
           label="Description"
-          value={
-            typeof detail.master.description === "string"
-              ? detail.master.description
-              : "-"
-          }
+          value={detail.master.description || "-"}
         />
         <div className="flex flex-wrap gap-2">
           <span className="text-xs uppercase text-default-400">Features</span>
@@ -222,11 +218,7 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
         </div>
         <InfoRow
           label="Description"
-          value={
-            typeof detail.variant.description === "string"
-              ? detail.variant.description
-              : "-"
-          }
+          value={detail.variant.description || "-"}
         />
       </section>
 

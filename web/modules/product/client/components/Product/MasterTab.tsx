@@ -7,6 +7,7 @@ import {
   SelectItemOption,
 } from "@base/client/components";
 import { Checkbox, CheckboxGroup, Textarea } from "@heroui/react";
+import { useTranslations } from "next-intl";
 import {
   ProductMasterFeatures,
   ProductMasterType,
@@ -41,10 +42,13 @@ export default function MasterTab({
   categoryQueryLoading,
   onUpdate,
 }: MasterTabProps) {
+  const t = useTranslations("common");
+  const tProduct = useTranslations("mdl-product");
+
   return (
     <div className="flex flex-col gap-4 pt-4">
       <IBaseInputMultipleLang
-        label="Name"
+        label={t("name")}
         value={value.name}
         onValueChange={(langs) =>
           onUpdate((current) => ({
@@ -60,7 +64,7 @@ export default function MasterTab({
 
       <div className="grid gap-4 md:grid-cols-2 items-start">
         <IBaseInput
-          label="Code"
+          label={t("code")}
           value={value.code ?? ""}
           onValueChange={(next) =>
             onUpdate((current) => ({ ...current, code: next }))
@@ -72,7 +76,7 @@ export default function MasterTab({
         />
 
         <IBaseSelectWithSearch
-          label="Product type"
+          label={tProduct("productType")}
           items={masterTypes}
           selectedKeys={
             value.type && masterTypes.some((item) => item.value === value.type)
@@ -94,7 +98,7 @@ export default function MasterTab({
 
       <div className="grid gap-4 md:grid-cols-2 items-start">
         <IBaseSelectWithSearch
-          label="Category"
+          label={t("category")}
           items={categoryOptions}
           selectedKeys={value.categoryId ? [value.categoryId] : []}
           onSelectionChange={(keys) => {
@@ -111,7 +115,7 @@ export default function MasterTab({
         />
 
         <IBaseInput
-          label="Brand"
+          label={t("brand")}
           value={value.brand ?? ""}
           onValueChange={(next) =>
             onUpdate((current) => ({ ...current, brand: next }))
@@ -121,7 +125,7 @@ export default function MasterTab({
       </div>
 
       <CheckboxGroup
-        label="Product features"
+        label={tProduct("productFeatures")}
         orientation="horizontal"
         value={featureOptions
           .filter((feature) => value.features?.[feature.key])
@@ -157,7 +161,7 @@ export default function MasterTab({
       </CheckboxGroup>
 
       <Textarea
-        label="Description"
+        label={t("description")}
         value={value.description ?? ""}
         onValueChange={(next) =>
           onUpdate((current) => ({ ...current, description: next }))

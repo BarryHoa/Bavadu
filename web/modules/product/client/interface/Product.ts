@@ -97,7 +97,7 @@ export type ProductDetail = {
 export type ProductFormPacking = {
   id?: string;
   name: LocaleFormValue;
-  description?: LocaleFormValue;
+  description?: string;
   isActive: boolean;
 };
 
@@ -160,7 +160,7 @@ export type ProductFormPayload = {
   packings?: Array<{
     id?: string;
     name: LocaleDataType<string>;
-    description?: LocaleDataType<string> | null;
+    description?: string | null;
     isActive?: boolean;
   }>;
   attributes?: Array<{

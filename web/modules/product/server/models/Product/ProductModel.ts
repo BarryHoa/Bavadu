@@ -145,7 +145,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
       packings: packings.map((packing) => ({
         id: packing.id,
         name: packing.name as any,
-        description: packing.description as any,
+        description: packing.description || undefined,
         isActive: packing.isActive,
         createdAt: packing.createdAt?.getTime(),
         updatedAt: packing.updatedAt?.getTime(),
@@ -244,7 +244,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
             name: this.normalizeLocale(packing.name) ?? {
               en: packing.id ?? "",
             },
-            description: this.normalizeLocale(packing.description),
+            description: packing.description?.trim() || null,
             isActive: packing.isActive ?? true,
             createdAt: now,
             updatedAt: now,
@@ -348,7 +348,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
             name: this.normalizeLocale(packing.name) ?? {
               en: packing.id ?? "",
             },
-            description: this.normalizeLocale(packing.description),
+            description: packing.description?.trim() || null,
             isActive: packing.isActive ?? true,
             createdAt: now,
             updatedAt: now,
