@@ -1,5 +1,5 @@
 import { randomBytes } from "crypto";
-import { and, eq, gt } from "drizzle-orm";
+import { and, eq, gt, lt } from "drizzle-orm";
 import { table_session } from "../../schemas/session";
 import { table_user, table_user_login } from "../../schemas/user";
 import { BaseModel } from "../BaseModel";
