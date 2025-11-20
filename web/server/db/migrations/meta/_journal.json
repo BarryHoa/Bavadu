@@ -29,6 +29,13 @@
       "when": 1763614298436,
       "tag": "0003_alter_product_packings_description_to_text",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1763625829814,
+      "tag": "0004_colorful_stark_industries",
+      "breakpoints": true
     }
   ]
 }

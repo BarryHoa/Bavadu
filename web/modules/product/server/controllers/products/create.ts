@@ -1,5 +1,7 @@
 import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
+import { withAuthHandler } from "@/module-base/server/utils/withAuthHandler";
 import { NextRequest, NextResponse } from "next/server";
+import type { AuthenticatedRequest } from "@/module-base/server/middleware/auth";
 import type { ProductCreateInput } from "../../models/Product/ProductModelInterface";
 import {
   ProductMasterFeaturesEnum,
@@ -190,7 +192,7 @@ export const buildPayload = (body: any): ProductCreateInput => {
   };
 };
 
-export async function POST(request: NextRequest) {
+async function handlePOST(request: AuthenticatedRequest) {
   try {
     const body = await request.json();
     const payload = buildPayload(body);
@@ -218,3 +220,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const POST = withAuthHandler(handlePOST);
