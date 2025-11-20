@@ -1,11 +1,11 @@
 import { randomBytes } from "crypto";
-import { eq, and, gt } from "drizzle-orm";
-import { BaseModel } from "../BaseModel";
+import { and, eq, gt } from "drizzle-orm";
 import { table_session } from "../../schemas/session";
 import { table_user, table_user_login } from "../../schemas/user";
+import { BaseModel } from "../BaseModel";
 import type {
-  SessionData,
   CreateSessionParams,
+  SessionData,
   ValidateSessionResult,
 } from "./SessionInterface";
 
@@ -24,9 +24,7 @@ class SessionModel extends BaseModel<typeof table_session> {
   /**
    * Create a new session for a user
    */
-  async createSession(
-    params: CreateSessionParams
-  ): Promise<SessionData> {
+  async createSession(params: CreateSessionParams): Promise<SessionData> {
     const {
       userId,
       ipAddress,
@@ -80,9 +78,7 @@ class SessionModel extends BaseModel<typeof table_session> {
   /**
    * Validate a session token and return session data with user info
    */
-  async validateSession(
-    sessionToken: string
-  ): Promise<ValidateSessionResult> {
+  async validateSession(sessionToken: string): Promise<ValidateSessionResult> {
     const db = this.getDb();
     const now = new Date();
 
@@ -214,4 +210,3 @@ class SessionModel extends BaseModel<typeof table_session> {
 }
 
 export default SessionModel;
-
