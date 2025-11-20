@@ -1,7 +1,10 @@
 import type { AuthenticatedRequest } from "@/module-base/server/middleware/auth";
 import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 import { withAuthHandler } from "@/module-base/server/utils/withAuthHandler";
+import { validateRequest } from "@/module-base/server/validation/middleware";
+import { productCreateInputSchema } from "@/module-base/server/validation/schemas/product";
 import { NextResponse } from "next/server";
+import type { AuthenticatedRequest } from "@/module-base/server/middleware/auth";
 import type { ProductCreateInput } from "../../models/Product/ProductModelInterface";
 import {
   ProductMasterFeaturesEnum,
