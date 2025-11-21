@@ -6,8 +6,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { SettingsProvider } from "./context/SettingsContext";
-
 import { NavigationLoader } from "@base/client/components/NavigationLoader";
 import { GlobalSettingsProvider } from "@base/client/contexts/global-settings";
 
@@ -48,10 +46,8 @@ export function Providers({ children }: ProvidersProps) {
           toastProps={{ variant: "solid" }}
         />
         <GlobalSettingsProvider>
-          <SettingsProvider>
-            <NavigationLoader minLoadingTime={300} style="bar" />
-            {children}
-          </SettingsProvider>
+          <NavigationLoader minLoadingTime={300} style="bar" />
+          {children}
         </GlobalSettingsProvider>
       </HeroUIProvider>
     </QueryClientProvider>

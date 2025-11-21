@@ -2,7 +2,7 @@
 
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Input } from "@heroui/input";
+import { Input as HeroUIInput } from "@heroui/input";
 import { Link } from "@heroui/link";
 import { useState } from "react";
 
@@ -82,7 +82,7 @@ export default function ResetPasswordPage() {
               </div>
             )}
 
-            <Input
+            <HeroUIInput
               label="Email"
               type="email"
               placeholder="Enter your email"

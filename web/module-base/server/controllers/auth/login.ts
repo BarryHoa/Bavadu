@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import SessionModel from "../../models/Sessions/SessionModel";
 import { table_user, table_user_login } from "../../schemas/user";
-import getEnv from "../../utils/getEnv";
+import getDbConnect from "../../utils/getDbConnect";
 
 interface LoginRequest {
   username?: string;
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const db = getEnv().getDb();
+    const db = getDbConnect();
 
     // Find user login by username, email, or phone
     let userLogin;

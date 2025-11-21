@@ -108,5 +108,13 @@
     "**/.next/**": true,
     "**/app/**": false
   },
-  "cSpell.words": ["heroui", "STOCKABLE"]
+  "cSpell.words": [
+    "heroui",
+    "PGHOST",
+    "PGPASSWORD",
+    "PGPORT",
+    "PGSSLMODE",
+    "PGUSER",
+    "STOCKABLE"
+  ]
 }

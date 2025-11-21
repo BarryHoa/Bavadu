@@ -53,16 +53,14 @@ export default class PurchaseOrderModel extends BaseModel<
   }
 
   list = async (): Promise<TblPurchaseOrder[]> => {
-    const db = getEnv().getDb();
-    return db
+    return this.db
       .select()
       .from(table_purchase_order)
       .orderBy(desc(table_purchase_order.createdAt));
   };
 
   getById = async (id: string) => {
-    const db = getEnv().getDb();
-    const [order] = await db
+    const [order] = await this.db
       .select()
       .from(table_purchase_order)
       .where(eq(table_purchase_order.id, id))
@@ -70,7 +68,7 @@ export default class PurchaseOrderModel extends BaseModel<
     if (!order) {
       return null;
     }
-    const lines = await db
+    const lines = await this.db
       .select()
       .from(table_purchase_order_line)
       .where(eq(table_purchase_order_line.orderId, order.id));
@@ -82,7 +80,6 @@ export default class PurchaseOrderModel extends BaseModel<
       throw new Error("Purchase order requires at least one line");
     }
 
-    const db = getEnv().getDb();
     const now = new Date();
     const generatedCode =
       input.code?.trim() ||
@@ -93,7 +90,7 @@ export default class PurchaseOrderModel extends BaseModel<
         .toString()
         .padStart(2, "0")}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
-    return db.transaction(async (tx) => {
+    return this.db.transaction(async (tx) => {
       const orderPayload: NewTblPurchaseOrder = {
         code: generatedCode,
         vendorName: input.vendorName.trim(),
@@ -149,8 +146,7 @@ export default class PurchaseOrderModel extends BaseModel<
   };
 
   confirm = async (orderId: string) => {
-    const db = getEnv().getDb();
-    const [updated] = await db
+    const [updated] = await this.db
       .update(table_purchase_order)
       .set({
         status: "confirmed",
@@ -167,7 +163,6 @@ export default class PurchaseOrderModel extends BaseModel<
   };
 
   receive = async (input: ReceivePurchaseOrderInput) => {
-    const db = getEnv().getDb();
     const env = getEnv();
     const stockModel = env.getModel("stock") as StockModel | undefined;
 
@@ -195,7 +190,7 @@ export default class PurchaseOrderModel extends BaseModel<
 
     const now = new Date();
 
-    await db.transaction(async (tx) => {
+    await this.db.transaction(async (tx) => {
       for (const receivedLine of input.lines) {
         const line = linesById.get(receivedLine.lineId);
         if (!line) {
@@ -265,8 +260,7 @@ export default class PurchaseOrderModel extends BaseModel<
   };
 
   cancel = async (orderId: string) => {
-    const db = getEnv().getDb();
-    const [updated] = await db
+    const [updated] = await this.db
       .update(table_purchase_order)
       .set({
         status: "cancelled",

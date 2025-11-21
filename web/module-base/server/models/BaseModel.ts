@@ -1,14 +1,16 @@
 import type { Column } from "drizzle-orm";
 import { and, eq } from "drizzle-orm";
-import type { PgTable } from "drizzle-orm/pg-core";
+import type { PgDatabase, PgTable } from "drizzle-orm/pg-core";
 import { isEmpty } from "lodash";
-import { getEnv } from "..";
+import getDbConnect from "../utils/getDbConnect";
 
 export class BaseModel<TTable extends PgTable<any> = PgTable<any>> {
   /**Main table of the model */
   protected readonly table: TTable;
+  protected readonly db: PgDatabase<any>;
   constructor(table: TTable) {
     this.table = table;
+    this.db = getDbConnect() as unknown as PgDatabase<any>;
   }
 
   /**Check if a field and value exists in the model */
@@ -18,8 +20,7 @@ export class BaseModel<TTable extends PgTable<any> = PgTable<any>> {
     ignore?: Record<string, unknown>;
   }) => {
     const { field, value, ignore } = params;
-    const db = getEnv().getDb();
-    if (!db) {
+    if (!this.db) {
       throw new Error("Database not initialized");
     }
     // check if field exists in table schema
@@ -62,7 +63,7 @@ export class BaseModel<TTable extends PgTable<any> = PgTable<any>> {
         )
       : eq(column, value);
 
-    const result = await db
+    const result = await this.db
       .select()
       .from(this.table as any)
       .where(whereClause)

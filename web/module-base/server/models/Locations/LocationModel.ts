@@ -1,6 +1,5 @@
 import { and, asc, eq, isNull } from "drizzle-orm";
 
-import { getEnv } from "../..";
 import { table_location_administrative_units } from "../../schemas/administrative-unit";
 import { table_location_countries } from "../../schemas/country";
 import { BaseModel } from "../BaseModel";
@@ -11,11 +10,7 @@ class LocationModel extends BaseModel<typeof table_location_countries> {
   }
 
   getLocationById = async (id: string) => {
-    const db = getEnv()?.getDb() ?? null;
-    if (!db) {
-      throw new Error("Database not initialized");
-    }
-    const location = await db
+    const location = await this.db
       .select()
       .from(this.table)
       .where(eq(this.table.id, id));
@@ -26,11 +21,7 @@ class LocationModel extends BaseModel<typeof table_location_countries> {
    * Get all active countries
    */
   getCountries = async () => {
-    const db = getEnv()?.getDb() ?? null;
-    if (!db) {
-      throw new Error("Database not initialized");
-    }
-    const countries = await db
+    const countries = await this.db
       .select()
       .from(this.table)
       .where(eq(this.table.isActive, true))
@@ -42,11 +33,7 @@ class LocationModel extends BaseModel<typeof table_location_countries> {
    * Get country detail by ID
    */
   getCountryDetail = async (id: string) => {
-    const db = getEnv()?.getDb() ?? null;
-    if (!db) {
-      throw new Error("Database not initialized");
-    }
-    const country = await db
+    const country = await this.db
       .select()
       .from(this.table)
       .where(eq(this.table.id, id));
@@ -65,11 +52,6 @@ class LocationModel extends BaseModel<typeof table_location_countries> {
     countryId?: string;
     level?: number;
   }) => {
-    const db = getEnv()?.getDb() ?? null;
-    if (!db) {
-      throw new Error("Database not initialized");
-    }
-
     const conditions = [eq(table_location_administrative_units.isActive, true)];
 
     // Filter by parentId
@@ -98,7 +80,7 @@ class LocationModel extends BaseModel<typeof table_location_countries> {
       );
     }
 
-    const administrativeUnits = await db
+    const administrativeUnits = await this.db
       .select()
       .from(table_location_administrative_units)
       .where(and(...conditions))
@@ -117,10 +99,6 @@ class LocationModel extends BaseModel<typeof table_location_countries> {
    * @param params.type - Administrative unit type (province, state, district, ward, commune, etc.)
    */
   getLocationBy = async (params: { parentId: string; type: string }) => {
-    const db = getEnv()?.getDb() ?? null;
-    if (!db) {
-      throw new Error("Database not initialized");
-    }
 
     const conditions = [
       eq(table_location_administrative_units.isActive, true),
@@ -128,7 +106,7 @@ class LocationModel extends BaseModel<typeof table_location_countries> {
       eq(table_location_administrative_units.type, params.type),
     ];
 
-    const administrativeUnits = await db
+    const administrativeUnits = await this.db
       .select()
       .from(table_location_administrative_units)
       .where(and(...conditions))
@@ -151,13 +129,8 @@ class LocationModel extends BaseModel<typeof table_location_countries> {
       level?: number;
     }
   ) => {
-    const db = getEnv()?.getDb() ?? null;
-    if (!db) {
-      throw new Error("Database not initialized");
-    }
-
     // First, get the country by code
-    const country = await db
+    const country = await this.db
       .select()
       .from(table_location_countries)
       .where(eq(table_location_countries.code, countryCode))
@@ -188,7 +161,7 @@ class LocationModel extends BaseModel<typeof table_location_countries> {
     const level = params?.level ?? 1;
     conditions.push(eq(table_location_administrative_units.level, level));
 
-    const administrativeUnits = await db
+    const administrativeUnits = await this.db
       .select()
       .from(table_location_administrative_units)
       .where(and(...conditions))

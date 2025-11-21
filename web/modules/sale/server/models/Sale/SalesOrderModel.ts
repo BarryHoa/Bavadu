@@ -53,16 +53,14 @@ export default class SalesOrderModel extends BaseModel<
   }
 
   list = async (): Promise<TblSalesOrder[]> => {
-    const db = getEnv().getDb();
-    return db
+    return this.db
       .select()
       .from(table_sales_order)
       .orderBy(desc(table_sales_order.createdAt));
   };
 
   getById = async (id: string) => {
-    const db = getEnv().getDb();
-    const [order] = await db
+    const [order] = await this.db
       .select()
       .from(table_sales_order)
       .where(eq(table_sales_order.id, id))
@@ -70,7 +68,7 @@ export default class SalesOrderModel extends BaseModel<
     if (!order) {
       return null;
     }
-    const lines = await db
+    const lines = await this.db
       .select()
       .from(table_sales_order_line)
       .where(eq(table_sales_order_line.orderId, order.id));
@@ -82,7 +80,6 @@ export default class SalesOrderModel extends BaseModel<
       throw new Error("Sales order requires at least one line");
     }
 
-    const db = getEnv().getDb();
     const now = new Date();
     const generatedCode =
       input.code?.trim() ||
@@ -93,7 +90,7 @@ export default class SalesOrderModel extends BaseModel<
         .toString()
         .padStart(2, "0")}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
-    return db.transaction(async (tx) => {
+    return this.db.transaction(async (tx) => {
       const orderPayload: NewTblSalesOrder = {
         code: generatedCode,
         customerName: input.customerName.trim(),
@@ -149,8 +146,7 @@ export default class SalesOrderModel extends BaseModel<
   };
 
   confirm = async (orderId: string) => {
-    const db = getEnv().getDb();
-    const [updated] = await db
+    const [updated] = await this.db
       .update(table_sales_order)
       .set({
         status: "confirmed",
@@ -167,7 +163,6 @@ export default class SalesOrderModel extends BaseModel<
   };
 
   deliver = async (input: DeliverSalesOrderInput) => {
-    const db = getEnv().getDb();
     const env = getEnv();
     const stockModel = env.getModel("stock") as StockModel | undefined;
 
@@ -195,7 +190,7 @@ export default class SalesOrderModel extends BaseModel<
 
     const now = new Date();
 
-    await db.transaction(async (tx) => {
+    await this.db.transaction(async (tx) => {
       for (const deliveredLine of input.lines) {
         const line = linesById.get(deliveredLine.lineId);
         if (!line) {
@@ -263,8 +258,7 @@ export default class SalesOrderModel extends BaseModel<
   };
 
   cancel = async (orderId: string) => {
-    const db = getEnv().getDb();
-    const [updated] = await db
+    const [updated] = await this.db
       .update(table_sales_order)
       .set({
         status: "cancelled",

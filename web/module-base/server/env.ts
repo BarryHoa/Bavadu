@@ -1,10 +1,8 @@
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import { drizzle } from "drizzle-orm/postgres-js";
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { dirname, join, relative } from "path";
-import postgres from "postgres";
 import { MenuFactoryElm } from "./interfaces/Menu";
 import { loadMenusFromModules } from "./loaders/menu-loader";
 dayjs.extend(utc);
@@ -19,15 +17,12 @@ type ModelFactoryElm = {
   timestamp: string;
 };
 
-type SchemaRegistry = Record<string, unknown>;
-
 interface EnvironmentOptions {
   projectRoot?: string;
 }
 
 class Environment {
   private readonly projectRoot: string;
-  private db: ReturnType<typeof drizzle> | null = null;
   private readonly modelFactories = new Map<string, ModelFactoryElm>();
   private readonly menuFactories: MenuFactoryElm[] = [];
 
@@ -39,14 +34,6 @@ class Environment {
     const env = new Environment(options.projectRoot ?? process.cwd());
     await env.init();
     return env;
-  }
-
-  getDb(): ReturnType<typeof drizzle> {
-    if (!this.db) {
-      throw new Error("Database not initialized. Call create() first.");
-    }
-
-    return this.db;
   }
 
   getModel<T extends object>(modelId: string): T | undefined {
@@ -131,7 +118,6 @@ class Environment {
 
   private async init(): Promise<void> {
     await this.registerModels();
-    await this.registerDb();
     await this.registerMenuStatic();
   }
 
@@ -185,31 +171,6 @@ class Environment {
     );
   }
 
-  private async registerDb(): Promise<void> {
-    console.log("Connecting to database...");
-
-    const schemas: SchemaRegistry = {};
-    const schemaEntryPoints = this.collectSchemaEntryPoints();
-
-    for (const schemaPath of schemaEntryPoints) {
-      try {
-        const schemaModule = await import(this.toImportPath(schemaPath));
-        Object.assign(schemas, schemaModule);
-      } catch (error) {
-        console.error(`Failed to load schema from ${schemaPath}:`, error);
-      }
-    }
-
-    try {
-      const client = this.createPgClient();
-      this.db = drizzle(client, { schema: schemas });
-      console.log("✅ DB connected with schema");
-    } catch (error) {
-      console.error("❌ DB connection failed:", error);
-      throw error;
-    }
-  }
-
   private collectModuleJsonPaths(): string[] {
     const paths: string[] = [];
 
@@ -227,37 +188,6 @@ class Environment {
     }
 
     return paths;
-  }
-
-  private collectSchemaEntryPoints(): string[] {
-    const schemaPaths: string[] = [];
-
-    const baseSchema = join(
-      this.projectRoot,
-      "module-base",
-      "server",
-      "schemas",
-      "index.ts"
-    );
-    if (existsSync(baseSchema)) {
-      schemaPaths.push(baseSchema);
-    }
-
-    const modulesRoot = join(this.projectRoot, "modules");
-    for (const dir of this.safeReadDir(modulesRoot)) {
-      const schemaPath = join(
-        modulesRoot,
-        dir,
-        "server",
-        "schemas",
-        "index.ts"
-      );
-      if (existsSync(schemaPath)) {
-        schemaPaths.push(schemaPath);
-      }
-    }
-
-    return schemaPaths;
   }
 
   private safeReadDir(dirPath: string): string[] {
@@ -326,22 +256,6 @@ class Environment {
 
     const segments = relativeModuleDir.split("/").filter(Boolean);
     return segments.pop() ?? relativeModuleDir;
-  }
-
-  private createPgClient() {
-    const sslMode = process.env.PGSSLMODE || "disable";
-
-    return postgres({
-      host: process.env.PGHOST || "localhost",
-      port: Number(process.env.PGPORT || 5432),
-      user: process.env.PGUSER,
-      password: process.env.PGPASSWORD,
-      database: process.env.PGDATABASE,
-      ssl: sslMode === "require" ? "require" : undefined,
-      max: 10,
-      idle_timeout: 20,
-      connect_timeout: 10,
-    });
   }
   private registerMenuStatic(): void {
     console.log("Registering menus...");

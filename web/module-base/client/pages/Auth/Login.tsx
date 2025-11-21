@@ -2,7 +2,7 @@
 
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Input } from "@heroui/input";
+import { Input as HeroUIInput } from "@heroui/input";
 import { Link } from "@heroui/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -65,7 +65,7 @@ export default function LoginPage() {
               </div>
             )}
 
-            <Input
+            <HeroUIInput
               label="Username"
               placeholder="Enter your username"
               value={username}
@@ -75,7 +75,7 @@ export default function LoginPage() {
               variant="bordered"
             />
 
-            <Input
+            <HeroUIInput
               label="Password"
               type="password"
               placeholder="Enter your password"

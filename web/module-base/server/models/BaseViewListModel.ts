@@ -1,12 +1,12 @@
 import { asc, desc, or, sql, type Column } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { isNil } from "lodash";
-import { getEnv, ParamSortMultiple } from "..";
 import { BaseModel } from "./BaseModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "./interfaces/ListInterface";
+import type { ParamSortMultiple } from "./interfaces/SortInterface";
 
 /**
  * Abstract base class for models that support view list data table functionality
@@ -110,9 +110,6 @@ export abstract class BaseViewListModel<
       sorts = undefined,
     } = params || {};
 
-    const env = getEnv();
-    const db = env.getDb();
-
     // 2) Build base SELECT list from column map
     const selectColumns = Object.fromEntries(
       Array.from(this.columns.entries()).map(([key, config]) => [
@@ -128,7 +125,7 @@ export abstract class BaseViewListModel<
     // when conditionally chaining where/orderBy.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const totalResult = "total-data-response" as keyof TRow;
-    let query: any = db
+    let query: any = this.db
       .select({
         ...selectColumns,
         [totalResult]: sql<number>`count(*) over()::int`.as("total"),

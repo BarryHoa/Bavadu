@@ -1,6 +1,5 @@
 import { and, eq, sql } from "drizzle-orm";
 
-import { getEnv } from "@base/server";
 import { BaseModel } from "@base/server/models/BaseModel";
 
 import type { TblStockLevel } from "../../schemas";
@@ -86,8 +85,7 @@ export default class StockModel extends BaseModel<typeof table_stock_move> {
       throw new Error("Transfer quantity must be positive");
     }
 
-    const db = getEnv().getDb();
-    return db.transaction(async (tx) => {
+    return this.db.transaction(async (tx) => {
       await this.applyDelta(
         {
           productId: input.productId,
@@ -124,8 +122,7 @@ export default class StockModel extends BaseModel<typeof table_stock_move> {
     productId: string,
     warehouseId: string
   ): Promise<TblStockLevel | null> => {
-    const db = getEnv().getDb();
-    const [record] = await db
+    const [record] = await this.db
       .select()
       .from(table_stock_level)
       .where(
@@ -148,7 +145,7 @@ export default class StockModel extends BaseModel<typeof table_stock_move> {
   ) => {
     const now = new Date();
     const quantityDelta = Number(input.quantityDelta);
-    const db = tx ?? getEnv().getDb();
+    const db = tx ?? this.db;
 
     const [currentLevel] = await db
       .select()

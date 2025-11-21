@@ -193,25 +193,14 @@ class SessionModel extends BaseModel<typeof table_session> {
   }
 
   /**
-   * Get database instance (not from env)
-   * Directly access from global runtime variables
-   * This avoids dependency on env injection
+   * Get database instance
+   * Uses getDbConnect utility to get database connection
    */
   private getDb() {
-    // Access system runtime variables directly (same pattern as getEnv but without export)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const systemRuntimeVariables = (globalThis as any).systemRuntimeVariables;
-
-    if (!systemRuntimeVariables?.env) {
-      throw new Error("Database not initialized");
-    }
-
-    const db = systemRuntimeVariables.env.getDb();
-    if (!db) {
-      throw new Error("Database not initialized");
-    }
-
-    return db;
+    // Import here to avoid circular dependency
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const getDbConnect = require("../utils/getDbConnect").default;
+    return getDbConnect();
   }
 }
 

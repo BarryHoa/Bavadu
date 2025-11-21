@@ -1,6 +1,5 @@
 import { asc, eq, sql } from "drizzle-orm";
 
-import { getEnv } from "@base/server";
 import { BaseModel } from "@base/server/models/BaseModel";
 
 import {
@@ -58,16 +57,14 @@ export default class WarehouseModel extends BaseModel<
   }
 
   listWarehouses = async (): Promise<TblStockWarehouse[]> => {
-    const db = getEnv().getDb();
-    return db
+    return this.db
       .select()
       .from(table_stock_warehouse)
       .orderBy(asc(table_stock_warehouse.name));
   };
 
   getWarehouse = async (id: string): Promise<TblStockWarehouse | null> => {
-    const db = getEnv().getDb();
-    const [record] = await db
+    const [record] = await this.db
       .select()
       .from(table_stock_warehouse)
       .where(eq(table_stock_warehouse.id, id))
@@ -79,10 +76,9 @@ export default class WarehouseModel extends BaseModel<
   createWarehouse = async (
     payload: WarehousePayload
   ): Promise<TblStockWarehouse> => {
-    const db = getEnv().getDb();
     const insertPayload = this.normalizeWarehousePayload(payload);
 
-    const [record] = await db
+    const [record] = await this.db
       .insert(table_stock_warehouse)
       .values(insertPayload)
       .returning();
@@ -94,8 +90,7 @@ export default class WarehouseModel extends BaseModel<
     id: string,
     payload: WarehousePayload
   ): Promise<TblStockWarehouse> => {
-    const db = getEnv().getDb();
-    const [record] = await db
+    const [record] = await this.db
       .update(table_stock_warehouse)
       .set({
         ...this.normalizeWarehousePayload(payload),

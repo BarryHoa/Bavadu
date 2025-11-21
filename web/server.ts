@@ -5,6 +5,7 @@
  */
 
 import Environment from "@base/server/env";
+import { Database } from "@base/server/stores/database";
 import http from "http";
 import next from "next";
 import dayjs from "dayjs";
@@ -29,8 +30,12 @@ async function startServer(): Promise<void> {
   try {
     await app.prepare();
 
+    // Initialize database
+    const database = new Database(process.cwd());
+    await database.initialize();
+
+    // Initialize environment
     const envProcess = await Environment.create();
-   
 
     const server = http.createServer(async (req, res) => {
       // INSERT_YOUR_CODE
@@ -38,6 +43,7 @@ async function startServer(): Promise<void> {
       // The value is always "server"
       (globalThis as any).systemRuntimeVariables = {
         env: envProcess,
+        database: database,
         timestamp: dayjs().format('YYYY-MM-DD HH:mm:ss')  
       }
       await handle(req, res);
@@ -54,6 +60,7 @@ async function startServer(): Promise<void> {
       console.log(`ℹ️  Received ${signal}, shutting down...`);
       try {
         await closeServer();
+        await database.closeAll();
         await app.close();
         console.log("✅ Server closed gracefully");
         process.exit(0);

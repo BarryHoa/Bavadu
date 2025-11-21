@@ -1,13 +1,12 @@
-import { getEnv } from "@base/server";
-import { NextResponse } from "next/server";
+import getDbConnect from "@base/server/utils/getDbConnect";
 import { asc } from "drizzle-orm";
+import { NextResponse } from "next/server";
 
 import { table_unit_of_measure } from "../../schemas";
 
 export async function GET() {
   try {
-    const env = getEnv();
-    const db = env.getDb();
+    const db = getDbConnect();
 
     const units = await db
       .select()

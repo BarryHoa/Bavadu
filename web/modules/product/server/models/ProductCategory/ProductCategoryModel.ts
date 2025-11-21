@@ -47,10 +47,7 @@ export default class ProductCategoryModel extends BaseModel<
   }
 
   getCategoryById = async (id: string): Promise<ProductCategoryRow | null> => {
-    const env = getEnv();
-    const db = env.getDb();
-
-    const result = await db
+    const result = await this.db
       .select({
         id: this.table.id,
         code: this.table.code,
@@ -102,9 +99,6 @@ export default class ProductCategoryModel extends BaseModel<
   createCategory = async (
     payload: ProductCategoryInput
   ): Promise<ProductCategoryRow> => {
-    const env = getEnv();
-    const db = env.getDb();
-
     const now = new Date();
     const insertData: NewTblProductCategory = {
       code: payload.code,
@@ -123,7 +117,7 @@ export default class ProductCategoryModel extends BaseModel<
       insertData.level = payload.level;
     }
 
-    const [created] = await db
+    const [created] = await this.db
       .insert(this.table)
       .values(insertData)
       .returning({ id: this.table.id });
@@ -145,9 +139,6 @@ export default class ProductCategoryModel extends BaseModel<
     id: string,
     payload: Partial<ProductCategoryInput>
   ): Promise<ProductCategoryRow | null> => {
-    const env = getEnv();
-    const db = env.getDb();
-
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
     };
@@ -165,7 +156,7 @@ export default class ProductCategoryModel extends BaseModel<
     }
     if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
 
-    await db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
 
     return this.getCategoryById(id);
   };

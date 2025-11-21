@@ -1,7 +1,5 @@
 import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
-
-import { getEnv } from "@base/server";
 import {
   table_product_attribute,
   table_product_category,
@@ -59,7 +57,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
 
   private getProductDetailInternal = async (
     id: string,
-    db = getEnv().getDb()
+    db = this.db
   ): Promise<ProductDetail | null> => {
     const rows = await db
       .select({
@@ -160,8 +158,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
   };
 
   getProductDetail = async (id: string): Promise<ProductDetail | null> => {
-    const env = getEnv();
-    return this.getProductDetailInternal(id, env.getDb());
+    return this.getProductDetailInternal(id, this.db);
   };
 
   private ensurePackingValues = (
@@ -179,12 +176,9 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
   };
 
   createProduct = async (payload: ProductCreateInput) => {
-    const env = getEnv();
-    const db = env.getDb();
-
     const now = new Date();
 
-    const result = await db.transaction(async (tx) => {
+    const result = await this.db.transaction(async (tx) => {
       const [master] = await tx
         .insert(table_product_master)
         .values({
@@ -278,12 +272,9 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
   };
 
   updateProduct = async (payload: ProductUpdateInput) => {
-    const env = getEnv();
-    const db = env.getDb();
-
     const now = new Date();
 
-    const result = await db.transaction(async (tx) => {
+    const result = await this.db.transaction(async (tx) => {
       const existingVariant = await tx
         .select({ id: this.table.id, masterId: this.table.productMasterId })
         .from(this.table)
