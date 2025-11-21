@@ -1,4 +1,3 @@
-import { setCsrfTokenCookie } from "@base/server/middleware/csrf";
 import { createSignedCsrfToken } from "@base/server/utils/csrf-token";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -20,8 +19,19 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Set CSRF token in cookie using helper function
-    setCsrfTokenCookie(response);
+    // Set the same signed token in cookie (not generating a new one)
+    const isProduction = process.env.NODE_ENV === "production";
+    const maxAge = Math.floor(
+      (expiresAt - Date.now()) / 1000
+    ); // Convert to seconds
+
+    response.cookies.set("csrf-token", signedToken, {
+      httpOnly: false, // Allow client-side JavaScript to read it
+      secure: isProduction,
+      sameSite: "lax",
+      maxAge,
+      path: "/",
+    });
 
     return response;
   } catch (error) {

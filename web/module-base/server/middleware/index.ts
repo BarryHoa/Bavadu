@@ -4,11 +4,7 @@
  */
 
 export { authenticateRequest } from "./auth";
-export {
-  checkCsrfProtection,
-  getCsrfTokenFromRequest,
-  setCsrfTokenCookie,
-} from "./csrf";
+export { checkCsrfProtection, setCsrfTokenCookie } from "./csrf";
 export { addPageHeaders } from "./page-headers";
 export { checkRateLimit } from "./rate-limit";
 export { addSecurityHeaders } from "./security-headers";

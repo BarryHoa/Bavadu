@@ -12,6 +12,9 @@ const SAFE_METHODS = ["GET", "HEAD", "OPTIONS"];
 
 /**
  * Check CSRF protection for state-changing requests
+ * Implements Double Submit Cookie Pattern:
+ * 1. Token in cookie (signed) must match token in header (plain)
+ * 2. Verify signature of cookie token
  * Returns error response if CSRF validation fails, null otherwise
  */
 export function checkCsrfProtection(request: NextRequest): NextResponse | null {
@@ -22,22 +25,24 @@ export function checkCsrfProtection(request: NextRequest): NextResponse | null {
     return null;
   }
 
-  // Get CSRF token from header or cookie
-  const csrfToken = getCsrfTokenFromRequest(request);
+  // Get tokens from both cookie and header (both are required)
+  const headerToken = request.headers.get(CSRF_HEADER_NAME);
+  const cookieSignedToken = request.cookies.get(CSRF_COOKIE_NAME)?.value;
 
-  if (!csrfToken) {
+  // Both are required for Double Submit Cookie Pattern
+  if (!headerToken || !cookieSignedToken) {
     return NextResponse.json(
       {
         success: false,
         error: "CSRF token validation failed",
-        message: "CSRF token is required",
+        message: "CSRF token is required in both cookie and header",
       },
       { status: 403 }
     );
   }
 
-  // Verify CSRF token
-  const verification = verifyCsrfToken(csrfToken);
+  // Verify the signed token from cookie
+  const verification = verifyCsrfToken(cookieSignedToken);
 
   if (!verification.valid) {
     const message = verification.expired
@@ -49,6 +54,21 @@ export function checkCsrfProtection(request: NextRequest): NextResponse | null {
         success: false,
         error: "CSRF token validation failed",
         message,
+      },
+      { status: 403 }
+    );
+  }
+
+  // Extract plain token from cookie and compare with header token
+  // This is the core of Double Submit Cookie Pattern
+  const cookiePlainToken = verification.token;
+
+  if (!cookiePlainToken || cookiePlainToken !== headerToken) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "CSRF token validation failed",
+        message: "CSRF token mismatch between cookie and header",
       },
       { status: 403 }
     );
@@ -73,13 +93,4 @@ export function setCsrfTokenCookie(response: NextResponse): void {
     maxAge,
     path: "/",
   });
-}
-
-/**
- * Get CSRF token from request (header or cookie)
- */
-export function getCsrfTokenFromRequest(request: NextRequest): string | null {
-  const headerToken = request.headers.get(CSRF_HEADER_NAME);
-  const cookieToken = request.cookies.get(CSRF_COOKIE_NAME)?.value;
-  return headerToken || cookieToken || null;
 }
