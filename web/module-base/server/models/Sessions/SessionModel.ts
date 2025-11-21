@@ -36,17 +36,6 @@ class SessionModel extends BaseModel<typeof table_session> {
     const expiresAt = new Date(now.getTime() + expiresIn);
     const sessionToken = this.generateSessionToken();
 
-    // Check if user exists
-    const [user] = await this.db
-      .select({ id: table_user.id })
-      .from(table_user)
-      .where(eq(table_user.id, userId))
-      .limit(1);
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
     const [session] = await this.db
       .insert(this.table)
       .values({

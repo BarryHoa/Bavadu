@@ -133,6 +133,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is active
+    console.log("Login: Checking user status", { status: user.status });
     if (user.status !== "active") {
       return NextResponse.json(
         { success: false, error: "Account is not active" },
