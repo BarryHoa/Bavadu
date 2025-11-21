@@ -79,8 +79,12 @@ async function handleApiRoute(
     return addSecurityHeaders(rateLimitResponse);
   }
 
-  // 2. CSRF Protection (skip for public routes)
-  if (!isPublicRoute(pathname)) {
+  // 2. CSRF Protection (skip for public routes and GET requests)
+  // Also skip CSRF endpoint itself
+  if (
+    !isPublicRoute(pathname) &&
+    pathname !== "/api/base/utils/get-csrf-token"
+  ) {
     const csrfResponse = checkCsrfProtection(req);
     if (csrfResponse) {
       return addSecurityHeaders(csrfResponse);

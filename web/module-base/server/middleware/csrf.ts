@@ -1,4 +1,8 @@
-import { verifyCsrfToken } from "@base/server/utils/csrf-token";
+import { CSRF_CONFIG } from "@base/server/config";
+import {
+  createSignedCsrfToken,
+  verifyCsrfToken,
+} from "@base/server/utils/csrf-token";
 import { NextRequest, NextResponse } from "next/server";
 
 // CSRF configuration
@@ -19,9 +23,7 @@ export function checkCsrfProtection(request: NextRequest): NextResponse | null {
   }
 
   // Get CSRF token from header or cookie
-  const headerToken = request.headers.get(CSRF_HEADER_NAME);
-  const cookieToken = request.cookies.get(CSRF_COOKIE_NAME)?.value;
-  const csrfToken = headerToken || cookieToken;
+  const csrfToken = getCsrfTokenFromRequest(request);
 
   if (!csrfToken) {
     return NextResponse.json(
@@ -53,4 +55,31 @@ export function checkCsrfProtection(request: NextRequest): NextResponse | null {
   }
 
   return null;
+}
+
+/**
+ * Generate and set CSRF token in response cookie
+ * Used for initial token generation or token refresh
+ */
+export function setCsrfTokenCookie(response: NextResponse): void {
+  const { signedToken } = createSignedCsrfToken();
+  const isProduction = process.env.NODE_ENV === "production";
+  const maxAge = Math.floor(CSRF_CONFIG.expirationMs / 1000); // Convert to seconds
+
+  response.cookies.set(CSRF_COOKIE_NAME, signedToken, {
+    httpOnly: false, // Allow client-side JavaScript to read it
+    secure: isProduction,
+    sameSite: "lax",
+    maxAge,
+    path: "/",
+  });
+}
+
+/**
+ * Get CSRF token from request (header or cookie)
+ */
+export function getCsrfTokenFromRequest(request: NextRequest): string | null {
+  const headerToken = request.headers.get(CSRF_HEADER_NAME);
+  const cookieToken = request.cookies.get(CSRF_COOKIE_NAME)?.value;
+  return headerToken || cookieToken || null;
 }

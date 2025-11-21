@@ -65,6 +65,10 @@
       {
         "path": "/check-duplicate",
         "handler": "/utils/check-duplicate"
+      },
+      {
+        "path": "/get-csrf-token",
+        "handler": "/utils/get-csrf-token"
       }
     ]
   },

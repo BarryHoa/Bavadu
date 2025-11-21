@@ -2,6 +2,7 @@ import { compare } from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { SESSION_CONFIG } from "../../config";
+import { setCsrfTokenCookie } from "../../middleware/csrf";
 import SessionModel from "../../models/Sessions/SessionModel";
 import { table_user, table_user_login } from "../../schemas/user";
 import getDbConnect from "../../utils/getDbConnect";
@@ -194,6 +195,9 @@ export async function POST(request: NextRequest) {
       maxAge: cookieMaxAge,
       path: SESSION_CONFIG.cookie.path,
     });
+
+    // Set CSRF token cookie after successful login
+    setCsrfTokenCookie(response);
 
     return response;
   } catch (error) {

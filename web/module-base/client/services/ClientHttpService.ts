@@ -1,3 +1,5 @@
+import { getCsrfToken, getHeadersWithCsrf } from "../utils/csrf";
+
 class ClientHttpService {
   private baseUrl: string;
 
@@ -11,14 +13,29 @@ class ClientHttpService {
     return `${this.baseUrl.replace(/\/$/, "")}/${url.replace(/^\//, "")}`;
   }
 
+  private async getHeadersWithCsrf(options?: RequestInit): Promise<HeadersInit> {
+    const safeMethods = ["GET", "HEAD", "OPTIONS"];
+    const method = (options?.method || "GET").toUpperCase();
+
+    // Only add CSRF token for state-changing methods
+    if (safeMethods.includes(method)) {
+      return {
+        "Content-Type": "application/json",
+        ...(options?.headers || {}),
+      };
+    }
+
+    // For POST, PUT, PATCH, DELETE - add CSRF token
+    return getHeadersWithCsrf(options?.headers);
+  }
+
   async get<T>(url: string, options?: RequestInit): Promise<T> {
+    const headers = await this.getHeadersWithCsrf(options);
     const response = await fetch(this.getFullUrl(url), {
       ...options,
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        ...(options?.headers || {}),
-      },
+      headers,
+      credentials: "include",
     });
     if (!response.ok) {
       throw new Error(
@@ -33,13 +50,12 @@ class ClientHttpService {
     data?: unknown,
     options?: RequestInit
   ): Promise<T> {
+    const headers = await this.getHeadersWithCsrf(options);
     const response = await fetch(this.getFullUrl(url), {
       ...options,
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(options?.headers || {}),
-      },
+      headers,
+      credentials: "include",
       body: data !== undefined ? JSON.stringify(data) : undefined,
     });
     if (!response.ok) {
@@ -51,13 +67,12 @@ class ClientHttpService {
   }
 
   async put<T>(url: string, data?: unknown, options?: RequestInit): Promise<T> {
+    const headers = await this.getHeadersWithCsrf(options);
     const response = await fetch(this.getFullUrl(url), {
       ...options,
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        ...(options?.headers || {}),
-      },
+      headers,
+      credentials: "include",
       body: data !== undefined ? JSON.stringify(data) : undefined,
     });
     if (!response.ok) {
@@ -73,13 +88,12 @@ class ClientHttpService {
     data?: unknown,
     options?: RequestInit
   ): Promise<T> {
+    const headers = await this.getHeadersWithCsrf(options);
     const response = await fetch(this.getFullUrl(url), {
       ...options,
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        ...(options?.headers || {}),
-      },
+      headers,
+      credentials: "include",
       body: data !== undefined ? JSON.stringify(data) : undefined,
     });
     if (!response.ok) {
@@ -91,13 +105,12 @@ class ClientHttpService {
   }
 
   async delete<T>(url: string, options?: RequestInit): Promise<T> {
+    const headers = await this.getHeadersWithCsrf(options);
     const response = await fetch(this.getFullUrl(url), {
       ...options,
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        ...(options?.headers || {}),
-      },
+      headers,
+      credentials: "include",
     });
     if (!response.ok) {
       throw new Error(
