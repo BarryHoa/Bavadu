@@ -1,13 +1,10 @@
+import getModuleQueryByModel from "@base/server/utils/getModuleQueryByModel";
 import { NextRequest, NextResponse } from "next/server";
-import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 import type { ProductUpdateInput } from "../../models/Product/ProductModelInterface";
 
 import { buildPayload as buildCreatePayload } from "./create";
 
-const buildUpdatePayload = (
-  body: any,
-  id: string
-): ProductUpdateInput => {
+const buildUpdatePayload = (body: any, id: string): ProductUpdateInput => {
   const createPayload = buildCreatePayload(body);
   return {
     id,

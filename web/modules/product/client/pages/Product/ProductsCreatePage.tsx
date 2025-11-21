@@ -7,14 +7,11 @@ import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 
+import { getClientLink } from "@base/client/utils/link/getClientLink";
 import ProductForm from "../../components/Product/ProductForm";
-import {
-  ProductFormPayload,
-  ProductFormValues,
-} from "../../interface/Product";
+import { ProductFormPayload, ProductFormValues } from "../../interface/Product";
 import ProductService from "../../services/ProductService";
 import { mapFormValuesToPayload } from "../../utils/productMapper";
-import { getClientLink } from "@/module-base/client/utils/link/getClientLink";
 
 const ProductsCreatePage = (): React.ReactNode => {
   const router = useRouter();

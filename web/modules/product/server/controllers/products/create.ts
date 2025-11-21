@@ -1,7 +1,7 @@
-import { getAuthenticatedUser } from "@/module-base/server/utils/auth-helpers";
-import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
-import { validateRequest } from "@/module-base/server/validation/middleware";
-import { productCreateInputSchema } from "@/module-base/server/validation/schemas/product";
+import { getAuthenticatedUser } from "@base/server/utils/auth-helpers";
+import getModuleQueryByModel from "@base/server/utils/getModuleQueryByModel";
+import { validateRequest } from "@base/server/validation/middleware";
+import { productCreateInputSchema } from "@base/server/validation/schemas/product";
 import { NextRequest, NextResponse } from "next/server";
 import type { ProductCreateInput } from "../../models/Product/ProductModelInterface";
 import {

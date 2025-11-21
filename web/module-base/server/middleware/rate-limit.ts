@@ -1,5 +1,5 @@
+import { rateLimitStore } from "@base/server/stores";
 import { NextRequest, NextResponse } from "next/server";
-import { rateLimitStore } from "@/module-base/server/stores";
 
 // Rate limiting configuration
 const RATE_LIMIT_CONFIG = {
@@ -49,9 +49,7 @@ export function checkRateLimit(
     const resetTime = Math.ceil(
       (rateLimitStore.getTimeUntilReset(key) + Date.now()) / 1000
     );
-    const retryAfter = Math.ceil(
-      rateLimitStore.getTimeUntilReset(key) / 1000
-    );
+    const retryAfter = Math.ceil(rateLimitStore.getTimeUntilReset(key) / 1000);
 
     return NextResponse.json(
       {
@@ -74,4 +72,3 @@ export function checkRateLimit(
 
   return null;
 }
-

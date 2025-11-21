@@ -1,5 +1,5 @@
+import SessionModel from "@base/server/models/Sessions/SessionModel";
 import { NextRequest, NextResponse } from "next/server";
-import SessionModel from "@/module-base/server/models/Sessions/SessionModel";
 
 /**
  * Authenticate request and inject user info into headers
@@ -61,4 +61,3 @@ export async function authenticateRequest(
     );
   }
 }
-

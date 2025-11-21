@@ -8,17 +8,14 @@ import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 
+import { getClientLink } from "@base/client/utils/link/getClientLink";
 import ProductForm from "../../components/Product/ProductForm";
-import {
-  ProductDetail,
-  ProductFormValues,
-} from "../../interface/Product";
+import { ProductDetail, ProductFormValues } from "../../interface/Product";
 import ProductService from "../../services/ProductService";
 import {
   mapDetailToFormValues,
   mapFormValuesToPayload,
 } from "../../utils/productMapper";
-import { getClientLink } from "@/module-base/client/utils/link/getClientLink";
 
 const getParamValue = (
   value: string | string[] | undefined
@@ -66,7 +63,13 @@ export default function ProductsEditPage(): React.ReactNode {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, values }: { id: string; values: ProductFormValues }) => {
+    mutationFn: async ({
+      id,
+      values,
+    }: {
+      id: string;
+      values: ProductFormValues;
+    }) => {
       const payload = mapFormValuesToPayload(values);
       const response = await ProductService.updateProduct(id, payload);
       if (!response.success) {
@@ -190,4 +193,3 @@ export default function ProductsEditPage(): React.ReactNode {
     </div>
   );
 }
-

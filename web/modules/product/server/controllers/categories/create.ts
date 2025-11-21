@@ -1,5 +1,5 @@
-import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
+import getModuleQueryByModel from "@base/server/utils/getModuleQueryByModel";
 import { NextRequest, NextResponse } from "next/server";
 
 const normalizeLocaleInput = (

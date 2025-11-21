@@ -1,4 +1,4 @@
-import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
+import getModuleQueryByModel from "@base/server/utils/getModuleQueryByModel";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {

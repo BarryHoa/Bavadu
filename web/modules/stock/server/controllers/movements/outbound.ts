@@ -1,5 +1,5 @@
+import getModuleQueryByModel from "@base/server/utils/getModuleQueryByModel";
 import { NextRequest, NextResponse } from "next/server";
-import getModuleQueryByModel from "@/module-base/server/utils/getModuleQueryByModel";
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,11 +35,9 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Failed to register outbound stock";
-    return NextResponse.json(
-      { success: false, message },
-      { status: 400 }
-    );
+      error instanceof Error
+        ? error.message
+        : "Failed to register outbound stock";
+    return NextResponse.json({ success: false, message }, { status: 400 });
   }
 }
-

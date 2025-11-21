@@ -1,9 +1,9 @@
-import AddressPicker from "@/module-base/client/components/AddressPicker/AddressPicker";
 import {
   IBaseInput,
   IBaseSelectWithSearch,
   SelectItemOption,
 } from "@base/client/components";
+import AddressPicker from "@base/client/components/AddressPicker/AddressPicker";
 import { Button } from "@heroui/button";
 import { Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";

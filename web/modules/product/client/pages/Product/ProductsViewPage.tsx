@@ -11,12 +11,13 @@ import { useMemo } from "react";
 import LinkAs from "@base/client/components/LinkAs";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
+import { getClientLink } from "@base/client/utils/link/getClientLink";
 import type { ProductDetail } from "../../interface/Product";
 import ProductService from "../../services/ProductService";
-import { getClientLink } from "@/module-base/client/utils/link/getClientLink";
 
-const getParamValue = (value: string | string[] | undefined): string | undefined =>
-  Array.isArray(value) ? value[0] : value;
+const getParamValue = (
+  value: string | string[] | undefined
+): string | undefined => (Array.isArray(value) ? value[0] : value);
 
 export default function ProductsViewPage(): React.ReactNode {
   const params = useParams();
@@ -160,15 +161,14 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
             label="Category"
             value={
               detail.master.category
-                ? localized(detail.master.category.name) ?? detail.master.category.code ?? detail.master.category.id
+                ? (localized(detail.master.category.name) ??
+                  detail.master.category.code ??
+                  detail.master.category.id)
                 : "-"
             }
           />
         </div>
-        <InfoRow
-          label="Description"
-          value={detail.master.description || "-"}
-        />
+        <InfoRow label="Description" value={detail.master.description || "-"} />
         <div className="flex flex-wrap gap-2">
           <span className="text-xs uppercase text-default-400">Features</span>
           <div className="flex flex-wrap gap-2">
@@ -200,9 +200,9 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
             label="Manufacturer"
             value={
               detail.variant.manufacturer
-                ? (typeof detail.variant.manufacturer.name === "string"
+                ? ((typeof detail.variant.manufacturer.name === "string"
                     ? detail.variant.manufacturer.name
-                    : detail.variant.manufacturer.code) ?? "-"
+                    : detail.variant.manufacturer.code) ?? "-")
                 : "-"
             }
           />
@@ -210,8 +210,8 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
             label="Base UOM"
             value={
               detail.variant.baseUom
-                ? localized(detail.variant.baseUom.name) ??
-                  detail.variant.baseUom.id
+                ? (localized(detail.variant.baseUom.name) ??
+                  detail.variant.baseUom.id)
                 : "-"
             }
           />
@@ -231,7 +231,9 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
         ) : (
           <div className="space-y-3">
             {detail.packings.map((packing) => (
-              <Card key={packing.id ?? localized(packing.name) ?? Math.random()}>
+              <Card
+                key={packing.id ?? localized(packing.name) ?? Math.random()}
+              >
                 <CardBody className="space-y-2">
                   <span className="font-medium">
                     {localized(packing.name) ?? packing.id}
@@ -263,7 +265,9 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
                   <p className="text-small text-default-500">
                     {localized(attribute.name) ?? attribute.code}
                   </p>
-                  <p className="text-small text-default-600">{attribute.value}</p>
+                  <p className="text-small text-default-600">
+                    {attribute.value}
+                  </p>
                 </CardBody>
               </Card>
             ))}
@@ -277,7 +281,8 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
 const InfoRow = ({ label, value }: { label: string; value?: string }) => (
   <div>
     <p className="text-xs uppercase text-default-400">{label}</p>
-    <p className="text-sm text-default-600">{value && value !== "" ? value : "-"}</p>
+    <p className="text-sm text-default-600">
+      {value && value !== "" ? value : "-"}
+    </p>
   </div>
 );
-

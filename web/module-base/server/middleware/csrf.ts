@@ -1,5 +1,5 @@
+import { verifyCsrfToken } from "@base/server/utils/csrf-token";
 import { NextRequest, NextResponse } from "next/server";
-import { verifyCsrfToken } from "@/module-base/server/utils/csrf-token";
 
 // CSRF configuration
 const CSRF_COOKIE_NAME = "csrf-token";
@@ -10,9 +10,7 @@ const SAFE_METHODS = ["GET", "HEAD", "OPTIONS"];
  * Check CSRF protection for state-changing requests
  * Returns error response if CSRF validation fails, null otherwise
  */
-export function checkCsrfProtection(
-  request: NextRequest
-): NextResponse | null {
+export function checkCsrfProtection(request: NextRequest): NextResponse | null {
   const method = request.method;
 
   // Skip CSRF check for safe methods
@@ -56,4 +54,3 @@ export function checkCsrfProtection(
 
   return null;
 }
-
