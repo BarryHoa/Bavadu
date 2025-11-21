@@ -1,3 +1,4 @@
+import { CSRF_CONFIG } from "@base/server/config";
 import { randomBytes, createHmac } from "crypto";
 
 /**
@@ -22,21 +23,12 @@ export interface CsrfTokenConfig {
 }
 
 /**
- * Get CSRF secret from environment or use default
- */
-function getCsrfSecret(): string {
-  return (
-    process.env.CSRF_SECRET || "csrf-secret-key-change-in-production"
-  );
-}
-
-/**
  * Default CSRF configuration
  */
 const defaultConfig: Required<CsrfTokenConfig> = {
-  secret: getCsrfSecret(),
-  tokenLength: 32,
-  expirationMs: 24 * 60 * 60 * 1000, // 24 hours
+  secret: CSRF_CONFIG.secret,
+  tokenLength: CSRF_CONFIG.tokenLength,
+  expirationMs: CSRF_CONFIG.expirationMs,
 };
 
 /**

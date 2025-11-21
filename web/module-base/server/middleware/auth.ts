@@ -1,3 +1,4 @@
+import { AUTH_CONFIG } from "@base/server/config";
 import SessionModel from "@base/server/models/Sessions/SessionModel";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -9,7 +10,7 @@ export async function authenticateRequest(
   request: NextRequest,
   nextHeaders: Headers
 ): Promise<NextResponse | null> {
-  const sessionToken = request.cookies.get("session_token")?.value;
+  const sessionToken = request.cookies.get(AUTH_CONFIG.sessionCookieName)?.value;
 
   if (!sessionToken) {
     return NextResponse.json(

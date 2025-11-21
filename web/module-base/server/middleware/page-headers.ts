@@ -1,3 +1,4 @@
+import { AUTH_CONFIG } from "@base/server/config";
 import { NextRequest } from "next/server";
 
 /**
@@ -38,7 +39,7 @@ export function addPageHeaders(
   }
 
   // Optionally inject session token for pages (if authenticated)
-  const sessionToken = request.cookies.get("session_token")?.value;
+  const sessionToken = request.cookies.get(AUTH_CONFIG.sessionCookieName)?.value;
   if (sessionToken) {
     nextHeaders.set("x-session-token", sessionToken);
   }

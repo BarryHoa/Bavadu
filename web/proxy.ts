@@ -14,7 +14,13 @@ const PUBLIC_ROUTES = [
   "/api/base/auth/logout",
   "/api/base/health",
   "/api/base/health/ping",
+  "/login",
+  "/reset-password",
+  "/",
 ];
+
+// Protected routes that require authentication
+const PROTECTED_ROUTES = ["/workspace"];
 
 // Routes that should be excluded from proxy
 const EXCLUDED_PATHS = ["/_next", "/static", "/favicon"];
@@ -23,7 +29,16 @@ const EXCLUDED_PATHS = ["/_next", "/static", "/favicon"];
  * Check if a path is a public route
  */
 function isPublicRoute(pathname: string): boolean {
-  return PUBLIC_ROUTES.some((route) => pathname.startsWith(route));
+  return PUBLIC_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route + "/")
+  );
+}
+
+/**
+ * Check if a path is a protected route
+ */
+function isProtectedRoute(pathname: string): boolean {
+  return PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
 }
 
 /**
@@ -85,16 +100,27 @@ async function handleApiRoute(
 
 /**
  * Handle page routes
- * - No rate limiting (handled by CDN/edge)
- * - No CSRF protection (pages are rendered, not API calls)
+ * - Authentication check for protected routes
  * - Locale and workspace headers
  */
-function handlePageRoute(
+async function handlePageRoute(
   req: NextRequest,
   pathname: string,
   nextHeaders: Headers
-): void {
+): Promise<NextResponse | null> {
+  // Check authentication for protected routes
+  if (isProtectedRoute(pathname) && !isPublicRoute(pathname)) {
+    const authResponse = await authenticateRequest(req, nextHeaders);
+    if (authResponse) {
+      // Redirect to login page if not authenticated
+      const loginUrl = new URL("/login", req.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
   addPageHeaders(req, nextHeaders, pathname);
+  return null;
 }
 
 /**
@@ -125,7 +151,10 @@ export async function proxy(req: NextRequest) {
 
   // Handle page routes
   if (isPageRoute(pathname)) {
-    handlePageRoute(req, pathname, nextHeaders);
+    const pageResponse = await handlePageRoute(req, pathname, nextHeaders);
+    if (pageResponse) {
+      return addSecurityHeaders(pageResponse); // Redirect to login
+    }
   }
 
   // Continue with modified headers
@@ -134,7 +163,6 @@ export async function proxy(req: NextRequest) {
   // Add security headers to all responses
   return addSecurityHeaders(response);
 }
-
 export const config = {
   matcher: [
     /*

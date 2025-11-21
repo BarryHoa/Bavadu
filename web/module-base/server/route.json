@@ -84,5 +84,22 @@
         "handler": "/location/get-location-by"
       }
     ]
+  },
+  {
+    "path": "/auth",
+    "routes": [
+      {
+        "path": "/login",
+        "handler": "/auth/login"
+      },
+      {
+        "path": "/logout",
+        "handler": "/auth/logout"
+      },
+      {
+        "path": "/me",
+        "handler": "/auth/me"
+      }
+    ]
   }
 ]

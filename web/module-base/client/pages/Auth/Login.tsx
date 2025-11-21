@@ -2,15 +2,17 @@
 
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Checkbox } from "@heroui/checkbox";
 import { Input as HeroUIInput } from "@heroui/input";
 import { Link } from "@heroui/link";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,6 +30,7 @@ export default function LoginPage() {
         body: JSON.stringify({
           username,
           password,
+          rememberMe,
         }),
       });
 
@@ -87,6 +90,13 @@ export default function LoginPage() {
             />
 
             <div className="flex items-center justify-between">
+              <Checkbox
+                isSelected={rememberMe}
+                onValueChange={setRememberMe}
+                size="sm"
+              >
+                <span className="text-sm">Remember me</span>
+              </Checkbox>
               <Link
                 href="/reset-password"
                 className="text-sm text-primary-600 hover:text-primary-500"
@@ -110,4 +120,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { AUTH_CONFIG } from "../../config";
 import SessionModel from "../../models/Sessions/SessionModel";
 import { getSessionInfo } from "../../utils/auth-helpers";
-
-const SESSION_COOKIE_NAME = "session_token";
 
 export async function POST(request: NextRequest) {
   try {
     // Get session token from headers (injected by proxy) or cookie
     const sessionInfo = getSessionInfo(request);
     const sessionToken =
-      sessionInfo?.token || request.cookies.get(SESSION_COOKIE_NAME)?.value;
+      sessionInfo?.token ||
+      request.cookies.get(AUTH_CONFIG.sessionCookieName)?.value;
 
     if (sessionToken) {
       // Destroy session
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Clear session cookie
-    response.cookies.delete(SESSION_COOKIE_NAME);
+    response.cookies.delete(AUTH_CONFIG.sessionCookieName);
 
     return response;
   } catch (error) {
@@ -39,4 +39,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

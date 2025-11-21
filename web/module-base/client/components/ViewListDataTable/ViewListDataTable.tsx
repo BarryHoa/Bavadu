@@ -52,6 +52,7 @@ export default function ViewListDataTable<T = any>(
   // Fetch data using react-query
   const {
     data: dataSource,
+    isDataDummy,
     total,
     isLoading,
     isFetching,
@@ -77,81 +78,19 @@ export default function ViewListDataTable<T = any>(
     return undefined;
   }, []);
 
-  // Actual filtering logic
-  const filteredData = useMemo(() => {
-    let filtered = [...dataSource];
-
-    // Search
-    if (store.search.trim()) {
-      filtered = filtered.filter((row) =>
-        columns.some(
-          (col: (typeof columns)[number]) =>
-            store.visibleColumns.has(col.key) &&
-            String((row as any)[col.key])
-              .toLowerCase()
-              .includes(store.search.trim().toLowerCase())
-        )
-      );
-    }
-
-    // Filters
-    if (filterOptions && store.activeFilters.size > 0) {
-      filtered = filtered.filter((row) =>
-        filterOptions.every(
-          (opt) => !store.activeFilters.has(opt.label) || opt.filterFn(row)
-        )
-      );
-    }
-
-    // Favorite filter
-    if (store.showFavorite && initialFavoriteFilter) {
-      filtered = filtered.filter(initialFavoriteFilter);
-    }
-
-    return filtered;
-  }, [
-    dataSource,
-    store.search,
-    columns,
-    store.visibleColumns,
-    filterOptions,
-    store.activeFilters,
-    store.showFavorite,
-    initialFavoriteFilter,
-  ]);
-
-  // Grouped data (simple approach: flatten table with group headers)
-  const processedData = useMemo(() => {
-    if (store.groupBy && groupByOptions) {
-      // Group rows by the selected key
-      const map = new Map<string, T[]>();
-      for (const row of filteredData) {
-        const groupKeyValue = (row as any)[store.groupBy];
-        const label =
-          groupByOptions.find((g) => g.key === store.groupBy)?.label +
-          ": " +
-          String(groupKeyValue ?? "");
-        if (!map.has(label)) {
-          map.set(label, []);
-        }
-        map.get(label)!.push(row);
-      }
-
-      // Flatten: for each group, insert a 'header' row (fake)
-      const flat: any[] = [];
-      Array.from(map.entries()).forEach(([label, rows]) => {
-        flat.push({ __groupHeader: true, groupLabel: label });
-        flat.push(...rows);
-      });
-      return flat;
-    }
-    return filteredData;
-  }, [filteredData, store.groupBy, groupByOptions]);
-
   // Prepare columns list with only visible columns
   const displayColumns = useMemo(() => {
-    return columns.filter((col: any) => store.visibleColumns.has(col.key));
-  }, [columns, store.visibleColumns]);
+    const cols = columns.filter((col: any) =>
+      store.visibleColumns.has(col.key)
+    );
+    if (isDataDummy) {
+      return cols.map((col: any) => ({
+        ...col,
+        render: () => null,
+      }));
+    }
+    return cols;
+  }, [columns, store.visibleColumns, isDataDummy]);
 
   const renderActions = useCallback(
     (acts: ActionElm[]) => {
@@ -256,7 +195,7 @@ export default function ViewListDataTable<T = any>(
           {...dataTableProps}
           total={total}
           columns={displayColumns}
-          dataSource={processedData}
+          dataSource={dataSource}
           loading={isLoading || isFetching || dataTableProps.loading}
           onRefresh={refresh}
           onChangeTable={onChangeTable}

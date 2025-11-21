@@ -1,6 +1,7 @@
 import { compare } from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
+import { SESSION_CONFIG } from "../../config";
 import SessionModel from "../../models/Sessions/SessionModel";
 import { table_user, table_user_login } from "../../schemas/user";
 import getDbConnect from "../../utils/getDbConnect";
@@ -10,6 +11,7 @@ interface LoginRequest {
   email?: string;
   phone?: string;
   password: string;
+  rememberMe?: boolean;
 }
 
 /**
@@ -37,7 +39,7 @@ function getUserAgent(request: NextRequest): string {
 export async function POST(request: NextRequest) {
   try {
     const body: LoginRequest = await request.json();
-    const { username, email, phone, password } = body;
+    const { username, password, rememberMe = false } = body;
 
     // Validate input
     if (!password) {
@@ -47,7 +49,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!username && !email && !phone) {
+    if (!username) {
       return NextResponse.json(
         { success: false, error: "Username, email, or phone is required" },
         { status: 400 }
@@ -56,29 +58,42 @@ export async function POST(request: NextRequest) {
 
     const db = getDbConnect();
 
-    // Find user login by username, email, or phone
-    let userLogin;
+    // Find user login by username, email, or phone in parallel
+    const queries = [];
+
     if (username) {
-      [userLogin] = await db
-        .select()
-        .from(table_user_login)
-        .where(eq(table_user_login.username, username))
-        .limit(1);
-    } else if (email) {
-      [userLogin] = await db
-        .select()
-        .from(table_user_login)
-        .where(eq(table_user_login.email, email))
-        .limit(1);
-    } else if (phone) {
-      [userLogin] = await db
-        .select()
-        .from(table_user_login)
-        .where(eq(table_user_login.phone, phone))
-        .limit(1);
+      queries.push(
+        db
+          .select()
+          .from(table_user_login)
+          .where(eq(table_user_login.username, username))
+          .limit(1)
+          .then((result) => result[0] || null)
+      );
+      queries.push(
+        db
+          .select()
+          .from(table_user_login)
+          .where(eq(table_user_login.email, username))
+          .limit(1)
+          .then((result) => result[0] || null)
+      );
+      queries.push(
+        db
+          .select()
+          .from(table_user_login)
+          .where(eq(table_user_login.phone, username))
+          .limit(1)
+          .then((result) => result[0] || null)
+      );
     }
 
+    // Execute all queries in parallel and get the first non-null result
+    const results = await Promise.all(queries);
+    const userLogin = results.find((user) => user !== null);
+
     if (!userLogin) {
+      console.error("Login: User not found", { username });
       return NextResponse.json(
         { success: false, error: "Invalid credentials" },
         { status: 401 }
@@ -86,8 +101,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify password
+    console.log("Login: Verifying password", {
+      email: userLogin.email,
+      username: userLogin.username,
+      hashPrefix: userLogin.passwordHash?.substring(0, 20),
+    });
     const passwordValid = await compare(password, userLogin.passwordHash);
     if (!passwordValid) {
+      console.error("Login: Password mismatch", {
+        email: userLogin.email,
+        username: userLogin.username,
+      });
       return NextResponse.json(
         { success: false, error: "Invalid credentials" },
         { status: 401 }
@@ -120,10 +144,17 @@ export async function POST(request: NextRequest) {
     const ipAddress = getClientIp(request);
     const userAgent = getUserAgent(request);
     const sessionModel = new SessionModel();
+
+    // Set session expiration: 30 days if remember me, 7 days otherwise
+    const expiresIn = rememberMe
+      ? SESSION_CONFIG.expiration.rememberMe
+      : SESSION_CONFIG.expiration.default;
+
     const session = await sessionModel.createSession({
       userId: user.id,
       ipAddress,
       userAgent,
+      expiresIn,
     });
 
     // Update last login info
@@ -151,13 +182,16 @@ export async function POST(request: NextRequest) {
     });
 
     // Set session cookie
-    const isProduction = process.env.NODE_ENV === "production";
-    response.cookies.set("session_token", session.sessionToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
-      path: "/",
+    const cookieMaxAge = rememberMe
+      ? SESSION_CONFIG.cookie.maxAge.rememberMe
+      : SESSION_CONFIG.cookie.maxAge.default;
+
+    response.cookies.set(SESSION_CONFIG.cookie.name, session.sessionToken, {
+      httpOnly: SESSION_CONFIG.cookie.httpOnly,
+      secure: SESSION_CONFIG.cookie.secure,
+      sameSite: SESSION_CONFIG.cookie.sameSite,
+      maxAge: cookieMaxAge,
+      path: SESSION_CONFIG.cookie.path,
     });
 
     return response;

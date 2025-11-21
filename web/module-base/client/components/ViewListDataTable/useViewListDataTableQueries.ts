@@ -34,9 +34,11 @@ export function useViewListDataTableQueries<T = any>({
   const [dataState, setDataState] = useState<{
     data: T[];
     total: number;
+    isDummyData: boolean;
   }>({
     data: [],
     total: 0,
+    isDummyData: false,
   });
 
   const fetchMutation = useMutation({
@@ -56,12 +58,14 @@ export function useViewListDataTableQueries<T = any>({
         return {
           data: dataResponse as T[],
           total: response.total,
+          isDummyData: false,
         };
       }
       if (isDummyData) {
         return {
           data: Array.from({ length: 4 }, () => ({})) as T[],
           total: 0,
+          isDummyData: true,
         };
       }
       return { data: [], total: 0 };
@@ -96,6 +100,7 @@ export function useViewListDataTableQueries<T = any>({
 
   return {
     data: dataState.data,
+    isDataDummy: dataState.isDummyData,
     total: dataState.total,
     isLoading: fetchMutation.isPending && dataState.data.length === 0,
     isFetching: fetchMutation.isPending,
