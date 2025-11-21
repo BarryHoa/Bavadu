@@ -32,13 +32,12 @@ class SessionModel extends BaseModel<typeof table_session> {
       expiresIn = 7 * 24 * 60 * 60 * 1000, // 7 days default
     } = params;
 
-    const db = this.getDb();
     const now = new Date();
     const expiresAt = new Date(now.getTime() + expiresIn);
     const sessionToken = this.generateSessionToken();
 
     // Check if user exists
-    const [user] = await db
+    const [user] = await this.db
       .select({ id: table_user.id })
       .from(table_user)
       .where(eq(table_user.id, userId))
@@ -48,7 +47,7 @@ class SessionModel extends BaseModel<typeof table_session> {
       throw new Error("User not found");
     }
 
-    const [session] = await db
+    const [session] = await this.db
       .insert(this.table)
       .values({
         userId,
@@ -79,10 +78,9 @@ class SessionModel extends BaseModel<typeof table_session> {
    * Validate a session token and return session data with user info
    */
   async validateSession(sessionToken: string): Promise<ValidateSessionResult> {
-    const db = this.getDb();
     const now = new Date();
 
-    const [session] = await db
+    const [session] = await this.db
       .select({
         session: this.table,
         user: table_user,
@@ -104,7 +102,7 @@ class SessionModel extends BaseModel<typeof table_session> {
     }
 
     // Update last access time
-    await db
+    await this.db
       .update(this.table)
       .set({ updatedAt: now })
       .where(eq(this.table.id, session.session.id));
@@ -131,9 +129,7 @@ class SessionModel extends BaseModel<typeof table_session> {
    * Destroy a session by token
    */
   async destroySession(sessionToken: string): Promise<boolean> {
-    const db = this.getDb();
-
-    const result = await db
+    const result = await this.db
       .delete(this.table)
       .where(eq(this.table.sessionToken, sessionToken));
 
@@ -144,9 +140,7 @@ class SessionModel extends BaseModel<typeof table_session> {
    * Destroy all sessions for a user
    */
   async destroyAllUserSessions(userId: string): Promise<number> {
-    const db = this.getDb();
-
-    const result = await db
+    const result = await this.db
       .delete(this.table)
       .where(eq(this.table.userId, userId));
 
@@ -157,11 +151,10 @@ class SessionModel extends BaseModel<typeof table_session> {
    * Clean up expired sessions
    */
   async cleanupExpiredSessions(): Promise<number> {
-    const db = this.getDb();
     const now = new Date();
 
     // Delete sessions where expiresAt < now (expired)
-    const result = await db
+    const result = await this.db
       .delete(this.table)
       .where(lt(this.table.expiresAt, now));
 
@@ -175,13 +168,12 @@ class SessionModel extends BaseModel<typeof table_session> {
     sessionToken: string,
     expiresIn?: number
   ): Promise<boolean> {
-    const db = this.getDb();
     const now = new Date();
     const newExpiresAt = new Date(
       now.getTime() + (expiresIn || 7 * 24 * 60 * 60 * 1000)
     );
 
-    const result = await db
+    const result = await this.db
       .update(this.table)
       .set({
         expiresAt: newExpiresAt,
@@ -190,17 +182,6 @@ class SessionModel extends BaseModel<typeof table_session> {
       .where(eq(this.table.sessionToken, sessionToken));
 
     return result.rowCount ? result.rowCount > 0 : false;
-  }
-
-  /**
-   * Get database instance
-   * Uses getDbConnect utility to get database connection
-   */
-  private getDb() {
-    // Import here to avoid circular dependency
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const getDbConnect = require("../utils/getDbConnect").default;
-    return getDbConnect();
   }
 }
 

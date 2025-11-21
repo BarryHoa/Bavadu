@@ -46,8 +46,8 @@ export function Providers({ children }: ProvidersProps) {
           toastProps={{ variant: "solid" }}
         />
         <GlobalSettingsProvider>
-          <NavigationLoader minLoadingTime={300} style="bar" />
-          {children}
+            <NavigationLoader minLoadingTime={300} style="bar" />
+            {children}
         </GlobalSettingsProvider>
       </HeroUIProvider>
     </QueryClientProvider>

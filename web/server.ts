@@ -6,9 +6,9 @@
 
 import Environment from "@base/server/env";
 import { Database } from "@base/server/stores/database";
+import dayjs from "dayjs";
 import http from "http";
 import next from "next";
-import dayjs from "dayjs";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.HOSTNAME || "localhost";
@@ -24,8 +24,6 @@ const app = next({
 
 const handle = app.getRequestHandler();
 
-
-
 async function startServer(): Promise<void> {
   try {
     await app.prepare();
@@ -34,20 +32,29 @@ async function startServer(): Promise<void> {
     const database = new Database(process.cwd());
     await database.initialize();
 
+    // Set database to globalThis BEFORE initializing environment
+    // because models need database during initialization
+    (globalThis as any).systemRuntimeVariables = {
+      database: database,
+    };
+
     // Initialize environment
     const envProcess = await Environment.create();
 
+    // Set globalThis with env, database, and initial timestamp
+    // This will be available for all requests
+    (globalThis as any).systemRuntimeVariables = {
+      env: envProcess,
+      database: database,
+      timestamp: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+    };
+
     const server = http.createServer(async (req, res) => {
-      // INSERT_YOUR_CODE
-      // Make a global variable for runtime at server
-      // The value is always "server"
-      (globalThis as any).systemRuntimeVariables = {
-        env: envProcess,
-        database: database,
-        timestamp: dayjs().format('YYYY-MM-DD HH:mm:ss')  
-      }
+      // Update timestamp for each request
+      (globalThis as any).systemRuntimeVariables.timestamp = dayjs().format(
+        "YYYY-MM-DD HH:mm:ss"
+      );
       await handle(req, res);
-    
     });
 
     // Graceful shutdown

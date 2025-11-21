@@ -1,5 +1,5 @@
-import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { DatabaseConnection } from "../stores/database";
+import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import type { DatabaseConnection } from "../stores/database";
 
 const getDbConnect = (key: string = "primary"): PostgresJsDatabase<any> => {
   const systemRuntimeVariables = (globalThis as any).systemRuntimeVariables;
