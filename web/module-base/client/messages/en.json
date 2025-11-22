@@ -25,7 +25,9 @@
       "required": "This field is required",
       "minLength": "Minimum {count} characters required",
       "maxLength": "Maximum {count} characters allowed",
-      "invalid": "Invalid value"
+      "invalid": "Invalid value",
+      "barcodeRequired": "Barcode is required",
+      "skuRequired": "SKU is required"
     },
     "actions": {
       "save": "Save",

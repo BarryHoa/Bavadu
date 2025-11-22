@@ -22,7 +22,8 @@ class ProductCategoryService extends ClientHttpService {
       data: ProductCategoryRow[];
     }>("/get-list");
 
-    return response.data ?? [];
+    const data = response.data;
+    return Array.isArray(data) ? data : [];
   }
 
   async getById(id: string): Promise<ProductCategoryRow> {

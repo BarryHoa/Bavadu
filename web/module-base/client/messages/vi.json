@@ -25,7 +25,9 @@
       "required": "Trường này là bắt buộc",
       "minLength": "Tối thiểu {count} ký tự",
       "maxLength": "Tối đa {count} ký tự",
-      "invalid": "Giá trị không hợp lệ"
+      "invalid": "Giá trị không hợp lệ",
+      "barcodeRequired": "Mã vạch là bắt buộc",
+      "skuRequired": "SKU là bắt buộc"
     },
     "actions": {
       "save": "Lưu",

@@ -380,7 +380,11 @@ const createVariantSchema = (
 
 const createProductFormSchema = (
   t: (key: string) => string,
-  tProduct: (key: string) => string
+  tProduct: (key: string) => string,
+  formatMessage: (
+    key: string,
+    values: Record<string, string | number>
+  ) => string
 ) =>
   object({
     master: object({
@@ -400,10 +404,7 @@ const createProductFormSchema = (
     variants: pipe(
       array(createVariantSchema(t, tProduct)),
       minLength(1, tProduct("errors.atLeastOneVariantRequired")),
-      maxLength(
-        20,
-        tProduct("errors.maxVariantsAllowed").replace("{count}", "20")
-      )
+      maxLength(20, formatMessage("errors.maxVariantsAllowed", { count: 20 }))
     ),
   });
 
@@ -419,6 +420,20 @@ export default function ProductForm({
   const getLocalizedText = useLocalizedText();
   const t = useTranslations("common");
   const tProduct = useTranslations("mdl-product");
+
+  // Helper to format messages with variables
+  // next-intl's useTranslations supports variables as second parameter
+  const formatMessage = useCallback(
+    (key: string, values: Record<string, string | number>) => {
+      // Type assertion to allow passing variables to next-intl translation function
+      const tWithVars = tProduct as unknown as (
+        key: string,
+        values?: Record<string, string | number>
+      ) => string;
+      return tWithVars(key, values);
+    },
+    [tProduct]
+  );
 
   const productTypesQuery = useQuery({
     queryKey: ["product-types"],
@@ -465,7 +480,7 @@ export default function ProductForm({
   } = useForm<ProductFormFieldValues>({
     defaultValues: mapToFieldValues(initialValues, featureOptions),
     resolver: valibotResolver(
-      createProductFormSchema(t, tProduct)
+      createProductFormSchema(t, tProduct, formatMessage)
     ) as unknown as Resolver<ProductFormFieldValues>,
     mode: "onSubmit",
     reValidateMode: "onChange",
@@ -487,7 +502,10 @@ export default function ProductForm({
 
   const categoryOptions = useMemo<SelectItemOption[]>(() => {
     if (!categoryQuery.data) return [];
-    return buildHierarchyOptions(categoryQuery.data).map((option) => ({
+    const categories = Array.isArray(categoryQuery.data)
+      ? categoryQuery.data
+      : [];
+    return buildHierarchyOptions(categories).map((option) => ({
       value: option.id,
       label: option.label,
     }));
