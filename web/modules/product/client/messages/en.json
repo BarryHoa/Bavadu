@@ -20,6 +20,7 @@
     "noAttributeEntries": "No attribute entries yet",
     "guideTooltip": "Information needed",
     "guideAriaLabel": "User guide",
+    "productFeaturesTooltip": "Product features depend on the product type. Changing features will affect UOM.",
     "definePackaging": "Define packaging options for this variant",
     "captureAttributes": "Capture additional attributes for this variant",
     "nameEnglish": "Name (English)",

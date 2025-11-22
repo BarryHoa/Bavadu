@@ -6,12 +6,18 @@ import {
   IBaseSelectWithSearch,
   SelectItemOption,
 } from "@base/client/components";
-import { Checkbox, CheckboxGroup, Textarea } from "@heroui/react";
+import { Checkbox, CheckboxGroup, Textarea, Tooltip } from "@heroui/react";
+import { HelpCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useMemo } from "react";
 import {
   ProductMasterFeatures,
   ProductMasterType,
 } from "../../interface/Product";
+import {
+  FORBIDDEN_FEATURES_BY_TYPE,
+  REQUIRED_FEATURES_BY_TYPE,
+} from "../../utils/product-features-validator";
 import type { MasterFieldValue } from "./types";
 
 type MasterTabProps = {
@@ -44,6 +50,34 @@ export default function MasterTab({
 }: MasterTabProps) {
   const t = useTranslations("common");
   const tProduct = useTranslations("mdl-product");
+
+  // Determine which features are required based on product type
+  const requiredFeatures = useMemo(() => {
+    if (!value.type) return new Set<ProductMasterFeatures>();
+    const required =
+      REQUIRED_FEATURES_BY_TYPE[value.type as ProductMasterType] || [];
+    return new Set(required);
+  }, [value.type]);
+
+  // Determine which features are forbidden based on product type
+  const forbiddenFeatures = useMemo(() => {
+    if (!value.type) return new Set<ProductMasterFeatures>();
+    const forbidden =
+      FORBIDDEN_FEATURES_BY_TYPE[value.type as ProductMasterType] || [];
+    return new Set(forbidden);
+  }, [value.type]);
+
+  // Filter out forbidden features
+  const allowedFeatureOptions = useMemo(() => {
+    return featureOptions.filter(
+      (feature) => !forbiddenFeatures.has(feature.key)
+    );
+  }, [featureOptions, forbiddenFeatures]);
+
+  // Check if a feature is required
+  const isFeatureRequired = (featureKey: ProductMasterFeatures) => {
+    return requiredFeatures.has(featureKey);
+  };
 
   return (
     <div className="flex flex-col gap-4 pt-4">
@@ -124,41 +158,71 @@ export default function MasterTab({
         />
       </div>
 
-      <CheckboxGroup
-        label={tProduct("productFeatures")}
-        orientation="horizontal"
-        value={featureOptions
-          .filter((feature) => value.features?.[feature.key])
-          .map((feature) => feature.key)}
-        onChange={(selected) => {
-          const selectedSet = new Set(selected as string[]);
-          onUpdate((current) => ({
-            ...current,
-            features: featureOptions.reduce(
-              (acc, feature) => ({
-                ...acc,
-                // If feature is disabled, keep it false
-                [feature.key]: disabledFeatures.has(feature.key)
-                  ? false
-                  : selectedSet.has(feature.key),
-              }),
-              {} as Record<ProductMasterFeatures, boolean>
-            ),
-          }));
-        }}
-        classNames={{ wrapper: "flex flex-wrap gap-3" }}
-        isDisabled={isBusy}
-      >
-        {featureOptions.map((feature) => (
-          <Checkbox
-            key={feature.key}
-            value={feature.key}
-            isDisabled={isBusy || disabledFeatures.has(feature.key)}
-          >
-            {feature.label}
-          </Checkbox>
-        ))}
-      </CheckboxGroup>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-foreground">
+            {tProduct("productFeatures")}
+          </label>
+          <Tooltip content={tProduct("productFeaturesTooltip")} placement="top">
+            <HelpCircle
+              size={16}
+              className="text-default-400 cursor-help"
+              aria-label="Thông tin về tính năng sản phẩm"
+            />
+          </Tooltip>
+        </div>
+        <CheckboxGroup
+          orientation="horizontal"
+          value={allowedFeatureOptions
+            .filter((feature) => value.features?.[feature.key])
+            .map((feature) => feature.key)}
+          onChange={(selected) => {
+            const selectedSet = new Set(selected as string[]);
+            onUpdate((current) => ({
+              ...current,
+              features: featureOptions.reduce(
+                (acc, feature) => {
+                  // If feature is forbidden, set to false and don't allow changes
+                  if (forbiddenFeatures.has(feature.key)) {
+                    acc[feature.key] = false;
+                    return acc;
+                  }
+                  // If feature is disabled, keep it false
+                  // If feature is required, keep it true (prevent unchecking)
+                  acc[feature.key] = disabledFeatures.has(feature.key)
+                    ? false
+                    : isFeatureRequired(feature.key)
+                      ? true
+                      : selectedSet.has(feature.key);
+                  return acc;
+                },
+                {} as Record<ProductMasterFeatures, boolean>
+              ),
+            }));
+          }}
+          classNames={{ wrapper: "flex flex-wrap gap-3" }}
+          isDisabled={isBusy}
+        >
+          {allowedFeatureOptions.map((feature) => {
+            const isRequired = isFeatureRequired(feature.key);
+            return (
+              <Checkbox
+                key={feature.key}
+                value={feature.key}
+                isDisabled={
+                  isBusy || disabledFeatures.has(feature.key) || isRequired
+                }
+                color={isRequired ? "danger" : undefined}
+                classNames={{
+                  label: isRequired ? "text-danger font-medium" : "",
+                }}
+              >
+                {feature.label}
+              </Checkbox>
+            );
+          })}
+        </CheckboxGroup>
+      </div>
 
       <Textarea
         label={t("description")}

@@ -107,6 +107,15 @@
     ]
   },
   {
+    "path": "/guideline",
+    "routes": [
+      {
+        "path": "/get-by-key",
+        "handler": "/guideline/get-by-key"
+      }
+    ]
+  },
+  {
     "path": "/news",
     "routes": [
       {

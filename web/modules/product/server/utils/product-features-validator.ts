@@ -37,62 +37,62 @@ export const DEFAULT_FEATURES_BY_TYPE: Record<
 
   // FINISHED_GOOD - Thành phẩm sản xuất
   finished_good: {
-    sale: true,
-    purchase: false, // Tự sản xuất, không mua
-    stockable: true,
-    manufacture: true, // Có thể sản xuất
-    subcontract: true, // Có thể gia công ngoài
-    maintenance: false,
-    asset: false,
-    accounting: false,
+    sale: false, // Tùy chọn
+    purchase: false, // Tùy chọn
+    stockable: true, // Bắt buộc
+    manufacture: true, // Bắt buộc
+    subcontract: false, // Tùy chọn
+    maintenance: false, // Tùy chọn
+    asset: false, // Tùy chọn
+    accounting: false, // Tùy chọn
   },
 
   // RAW_MATERIAL - Nguyên vật liệu
   raw_material: {
-    sale: false, // Thường không bán nguyên vật liệu
-    purchase: true,
-    stockable: true,
-    manufacture: true, // Có thể tự sản xuất nguyên vật liệu
-    subcontract: false,
-    maintenance: false,
-    asset: false,
-    accounting: false,
+    sale: false, // Tùy chọn
+    purchase: true, // Bắt buộc
+    stockable: true, // Bắt buộc
+    manufacture: true, // Bắt buộc (input)
+    subcontract: false, // Tùy chọn
+    maintenance: false, // Tùy chọn
+    asset: false, // Tùy chọn
+    accounting: false, // Tùy chọn
   },
 
   // CONSUMABLE - Vật tư tiêu hao
   consumable: {
-    sale: false, // Dùng nội bộ, không bán
-    purchase: true,
-    stockable: true,
-    manufacture: false,
-    subcontract: false,
-    maintenance: false,
-    asset: false,
-    accounting: false,
+    sale: false, // Tùy chọn
+    purchase: true, // Bắt buộc
+    stockable: true, // Bắt buộc
+    manufacture: false, // Không được phép
+    subcontract: false, // Không được phép
+    maintenance: false, // Tùy chọn
+    asset: false, // Tùy chọn
+    accounting: false, // Tùy chọn
   },
 
   // TOOL - Công cụ/Thiết bị
   tool: {
-    sale: false, // Dùng nội bộ
-    purchase: true,
-    stockable: true,
-    manufacture: false,
-    subcontract: false,
-    maintenance: true, // ← QUAN TRỌNG: Tool cần bảo trì
-    asset: false, // Tool không phải tài sản cố định
-    accounting: false,
+    sale: false, // Tùy chọn
+    purchase: true, // Bắt buộc
+    stockable: false, // Tùy chọn
+    manufacture: false, // Không được phép
+    subcontract: false, // Không được phép
+    maintenance: true, // Bắt buộc
+    asset: false, // Tùy chọn
+    accounting: false, // Tùy chọn
   },
 
   // ASSET - Tài sản cố định
   asset: {
-    sale: false, // Tài sản cố định, không bán
-    purchase: true,
-    stockable: true,
-    manufacture: false,
-    subcontract: false,
-    maintenance: true, // Có thể bảo trì
-    asset: true, // ← QUAN TRỌNG: Asset = true
-    accounting: true, // ← QUAN TRỌNG: Có khấu hao
+    sale: false, // Tùy chọn
+    purchase: true, // Bắt buộc
+    stockable: false, // Tùy chọn
+    manufacture: false, // Không được phép
+    subcontract: false, // Không được phép
+    maintenance: false, // Tùy chọn
+    asset: true, // Bắt buộc
+    accounting: true, // Bắt buộc
   },
 };
 
@@ -107,21 +107,17 @@ export const REQUIRED_FEATURES_BY_TYPE: Record<
     keyof ProductMasterFeatures
   >,
   service: ["sale", "purchase"] as Array<keyof ProductMasterFeatures>, // stockable phải false
-  finished_good: ["sale", "stockable", "manufacture"] as Array<
+  finished_good: ["stockable", "manufacture"] as Array<
     keyof ProductMasterFeatures
   >,
-  raw_material: ["purchase", "stockable"] as Array<keyof ProductMasterFeatures>,
+  raw_material: ["purchase", "stockable", "manufacture"] as Array<
+    keyof ProductMasterFeatures
+  >,
   consumable: ["purchase", "stockable"] as Array<keyof ProductMasterFeatures>,
-  tool: ["purchase", "stockable", "maintenance"] as Array<
+  tool: ["purchase", "maintenance"] as Array<keyof ProductMasterFeatures>,
+  asset: ["purchase", "asset", "accounting"] as Array<
     keyof ProductMasterFeatures
   >,
-  asset: [
-    "purchase",
-    "stockable",
-    "asset",
-    "accounting",
-    "maintenance",
-  ] as Array<keyof ProductMasterFeatures>,
 };
 
 /**
@@ -131,37 +127,17 @@ export const FORBIDDEN_FEATURES_BY_TYPE: Record<
   ProductMasterType,
   Array<keyof ProductMasterFeatures>
 > = {
-  goods: [
-    "manufacture",
-    "subcontract",
-    "maintenance",
-    "asset",
-    "accounting",
-  ] as Array<keyof ProductMasterFeatures>,
-  service: [
-    "stockable",
-    "manufacture",
-    "subcontract",
-    "maintenance",
-    "asset",
-    "accounting",
-  ] as Array<keyof ProductMasterFeatures>,
-  finished_good: ["purchase"] as Array<keyof ProductMasterFeatures>, // Không mua thành phẩm
-  raw_material: ["sale"] as Array<keyof ProductMasterFeatures>, // Không bán nguyên vật liệu
-  consumable: [
-    "sale",
-    "manufacture",
-    "subcontract",
-    "maintenance",
-    "asset",
-    "accounting",
-  ] as Array<keyof ProductMasterFeatures>,
-  tool: ["sale", "manufacture", "subcontract", "asset", "accounting"] as Array<
+  goods: ["manufacture", "subcontract"] as Array<keyof ProductMasterFeatures>,
+  service: ["stockable", "manufacture", "subcontract"] as Array<
     keyof ProductMasterFeatures
   >,
-  asset: ["sale", "manufacture", "subcontract"] as Array<
+  finished_good: [] as Array<keyof ProductMasterFeatures>, // Không có feature bị cấm
+  raw_material: [] as Array<keyof ProductMasterFeatures>, // Không có feature bị cấm
+  consumable: ["manufacture", "subcontract"] as Array<
     keyof ProductMasterFeatures
-  >, // Asset không bán, không sản xuất
+  >,
+  tool: ["manufacture", "subcontract"] as Array<keyof ProductMasterFeatures>,
+  asset: ["manufacture", "subcontract"] as Array<keyof ProductMasterFeatures>, // Asset không sản xuất
 };
 
 /**

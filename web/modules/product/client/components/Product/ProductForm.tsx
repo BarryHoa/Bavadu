@@ -28,11 +28,6 @@ import {
 } from "valibot";
 
 import {
-  FORBIDDEN_FEATURES_BY_TYPE,
-  REQUIRED_FEATURES_BY_TYPE,
-  getDefaultFeaturesForType,
-} from "../../../server/utils/product-features-validator";
-import {
   LocaleFormValue,
   ProductFormValues,
   ProductMasterFeatures,
@@ -42,6 +37,11 @@ import type { ProductCategoryRow } from "../../interface/ProductCategory";
 import ProductCategoryService from "../../services/ProductCategoryService";
 import ProductService from "../../services/ProductService";
 import UnitOfMeasureService from "../../services/UnitOfMeasureService";
+import {
+  FORBIDDEN_FEATURES_BY_TYPE,
+  REQUIRED_FEATURES_BY_TYPE,
+  getDefaultFeaturesForType,
+} from "../../utils/product-features-validator";
 import MasterTab from "./MasterTab";
 import ProductFormGuideModal from "./ProductFormGuideModal";
 import VariantTab from "./VariantTab";
@@ -65,21 +65,19 @@ const getFeaturesByProductType = (
 
   return featureOptions.reduce(
     (acc, feature) => {
-      const featureKey = feature.key as string;
-
       // If feature is required, set to true
-      if (requiredFeatures.includes(featureKey as any)) {
+      if (requiredFeatures.includes(feature.key)) {
         acc[feature.key] = true;
       }
       // If feature is forbidden, set to false
-      else if (forbiddenFeatures.includes(featureKey as any)) {
+      else if (forbiddenFeatures.includes(feature.key)) {
         acc[feature.key] = false;
       }
       // Otherwise, keep current value or use default
       else {
         acc[feature.key] =
           currentFeatures?.[feature.key] ??
-          defaultFeatures[featureKey as keyof typeof defaultFeatures] ??
+          defaultFeatures[feature.key] ??
           false;
       }
       return acc;
@@ -540,7 +538,7 @@ export default function ProductForm({
   const disabledFeatures = useMemo(() => {
     if (!masterType) return new Set<string>();
     const forbidden = FORBIDDEN_FEATURES_BY_TYPE[masterType] || [];
-    return new Set(forbidden.map((f) => f as string));
+    return new Set(forbidden.map((f) => f));
   }, [masterType]);
 
   const addVariant = useCallback(() => {
