@@ -10,6 +10,7 @@ import { useMemo } from "react";
 
 import LinkAs from "@base/client/components/LinkAs";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
 
 import { getClientLink } from "@base/client/utils/link/getClientLink";
 import type { ProductDetail } from "../../interface/Product";
@@ -143,7 +144,7 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
           <InfoRow label="Code" value={detail.master.code} />
           <InfoRow
             label="Name"
-            value={localized(detail.master.name) ?? detail.master.code}
+            value={localized(detail.master.name as LocalizeText) ?? detail.master.code}
           />
           <InfoRow
             label="Type"
@@ -161,7 +162,7 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
             label="Category"
             value={
               detail.master.category
-                ? (localized(detail.master.category.name) ??
+                ? (localized(detail.master.category.name as LocalizeText) ??
                   detail.master.category.code ??
                   detail.master.category.id)
                 : "-"
@@ -192,7 +193,7 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
         <div className="grid gap-3 md:grid-cols-2">
           <InfoRow
             label="Name"
-            value={localized(detail.variant.name) ?? detail.master.code}
+            value={localized(detail.variant.name as LocalizeText) ?? detail.master.code}
           />
           <InfoRow label="SKU" value={detail.variant.sku ?? "-"} />
           <InfoRow label="Barcode" value={detail.variant.barcode ?? "-"} />
@@ -210,7 +211,7 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
             label="Base UOM"
             value={
               detail.variant.baseUom
-                ? (localized(detail.variant.baseUom.name) ??
+                ? (localized(detail.variant.baseUom.name as LocalizeText) ??
                   detail.variant.baseUom.id)
                 : "-"
             }
@@ -232,14 +233,14 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
           <div className="space-y-3">
             {detail.packings.map((packing) => (
               <Card
-                key={packing.id ?? localized(packing.name) ?? Math.random()}
+                key={packing.id ?? localized(packing.name as LocalizeText) ?? Math.random()}
               >
                 <CardBody className="space-y-2">
                   <span className="font-medium">
-                    {localized(packing.name) ?? packing.id}
+                    {localized(packing.name as LocalizeText) ?? packing.id}
                   </span>
                   <p className="text-small text-default-500">
-                    {localized(packing.description) ?? "-"}
+                    {localized(packing.description as LocalizeText) ?? "-"}
                   </p>
                 </CardBody>
               </Card>
@@ -263,7 +264,7 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
                     <span className="font-medium">{attribute.code}</span>
                   </div>
                   <p className="text-small text-default-500">
-                    {localized(attribute.name) ?? attribute.code}
+                    {localized(attribute.name as LocalizeText) ?? attribute.code}
                   </p>
                   <p className="text-small text-default-600">
                     {attribute.value}

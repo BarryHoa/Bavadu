@@ -7,6 +7,7 @@ import {
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import type { Address, countryCode } from "@base/client/interface/Address";
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import locationService from "@base/client/services/LocationService";
 import { buildAddressString } from "@base/client/utils/address/addressUtils";
 import { Button } from "@heroui/button";
@@ -63,8 +64,8 @@ export default function AddressPicker({
 
   const countryItems = useMemo<SelectItemOption[]>(() => {
     return countries.map((country) => {
-      const name = getLocalizedName(country.name as Record<string, string>);
-      const nameObj = country.name as Record<string, string>;
+      const name = getLocalizedName(country.name as LocalizeText);
+      const nameObj = country.name as LocalizeText;
       return {
         value: country.code,
         label: name,
@@ -99,7 +100,8 @@ export default function AddressPicker({
       setTempAddress({
         country: {
           id: selectedCountryCode,
-          name: countries.find((c) => c.id === selectedCountryCode)?.name || {
+          name: (countries.find((c) => c.id === selectedCountryCode)
+            ?.name as LocalizeText) || {
             vi: "",
             en: "",
           },
@@ -144,7 +146,8 @@ export default function AddressPicker({
       setTempAddress({
         country: {
           id: initialCountryCode,
-          name: countries.find((c) => c.id === initialCountryCode)?.name || {
+          name: (countries.find((c) => c.id === initialCountryCode)
+            ?.name as LocalizeText) || {
             vi: "",
             en: "",
           },

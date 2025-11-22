@@ -11,6 +11,7 @@ import type {
   AdministrativeUnit,
   countryCode,
 } from "@base/client/interface/Address";
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import locationService from "@base/client/services/LocationService";
 import { createAdministrativeUnit } from "@base/client/utils/address/addressUtils";
 import { useQuery } from "@tanstack/react-query";
@@ -69,8 +70,8 @@ const PickerAddressByCountryVN = ({
   // Convert provinces to SelectItemOption format
   const provinceItems = useMemo<SelectItemOption[]>(() => {
     return provinces.map((province) => {
-      const name = getLocalizedName(province.name as Record<string, string>);
-      const nameObj = province.name as Record<string, string>;
+      const name = getLocalizedName(province.name as LocalizeText);
+      const nameObj = province.name as LocalizeText;
       // Include both Vietnamese and English names for better search
       const searchText = `${name} ${nameObj.vi || ""} ${nameObj.en || ""}`;
       return {
@@ -84,8 +85,8 @@ const PickerAddressByCountryVN = ({
   // Convert wards to SelectItemOption format
   const wardItems = useMemo<SelectItemOption[]>(() => {
     return wards.map((ward) => {
-      const name = getLocalizedName(ward.name as Record<string, string>);
-      const nameObj = ward.name as Record<string, string>;
+      const name = getLocalizedName(ward.name as LocalizeText);
+      const nameObj = ward.name as LocalizeText;
       // Include both Vietnamese and English names for better search
       const searchText = `${name} ${nameObj.vi || ""} ${nameObj.en || ""}`;
       return {

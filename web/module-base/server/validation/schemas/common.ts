@@ -120,10 +120,8 @@ export function optionalTrimmedStringSchema(
     v.pipe(
       v.string(),
       v.transform((input) => input.trim()),
-      v.pipe(
-        v.minLength(min, `${fieldName} must be at least ${min} characters`),
-        v.maxLength(max, `${fieldName} must be at most ${max} characters`)
-      )
+      v.minLength(min, `${fieldName} must be at least ${min} characters`),
+      v.maxLength(max, `${fieldName} must be at most ${max} characters`)
     )
   );
 }
@@ -168,7 +166,7 @@ export const isoDateSchema = v.pipe(
 /**
  * Array with minimum length validator factory
  */
-export function arrayMinLengthSchema<T extends v.BaseSchema>(
+export function arrayMinLengthSchema<T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>>(
   itemSchema: T,
   minLength: number = 1,
   fieldName: string = "Array"
@@ -182,7 +180,7 @@ export function arrayMinLengthSchema<T extends v.BaseSchema>(
 /**
  * Array with maximum length validator factory
  */
-export function arrayMaxLengthSchema<T extends v.BaseSchema>(
+export function arrayMaxLengthSchema<T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>>(
   itemSchema: T,
   maxLength: number,
   fieldName: string = "Array"
@@ -196,7 +194,7 @@ export function arrayMaxLengthSchema<T extends v.BaseSchema>(
 /**
  * Array with length range validator factory
  */
-export function arrayLengthSchema<T extends v.BaseSchema>(
+export function arrayLengthSchema<T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>>(
   itemSchema: T,
   minLength: number,
   maxLength: number,

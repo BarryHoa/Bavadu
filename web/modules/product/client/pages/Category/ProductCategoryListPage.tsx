@@ -7,6 +7,7 @@ import {
 } from "@base/client/components/DataTable";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import { formatDate } from "@base/client/utils/date/formatDate";
 
 import { Chip } from "@heroui/react";
@@ -33,7 +34,7 @@ const ProductCategoryListPage = (): React.ReactNode => {
           });
           return (
             <LinkAs href={path} as={as}>
-              {localized(row.name) || row.code}
+              {localized(row.name as LocalizeText) || row.code}
             </LinkAs>
           );
         },
@@ -48,7 +49,9 @@ const ProductCategoryListPage = (): React.ReactNode => {
         key: "parent.name",
         label: "Parent",
         render: (_, row) =>
-          row.parent ? localized(row.parent.name) || row.parent.id : "-",
+          row.parent
+            ? localized(row.parent.name as LocalizeText) || row.parent.id
+            : "-",
       },
       {
         key: "level",

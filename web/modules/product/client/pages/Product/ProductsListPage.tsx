@@ -6,6 +6,7 @@ import {
 } from "@base/client/components/DataTable";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
 
@@ -35,7 +36,7 @@ export default function ProductsListPage(): React.ReactNode {
           });
           return (
             <LinkAs href={path} as={as}>
-              {localized(row.name) || row.id}
+              {localized(row.name as LocalizeText) || row.id}
             </LinkAs>
           );
         },
@@ -53,7 +54,7 @@ export default function ProductsListPage(): React.ReactNode {
       {
         key: "baseUom.name",
         label: "Base UOM",
-        render: (_, row) => localized(row.baseUom?.name),
+        render: (_, row) => localized(row.baseUom?.name as LocalizeText),
       },
       {
         key: "productMaster.type",
@@ -92,7 +93,7 @@ export default function ProductsListPage(): React.ReactNode {
         key: "productMaster.category.name",
         label: "Category",
         render: (_, row) =>
-          localized(row.productMaster?.category?.name) ||
+          localized(row.productMaster?.category?.name as LocalizeText) ||
           row.productMaster?.category?.code,
       },
       {

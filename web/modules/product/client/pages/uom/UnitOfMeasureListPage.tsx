@@ -7,6 +7,7 @@ import {
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import { Button, Chip } from "@heroui/react";
 import { useMemo } from "react";
 
@@ -28,7 +29,7 @@ const UnitOfMeasureListPage = (): React.ReactNode => {
       {
         key: "name",
         label: "Unit name",
-        render: (_, row) => localized(row.name ?? row.id) || row.id,
+        render: (_, row) => localized((row.name ?? row.id) as LocalizeText) || row.id,
       },
       {
         key: "symbol",

@@ -2,7 +2,7 @@
 
 import { IBaseInput } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
-import { IBaseSelect, SelectItem } from "@base/client/components";
+import { IBaseSelect, IBaseSelectWithSearch, SelectItem, SelectItemOption } from "@base/client/components";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Textarea } from "@heroui/react";
@@ -244,7 +244,7 @@ export default function SalesOrderCreatePage(): React.ReactNode {
                     selectedKeys={
                       field.value ? new Set([field.value]) : new Set<string>()
                     }
-                    onSelectionChange={(keys) => {
+                    onSelectionChange={(keys: any) => {
                       const keySet = keys as Set<string>;
                       const [first] = Array.from(keySet);
                       field.onChange(

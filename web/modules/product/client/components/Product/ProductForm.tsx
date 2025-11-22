@@ -466,7 +466,7 @@ export default function ProductForm({
     defaultValues: mapToFieldValues(initialValues, featureOptions),
     resolver: valibotResolver(
       createProductFormSchema(t, tProduct)
-    ) as Resolver<ProductFormFieldValues>,
+    ) as unknown as Resolver<ProductFormFieldValues>,
     mode: "onSubmit",
     reValidateMode: "onChange",
   });

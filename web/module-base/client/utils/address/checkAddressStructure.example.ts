@@ -13,20 +13,20 @@ import {
 
 // Example 1: Old structure (3 levels) - có Quận/Huyện
 const oldStructureAddress: Partial<Address> = {
-  country: { id: "VN", name: { vi: "Việt Nam", en: "Vietnam" } },
+  country: { id: "VN", name: { vi: "Việt Nam", en: "Vietnam" }, code: "VN" },
   administrativeUnits: [
-    { id: "79", name: { vi: "TP. Hồ Chí Minh" }, type: "province", level: 1 },
-    { id: "760", name: { vi: "Quận 1" }, type: "district", level: 2 },
-    { id: "26734", name: { vi: "Phường Bến Nghé" }, type: "ward", level: 3 },
+    { id: "79", name: { vi: "TP. Hồ Chí Minh", en: "Ho Chi Minh City" }, type: "province", level: 1 },
+    { id: "760", name: { vi: "Quận 1", en: "District 1" }, type: "district", level: 2 },
+    { id: "26734", name: { vi: "Phường Bến Nghé", en: "Ben Nghe Ward" }, type: "ward", level: 3 },
   ],
 };
 
 // Example 2: New structure (2 levels) - không có Quận/Huyện
 const newStructureAddress: Partial<Address> = {
-  country: { id: "VN", name: { vi: "Việt Nam", en: "Vietnam" } },
+  country: { id: "VN", name: { vi: "Việt Nam", en: "Vietnam" }, code: "VN" },
   administrativeUnits: [
-    { id: "79", name: { vi: "TP. Hồ Chí Minh" }, type: "province", level: 1 },
-    { id: "26734", name: { vi: "Phường Bến Nghé" }, type: "ward", level: 3 },
+    { id: "79", name: { vi: "TP. Hồ Chí Minh", en: "Ho Chi Minh City" }, type: "province", level: 1 },
+    { id: "26734", name: { vi: "Phường Bến Nghé", en: "Ben Nghe Ward" }, type: "ward", level: 3 },
     // Không có district (Quận/Huyện)
   ],
 };
@@ -55,9 +55,9 @@ console.log("New structure address type:", type2); // "new"
 
 // Non-Vietnam address
 const usAddress: Partial<Address> = {
-  country: { id: "US", name: { en: "United States" } },
+  country: { id: "US", name: { vi: "Hoa Kỳ", en: "United States" }, code: "US" },
   administrativeUnits: [
-    { id: "DC", name: { en: "District of Columbia" }, type: "state", level: 1 },
+    { id: "DC", name: { vi: "Quận Columbia", en: "District of Columbia" }, type: "state", level: 1 },
   ],
 };
 const type3 = getVietnamStructureType(usAddress);
@@ -76,9 +76,9 @@ console.log("New structure is valid:", isValid2); // true
 
 // Invalid address (missing province)
 const invalidAddress: Partial<Address> = {
-  country: { id: "VN", name: { vi: "Việt Nam" } },
+  country: { id: "VN", name: { vi: "Việt Nam", en: "Vietnam" }, code: "VN" },
   administrativeUnits: [
-    { id: "26734", name: { vi: "Phường Bến Nghé" }, type: "ward", level: 3 },
+    { id: "26734", name: { vi: "Phường Bến Nghé", en: "Ben Nghe Ward" }, type: "ward", level: 3 },
     // Missing province
   ],
 };

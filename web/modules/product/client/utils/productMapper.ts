@@ -115,7 +115,9 @@ export const mapDetailToFormValues = (
     packings.map((packing) => ({
       id: packing.id,
       name: toLocaleFormValue(packing.name),
-      description: packing.description || "",
+      description: typeof packing.description === "string" 
+        ? packing.description 
+        : (packing.description?.vi || packing.description?.en || ""),
       isActive: packing.isActive ?? true,
     }));
 

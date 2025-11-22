@@ -9,9 +9,10 @@ import { useParams, useRouter } from "next/navigation";
 import { useMemo } from "react";
 
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import ProductCategoryService from "../../services/ProductCategoryService";
 import type { ProductCategoryRow } from "../../interface/ProductCategory";
+import ProductCategoryService from "../../services/ProductCategoryService";
 
 const getParamValue = (
   value: string | string[] | undefined
@@ -45,7 +46,9 @@ const ProductCategoryDetailPage = (): React.ReactNode => {
   const infoRows = [
     {
       label: "Name",
-      value: category ? (localized(category.name) ?? category.code) : "-",
+      value: category
+        ? (localized(category.name as LocalizeText) ?? category.code)
+        : "-",
     },
     {
       label: "Code",
@@ -55,7 +58,8 @@ const ProductCategoryDetailPage = (): React.ReactNode => {
       label: "Parent",
       value:
         category?.parent && category.parent.name
-          ? (localized(category.parent.name) ?? category.parent.id)
+          ? (localized(category.parent.name as LocalizeText) ??
+            category.parent.id)
           : (category?.parent?.id ?? "-"),
     },
     {
@@ -124,7 +128,7 @@ const ProductCategoryDetailPage = (): React.ReactNode => {
                       Description
                     </p>
                     <p className="mt-1 text-sm text-default-600">
-                      {localized(category.description) ?? "-"}
+                      {localized(category.description as LocalizeText) ?? "-"}
                     </p>
                   </div>
                 </>

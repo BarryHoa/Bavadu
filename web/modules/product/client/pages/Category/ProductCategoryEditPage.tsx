@@ -8,6 +8,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
 import ProductCategoryForm, {
   ProductCategoryFormValues,
@@ -107,9 +108,9 @@ const ProductCategoryEditPage = (): React.ReactNode => {
   const initialValues: ProductCategoryFormValues | undefined =
     categoryQuery.data
       ? {
-          name: localized(categoryQuery.data.name) ?? "",
+          name: localized(categoryQuery.data.name as LocalizeText) ?? "",
           code: categoryQuery.data.code ?? "",
-          description: localized(categoryQuery.data.description) ?? "",
+          description: localized(categoryQuery.data.description as LocalizeText) ?? "",
           parentId: categoryQuery.data.parent?.id ?? "",
           level: categoryQuery.data.level ?? undefined,
           isActive:

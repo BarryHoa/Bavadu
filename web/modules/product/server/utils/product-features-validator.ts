@@ -103,13 +103,25 @@ export const REQUIRED_FEATURES_BY_TYPE: Record<
   ProductMasterType,
   Array<keyof ProductMasterFeatures>
 > = {
-  goods: ["sale", "purchase", "stockable"],
-  service: ["sale", "purchase"], // stockable phải false
-  finished_good: ["sale", "stockable", "manufacture"],
-  raw_material: ["purchase", "stockable"],
-  consumable: ["purchase", "stockable"],
-  tool: ["purchase", "stockable", "maintenance"],
-  asset: ["purchase", "stockable", "asset", "accounting", "maintenance"],
+  goods: ["sale", "purchase", "stockable"] as Array<
+    keyof ProductMasterFeatures
+  >,
+  service: ["sale", "purchase"] as Array<keyof ProductMasterFeatures>, // stockable phải false
+  finished_good: ["sale", "stockable", "manufacture"] as Array<
+    keyof ProductMasterFeatures
+  >,
+  raw_material: ["purchase", "stockable"] as Array<keyof ProductMasterFeatures>,
+  consumable: ["purchase", "stockable"] as Array<keyof ProductMasterFeatures>,
+  tool: ["purchase", "stockable", "maintenance"] as Array<
+    keyof ProductMasterFeatures
+  >,
+  asset: [
+    "purchase",
+    "stockable",
+    "asset",
+    "accounting",
+    "maintenance",
+  ] as Array<keyof ProductMasterFeatures>,
 };
 
 /**
@@ -119,13 +131,37 @@ export const FORBIDDEN_FEATURES_BY_TYPE: Record<
   ProductMasterType,
   Array<keyof ProductMasterFeatures>
 > = {
-  goods: ["manufacture", "subcontract", "maintenance", "asset", "accounting"],
-  service: ["stockable", "manufacture", "subcontract", "maintenance", "asset", "accounting"],
-  finished_good: ["purchase"], // Không mua thành phẩm
-  raw_material: ["sale"], // Không bán nguyên vật liệu
-  consumable: ["sale", "manufacture", "subcontract", "maintenance", "asset", "accounting"],
-  tool: ["sale", "manufacture", "subcontract", "asset", "accounting"],
-  asset: ["sale", "manufacture", "subcontract"], // Asset không bán, không sản xuất
+  goods: [
+    "manufacture",
+    "subcontract",
+    "maintenance",
+    "asset",
+    "accounting",
+  ] as Array<keyof ProductMasterFeatures>,
+  service: [
+    "stockable",
+    "manufacture",
+    "subcontract",
+    "maintenance",
+    "asset",
+    "accounting",
+  ] as Array<keyof ProductMasterFeatures>,
+  finished_good: ["purchase"] as Array<keyof ProductMasterFeatures>, // Không mua thành phẩm
+  raw_material: ["sale"] as Array<keyof ProductMasterFeatures>, // Không bán nguyên vật liệu
+  consumable: [
+    "sale",
+    "manufacture",
+    "subcontract",
+    "maintenance",
+    "asset",
+    "accounting",
+  ] as Array<keyof ProductMasterFeatures>,
+  tool: ["sale", "manufacture", "subcontract", "asset", "accounting"] as Array<
+    keyof ProductMasterFeatures
+  >,
+  asset: ["sale", "manufacture", "subcontract"] as Array<
+    keyof ProductMasterFeatures
+  >, // Asset không bán, không sản xuất
 };
 
 /**
@@ -178,7 +214,7 @@ export function normalizeProductFeatures(
   userFeatures?: Partial<ProductMasterFeatures>
 ): Partial<ProductMasterFeatures> {
   const defaults = getDefaultFeaturesForType(type);
-  
+
   // Merge: user input overrides defaults
   const merged: Partial<ProductMasterFeatures> = {
     ...defaults,
@@ -199,4 +235,3 @@ export function normalizeProductFeatures(
 
   return merged;
 }
-

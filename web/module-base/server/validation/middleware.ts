@@ -13,7 +13,9 @@ export interface ValidationError {
 /**
  * Validate request body against a schema
  */
-export async function validateRequest<T extends v.BaseSchema>(
+export async function validateRequest<
+  T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
+>(
   request: NextRequest,
   schema: T
 ): Promise<
@@ -26,7 +28,16 @@ export async function validateRequest<T extends v.BaseSchema>(
 
     if (!result.success) {
       const errors: ValidationError[] = result.issues.map((issue) => ({
-        field: issue.path?.map((p) => p.key).join(".") || "root",
+        field:
+          issue.path
+            ?.map((p: any) => {
+              if (p && typeof p === "object" && "key" in p)
+                return String(p.key);
+              if (p && typeof p === "object" && "value" in p)
+                return String(p.value);
+              return String(p);
+            })
+            .join(".") || "root",
         message: issue.message,
         input: issue.input,
       }));
@@ -80,7 +91,9 @@ export async function validateRequest<T extends v.BaseSchema>(
 /**
  * Validate request query parameters against a schema
  */
-export async function validateQuery<T extends v.BaseSchema>(
+export async function validateQuery<
+  T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
+>(
   request: NextRequest,
   schema: T
 ): Promise<
@@ -97,7 +110,16 @@ export async function validateQuery<T extends v.BaseSchema>(
 
     if (!result.success) {
       const errors: ValidationError[] = result.issues.map((issue) => ({
-        field: issue.path?.map((p) => p.key).join(".") || "root",
+        field:
+          issue.path
+            ?.map((p: any) => {
+              if (p && typeof p === "object" && "key" in p)
+                return String(p.key);
+              if (p && typeof p === "object" && "value" in p)
+                return String(p.value);
+              return String(p);
+            })
+            .join(".") || "root",
         message: issue.message,
         input: issue.input,
       }));
@@ -127,9 +149,7 @@ export async function validateQuery<T extends v.BaseSchema>(
         {
           field: "query",
           message:
-            error instanceof Error
-              ? error.message
-              : "Invalid query parameters",
+            error instanceof Error ? error.message : "Invalid query parameters",
         },
       ],
       response: NextResponse.json(
@@ -148,7 +168,9 @@ export async function validateQuery<T extends v.BaseSchema>(
 /**
  * Validate URL parameters (route params) against a schema
  */
-export function validateParams<T extends v.BaseSchema>(
+export function validateParams<
+  T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
+>(
   params: Record<string, string | string[] | undefined>,
   schema: T
 ):
@@ -169,7 +191,16 @@ export function validateParams<T extends v.BaseSchema>(
 
     if (!result.success) {
       const errors: ValidationError[] = result.issues.map((issue) => ({
-        field: issue.path?.map((p) => p.key).join(".") || "root",
+        field:
+          issue.path
+            ?.map((p: any) => {
+              if (p && typeof p === "object" && "key" in p)
+                return String(p.key);
+              if (p && typeof p === "object" && "value" in p)
+                return String(p.value);
+              return String(p);
+            })
+            .join(".") || "root",
         message: issue.message,
         input: issue.input,
       }));
@@ -207,11 +238,12 @@ export function validateParams<T extends v.BaseSchema>(
           success: false,
           error: "Invalid route parameters",
           message:
-            error instanceof Error ? error.message : "Parameter validation failed",
+            error instanceof Error
+              ? error.message
+              : "Parameter validation failed",
         },
         { status: 400 }
       ),
     };
   }
 }
-

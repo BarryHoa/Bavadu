@@ -20,9 +20,19 @@ const statusColorMap: Record<string, "success" | "warning" | "danger"> = {
 };
 
 const formatLocation = (warehouse: WarehouseDto) => {
-  const parts = [warehouse.address.city, warehouse.address.country].filter(
-    (value) => value && value.trim().length > 0
-  );
+  if (!warehouse.address || warehouse.address.length === 0) {
+    return "—";
+  }
+  const address = warehouse.address[0];
+  const getLocalizedName = (name: any): string => {
+    if (!name) return "";
+    if (typeof name === "string") return name;
+    return name.vi || name.en || "";
+  };
+  const parts = [
+    address.administrativeUnits?.find((u) => u.level === 2) ? getLocalizedName(address.administrativeUnits.find((u) => u.level === 2)?.name) : undefined,
+    address.country ? getLocalizedName(address.country.name) : undefined
+  ].filter((value): value is string => Boolean(value) && typeof value === "string" && value.trim().length > 0);
   return parts.length ? parts.join(", ") : "—";
 };
 

@@ -33,8 +33,9 @@ export const buildAddressString = (
     if (typeof value === "string") {
       return value?.trim() || "";
     }
-    if (typeof value === "object") {
-      const result = value[locale] || value.vi || value.en || "";
+    if (typeof value === "object" && value !== null) {
+      const localizeText = value as LocalizeText;
+      const result = (localizeText[locale as keyof LocalizeText] || localizeText.vi || localizeText.en || "") as string;
       return result?.trim() || "";
     }
     return "";
@@ -240,7 +241,9 @@ export const createAdministrativeUnit = (
   name: string | { vi?: string; en?: string },
   type: AdministrativeUnitType
 ): AdministrativeUnit => {
-  const nameObj = typeof name === "string" ? { vi: name, en: name } : name;
+  const nameObj: LocalizeText = typeof name === "string" 
+    ? { vi: name, en: name } 
+    : { vi: name.vi, en: name.en };
 
   // Type-safe creation based on discriminated union
   // Note: "country", "street", and "postal_code" are not allowed here as they're stored separately in Address
