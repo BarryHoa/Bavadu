@@ -22,16 +22,29 @@
     "guideAriaLabel": "Hướng dẫn sử dụng",
     "productFeaturesTooltip": "Tính năng của sản phẩm phụ thuộc vào loại sản phẩm. Việc thay đổi tính năng sẽ ảnh hưởng đến UOM.",
     "definePackaging": "Định nghĩa các tùy chọn đóng gói cho biến thể này",
+    "baseUomDescription": "Đây là đơn vị đo cơ bản (UOM) của sản phẩm, đồng thời cũng là đơn vị lưu kho (nếu có tính năng lưu kho). Nên chọn đơn vị nhỏ nhất để tránh sai số khi chuyển đổi.",
+    "baseUomWarning": "Lưu ý: Đơn vị này sẽ không được thay đổi sau khi tạo sản phẩm.",
     "captureAttributes": "Thu thập các thuộc tính bổ sung cho biến thể này",
     "nameEnglish": "Tên (Tiếng Anh)",
     "nameVietnamese": "Tên (Tiếng Việt)",
     "descriptionEnglish": "Mô tả (Tiếng Anh)",
     "descriptionVietnamese": "Mô tả (Tiếng Việt)",
+    "deleteUom": "Xóa UOM",
     "errors": {
       "productCodeRequired": "Mã sản phẩm là bắt buộc",
       "baseUnitOfMeasureRequired": "Đơn vị đo cơ bản là bắt buộc",
       "atLeastOneVariantRequired": "Cần ít nhất một biến thể",
       "maxVariantsAllowed": "Tối đa {count} biến thể"
+    },
+    "productFeature": {
+      "sale": "Bán hàng",
+      "purchase": "Mua hàng",
+      "manufacture": "Sản xuất",
+      "subcontract": "Gia công",
+      "stockable": "Lưu kho",
+      "maintenance": "Bảo trì",
+      "asset": "Tài sản",
+      "accounting": "Kế toán"
     }
   }
 }

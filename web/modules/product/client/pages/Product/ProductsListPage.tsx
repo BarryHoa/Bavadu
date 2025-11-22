@@ -12,18 +12,16 @@ import { getClientLink } from "@base/client/utils/link/getClientLink";
 
 import LinkAs from "@base/client/components/LinkAs";
 import { Chip } from "@heroui/react";
-import React, { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { ProductMasterFeatures, ProductRow } from "../../interface/Product";
-import {
-  convertProductMasterFeaturesToArrayKey,
-  getNameProductFeatures,
-} from "../../utils/getNameProductFeatures";
+import React, { useMemo } from "react";
+import { ProductRow } from "../../interface/Product";
+import { convertProductMasterFeaturesToArrayKey } from "../../utils/getNameProductFeatures";
 import { getNameProductType } from "../../utils/getNameProductType";
 
 export default function ProductsListPage(): React.ReactNode {
   const localized = useLocalizedText();
   const t = useTranslations("dataTable");
+  const tProduct = useTranslations("mdl-product");
   const columns = useMemo<DataTableColumn<ProductRow>[]>(() => {
     return [
       {
@@ -70,8 +68,8 @@ export default function ProductsListPage(): React.ReactNode {
           const features = convertProductMasterFeaturesToArrayKey(
             row.productMaster?.features
           );
-          return getNameProductFeatures(
-            features as unknown as ProductMasterFeatures[]
+          return features.map((feature) =>
+            tProduct(`productFeature.${feature}`)
           );
         },
       },
@@ -104,7 +102,7 @@ export default function ProductsListPage(): React.ReactNode {
         render: (_, row) =>
           typeof row.manufacturer?.name === "string"
             ? row.manufacturer.name
-            : row.manufacturer?.code ?? "-",
+            : (row.manufacturer?.code ?? "-"),
       },
       {
         key: "productMaster.brand",

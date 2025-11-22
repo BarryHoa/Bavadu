@@ -22,16 +22,29 @@
     "guideAriaLabel": "User guide",
     "productFeaturesTooltip": "Product features depend on the product type. Changing features will affect UOM.",
     "definePackaging": "Define packaging options for this variant",
+    "baseUomDescription": "This is the base unit of measure (UOM) of the product, and also the storage unit (if stockable feature is enabled). Should choose the smallest unit to avoid conversion errors.",
+    "baseUomWarning": "Note: This unit cannot be changed after creating the product.",
     "captureAttributes": "Capture additional attributes for this variant",
     "nameEnglish": "Name (English)",
     "nameVietnamese": "Name (Vietnamese)",
     "descriptionEnglish": "Description (English)",
     "descriptionVietnamese": "Description (Vietnamese)",
+    "deleteUom": "Delete UOM",
     "errors": {
       "productCodeRequired": "Product code is required",
       "baseUnitOfMeasureRequired": "Base unit of measure is required",
       "atLeastOneVariantRequired": "At least one variant is required",
       "maxVariantsAllowed": "Maximum {count} variants allowed"
+    },
+    "productFeature": {
+      "sale": "Sale",
+      "purchase": "Purchase",
+      "manufacture": "Manufacture",
+      "subcontract": "Subcontract",
+      "stockable": "Stockable",
+      "maintenance": "Maintenance",
+      "asset": "Asset",
+      "accounting": "Accounting"
     }
   }
 }

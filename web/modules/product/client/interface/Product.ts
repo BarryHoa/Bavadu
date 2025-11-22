@@ -24,6 +24,7 @@ export enum ProductMasterFeatures {
   ASSET = "asset",
   ACCOUNTING = "accounting",
 }
+export type ProductMasterFeaturesType = `${ProductMasterFeatures}`;
 
 export type ProductRow = {
   id: string;

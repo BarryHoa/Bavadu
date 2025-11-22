@@ -453,7 +453,7 @@ export default function ProductForm({
       )?.[1] as ProductMasterFeatures | undefined;
       return {
         key: enumKey || (option.key as ProductMasterFeatures),
-        label: getLocalizedText(option.label as any) || option.key,
+        label: tProduct(`productFeature.${option.key}`),
       };
     });
   }, [productFeaturesQuery.data]);
@@ -763,6 +763,7 @@ export default function ProductForm({
                 <Tab key={`variant-${variantIndex}`} title={truncatedTitle}>
                   <VariantTab
                     value={variant}
+                    masterFeatures={masterFeatures}
                     variantIndex={variantIndex}
                     variantErrors={variantErrors as any}
                     uomOptions={uomOptions}

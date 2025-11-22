@@ -3,18 +3,20 @@
 import {
   IBaseInput,
   IBaseInputMultipleLang,
-  IBaseSelectWithSearch,
   SelectItemOption,
 } from "@base/client/components";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Divider, Textarea } from "@heroui/react";
 import { Plus, Trash } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { ProductMasterFeaturesType } from "../../interface/Product";
 import type { LocaleFieldValue, VariantFieldValue } from "./types";
 import { updateLocaleValue } from "./types";
+import UomSection from "./UomSection";
 
 type VariantTabProps = {
   value: VariantFieldValue;
+  masterFeatures: Record<ProductMasterFeaturesType, boolean>;
   variantIndex: number;
   variantErrors?: {
     name?: { en?: { message?: string } };
@@ -40,6 +42,7 @@ type VariantTabProps = {
 
 export default function VariantTab({
   value,
+  masterFeatures,
   variantIndex,
   variantErrors,
   uomOptions,
@@ -131,23 +134,17 @@ export default function VariantTab({
           isDisabled={isBusy}
         />
       </div>
-
-      <IBaseSelectWithSearch
-        label={tProduct("baseUnitOfMeasure")}
-        items={uomOptions}
-        selectedKeys={value.baseUomId ? [value.baseUomId] : []}
-        onSelectionChange={(keys) => {
-          const keySet = keys as Set<string>;
-          const [first] = Array.from(keySet);
-          const nextValue =
-            typeof first === "string" && first.length > 0 ? first : undefined;
-          onUpdate((current) => ({ ...current, baseUomId: nextValue }));
-        }}
-        isLoading={uomQueryLoading}
-        isRequired
-        isInvalid={Boolean(variantErrors?.baseUomId)}
-        errorMessage={variantErrors?.baseUomId?.message}
-        isDisabled={isBusy || uomQueryLoading}
+      <Divider />
+      <UomSection
+        baseUomId={value.baseUomId}
+        masterFeatures={masterFeatures}
+        uomOptions={uomOptions}
+        uomQueryLoading={uomQueryLoading}
+        isBusy={isBusy}
+        error={variantErrors?.baseUomId}
+        onBaseUomChange={(baseUomId) =>
+          onUpdate((current) => ({ ...current, baseUomId }))
+        }
       />
 
       <Divider />
