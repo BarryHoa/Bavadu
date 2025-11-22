@@ -1,4 +1,4 @@
-import { getCsrfToken, getHeadersWithCsrf } from "../utils/csrf";
+import { getHeadersWithCsrf } from "../utils/csrf";
 
 class ClientHttpService {
   private baseUrl: string;
@@ -13,7 +13,9 @@ class ClientHttpService {
     return `${this.baseUrl.replace(/\/$/, "")}/${url.replace(/^\//, "")}`;
   }
 
-  private async getHeadersWithCsrf(options?: RequestInit): Promise<HeadersInit> {
+  private async getHeadersWithCsrf(
+    options?: RequestInit
+  ): Promise<HeadersInit> {
     const safeMethods = ["GET", "HEAD", "OPTIONS"];
     const method = (options?.method || "GET").toUpperCase();
 
@@ -29,20 +31,44 @@ class ClientHttpService {
     return getHeadersWithCsrf(options?.headers);
   }
 
-  async get<T>(url: string, options?: RequestInit): Promise<T> {
-    const headers = await this.getHeadersWithCsrf(options);
-    const response = await fetch(this.getFullUrl(url), {
+  /**
+   * Generic method to send HTTP requests
+   * @param url - Request URL
+   * @param method - HTTP method (GET, POST, PUT, PATCH, DELETE)
+   * @param data - Optional request body data
+   * @param options - Optional fetch options
+   * @returns Promise with parsed JSON response
+   */
+  private async send<T>(
+    url: string,
+    method: string,
+    data?: unknown,
+    options?: RequestInit
+  ): Promise<T> {
+    const requestInit: RequestInit = {
       ...options,
-      method: "GET",
+      method,
+    };
+
+    const headers = await this.getHeadersWithCsrf(requestInit);
+    const response = await fetch(this.getFullUrl(url), {
+      ...requestInit,
       headers,
       credentials: "include",
+      body: data !== undefined ? JSON.stringify(data) : undefined,
     });
+
     if (!response.ok) {
       throw new Error(
-        `HTTP GET error: ${response.status} ${response.statusText}`
+        `HTTP ${method} error: ${response.status} ${response.statusText}`
       );
     }
+
     return response.json();
+  }
+
+  async get<T>(url: string, options?: RequestInit): Promise<T> {
+    return this.send<T>(url, "GET", undefined, options);
   }
 
   async post<T>(
@@ -50,37 +76,11 @@ class ClientHttpService {
     data?: unknown,
     options?: RequestInit
   ): Promise<T> {
-    const headers = await this.getHeadersWithCsrf(options);
-    const response = await fetch(this.getFullUrl(url), {
-      ...options,
-      method: "POST",
-      headers,
-      credentials: "include",
-      body: data !== undefined ? JSON.stringify(data) : undefined,
-    });
-    if (!response.ok) {
-      throw new Error(
-        `HTTP POST error: ${response.status} ${response.statusText}`
-      );
-    }
-    return response.json();
+    return this.send<T>(url, "POST", data, options);
   }
 
   async put<T>(url: string, data?: unknown, options?: RequestInit): Promise<T> {
-    const headers = await this.getHeadersWithCsrf(options);
-    const response = await fetch(this.getFullUrl(url), {
-      ...options,
-      method: "PUT",
-      headers,
-      credentials: "include",
-      body: data !== undefined ? JSON.stringify(data) : undefined,
-    });
-    if (!response.ok) {
-      throw new Error(
-        `HTTP PUT error: ${response.status} ${response.statusText}`
-      );
-    }
-    return response.json();
+    return this.send<T>(url, "PUT", data, options);
   }
 
   async patch<T>(
@@ -88,36 +88,11 @@ class ClientHttpService {
     data?: unknown,
     options?: RequestInit
   ): Promise<T> {
-    const headers = await this.getHeadersWithCsrf(options);
-    const response = await fetch(this.getFullUrl(url), {
-      ...options,
-      method: "PATCH",
-      headers,
-      credentials: "include",
-      body: data !== undefined ? JSON.stringify(data) : undefined,
-    });
-    if (!response.ok) {
-      throw new Error(
-        `HTTP PATCH error: ${response.status} ${response.statusText}`
-      );
-    }
-    return response.json();
+    return this.send<T>(url, "PATCH", data, options);
   }
 
   async delete<T>(url: string, options?: RequestInit): Promise<T> {
-    const headers = await this.getHeadersWithCsrf(options);
-    const response = await fetch(this.getFullUrl(url), {
-      ...options,
-      method: "DELETE",
-      headers,
-      credentials: "include",
-    });
-    if (!response.ok) {
-      throw new Error(
-        `HTTP DELETE error: ${response.status} ${response.statusText}`
-      );
-    }
-    return response.json();
+    return this.send<T>(url, "DELETE", undefined, options);
   }
 }
 

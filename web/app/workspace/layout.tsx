@@ -34,6 +34,7 @@ export default async function WorkspaceLayout({
 
   const fetchProps = async () => {
     const menusPromise = fetch(`${baseUrl}/api/base/workspace/menu`, {
+      ...hdrs,
       cache: "no-store",
     })
       .then(async (res) => (res.ok ? res.json() : { data: [] }))
@@ -56,6 +57,7 @@ export default async function WorkspaceLayout({
       messagesPromise,
       commonMessagesPromise,
     ]);
+
     return {
       menus,
       messages: { ...commonMessages, ...messages },

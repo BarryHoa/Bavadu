@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { AUTH_CONFIG } from "../../config";
+import { SESSION_CONFIG } from "../../config";
 import SessionModel from "../../models/Sessions/SessionModel";
-import { getSessionInfo } from "../../utils/auth-helpers";
 
+/**
+ * POST /api/base/auth/logout
+ * Logout user by destroying session
+ */
 export async function POST(request: NextRequest) {
   try {
-    // Get session token from headers (injected by proxy) or cookie
-    const sessionInfo = getSessionInfo(request);
-    const sessionToken =
-      sessionInfo?.token ||
-      request.cookies.get(AUTH_CONFIG.sessionCookieName)?.value;
+    const sessionToken = request.cookies.get(SESSION_CONFIG.cookie.name)?.value;
 
     if (sessionToken) {
-      // Destroy session
       const sessionModel = new SessionModel();
       await sessionModel.destroySession(sessionToken);
     }
@@ -24,7 +22,10 @@ export async function POST(request: NextRequest) {
     });
 
     // Clear session cookie
-    response.cookies.delete(AUTH_CONFIG.sessionCookieName);
+    response.cookies.delete(SESSION_CONFIG.cookie.name);
+
+    // Clear CSRF token cookie
+    response.cookies.delete("csrf-token");
 
     return response;
   } catch (error) {

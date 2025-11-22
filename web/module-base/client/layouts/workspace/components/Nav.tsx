@@ -1,21 +1,65 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { Avatar } from "@heroui/avatar";
 import { Badge } from "@heroui/badge";
 import { Button } from "@heroui/button";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@heroui/dropdown";
 import {
   Navbar as HeroNavbar,
   NavbarBrand,
   NavbarContent,
   NavbarItem,
 } from "@heroui/navbar";
-import { Bell } from "lucide-react";
+import { Bell, LogOut, User } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 
+const DEFAULT_AVATAR = "/favicon/favicon-32x32.png";
+
 export default function Nav() {
+  const router = useRouter();
+  const [avatarError, setAvatarError] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // TODO: Get user data from session/context
+  const userAvatar = "https://i.pravatar.cc/150?u=a042581f4e29026024d";
+  const displayAvatar = avatarError ? DEFAULT_AVATAR : userAvatar;
+
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      const response = await fetch("/api/base/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        // Redirect to login page
+        router.push("/login");
+        router.refresh();
+      } else {
+        console.error("Logout failed");
+        // Still redirect even if logout API fails
+        router.push("/login");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Still redirect on error
+      router.push("/login");
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <HeroNavbar
       shouldHideOnScroll
@@ -62,11 +106,34 @@ export default function Nav() {
           </Badge>
         </NavbarItem>
         <NavbarItem>
-          <Avatar
-            className="cursor-pointer"
-            size="sm"
-            src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
-          />
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Avatar
+                className="cursor-pointer transition-transform hover:scale-105"
+                size="sm"
+                src={displayAvatar}
+                onError={() => setAvatarError(true)}
+                fallback={
+                  <User
+                    size={16}
+                    className="text-default-500"
+                    strokeWidth={2}
+                  />
+                }
+              />
+            </DropdownTrigger>
+            <DropdownMenu aria-label="User menu" variant="flat">
+              <DropdownItem
+                key="logout"
+                color="danger"
+                startContent={<LogOut size={16} />}
+                onPress={handleLogout}
+                isDisabled={isLoggingOut}
+              >
+                {isLoggingOut ? "Logging out..." : "Logout"}
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
         </NavbarItem>
       </NavbarContent>
     </HeroNavbar>
