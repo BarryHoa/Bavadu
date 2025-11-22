@@ -8,7 +8,7 @@ AS $$
   SELECT gen_random_uuid();
 $$ LANGUAGE sql STABLE;
 --> statement-breakpoint
-CREATE TABLE "users" (
+CREATE TABLE IF NOT EXISTS "users" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"avatar" varchar(512),
 	"gender" varchar(10),
@@ -33,7 +33,7 @@ CREATE TABLE "users" (
 	"updated_by" varchar(36)
 );
 --> statement-breakpoint
-CREATE TABLE "users_login" (
+CREATE TABLE IF NOT EXISTS "users_login" (
 	"user_id" uuid NOT NULL,
 	"username" varchar(50),
 	"email" varchar(255),
@@ -52,7 +52,7 @@ CREATE TABLE "users_login" (
 	CONSTRAINT "users_login_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
-CREATE TABLE "dynamic_entities" (
+CREATE TABLE IF NOT EXISTS "dynamic_entities" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(20) NOT NULL,
 	"name" jsonb NOT NULL,
@@ -73,7 +73,7 @@ CREATE TABLE "dynamic_entities" (
 	"updated_by" varchar(36)
 );
 --> statement-breakpoint
-CREATE TABLE "product_masters" (
+CREATE TABLE IF NOT EXISTS "product_masters" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(100) NOT NULL,
 	"name" jsonb NOT NULL,
@@ -91,7 +91,7 @@ CREATE TABLE "product_masters" (
 	CONSTRAINT "product_masters_code_unique" UNIQUE("code")
 );
 --> statement-breakpoint
-CREATE TABLE "product_variants" (
+CREATE TABLE IF NOT EXISTS "product_variants" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"product_master_id" uuid NOT NULL,
 	"name" jsonb NOT NULL,
@@ -108,7 +108,7 @@ CREATE TABLE "product_variants" (
 	"updated_by" varchar(36)
 );
 --> statement-breakpoint
-CREATE TABLE "product_packings" (
+CREATE TABLE IF NOT EXISTS "product_packings" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"product_variant_id" uuid NOT NULL,
 	"name" jsonb NOT NULL,
@@ -120,7 +120,7 @@ CREATE TABLE "product_packings" (
 	"updated_by" varchar(36)
 );
 --> statement-breakpoint
-CREATE TABLE "product_attributes" (
+CREATE TABLE IF NOT EXISTS "product_attributes" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"product_variant_id" uuid NOT NULL,
 	"code" varchar(100) NOT NULL,
@@ -132,7 +132,7 @@ CREATE TABLE "product_attributes" (
 	"updated_by" varchar(36)
 );
 --> statement-breakpoint
-CREATE TABLE "product_categories" (
+CREATE TABLE IF NOT EXISTS "product_categories" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(100) NOT NULL,
 	"name" jsonb NOT NULL,
@@ -147,7 +147,7 @@ CREATE TABLE "product_categories" (
 	CONSTRAINT "product_categories_code_unique" UNIQUE("code")
 );
 --> statement-breakpoint
-CREATE TABLE "units_of_measure" (
+CREATE TABLE IF NOT EXISTS "units_of_measure" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"name" jsonb NOT NULL,
 	"symbol" varchar(20),
@@ -158,7 +158,7 @@ CREATE TABLE "units_of_measure" (
 	"updated_by" varchar(36)
 );
 --> statement-breakpoint
-CREATE TABLE "uom_conversions" (
+CREATE TABLE IF NOT EXISTS "uom_conversions" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"uom_id" uuid NOT NULL,
 	"conversion_ratio" numeric(15, 6) NOT NULL,
@@ -168,7 +168,7 @@ CREATE TABLE "uom_conversions" (
 	"updated_by" varchar(36)
 );
 --> statement-breakpoint
-CREATE TABLE "purchase_orders" (
+CREATE TABLE IF NOT EXISTS "purchase_orders" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(64) NOT NULL,
 	"vendor_name" varchar(128) NOT NULL,
@@ -183,7 +183,7 @@ CREATE TABLE "purchase_orders" (
 	"created_by" varchar(36)
 );
 --> statement-breakpoint
-CREATE TABLE "purchase_order_lines" (
+CREATE TABLE IF NOT EXISTS "purchase_order_lines" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"order_id" uuid NOT NULL,
 	"product_id" uuid NOT NULL,
@@ -195,7 +195,7 @@ CREATE TABLE "purchase_order_lines" (
 	"updated_at" timestamp with time zone DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "sales_orders" (
+CREATE TABLE IF NOT EXISTS "sales_orders" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(64) NOT NULL,
 	"customer_name" varchar(128) NOT NULL,
@@ -210,7 +210,7 @@ CREATE TABLE "sales_orders" (
 	"created_by" varchar(36)
 );
 --> statement-breakpoint
-CREATE TABLE "sales_order_lines" (
+CREATE TABLE IF NOT EXISTS "sales_order_lines" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"order_id" uuid NOT NULL,
 	"product_id" uuid NOT NULL,
@@ -222,7 +222,7 @@ CREATE TABLE "sales_order_lines" (
 	"updated_at" timestamp with time zone DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "stock_warehouses" (
+CREATE TABLE IF NOT EXISTS "stock_warehouses" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(64) NOT NULL,
 	"name" varchar(128) NOT NULL,
@@ -246,7 +246,7 @@ CREATE TABLE "stock_warehouses" (
 	CONSTRAINT "stock_warehouses_min_max_check" CHECK (("stock_warehouses"."max_stock" IS NULL) OR ("stock_warehouses"."max_stock"::numeric >= "stock_warehouses"."min_stock"::numeric))
 );
 --> statement-breakpoint
-CREATE TABLE "stock_levels" (
+CREATE TABLE IF NOT EXISTS "stock_levels" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"product_id" uuid NOT NULL,
 	"warehouse_id" uuid NOT NULL,
@@ -256,7 +256,7 @@ CREATE TABLE "stock_levels" (
 	"updated_at" timestamp with time zone DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "stock_moves" (
+CREATE TABLE IF NOT EXISTS "stock_moves" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"product_id" uuid NOT NULL,
 	"quantity" numeric(14, 2) NOT NULL,
@@ -269,7 +269,7 @@ CREATE TABLE "stock_moves" (
 	"created_by" varchar(36)
 );
 --> statement-breakpoint
-CREATE TABLE "location_countries" (
+CREATE TABLE IF NOT EXISTS "location_countries" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(2) NOT NULL,
 	"name" jsonb NOT NULL,
@@ -281,7 +281,7 @@ CREATE TABLE "location_countries" (
 	CONSTRAINT "location_countries_code_unique" UNIQUE("code")
 );
 --> statement-breakpoint
-CREATE TABLE "location_administrative_units" (
+CREATE TABLE IF NOT EXISTS "location_administrative_units" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"country_id" uuid NOT NULL,
 	"code" varchar(50),
@@ -294,6 +294,194 @@ CREATE TABLE "location_administrative_units" (
 	"updated_at" timestamp with time zone,
 	"created_by" varchar(36),
 	"updated_by" varchar(36)
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "sessions" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"session_token" varchar(255) NOT NULL,
+	"ip_address" varchar(45),
+	"user_agent" text,
+	"expires_at" timestamp with time zone NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "sessions_session_token_unique" UNIQUE("session_token")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "guidelines" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
+	"key" varchar(255) NOT NULL,
+	"content" text NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "guidelines_key_unique" UNIQUE("key")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "product_type_goods" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
+	"product_variant_id" uuid NOT NULL,
+	"default_sale_price" numeric(18, 4),
+	"default_purchase_price" numeric(18, 4),
+	"weight" numeric(10, 2),
+	"dimensions" jsonb,
+	"color" varchar(50),
+	"style" varchar(100),
+	"expiry_date" timestamp with time zone,
+	"expiry_tracking" boolean DEFAULT false,
+	"storage_conditions" text,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "product_type_goods_product_variant_id_unique" UNIQUE("product_variant_id")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "product_type_raw_material" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
+	"product_variant_id" uuid NOT NULL,
+	"default_purchase_price" numeric(18, 4),
+	"specifications" jsonb,
+	"quality_standard" text,
+	"primary_supplier_id" uuid,
+	"lead_time_days" integer,
+	"safety_stock" numeric(14, 2),
+	"default_reorder_point" numeric(14, 2),
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "product_type_raw_material_product_variant_id_unique" UNIQUE("product_variant_id")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "product_type_finished_good" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
+	"product_variant_id" uuid NOT NULL,
+	"default_sale_price" numeric(18, 4),
+	"default_manufacturing_cost" numeric(18, 4),
+	"bom_id" uuid,
+	"production_time" integer,
+	"production_unit" varchar(50),
+	"quality_standard" text,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "product_type_finished_good_product_variant_id_unique" UNIQUE("product_variant_id")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "product_type_consumable" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
+	"product_variant_id" uuid NOT NULL,
+	"default_purchase_price" numeric(18, 4),
+	"default_min_stock_level" numeric(14, 2),
+	"default_reorder_point" numeric(14, 2),
+	"expiry_tracking" boolean DEFAULT false,
+	"storage_conditions" text,
+	"packaging_unit" varchar(50),
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "product_type_consumable_product_variant_id_unique" UNIQUE("product_variant_id")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "product_type_tool" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
+	"product_variant_id" uuid NOT NULL,
+	"serial_number" varchar(100),
+	"model_number" varchar(100),
+	"purchase_date" timestamp with time zone,
+	"purchase_price" numeric(18, 4),
+	"warranty_period_months" integer,
+	"maintenance_interval_days" integer,
+	"last_maintenance_date" timestamp with time zone,
+	"next_maintenance_date" timestamp with time zone,
+	"status" varchar(20) DEFAULT 'in-use',
+	"location" varchar(200),
+	"assigned_to_user_id" uuid,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "product_type_tool_product_variant_id_unique" UNIQUE("product_variant_id"),
+	CONSTRAINT "product_type_tool_serial_number_unique" UNIQUE("serial_number")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "product_type_asset" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
+	"product_variant_id" uuid NOT NULL,
+	"asset_code" varchar(100),
+	"purchase_date" timestamp with time zone,
+	"purchase_price" numeric(18, 4),
+	"depreciation_method" varchar(30),
+	"useful_life_years" integer,
+	"residual_value" numeric(18, 4),
+	"depreciation_rate" numeric(5, 2),
+	"depreciation_start_date" timestamp with time zone,
+	"current_value" numeric(18, 4),
+	"location" varchar(200),
+	"assigned_to_user_id" uuid,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "product_type_asset_product_variant_id_unique" UNIQUE("product_variant_id"),
+	CONSTRAINT "product_type_asset_asset_code_unique" UNIQUE("asset_code")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "product_type_service" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
+	"product_variant_id" uuid NOT NULL,
+	"default_service_price" numeric(18, 4),
+	"unit" varchar(20),
+	"duration" integer,
+	"detailed_description" text,
+	"special_requirements" text,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "product_type_service_product_variant_id_unique" UNIQUE("product_variant_id")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "stock_settings" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
+	"product_id" uuid NOT NULL,
+	"warehouse_id" uuid NOT NULL,
+	"min_stock_level" numeric(14, 2),
+	"reorder_point" numeric(14, 2),
+	"max_stock_level" numeric(14, 2),
+	"lead_time" integer,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "stock_lots" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
+	"product_variant_id" uuid NOT NULL,
+	"warehouse_id" uuid NOT NULL,
+	"lot_number" varchar(100),
+	"batch_number" varchar(100),
+	"purchase_order_line_id" uuid,
+	"purchase_date" timestamp with time zone NOT NULL,
+	"unit_cost" numeric(18, 4) NOT NULL,
+	"quantity_received" numeric(14, 2) NOT NULL,
+	"quantity_available" numeric(14, 2) NOT NULL,
+	"quantity_reserved" numeric(14, 2) DEFAULT '0' NOT NULL,
+	"expiry_date" timestamp with time zone,
+	"manufacture_date" timestamp with time zone,
+	"status" varchar(20) DEFAULT 'active',
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "stock_lot_moves" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
+	"stock_move_id" uuid NOT NULL,
+	"stock_lot_id" uuid NOT NULL,
+	"quantity" numeric(14, 2) NOT NULL,
+	"unit_cost" numeric(18, 4) NOT NULL,
+	"total_cost" numeric(18, 4) NOT NULL,
+	"move_type" varchar(20) NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "cost_variances" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
+	"product_variant_id" uuid NOT NULL,
+	"purchase_order_line_id" uuid,
+	"standard_cost" numeric(18, 4) NOT NULL,
+	"actual_cost" numeric(18, 4) NOT NULL,
+	"variance" numeric(18, 4) NOT NULL,
+	"quantity" numeric(14, 2) NOT NULL,
+	"total_variance" numeric(18, 4) NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now()
 );
 --> statement-breakpoint
 ALTER TABLE "users_login" ADD CONSTRAINT "users_login_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
@@ -318,65 +506,65 @@ ALTER TABLE "stock_levels" ADD CONSTRAINT "stock_levels_warehouse_id_stock_wareh
 ALTER TABLE "stock_moves" ADD CONSTRAINT "stock_moves_product_id_product_masters_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."product_masters"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "stock_moves" ADD CONSTRAINT "stock_moves_source_warehouse_id_stock_warehouses_id_fk" FOREIGN KEY ("source_warehouse_id") REFERENCES "public"."stock_warehouses"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "stock_moves" ADD CONSTRAINT "stock_moves_target_warehouse_id_stock_warehouses_id_fk" FOREIGN KEY ("target_warehouse_id") REFERENCES "public"."stock_warehouses"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
-CREATE INDEX "users_status_idx" ON "users" USING btree ("status");--> statement-breakpoint
-CREATE INDEX "users_department_idx" ON "users" USING btree ("department");--> statement-breakpoint
-CREATE INDEX "users_joined_idx" ON "users" USING btree ("joined_at");--> statement-breakpoint
-CREATE INDEX "users_lastname_idx" ON "users" USING btree ("last_name");--> statement-breakpoint
-CREATE INDEX "users_login_user_id_idx" ON "users_login" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX "users_login_phone_idx" ON "users_login" USING btree ("phone");--> statement-breakpoint
-CREATE INDEX "users_login_last_login_idx" ON "users_login" USING btree ("last_login_at");--> statement-breakpoint
-CREATE INDEX "dynamic_entities_model_idx" ON "dynamic_entities" USING btree ("model");--> statement-breakpoint
-CREATE INDEX "dynamic_entities_parent_idx" ON "dynamic_entities" USING btree ("parent_id");--> statement-breakpoint
-CREATE INDEX "dynamic_entities_active_idx" ON "dynamic_entities" USING btree ("is_active");--> statement-breakpoint
-CREATE INDEX "product_masters_category_idx" ON "product_masters" USING btree ("category_id");--> statement-breakpoint
-CREATE INDEX "product_masters_type_idx" ON "product_masters" USING btree ("type");--> statement-breakpoint
-CREATE INDEX "product_masters_active_idx" ON "product_masters" USING btree ("is_active");--> statement-breakpoint
-CREATE INDEX "product_variants_master_idx" ON "product_variants" USING btree ("product_master_id");--> statement-breakpoint
-CREATE INDEX "product_variants_sku_idx" ON "product_variants" USING btree ("sku");--> statement-breakpoint
-CREATE INDEX "product_variants_barcode_idx" ON "product_variants" USING btree ("barcode");--> statement-breakpoint
-CREATE INDEX "product_variants_active_idx" ON "product_variants" USING btree ("is_active");--> statement-breakpoint
-CREATE INDEX "product_variants_base_uom_idx" ON "product_variants" USING btree ("base_uom_id");--> statement-breakpoint
-CREATE INDEX "product_packings_variant_idx" ON "product_packings" USING btree ("product_variant_id");--> statement-breakpoint
-CREATE INDEX "product_packings_active_idx" ON "product_packings" USING btree ("is_active");--> statement-breakpoint
-CREATE INDEX "product_attributes_variant_idx" ON "product_attributes" USING btree ("product_variant_id");--> statement-breakpoint
-CREATE INDEX "product_attributes_code_idx" ON "product_attributes" USING btree ("code");--> statement-breakpoint
-CREATE INDEX "product_categories_parent_idx" ON "product_categories" USING btree ("parent_id");--> statement-breakpoint
-CREATE INDEX "product_categories_active_idx" ON "product_categories" USING btree ("is_active");--> statement-breakpoint
-CREATE INDEX "units_of_measure_symbol_idx" ON "units_of_measure" USING btree ("symbol");--> statement-breakpoint
-CREATE INDEX "units_of_measure_active_idx" ON "units_of_measure" USING btree ("is_active");--> statement-breakpoint
-CREATE INDEX "uom_conversions_uom_idx" ON "uom_conversions" USING btree ("uom_id");--> statement-breakpoint
-CREATE INDEX "purchase_orders_code_idx" ON "purchase_orders" USING btree ("code");--> statement-breakpoint
-CREATE INDEX "purchase_orders_vendor_idx" ON "purchase_orders" USING btree ("vendor_name");--> statement-breakpoint
-CREATE INDEX "purchase_orders_status_idx" ON "purchase_orders" USING btree ("status");--> statement-breakpoint
-CREATE INDEX "purchase_orders_warehouse_idx" ON "purchase_orders" USING btree ("warehouse_id");--> statement-breakpoint
-CREATE INDEX "purchase_orders_expected_idx" ON "purchase_orders" USING btree ("expected_date");--> statement-breakpoint
-CREATE INDEX "purchase_orders_created_idx" ON "purchase_orders" USING btree ("created_at");--> statement-breakpoint
-CREATE INDEX "purchase_order_lines_order_idx" ON "purchase_order_lines" USING btree ("order_id");--> statement-breakpoint
-CREATE INDEX "purchase_order_lines_product_idx" ON "purchase_order_lines" USING btree ("product_id");--> statement-breakpoint
-CREATE INDEX "sales_orders_code_idx" ON "sales_orders" USING btree ("code");--> statement-breakpoint
-CREATE INDEX "sales_orders_customer_idx" ON "sales_orders" USING btree ("customer_name");--> statement-breakpoint
-CREATE INDEX "sales_orders_status_idx" ON "sales_orders" USING btree ("status");--> statement-breakpoint
-CREATE INDEX "sales_orders_warehouse_idx" ON "sales_orders" USING btree ("warehouse_id");--> statement-breakpoint
-CREATE INDEX "sales_orders_expected_idx" ON "sales_orders" USING btree ("expected_date");--> statement-breakpoint
-CREATE INDEX "sales_orders_created_idx" ON "sales_orders" USING btree ("created_at");--> statement-breakpoint
-CREATE INDEX "sales_order_lines_order_idx" ON "sales_order_lines" USING btree ("order_id");--> statement-breakpoint
-CREATE INDEX "sales_order_lines_product_idx" ON "sales_order_lines" USING btree ("product_id");--> statement-breakpoint
-CREATE UNIQUE INDEX "stock_warehouses_code_unique" ON "stock_warehouses" USING btree ("code");--> statement-breakpoint
-CREATE INDEX "stock_warehouses_company_idx" ON "stock_warehouses" USING btree ("company_id");--> statement-breakpoint
-CREATE INDEX "stock_warehouses_status_idx" ON "stock_warehouses" USING btree ("status");--> statement-breakpoint
-CREATE INDEX "stock_warehouses_type_idx" ON "stock_warehouses" USING btree ("type_code");--> statement-breakpoint
-CREATE UNIQUE INDEX "stock_levels_product_warehouse_unique" ON "stock_levels" USING btree ("product_id","warehouse_id");--> statement-breakpoint
-CREATE INDEX "stock_levels_product_idx" ON "stock_levels" USING btree ("product_id");--> statement-breakpoint
-CREATE INDEX "stock_levels_warehouse_idx" ON "stock_levels" USING btree ("warehouse_id");--> statement-breakpoint
-CREATE INDEX "stock_moves_product_idx" ON "stock_moves" USING btree ("product_id");--> statement-breakpoint
-CREATE INDEX "stock_moves_type_idx" ON "stock_moves" USING btree ("type");--> statement-breakpoint
-CREATE INDEX "stock_moves_source_idx" ON "stock_moves" USING btree ("source_warehouse_id");--> statement-breakpoint
-CREATE INDEX "stock_moves_target_idx" ON "stock_moves" USING btree ("target_warehouse_id");--> statement-breakpoint
-CREATE INDEX "stock_moves_created_idx" ON "stock_moves" USING btree ("created_at");--> statement-breakpoint
-CREATE INDEX "location_administrative_units_country_idx" ON "location_administrative_units" USING btree ("country_id");--> statement-breakpoint
-CREATE INDEX "location_administrative_units_parent_idx" ON "location_administrative_units" USING btree ("parent_id");--> statement-breakpoint
-CREATE INDEX "location_administrative_units_level_idx" ON "location_administrative_units" USING btree ("level");--> statement-breakpoint
-CREATE INDEX "location_administrative_units_type_idx" ON "location_administrative_units" USING btree ("type");--> statement-breakpoint
-CREATE INDEX "location_administrative_units_active_idx" ON "location_administrative_units" USING btree ("is_active");--> statement-breakpoint
-CREATE INDEX "location_countries_code_idx" ON "location_countries" USING btree ("code");--> statement-breakpoint
-CREATE INDEX "location_countries_is_active_idx" ON "location_countries" USING btree ("is_active");
+CREATE INDEX IF NOT EXISTS "users_status_idx" ON "users" USING btree ("status");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "users_department_idx" ON "users" USING btree ("department");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "users_joined_idx" ON "users" USING btree ("joined_at");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "users_lastname_idx" ON "users" USING btree ("last_name");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "users_login_user_id_idx" ON "users_login" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "users_login_phone_idx" ON "users_login" USING btree ("phone");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "users_login_last_login_idx" ON "users_login" USING btree ("last_login_at");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "dynamic_entities_model_idx" ON "dynamic_entities" USING btree ("model");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "dynamic_entities_parent_idx" ON "dynamic_entities" USING btree ("parent_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "dynamic_entities_active_idx" ON "dynamic_entities" USING btree ("is_active");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "product_masters_category_idx" ON "product_masters" USING btree ("category_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "product_masters_type_idx" ON "product_masters" USING btree ("type");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "product_masters_active_idx" ON "product_masters" USING btree ("is_active");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "product_variants_master_idx" ON "product_variants" USING btree ("product_master_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "product_variants_sku_idx" ON "product_variants" USING btree ("sku");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "product_variants_barcode_idx" ON "product_variants" USING btree ("barcode");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "product_variants_active_idx" ON "product_variants" USING btree ("is_active");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "product_variants_base_uom_idx" ON "product_variants" USING btree ("base_uom_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "product_packings_variant_idx" ON "product_packings" USING btree ("product_variant_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "product_packings_active_idx" ON "product_packings" USING btree ("is_active");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "product_attributes_variant_idx" ON "product_attributes" USING btree ("product_variant_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "product_attributes_code_idx" ON "product_attributes" USING btree ("code");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "product_categories_parent_idx" ON "product_categories" USING btree ("parent_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "product_categories_active_idx" ON "product_categories" USING btree ("is_active");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "units_of_measure_symbol_idx" ON "units_of_measure" USING btree ("symbol");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "units_of_measure_active_idx" ON "units_of_measure" USING btree ("is_active");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "uom_conversions_uom_idx" ON "uom_conversions" USING btree ("uom_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "purchase_orders_code_idx" ON "purchase_orders" USING btree ("code");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "purchase_orders_vendor_idx" ON "purchase_orders" USING btree ("vendor_name");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "purchase_orders_status_idx" ON "purchase_orders" USING btree ("status");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "purchase_orders_warehouse_idx" ON "purchase_orders" USING btree ("warehouse_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "purchase_orders_expected_idx" ON "purchase_orders" USING btree ("expected_date");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "purchase_orders_created_idx" ON "purchase_orders" USING btree ("created_at");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "purchase_order_lines_order_idx" ON "purchase_order_lines" USING btree ("order_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "purchase_order_lines_product_idx" ON "purchase_order_lines" USING btree ("product_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "sales_orders_code_idx" ON "sales_orders" USING btree ("code");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "sales_orders_customer_idx" ON "sales_orders" USING btree ("customer_name");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "sales_orders_status_idx" ON "sales_orders" USING btree ("status");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "sales_orders_warehouse_idx" ON "sales_orders" USING btree ("warehouse_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "sales_orders_expected_idx" ON "sales_orders" USING btree ("expected_date");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "sales_orders_created_idx" ON "sales_orders" USING btree ("created_at");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "sales_order_lines_order_idx" ON "sales_order_lines" USING btree ("order_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "sales_order_lines_product_idx" ON "sales_order_lines" USING btree ("product_id");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "stock_warehouses_code_unique" ON "stock_warehouses" USING btree ("code");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "stock_warehouses_company_idx" ON "stock_warehouses" USING btree ("company_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "stock_warehouses_status_idx" ON "stock_warehouses" USING btree ("status");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "stock_warehouses_type_idx" ON "stock_warehouses" USING btree ("type_code");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "stock_levels_product_warehouse_unique" ON "stock_levels" USING btree ("product_id","warehouse_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "stock_levels_product_idx" ON "stock_levels" USING btree ("product_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "stock_levels_warehouse_idx" ON "stock_levels" USING btree ("warehouse_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "stock_moves_product_idx" ON "stock_moves" USING btree ("product_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "stock_moves_type_idx" ON "stock_moves" USING btree ("type");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "stock_moves_source_idx" ON "stock_moves" USING btree ("source_warehouse_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "stock_moves_target_idx" ON "stock_moves" USING btree ("target_warehouse_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "stock_moves_created_idx" ON "stock_moves" USING btree ("created_at");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "location_administrative_units_country_idx" ON "location_administrative_units" USING btree ("country_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "location_administrative_units_parent_idx" ON "location_administrative_units" USING btree ("parent_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "location_administrative_units_level_idx" ON "location_administrative_units" USING btree ("level");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "location_administrative_units_type_idx" ON "location_administrative_units" USING btree ("type");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "location_administrative_units_active_idx" ON "location_administrative_units" USING btree ("is_active");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "location_countries_code_idx" ON "location_countries" USING btree ("code");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "location_countries_is_active_idx" ON "location_countries" USING btree ("is_active");

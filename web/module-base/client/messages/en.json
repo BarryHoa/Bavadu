@@ -115,5 +115,11 @@
         "placeholder": "House number, street name"
       }
     }
+  },
+  "guidelines": {
+    "title": "Information needed",
+    "loading": "Loading guide content...",
+    "error": "Unable to load guide content. Please try again later.",
+    "notFound": "Guide content not found."
   }
 }

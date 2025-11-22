@@ -115,5 +115,11 @@
         "placeholder": "Số nhà, tên đường"
       }
     }
+  },
+  "guidelines": {
+    "title": "Thông tin cần biết",
+    "loading": "Đang tải nội dung hướng dẫn...",
+    "error": "Không thể tải nội dung hướng dẫn. Vui lòng thử lại sau.",
+    "notFound": "Không tìm thấy nội dung hướng dẫn."
   }
 }

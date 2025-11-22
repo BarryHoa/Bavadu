@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS "guidelines_key_idx" ON "guidelines" USING btree ("key");
