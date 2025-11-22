@@ -1,0 +1,26 @@
+[
+  {
+    "key": "me",
+    "name": "Profile",
+    "icon": "User",
+    "order": 1,
+    "path": "/profile",
+    "as": "/profile"
+  },
+  {
+    "key": "news",
+    "name": "News",
+    "icon": "NewspaperIcon",
+    "order": 2,
+    "path": "/news",
+    "as": "/news"
+  },
+  {
+    "key": "settings",
+    "name": "Settings",
+    "icon": "Settings",
+    "order": 3,
+    "path": "/settings",
+    "as": "/settings"
+  }
+]

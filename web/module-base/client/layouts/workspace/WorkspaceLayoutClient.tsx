@@ -18,14 +18,12 @@ interface SerializedNavigationItem {
 
 interface WorkspaceLayoutClientProps {
   children: React.ReactNode;
-  navigationItems: SerializedNavigationItem[];
-  moduleMenus: MenuWorkspaceElement[];
+  menuItems: MenuWorkspaceElement[];
 }
 
 export default function WorkspaceLayoutClient({
   children,
-  navigationItems,
-  moduleMenus,
+  menuItems,
 }: WorkspaceLayoutClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const pathname = usePathname();
@@ -77,8 +75,7 @@ export default function WorkspaceLayoutClient({
         <div className="flex min-h-0 flex-1">
           <MenuPanel
             isOpen={sidebarOpen}
-            items={navigationItems as unknown as MenuWorkspaceElement[]}
-            moduleMenus={moduleMenus}
+            menuItems={menuItems}
             // Desktop menu: không auto đóng, giữ nguyên trạng thái pin/unpin
             onClose={() => {}}
             onToggleSidebar={handleToggleSidebar}

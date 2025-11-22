@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Circle,
   ClipboardList,
+  NewspaperIcon,
   Package,
   Pin,
   PinOff,
@@ -38,22 +39,24 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Building2,
   Settings,
   User,
+  NewspaperIcon,
 };
 interface MenuProps {
-  items: MenuWorkspaceElement[];
+  menuItems: MenuWorkspaceElement[];
   isOpen: boolean;
   onClose: () => void;
-  moduleMenus?: MenuWorkspaceElement[];
   onToggleSidebar?: () => void;
 }
 
 export default function Menu({
-  items,
   isOpen,
   onClose,
-  moduleMenus = [],
+  menuItems = [],
   onToggleSidebar,
 }: MenuProps) {
+  // Split menu items by type
+  const mainMenus = menuItems.filter((item) => item.type === "main");
+  const moduleMenus = menuItems.filter((item) => item.type === "mdl");
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [isHoverOpen, setIsHoverOpen] = useState(false);
@@ -190,7 +193,7 @@ export default function Menu({
 
   // Tự expand menu và highlight item đang active (ưu tiên theo localStorage)
   useEffect(() => {
-    const allItems = [...items, ...moduleMenus];
+    const allItems = menuItems;
 
     // Server-side: fallback theo URL hiện tại
     if (typeof window === "undefined") {
@@ -236,7 +239,7 @@ export default function Menu({
         Array.from(new Set([...prev, ...parentsToExpand]))
       );
     }
-  }, [pathname, items, moduleMenus]);
+  }, [pathname, menuItems]);
 
   const renderIcon = (iconName: string | undefined, isHighlighted: boolean) => {
     const IconComponent = (iconName && ICON_MAP[iconName]) || Circle;
@@ -477,7 +480,7 @@ export default function Menu({
             </button>
           </div>
 
-          <div className="space-y-1">{items.map(renderMenuItem)}</div>
+          <div className="space-y-1">{mainMenus.map(renderMenuItem)}</div>
 
           {moduleMenus.length > 0 && (
             <>

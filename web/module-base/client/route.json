@@ -1,5 +1,14 @@
 [
   {
+    "path": "/",
+    "layout": "/workspace/WorkspaceLayout",
+    "page": "/WorkspaceMainPage"
+  },
+  {
+    "path": "/news",
+    "page": "/News/NewsListPage"
+  },
+  {
     "path": "/admin",
     "routes": [
       { "path": "/models", "page": "/Admin/ModelsViewList/ModelsListPage" }

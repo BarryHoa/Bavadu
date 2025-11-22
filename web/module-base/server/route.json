@@ -105,5 +105,14 @@
         "handler": "/auth/me"
       }
     ]
+  },
+  {
+    "path": "/news",
+    "routes": [
+      {
+        "path": "/",
+        "handler": "/news/get-list"
+      }
+    ]
   }
 ]

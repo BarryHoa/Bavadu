@@ -6,4 +6,5 @@ export type MenuFactoryElm = {
   icon?: string;
   order?: number;
   children?: MenuFactoryElm[];
+  type: "main" | "mdl";
 };

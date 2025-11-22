@@ -4,7 +4,7 @@ import utc from "dayjs/plugin/utc";
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { dirname, join, relative } from "path";
 import { MenuFactoryElm } from "./interfaces/Menu";
-import { loadMenusFromModules } from "./loaders/menu-loader";
+import { loadAllMenus } from "./loaders/menu-loader";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Ho_Chi_Minh");
@@ -259,7 +259,7 @@ class Environment {
   }
   private registerMenuStatic(): void {
     console.log("Registering menus...");
-    const menus = loadMenusFromModules();
+    const menus = loadAllMenus();
     for (const menu of menus) {
       this.menuFactories.push(menu);
     }

@@ -10,5 +10,6 @@ export interface MenuWorkspaceElement<
   icon: string;
   order?: number;
   badge?: string;
+  type: "main" | "mdl";
   children?: MenuWorkspaceElement<K>[];
 }

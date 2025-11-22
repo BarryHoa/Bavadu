@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
-import getEnv from "../../utils/getEnv";
+import { loadAllMenus } from "../../loaders/menu-loader";
 
 export async function GET() {
   try {
-    // const menus = loadMenusFromModules();
-    const menus = getEnv()?.getMenuFactories() ?? [];
+    const menus = loadAllMenus();
     return NextResponse.json({
       success: true,
       data: menus,
-      message: `Loaded ${menus.length} module(s) menu`,
+      message: `Loaded ${menus.length} menu(s)`,
     });
   } catch (error) {
     // eslint-disable-next-line no-console

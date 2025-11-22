@@ -41,8 +41,8 @@ export default function LoginPage() {
         return;
       }
 
-      // Redirect to workspace or home
-      router.push("/workspace");
+      // Redirect to news page
+      router.push("/workspace/news");
       router.refresh();
     } catch (err) {
       setError("An error occurred. Please try again.");
