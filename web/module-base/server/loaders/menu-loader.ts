@@ -115,8 +115,8 @@ export function loadMenusFromModules(): MenuFactoryElm[] {
       menus.push({
         ...menuData,
         type: "mdl" as const,
-        path: normalizePath(modulePrefix, menuData.path ?? "/"),
-        as: normalizePath(modulePrefix, menuData.as ?? menuData.path ?? "/"),
+        // path: normalizePath(modulePrefix, menuData.path ?? "/"),
+        // as: normalizePath(modulePrefix, menuData.as ?? menuData.path ?? "/"),
         children: menuData.children
           ? attachPrefix(menuData.children, modulePrefix, "mdl")
           : undefined,

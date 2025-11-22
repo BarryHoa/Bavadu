@@ -60,7 +60,10 @@
     "empty": "Không có dữ liệu",
     "loading": "Đang tải...",
     "refresh": "Làm mới dữ liệu",
-    "summary": "Hiển thị {from} đến {to} trong tổng {total} mục"
+    "summary": "Hiển thị {from} đến {to} trong tổng {total} mục",
+    "columns": {
+      "action": "Thao tác"
+    }
   },
   "admin": {
     "models": {

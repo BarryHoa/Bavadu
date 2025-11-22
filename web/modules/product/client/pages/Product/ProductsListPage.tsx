@@ -13,6 +13,7 @@ import { getClientLink } from "@base/client/utils/link/getClientLink";
 import LinkAs from "@base/client/components/LinkAs";
 import { Chip } from "@heroui/react";
 import React, { useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { ProductMasterFeatures, ProductRow } from "../../interface/Product";
 import {
   convertProductMasterFeaturesToArrayKey,
@@ -22,6 +23,7 @@ import { getNameProductType } from "../../utils/getNameProductType";
 
 export default function ProductsListPage(): React.ReactNode {
   const localized = useLocalizedText();
+  const t = useTranslations("dataTable");
   const columns = useMemo<DataTableColumn<ProductRow>[]>(() => {
     return [
       {
@@ -125,7 +127,7 @@ export default function ProductsListPage(): React.ReactNode {
       },
       {
         key: DATA_TABLE_COLUMN_KEY_ACTION,
-        label: "Action",
+        label: t("columns.action"),
         align: "end",
         render: (_, row) => {
           const viewLink = getClientLink({
@@ -159,7 +161,7 @@ export default function ProductsListPage(): React.ReactNode {
         },
       },
     ];
-  }, []);
+  }, [t]);
 
   const createLink = getClientLink({
     mdl: "product",

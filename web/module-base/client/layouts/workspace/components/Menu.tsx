@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const KEY_WORKSPACE_LAST_MENU_PATH = "last_menu_key";
 
@@ -64,6 +64,23 @@ export default function Menu({
   const activeItemRef = useRef<HTMLDivElement>(null);
 
   const effectiveOpen = isOpen || isHoverOpen;
+
+  // Memoize the flattened menu list for efficiency
+  const flattenedMenus = useMemo(() => {
+    return menuItems
+      .flatMap((item) => {
+        if (item.children && item.children.length > 0) {
+          const children = item.children.flat();
+          return [item, ...children];
+        }
+        return [item];
+      })
+      .sort((a: any, b: any) => {
+        const lenA = (a.path || "").length;
+        const lenB = (b.path || "").length;
+        return lenB - lenA; // long to short
+      });
+  }, [menuItems]);
 
   const toggleExpanded = (itemName: string) => {
     setExpandedItems((prev) =>
@@ -117,39 +134,6 @@ export default function Menu({
     return parentsToExpand;
   };
 
-  const findParentsByKey = (
-    items: MenuWorkspaceElement[],
-    key: string
-  ): string[] => {
-    const parentsToExpand: string[] = [];
-
-    const checkItem = (item: MenuWorkspaceElement): boolean => {
-      if (item.key === key) {
-        // Nếu chính item này là menu group thì expand nó
-        parentsToExpand.push(item.name);
-
-        return true;
-      }
-
-      if (item.children) {
-        const hasMatchChild = item.children.some((child) => checkItem(child));
-
-        if (hasMatchChild) {
-          parentsToExpand.push(item.name);
-        }
-
-        return hasMatchChild;
-      }
-
-      return false;
-    };
-
-    items.forEach((item) => checkItem(item));
-
-    // Loại bỏ trùng lặp, nhưng giữ thứ tự
-    return Array.from(new Set(parentsToExpand));
-  };
-
   const findKeyByPath = (
     items: MenuWorkspaceElement[],
     path: string
@@ -191,48 +175,14 @@ export default function Menu({
     );
   };
 
-  // Tự expand menu và highlight item đang active (ưu tiên theo localStorage)
+  // Tự expand menu và highlight item đang active (ưu tiên theo pathname)
   useEffect(() => {
-    const allItems = menuItems;
-
-    // Server-side: fallback theo URL hiện tại
-    if (typeof window === "undefined") {
-      const parentsFromPath = findParentItemsToExpandByPath(allItems, pathname);
-      const derivedKey = findKeyByPath(allItems, pathname);
-
-      if (parentsFromPath.length > 0) {
-        setExpandedItems((prev) =>
-          Array.from(new Set([...prev, ...parentsFromPath]))
-        );
-      }
-
-      if (derivedKey) {
-        setActiveKey(derivedKey);
-      }
-
-      return;
-    }
-
-    const storedKey =
-      window.localStorage.getItem(KEY_WORKSPACE_LAST_MENU_PATH) || "";
-
-    let parentsToExpand: string[] = [];
-
-    if (storedKey) {
-      parentsToExpand = findParentsByKey(allItems, storedKey);
-      setActiveKey(storedKey);
-    }
-
-    // Nếu key trong localStorage không còn tồn tại trong menu, fallback theo URL hiện tại
-    if (parentsToExpand.length === 0) {
-      parentsToExpand = findParentItemsToExpandByPath(allItems, pathname);
-
-      const derivedKey = findKeyByPath(allItems, pathname);
-
-      if (derivedKey) {
-        setActiveKey(derivedKey);
-      }
-    }
+    const parentsToExpand: string[] = findParentItemsToExpandByPath(
+      flattenedMenus,
+      pathname
+    );
+    const keyToSet: string | null = findKeyByPath(flattenedMenus, pathname);
+    setActiveKey(keyToSet);
 
     if (parentsToExpand.length > 0) {
       setExpandedItems((prev) =>

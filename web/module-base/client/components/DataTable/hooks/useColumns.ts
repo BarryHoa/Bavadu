@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 
+import { useTranslations } from "next-intl";
 import {
   DATA_TABLE_COLUMN_KEY_ROW_NUMBER,
   type DataTableColumnDefinition,
@@ -21,35 +22,35 @@ type FrozenMeta = {
 const computeFrozenMeta = <T>(
   columns: DataTableColumnDefinition<T>[]
 ): FrozenMeta => {
-  const left: FrozenColumn[] = [];
-  const right: FrozenColumn[] = [];
-
   let leftOffset = 0;
   let rightOffset = 0;
 
-  columns.forEach((column) => {
-    if (column.fixed === "left") {
-      left.push({
-        key: column.key,
-        offset: leftOffset,
-        width: column.width || 150,
-      });
-      leftOffset += column.width || 150;
-    }
+  const leftColumns = columns.filter((column) => column.fixed === "left");
+  const left = leftColumns.map((column) => {
+    const frozen: FrozenColumn = {
+      key: column.key,
+      offset: leftOffset,
+      width: column.width || 150,
+    };
+    leftOffset += column.width || 150;
+    return frozen;
   });
 
-  for (let index = columns.length - 1; index >= 0; index -= 1) {
-    const column = columns[index];
-
-    if (column.fixed === "right") {
-      right.unshift({
+  const rightColumns = columns
+    .slice()
+    .reverse()
+    .filter((column) => column.fixed === "right");
+  const right = rightColumns
+    .map((column) => {
+      const frozen: FrozenColumn = {
         key: column.key,
         offset: rightOffset,
         width: column.width || 150,
-      });
+      };
       rightOffset += column.width || 150;
-    }
-  }
+      return frozen;
+    })
+    .reverse();
 
   return { left, right };
 };
@@ -117,12 +118,13 @@ const buildRenderValue = <T>(
 const useColumns = <T>(
   columns: DataTableColumnDefinition<T>[]
 ): ProcessedDataTableColumn<T>[] => {
+  const t = useTranslations("dataTable");
   return useMemo(() => {
     const frozenMeta = computeFrozenMeta(columns);
 
     const numberColumn: ProcessedDataTableColumn<T> = {
       key: DATA_TABLE_COLUMN_KEY_ROW_NUMBER,
-      label: "No.",
+      label: t("columns.number"),
       width: 64,
       align: "center",
       fixed: "left",

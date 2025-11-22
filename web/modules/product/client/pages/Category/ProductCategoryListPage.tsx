@@ -12,6 +12,7 @@ import { formatDate } from "@base/client/utils/date/formatDate";
 
 import { Chip } from "@heroui/react";
 import React, { useMemo } from "react";
+import { useTranslations } from "next-intl";
 
 import LinkAs from "@base/client/components/LinkAs";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
@@ -19,6 +20,7 @@ import { ProductCategoryRow } from "../../interface/ProductCategory";
 
 const ProductCategoryListPage = (): React.ReactNode => {
   const localized = useLocalizedText();
+  const t = useTranslations("dataTable");
 
   const columns = useMemo<DataTableColumn<ProductCategoryRow>[]>(() => {
     return [
@@ -89,7 +91,7 @@ const ProductCategoryListPage = (): React.ReactNode => {
       },
       {
         key: DATA_TABLE_COLUMN_KEY_ACTION,
-        label: "Actions",
+        label: t("columns.action"),
         align: "end",
         render: (_, row) => {
           const viewLink = getClientLink({
@@ -123,7 +125,7 @@ const ProductCategoryListPage = (): React.ReactNode => {
         },
       },
     ];
-  }, [localized]);
+  }, [localized, t]);
 
   const createLink = getClientLink({
     mdl: "product",

@@ -60,7 +60,11 @@
     "empty": "No data available",
     "loading": "Loading...",
     "refresh": "Refresh data",
-    "summary": "Showing {from} to {to} of {total} entries"
+    "summary": "Showing {from} to {to} of {total} entries",
+    "columns": {
+      "number": "No.",
+      "action": "Action"
+    }
   },
   "admin": {
     "models": {

@@ -10,6 +10,7 @@ import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import { Button, Chip } from "@heroui/react";
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 
 import { getClientLink } from "@base/client/utils/link/getClientLink";
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
@@ -23,6 +24,7 @@ interface UnitOfMeasureRow {
 
 const UnitOfMeasureListPage = (): React.ReactNode => {
   const localized = useLocalizedText();
+  const t = useTranslations("dataTable");
 
   const columns = useMemo<DataTableColumn<UnitOfMeasureRow>[]>(() => {
     return [
@@ -53,7 +55,7 @@ const UnitOfMeasureListPage = (): React.ReactNode => {
       },
       {
         key: DATA_TABLE_COLUMN_KEY_ACTION,
-        label: "Actions",
+        label: t("columns.action"),
         align: "end",
         render: (_, row) => {
           const { as } = getClientLink({
@@ -70,7 +72,7 @@ const UnitOfMeasureListPage = (): React.ReactNode => {
         },
       },
     ];
-  }, [localized]);
+  }, [localized, t]);
 
   const createLink = getClientLink({
     mdl: "product",

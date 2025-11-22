@@ -5,6 +5,8 @@ import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Checkbox } from "@heroui/checkbox";
 import { Input as HeroUIInput } from "@heroui/input";
 import { Link } from "@heroui/link";
+import { Eye, EyeOff } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -15,6 +17,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,14 +25,17 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
+      const trimmedUsername = username.trim();
+      const trimmedPassword = password.trim();
+
       const response = await fetch("/api/base/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username,
-          password,
+          username: trimmedUsername,
+          password: trimmedPassword,
           rememberMe,
         }),
       });
@@ -55,6 +61,18 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader className="flex flex-col gap-1 px-6 pt-6">
+          <div className="flex flex-col items-center gap-3 mb-2">
+            <div className="flex items-center gap-3">
+              <Image
+                src="/favicon/logo.png"
+                alt="BAVADU Logo"
+                width={48}
+                height={48}
+                className="object-contain"
+              />
+              <h2 className="text-3xl font-bold text-orange-500">BAVADU</h2>
+            </div>
+          </div>
           <h1 className="text-2xl font-bold">Sign in to your account</h1>
           <p className="text-sm text-gray-500">
             Enter your credentials to access your account
@@ -80,13 +98,35 @@ export default function LoginPage() {
 
             <HeroUIInput
               label="Password"
-              type="password"
+              type={isPasswordVisible ? "text" : "password"}
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               autoComplete="current-password"
               variant="bordered"
+              endContent={
+                <button
+                  type="button"
+                  onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                  className="focus:outline-none"
+                  aria-label={
+                    isPasswordVisible ? "Hide password" : "Show password"
+                  }
+                >
+                  {isPasswordVisible ? (
+                    <EyeOff
+                      size={20}
+                      className="text-default-400 pointer-events-none"
+                    />
+                  ) : (
+                    <Eye
+                      size={20}
+                      className="text-default-400 pointer-events-none"
+                    />
+                  )}
+                </button>
+              }
             />
 
             <div className="flex items-center justify-between">

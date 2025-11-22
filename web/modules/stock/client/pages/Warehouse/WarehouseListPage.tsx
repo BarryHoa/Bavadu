@@ -45,6 +45,7 @@ const formatStockRange = (warehouse: WarehouseDto) => {
 
 export default function WarehouseListPage(): React.ReactNode {
   const t = useTranslations("stock.warehouse.list");
+  const tDataTable = useTranslations("dataTable");
 
   const columns = useMemo<DataTableColumn<WarehouseDto>[]>(
     () => [
@@ -90,7 +91,7 @@ export default function WarehouseListPage(): React.ReactNode {
       },
       {
         key: DATA_TABLE_COLUMN_KEY_ACTION,
-        label: t("columns.actions"),
+        label: tDataTable("columns.action"),
         align: "end",
         render: (_, row) => (
           <LinkAs href={`/workspace/modules/stock/warehouses/edit/${row.id}`}>
@@ -99,7 +100,7 @@ export default function WarehouseListPage(): React.ReactNode {
         ),
       },
     ],
-    [t]
+    [t, tDataTable]
   );
 
   return (

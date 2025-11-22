@@ -21,6 +21,7 @@ type SalesOrderRow = SalesOrder & {
 
 export default function SalesOrdersListPage(): React.ReactNode {
   const t = useTranslations("sale.orders.list");
+  const tDataTable = useTranslations("dataTable");
 
   const columns = useMemo<DataTableColumn<SalesOrderRow>[]>(
     () => [
@@ -65,7 +66,7 @@ export default function SalesOrdersListPage(): React.ReactNode {
       },
       {
         key: DATA_TABLE_COLUMN_KEY_ACTION,
-        label: t("columns.action"),
+        label: tDataTable("columns.action"),
         align: "end",
         render: (_, row) => {
           if (!row?.id) return null;
@@ -84,7 +85,7 @@ export default function SalesOrdersListPage(): React.ReactNode {
         },
       },
     ],
-    [t]
+    [t, tDataTable]
   );
 
   return (
