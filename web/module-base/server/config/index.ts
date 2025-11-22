@@ -98,6 +98,19 @@ export const DATABASE_CONFIG = {
   },
 } as const;
 
+import { SYSTEM_TIMEZONE } from "../../shared/constants";
+
+// ============================================================================
+// SYSTEM CONFIGURATION
+// ============================================================================
+export const SYSTEM_CONFIG = {
+  /**
+   * Timezone for scheduled tasks
+   * Uses SYSTEM_TIMEZONE from shared constants
+   */
+  timezone: SYSTEM_TIMEZONE,
+} as const;
+
 // ============================================================================
 // EXPORT ALL CONFIG
 // ============================================================================
@@ -107,5 +120,5 @@ export const CONFIG = {
   session: SESSION_CONFIG,
   auth: AUTH_CONFIG,
   database: DATABASE_CONFIG,
+  system: SYSTEM_CONFIG,
 } as const;
-

@@ -68,7 +68,7 @@ export function useViewListDataTableQueries<T = any>({
           isDummyData: true,
         };
       }
-      return { data: [], total: 0 };
+      return { data: [], total: 0, isDummyData: false };
     },
     onSuccess: (result) => {
       setDataState(result);

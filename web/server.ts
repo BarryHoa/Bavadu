@@ -9,6 +9,7 @@ import { Database } from "@base/server/stores/database";
 import dayjs from "dayjs";
 import http from "http";
 import next from "next";
+import { ScheduledTask } from "./cron";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.HOSTNAME || "localhost";
@@ -49,6 +50,10 @@ async function startServer(): Promise<void> {
       timestamp: dayjs().format("YYYY-MM-DD HH:mm:ss"),
     };
 
+    // Initialize and start cron scheduler
+    const scheduler = new ScheduledTask();
+    scheduler.start();
+
     const server = http.createServer(async (req, res) => {
       // Update timestamp for each request
       (globalThis as any).systemRuntimeVariables.timestamp = dayjs().format(
@@ -66,6 +71,10 @@ async function startServer(): Promise<void> {
     const gracefulShutdown = async (signal: string) => {
       console.log(`ℹ️  Received ${signal}, shutting down...`);
       try {
+        // Stop cron scheduler
+        if (scheduler) {
+          scheduler.stop();
+        }
         await closeServer();
         await database.closeAll();
         await app.close();

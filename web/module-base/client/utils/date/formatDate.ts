@@ -1,3 +1,4 @@
+import { SYSTEM_TIMEZONE } from "@base/shared/constants";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
@@ -12,7 +13,7 @@ dayjs.extend(utc);
  */
 export const formatDateWithTime = (
   date: number | undefined | null | string,
-  timezone: string | undefined = "Asia/Ho_Chi_Minh"
+  timezone: string | undefined = SYSTEM_TIMEZONE
 ) => {
   if (!date) return "";
   const d = dayjs(date).tz(timezone);
@@ -27,7 +28,7 @@ export const formatDateWithTime = (
  */
 export const formatDate = (
   date: number | undefined | null | string,
-  timezone: string | undefined = "Asia/Ho_Chi_Minh"
+  timezone: string | undefined = SYSTEM_TIMEZONE
 ) => {
   if (!date) return "";
   const d = dayjs(date).tz(timezone);

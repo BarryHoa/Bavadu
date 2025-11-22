@@ -1,7 +1,7 @@
 "use client";
 
+import { SYSTEM_TIMEZONE } from "@base/shared/constants";
 import { NextIntlClientProvider } from "next-intl";
-const timeZone = "Asia/Ho_Chi_Minh";
 export default function ModuleI18nProvider({
   locale,
   messages,
@@ -15,7 +15,7 @@ export default function ModuleI18nProvider({
     <NextIntlClientProvider
       locale={locale}
       messages={messages}
-      timeZone={timeZone}
+      timeZone={SYSTEM_TIMEZONE}
     >
       {children}
     </NextIntlClientProvider>

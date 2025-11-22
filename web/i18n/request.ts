@@ -1,3 +1,4 @@
+import { SYSTEM_TIMEZONE } from "@base/shared/constants";
 import { getRequestConfig, GetRequestConfigParams } from "next-intl/server";
 import { notFound } from "next/navigation";
 
@@ -48,6 +49,6 @@ export default getRequestConfig(async ({ locale }: GetRequestConfigParams) => {
   return {
     locale: resolvedLocale,
     messages,
-    timeZone: "Asia/Ho_Chi_Minh",
+    timeZone: SYSTEM_TIMEZONE,
   };
 });
