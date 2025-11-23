@@ -30,6 +30,10 @@
     "descriptionEnglish": "Description (English)",
     "descriptionVietnamese": "Description (Vietnamese)",
     "deleteUom": "Delete UOM",
+    "addOtherUom": "Add Other UOM",
+    "otherUnitOfMeasure": "Other",
+    "duplicateUomTitle": "Duplicate UOM",
+    "duplicateUomMessage": "This UOM is already selected in another field",
     "errors": {
       "productCodeRequired": "Product code is required",
       "baseUnitOfMeasureRequired": "Base unit of measure is required",

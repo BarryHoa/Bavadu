@@ -148,6 +148,13 @@ const IBaseSelectWithSearch = (props: IBaseSelectWithSearchProps) => {
   }, [isOpen]);
 
   const handleOpenChange = (open: boolean) => {
+    // Prevent opening if disabled
+
+    if (rest.isDisabled) {
+      setIsOpen(false);
+      return;
+    }
+
     setIsOpen(open);
     if (rest.onOpenChange) {
       rest.onOpenChange(open);
@@ -177,6 +184,7 @@ const IBaseSelectWithSearch = (props: IBaseSelectWithSearchProps) => {
       onOpenChange={handleOpenChange}
       classNames={rest.classNames}
       items={filteredItems}
+      isOpen={isOpen}
     >
       <>
         {items && items.length > searchShowMaxResults && (

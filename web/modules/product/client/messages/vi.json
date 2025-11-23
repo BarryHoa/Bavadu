@@ -30,6 +30,10 @@
     "descriptionEnglish": "Mô tả (Tiếng Anh)",
     "descriptionVietnamese": "Mô tả (Tiếng Việt)",
     "deleteUom": "Xóa UOM",
+    "addOtherUom": "Thêm UOM khác",
+    "otherUnitOfMeasure": "Khác",
+    "duplicateUomTitle": "UOM trùng lặp",
+    "duplicateUomMessage": "UOM này đã được chọn ở trường khác",
     "errors": {
       "productCodeRequired": "Mã sản phẩm là bắt buộc",
       "baseUnitOfMeasureRequired": "Đơn vị đo cơ bản là bắt buộc",

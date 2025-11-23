@@ -28,7 +28,6 @@ import {
 } from "valibot";
 
 import {
-  LocaleFormValue,
   ProductFormValues,
   ProductMasterFeatures,
   ProductMasterType,
@@ -118,25 +117,29 @@ const createDefaultVariant = (): VariantFieldValue => ({
 // Helper function to create default values with feature options
 const createDefaultValues = (
   featureOptions: { key: ProductMasterFeatures; label: string }[]
-): ProductFormFieldValues => ({
-  master: {
-    code: "",
-    name: defaultLocaleValue(),
-    description: "",
-    type: ProductMasterType.GOODS,
-    features: featureOptions.reduce(
-      (acc, feature) => ({
-        ...acc,
-        [feature.key]: feature.key === ProductMasterFeatures.SALE,
-      }),
-      {} as Record<ProductMasterFeatures, boolean>
-    ),
-    isActive: true,
-    brand: "",
-    categoryId: undefined,
-  },
-  variants: [createDefaultVariant()],
-});
+): ProductFormFieldValues => {
+  const defaultFeatures = getDefaultFeaturesForType(ProductMasterType.GOODS);
+
+  return {
+    master: {
+      code: "",
+      name: defaultLocaleValue(),
+      description: "",
+      type: ProductMasterType.GOODS,
+      features: featureOptions.reduce(
+        (acc, feature) => ({
+          ...acc,
+          [feature.key]: defaultFeatures[feature.key] ?? false,
+        }),
+        {} as Record<ProductMasterFeatures, boolean>
+      ),
+      isActive: true,
+      brand: "",
+      categoryId: undefined,
+    },
+    variants: [createDefaultVariant()],
+  };
+};
 
 const buildHierarchyOptions = (categories: ProductCategoryRow[]) => {
   const grouped = new Map<string | null, ProductCategoryRow[]>();
@@ -181,27 +184,6 @@ interface ProductFormProps {
   onCancel?: () => void;
 }
 
-const ensureLocaleValue = (
-  value?: LocaleFormValue | null
-): LocaleFieldValue => ({
-  en: value?.en ?? "",
-  vi: value?.vi ?? "",
-});
-
-const toLocaleFormValue = (value: LocaleFieldValue): LocaleFormValue => ({
-  en: value.en.trim() ? value.en : undefined,
-  vi: value.vi.trim() ? value.vi : undefined,
-});
-
-// Helper to convert locale description to string (prefer English, fallback to Vietnamese)
-const descriptionLocaleToString = (
-  value?: LocaleFormValue | string | null
-): string => {
-  if (!value) return "";
-  if (typeof value === "string") return value;
-  return value.en?.trim() || value.vi?.trim() || "";
-};
-
 // Helper function to map initial values with feature options
 const mapToFieldValues = (
   initialValues: ProductFormValues | undefined,
@@ -225,7 +207,10 @@ const mapToFieldValues = (
 
   // Map single variant from initialValues to variants array
   const variant: VariantFieldValue = {
-    name: ensureLocaleValue(initialValues.variant.name),
+    name: {
+      en: initialValues.variant.name?.en ?? "",
+      vi: initialValues.variant.name?.vi ?? "",
+    },
     description: initialValues.variant.description || "",
     sku: initialValues.variant.sku ?? "",
     barcode: initialValues.variant.barcode ?? "",
@@ -239,15 +224,21 @@ const mapToFieldValues = (
     packings:
       initialValues.packings?.map((packing) => ({
         id: packing.id,
-        name: ensureLocaleValue(packing.name),
-        description: descriptionLocaleToString(packing.description),
+        name: {
+          en: packing.name?.en ?? "",
+          vi: packing.name?.vi ?? "",
+        },
+        description: packing.description || "",
         isActive: packing.isActive ?? true,
       })) ?? [],
     attributes:
       initialValues.attributes?.map((attribute) => ({
         id: attribute.id,
         code: attribute.code ?? "",
-        name: ensureLocaleValue(attribute.name),
+        name: {
+          en: attribute.name?.en ?? "",
+          vi: attribute.name?.vi ?? "",
+        },
         value: attribute.value ?? "",
       })) ?? [],
   };
@@ -255,7 +246,10 @@ const mapToFieldValues = (
   return {
     master: {
       code: initialValues.master.code ?? "",
-      name: ensureLocaleValue(initialValues.master.name),
+      name: {
+        en: initialValues.master.name?.en ?? "",
+        vi: initialValues.master.name?.vi ?? "",
+      },
       description: initialValues.master.description || "",
       type: initialValues.master.type || ProductMasterType.GOODS,
       features: featureState,
@@ -279,7 +273,10 @@ const mapToProductFormValues = (
   return {
     master: {
       code: values.master.code,
-      name: toLocaleFormValue(values.master.name),
+      name: {
+        en: values.master.name.en.trim() ? values.master.name.en : undefined,
+        vi: values.master.name.vi.trim() ? values.master.name.vi : undefined,
+      },
       description: values.master.description.trim() || "",
       type: values.master.type,
       features: values.master.features,
@@ -288,7 +285,10 @@ const mapToProductFormValues = (
       categoryId: values.master.categoryId,
     },
     variant: {
-      name: toLocaleFormValue(firstVariant.name),
+      name: {
+        en: firstVariant.name.en.trim() ? firstVariant.name.en : undefined,
+        vi: firstVariant.name.vi.trim() ? firstVariant.name.vi : undefined,
+      },
       description: firstVariant.description.trim() || "",
       sku: firstVariant.sku,
       barcode: firstVariant.barcode,
@@ -299,14 +299,20 @@ const mapToProductFormValues = (
     },
     packings: firstVariant.packings.map((packing) => ({
       id: packing.id,
-      name: toLocaleFormValue(packing.name),
+      name: {
+        en: packing.name.en.trim() ? packing.name.en : undefined,
+        vi: packing.name.vi.trim() ? packing.name.vi : undefined,
+      },
       description: packing.description.trim() || "",
       isActive: packing.isActive,
     })),
     attributes: firstVariant.attributes.map((attribute) => ({
       id: attribute.id,
       code: attribute.code,
-      name: toLocaleFormValue(attribute.name),
+      name: {
+        en: attribute.name.en.trim() ? attribute.name.en : undefined,
+        vi: attribute.name.vi.trim() ? attribute.name.vi : undefined,
+      },
       value: attribute.value,
     })),
   };
@@ -706,7 +712,7 @@ export default function ProductForm({
                   code: masterCode ?? "",
                   categoryId: masterCategoryId,
                   brand: masterBrand ?? "",
-                  type: masterType ?? ProductMasterType.GOODS,
+                  type: masterType as ProductMasterType,
                   description: masterDescription ?? "",
                   features: masterFeatures ?? {},
                   isActive: true,
