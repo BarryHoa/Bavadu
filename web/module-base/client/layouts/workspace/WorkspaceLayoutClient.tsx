@@ -1,6 +1,7 @@
 "use client";
 
 import { WorkspaceProvider } from "@base/client/contexts/workspace";
+import { usePrefetchModuleMessages } from "@base/client/hooks/usePrefetchModuleMessages";
 import { MenuWorkspaceElement } from "@base/client/interface/WorkspaceMenuInterface";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -19,14 +20,23 @@ interface SerializedNavigationItem {
 interface WorkspaceLayoutClientProps {
   children: React.ReactNode;
   menuItems: MenuWorkspaceElement[];
+  allModuleNames: string[];
+  currentModule: string | null;
+  locale: string;
 }
 
 export default function WorkspaceLayoutClient({
   children,
   menuItems,
+  allModuleNames,
+  currentModule,
+  locale,
 }: WorkspaceLayoutClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const pathname = usePathname();
+
+  // Prefetch messages for all other modules
+  usePrefetchModuleMessages(allModuleNames, currentModule, locale);
 
   // const defaultCrumbs: BreadcrumbItem[] = [];
   const parts = (pathname || "/workspace")

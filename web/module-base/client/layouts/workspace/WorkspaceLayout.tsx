@@ -1,3 +1,5 @@
+import { loadAllMenus } from "@base/server/loaders/menu-loader";
+import { getModuleNames } from "@base/server/utils/get-module-names";
 import { headers } from "next/headers";
 
 import ModuleI18nProvider from "@base/client/contexts/i18n";
@@ -12,50 +14,41 @@ export default async function WorkspaceLayout({
   children: React.ReactNode;
 }) {
   const hdrs = await headers();
-  const protocol = hdrs.get("x-forwarded-proto") ?? "http";
-  const host = hdrs.get("host");
-  const baseUrl = `${protocol}://${host}`;
   const workspaceModule = hdrs.get("x-workspace-module");
-  const locale = hdrs.get("x-locale");
-
-  const fetchProps = async () => {
-    const menusPromise = fetch(`${baseUrl}/api/base/workspace/menu`, {
-      ...hdrs,
-      cache: "no-store",
-    })
-      .then(async (res) => (res.ok ? res.json() : { data: [] }))
-      .then((json) => json?.data ?? [])
-      .catch(() => []);
-
-    // import messages for the workspace module
-    const messagesPromise = import(
-      `@mdl/${workspaceModule}/client/messages/${locale}.json`
-    )
-      .then((module) => module.default)
-      .catch(() => {});
-
-    const commonMessagesPromise = import(`@base/client/messages/${locale}.json`)
-      .then((module) => module.default)
-      .catch(() => {});
-
-    const [menus, messages, commonMessages] = await Promise.all([
-      menusPromise,
-      messagesPromise,
-      commonMessagesPromise,
-    ]);
-
-    return {
-      menuItems: menus as MenuWorkspaceElement[],
-      messages: { ...commonMessages, ...messages },
-    };
-  };
+  const locale = hdrs.get("x-locale") ?? "en";
 
   // Fetch menus
-  const props = await fetchProps();
+  const menuItems = loadAllMenus() as MenuWorkspaceElement[];
+
+  // Fetch common messages and current module messages
+  const [commonMessages, currentModuleMessages] = await Promise.all([
+    import(`@base/client/messages/${locale}.json`)
+      .then((module) => module.default)
+      .catch(() => ({})),
+    workspaceModule
+      ? import(`@mdl/${workspaceModule}/client/messages/${locale}.json`)
+          .then((module) => module.default)
+          .catch(() => ({}))
+      : Promise.resolve({}),
+  ]);
+
+  // Get all module names
+  const allModuleNames = getModuleNames();
+
+  // Initial messages structure for zustand
+  const initialMessages = {
+    common: commonMessages,
+    ...(workspaceModule ? { [workspaceModule]: currentModuleMessages } : {}),
+  };
 
   return (
-    <ModuleI18nProvider locale={locale ?? "en"} messages={props.messages}>
-      <WorkspaceLayoutClient menuItems={props.menuItems}>
+    <ModuleI18nProvider locale={locale} initialMessages={initialMessages}>
+      <WorkspaceLayoutClient
+        menuItems={menuItems}
+        allModuleNames={allModuleNames}
+        currentModule={workspaceModule}
+        locale={locale}
+      >
         {children}
       </WorkspaceLayoutClient>
     </ModuleI18nProvider>
