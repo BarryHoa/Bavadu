@@ -28,6 +28,8 @@ export default function ProductsListPage(): React.ReactNode {
         key: "name",
         label: "Name",
         sortable: true,
+        minWidth: 150,
+        maxWidth: 300,
         render: (_, row) => {
           const { path, as } = getClientLink({
             mdl: "product",
@@ -44,26 +46,36 @@ export default function ProductsListPage(): React.ReactNode {
       {
         key: "sku",
         label: "SKU",
+        minWidth: 100,
+        maxWidth: 150,
         render: (value) => value,
       },
       {
         key: "barcode",
         label: "Barcode",
+        minWidth: 120,
+        maxWidth: 200,
         render: (value) => value,
       },
       {
         key: "baseUom.name",
         label: "Base UOM",
+        minWidth: 100,
+        maxWidth: 150,
         render: (_, row) => localized(row.baseUom?.name as LocalizeText),
       },
       {
         key: "productMaster.type",
         label: "Type",
+        minWidth: 100,
+        maxWidth: 150,
         render: (_, row) => getNameProductType(row.productMaster?.type),
       },
       {
         key: "productMaster.features",
         label: "Features",
+        minWidth: 150,
+        maxWidth: 250,
         render: (_, row) => {
           const features = convertProductMasterFeaturesToArrayKey(
             row.productMaster?.features
@@ -77,6 +89,8 @@ export default function ProductsListPage(): React.ReactNode {
         key: "status",
         label: "Status",
         align: "center",
+        minWidth: 100,
+        maxWidth: 120,
         render: (_, row) => {
           return (
             <Chip
@@ -92,6 +106,8 @@ export default function ProductsListPage(): React.ReactNode {
       {
         key: "productMaster.category.name",
         label: "Category",
+        minWidth: 120,
+        maxWidth: 200,
         render: (_, row) =>
           localized(row.productMaster?.category?.name as LocalizeText) ||
           row.productMaster?.category?.code,
@@ -99,6 +115,8 @@ export default function ProductsListPage(): React.ReactNode {
       {
         key: "manufacturer.name",
         label: "Manufacturer",
+        minWidth: 120,
+        maxWidth: 200,
         render: (_, row) =>
           typeof row.manufacturer?.name === "string"
             ? row.manufacturer.name
@@ -107,6 +125,8 @@ export default function ProductsListPage(): React.ReactNode {
       {
         key: "productMaster.brand",
         label: "Brand",
+        minWidth: 100,
+        maxWidth: 180,
         render: (_, row) =>
           typeof row.productMaster?.brand === "string"
             ? row.productMaster.brand
@@ -116,17 +136,23 @@ export default function ProductsListPage(): React.ReactNode {
       {
         key: "createdAt",
         label: "Created At",
+        minWidth: 120,
+        maxWidth: 150,
         render: (_, row) => formatDate(row.createdAt),
       },
       {
         key: "updatedAt",
         label: "Updated At",
+        minWidth: 120,
+        maxWidth: 150,
         render: (_, row) => formatDate(row.updatedAt),
       },
       {
         key: DATA_TABLE_COLUMN_KEY_ACTION,
         label: t("columns.action"),
         align: "end",
+        minWidth: 80,
+        maxWidth: 100,
         render: (_, row) => {
           const viewLink = getClientLink({
             mdl: "product",
