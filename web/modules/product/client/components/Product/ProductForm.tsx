@@ -350,7 +350,8 @@ const productMasterTypeValues = Object.values(ProductMasterType) as [
 // Note: These schemas will be created inside the component to access t()
 const createVariantSchema = (
   t: (key: string) => string,
-  tProduct: (key: string) => string
+  tProduct: (key: string) => string,
+  tProductForm: (key: string) => string
 ) =>
   object({
     name: createLocaleRequiredSchema(t),
@@ -362,7 +363,7 @@ const createVariantSchema = (
     baseUomId: pipe(
       string(),
       trim(),
-      minLength(1, tProduct("errors.baseUnitOfMeasureRequired"))
+      minLength(1, tProductForm("errors.baseUnitOfMeasureRequired"))
     ),
     isActive: boolean(),
     packings: array(
@@ -386,6 +387,7 @@ const createVariantSchema = (
 const createProductFormSchema = (
   t: (key: string) => string,
   tProduct: (key: string) => string,
+  tProductForm: (key: string) => string,
   formatMessage: (
     key: string,
     values: Record<string, string | number>
@@ -396,7 +398,7 @@ const createProductFormSchema = (
       code: pipe(
         string(),
         trim(),
-        minLength(1, tProduct("errors.productCodeRequired"))
+        minLength(1, tProductForm("errors.productCodeRequired"))
       ),
       name: createLocaleRequiredSchema(t),
       description: fallback(pipe(string(), trim()), ""),
@@ -407,8 +409,8 @@ const createProductFormSchema = (
       categoryId: optional(pipe(string(), trim())),
     }),
     variants: pipe(
-      array(createVariantSchema(t, tProduct)),
-      minLength(1, tProduct("errors.atLeastOneVariantRequired")),
+      array(createVariantSchema(t, tProduct, tProductForm)),
+      minLength(1, tProductForm("errors.atLeastOneVariantRequired")),
       maxLength(20, formatMessage("errors.maxVariantsAllowed", { count: 20 }))
     ),
   });
@@ -425,19 +427,20 @@ export default function ProductForm({
   const getLocalizedText = useLocalizedText();
   const t = useTranslations("common");
   const tProduct = useTranslations("mdl-product");
+  const tProductForm = useTranslations("mdl-product.product-create");
 
   // Helper to format messages with variables
   // next-intl's useTranslations supports variables as second parameter
   const formatMessage = useCallback(
     (key: string, values: Record<string, string | number>) => {
       // Type assertion to allow passing variables to next-intl translation function
-      const tWithVars = tProduct as unknown as (
+      const tWithVars = tProductForm as unknown as (
         key: string,
         values?: Record<string, string | number>
       ) => string;
       return tWithVars(key, values);
     },
-    [tProduct]
+    [tProductForm]
   );
 
   const productTypesQuery = useQuery({
@@ -485,7 +488,7 @@ export default function ProductForm({
   } = useForm<ProductFormFieldValues>({
     defaultValues: mapToFieldValues(initialValues, featureOptions),
     resolver: valibotResolver(
-      createProductFormSchema(t, tProduct, formatMessage)
+      createProductFormSchema(t, tProduct, tProductForm, formatMessage)
     ) as unknown as Resolver<ProductFormFieldValues>,
     mode: "onSubmit",
     reValidateMode: "onChange",

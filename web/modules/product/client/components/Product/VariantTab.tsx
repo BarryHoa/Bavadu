@@ -54,6 +54,7 @@ export default function VariantTab({
 }: VariantTabProps) {
   const t = useTranslations("common");
   const tProduct = useTranslations("mdl-product");
+  const tProductForm = useTranslations("mdl-product.product-create");
 
   return (
     <div className="flex flex-col gap-4 pt-4">
@@ -68,7 +69,7 @@ export default function VariantTab({
           onPress={onRemove}
           isDisabled={isBusy || !canRemove}
         >
-          {tProduct("removeVariant")}
+          {tProductForm("removeVariant")}
         </Button>
       </div>
 
@@ -114,7 +115,7 @@ export default function VariantTab({
 
       <div className="grid gap-4 md:grid-cols-2">
         <IBaseInput
-          label={tProduct("manufacturerName")}
+          label={tProductForm("manufacturerName")}
           value={value.manufacturerName ?? ""}
           onValueChange={(next) =>
             onUpdate((current) => ({ ...current, manufacturerName: next }))
@@ -124,7 +125,7 @@ export default function VariantTab({
           isDisabled={isBusy}
         />
         <IBaseInput
-          label={tProduct("manufacturerCode")}
+          label={tProductForm("manufacturerCode")}
           value={value.manufacturerCode ?? ""}
           onValueChange={(next) =>
             onUpdate((current) => ({ ...current, manufacturerCode: next }))
@@ -152,9 +153,9 @@ export default function VariantTab({
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-medium font-medium">{tProduct("packings")}</h4>
+            <h4 className="text-medium font-medium">{tProductForm("packings")}</h4>
             <p className="text-small text-default-500">
-              {tProduct("definePackaging")}
+              {tProductForm("definePackaging")}
             </p>
           </div>
           <Button
@@ -176,13 +177,13 @@ export default function VariantTab({
             }
             isDisabled={isBusy}
           >
-            {tProduct("addPacking")}
+            {tProductForm("addPacking")}
           </Button>
         </div>
 
         {!value.packings || value.packings.length === 0 ? (
           <p className="text-small text-default-500">
-            {tProduct("noPackingEntries")}
+            {tProductForm("noPackingEntries")}
           </p>
         ) : (
           <div className="flex flex-col gap-3">
@@ -212,7 +213,7 @@ export default function VariantTab({
                   </div>
                   <div className="grid gap-3 md:grid-cols-2">
                     <IBaseInput
-                      label={tProduct("nameEnglish")}
+                      label={tProductForm("nameEnglish")}
                       value={packing.name.en ?? ""}
                       onValueChange={(next) =>
                         onUpdate((current) => ({
@@ -230,7 +231,7 @@ export default function VariantTab({
                       isDisabled={isBusy}
                     />
                     <IBaseInput
-                      label={tProduct("nameVietnamese")}
+                      label={tProductForm("nameVietnamese")}
                       value={packing.name.vi ?? ""}
                       onValueChange={(next) =>
                         onUpdate((current) => ({
@@ -279,10 +280,10 @@ export default function VariantTab({
         <div className="flex items-center justify-between">
           <div>
             <h4 className="text-medium font-medium">
-              {tProduct("attributes")}
+              {tProductForm("attributes")}
             </h4>
             <p className="text-small text-default-500">
-              {tProduct("captureAttributes")}
+              {tProductForm("captureAttributes")}
             </p>
           </div>
           <Button
@@ -304,13 +305,13 @@ export default function VariantTab({
             }
             isDisabled={isBusy}
           >
-            {tProduct("addAttribute")}
+            {tProductForm("addAttribute")}
           </Button>
         </div>
 
         {!value.attributes || value.attributes.length === 0 ? (
           <p className="text-small text-default-500">
-            {tProduct("noAttributeEntries")}
+            {tProductForm("noAttributeEntries")}
           </p>
         ) : (
           <div className="flex flex-col gap-3">
@@ -359,7 +360,7 @@ export default function VariantTab({
                   />
                   <div className="grid gap-3 md:grid-cols-2">
                     <IBaseInput
-                      label={tProduct("nameEnglish")}
+                      label={tProductForm("nameEnglish")}
                       value={attribute.name.en ?? ""}
                       onValueChange={(next) =>
                         onUpdate((current) => ({
@@ -377,7 +378,7 @@ export default function VariantTab({
                       isDisabled={isBusy}
                     />
                     <IBaseInput
-                      label={tProduct("nameVietnamese")}
+                      label={tProductForm("nameVietnamese")}
                       value={attribute.name.vi ?? ""}
                       onValueChange={(next) =>
                         onUpdate((current) => ({

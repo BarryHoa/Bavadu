@@ -165,9 +165,9 @@ export const useProductUoms = ({ masterFeatures }: UseProductUomsOptions) => {
     setOthersUoms((prev) => prev.filter((item) => item.uuid !== uuid));
   };
 
-  // Add other UOM (max 5 total)
+  // Add other UOM (max 9 total)
   const addOtherUom = () => {
-    const MAX_OTHER_UOMS = 5;
+    const MAX_OTHER_UOMS = 9;
     setOthersUoms((prev) => {
       // Count only "other" type UOMs
       const otherUomsCount = prev.filter((uom) => uom.type === "other").length;
@@ -201,7 +201,7 @@ export const useProductUoms = ({ masterFeatures }: UseProductUomsOptions) => {
 
   // Check if can add more UOMs
   const canAddOtherUom = () => {
-    const MAX_OTHER_UOMS = 5;
+    const MAX_OTHER_UOMS = 9;
     const otherUomsCount = othersUoms.filter(
       (uom) => uom.type === "other"
     ).length;
