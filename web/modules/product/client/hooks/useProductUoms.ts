@@ -13,7 +13,7 @@ export type OtherUom = {
   type: ProductMasterFeaturesType | "other";
   uuid: string;
   isActive: boolean;
-  conversionRatio: number;
+  conversionRatio: number | null;
 };
 
 type UseProductUomsOptions = {
@@ -143,12 +143,10 @@ export const useProductUoms = ({ masterFeatures }: UseProductUomsOptions) => {
   };
 
   // Update conversion ratio
-  const updateConversionRatio = (uuid: string, ratio: number) => {
+  const updateConversionRatio = (uuid: string, ratio: number | null) => {
     setOthersUoms((prev) =>
       prev.map((item) =>
-        item.uuid === uuid
-          ? { ...item, conversionRatio: ratio > 0 ? ratio : 1 }
-          : item
+        item.uuid === uuid ? { ...item, conversionRatio: ratio } : item
       )
     );
   };

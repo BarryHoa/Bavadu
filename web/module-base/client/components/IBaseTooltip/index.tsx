@@ -1,0 +1,30 @@
+import { Tooltip, TooltipProps } from "@heroui/tooltip";
+import clsx from "clsx";
+import React from "react";
+
+type IBaseTooltipProps = TooltipProps & {};
+
+const IBaseTooltip = React.forwardRef<HTMLDivElement, IBaseTooltipProps>(
+  (props, ref) => {
+    const { placement = "top", showArrow = true, classNames, ...rest } = props;
+
+    return (
+      <Tooltip
+        ref={ref}
+        placement={placement}
+        showArrow={showArrow}
+        color="primary"
+        classNames={{
+          base: clsx("bg-primary-400/80 backdrop-blur-sm", classNames?.base),
+          content: clsx("text-white/90", classNames?.content),
+          ...classNames,
+        }}
+        {...rest}
+      />
+    );
+  }
+);
+
+IBaseTooltip.displayName = "IBaseTooltip";
+
+export default IBaseTooltip;

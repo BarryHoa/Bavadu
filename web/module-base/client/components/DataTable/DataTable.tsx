@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 
-import { Tooltip } from "@heroui/react";
+import { IBaseTooltip } from "@base/client/components";
 import { useTranslations } from "next-intl";
 import PaginationComponent from "../Pagination/Pagination";
 import {
@@ -403,7 +403,7 @@ export default function DataTable<T = any>({
           <div className="flex items-center py-2 text-small text-default-500">
             {paginationSummary}
             {isRefreshData && (
-              <Tooltip content={refreshLabel}>
+              <IBaseTooltip content={refreshLabel}>
                 <button
                   type="button"
                   aria-label={refreshLabel}
@@ -412,7 +412,7 @@ export default function DataTable<T = any>({
                 >
                   <RefreshCw className="h-4 w-4 text-default-500 hover:text-primary" />
                 </button>
-              </Tooltip>
+              </IBaseTooltip>
             )}
           </div>
 

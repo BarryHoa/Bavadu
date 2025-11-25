@@ -3,7 +3,8 @@
 import { SelectItemOption } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { Button } from "@heroui/button";
-import { Card, CardBody, Tooltip } from "@heroui/react";
+import { IBaseTooltip } from "@base/client/components";
+import { Card, CardBody } from "@heroui/react";
 import { Tab, Tabs } from "@heroui/tabs";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
@@ -640,7 +641,7 @@ export default function ProductForm({
               </Button>
             </div>
             <div className="justify-end flex items-center gap-2">
-              <Tooltip content={tProduct("guideTooltip")} placement="top">
+              <IBaseTooltip content={tProduct("guideTooltip")} placement="top">
                 <Button
                   isIconOnly
                   variant="light"
@@ -651,7 +652,7 @@ export default function ProductForm({
                 >
                   <HelpCircle size={18} className="text-default-500" />
                 </Button>
-              </Tooltip>
+              </IBaseTooltip>
               {onCancel ? (
                 <Button
                   variant="light"

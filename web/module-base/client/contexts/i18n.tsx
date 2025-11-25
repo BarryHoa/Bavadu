@@ -43,7 +43,6 @@ export default function ModuleI18nProvider({
     );
   }, [messages, initialMessages]);
 
-  console.log({ combinedMessages, initialMessages });
   return (
     <NextIntlClientProvider
       locale={locale}

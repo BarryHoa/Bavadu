@@ -6,7 +6,8 @@ import {
   IBaseSelectWithSearch,
   SelectItemOption,
 } from "@base/client/components";
-import { Checkbox, CheckboxGroup, Textarea, Tooltip } from "@heroui/react";
+import { IBaseTooltip } from "@base/client/components";
+import { Checkbox, CheckboxGroup, Textarea } from "@heroui/react";
 import { HelpCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
@@ -163,13 +164,13 @@ export default function MasterTab({
           <label className="text-sm font-medium text-foreground">
             {tProduct("productFeatures")}
           </label>
-          <Tooltip content={tProduct("productFeaturesTooltip")} placement="top">
+          <IBaseTooltip content={tProduct("productFeaturesTooltip")} placement="top">
             <HelpCircle
               size={16}
               className="text-default-400 cursor-help"
               aria-label="Thông tin về tính năng sản phẩm"
             />
-          </Tooltip>
+          </IBaseTooltip>
         </div>
         <CheckboxGroup
           orientation="horizontal"

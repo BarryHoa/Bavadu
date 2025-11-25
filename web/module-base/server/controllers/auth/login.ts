@@ -102,11 +102,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify password
-    console.log("Login: Verifying password", {
-      email: userLogin.email,
-      username: userLogin.username,
-      hashPrefix: userLogin.passwordHash?.substring(0, 20),
-    });
+
     const passwordValid = await compare(password, userLogin.passwordHash);
     if (!passwordValid) {
       console.error("Login: Password mismatch", {
@@ -134,7 +130,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is active
-    console.log("Login: Checking user status", { status: user.status });
+
     if (user.status !== "active") {
       return NextResponse.json(
         { success: false, error: "Account is not active" },

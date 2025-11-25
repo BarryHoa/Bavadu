@@ -41,7 +41,7 @@ export function formatNumber(
   let result = integerWithSeparators;
 
   // If fixZero is true, always show decimal part
-  // If fixZero is false, only show decimal part if it's not all zeros
+  // If fixZero is false, only show decimal part if it's not all zeros, and remove trailing zeros
   if (decimalPlaces > 0) {
     if (fixZero) {
       // Always show decimal part when fixZero is true
@@ -50,7 +50,9 @@ export function formatNumber(
       // Only show decimal part if it's not all zeros
       const hasNonZeroDecimal = decimalPart && /[1-9]/.test(decimalPart);
       if (hasNonZeroDecimal) {
-        result += decimalSeparator + decimalPart;
+        // Remove trailing zeros from decimal part
+        const trimmedDecimal = decimalPart.replace(/0+$/, "");
+        result += decimalSeparator + trimmedDecimal;
       }
     }
   }

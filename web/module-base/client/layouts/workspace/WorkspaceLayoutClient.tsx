@@ -38,26 +38,7 @@ export default function WorkspaceLayoutClient({
   // Prefetch messages for all other modules
   usePrefetchModuleMessages(allModuleNames, currentModule, locale);
 
-  // const defaultCrumbs: BreadcrumbItem[] = [];
-  const parts = (pathname || "/workspace")
-    .split("/")
-    .filter(Boolean)
-    .filter((p) => p !== "modules");
-
-  let acc = "";
-  // const autoCrumbs: BreadcrumbItem[] = parts.map((p) => {
-  //   acc += `/${p}`;
-  //   const label = p.charAt(0).toUpperCase() + p.slice(1);
-
-  //   return { label, href: acc };
-  // });
-
-  // const initialCrumbs = [...autoCrumbs];
-
-  // Đọc trạng thái pin sidebar từ localStorage (mặc định là mở)
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     const stored = window.localStorage.getItem("workspace_sidebar_pinned");
     setSidebarOpen(stored === "false" ? false : true);
   }, []);

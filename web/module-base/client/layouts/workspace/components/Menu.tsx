@@ -1,9 +1,9 @@
 "use client";
 
+import { IBaseTooltip } from "@base/client/components";
 import { MenuWorkspaceElement } from "@base/client/interface/WorkspaceMenuInterface";
 import { Divider } from "@heroui/divider";
 import { ScrollShadow } from "@heroui/scroll-shadow";
-import { Tooltip } from "@heroui/tooltip";
 import clsx from "clsx";
 import {
   BarChart3,
@@ -276,9 +276,9 @@ export default function Menu({
             {effectiveOpen ? (
               content
             ) : (
-              <Tooltip content={item.name} placement="right">
+              <IBaseTooltip content={item.name} placement="right">
                 {content}
-              </Tooltip>
+              </IBaseTooltip>
             )}
           </>
         ) : (
@@ -301,9 +301,9 @@ export default function Menu({
             {effectiveOpen ? (
               content
             ) : (
-              <Tooltip content={item.name} placement="right">
+              <IBaseTooltip content={item.name} placement="right">
                 {content}
-              </Tooltip>
+              </IBaseTooltip>
             )}
           </Link>
         )}

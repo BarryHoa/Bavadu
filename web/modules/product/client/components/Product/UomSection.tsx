@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  IBaseInput,
+  IBaseInputNumber,
   IBaseSelectWithSearch,
   SelectItemOption,
 } from "@base/client/components";
@@ -134,15 +134,13 @@ export default function UomSection({
             />
           </div>
           <div className="w-[250px]">
-            <IBaseInput
-              type="number"
-              min={0}
-              step={0.0001}
+            <IBaseInputNumber
+              min={0.0001}
+              max={10000}
+              decimalPlaces={4}
               label={"Giá trị chuyển đổi"}
-              value={uom.conversionRatio.toString()}
-              onValueChange={(next) => {
-                // Ensure only valid number and positive
-                const ratio = Number(next);
+              value={uom.conversionRatio}
+              onValueChange={(ratio) => {
                 updateConversionRatio(uom.uuid, ratio);
               }}
               isDisabled={isBusy || !baseUomId}
