@@ -147,13 +147,18 @@ export default function DataTable<T = any>({
   // Get row key
   const getRowKey = useCallback(
     (record: T, index: number) => {
+      console.log("record", record);
+      console.log("index", isExistingRowKey);
       if (isExistingRowKey) {
         const val = (record as any)[rowKey];
 
+        console.log("val", val);
         if (typeof val === "string" || typeof val === "number") {
           return val;
         }
       }
+
+      console.log("index", index);
 
       return index;
     },
@@ -259,11 +264,16 @@ export default function DataTable<T = any>({
         | "default";
 
       return (
-        <div className="inline-flex h-full w-full items-center">
+        <div className={clsx("inline-flex h-full w-full items-center")}>
           <span
             className={clsx(
               "inline-flex w-full items-center px-2",
-              isSortable && "cursor-pointer select-none"
+              isSortable && "cursor-pointer select-none",
+              col.align === "end"
+                ? "justify-end"
+                : col.align === "center"
+                  ? "justify-center"
+                  : "justify-start"
             )}
             onClick={() => toggleSortForColumn(col)}
             role={isSortable ? "button" : undefined}
@@ -315,6 +325,17 @@ export default function DataTable<T = any>({
   const resolvedEmptyContent = emptyContent ?? t("empty");
   const loadingLabel = t("loading");
 
+  // Attach index to each item so row render always biết đúng index,
+  // hạn chế dùng Array.indexOf (có thể trả sai khi có object trùng).
+  const dataSourceWithIndex = useMemo(
+    () =>
+      (dataSource ?? []).map((item, index) => ({
+        item,
+        index,
+      })),
+    [dataSource]
+  );
+
   return (
     <div className={clsx("w-full bg-content1", classNames.wrapper)}>
       <div className="flex flex-1 flex-col gap-4">
@@ -329,7 +350,7 @@ export default function DataTable<T = any>({
           classNames={{
             ...classNames,
             tbody: clsx("overflow-x-auto", classNames.tbody),
-            wrapper: clsx("rounded-none p-2", classNames.wrapper),
+            wrapper: clsx("rounded-none p-0", classNames.wrapper),
             th: clsx(
               "px-0 bg-primary-600 text-white hover:bg-primary-700/80",
               classNames.th
@@ -360,35 +381,32 @@ export default function DataTable<T = any>({
           <TableBody
             emptyContent={resolvedEmptyContent}
             isLoading={loading}
-            items={dataSource}
+            // Kiểu của TableBody không cho index, nên wrap thêm index vào item
+            items={dataSourceWithIndex}
             loadingContent={<Spinner label={loadingLabel} />}
           >
-            {(item: T) => {
-              const index = dataSource.indexOf(item);
-
-              return (
-                <TableRow key={getRowKey(item, index)}>
-                  {processedColumns.map((col) => (
-                    <TableCell
-                      key={col.key}
-                      className={col.frozenClassName}
-                      style={col.frozenStyle}
+            {({ item, index }: { item: T; index: number }) => (
+              <TableRow key={getRowKey(item, index)}>
+                {processedColumns.map((col) => (
+                  <TableCell
+                    key={`${col.key}-${index}`}
+                    className={col.frozenClassName}
+                    style={col.frozenStyle}
+                  >
+                    <div
+                      className={clsx(
+                        "flex",
+                        `justify-${col.align || "start"}`
+                      )}
                     >
-                      <div
-                        className={clsx(
-                          "flex",
-                          `justify-${col.align || "start"}`
-                        )}
-                      >
-                        {col.key === DATA_TABLE_COLUMN_KEY_ROW_NUMBER
-                          ? paginationInfo.from + index + 1
-                          : col.renderValue(item, index)}
-                      </div>
-                    </TableCell>
-                  ))}
-                </TableRow>
-              );
-            }}
+                      {col.key === DATA_TABLE_COLUMN_KEY_ROW_NUMBER
+                        ? paginationInfo.from + index + 1
+                        : col.renderValue(item, index)}
+                    </div>
+                  </TableCell>
+                ))}
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>

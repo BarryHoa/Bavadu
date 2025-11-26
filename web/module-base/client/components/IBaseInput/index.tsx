@@ -10,6 +10,7 @@ const IBaseInput = React.forwardRef<HTMLInputElement, IBaseInputProps>(
       size = "sm",
       labelPlacement = "outside",
       placeholder = "Nhập thông tin...",
+      ...rest
     } = props;
     return (
       <HeroUIInput
@@ -27,7 +28,7 @@ const IBaseInput = React.forwardRef<HTMLInputElement, IBaseInputProps>(
         size={size}
         labelPlacement={labelPlacement}
         placeholder={placeholder ?? "Nhập thông tin..."}
-        {...props}
+        {...rest}
         isDisabled={isDisabled}
       />
     );

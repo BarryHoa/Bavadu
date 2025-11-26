@@ -229,6 +229,7 @@ export default function UomSection({
 
           return (
             <IBaseSelectWithSearch
+              aria-label={tProductForm("otherUnitOfMeasure") || "UOM"}
               items={uomOptions.filter(
                 (opt) =>
                   opt.value !== baseUomId &&
@@ -395,6 +396,7 @@ export default function UomSection({
                       tProductForm("noOtherUoms") || "No other UOMs added yet"
                     }
                     isRefreshData={false}
+                    isStriped={false}
                   />
                 </div>
                 {canAddOtherUom() && (

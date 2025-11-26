@@ -1,15 +1,16 @@
 import { InputProps } from "@heroui/input";
 import clsx from "clsx";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { formatNumber } from "../../utils/number";
 import IBaseInput from "../IBaseInput";
 import IBaseTooltip from "../IBaseTooltip";
 
+type InputNumberValue = number | null | undefined;
 export interface IBaseInputNumberProps
   extends Omit<InputProps, "onValueChange" | "value" | "defaultValue"> {
-  value?: number | null;
-  defaultValue?: number | null;
-  onValueChange?: (value: number | null) => void;
+  value?: InputNumberValue;
+  defaultValue?: InputNumberValue;
+  onValueChange?: (value: InputNumberValue) => void;
   decimalPlaces?: number;
   thousandSeparator?: string;
   decimalSeparator?: string;
@@ -18,6 +19,87 @@ export interface IBaseInputNumberProps
   max?: number;
   placeholder?: string;
   fixZero?: boolean;
+}
+
+// Format number to display string
+function formatDisplay(
+  num: InputNumberValue,
+  options: {
+    decimalPlaces: number;
+    thousandSeparator: string;
+    decimalSeparator: string;
+    fixZero: boolean;
+  }
+): string {
+  if (num === null || num === undefined) return "";
+  return formatNumber(num, {
+    decimalPlaces: options.decimalPlaces,
+    thousandSeparator: options.thousandSeparator,
+    decimalSeparator: options.decimalSeparator,
+    fixZero: options.fixZero,
+  });
+}
+
+// Get raw value without formatting
+function getRaw(num: InputNumberValue, decimalPlaces: number): string {
+  if (num === null || num === undefined) return "";
+  if (decimalPlaces > 0) {
+    const formatted = num.toFixed(decimalPlaces);
+    return formatted.includes(".")
+      ? formatted.replace(/\.?0+$/, "")
+      : formatted;
+  }
+  return num.toString();
+}
+
+// Parse string to number
+function parseToNumber(
+  str: string,
+  options: {
+    thousandSeparator: string;
+    decimalSeparator: string;
+    allowNegative: boolean;
+    decimalPlaces: number;
+  }
+): InputNumberValue {
+  if (!str?.trim()) return null;
+
+  let cleaned = str
+    .replace(new RegExp(`\\${options.thousandSeparator}`, "g"), "")
+    .replace(/[^\d.-]/g, "");
+
+  if (options.decimalSeparator !== ".") {
+    cleaned = cleaned.replace(
+      new RegExp(`\\${options.decimalSeparator}`, "g"),
+      "."
+    );
+  }
+
+  if (!options.allowNegative) {
+    cleaned = cleaned.replace(/-/g, "");
+  }
+
+  if (!cleaned) return null;
+
+  const parsed = parseFloat(cleaned);
+  if (isNaN(parsed)) return null;
+
+  return options.decimalPlaces >= 0
+    ? Number(parsed.toFixed(options.decimalPlaces))
+    : parsed;
+}
+
+// Clamp value to min/max range
+function clampValue(
+  num: InputNumberValue,
+  min?: number,
+  max?: number
+): InputNumberValue {
+  if (num === null || num === undefined) return num;
+  let result = num;
+  if (min !== undefined && result < min) result = min;
+  if (max !== undefined && result > max) result = max;
+  return result;
 }
 
 const IBaseInputNumber = React.forwardRef<
@@ -39,266 +121,261 @@ const IBaseInputNumber = React.forwardRef<
     ...rest
   } = props;
 
-  const [internalValue, setInternalValue] = useState<number | null>(
-    defaultValue ?? null
-  );
-  const [isFocused, setIsFocused] = useState(false);
-  const [inputValue, setInputValue] = useState<string>("");
-
   const isControlled = controlledValue !== undefined;
-  const currentValue = isControlled ? controlledValue : internalValue;
 
-  // Helper: Format number to display string
-  const getDisplayValue = (num: number | null): string => {
-    if (num === null || num === undefined) return "";
-    return formatNumber(num, {
-      decimalPlaces,
+  const [inputState, setInputState] = useState<{
+    display: string | undefined;
+    raw: InputNumberValue;
+    rawInput: string; // Store raw string input when focused
+    isFocused: boolean;
+  }>(() => {
+    return {
+      display: formatDisplay(defaultValue, {
+        decimalPlaces,
+        thousandSeparator,
+        decimalSeparator,
+        fixZero,
+      }),
+      raw: defaultValue,
+      rawInput:
+        defaultValue !== null && defaultValue !== undefined
+          ? getRaw(defaultValue, decimalPlaces)
+          : "",
+      isFocused: false,
+    };
+  });
+
+  // Get current numeric value
+  const currentValue = useMemo(
+    () => (isControlled ? controlledValue : inputState.raw),
+    [controlledValue, inputState.raw]
+  );
+
+  const handleChange = useCallback(
+    (valueChanged: string) => {
+      // When focused, store raw input string to allow decimal input
+      if (inputState.isFocused) {
+        setInputState((prev) => ({
+          ...prev,
+          rawInput: valueChanged,
+        }));
+
+        // Parse and update value, but don't restrict decimal input
+        // Allow partial input like "0." or "0.1"
+        const cleaned = valueChanged
+          .replace(new RegExp(`\\${thousandSeparator}`, "g"), "")
+          .replace(/[^\d.-]/g, "");
+
+        let normalized = cleaned;
+        if (decimalSeparator !== ".") {
+          normalized = cleaned.replace(
+            new RegExp(`\\${decimalSeparator}`, "g"),
+            "."
+          );
+        }
+
+        if (!allowNegative) {
+          normalized = normalized.replace(/-/g, "");
+        }
+
+        // Allow partial decimal input (e.g., "0.", "0.1")
+        if (
+          normalized === "" ||
+          normalized === "." ||
+          normalized === "-" ||
+          normalized === "-."
+        ) {
+          setInputState((prev) => ({
+            ...prev,
+            raw: null,
+          }));
+          onValueChange?.(null);
+          return;
+        }
+
+        // Try to parse, but allow NaN for partial input
+        const parsed = parseFloat(normalized);
+        if (!isNaN(parsed)) {
+          // Don't apply decimalPlaces restriction while typing
+          const parsedValue =
+            decimalPlaces >= 0
+              ? Number(parsed.toFixed(Math.max(decimalPlaces, 10))) // Use higher precision while typing
+              : parsed;
+
+          setInputState((prev) => ({
+            ...prev,
+            raw: parsedValue,
+          }));
+          onValueChange?.(parsedValue);
+        } else {
+          // Invalid input, but keep rawInput for user to continue typing
+          setInputState((prev) => ({
+            ...prev,
+            raw: null,
+          }));
+          onValueChange?.(null);
+        }
+      } else {
+        // Not focused, parse normally
+        const parsedValue = parseToNumber(valueChanged, {
+          thousandSeparator,
+          decimalSeparator,
+          allowNegative,
+          decimalPlaces,
+        });
+
+        setInputState((prev) => ({
+          ...prev,
+          raw: parsedValue,
+        }));
+
+        onValueChange?.(parsedValue);
+      }
+    },
+    [
       thousandSeparator,
       decimalSeparator,
-      fixZero,
-    });
-  };
-
-  // Helper: Clean input string for parsing
-  const cleanInputString = (str: string): string => {
-    if (!str?.trim()) return "";
-
-    let cleaned = str
-      .replace(new RegExp(`\\${thousandSeparator}`, "g"), "")
-      .replace(/[^\d.-]/g, "");
-
-    if (decimalSeparator !== ".") {
-      cleaned = cleaned.replace(new RegExp(`\\${decimalSeparator}`, "g"), ".");
-    }
-
-    if (!allowNegative) {
-      cleaned = cleaned.replace(/-/g, "");
-    }
-
-    return cleaned;
-  };
-
-  // Helper: Parse string to number (without enforcing min/max)
-  const parseToNumber = (str: string): number | null => {
-    const cleaned = cleanInputString(str);
-    if (!cleaned) return null;
-
-    const parsed = parseFloat(cleaned);
-    if (isNaN(parsed)) return null;
-
-    if (decimalPlaces >= 0) {
-      return Number(parsed.toFixed(decimalPlaces));
-    }
-
-    return parsed;
-  };
-
-  // Helper: Get raw value without formatting (for focused state)
-  const getRawValue = (num: number | null): string => {
-    if (num === null || num === undefined) return "";
-
-    if (decimalPlaces > 0) {
-      const formatted = num.toFixed(decimalPlaces);
-      if (formatted.includes(".")) {
-        return formatted.replace(/\.?0+$/, "");
-      }
-      return formatted;
-    }
-
-    return num.toString();
-  };
-
-  // Helper: Check if value is out of range
-  const isOutOfRange = (num: number | null): boolean => {
-    if (num === null || num === undefined) return false;
-    if (min !== undefined && num < min) return true;
-    if (max !== undefined && num > max) return true;
-    return false;
-  };
-
-  // Helper: Clamp value to min/max range
-  const clampValue = (num: number | null): number | null => {
-    if (num === null || num === undefined) return num;
-    let result = num;
-    if (min !== undefined && result < min) result = min;
-    if (max !== undefined && result > max) result = max;
-    return result;
-  };
-
-  // Helper: Check if should show tooltip
-  const shouldShowTooltip = (num: number | null): boolean => {
-    if (num === null || num === undefined) return false;
-    const hasDecimalPart = num % 1 !== 0;
-    const hasThousandSeparator = Math.abs(num) >= 1000;
-    return hasDecimalPart || hasThousandSeparator || isOutOfRange(num);
-  };
-
-  // Helper: Build tooltip content as ReactNode for multiline support
-  // Note: This function is called inside useMemo, so it doesn't need to be memoized
-  const buildTooltipContent = (num: number | null): React.ReactNode => {
-    if (!isFocused || num === null || num === undefined) return null;
-
-    const hasDecimalPart = num % 1 !== 0;
-    const hasThousandSeparator = Math.abs(num) >= 1000;
-    const outOfRange = isOutOfRange(num);
-
-    if (!hasDecimalPart && !hasThousandSeparator && !outOfRange) return null;
-
-    const valueDisplay = getDisplayValue(num);
-
-    if (outOfRange) {
-      const rangeParts: string[] = [];
-      if (min !== undefined) rangeParts.push(`Min: ${getDisplayValue(min)}`);
-      if (max !== undefined) rangeParts.push(`Max: ${getDisplayValue(max)}`);
-
-      if (rangeParts.length > 0) {
-        return (
-          <div className="flex flex-col gap-0.5">
-            <div>{valueDisplay}</div>
-            <div className="text-xs opacity-80">{rangeParts.join(" - ")}</div>
-          </div>
-        );
-      }
-    }
-
-    return valueDisplay;
-  };
-
-  const handleChange = (valueChanged: string) => {
-    if (isFocused) {
-      setInputValue(valueChanged);
-      // Don't call onValueChange while focused to avoid re-rendering parent
-      // Only update internal state for display purposes
-      if (!isControlled) {
-        const parsedValue = parseToNumber(valueChanged);
-        setInternalValue(parsedValue);
-      }
-      return;
-    }
-
-    // When not focused, update normally
-    const parsedValue = parseToNumber(valueChanged);
-
-    if (!isControlled) {
-      setInternalValue(parsedValue);
-    }
-
-    onValueChange?.(parsedValue);
-  };
-
-  // Memoize displayValue to avoid unnecessary recalculations
-  const displayValue = useMemo(() => {
-    if (isFocused) {
-      return inputValue;
-    }
-    if (currentValue === null || currentValue === undefined) {
-      return "";
-    }
-    return formatNumber(currentValue, {
+      allowNegative,
       decimalPlaces,
+      onValueChange,
+      inputState.isFocused,
+    ]
+  );
+
+  const handleFocus = useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      const currentRaw =
+        inputState.raw !== null && inputState.raw !== undefined
+          ? getRaw(inputState.raw, decimalPlaces)
+          : "";
+
+      setInputState((prev) => ({
+        ...prev,
+        isFocused: true,
+        rawInput: currentRaw,
+      }));
+
+      setTimeout(() => {
+        e.target.select();
+      }, 0);
+
+      rest.onFocus?.(e);
+      e.preventDefault();
+      e.stopPropagation();
+    },
+    [rest.onFocus, inputState.raw, decimalPlaces]
+  );
+
+  const handleBlur = useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      e.preventDefault();
+
+      // Parse the raw input string with proper decimal places restriction
+      const finalValue = parseToNumber(inputState.rawInput, {
+        thousandSeparator,
+        decimalSeparator,
+        allowNegative,
+        decimalPlaces,
+      });
+
+      const clampedValue = clampValue(finalValue, min, max);
+
+      if (clampedValue !== finalValue || clampedValue !== inputState.raw) {
+        onValueChange?.(clampedValue);
+      }
+
+      const display = formatDisplay(clampedValue, {
+        decimalPlaces,
+        thousandSeparator,
+        decimalSeparator,
+        fixZero,
+      });
+
+      setInputState((prev) => ({
+        ...prev,
+        display,
+        raw: clampedValue,
+        rawInput:
+          clampedValue !== null && clampedValue !== undefined
+            ? getRaw(clampedValue, decimalPlaces)
+            : "",
+        isFocused: false,
+      }));
+
+      rest.onBlur?.(e);
+      e.stopPropagation();
+    },
+    [
+      rest.onBlur,
+      onValueChange,
+      min,
+      max,
+      inputState.rawInput,
+      inputState.raw,
       thousandSeparator,
       decimalSeparator,
-      fixZero,
-    });
-  }, [
-    isFocused,
-    inputValue,
-    currentValue,
-    decimalPlaces,
-    thousandSeparator,
-    decimalSeparator,
-    fixZero,
-  ]);
+      allowNegative,
+      decimalPlaces,
+    ]
+  );
 
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    const rawValue = getRawValue(currentValue);
-
-    // Batch state updates to avoid multiple re-renders
-    setIsFocused(true);
-    setInputValue(rawValue);
-
-    // Use requestAnimationFrame instead of setTimeout for smoother selection
-    requestAnimationFrame(() => {
-      e.target.select();
-    });
-
-    rest.onFocus?.(e);
-  };
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    setIsFocused(false);
-    const parsedValue = parseToNumber(e.target.value);
-
-    // Clamp value to min/max range when blur
-    const clampedValue = clampValue(parsedValue);
-
-    // Update internal state if uncontrolled
-    if (!isControlled) {
-      setInternalValue(clampedValue);
+  // Update display when value changes externally
+  React.useEffect(() => {
+    if (!inputState.isFocused) {
+      const display = formatDisplay(currentValue, {
+        decimalPlaces,
+        thousandSeparator,
+        decimalSeparator,
+        fixZero,
+      });
+      setInputState((prev) => ({
+        ...prev,
+        display,
+        raw: currentValue,
+        rawInput:
+          currentValue !== null && currentValue !== undefined
+            ? getRaw(currentValue, decimalPlaces)
+            : "",
+      }));
     }
+  }, [controlledValue]);
 
-    // Always call onValueChange on blur to sync with parent
-    // Check if value actually changed to avoid unnecessary updates
-    if (clampedValue !== currentValue) {
-      onValueChange?.(clampedValue);
-    }
+  const hasValue = currentValue !== null && currentValue !== undefined;
 
-    const formattedValue = getDisplayValue(clampedValue);
+  const isInvalid =
+    currentValue !== null &&
+    currentValue !== undefined &&
+    ((min !== undefined && currentValue < min) ||
+      (max !== undefined && currentValue > max));
 
-    if (e.target.value !== formattedValue) {
-      e.target.value = formattedValue;
-    }
-
-    rest.onBlur?.(e);
-  };
-
-  const hasValue =
-    displayValue !== "" && displayValue !== null && displayValue !== undefined;
-  const isInvalid = isOutOfRange(currentValue);
-
-  // Memoize tooltip content to avoid re-creating ReactNode on every render
-  // Only recalculate when relevant values change
   const tooltipContent = useMemo(() => {
-    if (!isFocused || currentValue === null || currentValue === undefined)
+    if (
+      !inputState.isFocused ||
+      currentValue === null ||
+      currentValue === undefined
+    )
       return null;
 
     const hasDecimalPart = currentValue % 1 !== 0;
     const hasThousandSeparator = Math.abs(currentValue) >= 1000;
-    const outOfRange =
-      (min !== undefined && currentValue < min) ||
-      (max !== undefined && currentValue > max);
+    const outOfRange = isInvalid;
 
     if (!hasDecimalPart && !hasThousandSeparator && !outOfRange) return null;
 
-    const valueDisplay = formatNumber(currentValue, {
+    const formatOptions = {
       decimalPlaces,
       thousandSeparator,
       decimalSeparator,
       fixZero,
-    });
+    };
+    const valueDisplay = formatDisplay(currentValue, formatOptions);
 
     if (outOfRange) {
       const rangeParts: string[] = [];
-      if (min !== undefined) {
-        rangeParts.push(
-          `Min: ${formatNumber(min, {
-            decimalPlaces,
-            thousandSeparator,
-            decimalSeparator,
-            fixZero,
-          })}`
-        );
-      }
-      if (max !== undefined) {
-        rangeParts.push(
-          `Max: ${formatNumber(max, {
-            decimalPlaces,
-            thousandSeparator,
-            decimalSeparator,
-            fixZero,
-          })}`
-        );
-      }
+      if (min !== undefined)
+        rangeParts.push(`Min: ${formatDisplay(min, formatOptions)}`);
+      if (max !== undefined)
+        rangeParts.push(`Max: ${formatDisplay(max, formatOptions)}`);
 
       if (rangeParts.length > 0) {
         return (
@@ -312,48 +389,44 @@ const IBaseInputNumber = React.forwardRef<
 
     return valueDisplay;
   }, [
-    isFocused,
+    inputState.isFocused,
     currentValue,
-    min,
-    max,
+    isInvalid,
     decimalPlaces,
     thousandSeparator,
     decimalSeparator,
     fixZero,
+    min,
+    max,
   ]);
-
-  const shouldShowTooltipElement = isFocused && tooltipContent !== null;
-
-  // Memoize classNames to avoid re-creating object on every render
-  const inputClassNames = useMemo(
-    () => ({
-      ...rest.classNames,
-      input: clsx(
-        rest.classNames?.input,
-        hasValue ? "text-right" : "text-left",
-        isInvalid && "text-danger"
-      ),
-    }),
-    [rest.classNames, hasValue, isInvalid]
-  );
 
   return (
     <IBaseTooltip
       content={tooltipContent}
-      isOpen={shouldShowTooltipElement}
+      isOpen={inputState.isFocused && tooltipContent !== null}
       placement="top"
-      showArrow
     >
       <IBaseInput
         ref={ref}
         type="text"
         inputMode="decimal"
-        value={displayValue}
+        value={
+          inputState.isFocused
+            ? inputState.rawInput
+            : (inputState.display ?? "")
+        }
         onValueChange={handleChange}
         onFocus={handleFocus}
         onBlur={handleBlur}
         placeholder={placeholder}
-        classNames={inputClassNames}
+        classNames={{
+          ...rest.classNames,
+          input: clsx(
+            rest.classNames?.input,
+            hasValue ? "text-right" : "text-left",
+            isInvalid && "text-danger"
+          ),
+        }}
         {...rest}
       />
     </IBaseTooltip>
