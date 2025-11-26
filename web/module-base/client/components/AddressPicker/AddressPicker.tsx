@@ -2,7 +2,7 @@
 
 import {
   IBaseInput,
-  IBaseSelectWithSearch,
+  IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
@@ -222,22 +222,16 @@ export default function AddressPicker({
               </ModalHeader>
               <ModalBody>
                 <div className="flex flex-col gap-4">
-                  <IBaseSelectWithSearch
+                  <IBaseSingleSelect
                     label={t("modal.country.label")}
                     placeholder={t("modal.country.placeholder")}
                     items={countryItems}
                     isRequired
-                    selectedKeys={
-                      selectedCountryCode
-                        ? new Set([selectedCountryCode])
-                        : new Set(["VN"])
-                    }
-                    onSelectionChange={(keys) => {
-                      const keySet = keys as Set<string>;
-                      const selected = Array.from(keySet)[0] as string;
+                    selectedKey={selectedCountryCode || "VN"}
+                    onSelectionChange={(key) => {
                       // Prevent deselection - at least one item must be selected
-                      if (selected) {
-                        setSelectedCountryCode(selected as countryCode);
+                      if (key) {
+                        setSelectedCountryCode(key as countryCode);
                       }
                     }}
                     disallowEmptySelection

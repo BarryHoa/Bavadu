@@ -2,7 +2,7 @@
 
 import {
   IBaseInput,
-  IBaseSelectWithSearch,
+  IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
@@ -140,16 +140,13 @@ const PickerAddressByCountryVN = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <IBaseSelectWithSearch
+      <IBaseSingleSelect
         label={t("province.label")}
         placeholder={t("province.placeholder")}
         items={provinceItems}
-        selectedKeys={
-          selectedProvinceId ? new Set([selectedProvinceId]) : new Set()
-        }
-        onSelectionChange={(keys) => {
-          const selected = Array.from(keys)[0] as string;
-          const newProvinceId = selected || "";
+        selectedKey={selectedProvinceId || undefined}
+        onSelectionChange={(key) => {
+          const newProvinceId = key || "";
           setSelectedProvinceId(newProvinceId);
           // Reset ward khi đổi province
           setSelectedWardId("");
@@ -160,14 +157,13 @@ const PickerAddressByCountryVN = ({
       />
 
       {/* Phường/Xã/Thị trấn - Required (trực thuộc tỉnh/TP) */}
-      <IBaseSelectWithSearch
+      <IBaseSingleSelect
         label={t("ward.label")}
         placeholder={t("ward.placeholder")}
         items={wardItems}
-        selectedKeys={selectedWardId ? new Set([selectedWardId]) : new Set()}
-        onSelectionChange={(keys) => {
-          const selected = Array.from(keys)[0] as string;
-          const newWardId = selected || "";
+        selectedKey={selectedWardId || undefined}
+        onSelectionChange={(key) => {
+          const newWardId = key || "";
           setSelectedWardId(newWardId);
           // Update administrativeUnits
           updateAdministrativeUnits(selectedProvinceId, newWardId);

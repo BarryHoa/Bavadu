@@ -2,7 +2,7 @@
 
 import { SelectItem } from "@heroui/select";
 import MiniSearch from "minisearch";
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import IBaseInput from "../IBaseInput";
 import IBaseSelect, { IBaseSelectProps } from "./IBaseSelect";
 
@@ -13,8 +13,13 @@ export interface SelectItemOption extends Record<string, unknown> {
   [key: string]: unknown;
 }
 
-interface IBaseSelectWithSearchProps
-  extends Omit<IBaseSelectProps, "children" | "selectionMode"> {
+interface IBaseSingleSelectProps
+  extends Omit<
+    IBaseSelectProps,
+    "children" | "selectionMode" | "onSelectionChange" | "selectedKeys"
+  > {
+  selectedKey?: string;
+  onSelectionChange?: (key?: string, item?: SelectItemOption) => void;
   items?: SelectItemOption[];
   searchPlaceholder?: string;
   searchShowMaxResults?: number;
@@ -25,9 +30,14 @@ interface IBaseSelectWithSearchProps
   }[];
 }
 
-const IBaseSelectWithSearch = (props: IBaseSelectWithSearchProps) => {
+const IBaseSingleSelect = React.forwardRef<
+  HTMLSelectElement,
+  IBaseSingleSelectProps
+>((props, ref) => {
   const {
     items,
+    selectedKey,
+    onSelectionChange,
     searchPlaceholder = "Search...",
     searchRules = [{ by: "label", prefix: true, fuzzy: 0.2 }],
     searchShowMaxResults = 10,
@@ -166,20 +176,37 @@ const IBaseSelectWithSearch = (props: IBaseSelectWithSearchProps) => {
   ) => {
     // Prevent selection of the search input item
     if (typeof keys === "string") return;
-    const selected = Array.from(keys)[0] as string;
+    const keySet = keys as Set<string>;
+    const selected = Array.from(keySet)[0] as string | undefined;
+
     if (selected === "__search__") {
       return;
     }
-    // Call the original onSelectionChange if provided
-    if (rest.onSelectionChange) {
-      rest.onSelectionChange(keys as any);
+
+    if (!onSelectionChange) return;
+
+    // Handle clearing selection (empty set)
+    if (!selected || keySet.size === 0) {
+      // Find a placeholder item or use empty string
+      // For clearing, we'll pass empty string and a minimal item
+      const emptyItem: SelectItemOption = { value: "", label: "" };
+      onSelectionChange("", emptyItem);
+      return;
+    }
+
+    // Find the selected item
+    const selectedItem = items?.find((item) => item.value === selected);
+    if (selectedItem) {
+      onSelectionChange(selected, selectedItem);
     }
   };
 
   return (
     <IBaseSelect
       {...rest}
+      ref={ref}
       selectionMode="single"
+      selectedKeys={selectedKey ? new Set([selectedKey]) : undefined}
       onSelectionChange={handleSelectionChange}
       onOpenChange={handleOpenChange}
       classNames={rest.classNames}
@@ -242,6 +269,8 @@ const IBaseSelectWithSearch = (props: IBaseSelectWithSearchProps) => {
       </>
     </IBaseSelect>
   );
-};
+});
 
-export default IBaseSelectWithSearch;
+IBaseSingleSelect.displayName = "IBaseSingleSelect";
+
+export default IBaseSingleSelect;

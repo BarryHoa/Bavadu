@@ -2,7 +2,7 @@
 
 import {
   IBaseInput,
-  IBaseSelectWithSearch,
+  IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
 import { Button } from "@heroui/button";
@@ -96,43 +96,21 @@ export default function MovementCard({
           value={formValues.quantity}
           onValueChange={(value) => handleChange("quantity", value)}
         />
-        <IBaseSelectWithSearch
+        <IBaseSingleSelect
           label="Warehouse"
           items={warehouseItems}
-          selectedKeys={
-            new Set<string>(
-              formValues.primaryWarehouseId
-                ? [formValues.primaryWarehouseId]
-                : []
-            )
-          }
-          onSelectionChange={(keys) => {
-            const keySet = keys as Set<string>;
-            const [first] = Array.from(keySet);
-            handleChange(
-              "primaryWarehouseId",
-              typeof first === "string" ? first : ""
-            );
+          selectedKey={formValues.primaryWarehouseId}
+          onSelectionChange={(key) => {
+            handleChange("primaryWarehouseId", key || "");
           }}
         />
         {requireSecondaryWarehouse ? (
-          <IBaseSelectWithSearch
+          <IBaseSingleSelect
             label="Target Warehouse"
             items={warehouseItems}
-            selectedKeys={
-              new Set<string>(
-                formValues.secondaryWarehouseId
-                  ? [formValues.secondaryWarehouseId]
-                  : []
-              )
-            }
-            onSelectionChange={(keys) => {
-              const keySet = keys as Set<string>;
-              const [first] = Array.from(keySet);
-              handleChange(
-                "secondaryWarehouseId",
-                typeof first === "string" ? first : ""
-              );
+            selectedKey={formValues.secondaryWarehouseId}
+            onSelectionChange={(key) => {
+              handleChange("secondaryWarehouseId", key || "");
             }}
           />
         ) : null}

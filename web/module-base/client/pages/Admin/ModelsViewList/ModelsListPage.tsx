@@ -1,8 +1,8 @@
 "use client";
 
+import { IBaseInput } from "@base/client/components";
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/card";
-import { IBaseInput } from "@base/client/components";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import MiniSearch from "minisearch";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -186,7 +186,6 @@ export default function ModelsListPage() {
       ? t("table.empty.search")
       : t("table.empty.default"));
 
-  console.log("filteredModels", filteredModels);
   return (
     <Card>
       <CardBody className="flex flex-col gap-4">

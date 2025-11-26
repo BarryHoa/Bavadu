@@ -3,7 +3,7 @@
 import {
   IBaseInput,
   IBaseInputMultipleLang,
-  IBaseSelectWithSearch,
+  IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
 import { IBaseTooltip } from "@base/client/components";
@@ -110,19 +110,17 @@ export default function MasterTab({
           isDisabled={isBusy}
         />
 
-        <IBaseSelectWithSearch
+        <IBaseSingleSelect
           label={tProduct("productType")}
           items={masterTypes}
-          selectedKeys={
+          selectedKey={
             value.type && masterTypes.some((item) => item.value === value.type)
-              ? [value.type]
-              : []
+              ? value.type
+              : undefined
           }
-          onSelectionChange={(keys) => {
-            const keySet = keys as Set<string>;
-            const [first] = Array.from(keySet);
+          onSelectionChange={(key) => {
             const next =
-              (first as ProductMasterType) || ProductMasterType.GOODS;
+              (key as ProductMasterType) || ProductMasterType.GOODS;
             onUpdate((current) => ({ ...current, type: next }));
           }}
           isInvalid={Boolean(errors?.type)}
@@ -132,16 +130,12 @@ export default function MasterTab({
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 items-start">
-        <IBaseSelectWithSearch
+        <IBaseSingleSelect
           label={t("category")}
           items={categoryOptions}
-          selectedKeys={value.categoryId ? [value.categoryId] : []}
-          onSelectionChange={(keys) => {
-            const keySet = keys as Set<string>;
-            const [first] = Array.from(keySet);
-            const nextValue =
-              typeof first === "string" && first.length > 0 ? first : undefined;
-            onUpdate((current) => ({ ...current, categoryId: nextValue }));
+          selectedKey={value.categoryId}
+          onSelectionChange={(key) => {
+            onUpdate((current) => ({ ...current, categoryId: key || undefined }));
           }}
           isLoading={categoryQueryLoading}
           isInvalid={Boolean(errors?.categoryId)}

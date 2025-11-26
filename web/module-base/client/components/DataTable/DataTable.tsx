@@ -147,18 +147,13 @@ export default function DataTable<T = any>({
   // Get row key
   const getRowKey = useCallback(
     (record: T, index: number) => {
-      console.log("record", record);
-      console.log("index", isExistingRowKey);
       if (isExistingRowKey) {
         const val = (record as any)[rowKey];
 
-        console.log("val", val);
         if (typeof val === "string" || typeof val === "number") {
           return val;
         }
       }
-
-      console.log("index", index);
 
       return index;
     },
@@ -385,28 +380,31 @@ export default function DataTable<T = any>({
             items={dataSourceWithIndex}
             loadingContent={<Spinner label={loadingLabel} />}
           >
-            {({ item, index }: { item: T; index: number }) => (
-              <TableRow key={getRowKey(item, index)}>
-                {processedColumns.map((col) => (
-                  <TableCell
-                    key={`${col.key}-${index}`}
-                    className={col.frozenClassName}
-                    style={col.frozenStyle}
-                  >
-                    <div
-                      className={clsx(
-                        "flex",
-                        `justify-${col.align || "start"}`
-                      )}
+            {({ item, index }: { item: T; index: number }) => {
+              const rowKey = getRowKey(item, index);
+              return (
+                <TableRow key={rowKey}>
+                  {processedColumns.map((col) => (
+                    <TableCell
+                      key={`${col.key}-${rowKey}`}
+                      className={col.frozenClassName}
+                      style={col.frozenStyle}
                     >
-                      {col.key === DATA_TABLE_COLUMN_KEY_ROW_NUMBER
-                        ? paginationInfo.from + index + 1
-                        : col.renderValue(item, index)}
-                    </div>
-                  </TableCell>
-                ))}
-              </TableRow>
-            )}
+                      <div
+                        className={clsx(
+                          "flex",
+                          `justify-${col.align || "start"}`
+                        )}
+                      >
+                        {col.key === DATA_TABLE_COLUMN_KEY_ROW_NUMBER
+                          ? paginationInfo.from + index + 1
+                          : col.renderValue(item, index)}
+                      </div>
+                    </TableCell>
+                  ))}
+                </TableRow>
+              );
+            }}
           </TableBody>
         </Table>
       </div>

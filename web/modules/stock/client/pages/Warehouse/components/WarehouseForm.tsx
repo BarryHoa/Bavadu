@@ -1,6 +1,6 @@
 import {
   IBaseInput,
-  IBaseSelectWithSearch,
+  IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
 import AddressPicker from "@base/client/components/AddressPicker/AddressPicker";
@@ -306,16 +306,12 @@ export default function WarehouseForm({
             name="status"
             control={control}
             render={({ field, fieldState }) => (
-              <IBaseSelectWithSearch
+              <IBaseSingleSelect
                 label="Status"
                 items={statusOptions}
-                selectedKeys={new Set([field.value])}
-                onSelectionChange={(keys) => {
-                  const keySet = keys as Set<string>;
-                  const [first] = Array.from(keySet);
-                  if (first) {
-                    field.onChange(first);
-                  }
+                selectedKey={field.value}
+                onSelectionChange={(key) => {
+                  field.onChange(key);
                 }}
                 isInvalid={fieldState.invalid}
                 errorMessage={fieldState.error?.message}
@@ -327,16 +323,12 @@ export default function WarehouseForm({
             name="valuationMethod"
             control={control}
             render={({ field, fieldState }) => (
-              <IBaseSelectWithSearch
+              <IBaseSingleSelect
                 label="Valuation method"
                 items={valuationOptions}
-                selectedKeys={new Set([field.value])}
-                onSelectionChange={(keys) => {
-                  const keySet = keys as Set<string>;
-                  const [first] = Array.from(keySet);
-                  if (first) {
-                    field.onChange(first);
-                  }
+                selectedKey={field.value}
+                onSelectionChange={(key) => {
+                  field.onChange(key);
                 }}
                 isInvalid={fieldState.invalid}
                 errorMessage={fieldState.error?.message}

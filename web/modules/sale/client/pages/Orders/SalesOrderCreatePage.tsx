@@ -2,7 +2,7 @@
 
 import { IBaseInput } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
-import { IBaseSelect, IBaseSelectWithSearch, SelectItem, SelectItemOption } from "@base/client/components";
+import { IBaseSelect, IBaseSingleSelect, SelectItem, SelectItemOption } from "@base/client/components";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Textarea } from "@heroui/react";
@@ -238,18 +238,12 @@ export default function SalesOrderCreatePage(): React.ReactNode {
                 name="warehouseId"
                 control={control}
                 render={({ field, fieldState }) => (
-                  <IBaseSelectWithSearch
+                  <IBaseSingleSelect
                     label="Warehouse (optional)"
                     items={warehouseOptions}
-                    selectedKeys={
-                      field.value ? new Set([field.value]) : new Set<string>()
-                    }
-                    onSelectionChange={(keys: any) => {
-                      const keySet = keys as Set<string>;
-                      const [first] = Array.from(keySet);
-                      field.onChange(
-                        typeof first === "string" ? first : undefined
-                      );
+                    selectedKey={field.value}
+                    onSelectionChange={(key) => {
+                      field.onChange(key || undefined);
                     }}
                     isInvalid={fieldState.invalid}
                     errorMessage={fieldState.error?.message}

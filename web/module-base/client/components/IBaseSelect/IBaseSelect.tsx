@@ -4,13 +4,16 @@ import {
   SelectProps,
 } from "@heroui/select";
 import clsx from "clsx";
+import React from "react";
 
 export type IBaseSelectProps = SelectProps & {};
-const IBaseSelect = (props: IBaseSelectProps) => {
-  const { isDisabled, classNames, ...rest } = props;
-  return (
-    <SelectPrimitive
-      {...rest}
+const IBaseSelect = React.forwardRef<HTMLSelectElement, IBaseSelectProps>(
+  (props, ref) => {
+    const { isDisabled, classNames, ...rest } = props;
+    return (
+      <SelectPrimitive
+        {...rest}
+        ref={ref}
       classNames={{
         base: clsx("max-w opacity-100", classNames?.base),
         label: clsx("text-small text-default-600", classNames?.label),
@@ -46,9 +49,12 @@ const IBaseSelect = (props: IBaseSelectProps) => {
       placeholder="Please select..."
       fullWidth
       scrollShadowProps={{ size: 0 }}
-    />
-  );
-};
+      />
+    );
+  }
+);
+
+IBaseSelect.displayName = "IBaseSelect";
 
 export default IBaseSelect;
 export { SelectItem };

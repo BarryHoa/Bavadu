@@ -3,7 +3,7 @@
 import {
   IBaseDigitViewer,
   IBaseInput,
-  IBaseSelectWithSearch,
+  IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
 import type { DataTableColumn } from "@base/client/components/DataTable";
@@ -116,18 +116,14 @@ export default function StockSummarySection({
               })
             }
           />
-          <IBaseSelectWithSearch
+          <IBaseSingleSelect
             label="Warehouse"
             items={warehouseItems}
-            selectedKeys={
-              new Set<string>(filters.warehouseId ? [filters.warehouseId] : [])
-            }
-            onSelectionChange={(keys) => {
-              const keySet = keys as Set<string>;
-              const [first] = Array.from(keySet);
+            selectedKey={filters.warehouseId}
+            onSelectionChange={(key) => {
               onFilterChange({
                 ...filters,
-                warehouseId: typeof first === "string" ? first : undefined,
+                warehouseId: key || undefined,
               });
             }}
             className="max-w-xs"

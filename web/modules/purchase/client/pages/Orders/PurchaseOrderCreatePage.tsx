@@ -2,7 +2,7 @@
 
 import {
   IBaseInput,
-  IBaseSelectWithSearch,
+  IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
@@ -237,18 +237,12 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
                 name="warehouseId"
                 control={control}
                 render={({ field, fieldState }) => (
-                  <IBaseSelectWithSearch
+                  <IBaseSingleSelect
                     label="Warehouse (optional)"
                     items={warehouseOptions}
-                    selectedKeys={
-                      field.value ? new Set([field.value]) : new Set<string>()
-                    }
-                    onSelectionChange={(keys) => {
-                      const keySet = keys as Set<string>;
-                      const [first] = Array.from(keySet);
-                      field.onChange(
-                        typeof first === "string" ? first : undefined
-                      );
+                    selectedKey={field.value}
+                    onSelectionChange={(key) => {
+                      field.onChange(key || undefined);
                     }}
                     isInvalid={fieldState.invalid}
                     errorMessage={fieldState.error?.message}

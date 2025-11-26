@@ -27,7 +27,7 @@ export {
   SelectItem,
 } from "./IBaseSelect";
 export type { IBaseSelectProps, SelectItemOption } from "./IBaseSelect";
-export { default as IBaseSelectWithSearch } from "./IBaseSelect/IBaseSelectWithSearch";
+export { default as IBaseSingleSelect } from "./IBaseSelect/IBaseSingleSelect";
 export { default as MarkdownContent } from "./MarkdownContent";
 export * from "./LoadingBar";
 export * from "./LoadingOverlay";

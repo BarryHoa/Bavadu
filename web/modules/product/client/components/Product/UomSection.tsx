@@ -3,7 +3,7 @@
 import {
   DataTable,
   IBaseInputNumber,
-  IBaseSelectWithSearch,
+  IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
 import {
@@ -18,9 +18,10 @@ import {
   ModalFooter,
   ModalHeader,
 } from "@heroui/modal";
+import { addToast } from "@heroui/react";
 import { Plus, Trash } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { OtherUom } from "../../hooks/useProductUoms";
 import { useProductUoms } from "../../hooks/useProductUoms";
 import {
@@ -77,9 +78,6 @@ export default function UomSection({
   const [purchaseUomId, setPurchaseUomId] = useState<string | undefined>();
   const [mrpUomId, setMrpUomId] = useState<string | undefined>();
 
-  // Store previous UOM values for each field to revert on duplicate
-  const previousUomValues = useRef<Map<string, string | null>>(new Map());
-
   // Filter othersUoms to only "other" type for table
   const otherUomsForTable = useMemo(() => {
     return othersUoms.filter((uom) => uom.type === "other");
@@ -116,50 +114,16 @@ export default function UomSection({
     ) => {
       if (!selectedUomId) {
         resetUom(uuid);
-        previousUomValues.current.set(uuid, null);
         return;
       }
 
       // Check if UOM is duplicate
-      if (selectedUomId === baseUomId) {
-        const previousValue = previousUomValues.current.get(uuid);
-        if (previousValue) {
-          const prevUom = uomOptions.find(
-            (item) => item.value === previousValue
-          );
-          if (prevUom) {
-            updateUom(uuid, prevUom.value, prevUom.label, baseUomId);
-          }
-        } else {
-          resetUom(uuid);
-        }
+
+      const uomIds = [...othersUoms.map((uom) => uom.uomId), baseUomId];
+      if (uomIds.includes(selectedUomId)) {
         setDuplicateModal({
           isOpen: true,
-          duplicateLabel: "Base UOM",
-        });
-        return;
-      }
-
-      // Check if UOM already exists in othersUoms
-      const duplicate = othersUoms.find(
-        (uom) => uom.uomId === selectedUomId && uom.uuid !== uuid
-      );
-
-      if (duplicate) {
-        const previousValue = previousUomValues.current.get(uuid);
-        if (previousValue) {
-          const prevUom = uomOptions.find(
-            (item) => item.value === previousValue
-          );
-          if (prevUom) {
-            updateUom(uuid, prevUom.value, prevUom.label, baseUomId);
-          }
-        } else {
-          resetUom(uuid);
-        }
-        setDuplicateModal({
-          isOpen: true,
-          duplicateLabel: duplicate.label,
+          duplicateLabel: selectedUomName ?? undefined,
         });
         return;
       }
@@ -171,9 +135,6 @@ export default function UomSection({
         selectedUomName || "",
         baseUomId
       );
-      if (result.success) {
-        previousUomValues.current.set(uuid, selectedUomId);
-      }
     },
     [baseUomId, othersUoms, uomOptions, updateUom, resetUom, setDuplicateModal]
   );
@@ -197,7 +158,7 @@ export default function UomSection({
   const confirmDelete = useCallback(() => {
     if (deleteConfirmModal.uomId) {
       removeUom(deleteConfirmModal.uomId);
-      previousUomValues.current.delete(deleteConfirmModal.uomId);
+
       setDeleteConfirmModal({ isOpen: false });
     }
   }, [deleteConfirmModal.uomId, removeUom, setDeleteConfirmModal]);
@@ -209,8 +170,8 @@ export default function UomSection({
 
   // Handler for conversion ratio change
   const handleConversionRatioChange = useCallback(
-    (uuid: string) => (ratio: number | null) => {
-      updateConversionRatio(uuid, ratio);
+    (uuid: string) => (ratio: number | null | undefined) => {
+      updateConversionRatio(uuid, ratio ?? null);
     },
     [updateConversionRatio]
   );
@@ -223,12 +184,8 @@ export default function UomSection({
         title: tProductForm("otherUnitOfMeasure") || "UOM",
         width: 300,
         render: (_, record) => {
-          if (!previousUomValues.current.has(record.uuid)) {
-            previousUomValues.current.set(record.uuid, record.uomId);
-          }
-
           return (
-            <IBaseSelectWithSearch
+            <IBaseSingleSelect
               aria-label={tProductForm("otherUnitOfMeasure") || "UOM"}
               items={uomOptions.filter(
                 (opt) =>
@@ -237,23 +194,13 @@ export default function UomSection({
                     (uom) => uom.uuid !== record.uuid && uom.uomId === opt.value
                   )
               )}
-              selectedKeys={record.uomId ? [record.uomId] : []}
-              onSelectionChange={(keys) => {
-                const keySet = keys as Set<string>;
-                const [first] = Array.from(keySet);
-                const selectedUom = uomOptions.find(
-                  (item) => item.value === first
+              selectedKey={record.uomId || undefined}
+              onSelectionChange={(key, item) => {
+                handleUomSelection(
+                  record.uuid,
+                  key ?? null,
+                  item?.label ?? null
                 );
-
-                if (selectedUom) {
-                  handleUomSelection(
-                    record.uuid,
-                    selectedUom.value,
-                    selectedUom.label
-                  );
-                } else {
-                  handleUomSelection(record.uuid, null, null);
-                }
               }}
               isLoading={uomQueryLoading}
               isDisabled={isBusy || uomQueryLoading || !baseUomId}
@@ -334,8 +281,6 @@ export default function UomSection({
 
   const isStockable = masterFeatures[ProductMasterFeatures.STOCKABLE];
 
-  console.log("otherUomsForTable", otherUomsForTable);
-
   return (
     <>
       <div className="flex flex-col gap-4">
@@ -350,21 +295,42 @@ export default function UomSection({
       <div className="flex flex-col gap-4">
         <div className="flex gap-4">
           <div className="flex-shrink-0 w-[400px]">
-            <IBaseSelectWithSearch
+            <IBaseSingleSelect
               label={
                 tProductForm("baseUnitOfMeasure") +
                 (isStockable ? " (Stockable)" : "")
               }
               items={uomOptions}
-              selectedKeys={baseUomId ? [baseUomId] : []}
-              onSelectionChange={(keys) => {
-                const keySet = keys as Set<string>;
-                const [first] = Array.from(keySet);
-                const nextValue =
-                  typeof first === "string" && first.length > 0
-                    ? first
-                    : undefined;
-                onBaseUomChange(nextValue);
+              selectedKey={baseUomId}
+              onSelectionChange={(key) => {
+                // check duplicate in otherUomsForTable
+                const duplicate = otherUomsForTable.find(
+                  (uom) => uom.uomId === key
+                );
+                if (duplicate) {
+                  addToast({
+                    title: tProductForm("duplicateUom"),
+                    description: tProductForm("duplicateUomDescription"),
+                    color: "warning",
+                  });
+                  return;
+                }
+                onBaseUomChange(key);
+
+                // Auto-set SALE, PURCHASE, MANUFACTURE to base if not already selected
+                if (key) {
+                  setTimeout(() => {
+                    if (masterFeatures[ProductMasterFeatures.SALE]) {
+                      setSaleUomId(key);
+                    }
+                    if (masterFeatures[ProductMasterFeatures.PURCHASE]) {
+                      setPurchaseUomId(key);
+                    }
+                    if (masterFeatures[ProductMasterFeatures.MANUFACTURE]) {
+                      setMrpUomId(key);
+                    }
+                  }, 100);
+                }
               }}
               isLoading={uomQueryLoading}
               isRequired
@@ -421,46 +387,41 @@ export default function UomSection({
                 masterFeatures[ProductMasterFeatures.MANUFACTURE]) && (
                 <div className="grid grid-cols-3 gap-4 mt-4">
                   {masterFeatures[ProductMasterFeatures.SALE] && (
-                    <IBaseSelectWithSearch
+                    <IBaseSingleSelect
                       label={tProduct("productFeature.sale") || "Sale UOM"}
                       items={availableUomOptions}
-                      selectedKeys={saleUomId ? [saleUomId] : []}
-                      onSelectionChange={(keys) => {
-                        const keySet = keys as Set<string>;
-                        const [first] = Array.from(keySet);
-                        setSaleUomId(first || undefined);
+                      selectedKey={saleUomId}
+                      onSelectionChange={(key) => {
+                        console.log("key", key);
+                        setSaleUomId(key);
                       }}
                       isLoading={uomQueryLoading}
                       isDisabled={isBusy || uomQueryLoading || !baseUomId}
                     />
                   )}
                   {masterFeatures[ProductMasterFeatures.PURCHASE] && (
-                    <IBaseSelectWithSearch
+                    <IBaseSingleSelect
                       label={
                         tProduct("productFeature.purchase") || "Purchase UOM"
                       }
                       items={availableUomOptions}
-                      selectedKeys={purchaseUomId ? [purchaseUomId] : []}
-                      onSelectionChange={(keys) => {
-                        const keySet = keys as Set<string>;
-                        const [first] = Array.from(keySet);
-                        setPurchaseUomId(first || undefined);
+                      selectedKey={purchaseUomId}
+                      onSelectionChange={(key) => {
+                        setPurchaseUomId(key);
                       }}
                       isLoading={uomQueryLoading}
                       isDisabled={isBusy || uomQueryLoading || !baseUomId}
                     />
                   )}
                   {masterFeatures[ProductMasterFeatures.MANUFACTURE] && (
-                    <IBaseSelectWithSearch
+                    <IBaseSingleSelect
                       label={
                         tProduct("productFeature.manufacture") || "MRP UOM"
                       }
                       items={availableUomOptions}
-                      selectedKeys={mrpUomId ? [mrpUomId] : []}
-                      onSelectionChange={(keys) => {
-                        const keySet = keys as Set<string>;
-                        const [first] = Array.from(keySet);
-                        setMrpUomId(first || undefined);
+                      selectedKey={mrpUomId}
+                      onSelectionChange={(key) => {
+                        setMrpUomId(key);
                       }}
                       isLoading={uomQueryLoading}
                       isDisabled={isBusy || uomQueryLoading || !baseUomId}
