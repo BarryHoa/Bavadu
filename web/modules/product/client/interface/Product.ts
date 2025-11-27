@@ -128,6 +128,18 @@ export type ProductFormValues = {
     manufacturerName: string;
     manufacturerCode: string;
     baseUomId?: string;
+    saleUomId?: string;
+    purchaseUomId?: string;
+    manufacturingUomId?: string;
+    uomConversions?: Array<{
+      uuid: string;
+      uomId: string | null;
+      uomName: string | null;
+      label: string;
+      type: string;
+      isActive: boolean;
+      conversionRatio: number | null;
+    }>;
     isActive: boolean;
   };
   packings: ProductFormPacking[];

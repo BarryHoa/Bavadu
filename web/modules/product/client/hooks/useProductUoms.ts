@@ -1,20 +1,17 @@
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { uuidv7 } from "uuidv7";
+import type { UomConversions } from "../components/Product/types";
 import {
   ProductMasterFeatures,
   ProductMasterFeaturesType,
 } from "../interface/Product";
 
-export type OtherUom = {
-  uomId: string | null;
-  uomName: string | null;
-  label: string;
-  type: ProductMasterFeaturesType | "other";
-  uuid: string;
-  isActive: boolean;
-  conversionRatio: number | null;
-};
+// Re-export UomConversions type for backward compatibility
+export type { UomConversions } from "../components/Product/types";
+
+// Legacy type alias - use UomConversions instead
+export type OtherUom = UomConversions;
 
 type UseProductUomsOptions = {
   masterFeatures: Record<ProductMasterFeaturesType, boolean>;
@@ -22,9 +19,9 @@ type UseProductUomsOptions = {
 
 export const useProductUoms = ({ masterFeatures }: UseProductUomsOptions) => {
   const tProduct = useTranslations("mdl-product");
-  const [othersUoms, setOthersUoms] = useState<OtherUom[]>([]);
+  const [uomConversions, setUomConversions] = useState<UomConversions[]>([]);
 
-  // Initialize othersUoms based on masterFeatures
+  // Initialize uomConversions based on masterFeatures
   useEffect(() => {
     const sortKeys = [
       ProductMasterFeatures.SALE,
@@ -32,7 +29,7 @@ export const useProductUoms = ({ masterFeatures }: UseProductUomsOptions) => {
       ProductMasterFeatures.MANUFACTURE,
     ];
 
-    const newOthersUoms = sortKeys
+    const newUomConversions = sortKeys
       .filter((key: ProductMasterFeaturesType) => masterFeatures[key] === true)
       .map((key: ProductMasterFeaturesType) => ({
         type: key,
@@ -44,7 +41,7 @@ export const useProductUoms = ({ masterFeatures }: UseProductUomsOptions) => {
         conversionRatio: 1,
       }));
 
-    setOthersUoms(newOthersUoms);
+    setUomConversions(newUomConversions);
   }, [masterFeatures, tProduct]);
 
   // Check if UOM is duplicate based on type
@@ -57,7 +54,7 @@ export const useProductUoms = ({ masterFeatures }: UseProductUomsOptions) => {
     currentType: ProductMasterFeaturesType | "other",
     baseUomId?: string
   ): { isDuplicate: boolean; duplicateLabel?: string } => {
-    const currentUom = othersUoms.find((uom) => uom.uuid === currentUuid);
+    const currentUom = uomConversions.find((uom) => uom.uuid === currentUuid);
 
     // If current type is "other", check against everything
     if (currentType === "other") {
@@ -67,7 +64,7 @@ export const useProductUoms = ({ masterFeatures }: UseProductUomsOptions) => {
       }
 
       // Check against all other UOMs (sale, purchase, manufacture, and other "other" UOMs)
-      const duplicate = othersUoms.find(
+      const duplicate = uomConversions.find(
         (uom) => uom.uomId === uomId && uom.uuid !== currentUuid
       );
 
@@ -85,7 +82,7 @@ export const useProductUoms = ({ masterFeatures }: UseProductUomsOptions) => {
       }
 
       // Check only against "other" type UOMs
-      const duplicateOther = othersUoms.find(
+      const duplicateOther = uomConversions.find(
         (uom) =>
           uom.type === "other" &&
           uom.uomId === uomId &&
@@ -107,7 +104,7 @@ export const useProductUoms = ({ masterFeatures }: UseProductUomsOptions) => {
     uomName: string,
     baseUomId?: string
   ): { success: boolean; isDuplicate: boolean; duplicateLabel?: string } => {
-    const currentUom = othersUoms.find((uom) => uom.uuid === uuid);
+    const currentUom = uomConversions.find((uom) => uom.uuid === uuid);
     if (!currentUom) {
       return { success: false, isDuplicate: false };
     }
@@ -127,7 +124,7 @@ export const useProductUoms = ({ masterFeatures }: UseProductUomsOptions) => {
       };
     }
 
-    setOthersUoms((prev) =>
+    setUomConversions((prev) =>
       prev.map((item) =>
         item.uuid === uuid
           ? {
@@ -144,7 +141,7 @@ export const useProductUoms = ({ masterFeatures }: UseProductUomsOptions) => {
 
   // Update conversion ratio
   const updateConversionRatio = (uuid: string, ratio: number | null) => {
-    setOthersUoms((prev) =>
+    setUomConversions((prev) =>
       prev.map((item) =>
         item.uuid === uuid ? { ...item, conversionRatio: ratio } : item
       )
@@ -153,7 +150,7 @@ export const useProductUoms = ({ masterFeatures }: UseProductUomsOptions) => {
 
   // Reset UOM (clear selection)
   const resetUom = (uuid: string) => {
-    setOthersUoms((prev) =>
+    setUomConversions((prev) =>
       prev.map((item) =>
         item.uuid === uuid ? { ...item, uomId: null, uomName: null } : item
       )
@@ -162,17 +159,19 @@ export const useProductUoms = ({ masterFeatures }: UseProductUomsOptions) => {
 
   // Remove UOM (delete from list)
   const removeUom = (uuid: string) => {
-    setOthersUoms((prev) => prev.filter((item) => item.uuid !== uuid));
+    setUomConversions((prev) => prev.filter((item) => item.uuid !== uuid));
   };
 
   // Add other UOM (max 9 total)
   const addOtherUom = () => {
     const MAX_OTHER_UOMS = 9;
-    setOthersUoms((prev) => {
+    setUomConversions((prev) => {
       // Count only "other" type UOMs
-      const otherUomsCount = prev.filter((uom) => uom.type === "other").length;
+      const uomConversionsCount = prev.filter(
+        (uom) => uom.type === "other"
+      ).length;
 
-      if (otherUomsCount >= MAX_OTHER_UOMS) {
+      if (uomConversionsCount >= MAX_OTHER_UOMS) {
         return prev;
       }
 
@@ -192,31 +191,31 @@ export const useProductUoms = ({ masterFeatures }: UseProductUomsOptions) => {
   };
 
   // Get all UOMs data
-  const getOthersUoms = () => othersUoms;
+  const getUomConversions = () => uomConversions;
 
   // Set UOMs data (for initial values or external updates)
-  const setOthersUomsData = (uoms: OtherUom[]) => {
-    setOthersUoms(uoms);
+  const setUomConversionsData = (uoms: UomConversions[]) => {
+    setUomConversions(uoms);
   };
 
   // Check if can add more UOMs
   const canAddOtherUom = () => {
     const MAX_OTHER_UOMS = 9;
-    const otherUomsCount = othersUoms.filter(
+    const uomConversionsCount = uomConversions.filter(
       (uom) => uom.type === "other"
     ).length;
-    return otherUomsCount < MAX_OTHER_UOMS;
+    return uomConversionsCount < MAX_OTHER_UOMS;
   };
 
   return {
-    othersUoms,
+    uomConversions,
     updateUom,
     updateConversionRatio,
     resetUom,
     removeUom,
     addOtherUom,
     canAddOtherUom,
-    getOthersUoms,
-    setOthersUomsData,
+    getUomConversions,
+    setUomConversionsData,
   };
 };

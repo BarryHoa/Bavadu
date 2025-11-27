@@ -8,7 +8,7 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-} from "@heroui/modal";
+} from "@base/client/components";
 import { Languages } from "lucide-react";
 import { useMemo, useState } from "react";
 

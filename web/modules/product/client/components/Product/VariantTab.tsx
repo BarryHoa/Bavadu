@@ -138,6 +138,10 @@ export default function VariantTab({
       <Divider />
       <UomSection
         baseUomId={value.baseUomId}
+        saleUomId={value.saleUomId}
+        purchaseUomId={value.purchaseUomId}
+        manufacturingUomId={value.manufacturingUomId}
+        uomConversions={value.uomConversions}
         masterFeatures={masterFeatures}
         uomOptions={uomOptions}
         uomQueryLoading={uomQueryLoading}
@@ -145,6 +149,18 @@ export default function VariantTab({
         error={variantErrors?.baseUomId}
         onBaseUomChange={(baseUomId) =>
           onUpdate((current) => ({ ...current, baseUomId }))
+        }
+        onSaleUomChange={(saleUomId) =>
+          onUpdate((current) => ({ ...current, saleUomId }))
+        }
+        onPurchaseUomChange={(purchaseUomId) =>
+          onUpdate((current) => ({ ...current, purchaseUomId }))
+        }
+        onManufacturingUomChange={(manufacturingUomId) =>
+          onUpdate((current) => ({ ...current, manufacturingUomId }))
+        }
+        onUomConversionsChange={(uomConversions) =>
+          onUpdate((current) => ({ ...current, uomConversions }))
         }
       />
 

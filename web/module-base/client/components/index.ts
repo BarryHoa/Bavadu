@@ -17,10 +17,28 @@ export { default as DatePicker } from "./DatePicker";
 export { default as IBaseDigitViewer } from "./IBaseDigitViewer";
 export type { IBaseDigitViewerProps } from "./IBaseDigitViewer";
 export { default as IBaseInput, default as Input } from "./IBaseInput";
+export { default as IBaseInputMultipleLang } from "./IBaseInputMultipleLang";
 export { default as IBaseInputNumber } from "./IBaseInputNumber";
 export type { IBaseInputNumberProps } from "./IBaseInputNumber";
-export { default as IBaseInputMultipleLang } from "./IBaseInputMultipleLang";
-export { default as IBaseTooltip } from "./IBaseTooltip";
+export {
+  default as IBaseModal,
+  IBaseModalBody,
+  IBaseModalContent,
+  IBaseModalFooter,
+  IBaseModalHeader,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+} from "./IBaseModal";
+export type {
+  IBaseModalBodyProps,
+  IBaseModalContentProps,
+  IBaseModalFooterProps,
+  IBaseModalHeaderProps,
+  IBaseModalProps,
+} from "./IBaseModal";
 export {
   default as IBaseSelect,
   default as Select,
@@ -28,9 +46,10 @@ export {
 } from "./IBaseSelect";
 export type { IBaseSelectProps, SelectItemOption } from "./IBaseSelect";
 export { default as IBaseSingleSelect } from "./IBaseSelect/IBaseSingleSelect";
-export { default as MarkdownContent } from "./MarkdownContent";
+export { default as IBaseTooltip } from "./IBaseTooltip";
 export * from "./LoadingBar";
 export * from "./LoadingOverlay";
+export { default as MarkdownContent } from "./MarkdownContent";
 export * from "./NavigationLoader";
 
 // Icons and primitives

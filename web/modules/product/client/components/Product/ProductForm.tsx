@@ -1,9 +1,8 @@
 "use client";
 
-import { SelectItemOption } from "@base/client/components";
+import { IBaseTooltip, SelectItemOption } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { Button } from "@heroui/button";
-import { IBaseTooltip } from "@base/client/components";
 import { Card, CardBody } from "@heroui/react";
 import { Tab, Tabs } from "@heroui/tabs";
 import { valibotResolver } from "@hookform/resolvers/valibot";
@@ -19,6 +18,8 @@ import {
   fallback,
   maxLength,
   minLength,
+  nullable,
+  number,
   object,
   optional,
   picklist,
@@ -28,6 +29,7 @@ import {
   trim,
 } from "valibot";
 
+import { minValue } from "valibot";
 import {
   ProductFormValues,
   ProductMasterFeatures,
@@ -45,7 +47,11 @@ import {
 import MasterTab from "./MasterTab";
 import ProductFormGuideModal from "./ProductFormGuideModal";
 import VariantTab from "./VariantTab";
-import type { LocaleFieldValue, VariantFieldValue } from "./types";
+import type {
+  LocaleFieldValue,
+  UomConversions,
+  VariantFieldValue,
+} from "./types";
 
 /**
  * Get features for a product type based on constraints
@@ -110,6 +116,10 @@ const createDefaultVariant = (): VariantFieldValue => ({
   manufacturerName: "",
   manufacturerCode: "",
   baseUomId: undefined,
+  saleUomId: undefined,
+  purchaseUomId: undefined,
+  manufacturingUomId: undefined,
+  uomConversions: [],
   isActive: true,
   packings: [],
   attributes: [],
@@ -221,6 +231,11 @@ const mapToFieldValues = (
         : "",
     manufacturerCode: initialValues.variant.manufacturerCode ?? "",
     baseUomId: initialValues.variant.baseUomId ?? undefined,
+    saleUomId: initialValues.variant.saleUomId ?? undefined,
+    purchaseUomId: initialValues.variant.purchaseUomId ?? undefined,
+    manufacturingUomId: initialValues.variant.manufacturingUomId ?? undefined,
+    uomConversions: (initialValues.variant.uomConversions ??
+      []) as UomConversions[],
     isActive: initialValues.variant.isActive ?? true,
     packings:
       initialValues.packings?.map((packing) => ({
@@ -296,6 +311,20 @@ const mapToProductFormValues = (
       manufacturerName: firstVariant.manufacturerName.trim() || "",
       manufacturerCode: firstVariant.manufacturerCode,
       baseUomId: firstVariant.baseUomId,
+      saleUomId: firstVariant.saleUomId,
+      purchaseUomId: firstVariant.purchaseUomId,
+      manufacturingUomId: firstVariant.manufacturingUomId,
+      uomConversions: firstVariant.uomConversions
+        .filter((uom) => uom.uomId !== null && uom.conversionRatio !== null)
+        .map((uom) => ({
+          uuid: uom.uuid,
+          uomId: uom.uomId,
+          uomName: uom.uomName,
+          label: uom.label,
+          type: uom.type,
+          isActive: uom.isActive,
+          conversionRatio: uom.conversionRatio,
+        })),
       isActive: firstVariant.isActive,
     },
     packings: firstVariant.packings.map((packing) => ({
@@ -365,6 +394,26 @@ const createVariantSchema = (
       trim(),
       minLength(1, tProductForm("errors.baseUnitOfMeasureRequired"))
     ),
+    saleUomId: optional(pipe(string(), trim())),
+    purchaseUomId: optional(pipe(string(), trim())),
+    manufacturingUomId: optional(pipe(string(), trim())),
+    uomConversions: array(
+      object({
+        uuid: pipe(string(), trim()),
+        uomId: nullable(pipe(string(), trim())),
+        uomName: nullable(pipe(string(), trim())),
+        label: pipe(string(), trim()),
+        type: pipe(string(), trim()),
+        isActive: boolean(),
+        conversionRatio: nullable(
+          pipe(
+            number(),
+            minValue(0.000001, tProductForm("errors.conversionRatioRequired"))
+          )
+        ),
+      })
+    ),
+
     isActive: boolean(),
     packings: array(
       object({

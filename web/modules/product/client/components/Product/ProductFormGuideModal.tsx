@@ -2,7 +2,12 @@
 
 import { MarkdownContent } from "@base/client/components";
 import guidelineService from "@base/client/services/GuidelineService";
-import { Modal, ModalBody, ModalContent, ModalHeader } from "@heroui/modal";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+} from "@base/client/components";
 import { useQuery } from "@tanstack/react-query";
 import { HelpCircle, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";

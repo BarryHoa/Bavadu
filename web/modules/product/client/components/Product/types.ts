@@ -1,8 +1,22 @@
-import type { ProductMasterType, ProductMasterFeatures } from "../../interface/Product";
+import type {
+  ProductMasterFeatures,
+  ProductMasterFeaturesType,
+  ProductMasterType,
+} from "../../interface/Product";
 
 export type LocaleFieldValue = {
   en: string;
   vi: string;
+};
+
+export type UomConversions = {
+  uomId: string | null;
+  uomName: string | null;
+  label: string;
+  type: ProductMasterFeaturesType | "other";
+  conversionRatio: number | null;
+  uuid: string;
+  isActive: boolean;
 };
 
 export type VariantFieldValue = {
@@ -13,6 +27,10 @@ export type VariantFieldValue = {
   manufacturerName: string;
   manufacturerCode: string;
   baseUomId?: string;
+  saleUomId?: string;
+  purchaseUomId?: string;
+  manufacturingUomId?: string;
+  uomConversions: UomConversions[];
   isActive: boolean;
   packings: Array<{
     id?: string;
