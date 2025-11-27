@@ -44,6 +44,9 @@ export interface ProductVariantInput {
     code?: string | null;
   } | null;
   baseUomId?: string | null;
+  saleUomId?: string | null;
+  purchaseUomId?: string | null;
+  manufacturingUomId?: string | null;
   isActive?: boolean;
   images?: { url: string; alt?: string | null }[];
 }
@@ -62,11 +65,20 @@ export interface ProductAttributeInput {
   value: string;
 }
 
+export interface UomConversionInput {
+  uomId: string;
+  uomName: string;
+  conversionRatio: number;
+  label?: string;
+  type?: string;
+}
+
 export interface ProductCreateInput {
   master: ProductMasterInput;
   variant: ProductVariantInput;
   packings?: ProductPackingInput[];
   attributes?: ProductAttributeInput[];
+  uomConversions?: UomConversionInput[];
 }
 
 export interface ProductUpdateInput extends ProductCreateInput {

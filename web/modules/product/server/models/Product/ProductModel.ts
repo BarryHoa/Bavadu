@@ -6,6 +6,7 @@ import {
   table_product_packing,
   table_product_variant,
   table_unit_of_measure,
+  table_uom_conversion,
 } from "../../schemas";
 import {
   table_product_master,
@@ -219,6 +220,9 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
               }
             : null,
           baseUomId: payload.variant.baseUomId || null,
+          saleUomId: payload.variant.saleUomId || null,
+          purchaseUomId: payload.variant.purchaseUomId || null,
+          manufacturingUomId: payload.variant.manufacturingUomId || null,
           isActive: payload.variant.isActive ?? true,
           createdAt: now,
           updatedAt: now,
@@ -263,6 +267,38 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
             updatedAt: now,
           }))
         );
+      }
+
+      // Handle uomConversions - create units_of_measure records
+      const normalizedUomConversions = payload.uomConversions ?? [];
+      if (normalizedUomConversions.length > 0 && variant.baseUomId) {
+        // Insert UOM records first
+        const uomInserts = await tx
+          .insert(table_unit_of_measure)
+          .values(
+            normalizedUomConversions.map((conversion) => ({
+              name: this.normalizeLocale(conversion.uomName) ?? {
+                en: conversion.uomName,
+              },
+              symbol: null,
+              isActive: true,
+              createdAt: now,
+              updatedAt: now,
+            }))
+          )
+          .returning({ id: table_unit_of_measure.id });
+
+        // Then insert conversion records linking to baseUomId
+        if (uomInserts.length > 0) {
+          await tx.insert(table_uom_conversion).values(
+            normalizedUomConversions.map((conversion, index) => ({
+              uomId: uomInserts[index]?.id || conversion.uomId,
+              conversionRatio: conversion.conversionRatio.toString(),
+              createdAt: now,
+              updatedAt: now,
+            }))
+          );
+        }
       }
 
       return { id: variant.id };
@@ -321,6 +357,9 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
               }
             : null,
           baseUomId: payload.variant.baseUomId || null,
+          saleUomId: payload.variant.saleUomId || null,
+          purchaseUomId: payload.variant.purchaseUomId || null,
+          manufacturingUomId: payload.variant.manufacturingUomId || null,
           isActive: payload.variant.isActive ?? true,
           updatedAt: now,
         })

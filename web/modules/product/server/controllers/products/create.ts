@@ -181,8 +181,55 @@ export const buildPayload = (body: any): ProductCreateInput => {
       typeof variant.baseUomId === "string" && variant.baseUomId
         ? variant.baseUomId
         : null,
+    saleUomId:
+      typeof variant.saleUomId === "string" && variant.saleUomId
+        ? variant.saleUomId
+        : null,
+    purchaseUomId:
+      typeof variant.purchaseUomId === "string" && variant.purchaseUomId
+        ? variant.purchaseUomId
+        : null,
+    manufacturingUomId:
+      typeof variant.manufacturingUomId === "string" &&
+      variant.manufacturingUomId
+        ? variant.manufacturingUomId
+        : null,
     isActive: typeof variant.isActive === "boolean" ? variant.isActive : true,
     images: Array.isArray(variant.images) ? variant.images : undefined,
+  };
+
+  // Normalize uomConversions
+  const normalizeUomConversions = (raw: unknown) => {
+    if (!Array.isArray(raw)) {
+      return [];
+    }
+
+    return raw
+      .map((item) => {
+        const uomId =
+          typeof (item as any)?.uomId === "string" ? (item as any).uomId : null;
+        const uomName =
+          typeof (item as any)?.uomName === "string"
+            ? (item as any).uomName
+            : null;
+        const conversionRatio =
+          typeof (item as any)?.conversionRatio === "number"
+            ? (item as any).conversionRatio
+            : null;
+
+        if (!uomId || !uomName || conversionRatio === null) {
+          return null;
+        }
+
+        return {
+          uomId,
+          uomName,
+          conversionRatio,
+          label: typeof (item as any)?.label === "string" ? (item as any).label : undefined,
+          type: typeof (item as any)?.type === "string" ? (item as any).type : undefined,
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null);
   };
 
   return {
@@ -190,6 +237,7 @@ export const buildPayload = (body: any): ProductCreateInput => {
     variant: variantPayload,
     packings: normalizePackings(body.packings),
     attributes: normalizeAttributes(body.attributes),
+    uomConversions: normalizeUomConversions(body.uomConversions),
   };
 };
 
