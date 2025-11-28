@@ -1,9 +1,9 @@
 import * as v from "valibot";
 
 /**
- * UUID v7 validator
+ * UUID v7 validator (strict, v7 only)
  */
-export const uuidSchema = v.pipe(
+export const uuidV7Schema = v.pipe(
   v.string(),
   v.regex(
     /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
@@ -12,15 +12,22 @@ export const uuidSchema = v.pipe(
 );
 
 /**
- * Standard UUID validator (any version)
+ * Standard UUID validator (any version 1-7)
+ * This is the default UUID schema that accepts any valid UUID version
  */
-export const uuidAnySchema = v.pipe(
+export const uuidSchema = v.pipe(
   v.string(),
   v.regex(
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
     "Invalid UUID format"
   )
 );
+
+/**
+ * Standard UUID validator (any version) - alias for uuidSchema
+ * @deprecated Use uuidSchema instead. This alias is kept for backward compatibility.
+ */
+export const uuidAnySchema = uuidSchema;
 
 /**
  * Email validator
@@ -39,7 +46,10 @@ export const phoneSchema = v.pipe(
   v.string(),
   v.minLength(1, "Phone is required"),
   v.maxLength(20, "Phone must be at most 20 characters"),
-  v.regex(/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/, "Invalid phone format")
+  v.regex(
+    /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/,
+    "Invalid phone format"
+  )
 );
 
 /**
@@ -49,7 +59,10 @@ export const usernameSchema = v.pipe(
   v.string(),
   v.minLength(3, "Username must be at least 3 characters"),
   v.maxLength(50, "Username must be at most 50 characters"),
-  v.regex(/^[a-zA-Z0-9_-]+$/, "Username can only contain letters, numbers, underscores, and hyphens")
+  v.regex(
+    /^[a-zA-Z0-9_-]+$/,
+    "Username can only contain letters, numbers, underscores, and hyphens"
+  )
 );
 
 /**
@@ -147,10 +160,7 @@ export const nonNegativeIntegerSchema = v.pipe(
 /**
  * URL validator
  */
-export const urlSchema = v.pipe(
-  v.string(),
-  v.url("Invalid URL format")
-);
+export const urlSchema = v.pipe(v.string(), v.url("Invalid URL format"));
 
 /**
  * ISO date string validator
@@ -166,35 +176,39 @@ export const isoDateSchema = v.pipe(
 /**
  * Array with minimum length validator factory
  */
-export function arrayMinLengthSchema<T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>>(
-  itemSchema: T,
-  minLength: number = 1,
-  fieldName: string = "Array"
-) {
+export function arrayMinLengthSchema<
+  T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
+>(itemSchema: T, minLength: number = 1, fieldName: string = "Array") {
   return v.pipe(
     v.array(itemSchema),
-    v.minLength(minLength, `${fieldName} must have at least ${minLength} item(s)`)
+    v.minLength(
+      minLength,
+      `${fieldName} must have at least ${minLength} item(s)`
+    )
   );
 }
 
 /**
  * Array with maximum length validator factory
  */
-export function arrayMaxLengthSchema<T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>>(
-  itemSchema: T,
-  maxLength: number,
-  fieldName: string = "Array"
-) {
+export function arrayMaxLengthSchema<
+  T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
+>(itemSchema: T, maxLength: number, fieldName: string = "Array") {
   return v.pipe(
     v.array(itemSchema),
-    v.maxLength(maxLength, `${fieldName} must have at most ${maxLength} item(s)`)
+    v.maxLength(
+      maxLength,
+      `${fieldName} must have at most ${maxLength} item(s)`
+    )
   );
 }
 
 /**
  * Array with length range validator factory
  */
-export function arrayLengthSchema<T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>>(
+export function arrayLengthSchema<
+  T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
+>(
   itemSchema: T,
   minLength: number,
   maxLength: number,
@@ -202,8 +216,13 @@ export function arrayLengthSchema<T extends v.BaseSchema<unknown, unknown, v.Bas
 ) {
   return v.pipe(
     v.array(itemSchema),
-    v.minLength(minLength, `${fieldName} must have at least ${minLength} item(s)`),
-    v.maxLength(maxLength, `${fieldName} must have at most ${maxLength} item(s)`)
+    v.minLength(
+      minLength,
+      `${fieldName} must have at least ${minLength} item(s)`
+    ),
+    v.maxLength(
+      maxLength,
+      `${fieldName} must have at most ${maxLength} item(s)`
+    )
   );
 }
-

@@ -4,10 +4,12 @@ import { HeroUIProvider } from "@heroui/system";
 import { ToastProvider } from "@heroui/toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 import { NavigationLoader } from "@base/client/components/NavigationLoader";
 import { GlobalSettingsProvider } from "@base/client/contexts/global-settings";
+// Import root-store để khởi tạo và test DevTools
+import { setRootStoreValue } from "@base/client/stores/root-store";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -38,6 +40,11 @@ export function Providers({ children }: ProvidersProps) {
       })
   );
 
+  // Initialize root-store và test DevTools
+  useLayoutEffect(() => {
+    setRootStoreValue("__init__", { timestamp: Date.now() });
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <HeroUIProvider navigate={router.push}>
@@ -46,8 +53,8 @@ export function Providers({ children }: ProvidersProps) {
           toastProps={{ variant: "solid" }}
         />
         <GlobalSettingsProvider>
-            <NavigationLoader minLoadingTime={300} style="bar" />
-            {children}
+          <NavigationLoader minLoadingTime={300} />
+          {children}
         </GlobalSettingsProvider>
       </HeroUIProvider>
     </QueryClientProvider>
