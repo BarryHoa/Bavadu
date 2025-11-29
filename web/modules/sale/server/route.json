@@ -8,6 +8,82 @@
       { "path": "/confirm", "handler": "/orders/confirm" },
       { "path": "/deliver", "handler": "/orders/deliver" }
     ]
+  },
+  {
+    "group": "orders-b2b",
+    "routes": [
+      { "path": "/", "handler": "/orders-b2b/list" },
+      { "path": "/create", "handler": "/orders-b2b/create" },
+      { "path": "/detail", "handler": "/orders-b2b/get-by-id" },
+      { "path": "/update", "handler": "/orders-b2b/update" },
+      { "path": "/send", "handler": "/orders-b2b/send" },
+      { "path": "/deliver", "handler": "/orders-b2b/deliver" }
+    ]
+  },
+  {
+    "group": "orders-b2c",
+    "routes": [
+      { "path": "/", "handler": "/orders-b2c/list" },
+      { "path": "/create", "handler": "/orders-b2c/create" },
+      { "path": "/detail", "handler": "/orders-b2c/get-by-id" },
+      { "path": "/update", "handler": "/orders-b2c/update" },
+      { "path": "/confirm", "handler": "/orders-b2c/confirm" },
+      { "path": "/complete", "handler": "/orders-b2c/complete" }
+    ]
+  },
+  {
+    "group": "customers/companies",
+    "routes": [
+      { "path": "/", "handler": "/customers/companies/list" },
+      { "path": "/create", "handler": "/customers/companies/create" },
+      { "path": "/detail", "handler": "/customers/companies/get-by-id" },
+      { "path": "/update", "handler": "/customers/companies/update" }
+    ]
+  },
+  {
+    "group": "customers/individuals",
+    "routes": [
+      { "path": "/", "handler": "/customers/individuals/list" },
+      { "path": "/create", "handler": "/customers/individuals/create" },
+      { "path": "/detail", "handler": "/customers/individuals/get-by-id" },
+      { "path": "/update", "handler": "/customers/individuals/update" }
+    ]
+  },
+  {
+    "group": "master-data/payment-methods",
+    "routes": [
+      { "path": "/", "handler": "/master-data/payment-methods/list" }
+    ]
+  },
+  {
+    "group": "master-data/payment-terms",
+    "routes": [
+      { "path": "/", "handler": "/master-data/payment-terms/list" }
+    ]
+  },
+  {
+    "group": "master-data/shipping-methods",
+    "routes": [
+      { "path": "/", "handler": "/master-data/shipping-methods/list" }
+    ]
+  },
+  {
+    "group": "master-data/shipping-terms",
+    "routes": [
+      { "path": "/", "handler": "/master-data/shipping-terms/list" }
+    ]
+  },
+  {
+    "group": "master-data/tax-rates",
+    "routes": [
+      { "path": "/", "handler": "/master-data/tax-rates/list" }
+    ]
+  },
+  {
+    "group": "deliveries",
+    "routes": [
+      { "path": "/create", "handler": "/deliveries/create" }
+    ]
   }
 ]
 

@@ -7,7 +7,17 @@
   "icon": "Receipt",
   "models": {
     "sale.order": "Sale/SalesOrderModel",
-    "list.sale.order": "Sale/ListSalesOrderModel"
+    "list.sale.order": "Sale/ListSalesOrderModel",
+    "sale.orderB2B": "Sale/SalesOrderB2BModel",
+    "list.sale.orderB2B": "Sale/ListSalesOrderB2BModel",
+    "sale.orderB2C": "Sale/SalesOrderB2CModel",
+    "list.sale.orderB2C": "Sale/ListSalesOrderB2CModel",
+    "sale.customer": "Customer/CustomerModel",
+    "list.sale.customer.company": "Customer/ListCustomerCompanyModel",
+    "list.sale.customer.individual": "Customer/ListCustomerIndividualModel",
+    "sale.masterData": "MasterData/MasterDataModel",
+    "sale.delivery": "Delivery/DeliveryModel",
+    "list.sale.delivery": "Delivery/ListDeliveryModel"
   }
 }
 

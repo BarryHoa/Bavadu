@@ -5,11 +5,44 @@
   "order": 2,
   "children": [
     {
-      "key": "sales-orders",
-      "name": "Sales Orders",
-      "path": "/",
-      "as": "/",
-      "icon": "ClipboardList"
+      "key": "sales-orders-b2b",
+      "name": "B2B Orders",
+      "path": "/orders-b2b",
+      "as": "/orders-b2b",
+      "icon": "Building2"
+    },
+    {
+      "key": "sales-orders-b2c",
+      "name": "B2C Orders",
+      "path": "/orders-b2c",
+      "as": "/orders-b2c",
+      "icon": "User"
+    },
+    {
+      "key": "customers",
+      "name": "Customers",
+      "icon": "Users",
+      "children": [
+        {
+          "key": "customers-companies",
+          "name": "Companies",
+          "path": "/customers/companies",
+          "as": "/customers/companies"
+        },
+        {
+          "key": "customers-individuals",
+          "name": "Individuals",
+          "path": "/customers/individuals",
+          "as": "/customers/individuals"
+        }
+      ]
+    },
+    {
+      "key": "deliveries",
+      "name": "Deliveries",
+      "path": "/deliveries",
+      "as": "/deliveries",
+      "icon": "Truck"
     }
   ]
 }

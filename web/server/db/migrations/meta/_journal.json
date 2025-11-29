@@ -50,6 +50,13 @@
       "when": 1763796198910,
       "tag": "0006_sour_sway",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1764420230380,
+      "tag": "0007_left_sandman",
+      "breakpoints": true
     }
   ]
 }
