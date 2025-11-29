@@ -1,12 +1,12 @@
 "use client";
 
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
-import LinkAs from "@base/client/components/LinkAs";
-import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import {
   DATA_TABLE_COLUMN_KEY_ACTION,
   DataTableColumn,
 } from "@base/client/components/DataTable";
+import LinkAs from "@base/client/components/LinkAs";
+import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
@@ -31,7 +31,7 @@ export default function SalesOrdersB2CListPage(): React.ReactNode {
         render: (value, row) => {
           if (!row?.id) return value;
           return (
-            <LinkAs href={`/workspace/modules/b2c-sales/orders-b2c/view/${row.id}`}>
+            <LinkAs href={`/workspace/modules/b2c-sales/view/${row.id}`}>
               {row.code}
             </LinkAs>
           );
@@ -75,7 +75,7 @@ export default function SalesOrdersB2CListPage(): React.ReactNode {
         align: "end",
         render: (_, row) => {
           if (!row?.id) return null;
-          const viewLink = `/workspace/modules/b2c-sales/orders-b2c/view/${row.id}`;
+          const viewLink = `/workspace/modules/b2c-sales/view/${row.id}`;
           return (
             <ActionMenu
               actions={[
@@ -102,11 +102,11 @@ export default function SalesOrdersB2CListPage(): React.ReactNode {
         actionsRight={[
           {
             key: "new",
-            title: "New B2C Order",
+            title: "New Order",
             type: "link",
             color: "primary",
             props: {
-              href: "/workspace/modules/b2c-sales/orders-b2c/create",
+              href: "/workspace/modules/b2c-sales/create",
             },
           },
         ]}
@@ -114,4 +114,3 @@ export default function SalesOrdersB2CListPage(): React.ReactNode {
     </div>
   );
 }
-

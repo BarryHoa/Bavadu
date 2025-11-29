@@ -8,7 +8,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { table_product_master } from "../../../../product/server/schemas/product-master";
+import { table_product_master } from "@mdl/product/server/schemas/product-master";
 import { table_sales_order_b2c } from "./order-b2c";
 
 export const table_sales_order_line_b2c = pgTable(

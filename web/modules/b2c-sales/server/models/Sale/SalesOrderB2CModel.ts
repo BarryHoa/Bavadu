@@ -21,7 +21,7 @@ import type {
   CreateSalesOrderB2CInput,
   UpdateSalesOrderB2CInput,
 } from "../../models/interfaces/SalesOrderB2C";
-import type StockModel from "../../../../../stock/server/models/Stock/StockModel";
+import type StockModel from "@mdl/stock/server/models/Stock/StockModel";
 
 export default class SalesOrderB2CModel extends BaseModel<
   typeof table_sales_order_b2c

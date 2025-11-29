@@ -1,19 +1,18 @@
 "use client";
 
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
-import LinkAs from "@base/client/components/LinkAs";
-import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import {
   DATA_TABLE_COLUMN_KEY_ACTION,
   DataTableColumn,
 } from "@base/client/components/DataTable";
+import LinkAs from "@base/client/components/LinkAs";
+import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 
 import { SalesOrderB2B } from "../../interface/SalesOrderB2B";
-import { salesOrderB2BService } from "../../services/SalesOrderB2BService";
 
 type SalesOrderB2BRow = SalesOrderB2B & {
   expectedDate?: number | string | null;
@@ -32,7 +31,7 @@ export default function SalesOrdersB2BListPage(): React.ReactNode {
         render: (value, row) => {
           if (!row?.id) return value;
           return (
-            <LinkAs href={`/workspace/modules/b2b-sales/orders-b2b/view/${row.id}`}>
+            <LinkAs href={`/workspace/modules/b2b-sales/view/${row.id}`}>
               {row.code}
             </LinkAs>
           );
@@ -71,7 +70,7 @@ export default function SalesOrdersB2BListPage(): React.ReactNode {
         align: "end",
         render: (_, row) => {
           if (!row?.id) return null;
-          const viewLink = `/workspace/modules/b2b-sales/orders-b2b/view/${row.id}`;
+          const viewLink = `/workspace/modules/b2b-sales/view/${row.id}`;
           return (
             <ActionMenu
               actions={[
@@ -98,11 +97,11 @@ export default function SalesOrdersB2BListPage(): React.ReactNode {
         actionsRight={[
           {
             key: "new",
-            title: "New B2B Order",
+            title: "New Order",
             type: "link",
             color: "primary",
             props: {
-              href: "/workspace/modules/b2b-sales/orders-b2b/create",
+              href: "/workspace/modules/b2b-sales/create",
             },
           },
         ]}
@@ -110,4 +109,3 @@ export default function SalesOrdersB2BListPage(): React.ReactNode {
     </div>
   );
 }
-

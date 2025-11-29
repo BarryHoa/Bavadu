@@ -49,7 +49,7 @@ export interface SalesOrderB2BDto {
 
 export default class SalesOrderB2BService extends ClientHttpService {
   constructor() {
-    super("/api/modules/b2b-sales/orders-b2b");
+    super("/api/modules/b2b-sales/orders");
   }
 
   list() {

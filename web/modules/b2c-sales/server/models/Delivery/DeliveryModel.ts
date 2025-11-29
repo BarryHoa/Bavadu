@@ -1,20 +1,22 @@
 import { eq } from "drizzle-orm";
 
-import { BaseModel } from "@base/server/models/BaseModel";
 import { getEnv } from "@base/server";
+import { BaseModel } from "@base/server/models/BaseModel";
 import {
-  table_sales_order_delivery,
-  table_sales_order_delivery_line,
   table_sales_order_b2b,
-  table_sales_order_b2c,
   table_sales_order_line_b2b,
-  table_sales_order_line_b2c,
-} from "../../schemas";
+} from "@mdl/b2b-sales/server/schemas";
+import type StockModel from "@mdl/stock/server/models/Stock/StockModel";
 import type {
   NewTblSalesOrderDelivery,
   NewTblSalesOrderDeliveryLine,
 } from "../../schemas";
-import type StockModel from "../../../../../stock/server/models/Stock/StockModel";
+import {
+  table_sales_order_b2c,
+  table_sales_order_delivery,
+  table_sales_order_delivery_line,
+  table_sales_order_line_b2c,
+} from "../../schemas";
 
 export interface CreateDeliveryInput {
   orderType: "B2B" | "B2C";
@@ -55,7 +57,7 @@ export default class DeliveryModel extends BaseModel<
         .where(eq(table_sales_order_b2b.id, input.orderId))
         .limit(1);
       if (!b2bOrder) {
-        throw new Error("B2B order not found");
+        throw new Error("Order not found");
       }
       order = b2bOrder;
       orderCode = b2bOrder.code;
@@ -66,7 +68,7 @@ export default class DeliveryModel extends BaseModel<
         .where(eq(table_sales_order_b2c.id, input.orderId))
         .limit(1);
       if (!b2cOrder) {
-        throw new Error("B2C order not found");
+        throw new Error("Order not found");
       }
       order = b2cOrder;
       orderCode = b2cOrder.code;
@@ -112,9 +114,7 @@ export default class DeliveryModel extends BaseModel<
       for (const deliveryLine of input.lines) {
         const orderLine = linesById.get(deliveryLine.lineId);
         if (!orderLine) {
-          throw new Error(
-            `Order line ${deliveryLine.lineId} not found`
-          );
+          throw new Error(`Order line ${deliveryLine.lineId} not found`);
         }
 
         const quantity = Number(deliveryLine.quantity ?? 0);
@@ -175,4 +175,3 @@ export default class DeliveryModel extends BaseModel<
     });
   };
 }
-

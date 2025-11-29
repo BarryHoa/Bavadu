@@ -6,7 +6,7 @@ import {
   table_currency,
   table_currency_exchange_rate,
 } from "@base/server/schemas/currency";
-import type StockModel from "../../../../../stock/server/models/Stock/StockModel";
+import type StockModel from "@mdl/stock/server/models/Stock/StockModel";
 import type {
   CreateSalesOrderB2BInput,
   DeliverSalesOrderB2BInput,
@@ -17,12 +17,12 @@ import type {
   NewTblSalesOrderB2B,
   TblSalesOrderB2B,
   TblSalesOrderLineB2B,
-} from "../schemas";
+} from "../../schemas";
 import {
   table_order_currency_rate,
   table_sales_order_b2b,
   table_sales_order_line_b2b,
-} from "../schemas";
+} from "../../schemas";
 
 export default class SalesOrderB2BModel extends BaseModel<
   typeof table_sales_order_b2b

@@ -8,7 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { table_stock_warehouse } from "../../../../stock/server/schemas/warehouse";
+import { table_stock_warehouse } from "@mdl/stock/server/schemas/warehouse";
 
 // Sales Order Delivery - Track deliveries from orders (warehouse receipts)
 export const table_sales_order_delivery = pgTable(

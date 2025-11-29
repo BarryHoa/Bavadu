@@ -12,7 +12,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { table_stock_warehouse } from "../../../../stock/server/schemas/warehouse";
+import { table_stock_warehouse } from "@mdl/stock/server/schemas/warehouse";
 
 export const table_sales_order_b2c = pgTable(
   "sales_orders_b2c",

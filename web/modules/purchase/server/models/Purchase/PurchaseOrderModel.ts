@@ -11,7 +11,7 @@ import type {
   TblPurchaseOrder,
   TblPurchaseOrderLine,
 } from "../../schemas";
-import type StockModel from "../../../../stock/server/models/Stock/StockModel";
+import type StockModel from "@mdl/stock/server/models/Stock/StockModel";
 
 type PurchaseStatus = "draft" | "confirmed" | "received" | "cancelled";
 

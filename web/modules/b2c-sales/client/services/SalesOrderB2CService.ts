@@ -47,7 +47,7 @@ export interface SalesOrderB2CDto {
 
 export default class SalesOrderB2CService extends ClientHttpService {
   constructor() {
-    super("/api/modules/b2c-sales/orders-b2c");
+    super("/api/modules/b2c-sales/orders");
   }
 
   list() {
