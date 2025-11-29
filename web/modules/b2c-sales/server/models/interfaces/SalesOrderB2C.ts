@@ -1,8 +1,11 @@
-import type { LocaleDataType } from "@base/server/interfaces/Locale";
 import type { User } from "@base/server/interfaces/User";
-import type { TblSalesOrderB2C, TblSalesOrderLineB2C } from "../../schemas";
+import type { TblSalesOrderB2C } from "../../schemas";
 
-export type SalesOrderB2CStatus = "draft" | "confirmed" | "completed" | "cancelled";
+export type SalesOrderB2CStatus =
+  | "draft"
+  | "confirmed"
+  | "completed"
+  | "cancelled";
 
 export interface SalesOrderB2CLine {
   id: string;
@@ -54,7 +57,7 @@ export interface CreateSalesOrderB2CInput {
   userId?: string;
 }
 
-export interface UpdateSalesOrderB2CInput extends Partial<CreateSalesOrderB2CInput> {
+export interface UpdateSalesOrderB2CInput
+  extends Partial<CreateSalesOrderB2CInput> {
   id: string;
 }
-

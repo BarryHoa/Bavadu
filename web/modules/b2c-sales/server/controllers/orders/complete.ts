@@ -23,8 +23,9 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Failed to complete B2C sales order";
+      error instanceof Error
+        ? error.message
+        : "Failed to complete B2C sales order";
     return JSONResponse({ message, status: 400 });
   }
 }
-

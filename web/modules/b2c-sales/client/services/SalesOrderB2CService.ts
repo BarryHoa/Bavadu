@@ -147,4 +147,3 @@ export default class SalesOrderB2CService extends ClientHttpService {
 }
 
 export const salesOrderB2CService = new SalesOrderB2CService();
-

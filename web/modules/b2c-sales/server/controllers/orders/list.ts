@@ -12,8 +12,9 @@ export async function GET(request: NextRequest) {
     return response;
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Failed to list B2C sales orders";
+      error instanceof Error
+        ? error.message
+        : "Failed to list B2C sales orders";
     return JSONResponse({ message, status: 400 });
   }
 }
-

@@ -1,27 +1,20 @@
 import { desc, eq, sql } from "drizzle-orm";
 
 import { BaseModel } from "@base/server/models/BaseModel";
-import { getEnv } from "@base/server";
-import {
-  table_sales_order_b2c,
-  table_sales_order_line_b2c,
-  table_order_currency_rate,
-} from "../../schemas";
 import {
   table_currency,
   table_currency_exchange_rate,
 } from "@base/server/schemas/currency";
 import type {
-  NewTblSalesOrderB2C,
-  TblSalesOrderB2C,
-  TblSalesOrderLineB2C,
-} from "../../schemas";
-import type {
-  SalesOrderB2CStatus,
   CreateSalesOrderB2CInput,
   UpdateSalesOrderB2CInput,
 } from "../../models/interfaces/SalesOrderB2C";
-import type StockModel from "@mdl/stock/server/models/Stock/StockModel";
+import type { NewTblSalesOrderB2C, TblSalesOrderB2C } from "../../schemas";
+import {
+  table_order_currency_rate,
+  table_sales_order_b2c,
+  table_sales_order_line_b2c,
+} from "../../schemas";
 
 export default class SalesOrderB2CModel extends BaseModel<
   typeof table_sales_order_b2c
@@ -66,7 +59,10 @@ export default class SalesOrderB2CModel extends BaseModel<
         .padStart(2, "0")}${now
         .getDate()
         .toString()
-        .padStart(2, "0")}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+        .padStart(
+          2,
+          "0"
+        )}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
     // Get currency rate
     const currency = input.currency ?? "USD";
@@ -77,7 +73,7 @@ export default class SalesOrderB2CModel extends BaseModel<
         .from(table_currency)
         .where(eq(table_currency.code, currency))
         .limit(1);
-      
+
       if (currencyRecord) {
         const [latestRate] = await this.db
           .select()
@@ -85,7 +81,7 @@ export default class SalesOrderB2CModel extends BaseModel<
           .where(eq(table_currency_exchange_rate.currencyId, currencyRecord.id))
           .orderBy(desc(table_currency_exchange_rate.rateDate))
           .limit(1);
-        
+
         if (latestRate?.exchangeRate) {
           currencyRate = Number(latestRate.exchangeRate);
         }
@@ -120,7 +116,7 @@ export default class SalesOrderB2CModel extends BaseModel<
         const unitPrice = Number(line.unitPrice ?? 0);
         const lineDiscount = Number(line.lineDiscount ?? 0);
         const taxRate = Number(line.taxRate ?? 0);
-        
+
         const lineSubtotal = quantity * unitPrice;
         const lineTax = ((lineSubtotal - lineDiscount) * taxRate) / 100;
         const lineTotal = lineSubtotal - lineDiscount + lineTax;
@@ -231,9 +227,11 @@ export default class SalesOrderB2CModel extends BaseModel<
 
     const now = new Date();
     let subtotal = 0;
-    let totalDiscount = input.totalDiscount ?? Number(orderData.order.totalDiscount);
+    let totalDiscount =
+      input.totalDiscount ?? Number(orderData.order.totalDiscount);
     let totalTax = input.totalTax ?? Number(orderData.order.totalTax);
-    const shippingFee = input.shippingFee ?? Number(orderData.order.shippingFee);
+    const shippingFee =
+      input.shippingFee ?? Number(orderData.order.shippingFee);
 
     // Calculate line totals
     const lineData: Array<{
@@ -255,7 +253,7 @@ export default class SalesOrderB2CModel extends BaseModel<
       const unitPrice = Number(line.unitPrice ?? 0);
       const lineDiscount = Number(line.lineDiscount ?? 0);
       const taxRate = Number(line.taxRate ?? 0);
-      
+
       const lineSubtotal = quantity * unitPrice;
       const lineTax = ((lineSubtotal - lineDiscount) * taxRate) / 100;
       const lineTotal = lineSubtotal - lineDiscount + lineTax;
@@ -388,4 +386,3 @@ export default class SalesOrderB2CModel extends BaseModel<
     return updated;
   };
 }
-

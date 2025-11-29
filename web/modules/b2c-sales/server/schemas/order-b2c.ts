@@ -1,6 +1,7 @@
 import { table_payment_method } from "@base/server/schemas/payment-method";
 import { table_shipping_method } from "@base/server/schemas/shipping-method";
 import { table_shipping_term } from "@base/server/schemas/shipping-term";
+import { table_stock_warehouse } from "@mdl/stock/server/schemas/warehouse";
 import { sql } from "drizzle-orm";
 import {
   boolean,
@@ -12,7 +13,6 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { table_stock_warehouse } from "@mdl/stock/server/schemas/warehouse";
 
 export const table_sales_order_b2c = pgTable(
   "sales_orders_b2c",
