@@ -6,6 +6,11 @@
   "icon": "Package",
   "models": {
     "user": "Users/UserModel",
-    "location": "Locations/LocationModel"
+    "location": "Locations/LocationModel",
+    "payment-method": "PaymentMethod/PaymentMethodModel",
+    "payment-term": "PaymentTerm/PaymentTermModel",
+    "shipping-method": "ShippingMethod/ShippingMethodModel",
+    "shipping-term": "ShippingTerm/ShippingTermModel",
+    "tax-rate": "TaxRate/TaxRateModel"
   }
 }

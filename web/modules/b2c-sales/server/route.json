@@ -1,0 +1,26 @@
+[
+  {
+    "group": "orders",
+    "routes": [
+      { "path": "/", "handler": "/orders/list" },
+      { "path": "/create", "handler": "/orders/create" },
+      { "path": "/detail", "handler": "/orders/get-by-id" },
+      { "path": "/update", "handler": "/orders/update" },
+      { "path": "/confirm", "handler": "/orders/confirm" },
+      { "path": "/complete", "handler": "/orders/complete" }
+    ]
+  },
+  {
+    "group": "customers",
+    "routes": [
+      { "path": "/", "handler": "/customers/list" },
+      { "path": "/create", "handler": "/customers/create" },
+      { "path": "/detail", "handler": "/customers/get-by-id" },
+      { "path": "/update", "handler": "/customers/update" }
+    ]
+  },
+  {
+    "group": "deliveries",
+    "routes": [{ "path": "/create", "handler": "/deliveries/create" }]
+  }
+]

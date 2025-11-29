@@ -1,0 +1,27 @@
+[
+  {
+    "path": "/",
+    "routes": [
+      { "path": "/", "page": "/Orders/SalesOrdersB2BListPage" },
+      { "path": "/create", "page": "/Orders/SalesOrderB2BCreatePage" },
+      { "path": "/edit/[id]", "page": "/Orders/SalesOrderB2BEditPage" },
+      { "path": "/view/[id]", "page": "/Orders/SalesOrderB2BViewPage" }
+    ]
+  },
+  {
+    "path": "/customers",
+    "routes": [
+      { "path": "/", "page": "/Customers/CustomerCompaniesListPage" },
+      { "path": "/create", "page": "/Customers/CustomerCompanyCreatePage" },
+      { "path": "/edit/[id]", "page": "/Customers/CustomerCompanyEditPage" },
+      { "path": "/view/[id]", "page": "/Customers/CustomerCompanyViewPage" }
+    ]
+  },
+  {
+    "path": "/deliveries",
+    "routes": [
+      { "path": "/", "page": "/Deliveries/DeliveriesListPage" },
+      { "path": "/create", "page": "/Deliveries/CreateDeliveryPage" }
+    ]
+  }
+]

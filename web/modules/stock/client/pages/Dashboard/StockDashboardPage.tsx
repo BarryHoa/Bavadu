@@ -192,7 +192,7 @@ export default function StockDashboardPage(): React.ReactNode {
           size="sm"
           variant="light"
           className="ml-2"
-          onPress={() => router.push("/workspace/modules/sale")}
+          onPress={() => router.push("/workspace/modules/b2b-sales/orders")}
         >
           Go to Sales Orders
         </Button>

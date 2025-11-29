@@ -1,0 +1,16 @@
+{
+  "name": "b2c-sales",
+  "title": "B2C Sales",
+  "version": "0.1.0",
+  "description": "B2C Sales orders and customer management",
+  "category": "Operations",
+  "icon": "User",
+  "models": {
+    "b2c-sales.order": "Sale/SalesOrderB2CModel",
+    "list.b2c-sales.order": "Sale/ListSalesOrderB2CModel",
+    "b2c-sales.customer": "Customer/CustomerModel",
+    "list.b2c-sales.customer.individual": "Customer/ListCustomerIndividualModel",
+    "b2c-sales.delivery": "Delivery/DeliveryModel",
+    "list.b2c-sales.delivery": "Delivery/ListDeliveryModel"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "key": "b2c-sales-main",
+  "name": "B2C Sales",
+  "icon": "User",
+  "order": 3,
+  "children": [
+    {
+      "key": "b2c-orders",
+      "name": "Orders",
+      "path": "/",
+      "as": "/",
+      "icon": "FileText"
+    },
+    {
+      "key": "b2c-customers",
+      "name": "Customers",
+      "path": "/customers",
+      "as": "/customers",
+      "icon": "Users"
+    },
+    {
+      "key": "b2c-deliveries",
+      "name": "Deliveries",
+      "path": "/deliveries",
+      "as": "/deliveries",
+      "icon": "Truck"
+    }
+  ]
+}

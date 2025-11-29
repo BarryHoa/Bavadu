@@ -1,0 +1,27 @@
+[
+  {
+    "path": "/",
+    "routes": [
+      { "path": "/", "page": "/Orders/SalesOrdersB2CListPage" },
+      { "path": "/create", "page": "/Orders/SalesOrderB2CCreatePage" },
+      { "path": "/edit/[id]", "page": "/Orders/SalesOrderB2CEditPage" },
+      { "path": "/view/[id]", "page": "/Orders/SalesOrderB2CViewPage" }
+    ]
+  },
+  {
+    "path": "/customers",
+    "routes": [
+      { "path": "/", "page": "/Customers/CustomerIndividualsListPage" },
+      { "path": "/create", "page": "/Customers/CustomerIndividualCreatePage" },
+      { "path": "/edit/[id]", "page": "/Customers/CustomerIndividualEditPage" },
+      { "path": "/view/[id]", "page": "/Customers/CustomerIndividualViewPage" }
+    ]
+  },
+  {
+    "path": "/deliveries",
+    "routes": [
+      { "path": "/", "page": "/Deliveries/DeliveriesListPage" },
+      { "path": "/create", "page": "/Deliveries/CreateDeliveryPage" }
+    ]
+  }
+]
