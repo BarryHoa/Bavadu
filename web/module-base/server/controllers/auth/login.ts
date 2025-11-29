@@ -1,11 +1,12 @@
 import { compare } from "bcryptjs";
 import { eq } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { SESSION_CONFIG } from "../../config";
 import { setCsrfTokenCookie } from "../../middleware/csrf";
 import SessionModel from "../../models/Sessions/SessionModel";
 import { table_user, table_user_login } from "../../schemas/user";
 import getDbConnect from "../../utils/getDbConnect";
+import { JSONResponse } from "../../utils/JSONResponse";
 
 interface LoginRequest {
   username?: string;
@@ -44,17 +45,17 @@ export async function POST(request: NextRequest) {
 
     // Validate input
     if (!password) {
-      return NextResponse.json(
-        { success: false, error: "Password is required" },
-        { status: 400 }
-      );
+      return JSONResponse({
+        error: "Password is required",
+        status: 400,
+      });
     }
 
     if (!username) {
-      return NextResponse.json(
-        { success: false, error: "Username, email, or phone is required" },
-        { status: 400 }
-      );
+      return JSONResponse({
+        error: "Username, email, or phone is required",
+        status: 400,
+      });
     }
 
     const db = getDbConnect();
@@ -95,10 +96,10 @@ export async function POST(request: NextRequest) {
 
     if (!userLogin) {
       console.error("Login: User not found", { username });
-      return NextResponse.json(
-        { success: false, error: "Invalid credentials" },
-        { status: 401 }
-      );
+      return JSONResponse({
+        error: "Invalid credentials",
+        status: 401,
+      });
     }
 
     // Verify password
@@ -109,10 +110,10 @@ export async function POST(request: NextRequest) {
         email: userLogin.email,
         username: userLogin.username,
       });
-      return NextResponse.json(
-        { success: false, error: "Invalid credentials" },
-        { status: 401 }
-      );
+      return JSONResponse({
+        error: "Invalid credentials",
+        status: 401,
+      });
     }
 
     // Get user info
@@ -123,19 +124,19 @@ export async function POST(request: NextRequest) {
       .limit(1);
 
     if (!user) {
-      return NextResponse.json(
-        { success: false, error: "User not found" },
-        { status: 404 }
-      );
+      return JSONResponse({
+        error: "User not found",
+        status: 404,
+      });
     }
 
     // Check if user is active
 
     if (user.status !== "active") {
-      return NextResponse.json(
-        { success: false, error: "Account is not active" },
-        { status: 403 }
-      );
+      return JSONResponse({
+        error: "Account is not active",
+        status: 403,
+      });
     }
 
     // Create session
@@ -168,8 +169,7 @@ export async function POST(request: NextRequest) {
       .where(eq(table_user_login.userId, user.id));
 
     // Create response with session cookie
-    const response = NextResponse.json({
-      success: true,
+    const response = JSONResponse({
       data: {
         user: {
           id: user.id,
@@ -177,6 +177,7 @@ export async function POST(request: NextRequest) {
           avatar: user.avatar,
         },
       },
+      status: 200,
     });
 
     // Set session cookie
@@ -198,13 +199,10 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     console.error("Login error:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Login failed",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return JSONResponse({
+      error: "Login failed",
+      message: error instanceof Error ? error.message : "Unknown error",
+      status: 500,
+    });
   }
 }

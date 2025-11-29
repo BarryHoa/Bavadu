@@ -19,12 +19,10 @@ export type ProductFeatureOption = {
 };
 
 export type ProductTypesResponse = {
-  success: boolean;
   data: ProductTypeOption[];
 };
 
 export type ProductFeaturesResponse = {
-  success: boolean;
   data: ProductFeatureOption[];
 };
 
@@ -43,7 +41,6 @@ export type OptionalFieldDefinition = {
 };
 
 export type OptionalFieldsResponse = {
-  success: boolean;
   data: OptionalFieldDefinition[];
 };
 
@@ -55,23 +52,23 @@ class ProductService extends ClientHttpService {
 
   async getProductList(params: any) {
     // POST to fetch list of products
-    return this.post<{ success: boolean; data: any[] }>(`/`, params);
+    return this.post<{ data: any[] }>(`/`, params);
   }
 
   async getProductById(id: string) {
     // GET to fetch product by ID
-    return this.get<{ success: boolean; data: ProductDetail }>(`/${id}`);
+    return this.get<{ data: ProductDetail }>(`/${id}`);
   }
 
   async createProduct(payload: ProductFormPayload) {
-    return this.post<{ success: boolean; data: ProductDetail }>(
+    return this.post<{ data: ProductDetail }>(
       `/create`,
       payload
     );
   }
 
   async updateProduct(id: string, payload: ProductFormUpdatePayload) {
-    return this.patch<{ success: boolean; data: ProductDetail }>(
+    return this.patch<{ data: ProductDetail }>(
       `/${id}`,
       payload
     );

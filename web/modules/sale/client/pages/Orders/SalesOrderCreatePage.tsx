@@ -1,8 +1,11 @@
 "use client";
 
-import { IBaseInput } from "@base/client/components";
+import {
+  IBaseInput,
+  IBaseSingleSelect,
+  SelectItemOption,
+} from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
-import { IBaseSelect, IBaseSingleSelect, SelectItem, SelectItemOption } from "@base/client/components";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Textarea } from "@heroui/react";
@@ -27,6 +30,7 @@ import {
   trim,
 } from "valibot";
 
+import currencyService from "@base/client/services/CurrencyService";
 import StockService from "@mdl/stock/client/services/StockService";
 import { salesOrderService } from "../../services/SalesOrderService";
 
@@ -122,9 +126,14 @@ export default function SalesOrderCreatePage(): React.ReactNode {
     queryKey: ["warehouses"],
     queryFn: async () => {
       const response = await StockService.listWarehouses();
-      if (!response.success) {
-        throw new Error(response.message ?? "Failed to load warehouses.");
-      }
+      return response.data ?? [];
+    },
+  });
+
+  const currenciesQuery = useQuery({
+    queryKey: ["currencies"],
+    queryFn: async () => {
+      const response = await currencyService.getList();
       return response.data ?? [];
     },
   });
@@ -149,7 +158,7 @@ export default function SalesOrderCreatePage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await salesOrderService.create(payload);
-      if (!response.success || !response.data) {
+      if (!response.data) {
         throw new Error(response.message ?? "Failed to create sales order.");
       }
 
@@ -190,6 +199,17 @@ export default function SalesOrderCreatePage(): React.ReactNode {
     [warehousesQuery.data]
   );
 
+  const currencyOptions = useMemo<SelectItemOption[]>(
+    () =>
+      (currenciesQuery.data ?? []).map((currency) => ({
+        value: currency.code,
+        label: `${currency.code}${currency.symbol ? ` (${currency.symbol})` : ""} — ${typeof currency.name === "string" ? currency.name : currency.name?.en || currency.name?.vi || currency.code}`,
+        searchText:
+          `${currency.code} ${currency.symbol || ""} ${typeof currency.name === "string" ? currency.name : currency.name?.en || currency.name?.vi || ""}`.trim(),
+      })),
+    [currenciesQuery.data]
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex justify-end">
@@ -215,6 +235,13 @@ export default function SalesOrderCreatePage(): React.ReactNode {
               {warehousesQuery.error instanceof Error
                 ? warehousesQuery.error.message
                 : "Unable to load warehouses. You can continue without selecting one."}
+            </div>
+          ) : null}
+          {currenciesQuery.isError ? (
+            <div className="mb-4 rounded-large border border-warning-200 bg-warning-50 px-3 py-2 text-sm text-warning-600">
+              {currenciesQuery.error instanceof Error
+                ? currenciesQuery.error.message
+                : "Unable to load currencies. Please try again."}
             </div>
           ) : null}
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
@@ -270,13 +297,18 @@ export default function SalesOrderCreatePage(): React.ReactNode {
                 name="currency"
                 control={control}
                 render={({ field, fieldState }) => (
-                  <IBaseInput
-                    {...field}
+                  <IBaseSingleSelect
                     label="Currency"
-                    value={field.value}
-                    onValueChange={field.onChange}
+                    items={currencyOptions}
+                    selectedKey={field.value}
+                    onSelectionChange={(key) => {
+                      field.onChange(key || "");
+                    }}
                     isInvalid={fieldState.invalid}
                     errorMessage={fieldState.error?.message}
+                    isDisabled={currenciesQuery.isLoading}
+                    isRequired
+                    searchPlaceholder="Search currency..."
                   />
                 )}
               />

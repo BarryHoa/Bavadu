@@ -40,7 +40,7 @@ const ProductsCreatePage = (): React.ReactNode => {
   const createMutation = useMutation({
     mutationFn: async (payload: ProductFormPayload) => {
       const response = await ProductService.createProduct(payload);
-      if (!response.success) {
+      if (!response.data) {
         throw new Error("Failed to create product");
       }
       return response.data;

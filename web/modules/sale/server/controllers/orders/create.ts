@@ -1,5 +1,6 @@
 import getModuleQueryByModel from "@base/server/utils/getModuleQueryByModel";
-import { NextRequest, NextResponse } from "next/server";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,13 +8,10 @@ export async function POST(request: NextRequest) {
 
     const { customerName, lines } = payload;
     if (!customerName || !Array.isArray(lines) || lines.length === 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "customerName and at least one line are required",
-        },
-        { status: 400 }
-      );
+      return JSONResponse({
+        message: "customerName and at least one line are required",
+        status: 400,
+      });
     }
 
     const response = await getModuleQueryByModel({
@@ -40,6 +38,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to create sales order";
-    return NextResponse.json({ success: false, message }, { status: 400 });
+    return JSONResponse({ message, status: 400 });
   }
 }

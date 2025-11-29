@@ -1,4 +1,5 @@
 import { createSignedCsrfToken } from "@base/server/utils/csrf-token";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -11,12 +12,12 @@ export async function GET(request: NextRequest) {
     const { token, signedToken, expiresAt } = createSignedCsrfToken();
 
     // Create response with token
-    const response = NextResponse.json({
-      success: true,
+    const response = JSONResponse({
       data: {
         token,
         expiresAt,
       },
+      status: 200,
     });
 
     // Set the same signed token in cookie (not generating a new one)
@@ -36,14 +37,11 @@ export async function GET(request: NextRequest) {
     return response;
   } catch (error) {
     console.error("CSRF token generation error:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to generate CSRF token",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return JSONResponse({
+      error: "Failed to generate CSRF token",
+      message: error instanceof Error ? error.message : "Unknown error",
+      status: 500,
+    });
   }
 }
 

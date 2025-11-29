@@ -1,5 +1,6 @@
 import getModuleQueryByModel from "@base/server/utils/getModuleQueryByModel";
-import { NextRequest, NextResponse } from "next/server";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { NextRequest } from "next/server";
 
 export async function GET(_request: NextRequest) {
   try {
@@ -13,13 +14,10 @@ export async function GET(_request: NextRequest) {
   } catch (error) {
     console.error("Error getting countries:", error);
 
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to get countries",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return JSONResponse({
+      error: "Failed to get countries",
+      message: error instanceof Error ? error.message : "Unknown error",
+      status: 500,
+    });
   }
 }

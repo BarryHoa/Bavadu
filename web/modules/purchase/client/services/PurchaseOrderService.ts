@@ -32,7 +32,6 @@ export default class PurchaseOrderService extends ClientHttpService {
 
   list() {
     return this.get<{
-      success: boolean;
       data: PurchaseOrderDto[];
       message?: string;
     }>("/");
@@ -40,7 +39,6 @@ export default class PurchaseOrderService extends ClientHttpService {
 
   getById(id: string) {
     return this.get<{
-      success: boolean;
       data: { order: PurchaseOrderDto; lines: PurchaseOrderLineDto[] };
       message?: string;
     }>(`/detail?id=${id}`);
@@ -61,7 +59,6 @@ export default class PurchaseOrderService extends ClientHttpService {
     }>;
   }) {
     return this.post<{
-      success: boolean;
       data: { order: PurchaseOrderDto; lines: PurchaseOrderLineDto[] };
       message?: string;
     }>("/create", payload);
@@ -69,7 +66,6 @@ export default class PurchaseOrderService extends ClientHttpService {
 
   confirm(orderId: string) {
     return this.post<{
-      success: boolean;
       data: PurchaseOrderDto;
       message?: string;
     }>("/confirm", { orderId });
@@ -84,7 +80,6 @@ export default class PurchaseOrderService extends ClientHttpService {
     lines: Array<{ lineId: string; quantity: number }>;
   }) {
     return this.post<{
-      success: boolean;
       data: { order: PurchaseOrderDto; lines: PurchaseOrderLineDto[] };
       message?: string;
     }>("/receive", payload);

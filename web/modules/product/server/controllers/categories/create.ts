@@ -1,6 +1,7 @@
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
 import getModuleQueryByModel from "@base/server/utils/getModuleQueryByModel";
-import { NextRequest, NextResponse } from "next/server";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { NextRequest } from "next/server";
 
 const normalizeLocaleInput = (
   value: unknown
@@ -21,14 +22,11 @@ export async function POST(request: NextRequest) {
     const { code, name, description, parentId, level, isActive } = body ?? {};
 
     if (!code || !name) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Invalid payload",
-          message: "Both code and name are required",
-        },
-        { status: 400 }
-      );
+      return JSONResponse({
+        error: "Invalid payload",
+        message: "Both code and name are required",
+        status: 400,
+      });
     }
 
     const payload = {
@@ -58,13 +56,10 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to create category",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return JSONResponse({
+      error: "Failed to create category",
+      message: error instanceof Error ? error.message : "Unknown error",
+      status: 500,
+    });
   }
 }

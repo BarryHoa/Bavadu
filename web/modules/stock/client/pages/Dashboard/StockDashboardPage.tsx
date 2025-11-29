@@ -31,10 +31,10 @@ export default function StockDashboardPage(): React.ReactNode {
     queryKey: ["warehouses"],
     queryFn: async () => {
       const res = await fetch("/api/modules/stock/warehouses");
-      const json = await res.json();
-      if (!json.success) {
-        throw new Error(json.message ?? "Failed to load warehouses.");
+      if (!res.ok) {
+        throw new Error("Failed to load warehouses.");
       }
+      const json = await res.json();
       return json.data ?? [];
     },
   });

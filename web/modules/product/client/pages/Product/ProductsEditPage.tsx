@@ -55,7 +55,7 @@ export default function ProductsEditPage(): React.ReactNode {
         throw new Error("Missing product id");
       }
       const response = await ProductService.getProductById(productId);
-      if (!response.success) {
+      if (!response.data) {
         throw new Error("Failed to load product");
       }
       return response.data as ProductDetail;
@@ -72,7 +72,7 @@ export default function ProductsEditPage(): React.ReactNode {
     }) => {
       const payload = mapFormValuesToPayload(values);
       const response = await ProductService.updateProduct(id, payload);
-      if (!response.success) {
+      if (!response.data) {
         throw new Error("Failed to update product");
       }
       return response.data;

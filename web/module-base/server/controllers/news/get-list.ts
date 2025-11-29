@@ -1,7 +1,8 @@
 import { desc, eq, sql } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { table_news, table_user } from "../../schemas";
 import getDbConnect from "../../utils/getDbConnect";
+import { JSONResponse } from "../../utils/JSONResponse";
 
 /**
  * GET /api/base/news
@@ -72,8 +73,7 @@ export async function GET(request: NextRequest) {
       createdAt: item.createdAt.toISOString(),
     }));
 
-    return NextResponse.json({
-      success: true,
+    return JSONResponse({
       data: formattedNews,
       pagination: {
         total,
@@ -81,16 +81,14 @@ export async function GET(request: NextRequest) {
         offset,
         hasMore: offset + limit < total,
       },
+      status: 200,
     });
   } catch (error) {
     console.error("Error fetching news:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to fetch news",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return JSONResponse({
+      error: "Failed to fetch news",
+      message: error instanceof Error ? error.message : "Unknown error",
+      status: 500,
+    });
   }
 }

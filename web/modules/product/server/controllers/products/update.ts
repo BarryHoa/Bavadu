@@ -1,5 +1,6 @@
 import getModuleQueryByModel from "@base/server/utils/getModuleQueryByModel";
-import { NextRequest, NextResponse } from "next/server";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { NextRequest } from "next/server";
 import type { ProductUpdateInput } from "../../models/Product/ProductModelInterface";
 
 import { buildPayload as buildCreatePayload } from "./create";
@@ -23,14 +24,11 @@ export async function PATCH(
     const { id } = params;
 
     if (!id) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Invalid product ID",
-          message: "Product ID is required",
-        },
-        { status: 400 }
-      );
+      return JSONResponse({
+        error: "Invalid product ID",
+        message: "Product ID is required",
+        status: 400,
+      });
     }
 
     const body = await request.json();
@@ -53,13 +51,10 @@ export async function PATCH(
         ? 400
         : 500;
 
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to update product",
-        message,
-      },
-      { status: statusCode }
-    );
+    return JSONResponse({
+      error: "Failed to update product",
+      message,
+      status: statusCode,
+    });
   }
 }

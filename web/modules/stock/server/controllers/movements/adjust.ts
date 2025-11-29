@@ -1,5 +1,6 @@
 import getModuleQueryByModel from "@base/server/utils/getModuleQueryByModel";
-import { NextRequest, NextResponse } from "next/server";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,14 +10,11 @@ export async function POST(request: NextRequest) {
     const quantityDelta = Number(payload.quantityDelta ?? 0);
 
     if (!productId || !warehouseId || Number.isNaN(quantityDelta)) {
-      return NextResponse.json(
-        {
-          success: false,
-          message:
-            "productId, warehouseId and quantityDelta are required for stock adjustment",
-        },
-        { status: 400 }
-      );
+      return JSONResponse({
+        message:
+          "productId, warehouseId and quantityDelta are required for stock adjustment",
+        status: 400,
+      });
     }
 
     const response = await getModuleQueryByModel({
@@ -36,6 +34,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to adjust stock";
-    return NextResponse.json({ success: false, message }, { status: 400 });
+    return JSONResponse({ message, status: 400 });
   }
 }

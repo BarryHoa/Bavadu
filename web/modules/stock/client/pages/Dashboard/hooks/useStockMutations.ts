@@ -27,10 +27,7 @@ export function useStockMutations() {
 
   const adjustMutation = useMutation({
     mutationFn: async (payload: AdjustPayload) => {
-      const response = await StockService.adjustStock(payload);
-      if (!response.success) {
-        throw new Error(response.message ?? "Failed to adjust stock.");
-      }
+      await StockService.adjustStock(payload);
     },
     onSuccess: onMovementSuccess,
     onError: onMovementError,
@@ -38,10 +35,7 @@ export function useStockMutations() {
 
   const receiveMutation = useMutation({
     mutationFn: async (payload: InOutPayload) => {
-      const response = await StockService.receiveStock(payload);
-      if (!response.success) {
-        throw new Error(response.message ?? "Failed to receive stock.");
-      }
+      await StockService.receiveStock(payload);
     },
     onSuccess: onMovementSuccess,
     onError: onMovementError,
@@ -49,10 +43,7 @@ export function useStockMutations() {
 
   const issueMutation = useMutation({
     mutationFn: async (payload: InOutPayload) => {
-      const response = await StockService.issueStock(payload);
-      if (!response.success) {
-        throw new Error(response.message ?? "Failed to issue stock.");
-      }
+      await StockService.issueStock(payload);
     },
     onSuccess: onMovementSuccess,
     onError: onMovementError,
@@ -60,10 +51,7 @@ export function useStockMutations() {
 
   const transferMutation = useMutation({
     mutationFn: async (payload: TransferPayload) => {
-      const response = await StockService.transferStock(payload);
-      if (!response.success) {
-        throw new Error(response.message ?? "Failed to transfer stock.");
-      }
+      await StockService.transferStock(payload);
     },
     onSuccess: onMovementSuccess,
     onError: onMovementError,

@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { NextRequest } from "next/server";
 import { SESSION_CONFIG } from "../../config";
 import SessionModel from "../../models/Sessions/SessionModel";
 
@@ -16,9 +17,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Create response
-    const response = NextResponse.json({
-      success: true,
+    const response = JSONResponse({
       message: "Logged out successfully",
+      status: 200,
     });
 
     // Clear session cookie
@@ -30,13 +31,10 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     console.error("Logout error:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Logout failed",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return JSONResponse({
+      error: "Logout failed",
+      message: error instanceof Error ? error.message : "Unknown error",
+      status: 500,
+    });
   }
 }

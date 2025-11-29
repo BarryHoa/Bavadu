@@ -121,9 +121,6 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
     queryKey: ["warehouses"],
     queryFn: async () => {
       const response = await StockService.listWarehouses();
-      if (!response.success) {
-        throw new Error(response.message ?? "Failed to load warehouses.");
-      }
       return response.data ?? [];
     },
   });
@@ -148,7 +145,7 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await purchaseOrderService.create(payload);
-      if (!response.success || !response.data) {
+      if (!response.data) {
         throw new Error(response.message ?? "Failed to create purchase order.");
       }
 

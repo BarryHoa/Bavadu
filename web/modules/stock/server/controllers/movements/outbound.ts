@@ -1,5 +1,6 @@
 import getModuleQueryByModel from "@base/server/utils/getModuleQueryByModel";
-import { NextRequest, NextResponse } from "next/server";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,14 +10,11 @@ export async function POST(request: NextRequest) {
     const quantity = Number(payload.quantity ?? 0);
 
     if (!productId || !warehouseId || quantity <= 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          message:
-            "productId, warehouseId and a positive quantity are required for outbound movement",
-        },
-        { status: 400 }
-      );
+      return JSONResponse({
+        message:
+          "productId, warehouseId and a positive quantity are required for outbound movement",
+        status: 400,
+      });
     }
 
     const response = await getModuleQueryByModel({
@@ -38,6 +36,6 @@ export async function POST(request: NextRequest) {
       error instanceof Error
         ? error.message
         : "Failed to register outbound stock";
-    return NextResponse.json({ success: false, message }, { status: 400 });
+    return JSONResponse({ message, status: 400 });
   }
 }

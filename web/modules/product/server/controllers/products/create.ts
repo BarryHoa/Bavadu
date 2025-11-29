@@ -1,8 +1,9 @@
 import { getAuthenticatedUser } from "@base/server/utils/auth-helpers";
 import getModuleQueryByModel from "@base/server/utils/getModuleQueryByModel";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { validateRequest } from "@base/server/validation/middleware";
 import { productCreateInputSchema } from "@base/server/validation/schemas/product";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import type { ProductCreateInput } from "../../models/Product/ProductModelInterface";
 import {
   ProductMasterFeaturesEnum,
@@ -265,14 +266,11 @@ async function handlePOST(request: NextRequest) {
 
     const statusCode = /invalid|required/i.test(message) ? 400 : 500;
 
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to create product",
-        message,
-      },
-      { status: statusCode }
-    );
+    return JSONResponse({
+      error: "Failed to create product",
+      message,
+      status: statusCode,
+    });
   }
 }
 
@@ -282,14 +280,11 @@ export async function POST(request: NextRequest) {
   const user = getAuthenticatedUser(request);
 
   if (!user) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Authentication required",
-        message: "You must be authenticated to perform this action",
-      },
-      { status: 401 }
-    );
+    return JSONResponse({
+      error: "Authentication required",
+      message: "You must be authenticated to perform this action",
+      status: 401,
+    });
   }
 
   // Call handler

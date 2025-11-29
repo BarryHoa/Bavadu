@@ -1,5 +1,6 @@
 import getModuleQueryByModel from "@base/server/utils/getModuleQueryByModel";
-import { NextRequest, NextResponse } from "next/server";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,14 +9,11 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get("type");
 
     if (!parentId || !type) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Invalid parameters",
-          message: "Parent ID and type are required",
-        },
-        { status: 400 }
-      );
+      return JSONResponse({
+        error: "Invalid parameters",
+        message: "Parent ID and type are required",
+        status: 400,
+      });
     }
 
     const response = await getModuleQueryByModel({
@@ -31,13 +29,10 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error getting location by parent and type:", error);
 
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to get location by parent and type",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return JSONResponse({
+      error: "Failed to get location by parent and type",
+      message: error instanceof Error ? error.message : "Unknown error",
+      status: 500,
+    });
   }
 }

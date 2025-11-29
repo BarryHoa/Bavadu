@@ -45,7 +45,7 @@ export default function SalesOrderDetailPage(): React.ReactNode {
         throw new Error("Sales order identifier is missing.");
       }
       const response = await salesOrderService.getById(orderId);
-      if (!response.success || !response.data) {
+      if (!response.data) {
         throw new Error(response.message ?? "Failed to fetch sales order.");
       }
 
@@ -86,7 +86,7 @@ export default function SalesOrderDetailPage(): React.ReactNode {
   } = useCreateUpdate<string, SalesOrderDto>({
     mutationFn: async (id) => {
       const response = await salesOrderService.confirm(id);
-      if (!response.success || !response.data) {
+      if (!response.data) {
         throw new Error(response.message ?? "Failed to confirm sales order.");
       }
       return response.data;
@@ -112,7 +112,7 @@ export default function SalesOrderDetailPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await salesOrderService.deliver(payload);
-      if (!response.success || !response.data) {
+      if (!response.data) {
         throw new Error(response.message ?? "Failed to deliver products.");
       }
 

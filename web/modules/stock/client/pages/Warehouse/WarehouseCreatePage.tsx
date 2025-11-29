@@ -21,7 +21,7 @@ export default function WarehouseCreatePage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await StockService.createWarehouse(payload);
-      if (!response.success || !response.data) {
+      if (!response.data) {
         throw new Error(response.message ?? "Failed to create warehouse.");
       }
       return response.data;

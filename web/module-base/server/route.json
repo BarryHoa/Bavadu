@@ -123,5 +123,18 @@
         "handler": "/news/get-list"
       }
     ]
+  },
+  {
+    "path": "/currency",
+    "routes": [
+      {
+        "path": "/",
+        "handler": "/currency/get-list"
+      },
+      {
+        "path": "/latest-rate",
+        "handler": "/currency/get-latest-rate"
+      }
+    ]
   }
 ]

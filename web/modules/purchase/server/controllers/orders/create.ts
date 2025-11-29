@@ -1,5 +1,6 @@
 import getModuleQueryByModel from "@base/server/utils/getModuleQueryByModel";
-import { NextRequest, NextResponse } from "next/server";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,13 +8,10 @@ export async function POST(request: NextRequest) {
 
     const { vendorName, lines } = payload;
     if (!vendorName || !Array.isArray(lines) || lines.length === 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "vendorName and at least one line are required",
-        },
-        { status: 400 }
-      );
+      return JSONResponse({
+        message: "vendorName and at least one line are required",
+        status: 400,
+      });
     }
 
     const response = await getModuleQueryByModel({
@@ -42,6 +40,6 @@ export async function POST(request: NextRequest) {
       error instanceof Error
         ? error.message
         : "Failed to create purchase order";
-    return NextResponse.json({ success: false, message }, { status: 400 });
+    return JSONResponse({ message, status: 400 });
   }
 }

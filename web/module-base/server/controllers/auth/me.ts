@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { NextRequest } from "next/server";
 import { getAuthenticatedUser } from "../../utils/auth-helpers";
 
 export async function GET(request: NextRequest) {
@@ -8,18 +9,14 @@ export async function GET(request: NextRequest) {
     const user = getAuthenticatedUser(request);
 
     if (!user) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Authentication required",
-          message: "You must be authenticated to access this resource",
-        },
-        { status: 401 }
-      );
+      return JSONResponse({
+        error: "Authentication required",
+        message: "You must be authenticated to access this resource",
+        status: 401,
+      });
     }
 
-    return NextResponse.json({
-      success: true,
+    return JSONResponse({
       data: {
         user: {
           id: user.id,
@@ -27,17 +24,15 @@ export async function GET(request: NextRequest) {
           avatar: user.avatar,
         },
       },
+      status: 200,
     });
   } catch (error) {
     console.error("Get current user error:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to get current user",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return JSONResponse({
+      error: "Failed to get current user",
+      message: error instanceof Error ? error.message : "Unknown error",
+      status: 500,
+    });
   }
 }
 

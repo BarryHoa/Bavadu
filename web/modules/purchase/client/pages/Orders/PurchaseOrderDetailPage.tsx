@@ -46,7 +46,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
       }
 
       const response = await purchaseOrderService.getById(orderId);
-      if (!response.success || !response.data) {
+      if (!response.data) {
         throw new Error("Failed to fetch purchase order.");
       }
 
@@ -87,7 +87,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
   } = useCreateUpdate<string, PurchaseOrderDto>({
     mutationFn: async (id) => {
       const response = await purchaseOrderService.confirm(id);
-      if (!response.success || !response.data) {
+      if (!response.data) {
         throw new Error("Failed to confirm purchase order.");
       }
 
@@ -114,7 +114,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await purchaseOrderService.receive(payload);
-      if (!response.success || !response.data) {
+      if (!response.data) {
         throw new Error("Failed to receive products.");
       }
 

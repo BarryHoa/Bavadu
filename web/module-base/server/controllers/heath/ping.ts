@@ -1,9 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { NextRequest } from "next/server";
 
 export async function GET(_request: NextRequest) {
-  return NextResponse.json({
-    success: true,
+  return JSONResponse({
     message: "pong",
-    timestamp: new Date().toISOString(),
+    data: {
+      timestamp: new Date().toISOString(),
+    },
+    status: 200,
   });
 }

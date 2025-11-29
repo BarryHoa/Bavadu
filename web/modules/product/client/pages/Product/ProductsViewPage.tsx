@@ -51,7 +51,7 @@ export default function ProductsViewPage(): React.ReactNode {
         throw new Error("Missing product id");
       }
       const response = await ProductService.getProductById(productId);
-      if (!response.success) {
+      if (!response.data) {
         throw new Error("Failed to load product");
       }
       return response.data as ProductDetail;

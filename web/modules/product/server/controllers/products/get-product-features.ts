@@ -1,5 +1,5 @@
+import { JSONResponse } from "@base/server/utils/JSONResponse";
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
-import { NextResponse } from "next/server";
 import type { ProductMasterFeatures } from "../../models/interfaces/ProductMaster";
 
 export async function GET() {
@@ -43,18 +43,15 @@ export async function GET() {
       },
     ];
 
-    return NextResponse.json({
-      success: true,
+    return JSONResponse({
       data: featureOptions,
+      status: 200,
     });
   } catch (error) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to fetch product features",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return JSONResponse({
+      error: "Failed to fetch product features",
+      message: error instanceof Error ? error.message : "Unknown error",
+      status: 500,
+    });
   }
 }

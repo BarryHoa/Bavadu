@@ -1,5 +1,6 @@
 import getModuleQueryByModel from "@base/server/utils/getModuleQueryByModel";
-import { NextRequest, NextResponse } from "next/server";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { NextRequest } from "next/server";
 
 // UUID v4/v7 validation regex
 const UUID_REGEX =
@@ -43,14 +44,11 @@ export async function GET(
 
     return response;
   } catch (error) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to fetch category",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return JSONResponse({
+      error: "Failed to fetch category",
+      message: error instanceof Error ? error.message : "Unknown error",
+      status: 500,
+    });
   }
 }
 
@@ -62,26 +60,20 @@ export async function PATCH(
     const { id } = await params;
 
     if (!id) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Invalid category ID",
-          message: "Category ID is required",
-        },
-        { status: 400 }
-      );
+      return JSONResponse({
+        error: "Invalid category ID",
+        message: "Category ID is required",
+        status: 400,
+      });
     }
 
     // Validate UUID format to prevent matching non-UUID paths like "get-list"
     if (!UUID_REGEX.test(id)) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Invalid category ID",
-          message: "Category ID must be a valid UUID",
-        },
-        { status: 400 }
-      );
+      return JSONResponse({
+        error: "Invalid category ID",
+        message: "Category ID must be a valid UUID",
+        status: 400,
+      });
     }
 
     const payload = await request.json();
@@ -97,13 +89,10 @@ export async function PATCH(
 
     return response;
   } catch (error) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to update category",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return JSONResponse({
+      error: "Failed to update category",
+      message: error instanceof Error ? error.message : "Unknown error",
+      status: 500,
+    });
   }
 }

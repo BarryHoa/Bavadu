@@ -33,7 +33,7 @@ export default function WarehouseEditPage(): React.ReactNode {
       }
 
       const response = await StockService.getWarehouseById(warehouseId);
-      if (!response.success || !response.data) {
+      if (!response.data) {
         throw new Error(response.message ?? "Unable to load warehouse.");
       }
 
@@ -47,7 +47,7 @@ export default function WarehouseEditPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await StockService.updateWarehouse(payload);
-      if (!response.success || !response.data) {
+      if (!response.data) {
         throw new Error(response.message ?? "Failed to update warehouse.");
       }
 

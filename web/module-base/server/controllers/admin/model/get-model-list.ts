@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
 import getEnv from "../../../utils/getEnv";
 
 const getModelList = async () => {
@@ -19,10 +19,10 @@ const getModelList = async () => {
 
 export async function GET() {
   const modelList = await getModelList();
-  return NextResponse.json({
-    success: true,
+  return JSONResponse({
     data: modelList,
     total: modelList.length,
     message: `Loaded ${modelList.length} model(s)`,
+    status: 200,
   });
 }
