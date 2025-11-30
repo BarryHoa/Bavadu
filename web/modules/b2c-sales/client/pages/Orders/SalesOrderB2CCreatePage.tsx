@@ -33,9 +33,10 @@ import {
   taxRateService,
 } from "@base/client/services";
 import currencyService from "@base/client/services/CurrencyService";
-import StockService from "@mdl/stock/client/services/StockService";
 import UnitOfMeasureService from "@mdl/product/client/services/UnitOfMeasureService";
+import StockService from "@mdl/stock/client/services/StockService";
 import { type CustomerIndividualDto } from "../../services/CustomerService";
+import { priceListB2CService } from "../../services/PriceListB2CService";
 import { salesOrderB2CService } from "../../services/SalesOrderB2CService";
 import CustomerInfoSection from "./components/CustomerInfoSection";
 import DeliveryInfoSection from "./components/DeliveryInfoSection";
@@ -47,26 +48,20 @@ const quantitySchema = pipe(
   string(),
   trim(),
   minLength(1, "Quantity is required"),
-  custom(
-    (value) => {
-      const num = Number(value);
-      return !Number.isNaN(num) && num >= 0 && num <= 5000;
-    },
-    "Quantity must be between 0 and 5000"
-  )
+  custom((value) => {
+    const num = Number(value);
+    return !Number.isNaN(num) && num >= 0 && num <= 5000;
+  }, "Quantity must be between 0 and 5000")
 );
 
 const priceSchema = pipe(
   string(),
   trim(),
-  custom(
-    (value) => {
-      if (value === "") return true;
-      const num = Number(value);
-      return !Number.isNaN(num) && num >= 0 && num <= 100000000;
-    },
-    "Price must be between 0 and 100,000,000"
-  )
+  custom((value) => {
+    if (value === "") return true;
+    const num = Number(value);
+    return !Number.isNaN(num) && num >= 0 && num <= 100000000;
+  }, "Price must be between 0 and 100,000,000")
 );
 
 const discountSchema = pipe(
@@ -104,7 +99,7 @@ const orderLineSchema = object({
 
 const salesOrderB2CFormSchema = object({
   // Pricing & Currency
-  pricingId: optional(pipe(string(), trim())),
+  priceListId: optional(pipe(string(), trim())),
   currency: pipe(string(), trim(), minLength(1, "Currency is required")),
 
   // Customer
@@ -137,7 +132,7 @@ const salesOrderB2CFormSchema = object({
 });
 
 type SalesOrderB2CFormValues = {
-  pricingId?: string;
+  priceListId?: string;
   currency: string;
   customerName: string;
   requireInvoice?: boolean;
@@ -189,7 +184,7 @@ export default function SalesOrderB2CCreatePage(): React.ReactNode {
   } = useForm<SalesOrderB2CFormValues>({
     resolver: valibotResolver(salesOrderB2CFormSchema) as any,
     defaultValues: {
-      pricingId: undefined,
+      priceListId: undefined,
       currency: DEFAULT_CURRENCY,
       customerName: DEFAULT_CUSTOMER_NAME,
       requireInvoice: false,
@@ -213,7 +208,7 @@ export default function SalesOrderB2CCreatePage(): React.ReactNode {
   });
 
   const watchedLines = watch("lines");
-  const watchedPricingId = watch("pricingId");
+  const watchedPriceListId = watch("priceListId");
   const watchedCurrency = watch("currency");
   const watchedShippingMethodId = watch("shippingMethodId");
   const watchedTotalDiscount = watch("totalDiscount") || "0";
@@ -325,6 +320,14 @@ export default function SalesOrderB2CCreatePage(): React.ReactNode {
     },
   });
 
+  const priceListsQuery = useQuery({
+    queryKey: ["price-lists-b2c"],
+    queryFn: async () => {
+      const response = await priceListB2CService.list();
+      return response.data ?? [];
+    },
+  });
+
   // Find default payment method (Cash/Tiền mặt)
   const defaultPaymentMethod = useMemo(() => {
     if (!paymentMethodsQuery.data) return undefined;
@@ -391,6 +394,7 @@ export default function SalesOrderB2CCreatePage(): React.ReactNode {
 
     const payload = {
       customerName: values.customerName.trim(),
+      priceListId: values.priceListId?.trim() || undefined,
       deliveryAddress: isShippingOtherThanPickup
         ? values.deliveryAddress?.trim() || undefined
         : undefined,
@@ -448,9 +452,19 @@ export default function SalesOrderB2CCreatePage(): React.ReactNode {
     [currenciesQuery.data]
   );
 
-  const pricingOptions = useMemo<SelectItemOption[]>(
-    () => [], // TODO: Load pricing options when available
-    []
+  const priceListOptions = useMemo<SelectItemOption[]>(
+    () =>
+      (priceListsQuery.data ?? [])
+        .filter((pl) => pl.status === "active")
+        .map((pl) => {
+          const name =
+            typeof pl.name === "object" ? pl.name.vi || pl.name.en : pl.name;
+          return {
+            value: pl.id,
+            label: `${pl.code} - ${name}`,
+          };
+        }),
+    [priceListsQuery.data]
   );
 
   const paymentMethodOptions = useMemo<SelectItemOption[]>(
@@ -537,10 +551,10 @@ export default function SalesOrderB2CCreatePage(): React.ReactNode {
             {/* Section: Thông tin chung */}
             <GeneralInfoSection
               control={control}
-              pricingOptions={pricingOptions}
+              priceListOptions={priceListOptions}
               currencyOptions={currencyOptions}
               warehouseOptions={warehouseOptions}
-              watchedPricingId={watchedPricingId}
+              watchedPriceListId={watchedPriceListId}
               errors={errors}
             />
 
@@ -554,11 +568,13 @@ export default function SalesOrderB2CCreatePage(): React.ReactNode {
               remove={remove}
               watchedLines={watchedLines}
               watchedCurrency={watchedCurrency}
+              watchedPriceListId={watchedPriceListId}
               taxRateOptions={taxRateOptions}
               taxRatesQuery={taxRatesQuery}
               uomOptions={uomOptions}
               errors={errors}
               defaultLine={defaultLine}
+              setValue={setValue}
             />
 
             <Divider />

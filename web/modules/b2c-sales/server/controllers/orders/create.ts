@@ -30,6 +30,7 @@ export async function POST(request: NextRequest) {
         warehouseId: payload.warehouseId ?? undefined,
         expectedDate: payload.expectedDate ?? undefined,
         currency: payload.currency ?? undefined,
+        priceListId: payload.priceListId ?? undefined,
         notes: payload.notes ?? undefined,
         totalDiscount: payload.totalDiscount,
         totalTax: payload.totalTax,

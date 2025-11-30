@@ -5,19 +5,19 @@ import { Control, Controller } from "react-hook-form";
 
 interface GeneralInfoSectionProps {
   control: Control<any>;
-  pricingOptions: SelectItemOption[];
+  priceListOptions: SelectItemOption[];
   currencyOptions: SelectItemOption[];
   warehouseOptions: SelectItemOption[];
-  watchedPricingId?: string;
+  watchedPriceListId?: string;
   errors?: any;
 }
 
 export default function GeneralInfoSection({
   control,
-  pricingOptions,
+  priceListOptions,
   currencyOptions,
   warehouseOptions,
-  watchedPricingId,
+  watchedPriceListId,
   errors,
 }: GeneralInfoSectionProps) {
   return (
@@ -25,13 +25,13 @@ export default function GeneralInfoSection({
       <h2 className="text-base font-semibold mb-2">Thông tin chung</h2>
       <div className="grid gap-2 md:grid-cols-3">
         <Controller
-          name="pricingId"
+          name="priceListId"
           control={control}
           render={({ field, fieldState }) => (
             <IBaseSingleSelect
-              label="Pricing"
+              label="Price List"
               size="sm"
-              items={pricingOptions}
+              items={priceListOptions}
               selectedKey={field.value}
               onSelectionChange={(key) => {
                 field.onChange(key || undefined);
@@ -54,7 +54,7 @@ export default function GeneralInfoSection({
                 field.onChange(key || undefined);
               }}
               isRequired
-              isDisabled={!!watchedPricingId}
+              isDisabled={!!watchedPriceListId}
               isInvalid={fieldState.invalid}
               errorMessage={fieldState.error?.message}
             />

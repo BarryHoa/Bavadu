@@ -181,5 +181,39 @@
         "handler": "/master-data/tax-rates/list"
       }
     ]
+  },
+  {
+    "path": "/price-lists",
+    "routes": [
+      {
+        "path": "/calculate-price",
+        "handler": "/price-lists/calculate-price"
+      }
+    ]
+  },
+  {
+    "path": "/price-lists-b2c",
+    "routes": [
+      {
+        "path": "/",
+        "handler": "/price-lists-b2c/list"
+      },
+      {
+        "path": "/detail",
+        "handler": "/price-lists-b2c/get-by-id"
+      },
+      {
+        "path": "/create",
+        "handler": "/price-lists-b2c/create"
+      },
+      {
+        "path": "/update",
+        "handler": "/price-lists-b2c/update"
+      },
+      {
+        "path": "/delete",
+        "handler": "/price-lists-b2c/delete"
+      }
+    ]
   }
 ]

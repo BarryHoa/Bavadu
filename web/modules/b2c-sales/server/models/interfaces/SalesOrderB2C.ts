@@ -42,6 +42,7 @@ export interface CreateSalesOrderB2CInput {
   warehouseId?: string;
   expectedDate?: string;
   currency?: string;
+  priceListId?: string; // Optional: Nếu không có, sẽ tự động tìm default price list
   notes?: string;
   lines: Array<{
     productId: string;

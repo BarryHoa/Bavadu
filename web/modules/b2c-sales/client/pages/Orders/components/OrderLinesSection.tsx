@@ -6,11 +6,12 @@ import {
   IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
+import ClientHttpService from "@base/client/services/ClientHttpService";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Divider } from "@heroui/react";
 import { Trash2 } from "lucide-react";
-import { useMemo } from "react";
-import { Control, Controller } from "react-hook-form";
+import { useMemo, useEffect } from "react";
+import { Control, Controller, UseFormSetValue } from "react-hook-form";
 
 interface OrderLinesSectionProps {
   control: Control<any>;
@@ -19,12 +20,16 @@ interface OrderLinesSectionProps {
   remove: (index: number) => void;
   watchedLines: any[];
   watchedCurrency: string;
+  watchedPriceListId?: string;
   taxRateOptions: SelectItemOption[];
   taxRatesQuery: { isLoading: boolean };
   uomOptions: SelectItemOption[];
   errors?: any;
   defaultLine: any;
+  setValue: UseFormSetValue<any>;
 }
+
+const pricingService = new ClientHttpService("/api/base/price-lists");
 
 export default function OrderLinesSection({
   control,
@@ -33,13 +38,59 @@ export default function OrderLinesSection({
   remove,
   watchedLines,
   watchedCurrency,
+  watchedPriceListId,
   taxRateOptions,
   taxRatesQuery,
   uomOptions,
   errors,
   defaultLine,
+  setValue,
 }: OrderLinesSectionProps) {
   const DEFAULT_CURRENCY = "VND";
+
+  // Auto-calculate price when product, quantity, or priceListId changes
+  useEffect(() => {
+    if (!watchedPriceListId) return;
+
+    watchedLines.forEach(async (line, index) => {
+      const productId = line.productId;
+      const quantity = Number(line.quantity) || 0;
+
+      if (!productId || quantity <= 0) return;
+
+      try {
+        // Call calculate-price API
+        // Note: productId is assumed to be variantId, we'll need productMasterId too
+        // For now, we'll use productId as both variantId and masterId
+        const response = await pricingService.post<{
+          data: {
+            unitPrice: number;
+            basePrice: number;
+            discountAmount: number;
+            finalPrice: number;
+            priceSource: string;
+          };
+        }>("/calculate-price", {
+          productVariantId: productId,
+          productMasterId: productId, // TODO: Get actual masterId from product
+          quantity,
+          priceListId: watchedPriceListId,
+        });
+
+        if (response.data?.data) {
+          const priceData = response.data.data;
+          // Only auto-fill if unitPrice is not manually set or is 0
+          const currentPrice = Number(line.unitPrice) || 0;
+          if (currentPrice === 0 || currentPrice === 1) {
+            setValue(`lines.${index}.unitPrice`, priceData.finalPrice.toString());
+          }
+        }
+      } catch (error) {
+        // Silently fail - user can enter price manually
+        console.error("Failed to calculate price:", error);
+      }
+    });
+  }, [watchedPriceListId, watchedLines, setValue]);
 
   // Calculate line totals for each line
   const lineTotals = useMemo(() => {

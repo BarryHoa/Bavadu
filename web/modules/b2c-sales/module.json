@@ -11,6 +11,7 @@
     "b2c-sales.customer": "Customer/CustomerModel",
     "list.b2c-sales.customer.individual": "Customer/ListCustomerIndividualModel",
     "b2c-sales.delivery": "Delivery/DeliveryModel",
-    "list.b2c-sales.delivery": "Delivery/ListDeliveryModel"
+    "list.b2c-sales.delivery": "Delivery/ListDeliveryModel",
+    "list.b2c-sales.price-list": "PriceList/ListPriceListB2CModel"
   }
 }

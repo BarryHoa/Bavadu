@@ -23,5 +23,14 @@
       { "path": "/", "page": "/Deliveries/DeliveriesListPage" },
       { "path": "/create", "page": "/Deliveries/CreateDeliveryPage" }
     ]
+  },
+  {
+    "path": "/price-lists",
+    "routes": [
+      { "path": "/", "page": "/PriceLists/PriceListsB2CListPage" },
+      { "path": "/create", "page": "/PriceLists/PriceListB2CCreatePage" },
+      { "path": "/edit/[id]", "page": "/PriceLists/PriceListB2CEditPage" },
+      { "path": "/view/[id]", "page": "/PriceLists/PriceListB2CViewPage" }
+    ]
   }
 ]

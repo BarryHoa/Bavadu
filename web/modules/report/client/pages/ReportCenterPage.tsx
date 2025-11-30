@@ -1,9 +1,8 @@
 "use client";
 
-import React from "react";
-import ReactECharts from "echarts-for-react";
+import { IBaseTabs, Tab } from "@base/client/components";
 import { Card } from "@heroui/card";
-import { Tabs, Tab } from "@heroui/tabs";
+import ReactECharts from "echarts-for-react";
 
 const overviewOption: echarts.EChartsOption = {
   tooltip: { trigger: "axis" },
@@ -45,12 +44,7 @@ export default function ReportCenterPage() {
         </div>
       </div>
 
-      <Tabs
-        aria-label="Report groups"
-        color="primary"
-        variant="bordered"
-        className="w-full"
-      >
+      <IBaseTabs aria-label="Report groups" color="primary">
         <Tab key="overview" title="Overview">
           <Card className="p-4">
             <div className="mb-3 text-sm font-medium text-slate-700">
@@ -72,9 +66,7 @@ export default function ReportCenterPage() {
             </div>
           </Card>
         </Tab>
-      </Tabs>
+      </IBaseTabs>
     </div>
   );
 }
-
-

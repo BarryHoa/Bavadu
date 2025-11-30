@@ -77,6 +77,7 @@ export default class SalesOrderB2CService extends ClientHttpService {
     warehouseId?: string;
     expectedDate?: string;
     currency?: string;
+    priceListId?: string;
     notes?: string;
     totalDiscount?: number;
     totalTax?: number;

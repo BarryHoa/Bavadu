@@ -1,10 +1,14 @@
 "use client";
 
-import { IBaseTooltip, SelectItemOption } from "@base/client/components";
+import {
+  IBaseTabs,
+  IBaseTooltip,
+  SelectItemOption,
+  Tab,
+} from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/react";
-import { Tab, Tabs } from "@heroui/tabs";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
 import { HelpCircle, Plus } from "lucide-react";
@@ -743,16 +747,15 @@ export default function ProductForm({
             </div>
           </div>
 
-          <Tabs
+          <IBaseTabs
             aria-label="Product form tabs"
             color="primary"
-            // variant="bordered"
-            size="sm"
-            className="w-full"
             selectedKey={selectedTab}
-            onSelectionChange={(key) => setSelectedTab(key as string)}
+            onSelectionChange={(key: React.Key) =>
+              setSelectedTab(key as string)
+            }
             classNames={{
-              tabList: "gap-0 overflow-x-auto mb-0",
+              tabList: "overflow-x-auto mb-0",
               tab: "max-w-[80px]",
               tabContent: "max-w-[80px] truncate",
               base: "mb-0",
@@ -835,7 +838,7 @@ export default function ProductForm({
                 </Tab>
               );
             })}
-          </Tabs>
+          </IBaseTabs>
         </CardBody>
       </Card>
 

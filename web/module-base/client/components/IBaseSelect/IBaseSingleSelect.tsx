@@ -53,13 +53,22 @@ const IBaseSingleSelect = React.forwardRef<
       return null;
     }
 
-    const searchableItems = items.map((item) => ({
-      id: item.value,
-      label: item.label,
-      searchText: item.searchText || item.label,
+    // Filter out items with invalid values and ensure value is a string
+    const validItems = items.filter(
+      (item) => item.value !== undefined && item.value !== null && item.value !== ""
+    );
+
+    if (validItems.length === 0) {
+      return null;
+    }
+
+    const searchableItems = validItems.map((item) => ({
+      id: String(item.value),
+      label: String(item.label || ""),
+      searchText: String(item.searchText || item.label || ""),
       // Add full phrase for exact matching
       fullPhrase:
-        `${item.label} ${item.searchText || item.label}`.toLowerCase(),
+        `${item.label || ""} ${item.searchText || item.label || ""}`.toLowerCase(),
     }));
 
     const ms = new MiniSearch<{

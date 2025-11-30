@@ -36,7 +36,7 @@ export const table_sales_order_line_b2c = pgTable(
     unitPrice: numeric("unit_price", { precision: 14, scale: 2 })
       .notNull()
       .default("0"),
-    
+
     // Pricing fields
     lineDiscount: numeric("line_discount", { precision: 14, scale: 2 })
       .notNull()
@@ -53,16 +53,30 @@ export const table_sales_order_line_b2c = pgTable(
     lineTotal: numeric("line_total", { precision: 14, scale: 2 })
       .notNull()
       .default("0"), // lineSubtotal - lineDiscount + lineTax
-    
+
+    // Price source tracking (for audit and manual override)
+    priceSource: varchar("price_source", { length: 20 })
+      .notNull()
+      .default("price_list"), // 'price_list' | 'manual_override' | 'product_default'
+    priceListItemId: uuid("price_list_item_id"), // ID của price_list_item đã dùng (để audit)
+    pricingRuleId: uuid("pricing_rule_id"), // ID của pricing_rule đã dùng (để audit)
+    basePrice: numeric("base_price", { precision: 18, scale: 4 }), // Giá gốc trước khi áp dụng rules
+    originalUnitPrice: numeric("original_unit_price", {
+      precision: 18,
+      scale: 4,
+    }), // Giá từ price list (trước override)
+
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
   (table) => [
     index("sales_order_lines_b2c_order_idx").on(table.orderId),
     index("sales_order_lines_b2c_product_idx").on(table.productId),
+    index("idx_sales_order_lines_b2c_price_source").on(table.priceSource),
   ]
 );
 
-export type TblSalesOrderLineB2C = typeof table_sales_order_line_b2c.$inferSelect;
-export type NewTblSalesOrderLineB2C = typeof table_sales_order_line_b2c.$inferInsert;
-
+export type TblSalesOrderLineB2C =
+  typeof table_sales_order_line_b2c.$inferSelect;
+export type NewTblSalesOrderLineB2C =
+  typeof table_sales_order_line_b2c.$inferInsert;

@@ -46,6 +46,8 @@ export {
 } from "./IBaseSelect";
 export type { IBaseSelectProps, SelectItemOption } from "./IBaseSelect";
 export { default as IBaseSingleSelect } from "./IBaseSelect/IBaseSingleSelect";
+export { default as IBaseTabs, Tab } from "./IBaseTabs";
+export type { IBaseTabsProps } from "./IBaseTabs";
 export { default as IBaseTooltip } from "./IBaseTooltip";
 export * from "./LoadingBar";
 export * from "./LoadingOverlay";

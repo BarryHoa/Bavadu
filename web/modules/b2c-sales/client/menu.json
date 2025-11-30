@@ -24,6 +24,13 @@
       "path": "/deliveries",
       "as": "/deliveries",
       "icon": "Truck"
+    },
+    {
+      "key": "b2c-price-lists",
+      "name": "Price Lists",
+      "path": "/price-lists",
+      "as": "/price-lists",
+      "icon": "Tag"
     }
   ]
 }

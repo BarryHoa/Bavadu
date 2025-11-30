@@ -1,4 +1,5 @@
 import { table_payment_method } from "@base/server/schemas/payment-method";
+import { table_price_lists_b2c } from "@base/server/schemas/price-list-b2c";
 import { table_shipping_method } from "@base/server/schemas/shipping-method";
 import { table_shipping_term } from "@base/server/schemas/shipping-term";
 import { table_stock_warehouse } from "@mdl/stock/server/schemas/warehouse";
@@ -43,6 +44,12 @@ export const table_sales_order_b2c = pgTable(
       { onDelete: "set null" }
     ),
     requireInvoice: boolean("require_invoice").default(false).notNull(),
+
+    // Pricing
+    priceListId: uuid("price_list_id").references(
+      () => table_price_lists_b2c.id,
+      { onDelete: "set null" }
+    ),
 
     // Common fields
     warehouseId: uuid("warehouse_id").references(
@@ -89,6 +96,7 @@ export const table_sales_order_b2c = pgTable(
     index("sales_orders_b2c_expected_idx").on(table.expectedDate),
     index("sales_orders_b2c_created_idx").on(table.createdAt),
     index("sales_orders_b2c_completed_idx").on(table.completedAt),
+    index("idx_sales_orders_b2c_price_list").on(table.priceListId),
   ]
 );
 
