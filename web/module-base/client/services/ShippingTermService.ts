@@ -1,4 +1,5 @@
 import ClientHttpService from "@base/client/services/ClientHttpService";
+import { dropdownOptionsService } from "@base/client/services/DropdownOptionsService";
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
 
 export interface ShippingTermDto {
@@ -23,7 +24,10 @@ export default class ShippingTermService extends ClientHttpService {
       message?: string;
     }>("/");
   }
+
+  getOptionsDropdown() {
+    return dropdownOptionsService.getOptionsDropdown("shipping-term");
+  }
 }
 
 export const shippingTermService = new ShippingTermService();
-

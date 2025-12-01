@@ -1,4 +1,5 @@
 import ClientHttpService from "@base/client/services/ClientHttpService";
+import { dropdownOptionsService } from "@base/client/services/DropdownOptionsService";
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
 
 export interface PaymentMethodDto {
@@ -23,7 +24,10 @@ export default class PaymentMethodService extends ClientHttpService {
       message?: string;
     }>("/");
   }
+
+  getOptionsDropdown() {
+    return dropdownOptionsService.getOptionsDropdown("payment-method");
+  }
 }
 
 export const paymentMethodService = new PaymentMethodService();
-

@@ -1,5 +1,44 @@
 [
   {
+    "path": "/health",
+    "routes": [
+      {
+        "path": "/",
+        "handler": "/heath/index"
+      },
+      {
+        "path": "/ping",
+        "handler": "/heath/ping"
+      }
+    ]
+  },
+  {
+    "path": "/auth",
+    "routes": [
+      {
+        "path": "/login",
+        "handler": "/auth/login"
+      },
+      {
+        "path": "/logout",
+        "handler": "/auth/logout"
+      },
+      {
+        "path": "/me",
+        "handler": "/auth/me"
+      }
+    ]
+  },
+  {
+    "path": "/workspace",
+    "routes": [
+      {
+        "path": "/menu",
+        "handler": "/workspace/get-menu"
+      }
+    ]
+  },
+  {
     "path": "/admin",
     "routes": [
       {
@@ -28,47 +67,50 @@
         "handler": "/view-data-table-list/favorite-filter"
       },
       {
-        "path": "/group-by",
-        "handler": "/view-data-table-list/group-by"
-      },
-      {
         "path": "/favorite-filter-update",
         "handler": "/view-data-table-list/favorite-filter-update"
+      },
+      {
+        "path": "/group-by",
+        "handler": "/view-data-table-list/group-by"
       }
     ]
   },
   {
-    "path": "/workspace",
+    "path": "/master-data",
     "routes": [
       {
-        "path": "/menu",
-        "handler": "/workspace/get-menu"
+        "path": "/payment-methods",
+        "handler": "/master-data/payment-methods/list"
+      },
+      {
+        "path": "/payment-terms",
+        "handler": "/master-data/payment-terms/list"
+      },
+      {
+        "path": "/shipping-methods",
+        "handler": "/master-data/shipping-methods/list"
+      },
+      {
+        "path": "/shipping-terms",
+        "handler": "/master-data/shipping-terms/list"
+      },
+      {
+        "path": "/tax-rates",
+        "handler": "/master-data/tax-rates/list"
       }
     ]
   },
   {
-    "path": "/health",
+    "path": "/currency",
     "routes": [
       {
         "path": "/",
-        "handler": "/heath/index"
+        "handler": "/currency/get-list"
       },
       {
-        "path": "/ping",
-        "handler": "/heath/ping"
-      }
-    ]
-  },
-  {
-    "path": "/utils",
-    "routes": [
-      {
-        "path": "/check-duplicate",
-        "handler": "/utils/check-duplicate"
-      },
-      {
-        "path": "/get-csrf-token",
-        "handler": "/utils/get-csrf-token"
+        "path": "/latest-rate",
+        "handler": "/currency/get-latest-rate"
       }
     ]
   },
@@ -90,28 +132,20 @@
     ]
   },
   {
-    "path": "/auth",
+    "path": "/dropdown-options",
     "routes": [
       {
-        "path": "/login",
-        "handler": "/auth/login"
-      },
-      {
-        "path": "/logout",
-        "handler": "/auth/logout"
-      },
-      {
-        "path": "/me",
-        "handler": "/auth/me"
+        "path": "/",
+        "handler": "/dropdown-options/get-options-dropdown"
       }
     ]
   },
   {
-    "path": "/guideline",
+    "path": "/price-lists",
     "routes": [
       {
-        "path": "/get-by-key",
-        "handler": "/guideline/get-by-key"
+        "path": "/calculate-price",
+        "handler": "/price-lists/calculate-price"
       }
     ]
   },
@@ -125,70 +159,25 @@
     ]
   },
   {
-    "path": "/currency",
+    "path": "/guideline",
     "routes": [
       {
-        "path": "/",
-        "handler": "/currency/get-list"
+        "path": "/get-by-key",
+        "handler": "/guideline/get-by-key"
+      }
+    ]
+  },
+  {
+    "path": "/utils",
+    "routes": [
+      {
+        "path": "/check-duplicate",
+        "handler": "/utils/check-duplicate"
       },
       {
-        "path": "/latest-rate",
-        "handler": "/currency/get-latest-rate"
+        "path": "/get-csrf-token",
+        "handler": "/utils/get-csrf-token"
       }
     ]
-  },
-  {
-    "path": "/master-data/payment-methods",
-    "routes": [
-      {
-        "path": "/",
-        "handler": "/master-data/payment-methods/list"
-      }
-    ]
-  },
-  {
-    "path": "/master-data/payment-terms",
-    "routes": [
-      {
-        "path": "/",
-        "handler": "/master-data/payment-terms/list"
-      }
-    ]
-  },
-  {
-    "path": "/master-data/shipping-methods",
-    "routes": [
-      {
-        "path": "/",
-        "handler": "/master-data/shipping-methods/list"
-      }
-    ]
-  },
-  {
-    "path": "/master-data/shipping-terms",
-    "routes": [
-      {
-        "path": "/",
-        "handler": "/master-data/shipping-terms/list"
-      }
-    ]
-  },
-  {
-    "path": "/master-data/tax-rates",
-    "routes": [
-      {
-        "path": "/",
-        "handler": "/master-data/tax-rates/list"
-      }
-    ]
-  },
-  {
-    "path": "/price-lists",
-    "routes": [
-      {
-        "path": "/calculate-price",
-        "handler": "/price-lists/calculate-price"
-      }
-    ]
-  },
+  }
 ]

@@ -58,6 +58,10 @@ export abstract class BaseViewListModel<
     ];
   }
 
+  // ============================================================================
+  // ABSTRACT METHODS - Must be implemented by subclasses
+  // ============================================================================
+
   /**
    * Subclass must declare which columns are available for select/sort.
    */
@@ -84,6 +88,123 @@ export abstract class BaseViewListModel<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected abstract declarationMappingData(row: any, index: number): TRow;
 
+  // ============================================================================
+  // PROTECTED HELPER METHODS
+  // ============================================================================
+
+  /**
+   * Build a query data list but allows specifying custom select columns/expressions.
+   * @param params - List query parameters
+   * @param select - Array of columns/expressions or a function (queryBuilder) to customize the select clause
+   * @param callBackBuildQuery - Optional callback to extend query (joins / where / filters) after search is applied
+   */
+  buildQueryDataListWithSelect = async (
+    params: ListParamsRequest<TFilter>,
+    select: Array<any> | ((qb: typeof this.db) => any),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    callBackBuildQuery?: (query: any) => any
+  ): Promise<ListParamsResponse<TRow>> => {
+    const {
+      filters = undefined,
+      search,
+      sorts = undefined,
+      offset = 0,
+      limit = 50,
+    } = params;
+
+    // Start with a query builder: allow calling with select clauses
+    let query: any;
+    if (Array.isArray(select)) {
+      query = (this.db.select as any)(...select).from(this.table as any);
+    } else if (typeof select === "function") {
+      query = select(this.db).from(this.table as any);
+    } else {
+      query = this.db.select().from(this.table as any);
+    }
+
+    // Apply filter, search, etc., as per buildQueryDataList
+    // 1. Filter
+    const filterConditions = this.filter
+      .map((filterFn) => filterFn(filters))
+      .filter((expr): expr is Exclude<typeof expr, undefined> => Boolean(expr));
+
+    if (filterConditions.length > 0) {
+      query = query.where(...filterConditions);
+    }
+
+    // 2. Search
+    const searchText = isNil(search) ? undefined : String(search).trim();
+    if (searchText) {
+      const searchExpressions = this.search
+        .map((searchTerm) => searchTerm(searchText))
+        .filter((expr): expr is Exclude<typeof expr, undefined> =>
+          Boolean(expr)
+        );
+
+      if (searchExpressions.length > 0) {
+        query = query.where(or(...searchExpressions));
+      }
+    }
+
+    // 3. Allow child model to extend query (joins / where / filters) via callback
+    if (callBackBuildQuery) {
+      query = callBackBuildQuery(query);
+    }
+
+    // 4. Sort
+    let orderByExpressions =
+      sorts
+        ?.map((sortObj: ParamSortMultiple[number]) => {
+          const sortColumn = this.columns.get(sortObj.column);
+          if (!sortColumn || !sortColumn.sort) {
+            return undefined;
+          }
+          if (sortObj.direction === "descending") {
+            return desc(sortColumn.column);
+          }
+          return asc(sortColumn.column);
+        })
+        .filter((expr): expr is ReturnType<typeof asc> => Boolean(expr)) ?? [];
+
+    if (orderByExpressions.length === 0) {
+      orderByExpressions = this.sortDefault
+        .map((sort) => {
+          const sortColumn = this.columns.get(sort.column);
+          if (!sortColumn || !sortColumn.sort) {
+            return undefined;
+          }
+          if (sort.direction === "descending") {
+            return desc(sortColumn.column);
+          }
+          return asc(sortColumn.column);
+        })
+        .filter((expr): expr is ReturnType<typeof asc> => Boolean(expr));
+    }
+
+    query = query.orderBy(...orderByExpressions);
+
+    // drizzle select is then-able, so await directly
+    const result = (await query.limit(limit).offset(offset)) as any[];
+    // Try to determine total if result includes it, otherwise fallback to length
+    // Check for both "total-data-response" (from buildQueryDataList) and "totalResult" keys
+    const totalResultKey = "total-data-response";
+    const total =
+      result.length > 0 &&
+      (typeof result[0][totalResultKey] !== "undefined" ||
+        typeof result[0].totalResult !== "undefined")
+        ? (result[0][totalResultKey] ?? result[0].totalResult)
+        : result.length;
+
+    const data = result.map((row: any, index: number) =>
+      this.declarationMappingData(row, index)
+    );
+
+    return {
+      data,
+      total,
+    };
+  };
+
   /**
    * Helper to build paginated list query with common behavior.
    *
@@ -101,16 +222,7 @@ export abstract class BaseViewListModel<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     callBackBuildQuery?: (query: any) => any
   ) => {
-    // 1) Parse list params with sensible defaults
-    const {
-      offset = 0,
-      limit = 10,
-      search = undefined,
-      filters = undefined,
-      sorts = undefined,
-    } = params || {};
-
-    // 2) Build base SELECT list from column map
+    // Build base SELECT list from column map with total count
     const selectColumns = Object.fromEntries(
       Array.from(this.columns.entries()).map(([key, config]) => [
         key,
@@ -118,90 +230,47 @@ export abstract class BaseViewListModel<
       ])
     );
 
-    // 3) Build base query (SELECT ... FROM ...)
-    //    Use `any` for query to avoid Drizzle's complex generic narrowing issues
-    //    when conditionally chaining where/orderBy.
-    // Use `any` for query to avoid Drizzle's complex generic narrowing issues
-    // when conditionally chaining where/orderBy.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const totalResult = "total-data-response" as keyof TRow;
-    let query: any = this.db
-      .select({
-        ...selectColumns,
-        [totalResult]: sql<number>`count(*) over()::int`.as("total"),
-      })
-      .from(this.table as any);
-
-    // 4) Apply global search conditions if configured
-    const searchText = isNil(search) ? undefined : String(search).trim();
-    const searchExpressions = this.search
-      .map((searchTerm) => searchTerm(searchText ?? ""))
-      .filter((expr): expr is Exclude<typeof expr, undefined> => Boolean(expr));
-
-    if (searchText && searchExpressions.length > 0) {
-      query = query.where(or(...searchExpressions));
-    }
-
-    // 5) Allow child model to extend query (joins / where / filters)
-    if (callBackBuildQuery) {
-      query = callBackBuildQuery(query);
-    }
-
-    // 6) Build ORDER BY from `sorts` or fallback to `sortDefault`
-    let orderByExpressions =
-      sorts
-        ?.map((sort) => {
-          const sortColumn = this.columns.get(sort.column);
-          if (!sortColumn || !sortColumn.sort) {
-            return undefined;
-          }
-
-          if (sort.direction === "descending") {
-            return desc(sortColumn.column);
-          }
-
-          return asc(sortColumn.column);
-        })
-        .filter((expr): expr is ReturnType<typeof asc> => Boolean(expr)) ?? [];
-
-    // Fallback to default sort if no valid sort provided
-    if (orderByExpressions.length === 0) {
-      orderByExpressions = this.sortDefault
-        .map((sort) => {
-          const sortColumn = this.columns.get(sort.column);
-          if (!sortColumn || !sortColumn.sort) {
-            return undefined;
-          }
-
-          if (sort.direction === "descending") {
-            return desc(sortColumn.column);
-          }
-
-          return asc(sortColumn.column);
-        })
-        .filter((expr): expr is ReturnType<typeof asc> => Boolean(expr));
-    }
-
-    query = query.orderBy(...orderByExpressions);
-
-    // drizzle select is then-able, so await directly
-    const result = (await query.limit(limit).offset(offset)) as any[];
-    const total = result.length > 0 ? result[0][totalResult] : 0;
-
-    const data = result.map((row, index) =>
-      this.declarationMappingData(row, index)
-    );
-
-    return {
-      data: data,
-      total,
+    const selectWithTotal = {
+      ...selectColumns,
+      [totalResult]: sql<number>`count(*) over()::int`.as("total"),
     };
+
+    // Use buildQueryDataListWithSelect with custom select and callback
+    return await this.buildQueryDataListWithSelect(
+      params,
+      (qb) => qb.select(selectWithTotal),
+      callBackBuildQuery
+    );
   };
 
-  // Default getData implementation using shared query/mapping logic
+  // ============================================================================
+  // PUBLIC METHODS
+  // ============================================================================
+
+  /**
+   * Default getData implementation using shared query/mapping logic
+   */
   getData = async (
     params: ListParamsRequest<TFilter>
   ): Promise<ListParamsResponse<TRow>> => {
     return await this.buildQueryDataList(params);
+  };
+
+  /**
+   * Override this method to return the options for the dropdown
+   */
+  getOptionsDropdown = async (
+    params: ListParamsRequest<TFilter>
+  ): Promise<
+    ListParamsResponse<{
+      label: string;
+      value: string;
+      [key: string]: any;
+    }>
+  > => {
+    throw new Error("Method not implemented");
+    // return await this.buildQueryDataList(params);
   };
 }

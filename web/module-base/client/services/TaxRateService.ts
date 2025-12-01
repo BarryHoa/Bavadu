@@ -1,4 +1,5 @@
 import ClientHttpService from "@base/client/services/ClientHttpService";
+import { dropdownOptionsService } from "@base/client/services/DropdownOptionsService";
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
 
 export interface TaxRateDto {
@@ -24,7 +25,10 @@ export default class TaxRateService extends ClientHttpService {
       message?: string;
     }>("/");
   }
+
+  getOptionsDropdown() {
+    return dropdownOptionsService.getOptionsDropdown("tax-rate");
+  }
 }
 
 export const taxRateService = new TaxRateService();
-

@@ -63,6 +63,7 @@ export default function SalesOrderB2CForm({
     handleSubmit,
     watch,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm<SalesOrderB2CFormValues>({
     resolver: valibotResolver(validation.salesOrderB2CFormSchema) as any,
@@ -143,33 +144,33 @@ export default function SalesOrderB2CForm({
   });
 
   const paymentMethodsQuery = useQuery({
-    queryKey: ["payment-methods"],
+    queryKey: ["payment-methods-dropdown"],
     queryFn: async () => {
-      const response = await paymentMethodService.getList();
+      const response = await paymentMethodService.getOptionsDropdown();
       return response.data ?? [];
     },
   });
 
   const shippingMethodsQuery = useQuery({
-    queryKey: ["shipping-methods"],
+    queryKey: ["shipping-methods-dropdown"],
     queryFn: async () => {
-      const response = await shippingMethodService.getList();
+      const response = await shippingMethodService.getOptionsDropdown();
       return response.data ?? [];
     },
   });
 
   const shippingTermsQuery = useQuery({
-    queryKey: ["shipping-terms"],
+    queryKey: ["shipping-terms-dropdown"],
     queryFn: async () => {
-      const response = await shippingTermService.getList();
+      const response = await shippingTermService.getOptionsDropdown();
       return response.data ?? [];
     },
   });
 
   const taxRatesQuery = useQuery({
-    queryKey: ["tax-rates"],
+    queryKey: ["tax-rates-dropdown"],
     queryFn: async () => {
-      const response = await taxRateService.getList();
+      const response = await taxRateService.getOptionsDropdown();
       return response.data ?? [];
     },
   });
@@ -192,45 +193,12 @@ export default function SalesOrderB2CForm({
     },
   });
 
-  // Load and filter price lists
+  // Load price lists using dropdown-options API
   const priceListsQuery = useQuery({
-    queryKey: ["price-lists-b2c", serverTimeQuery.data],
+    queryKey: ["price-lists-b2c-dropdown", serverTimeQuery.data],
     queryFn: async () => {
-      const response = await priceListB2CService.list();
-      const allPriceLists = response.data ?? [];
-      const now = serverTimeQuery.data
-        ? new Date(serverTimeQuery.data)
-        : new Date();
-
-      // Filter: status = active, validFrom <= now <= validTo
-      const filtered = allPriceLists.filter((pl) => {
-        if (pl.status !== "active") return false;
-
-        const validFrom = new Date(pl.validFrom);
-        const validTo = pl.validTo ? new Date(pl.validTo) : null;
-
-        if (now < validFrom) return false;
-        if (validTo && now > validTo) return false;
-
-        // TODO: Filter by channel and store when available
-        // For now, include all that pass date validation
-
-        return true;
-      });
-
-      // Sort: priority (desc) -> validTo (asc)
-      filtered.sort((a, b) => {
-        // First sort by priority (higher priority first)
-        if (b.priority !== a.priority) {
-          return b.priority - a.priority;
-        }
-        // Then sort by validTo (earlier expiration first)
-        const aValidTo = a.validTo ? new Date(a.validTo).getTime() : Infinity;
-        const bValidTo = b.validTo ? new Date(b.validTo).getTime() : Infinity;
-        return aValidTo - bValidTo;
-      });
-
-      return filtered;
+      const response = await priceListB2CService.getOptionsDropdown();
+      return response.data ?? [];
     },
     enabled: !!serverTimeQuery.data,
   });
@@ -241,8 +209,10 @@ export default function SalesOrderB2CForm({
     return paymentMethodsQuery.data.find(
       (pm) =>
         pm.code?.toLowerCase().includes("cash") ||
-        pm.name.vi?.toLowerCase().includes("tiền mặt") ||
-        pm.name.en?.toLowerCase().includes("cash")
+        (typeof pm.name === "object" &&
+          (pm.name.vi?.toLowerCase().includes("tiền mặt") ||
+            pm.name.en?.toLowerCase().includes("cash"))) ||
+        (typeof pm.name === "string" && pm.name.toLowerCase().includes("cash"))
     );
   }, [paymentMethodsQuery.data]);
 
@@ -252,37 +222,44 @@ export default function SalesOrderB2CForm({
     return shippingMethodsQuery.data.find(
       (sm) =>
         sm.code?.toLowerCase().includes("pickup") ||
-        sm.name.vi?.toLowerCase().includes("tự nhận") ||
-        sm.name.en?.toLowerCase().includes("pickup")
+        (typeof sm.name === "object" &&
+          (sm.name.vi?.toLowerCase().includes("tự nhận") ||
+            sm.name.en?.toLowerCase().includes("pickup"))) ||
+        (typeof sm.name === "string" &&
+          sm.name.toLowerCase().includes("pickup"))
     );
   }, [shippingMethodsQuery.data]);
 
   // Set default payment and shipping methods
-  useMemo(() => {
-    if (defaultPaymentMethod && !watch("paymentMethodId")) {
-      setValue("paymentMethodId", defaultPaymentMethod.id);
+  useEffect(() => {
+    const paymentMethodId = getValues("paymentMethodId");
+    const shippingMethodId = getValues("shippingMethodId");
+
+    if (defaultPaymentMethod && !paymentMethodId) {
+      setValue("paymentMethodId", defaultPaymentMethod.value);
     }
-    if (defaultShippingMethod && !watch("shippingMethodId")) {
-      setValue("shippingMethodId", defaultShippingMethod.id);
+    if (defaultShippingMethod && !shippingMethodId) {
+      setValue("shippingMethodId", defaultShippingMethod.value);
     }
-  }, [defaultPaymentMethod, defaultShippingMethod, setValue, watch]);
+  }, [defaultPaymentMethod, defaultShippingMethod, setValue, getValues]);
 
   // Auto-select first price list when loaded
   useEffect(() => {
+    const priceListId = getValues("priceListId");
     if (
       priceListsQuery.data &&
       priceListsQuery.data.length > 0 &&
-      !watch("priceListId")
+      !priceListId
     ) {
       const firstPriceList = priceListsQuery.data[0];
-      setValue("priceListId", firstPriceList.id);
+      setValue("priceListId", firstPriceList.value);
     }
-  }, [priceListsQuery.data, setValue, watch]);
+  }, [priceListsQuery.data, setValue, getValues]);
 
   // Check if shipping method is not pickup
   const isShippingOtherThanPickup = useMemo(() => {
     if (!watchedShippingMethodId || !defaultShippingMethod) return false;
-    return watchedShippingMethodId !== defaultShippingMethod.id;
+    return watchedShippingMethodId !== defaultShippingMethod.value;
   }, [watchedShippingMethodId, defaultShippingMethod]);
 
   const onSubmitForm: SubmitHandler<SalesOrderB2CFormValues> = async (
@@ -308,14 +285,10 @@ export default function SalesOrderB2CForm({
 
   const priceListOptions = useMemo<SelectItemOption[]>(
     () =>
-      (priceListsQuery.data ?? []).map((pl) => {
-        const name =
-          typeof pl.name === "object" ? pl.name.vi || pl.name.en : pl.name;
-        return {
-          value: pl.id,
-          label: `${pl.code} - ${name}`,
-        };
-      }),
+      (priceListsQuery.data ?? []).map((pl) => ({
+        value: pl.value,
+        label: pl.label,
+      })),
     [priceListsQuery.data]
   );
 
@@ -339,45 +312,42 @@ export default function SalesOrderB2CForm({
 
   const paymentMethodOptions = useMemo<SelectItemOption[]>(
     () =>
-      (paymentMethodsQuery.data ?? [])
-        .filter((pm) => pm.isActive)
-        .map((pm) => ({
-          value: pm.id,
-          label: pm.name.en || pm.name.vi || pm.code,
-        })),
+      (paymentMethodsQuery.data ?? []).map((pm) => ({
+        value: pm.value,
+        label: pm.label,
+      })),
     [paymentMethodsQuery.data]
   );
 
   const shippingMethodOptions = useMemo<SelectItemOption[]>(
     () =>
-      (shippingMethodsQuery.data ?? [])
-        .filter((sm) => sm.isActive)
-        .map((sm) => ({
-          value: sm.id,
-          label: sm.name.en || sm.name.vi || sm.code,
-        })),
+      (shippingMethodsQuery.data ?? []).map((sm) => ({
+        value: sm.value,
+        label: sm.label,
+      })),
     [shippingMethodsQuery.data]
   );
 
   const shippingTermOptions = useMemo<SelectItemOption[]>(
     () =>
-      (shippingTermsQuery.data ?? [])
-        .filter((st) => st.isActive)
-        .map((st) => ({
-          value: st.id,
-          label: st.name.en || st.name.vi || st.code,
-        })),
+      (shippingTermsQuery.data ?? []).map((st) => ({
+        value: st.value,
+        label: st.label,
+      })),
     [shippingTermsQuery.data]
   );
 
   const taxRateOptions = useMemo<SelectItemOption[]>(
     () =>
-      (taxRatesQuery.data ?? [])
-        .filter((tr) => tr.isActive)
-        .map((tr) => ({
-          value: tr.rate,
-          label: `${tr.name.en || tr.name.vi || tr.code} (${tr.rate}%)`,
-        })),
+      (taxRatesQuery.data ?? []).map((tr) => {
+        // Extract rate from name if available, otherwise use value
+        const rate = tr.rate || tr.name?.rate || "";
+        const label = rate ? `${tr.label} (${rate}%)` : tr.label;
+        return {
+          value: tr.value,
+          label,
+        };
+      }),
     [taxRatesQuery.data]
   );
 

@@ -1,3 +1,4 @@
+import { dropdownOptionsService } from "@base/client/services";
 import ClientHttpService from "@base/client/services/ClientHttpService";
 
 export interface PriceListB2CDto {
@@ -99,7 +100,7 @@ export default class PriceListB2CService extends ClientHttpService {
     }>("/update", payload);
   }
 
-  delete(id: string) {
+  deleteById(id: string) {
     return this.delete<{
       message?: string;
     }>(`/delete?id=${id}`);
@@ -118,6 +119,20 @@ export default class PriceListB2CService extends ClientHttpService {
       total: number;
       message?: string;
     }>("/", { params });
+  }
+
+  // Get dropdown options using dropdown-options API
+  getOptionsDropdown(params?: {
+    offset?: number;
+    limit?: number;
+    search?: string;
+    filters?: Record<string, any>;
+    sorts?: Array<{ column: string; direction: "ascending" | "descending" }>;
+  }) {
+    return dropdownOptionsService.getOptionsDropdown(
+      "list.b2c-sales.price-list",
+      params
+    );
   }
 }
 
