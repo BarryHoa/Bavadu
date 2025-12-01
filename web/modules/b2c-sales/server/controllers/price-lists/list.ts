@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import PriceListB2CModel from "../../models/PriceListB2C/PriceListB2CModel";
-import { JSONResponse } from "../../utils/JSONResponse";
+import PriceListB2CModel from "../../models/PriceList/PriceListB2CModel";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
 
 export async function GET(request: NextRequest) {
   try {
@@ -38,3 +38,4 @@ export async function POST(request: NextRequest) {
     return JSONResponse({ message, status: 400 });
   }
 }
+

@@ -181,7 +181,13 @@ export default function Menu({
       flattenedMenus,
       pathname
     );
-    const keyToSet: string | null = findKeyByPath(flattenedMenus, pathname);
+
+    const normalizedPathName = normalizePath(pathname);
+    const keyToSet: string | null =
+      flattenedMenus.find(
+        (item) => normalizePath(item.path || "") === normalizedPathName
+      )?.key || null;
+
     setActiveKey(keyToSet);
 
     if (parentsToExpand.length > 0) {

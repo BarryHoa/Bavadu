@@ -14,6 +14,7 @@ import { Button } from "@heroui/button";
 import { Checkbox, useDisclosure } from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
 import { RefreshCwIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useCallback, useMemo } from "react";
 import { Control, Controller, useWatch } from "react-hook-form";
 import {
@@ -38,6 +39,7 @@ export default function CustomerInfoSection({
   setSelectedCustomer,
   errors,
 }: CustomerInfoSectionProps) {
+  const t = useTranslations("b2cSales.order.create.labels");
   const {
     isOpen: isCustomerModalOpen,
     onOpen: onCustomerModalOpen,
@@ -75,20 +77,20 @@ export default function CustomerInfoSection({
     () => [
       {
         key: "code",
-        label: "Code",
+        label: t("code"),
       },
       {
         key: "name",
-        label: "Name",
+        label: t("name"),
         render: (_, row) => `${row.firstName} ${row.lastName}`,
       },
       {
         key: "phone",
-        label: "Phone",
+        label: t("phone"),
       },
       {
         key: "actions",
-        label: "Actions",
+        label: t("actions"),
         render: (_, row) => (
           <Button
             size="sm"
@@ -106,7 +108,7 @@ export default function CustomerInfoSection({
   return (
     <>
       <div>
-        <h2 className="text-base font-semibold mb-2">Thông tin khách hàng</h2>
+        <h2 className="text-base font-semibold mb-2">{t("customerInfo")}</h2>
         <div className=" flex flex-col space-y-3">
           <div>
             <Controller
@@ -118,7 +120,7 @@ export default function CustomerInfoSection({
                   isSelected={field.value}
                   onValueChange={field.onChange}
                 >
-                  Yêu cầu xuất hóa đơn
+                  {t("requireInvoice")}
                 </Checkbox>
               )}
             />
@@ -137,7 +139,7 @@ export default function CustomerInfoSection({
                         size="sm"
                         value={field.value}
                         onValueChange={field.onChange}
-                        label="Customer Name"
+                        label={t("customerName")}
                         isRequired
                         isInvalid={fieldState.invalid}
                         errorMessage={fieldState.error?.message}
@@ -168,7 +170,7 @@ export default function CustomerInfoSection({
               onPress={onCustomerModalOpen}
               color="primary"
             >
-              Chọn khách hàng
+              {t("selectCustomer")}
             </Button>
           </div>
         </div>
@@ -182,7 +184,7 @@ export default function CustomerInfoSection({
         scrollBehavior="inside"
       >
         <ModalContent>
-          <ModalHeader>Chọn khách hàng</ModalHeader>
+          <ModalHeader>{t("selectCustomer")}</ModalHeader>
           <ModalBody>
             <DataTable
               columns={customerColumns}
@@ -194,7 +196,7 @@ export default function CustomerInfoSection({
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={onCustomerModalClose}>
-              Đóng
+              {t("close")}
             </Button>
           </ModalFooter>
         </ModalContent>

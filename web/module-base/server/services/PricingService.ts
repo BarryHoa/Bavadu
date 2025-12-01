@@ -8,7 +8,7 @@ import {
   table_pricing_rules_b2c,
   TblPriceListItemB2C,
   TblPricingRuleB2C,
-} from "../schemas/price-list-b2c";
+} from "@mdl/b2c-sales/server/schemas/price-list-b2c";
 import getDbConnect from "../utils/getDbConnect";
 
 export interface CalculatePriceParams {

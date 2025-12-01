@@ -67,7 +67,7 @@ export interface UpdatePriceListB2CParams {
 
 export default class PriceListB2CService extends ClientHttpService {
   constructor() {
-    super("/api/base/price-lists-b2c");
+    super("/api/b2c-sales/price-lists");
   }
 
   list() {

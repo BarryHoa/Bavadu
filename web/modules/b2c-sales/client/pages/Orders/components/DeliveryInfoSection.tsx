@@ -1,6 +1,7 @@
 "use client";
 
 import { IBaseInput, IBaseInputNumber, IBaseSingleSelect, SelectItemOption } from "@base/client/components";
+import { useTranslations } from "next-intl";
 import { Control, Controller } from "react-hook-form";
 
 interface DeliveryInfoSectionProps {
@@ -20,16 +21,17 @@ export default function DeliveryInfoSection({
   isShippingOtherThanPickup,
   errors,
 }: DeliveryInfoSectionProps) {
+  const t = useTranslations("b2cSales.order.create.labels");
   return (
     <div>
-      <h2 className="text-base font-semibold mb-2">Thông tin giao hàng</h2>
+      <h2 className="text-base font-semibold mb-2">{t("deliveryInfo")}</h2>
       <div className="grid gap-2 md:grid-cols-2">
         <Controller
           name="paymentMethodId"
           control={control}
           render={({ field, fieldState }) => (
             <IBaseSingleSelect
-              label="Payment Method"
+              label={t("paymentMethod")}
               size="sm"
               items={paymentMethodOptions}
               selectedKey={field.value}
@@ -46,7 +48,7 @@ export default function DeliveryInfoSection({
           control={control}
           render={({ field, fieldState }) => (
             <IBaseSingleSelect
-              label="Shipping Method"
+              label={t("shippingMethod")}
               size="sm"
               items={shippingMethodOptions}
               selectedKey={field.value}
@@ -65,7 +67,7 @@ export default function DeliveryInfoSection({
               control={control}
               rules={{
                 required: isShippingOtherThanPickup
-                  ? "Shipping Address is required"
+                  ? t("shippingAddressRequired")
                   : false,
               }}
               render={({ field, fieldState }) => (
@@ -74,7 +76,7 @@ export default function DeliveryInfoSection({
                   size="sm"
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
-                  label="Shipping Address"
+                  label={t("shippingAddress")}
                   isRequired={isShippingOtherThanPickup}
                   isInvalid={
                     fieldState.invalid ||
@@ -83,7 +85,7 @@ export default function DeliveryInfoSection({
                   errorMessage={
                     fieldState.error?.message ||
                     (isShippingOtherThanPickup && !field.value?.trim()
-                      ? "Shipping Address is required"
+                      ? t("shippingAddressRequired")
                       : undefined)
                   }
                 />
@@ -97,7 +99,7 @@ export default function DeliveryInfoSection({
                   value={field.value ? Number(field.value) : 0}
                   onValueChange={(val) => field.onChange(val?.toString() ?? "0")}
                   size="sm"
-                  label="Shipping Fee"
+                  label={t("shippingFee")}
                   min={0}
                   decimalPlaces={2}
                   allowNegative={false}
@@ -114,7 +116,7 @@ export default function DeliveryInfoSection({
                   {...field}
                   size="sm"
                   type="date"
-                  label="Ngày giao hàng"
+                  label={t("deliveryDate")}
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
                   isInvalid={fieldState.invalid}

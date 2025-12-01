@@ -22,5 +22,15 @@
   {
     "group": "deliveries",
     "routes": [{ "path": "/create", "handler": "/deliveries/create" }]
+  },
+  {
+    "group": "price-lists",
+    "routes": [
+      { "path": "/", "handler": "/price-lists/list" },
+      { "path": "/detail", "handler": "/price-lists/get-by-id" },
+      { "path": "/create", "handler": "/price-lists/create" },
+      { "path": "/update", "handler": "/price-lists/update" },
+      { "path": "/delete", "handler": "/price-lists/delete" }
+    ]
   }
 ]

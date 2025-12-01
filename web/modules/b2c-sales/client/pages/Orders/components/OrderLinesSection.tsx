@@ -10,7 +10,8 @@ import ClientHttpService from "@base/client/services/ClientHttpService";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Divider } from "@heroui/react";
 import { Trash2 } from "lucide-react";
-import { useMemo, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import { useEffect, useMemo } from "react";
 import { Control, Controller, UseFormSetValue } from "react-hook-form";
 
 interface OrderLinesSectionProps {
@@ -46,6 +47,7 @@ export default function OrderLinesSection({
   defaultLine,
   setValue,
 }: OrderLinesSectionProps) {
+  const t = useTranslations("b2cSales.order.create.labels");
   const DEFAULT_CURRENCY = "VND";
 
   // Auto-calculate price when product, quantity, or priceListId changes
@@ -77,17 +79,20 @@ export default function OrderLinesSection({
           priceListId: watchedPriceListId,
         });
 
-        if (response.data?.data) {
-          const priceData = response.data.data;
+        if (response?.data) {
+          const priceData = response.data;
           // Only auto-fill if unitPrice is not manually set or is 0
           const currentPrice = Number(line.unitPrice) || 0;
           if (currentPrice === 0 || currentPrice === 1) {
-            setValue(`lines.${index}.unitPrice`, priceData.finalPrice.toString());
+            setValue(
+              `lines.${index}.unitPrice`,
+              priceData.finalPrice.toString()
+            );
           }
         }
       } catch (error) {
         // Silently fail - user can enter price manually
-        console.error("Failed to calculate price:", error);
+        console.error("Không thể tính giá:", error);
       }
     });
   }, [watchedPriceListId, watchedLines, setValue]);
@@ -123,9 +128,7 @@ export default function OrderLinesSection({
 
   return (
     <div className="space-y-3">
-      <div>
-        <h2 className="text-lg font-semibold">Order Lines</h2>
-      </div>
+      <h2 className="text-base font-semibold mb-2">{t("orderLines")}</h2>
 
       {fields.map((fieldItem, index) => {
         const line = watchedLines[index];
@@ -143,7 +146,7 @@ export default function OrderLinesSection({
               {/* Header with line number and remove button */}
               <div className="flex items-center justify-between pb-1">
                 <h3 className="text-xs font-medium text-default-500">
-                  Line {index + 1}
+                  {t("line")} {index + 1}
                 </h3>
                 <Button
                   size="sm"
@@ -152,7 +155,7 @@ export default function OrderLinesSection({
                   isIconOnly
                   onPress={() => remove(index)}
                   isDisabled={fields.length === 1}
-                  aria-label="Remove line"
+                  aria-label={t("removeLine")}
                   className="min-w-6 h-6"
                 >
                   <Trash2 size={14} />
@@ -171,7 +174,7 @@ export default function OrderLinesSection({
                         {...field}
                         value={field.value}
                         onValueChange={field.onChange}
-                        label="Product"
+                        label={t("product")}
                         size="sm"
                         isRequired
                         isInvalid={fieldState.invalid}
@@ -182,13 +185,13 @@ export default function OrderLinesSection({
                 </div>
 
                 {/* Unit of Measure - fixed width on lg */}
-                <div className="md:col-span-1 lg:w-[150px] lg:flex-shrink-0">
+                <div className="md:col-span-1 lg:w-[250px] lg:flex-shrink-0">
                   <Controller
                     name={`lines.${index}.unitId`}
                     control={control}
                     render={({ field, fieldState }) => (
                       <IBaseSingleSelect
-                        label="Unit"
+                        label={t("unit")}
                         size="sm"
                         items={uomOptions}
                         selectedKey={field.value}
@@ -213,7 +216,7 @@ export default function OrderLinesSection({
                         onValueChange={(val) =>
                           field.onChange(val?.toString() ?? "")
                         }
-                        label="Quantity"
+                        label={t("quantity")}
                         size="sm"
                         min={0}
                         max={5000}
@@ -238,7 +241,7 @@ export default function OrderLinesSection({
                         onValueChange={(val) =>
                           field.onChange(val?.toString() ?? "")
                         }
-                        label="Unit Price"
+                        label={t("unitPrice")}
                         size="sm"
                         min={0}
                         max={100000000}
@@ -252,7 +255,7 @@ export default function OrderLinesSection({
                 </div>
 
                 {/* Discount - fixed width on lg */}
-                <div className="md:col-span-1 lg:w-[140px] lg:flex-shrink-0">
+                <div className="md:col-span-1 lg:w-[200px] lg:flex-shrink-0">
                   <Controller
                     name={`lines.${index}.lineDiscount`}
                     control={control}
@@ -270,7 +273,7 @@ export default function OrderLinesSection({
                           onValueChange={(val) =>
                             field.onChange(val?.toString() ?? "")
                           }
-                          label="Discount"
+                          label={t("discount")}
                           size="sm"
                           min={0}
                           max={maxDiscount}
@@ -280,7 +283,9 @@ export default function OrderLinesSection({
                           errorMessage={
                             fieldState.error?.message ||
                             (isDiscountExceeded
-                              ? `Discount cannot exceed ${maxDiscount.toLocaleString()} (quantity × unit price)`
+                              ? t("errors.discountExceeded", {
+                                  max: maxDiscount.toLocaleString(),
+                                })
                               : undefined)
                           }
                         />
@@ -290,13 +295,13 @@ export default function OrderLinesSection({
                 </div>
 
                 {/* Tax Rate - fixed width on lg */}
-                <div className="md:col-span-1 lg:w-[120px] lg:flex-shrink-0">
+                <div className="md:col-span-1 lg:w-[150px] lg:flex-shrink-0">
                   <Controller
                     name={`lines.${index}.taxRate`}
                     control={control}
                     render={({ field, fieldState }) => (
                       <IBaseSingleSelect
-                        label="Tax Rate"
+                        label={t("taxRate")}
                         items={taxRateOptions}
                         selectedKey={field.value}
                         onSelectionChange={(key) => {
@@ -315,30 +320,36 @@ export default function OrderLinesSection({
               <Divider className="my-1" />
 
               {/* Line Summary */}
-              <div className="bg-content2 rounded-lg p-2">
+              <div className="bg-content2 rounded-lg py-1 px-2">
                 <div className="grid grid-cols-4 gap-2 text-xs">
                   <div>
-                    <span className="text-default-500 text-xs">Subtotal:</span>
+                    <span className="text-default-500 text-xs">
+                      {t("subtotal")}:
+                    </span>
                     <p className="font-medium text-sm">
                       {formatCurrency(totals.lineSubtotal)}
                     </p>
                   </div>
                   <div>
-                    <span className="text-default-500 text-xs">Discount:</span>
+                    <span className="text-default-500 text-xs">
+                      {t("discount")}:
+                    </span>
                     <p className="font-medium text-sm text-danger">
                       -{formatCurrency(totals.lineDiscount)}
                     </p>
                   </div>
                   <div>
                     <span className="text-default-500 text-xs">
-                      Tax Amount:
+                      {t("taxAmount")}:
                     </span>
                     <p className="font-medium text-sm">
                       {formatCurrency(totals.lineTax)}
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="text-default-500 text-xs">Total:</span>
+                    <span className="text-default-500 text-xs">
+                      {t("total")}:
+                    </span>
                     <p className="font-semibold text-primary text-base">
                       {formatCurrency(totals.lineTotal)}
                     </p>
@@ -357,7 +368,7 @@ export default function OrderLinesSection({
           onPress={() => append(defaultLine)}
           color="primary"
         >
-          Add line
+          {t("addLine")}
         </Button>
       </div>
 
@@ -369,7 +380,7 @@ export default function OrderLinesSection({
 
       {fields.length === 0 && (
         <div className="text-center py-8 text-default-500">
-          No order lines. Click 'Add line' to add items.
+          {t("noOrderLines")}
         </div>
       )}
     </div>

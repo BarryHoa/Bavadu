@@ -1,0 +1,108 @@
+{
+  "b2cSales": {
+    "order": {
+      "create": {
+        "validation": {
+          "quantity": {
+            "required": "Quantity is required",
+            "range": "Quantity must be between {min} and {max}"
+          },
+          "price": {
+            "range": "Price must be between {min} and {max}"
+          },
+          "discount": {
+            "min": "Discount must be greater than or equal to {min}"
+          },
+          "taxRate": {
+            "range": "Tax rate must be between {min} and {max}"
+          },
+          "product": {
+            "required": "Product is required"
+          },
+          "currency": {
+            "required": "Currency is required"
+          },
+          "priceListId": {
+            "required": "Pricing is required"
+          },
+          "customerName": {
+            "required": "Customer name is required"
+          },
+          "lines": {
+            "required": "At least one order line is required"
+          }
+        },
+        "labels": {
+          "orderLines": "Order Lines",
+          "product": "Product",
+          "unit": "Unit",
+          "quantity": "Quantity",
+          "unitPrice": "Unit Price",
+          "discount": "Discount",
+          "taxRate": "Tax Rate",
+          "subtotal": "Subtotal",
+          "taxAmount": "Tax Amount",
+          "total": "Total",
+          "addLine": "Add line",
+          "line": "Line",
+          "removeLine": "Remove line",
+          "noOrderLines": "No order lines. Click 'Add line' to add items.",
+          "cancel": "Cancel",
+          "createOrder": "Create Order",
+          "notes": "Notes",
+          "generalInfo": "General Information",
+          "createdAt": "Created At",
+          "currency": "Currency",
+          "pricing": "Pricing",
+          "warehouse": "Warehouse",
+          "customerInfo": "Customer Information",
+          "requireInvoice": "Require Invoice",
+          "customerName": "Customer Name",
+          "selectCustomer": "Select Customer",
+          "code": "Code",
+          "name": "Name",
+          "phone": "Phone",
+          "actions": "Actions",
+          "select": "Select",
+          "close": "Close",
+          "deliveryInfo": "Delivery Information",
+          "paymentMethod": "Payment Method",
+          "shippingMethod": "Shipping Method",
+          "shippingAddress": "Shipping Address",
+          "shippingAddressRequired": "Shipping Address is required",
+          "shippingFee": "Shipping Fee",
+          "deliveryDate": "Delivery Date",
+          "orderTotals": "Order Totals",
+          "orderDiscount": "Order Discount",
+          "orderTax": "Order Tax",
+          "lineDiscounts": "Line Discounts",
+          "lineTaxes": "Line Taxes",
+          "grandTotal": "Grand Total",
+          "list": {
+            "code": "Code",
+            "customerName": "Customer Name",
+            "status": "Status",
+            "expectedDate": "Expected Date",
+            "completedAt": "Completed At",
+            "totalAmount": "Total Amount",
+            "view": "View",
+            "newOrder": "New Order"
+          },
+          "edit": {
+            "title": "Edit B2C Sales Order",
+            "description": "Order edit form will be implemented here."
+          },
+          "view": {
+            "title": "View B2C Sales Order",
+            "description": "Order view page will be implemented here."
+          },
+          "errors": {
+            "failedToCalculatePrice": "Failed to calculate price",
+            "failedToCreateOrder": "Failed to create B2C sales order",
+            "discountExceeded": "Discount cannot exceed {max} (quantity × unit price)"
+          }
+        }
+      }
+    }
+  }
+}

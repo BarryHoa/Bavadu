@@ -1,0 +1,524 @@
+"use client";
+
+import { SelectItemOption } from "@base/client/components";
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Controller,
+  useFieldArray,
+  useForm,
+  type SubmitHandler,
+} from "react-hook-form";
+
+import {
+  paymentMethodService,
+  shippingMethodService,
+  shippingTermService,
+  taxRateService,
+} from "@base/client/services";
+import { Button } from "@heroui/button";
+import { Card, CardBody, Textarea } from "@heroui/react";
+import UnitOfMeasureService from "@mdl/product/client/services/UnitOfMeasureService";
+import StockService from "@mdl/stock/client/services/StockService";
+import { type CustomerIndividualDto } from "../../../services/CustomerService";
+import { priceListB2CService } from "../../../services/PriceListB2CService";
+import type { SalesOrderB2CFormValues } from "../validation/createSalesOrderB2CValidation";
+import { createSalesOrderB2CValidation } from "../validation/createSalesOrderB2CValidation";
+import CustomerInfoSection from "./CustomerInfoSection";
+import DeliveryInfoSection from "./DeliveryInfoSection";
+import GeneralInfoSection from "./GeneralInfoSection";
+import OrderLinesSection from "./OrderLinesSection";
+import OrderTotalsSection from "./OrderTotalsSection";
+
+// Re-export for backward compatibility
+export type { SalesOrderB2CFormValues };
+
+interface SalesOrderB2CFormProps {
+  onSubmit: (values: SalesOrderB2CFormValues) => Promise<void>;
+  onCancel?: () => void;
+  submitError?: string | null;
+  isSubmitting?: boolean;
+  defaultValues?: Partial<SalesOrderB2CFormValues>;
+}
+
+export default function SalesOrderB2CForm({
+  onSubmit,
+  onCancel,
+  submitError,
+  isSubmitting = false,
+  defaultValues,
+}: SalesOrderB2CFormProps) {
+  const t = useTranslations("b2cSales.order.create.validation");
+  const tLabels = useTranslations("b2cSales.order.create.labels");
+  const [selectedCustomer, setSelectedCustomer] =
+    useState<CustomerIndividualDto | null>(null);
+
+  // Create validation schemas with translation
+  const validation = useMemo(() => createSalesOrderB2CValidation(t), [t]);
+
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<SalesOrderB2CFormValues>({
+    resolver: valibotResolver(validation.salesOrderB2CFormSchema) as any,
+    defaultValues: {
+      lines: [validation.defaultLine],
+      ...defaultValues,
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "lines",
+  });
+
+  const watchedLines = watch("lines");
+  const watchedPriceListId = watch("priceListId");
+  const watchedCurrency = watch("currency");
+  const watchedShippingMethodId = watch("shippingMethodId");
+  const watchedTotalDiscount = watch("totalDiscount") || "0";
+  const watchedTotalTax = watch("totalTax") || "0";
+  const watchedShippingFee = watch("shippingFee") || "0";
+
+  // Calculate totals
+  const calculatedTotals = useMemo(() => {
+    let subtotal = 0;
+    let totalLineDiscount = 0;
+    let totalLineTax = 0;
+
+    watchedLines.forEach((line) => {
+      const quantity = Number(line.quantity) || 0;
+      const unitPrice = Number(line.unitPrice) || 0;
+      const lineDiscount = Number(line.lineDiscount) || 0;
+      const taxRate = Number(line.taxRate) || 0;
+
+      const lineSubtotal = quantity * unitPrice;
+      const lineTax = ((lineSubtotal - lineDiscount) * taxRate) / 100;
+
+      subtotal += lineSubtotal;
+      totalLineDiscount += lineDiscount;
+      totalLineTax += lineTax;
+    });
+
+    const orderDiscount = Number(watchedTotalDiscount) || 0;
+    const orderTax = Number(watchedTotalTax) || 0;
+    const shipping = Number(watchedShippingFee) || 0;
+
+    const grandTotal =
+      subtotal -
+      totalLineDiscount -
+      orderDiscount +
+      totalLineTax +
+      orderTax +
+      shipping;
+
+    return {
+      subtotal,
+      totalLineDiscount,
+      totalLineTax,
+      orderDiscount,
+      orderTax,
+      shipping,
+      grandTotal,
+    };
+  }, [watchedLines, watchedTotalDiscount, watchedTotalTax, watchedShippingFee]);
+
+  // Load master data
+  const warehousesQuery = useQuery({
+    queryKey: ["warehouses"],
+    queryFn: async () => {
+      const response = await StockService.listWarehouses();
+      // Filter only internal warehouses
+      return (response.data ?? []).filter(
+        (wh) =>
+          wh.typeCode?.toUpperCase() === "INTERNAL" ||
+          wh.typeCode?.toUpperCase().includes("INTERNAL")
+      );
+    },
+  });
+
+  const paymentMethodsQuery = useQuery({
+    queryKey: ["payment-methods"],
+    queryFn: async () => {
+      const response = await paymentMethodService.getList();
+      return response.data ?? [];
+    },
+  });
+
+  const shippingMethodsQuery = useQuery({
+    queryKey: ["shipping-methods"],
+    queryFn: async () => {
+      const response = await shippingMethodService.getList();
+      return response.data ?? [];
+    },
+  });
+
+  const shippingTermsQuery = useQuery({
+    queryKey: ["shipping-terms"],
+    queryFn: async () => {
+      const response = await shippingTermService.getList();
+      return response.data ?? [];
+    },
+  });
+
+  const taxRatesQuery = useQuery({
+    queryKey: ["tax-rates"],
+    queryFn: async () => {
+      const response = await taxRateService.getList();
+      return response.data ?? [];
+    },
+  });
+
+  const uomQuery = useQuery({
+    queryKey: ["units-of-measure"],
+    queryFn: async () => {
+      const response = await UnitOfMeasureService.getList();
+      return response.data ?? [];
+    },
+  });
+
+  // Get server time
+  const serverTimeQuery = useQuery({
+    queryKey: ["server-time"],
+    queryFn: async () => {
+      const response = await fetch("/api/base/health/ping");
+      const data = await response.json();
+      return data.data?.timestamp || new Date().toISOString();
+    },
+  });
+
+  // Load and filter price lists
+  const priceListsQuery = useQuery({
+    queryKey: ["price-lists-b2c", serverTimeQuery.data],
+    queryFn: async () => {
+      const response = await priceListB2CService.list();
+      const allPriceLists = response.data ?? [];
+      const now = serverTimeQuery.data
+        ? new Date(serverTimeQuery.data)
+        : new Date();
+
+      // Filter: status = active, validFrom <= now <= validTo
+      const filtered = allPriceLists.filter((pl) => {
+        if (pl.status !== "active") return false;
+
+        const validFrom = new Date(pl.validFrom);
+        const validTo = pl.validTo ? new Date(pl.validTo) : null;
+
+        if (now < validFrom) return false;
+        if (validTo && now > validTo) return false;
+
+        // TODO: Filter by channel and store when available
+        // For now, include all that pass date validation
+
+        return true;
+      });
+
+      // Sort: priority (desc) -> validTo (asc)
+      filtered.sort((a, b) => {
+        // First sort by priority (higher priority first)
+        if (b.priority !== a.priority) {
+          return b.priority - a.priority;
+        }
+        // Then sort by validTo (earlier expiration first)
+        const aValidTo = a.validTo ? new Date(a.validTo).getTime() : Infinity;
+        const bValidTo = b.validTo ? new Date(b.validTo).getTime() : Infinity;
+        return aValidTo - bValidTo;
+      });
+
+      return filtered;
+    },
+    enabled: !!serverTimeQuery.data,
+  });
+
+  // Find default payment method (Cash/Tiền mặt)
+  const defaultPaymentMethod = useMemo(() => {
+    if (!paymentMethodsQuery.data) return undefined;
+    return paymentMethodsQuery.data.find(
+      (pm) =>
+        pm.code?.toLowerCase().includes("cash") ||
+        pm.name.vi?.toLowerCase().includes("tiền mặt") ||
+        pm.name.en?.toLowerCase().includes("cash")
+    );
+  }, [paymentMethodsQuery.data]);
+
+  // Find default shipping method (Pickup/Tự nhận)
+  const defaultShippingMethod = useMemo(() => {
+    if (!shippingMethodsQuery.data) return undefined;
+    return shippingMethodsQuery.data.find(
+      (sm) =>
+        sm.code?.toLowerCase().includes("pickup") ||
+        sm.name.vi?.toLowerCase().includes("tự nhận") ||
+        sm.name.en?.toLowerCase().includes("pickup")
+    );
+  }, [shippingMethodsQuery.data]);
+
+  // Set default payment and shipping methods
+  useMemo(() => {
+    if (defaultPaymentMethod && !watch("paymentMethodId")) {
+      setValue("paymentMethodId", defaultPaymentMethod.id);
+    }
+    if (defaultShippingMethod && !watch("shippingMethodId")) {
+      setValue("shippingMethodId", defaultShippingMethod.id);
+    }
+  }, [defaultPaymentMethod, defaultShippingMethod, setValue, watch]);
+
+  // Auto-select first price list when loaded
+  useEffect(() => {
+    if (
+      priceListsQuery.data &&
+      priceListsQuery.data.length > 0 &&
+      !watch("priceListId")
+    ) {
+      const firstPriceList = priceListsQuery.data[0];
+      setValue("priceListId", firstPriceList.id);
+    }
+  }, [priceListsQuery.data, setValue, watch]);
+
+  // Check if shipping method is not pickup
+  const isShippingOtherThanPickup = useMemo(() => {
+    if (!watchedShippingMethodId || !defaultShippingMethod) return false;
+    return watchedShippingMethodId !== defaultShippingMethod.id;
+  }, [watchedShippingMethodId, defaultShippingMethod]);
+
+  const onSubmitForm: SubmitHandler<SalesOrderB2CFormValues> = async (
+    values
+  ) => {
+    // Validate delivery address if shipping is not pickup
+    if (isShippingOtherThanPickup && !values.deliveryAddress?.trim()) {
+      setValue("deliveryAddress", "", { shouldValidate: true });
+      return;
+    }
+
+    await onSubmit(values);
+  };
+
+  const warehouseOptions = useMemo<SelectItemOption[]>(
+    () =>
+      (warehousesQuery.data ?? []).map((warehouse) => ({
+        value: warehouse.id,
+        label: `${warehouse.code} — ${warehouse.name}`,
+      })),
+    [warehousesQuery.data]
+  );
+
+  const priceListOptions = useMemo<SelectItemOption[]>(
+    () =>
+      (priceListsQuery.data ?? []).map((pl) => {
+        const name =
+          typeof pl.name === "object" ? pl.name.vi || pl.name.en : pl.name;
+        return {
+          value: pl.id,
+          label: `${pl.code} - ${name}`,
+        };
+      }),
+    [priceListsQuery.data]
+  );
+
+  // Format server time for display
+  const formattedCreatedAt = useMemo(() => {
+    if (!serverTimeQuery.data) return undefined;
+    try {
+      const date = new Date(serverTimeQuery.data);
+      return date.toLocaleString("vi-VN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+    } catch {
+      return serverTimeQuery.data;
+    }
+  }, [serverTimeQuery.data]);
+
+  const paymentMethodOptions = useMemo<SelectItemOption[]>(
+    () =>
+      (paymentMethodsQuery.data ?? [])
+        .filter((pm) => pm.isActive)
+        .map((pm) => ({
+          value: pm.id,
+          label: pm.name.en || pm.name.vi || pm.code,
+        })),
+    [paymentMethodsQuery.data]
+  );
+
+  const shippingMethodOptions = useMemo<SelectItemOption[]>(
+    () =>
+      (shippingMethodsQuery.data ?? [])
+        .filter((sm) => sm.isActive)
+        .map((sm) => ({
+          value: sm.id,
+          label: sm.name.en || sm.name.vi || sm.code,
+        })),
+    [shippingMethodsQuery.data]
+  );
+
+  const shippingTermOptions = useMemo<SelectItemOption[]>(
+    () =>
+      (shippingTermsQuery.data ?? [])
+        .filter((st) => st.isActive)
+        .map((st) => ({
+          value: st.id,
+          label: st.name.en || st.name.vi || st.code,
+        })),
+    [shippingTermsQuery.data]
+  );
+
+  const taxRateOptions = useMemo<SelectItemOption[]>(
+    () =>
+      (taxRatesQuery.data ?? [])
+        .filter((tr) => tr.isActive)
+        .map((tr) => ({
+          value: tr.rate,
+          label: `${tr.name.en || tr.name.vi || tr.code} (${tr.rate}%)`,
+        })),
+    [taxRatesQuery.data]
+  );
+
+  const uomOptions = useMemo<SelectItemOption[]>(
+    () =>
+      (uomQuery.data ?? [])
+        .filter((uom) => uom.isActive)
+        .map((uom) => {
+          const name = (uom.name as any)?.vi || (uom.name as any)?.en || "";
+          const label = uom.symbol ? `${name} (${uom.symbol})` : name;
+          return {
+            value: uom.id,
+            label,
+          };
+        }),
+    [uomQuery.data]
+  );
+
+  return (
+    <form className="space-y-3" onSubmit={handleSubmit(onSubmitForm)}>
+      {submitError ? (
+        <div className="mb-3 rounded-large border border-danger-200 bg-danger-50 px-3 py-2 text-sm text-danger-600">
+          {submitError}
+        </div>
+      ) : null}
+
+      {/* Action Buttons - Sticky */}
+      <div className="sticky top-0 z-10 flex justify-end gap-3 py-2 mb-3 bg-background border-b border-divider -mx-4 px-4">
+        {onCancel && (
+          <Button size="sm" variant="light" onPress={onCancel}>
+            {tLabels("cancel")}
+          </Button>
+        )}
+        <Button
+          color="primary"
+          type="submit"
+          size="sm"
+          isLoading={isSubmitting}
+          disabled={isSubmitting}
+        >
+          {tLabels("createOrder")}
+        </Button>
+      </div>
+
+      {/* Section: Thông tin chung */}
+      <Card>
+        <CardBody className="p-4">
+          <GeneralInfoSection
+            control={control}
+            priceListOptions={priceListOptions}
+            warehouseOptions={warehouseOptions}
+            watchedPriceListId={watchedPriceListId}
+            createdAt={formattedCreatedAt}
+            currency={watchedCurrency}
+            errors={errors}
+          />
+        </CardBody>
+      </Card>
+
+      {/* Section: Order Lines */}
+      <Card>
+        <CardBody className="p-4">
+          <OrderLinesSection
+            control={control}
+            fields={fields}
+            append={append}
+            remove={remove}
+            watchedLines={watchedLines}
+            watchedCurrency={watchedCurrency}
+            watchedPriceListId={watchedPriceListId}
+            taxRateOptions={taxRateOptions}
+            taxRatesQuery={taxRatesQuery}
+            uomOptions={uomOptions}
+            errors={errors}
+            defaultLine={validation.defaultLine}
+            setValue={setValue}
+          />
+        </CardBody>
+      </Card>
+
+      {/* Section: Thông tin giao hàng */}
+      <Card>
+        <CardBody className="p-4">
+          <DeliveryInfoSection
+            control={control}
+            paymentMethodOptions={paymentMethodOptions}
+            shippingMethodOptions={shippingMethodOptions}
+            shippingTermOptions={shippingTermOptions}
+            isShippingOtherThanPickup={isShippingOtherThanPickup}
+            errors={errors}
+          />
+        </CardBody>
+      </Card>
+
+      {/* Order Totals */}
+      <Card>
+        <CardBody className="p-4">
+          <OrderTotalsSection
+            control={control}
+            calculatedTotals={calculatedTotals}
+            watchedCurrency={watchedCurrency}
+            isShippingOtherThanPickup={isShippingOtherThanPickup}
+            errors={errors}
+          />
+        </CardBody>
+      </Card>
+
+      {/* Section: Thông tin khách hàng */}
+      <Card>
+        <CardBody className="p-4">
+          <CustomerInfoSection
+            control={control}
+            setValue={setValue}
+            selectedCustomer={selectedCustomer}
+            setSelectedCustomer={setSelectedCustomer}
+            errors={errors}
+          />
+        </CardBody>
+      </Card>
+
+      {/* Notes */}
+      <Card>
+        <CardBody className="p-4">
+          <Controller
+            name="notes"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Textarea
+                {...field}
+                label={tLabels("notes")}
+                size="sm"
+                minRows={2}
+                value={field.value ?? ""}
+                onValueChange={field.onChange}
+                isInvalid={fieldState.invalid}
+                errorMessage={fieldState.error?.message}
+              />
+            )}
+          />
+        </CardBody>
+      </Card>
+    </form>
+  );
+}

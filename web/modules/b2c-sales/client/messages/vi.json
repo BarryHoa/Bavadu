@@ -1,0 +1,109 @@
+{
+  "b2cSales": {
+    "order": {
+      "create": {
+        "validation": {
+          "quantity": {
+            "required": "Số lượng là bắt buộc",
+            "range": "Số lượng phải từ {min} đến {max}"
+          },
+          "price": {
+            "range": "Giá phải từ {min} đến {max}"
+          },
+          "discount": {
+            "min": "Chiết khấu phải lớn hơn hoặc bằng {min}"
+          },
+          "taxRate": {
+            "range": "Thuế suất phải từ {min} đến {max}"
+          },
+          "product": {
+            "required": "Sản phẩm là bắt buộc"
+          },
+          "currency": {
+            "required": "Tiền tệ là bắt buộc"
+          },
+          "priceListId": {
+            "required": "Bảng giá là bắt buộc"
+          },
+          "customerName": {
+            "required": "Tên khách hàng là bắt buộc"
+          },
+          "lines": {
+            "required": "Cần ít nhất một dòng đơn hàng"
+          }
+        },
+        "labels": {
+          "orderLines": "Chi tiết đơn hàng",
+          "product": "Sản phẩm",
+          "unit": "Đơn vị",
+          "quantity": "Số lượng",
+          "unitPrice": "Đơn giá",
+          "discount": "Chiết khấu",
+          "taxRate": "Thuế suất",
+          "subtotal": "Tạm tính",
+          "taxAmount": "Thuế",
+          "total": "Tổng cộng",
+          "addLine": "Thêm dòng",
+          "line": "Dòng",
+          "removeLine": "Xóa dòng",
+          "noOrderLines": "Chưa có dòng đơn hàng. Nhấn 'Thêm dòng' để thêm sản phẩm.",
+          "cancel": "Hủy",
+          "createOrder": "Tạo đơn hàng",
+          "notes": "Ghi chú",
+          "generalInfo": "Thông tin chung",
+          "createdAt": "Ngày giờ tạo",
+          "currency": "Tiền tệ",
+          "pricing": "Bảng giá",
+          "warehouse": "Kho hàng",
+          "customerInfo": "Thông tin khách hàng",
+          "requireInvoice": "Yêu cầu xuất hóa đơn",
+          "customerName": "Tên khách hàng",
+          "selectCustomer": "Chọn khách hàng",
+          "code": "Mã",
+          "name": "Tên",
+          "phone": "Điện thoại",
+          "actions": "Thao tác",
+          "select": "Chọn",
+          "close": "Đóng",
+          "deliveryInfo": "Thông tin giao hàng",
+          "paymentMethod": "Phương thức thanh toán",
+          "shippingMethod": "Phương thức giao hàng",
+          "shippingAddress": "Địa chỉ giao hàng",
+          "shippingAddressRequired": "Địa chỉ giao hàng là bắt buộc",
+          "shippingFee": "Phí giao hàng",
+          "deliveryDate": "Ngày giao hàng",
+          "orderTotals": "Tổng kết đơn hàng",
+          "orderDiscount": "Chiết khấu đơn hàng",
+          "orderTax": "Thuế đơn hàng",
+          "lineDiscounts": "Chiết khấu dòng",
+          "lineTaxes": "Thuế dòng",
+          "grandTotal": "Tổng cộng",
+          "list": {
+            "code": "Mã",
+            "customerName": "Tên khách hàng",
+            "status": "Trạng thái",
+            "expectedDate": "Ngày giao dự kiến",
+            "completedAt": "Hoàn thành lúc",
+            "totalAmount": "Tổng tiền",
+            "view": "Xem",
+            "newOrder": "Đơn hàng mới"
+          },
+          "edit": {
+            "title": "Chỉnh sửa đơn hàng B2C",
+            "description": "Form chỉnh sửa đơn hàng sẽ được triển khai tại đây."
+          },
+          "view": {
+            "title": "Xem đơn hàng B2C",
+            "description": "Trang xem đơn hàng sẽ được triển khai tại đây."
+          },
+          "errors": {
+            "failedToCalculatePrice": "Không thể tính giá",
+            "failedToCreateOrder": "Không thể tạo đơn hàng B2C",
+            "discountExceeded": "Chiết khấu không được vượt quá {max} (số lượng × đơn giá)"
+          }
+        }
+      }
+    }
+  }
+}
+

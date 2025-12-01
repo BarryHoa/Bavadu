@@ -1,71 +1,63 @@
 "use client";
 
-import { IBaseInput, IBaseSingleSelect, SelectItemOption } from "@base/client/components";
+import { IBaseSingleSelect, SelectItemOption } from "@base/client/components";
+import { useTranslations } from "next-intl";
 import { Control, Controller } from "react-hook-form";
 
 interface GeneralInfoSectionProps {
   control: Control<any>;
   priceListOptions: SelectItemOption[];
-  currencyOptions: SelectItemOption[];
   warehouseOptions: SelectItemOption[];
   watchedPriceListId?: string;
+  createdAt?: string;
+  currency?: string;
   errors?: any;
 }
 
 export default function GeneralInfoSection({
   control,
   priceListOptions,
-  currencyOptions,
   warehouseOptions,
   watchedPriceListId,
+  createdAt,
+  currency,
   errors,
 }: GeneralInfoSectionProps) {
+  const t = useTranslations("b2cSales.order.create.labels");
   return (
     <div>
-      <h2 className="text-base font-semibold mb-2">Thông tin chung</h2>
+      <h2 className="text-base font-semibold mb-2">{t("generalInfo")}</h2>
+      <div className="text-sm text-default-700 py-2 text-bold mb-3">
+        {t("createdAt")}: {createdAt || "—"}, {t("currency")}: {currency}
+      </div>
+
       <div className="grid gap-2 md:grid-cols-3">
+        {/* Pricing */}
         <Controller
           name="priceListId"
           control={control}
           render={({ field, fieldState }) => (
             <IBaseSingleSelect
-              label="Price List"
+              label={t("pricing")}
               size="sm"
               items={priceListOptions}
               selectedKey={field.value}
               onSelectionChange={(key) => {
                 field.onChange(key || undefined);
               }}
-              isInvalid={fieldState.invalid}
-              errorMessage={fieldState.error?.message}
-            />
-          )}
-        />
-        <Controller
-          name="currency"
-          control={control}
-          render={({ field, fieldState }) => (
-            <IBaseSingleSelect
-              label="Currency"
-              size="sm"
-              items={currencyOptions}
-              selectedKey={field.value}
-              onSelectionChange={(key) => {
-                field.onChange(key || undefined);
-              }}
               isRequired
-              isDisabled={!!watchedPriceListId}
               isInvalid={fieldState.invalid}
               errorMessage={fieldState.error?.message}
             />
           )}
         />
+
         <Controller
           name="warehouseId"
           control={control}
           render={({ field, fieldState }) => (
             <IBaseSingleSelect
-              label="Warehouse"
+              label={t("warehouse")}
               size="sm"
               items={warehouseOptions}
               selectedKey={field.value}
@@ -81,4 +73,3 @@ export default function GeneralInfoSection({
     </div>
   );
 }
-

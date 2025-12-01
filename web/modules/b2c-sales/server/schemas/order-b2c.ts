@@ -1,5 +1,5 @@
 import { table_payment_method } from "@base/server/schemas/payment-method";
-import { table_price_lists_b2c } from "@base/server/schemas/price-list-b2c";
+import { table_price_lists_b2c } from "./price-list-b2c";
 import { table_shipping_method } from "@base/server/schemas/shipping-method";
 import { table_shipping_term } from "@base/server/schemas/shipping-term";
 import { table_stock_warehouse } from "@mdl/stock/server/schemas/warehouse";

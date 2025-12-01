@@ -1,10 +1,10 @@
 import { desc, eq, ilike, sql } from "drizzle-orm";
+import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
 import {
   table_price_lists_b2c,
   TblPriceListB2C,
 } from "../../schemas/price-list-b2c";
 import { PriceListValidationService } from "../../services/PriceListValidationService";
-import { BaseViewListModel } from "../BaseViewListModel";
 
 export interface PriceListB2CRow {
   id: string;
@@ -332,3 +332,4 @@ export default class PriceListB2CModel extends BaseViewListModel<
     return result.length > 0;
   }
 }
+

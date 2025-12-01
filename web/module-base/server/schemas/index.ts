@@ -6,7 +6,6 @@ export * from "./guideline";
 export * from "./news";
 export * from "./payment-method";
 export * from "./payment-term";
-export * from "./price-list-b2c";
 export * from "./session";
 export * from "./shipping-method";
 export * from "./shipping-term";

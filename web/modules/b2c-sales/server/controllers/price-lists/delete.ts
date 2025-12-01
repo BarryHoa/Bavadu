@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
-import PriceListB2CModel from "../../models/PriceListB2C/PriceListB2CModel";
-import { JSONResponse } from "../../utils/JSONResponse";
+import PriceListB2CModel from "../../models/PriceList/PriceListB2CModel";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
 
-export async function GET(request: NextRequest) {
+export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
@@ -15,9 +15,9 @@ export async function GET(request: NextRequest) {
     }
 
     const model = new PriceListB2CModel();
-    const priceList = await model.getById(id);
+    const deleted = await model.delete(id);
 
-    if (!priceList) {
+    if (!deleted) {
       return JSONResponse({
         message: `Price list with id "${id}" not found`,
         status: 404,
@@ -25,12 +25,13 @@ export async function GET(request: NextRequest) {
     }
 
     return JSONResponse({
-      data: priceList,
+      message: "Price list deleted successfully",
       status: 200,
     });
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Failed to get price list";
+      error instanceof Error ? error.message : "Failed to delete price list";
     return JSONResponse({ message, status: 400 });
   }
 }
+

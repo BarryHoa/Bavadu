@@ -239,3 +239,4 @@ export const table_price_tiers_b2c = pgTable(
 
 export type TblPriceTierB2C = typeof table_price_tiers_b2c.$inferSelect;
 export type NewTblPriceTierB2C = typeof table_price_tiers_b2c.$inferInsert;
+

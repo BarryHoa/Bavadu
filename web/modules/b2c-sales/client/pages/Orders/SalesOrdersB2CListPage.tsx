@@ -22,12 +22,13 @@ type SalesOrderB2CRow = SalesOrderB2C & {
 
 export default function SalesOrdersB2CListPage(): React.ReactNode {
   const tDataTable = useTranslations("dataTable");
+  const t = useTranslations("b2cSales.order.create.labels.list");
 
   const columns = useMemo<DataTableColumn<SalesOrderB2CRow>[]>(
     () => [
       {
         key: "code",
-        label: "Code",
+        label: t("code"),
         render: (value, row) => {
           if (!row?.id) return value;
           return (
@@ -39,11 +40,11 @@ export default function SalesOrdersB2CListPage(): React.ReactNode {
       },
       {
         key: "customerName",
-        label: "Customer Name",
+        label: t("customerName"),
       },
       {
         key: "status",
-        label: "Status",
+        label: t("status"),
         render: (value) => (
           <Chip size="sm" variant="flat" className="capitalize">
             {value || "draft"}
@@ -52,17 +53,17 @@ export default function SalesOrdersB2CListPage(): React.ReactNode {
       },
       {
         key: "expectedDate",
-        label: "Expected Date",
+        label: t("expectedDate"),
         render: (value) => formatDate(value),
       },
       {
         key: "completedAt",
-        label: "Completed At",
+        label: t("completedAt"),
         render: (value) => formatDate(value),
       },
       {
         key: "grandTotal",
-        label: "Total Amount",
+        label: t("totalAmount"),
         render: (_, row) =>
           new Intl.NumberFormat(undefined, {
             style: "currency",
@@ -81,7 +82,7 @@ export default function SalesOrdersB2CListPage(): React.ReactNode {
               actions={[
                 {
                   key: "view",
-                  label: "View",
+                  label: t("view"),
                   href: viewLink,
                 },
               ]}
@@ -102,7 +103,7 @@ export default function SalesOrdersB2CListPage(): React.ReactNode {
         actionsRight={[
           {
             key: "new",
-            title: "New Order",
+            title: t("newOrder"),
             type: "link",
             color: "primary",
             props: {

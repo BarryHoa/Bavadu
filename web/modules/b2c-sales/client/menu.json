@@ -9,28 +9,29 @@
       "name": "Orders",
       "path": "/",
       "as": "/",
-      "icon": "FileText"
+      "order": 1
     },
     {
       "key": "b2c-customers",
       "name": "Customers",
       "path": "/customers",
       "as": "/customers",
-      "icon": "Users"
+      "icon": "Users",
+      "order": 2
     },
     {
       "key": "b2c-deliveries",
       "name": "Deliveries",
       "path": "/deliveries",
       "as": "/deliveries",
-      "icon": "Truck"
+      "order": 3
     },
     {
       "key": "b2c-price-lists",
       "name": "Price Lists",
       "path": "/price-lists",
       "as": "/price-lists",
-      "icon": "Tag"
+      "order": 4
     }
   ]
 }

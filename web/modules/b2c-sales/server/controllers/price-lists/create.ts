@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
-import { getAuthenticatedUser } from "../../middleware/auth";
-import PriceListB2CModel from "../../models/PriceListB2C/PriceListB2CModel";
-import { JSONResponse } from "../../utils/JSONResponse";
+import { getAuthenticatedUser } from "@base/server/middleware/auth";
+import PriceListB2CModel from "../../models/PriceList/PriceListB2CModel";
+import { JSONResponse } from "@base/server/utils/JSONResponse";
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,3 +58,4 @@ export async function POST(request: NextRequest) {
     return JSONResponse({ message, status: 400 });
   }
 }
+

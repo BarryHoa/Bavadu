@@ -6,7 +6,7 @@ import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
-import { table_price_lists_b2c } from "@base/server/schemas/price-list-b2c";
+import { table_price_lists_b2c } from "../../schemas/price-list-b2c";
 
 class ListPriceListB2CModel extends BaseViewListModel<
   typeof table_price_lists_b2c,
