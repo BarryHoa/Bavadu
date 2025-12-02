@@ -127,5 +127,28 @@
     "loading": "Loading guide content...",
     "error": "Unable to load guide content. Please try again later.",
     "notFound": "Guide content not found."
+  },
+  "components": {
+    "input": {
+      "placeholder": "Enter information...",
+      "numberPlaceholder": "Enter number...",
+      "searchPlaceholder": "Search..."
+    },
+    "textarea": {
+      "placeholder": "Enter information..."
+    },
+    "translate": {
+      "title": "Translate",
+      "english": "English",
+      "vietnamese": "Vietnamese",
+      "copyToAll": "Copy to all languages"
+    },
+    "selectAsync": {
+      "searchLabel": "Search",
+      "error": "Failed to load options",
+      "loading": "Loading...",
+      "noResults": "No results found",
+      "loadingMore": "Loading more..."
+    }
   }
 }

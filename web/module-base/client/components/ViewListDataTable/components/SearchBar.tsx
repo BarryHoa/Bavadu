@@ -1,6 +1,5 @@
 "use client";
-import { Search } from "lucide-react";
-import { IBaseInput } from "@base/client/components";
+import { IBaseInputSearch } from "@base/client/components";
 
 interface SearchBarProps {
   value: string;
@@ -14,8 +13,7 @@ export default function SearchBar({
   placeholder = "Search",
 }: SearchBarProps) {
   return (
-    <IBaseInput
-      startContent={<Search size={16} className="text-default-400" />}
+    <IBaseInputSearch
       placeholder={placeholder}
       value={value}
       onValueChange={onChange}

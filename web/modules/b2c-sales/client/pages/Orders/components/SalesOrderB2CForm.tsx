@@ -23,7 +23,6 @@ import { Card, CardBody, Textarea } from "@heroui/react";
 import UnitOfMeasureService from "@mdl/product/client/services/UnitOfMeasureService";
 import StockService from "@mdl/stock/client/services/StockService";
 import { type CustomerIndividualDto } from "../../../services/CustomerService";
-import { priceListB2CService } from "../../../services/PriceListB2CService";
 import type { SalesOrderB2CFormValues } from "../validation/createSalesOrderB2CValidation";
 import { createSalesOrderB2CValidation } from "../validation/createSalesOrderB2CValidation";
 import CustomerInfoSection from "./CustomerInfoSection";
@@ -183,26 +182,6 @@ export default function SalesOrderB2CForm({
     },
   });
 
-  // Get server time
-  const serverTimeQuery = useQuery({
-    queryKey: ["server-time"],
-    queryFn: async () => {
-      const response = await fetch("/api/base/health/ping");
-      const data = await response.json();
-      return data.data?.timestamp || new Date().toISOString();
-    },
-  });
-
-  // Load price lists using dropdown-options API
-  const priceListsQuery = useQuery({
-    queryKey: ["price-lists-b2c-dropdown", serverTimeQuery.data],
-    queryFn: async () => {
-      const response = await priceListB2CService.getOptionsDropdown();
-      return response.data ?? [];
-    },
-    enabled: !!serverTimeQuery.data,
-  });
-
   // Find default payment method (Cash/Tiền mặt)
   const defaultPaymentMethod = useMemo(() => {
     if (!paymentMethodsQuery.data) return undefined;
@@ -243,19 +222,6 @@ export default function SalesOrderB2CForm({
     }
   }, [defaultPaymentMethod, defaultShippingMethod, setValue, getValues]);
 
-  // Auto-select first price list when loaded
-  useEffect(() => {
-    const priceListId = getValues("priceListId");
-    if (
-      priceListsQuery.data &&
-      priceListsQuery.data.length > 0 &&
-      !priceListId
-    ) {
-      const firstPriceList = priceListsQuery.data[0];
-      setValue("priceListId", firstPriceList.value);
-    }
-  }, [priceListsQuery.data, setValue, getValues]);
-
   // Check if shipping method is not pickup
   const isShippingOtherThanPickup = useMemo(() => {
     if (!watchedShippingMethodId || !defaultShippingMethod) return false;
@@ -283,32 +249,18 @@ export default function SalesOrderB2CForm({
     [warehousesQuery.data]
   );
 
-  const priceListOptions = useMemo<SelectItemOption[]>(
-    () =>
-      (priceListsQuery.data ?? []).map((pl) => ({
-        value: pl.value,
-        label: pl.label,
-      })),
-    [priceListsQuery.data]
-  );
-
   // Format server time for display
   const formattedCreatedAt = useMemo(() => {
-    if (!serverTimeQuery.data) return undefined;
-    try {
-      const date = new Date(serverTimeQuery.data);
-      return date.toLocaleString("vi-VN", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      });
-    } catch {
-      return serverTimeQuery.data;
-    }
-  }, [serverTimeQuery.data]);
+    const now = new Date();
+    return now.toLocaleString("vi-VN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+  }, []);
 
   const paymentMethodOptions = useMemo<SelectItemOption[]>(
     () =>
@@ -397,7 +349,6 @@ export default function SalesOrderB2CForm({
         <CardBody className="p-4">
           <GeneralInfoSection
             control={control}
-            priceListOptions={priceListOptions}
             warehouseOptions={warehouseOptions}
             watchedPriceListId={watchedPriceListId}
             createdAt={formattedCreatedAt}

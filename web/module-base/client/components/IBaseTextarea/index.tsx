@@ -1,24 +1,25 @@
 "use client";
 
-import { Input as HeroUIInput, InputProps } from "@heroui/input";
+import { Textarea as HeroUITextarea, TextAreaProps } from "@heroui/input";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import React from "react";
 
-type IBaseInputProps = InputProps & {};
-const IBaseInput = React.forwardRef<HTMLInputElement, IBaseInputProps>(
+export type IBaseTextareaProps = TextAreaProps & {};
+const IBaseTextarea = React.forwardRef<HTMLTextAreaElement, IBaseTextareaProps>(
   (props, ref) => {
-    const t = useTranslations("components.input");
+    const t = useTranslations("components.textarea");
     const {
       isDisabled,
       size = "sm",
       labelPlacement = "outside",
       placeholder,
+      minRows = 3,
       ...rest
     } = props;
     const defaultPlaceholder = t("placeholder");
     return (
-      <HeroUIInput
+      <HeroUITextarea
         ref={ref}
         classNames={{
           base: "max-w opacity-100",
@@ -33,6 +34,7 @@ const IBaseInput = React.forwardRef<HTMLInputElement, IBaseInputProps>(
         size={size}
         labelPlacement={labelPlacement}
         placeholder={placeholder ?? defaultPlaceholder}
+        minRows={minRows}
         {...rest}
         isDisabled={isDisabled}
       />
@@ -40,6 +42,6 @@ const IBaseInput = React.forwardRef<HTMLInputElement, IBaseInputProps>(
   }
 );
 
-IBaseInput.displayName = "IBaseInput";
+IBaseTextarea.displayName = "IBaseTextarea";
 
-export default IBaseInput;
+export default IBaseTextarea;

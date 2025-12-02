@@ -1,5 +1,8 @@
+"use client";
+
 import { InputProps } from "@heroui/input";
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 import React, { useCallback, useMemo, useState } from "react";
 import { formatNumber } from "../../utils/number";
 import IBaseInput from "../IBaseInput";
@@ -106,6 +109,7 @@ const IBaseInputNumber = React.forwardRef<
   HTMLInputElement,
   IBaseInputNumberProps
 >((props, ref) => {
+  const t = useTranslations("components.input");
   const {
     value: controlledValue,
     defaultValue,
@@ -116,10 +120,11 @@ const IBaseInputNumber = React.forwardRef<
     allowNegative = true,
     min,
     max,
-    placeholder = "Nhập số...",
+    placeholder,
     fixZero = true,
     ...rest
   } = props;
+  const defaultPlaceholder = t("numberPlaceholder");
 
   const isControlled = controlledValue !== undefined;
 
@@ -418,7 +423,7 @@ const IBaseInputNumber = React.forwardRef<
         onValueChange={handleChange}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        placeholder={placeholder}
+        placeholder={placeholder ?? defaultPlaceholder}
         classNames={{
           ...rest.classNames,
           input: clsx(

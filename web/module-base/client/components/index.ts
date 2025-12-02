@@ -20,6 +20,10 @@ export { default as IBaseInput, default as Input } from "./IBaseInput";
 export { default as IBaseInputMultipleLang } from "./IBaseInputMultipleLang";
 export { default as IBaseInputNumber } from "./IBaseInputNumber";
 export type { IBaseInputNumberProps } from "./IBaseInputNumber";
+export { default as IBaseInputSearch } from "./IBaseInputSearch";
+export type { IBaseInputSearchProps } from "./IBaseInputSearch";
+export { default as IBaseTextarea, default as Textarea } from "./IBaseTextarea";
+export type { IBaseTextareaProps } from "./IBaseTextarea";
 export {
   default as IBaseModal,
   IBaseModalBody,
@@ -46,6 +50,12 @@ export {
 } from "./IBaseSelect";
 export type { IBaseSelectProps, SelectItemOption } from "./IBaseSelect";
 export { default as IBaseSingleSelect } from "./IBaseSelect/IBaseSingleSelect";
+export { default as IBaseSingleSelectAsync } from "./IBaseSelect/IBaseSingleSelectAsync";
+export type {
+  FetchOptionsFn,
+  FetchOptionsParams,
+  IBaseSingleSelectAsyncProps,
+} from "./IBaseSelect/IBaseSingleSelectAsync";
 export { default as IBaseTabs, Tab } from "./IBaseTabs";
 export type { IBaseTabsProps } from "./IBaseTabs";
 export { default as IBaseTooltip } from "./IBaseTooltip";

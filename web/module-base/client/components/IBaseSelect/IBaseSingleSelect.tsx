@@ -3,7 +3,7 @@
 import { SelectItem } from "@heroui/select";
 import MiniSearch from "minisearch";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import IBaseInput from "../IBaseInput";
+import IBaseInputSearch from "../IBaseInputSearch";
 import IBaseSelect, { IBaseSelectProps } from "./IBaseSelect";
 
 export interface SelectItemOption extends Record<string, unknown> {
@@ -231,7 +231,7 @@ const IBaseSingleSelect = React.forwardRef<
             isReadOnly
             hideSelectedIcon
           >
-            <IBaseInput
+            <IBaseInputSearch
               ref={searchInputRef}
               value={searchTerm}
               onValueChange={setSearchTerm}
@@ -242,21 +242,6 @@ const IBaseSingleSelect = React.forwardRef<
                 base: "w-full",
                 input: "text-sm",
               }}
-              startContent={
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="11" cy="11" r="8" />
-                  <path d="m21 21-4.35-4.35" />
-                </svg>
-              }
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
@@ -266,6 +251,7 @@ const IBaseSingleSelect = React.forwardRef<
                   setSearchTerm("");
                 }
               }}
+              showClearButton={false}
             />
           </SelectItem>
         )}

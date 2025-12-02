@@ -1,12 +1,15 @@
 "use client";
 
-import { IBaseSingleSelect, SelectItemOption } from "@base/client/components";
+import {
+  IBaseSingleSelect,
+  IBaseSingleSelectAsync,
+  SelectItemOption,
+} from "@base/client/components";
 import { useTranslations } from "next-intl";
 import { Control, Controller } from "react-hook-form";
 
 interface GeneralInfoSectionProps {
   control: Control<any>;
-  priceListOptions: SelectItemOption[];
   warehouseOptions: SelectItemOption[];
   watchedPriceListId?: string;
   createdAt?: string;
@@ -16,7 +19,6 @@ interface GeneralInfoSectionProps {
 
 export default function GeneralInfoSection({
   control,
-  priceListOptions,
   warehouseOptions,
   watchedPriceListId,
   createdAt,
@@ -37,10 +39,10 @@ export default function GeneralInfoSection({
           name="priceListId"
           control={control}
           render={({ field, fieldState }) => (
-            <IBaseSingleSelect
+            <IBaseSingleSelectAsync
               label={t("pricing")}
               size="sm"
-              items={priceListOptions}
+              model="list.b2c-sales.price-list"
               selectedKey={field.value}
               onSelectionChange={(key) => {
                 field.onChange(key || undefined);

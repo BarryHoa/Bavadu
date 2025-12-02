@@ -4,7 +4,7 @@ import { IBaseInput } from "@base/client/components";
 import { Button } from "@heroui/button";
 import type { InputProps } from "@heroui/input";
 import { ArrowRight, Languages } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import React, { useCallback, useMemo, useState } from "react";
 import {
   DEFAULT_SUPPORTED_LANGS,
@@ -37,6 +37,7 @@ const IBaseInputMultipleLang = React.forwardRef<
   HTMLInputElement,
   IBaseInputMultipleLangProps
 >((props, ref) => {
+  const t = useTranslations("components.translate");
   const locale = useLocale();
   const { value, onValueChange, defaultLangs, ...restProps } = props;
 
@@ -124,7 +125,7 @@ const IBaseInputMultipleLang = React.forwardRef<
             variant="light"
             onPress={handleCopyToAll}
             className="min-w-0 w-6 h-6"
-            title="Copy to all languages"
+            title={t("copyToAll")}
           >
             <ArrowRight size={16} className="text-primary" />
           </Button>
@@ -135,7 +136,7 @@ const IBaseInputMultipleLang = React.forwardRef<
           variant="light"
           onPress={handleOpenModal}
           className="min-w-0 w-6 h-6"
-          title="Translate"
+          title={t("title")}
         >
           <Languages size={16} className="text-primary" />
         </Button>

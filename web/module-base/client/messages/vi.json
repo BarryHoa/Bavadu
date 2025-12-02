@@ -126,5 +126,28 @@
     "loading": "Đang tải nội dung hướng dẫn...",
     "error": "Không thể tải nội dung hướng dẫn. Vui lòng thử lại sau.",
     "notFound": "Không tìm thấy nội dung hướng dẫn."
+  },
+  "components": {
+    "input": {
+      "placeholder": "Nhập thông tin...",
+      "numberPlaceholder": "Nhập số...",
+      "searchPlaceholder": "Tìm kiếm..."
+    },
+    "textarea": {
+      "placeholder": "Nhập thông tin..."
+    },
+    "translate": {
+      "title": "Dịch",
+      "english": "Tiếng Anh",
+      "vietnamese": "Tiếng Việt",
+      "copyToAll": "Sao chép sang tất cả ngôn ngữ"
+    },
+    "selectAsync": {
+      "searchLabel": "Tìm kiếm",
+      "error": "Không thể tải danh sách lựa chọn",
+      "loading": "Đang tải...",
+      "noResults": "Không tìm thấy dữ liệu",
+      "loadingMore": "Đang tải thêm..."
+    }
   }
 }

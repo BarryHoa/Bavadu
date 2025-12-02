@@ -10,9 +10,8 @@ import {
   ModalHeader,
 } from "@base/client/components";
 import { Languages } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
-
-import { useLocale } from "next-intl";
 import {
   DEFAULT_SUPPORTED_LANGS,
   LocalizeText,
@@ -32,6 +31,8 @@ export default function TranslateModal({
   onSave,
   value,
 }: TranslateModalProps) {
+  const t = useTranslations("components.translate");
+  const tCommon = useTranslations("common.actions");
   const curentLocale = useLocale();
   const [langValues, setLangValues] = useState<LocalizeText>(() => {
     if (typeof value === "object" && value !== null) {
@@ -45,10 +46,10 @@ export default function TranslateModal({
   });
   const labelText = useMemo(() => {
     return {
-      en: "English",
-      vi: "Vietnamese",
+      en: t("english"),
+      vi: t("vietnamese"),
     };
-  }, []);
+  }, [t]);
 
   // Update when initialLangs change
 
@@ -71,7 +72,7 @@ export default function TranslateModal({
           <>
             <ModalHeader className="flex items-center gap-2">
               <Languages size={20} />
-              Translate
+              {t("title")}
             </ModalHeader>
             <ModalBody className="space-y-4">
               {DEFAULT_SUPPORTED_LANGS.filter(
@@ -93,10 +94,10 @@ export default function TranslateModal({
             </ModalBody>
             <ModalFooter>
               <Button variant="light" onPress={onClose}>
-                Cancel
+                {tCommon("cancel")}
               </Button>
               <Button color="primary" onPress={handleSave}>
-                Save
+                {tCommon("save")}
               </Button>
             </ModalFooter>
           </>

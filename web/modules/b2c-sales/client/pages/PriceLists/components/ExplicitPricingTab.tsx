@@ -2,7 +2,7 @@
 
 import {
   DataTable,
-  IBaseInput,
+  IBaseInputSearch,
   SelectItemOption,
 } from "@base/client/components";
 import type { DataTableColumnDefinition } from "@base/client/components/DataTable/DataTableInterface";
@@ -12,7 +12,7 @@ import { Card, CardBody } from "@heroui/react";
 import ProductService from "@mdl/product/client/services/ProductService";
 import UnitOfMeasureService from "@mdl/product/client/services/UnitOfMeasureService";
 import { useQuery } from "@tanstack/react-query";
-import { Edit2, Plus, Search, Trash2 } from "lucide-react";
+import { Edit2, Plus, Trash2 } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import {
   Control,
@@ -352,12 +352,10 @@ export default function ExplicitPricingTab({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="w-[500px]">
-          <IBaseInput
+          <IBaseInputSearch
             placeholder="Search by product name or code..."
             value={searchTerm}
             onValueChange={setSearchTerm}
-            startContent={<Search size={16} className="text-default-400" />}
-            isClearable
             size="sm"
           />
         </div>
