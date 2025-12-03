@@ -1,6 +1,6 @@
 import { asc, desc, or, sql, type Column } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
-import { isNil } from "lodash";
+import { isNil, omitBy } from "lodash";
 import { BaseModel } from "./BaseModel";
 import type {
   ListParamsRequest,
@@ -100,7 +100,7 @@ export abstract class BaseViewListModel<
    */
   buildQueryDataListWithSelect = async (
     params: ListParamsRequest<TFilter>,
-    select: Array<any> | ((qb: typeof this.db) => any),
+    select?: Record<string, Column<any>>,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     callBackBuildQuery?: (query: any) => any
   ): Promise<ListParamsResponse<TRow>> => {
@@ -112,14 +112,31 @@ export abstract class BaseViewListModel<
       limit = 50,
     } = params;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const totalResultKey = "total-data-response" as keyof TRow;
+
     // Start with a query builder: allow calling with select clauses
     let query: any;
-    if (Array.isArray(select)) {
-      query = (this.db.select as any)(...select).from(this.table as any);
-    } else if (typeof select === "function") {
-      query = select(this.db).from(this.table as any);
-    } else {
-      query = this.db.select().from(this.table as any);
+    switch (typeof select) {
+      case "object":
+        {
+          const selectWithTotal = {
+            ...select,
+            [totalResultKey]: sql<number>`count(*) over()::int`.as("total"),
+          };
+          query = this.db.select(selectWithTotal).from(this.table as any);
+        }
+        break;
+
+      default:
+        {
+          const selectWithTotal = {
+            ...this.table, // select all columns (i.e., SELECT *)
+            [totalResultKey]: sql<number>`count(*) over()::int`.as("total"),
+          };
+          query = this.db.select(selectWithTotal).from(this.table as any);
+        }
+        break;
     }
 
     // Apply filter, search, etc., as per buildQueryDataList
@@ -187,22 +204,13 @@ export abstract class BaseViewListModel<
     const result = (await query.limit(limit).offset(offset)) as any[];
     // Try to determine total if result includes it, otherwise fallback to length
     // Check for both "total-data-response" (from buildQueryDataList) and "totalResult" keys
-    const totalResultKey = "total-data-response";
-    const total =
-      result.length > 0 &&
-      (typeof result[0][totalResultKey] !== "undefined" ||
-        typeof result[0].totalResult !== "undefined")
-        ? (result[0][totalResultKey] ?? result[0].totalResult)
-        : result.length;
 
-    const data = result.map((row: any, index: number) =>
-      this.declarationMappingData(row, index)
-    );
+    const total = result?.[0]?.[totalResultKey] ?? 0;
+    const data = result?.map((row: any) =>
+      omitBy(row, totalResultKey)
+    ) as TRow[];
 
-    return {
-      data,
-      total,
-    };
+    return { data, total };
   };
 
   /**
@@ -230,19 +238,19 @@ export abstract class BaseViewListModel<
       ])
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const totalResult = "total-data-response" as keyof TRow;
-    const selectWithTotal = {
-      ...selectColumns,
-      [totalResult]: sql<number>`count(*) over()::int`.as("total"),
-    };
-
     // Use buildQueryDataListWithSelect with custom select and callback
-    return await this.buildQueryDataListWithSelect(
+    const result = await this.buildQueryDataListWithSelect(
       params,
-      (qb) => qb.select(selectWithTotal),
+      selectColumns as Record<string, never>,
       callBackBuildQuery
     );
+    return {
+      data:
+        result?.data?.map((row: any, index: number) =>
+          this.declarationMappingData(row, index)
+        ) ?? [],
+      total: result?.total ?? 0,
+    };
   };
 
   // ============================================================================
