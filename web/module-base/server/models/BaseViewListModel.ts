@@ -107,7 +107,7 @@ export abstract class BaseViewListModel<
    * Subclass can override to transform the row data.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(row: any, index: number): TRow {
+  protected declarationMappingData(row: any, index?: number): TRow {
     return row as TRow;
   }
 

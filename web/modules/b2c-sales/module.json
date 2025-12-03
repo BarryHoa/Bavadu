@@ -13,6 +13,6 @@
     "b2c-sales.delivery": "Delivery/DeliveryModel",
     "b2c-sales.delivery.view-list": "Delivery/DeliveryViewListModel",
     "b2c-sales.price-list.view-list": "PriceList/PriceListB2CViewListModel",
-    "b2c-sales.price-list.dropdown-list": "PriceList/PriceListB2CDropdownViewListModel"
+    "b2c-sales.price-list.dropdown-list": "PriceList/PriceListB2CDropdownListModel"
   }
 }

@@ -9,7 +9,7 @@
     "product": "Product/ProductModel",
     "product.category": "ProductCategory/ProductCategoryModel",
     "product.view-list": "Product/ProductViewListModel",
-    "product.dropdown-list": "Product/ProductDropdownViewListModel",
+    "product.dropdown-list": "Product/ProductDropdownListModel",
     "product.category.view-list": "ProductCategory/ProductCategoryViewListModel"
   }
 }

@@ -15,7 +15,7 @@ type PriceListB2CDropdownOption = {
   [key: string]: any;
 };
 
-class PriceListB2CDropdownViewListModel extends BaseViewListModel<
+class PriceListB2CDropdownListModel extends BaseViewListModel<
   typeof table_price_lists_b2c,
   PriceListB2CDropdownOption
 > {
@@ -68,7 +68,10 @@ class PriceListB2CDropdownViewListModel extends BaseViewListModel<
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(row: any): PriceListB2CDropdownOption {
+  protected declarationMappingData(
+    row: any,
+    index: number
+  ): PriceListB2CDropdownOption {
     // Handle LocaleDataType<string> for name
     const name =
       typeof row.name === "string"
@@ -101,10 +104,13 @@ class PriceListB2CDropdownViewListModel extends BaseViewListModel<
     );
 
     return {
-      data: result.data,
+      data: result.data.map((row: any, index: number) =>
+        this.declarationMappingData(row, index)
+      ),
       total: result.total,
     };
   };
 }
 
-export default PriceListB2CDropdownViewListModel;
+export default PriceListB2CDropdownListModel;
+

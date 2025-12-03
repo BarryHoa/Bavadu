@@ -1,6 +1,6 @@
-import { NextRequest } from "next/server";
-import PriceListB2CViewListModel from "../../models/PriceList/PriceListB2CViewListModel";
 import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { NextRequest } from "next/server";
+import PriceListB2CModel from "../../models/PriceList/PriceListB2CModel";
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const model = new PriceListB2CViewListModel();
+    const model = new PriceListB2CModel();
     const priceList = await model.getById(id);
 
     if (!priceList) {
@@ -34,4 +34,3 @@ export async function GET(request: NextRequest) {
     return JSONResponse({ message, status: 400 });
   }
 }
-

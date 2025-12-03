@@ -1,1 +1,1 @@
-export { default as PaymentMethodDropdownViewListModel } from "./PaymentMethodDropdownViewListModel";
+export { default as PaymentMethodDropdownListModel } from "./PaymentMethodDropdownListModel";

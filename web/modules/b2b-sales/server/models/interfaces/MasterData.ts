@@ -5,7 +5,7 @@ import type {
   TblShippingMethod,
   TblShippingTerm,
   TblTaxRate,
-} from "../../schemas";
+} from "@base/server/schemas";
 
 export interface PaymentMethod extends TblPaymentMethod {
   name: LocaleDataType<string>;
@@ -31,4 +31,3 @@ export interface TaxRate extends TblTaxRate {
   name: LocaleDataType<string>;
   description?: LocaleDataType<string>;
 }
-

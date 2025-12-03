@@ -5,9 +5,9 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
 import { asc, eq } from "drizzle-orm";
-import { table_payment_method } from "../../schemas/payment-method";
+import { table_payment_term } from "../../schemas/payment-term";
 
-type PaymentMethodDropdownOption = {
+type PaymentTermDropdownOption = {
   label: string;
   value: string;
   code: string;
@@ -15,13 +15,13 @@ type PaymentMethodDropdownOption = {
   [key: string]: any;
 };
 
-class PaymentMethodDropdownViewListModel extends BaseViewListModel<
-  typeof table_payment_method,
-  PaymentMethodDropdownOption
+class PaymentTermDropdownListModel extends BaseViewListModel<
+  typeof table_payment_term,
+  PaymentTermDropdownOption
 > {
   constructor() {
     super({
-      table: table_payment_method,
+      table: table_payment_term,
       sortDefault: [
         {
           column: "order",
@@ -39,10 +39,10 @@ class PaymentMethodDropdownViewListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_payment_method.id, sort: false }],
-      ["code", { column: table_payment_method.code, sort: true }],
-      ["name", { column: table_payment_method.name, sort: false }],
-      ["order", { column: table_payment_method.order, sort: true }],
+      ["id", { column: table_payment_term.id, sort: false }],
+      ["code", { column: table_payment_term.code, sort: true }],
+      ["name", { column: table_payment_term.name, sort: false }],
+      ["order", { column: table_payment_term.order, sort: true }],
     ]);
   }
 
@@ -52,16 +52,20 @@ class PaymentMethodDropdownViewListModel extends BaseViewListModel<
 
   protected declarationFilter() {
     return new Map([
-      ["isActive", (value: boolean | undefined) => {
-        // Always filter active items for dropdown
-        return eq(table_payment_method.isActive, true);
-      }],
+      [
+        "isActive",
+        (value: boolean | undefined) => {
+          return eq(table_payment_term.isActive, true);
+        },
+      ],
     ]);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(row: any): PaymentMethodDropdownOption {
-    // Handle LocaleDataType<string> for name
+  protected declarationMappingData(
+    row: any,
+    index: number
+  ): PaymentTermDropdownOption {
     const name =
       typeof row.name === "string"
         ? row.name
@@ -77,29 +81,30 @@ class PaymentMethodDropdownViewListModel extends BaseViewListModel<
 
   getData = async (
     params: ListParamsRequest
-  ): Promise<ListParamsResponse<PaymentMethodDropdownOption>> => {
+  ): Promise<ListParamsResponse<PaymentTermDropdownOption>> => {
     const result = await this.buildQueryDataListWithSelect(
       params,
       {
-        id: table_payment_method.id,
-        code: table_payment_method.code,
-        name: table_payment_method.name,
-        order: table_payment_method.order,
+        id: table_payment_term.id,
+        code: table_payment_term.code,
+        name: table_payment_term.name,
+        order: table_payment_term.order,
       },
       (query) => {
-        // Filter only active payment methods
         return query
-          .where(eq(table_payment_method.isActive, true))
-          .orderBy(asc(table_payment_method.order));
+          .where(eq(table_payment_term.isActive, true))
+          .orderBy(asc(table_payment_term.order));
       }
     );
 
     return {
-      data: result.data,
+      data: result.data.map((row: any, index: number) =>
+        this.declarationMappingData(row, index)
+      ),
       total: result.total,
     };
   };
 }
 
-export default PaymentMethodDropdownViewListModel;
+export default PaymentTermDropdownListModel;
 

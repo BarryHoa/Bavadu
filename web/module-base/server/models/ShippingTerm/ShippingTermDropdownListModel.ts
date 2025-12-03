@@ -5,9 +5,9 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
 import { asc, eq } from "drizzle-orm";
-import { table_payment_term } from "../../schemas/payment-term";
+import { table_shipping_term } from "../../schemas/shipping-term";
 
-type PaymentTermDropdownOption = {
+type ShippingTermDropdownOption = {
   label: string;
   value: string;
   code: string;
@@ -15,13 +15,13 @@ type PaymentTermDropdownOption = {
   [key: string]: any;
 };
 
-class PaymentTermDropdownViewListModel extends BaseViewListModel<
-  typeof table_payment_term,
-  PaymentTermDropdownOption
+class ShippingTermDropdownListModel extends BaseViewListModel<
+  typeof table_shipping_term,
+  ShippingTermDropdownOption
 > {
   constructor() {
     super({
-      table: table_payment_term,
+      table: table_shipping_term,
       sortDefault: [
         {
           column: "order",
@@ -39,10 +39,10 @@ class PaymentTermDropdownViewListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_payment_term.id, sort: false }],
-      ["code", { column: table_payment_term.code, sort: true }],
-      ["name", { column: table_payment_term.name, sort: false }],
-      ["order", { column: table_payment_term.order, sort: true }],
+      ["id", { column: table_shipping_term.id, sort: false }],
+      ["code", { column: table_shipping_term.code, sort: true }],
+      ["name", { column: table_shipping_term.name, sort: false }],
+      ["order", { column: table_shipping_term.order, sort: true }],
     ]);
   }
 
@@ -52,14 +52,20 @@ class PaymentTermDropdownViewListModel extends BaseViewListModel<
 
   protected declarationFilter() {
     return new Map([
-      ["isActive", (value: boolean | undefined) => {
-        return eq(table_payment_term.isActive, true);
-      }],
+      [
+        "isActive",
+        (value: boolean | undefined) => {
+          return eq(table_shipping_term.isActive, true);
+        },
+      ],
     ]);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(row: any): PaymentTermDropdownOption {
+  protected declarationMappingData(
+    row: any,
+    index: number
+  ): ShippingTermDropdownOption {
     const name =
       typeof row.name === "string"
         ? row.name
@@ -75,28 +81,30 @@ class PaymentTermDropdownViewListModel extends BaseViewListModel<
 
   getData = async (
     params: ListParamsRequest
-  ): Promise<ListParamsResponse<PaymentTermDropdownOption>> => {
+  ): Promise<ListParamsResponse<ShippingTermDropdownOption>> => {
     const result = await this.buildQueryDataListWithSelect(
       params,
       {
-        id: table_payment_term.id,
-        code: table_payment_term.code,
-        name: table_payment_term.name,
-        order: table_payment_term.order,
+        id: table_shipping_term.id,
+        code: table_shipping_term.code,
+        name: table_shipping_term.name,
+        order: table_shipping_term.order,
       },
       (query) => {
         return query
-          .where(eq(table_payment_term.isActive, true))
-          .orderBy(asc(table_payment_term.order));
+          .where(eq(table_shipping_term.isActive, true))
+          .orderBy(asc(table_shipping_term.order));
       }
     );
 
     return {
-      data: result.data,
+      data: result.data.map((row: any, index: number) =>
+        this.declarationMappingData(row, index)
+      ),
       total: result.total,
     };
   };
 }
 
-export default PaymentTermDropdownViewListModel;
+export default ShippingTermDropdownListModel;
 

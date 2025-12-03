@@ -5,9 +5,9 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
 import { asc, eq } from "drizzle-orm";
-import { table_tax_rate } from "../../schemas/tax-rate";
+import { table_shipping_method } from "../../schemas/shipping-method";
 
-type TaxRateDropdownOption = {
+type ShippingMethodDropdownOption = {
   label: string;
   value: string;
   code: string;
@@ -15,13 +15,13 @@ type TaxRateDropdownOption = {
   [key: string]: any;
 };
 
-class TaxRateDropdownViewListModel extends BaseViewListModel<
-  typeof table_tax_rate,
-  TaxRateDropdownOption
+class ShippingMethodDropdownListModel extends BaseViewListModel<
+  typeof table_shipping_method,
+  ShippingMethodDropdownOption
 > {
   constructor() {
     super({
-      table: table_tax_rate,
+      table: table_shipping_method,
       sortDefault: [
         {
           column: "order",
@@ -39,10 +39,10 @@ class TaxRateDropdownViewListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_tax_rate.id, sort: false }],
-      ["code", { column: table_tax_rate.code, sort: true }],
-      ["name", { column: table_tax_rate.name, sort: false }],
-      ["order", { column: table_tax_rate.order, sort: true }],
+      ["id", { column: table_shipping_method.id, sort: false }],
+      ["code", { column: table_shipping_method.code, sort: true }],
+      ["name", { column: table_shipping_method.name, sort: false }],
+      ["order", { column: table_shipping_method.order, sort: true }],
     ]);
   }
 
@@ -52,14 +52,20 @@ class TaxRateDropdownViewListModel extends BaseViewListModel<
 
   protected declarationFilter() {
     return new Map([
-      ["isActive", (value: boolean | undefined) => {
-        return eq(table_tax_rate.isActive, true);
-      }],
+      [
+        "isActive",
+        (value: boolean | undefined) => {
+          return eq(table_shipping_method.isActive, true);
+        },
+      ],
     ]);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(row: any): TaxRateDropdownOption {
+  protected declarationMappingData(
+    row: any,
+    index: number
+  ): ShippingMethodDropdownOption {
     const name =
       typeof row.name === "string"
         ? row.name
@@ -75,28 +81,30 @@ class TaxRateDropdownViewListModel extends BaseViewListModel<
 
   getData = async (
     params: ListParamsRequest
-  ): Promise<ListParamsResponse<TaxRateDropdownOption>> => {
+  ): Promise<ListParamsResponse<ShippingMethodDropdownOption>> => {
     const result = await this.buildQueryDataListWithSelect(
       params,
       {
-        id: table_tax_rate.id,
-        code: table_tax_rate.code,
-        name: table_tax_rate.name,
-        order: table_tax_rate.order,
+        id: table_shipping_method.id,
+        code: table_shipping_method.code,
+        name: table_shipping_method.name,
+        order: table_shipping_method.order,
       },
       (query) => {
         return query
-          .where(eq(table_tax_rate.isActive, true))
-          .orderBy(asc(table_tax_rate.order));
+          .where(eq(table_shipping_method.isActive, true))
+          .orderBy(asc(table_shipping_method.order));
       }
     );
 
     return {
-      data: result.data,
+      data: result.data.map((row: any, index: number) =>
+        this.declarationMappingData(row, index)
+      ),
       total: result.total,
     };
   };
 }
 
-export default TaxRateDropdownViewListModel;
+export default ShippingMethodDropdownListModel;
 

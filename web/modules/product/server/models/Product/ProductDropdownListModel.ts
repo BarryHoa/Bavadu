@@ -12,7 +12,7 @@ type ProductDropdownOption = {
   [key: string]: any;
 };
 
-class ProductDropdownViewListModel extends BaseViewListModel<
+class ProductDropdownListModel extends BaseViewListModel<
   typeof table_product_variant,
   ProductDropdownOption,
   ProductFilter
@@ -43,7 +43,10 @@ class ProductDropdownViewListModel extends BaseViewListModel<
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(row: any): ProductDropdownOption {
+  protected declarationMappingData(
+    row: any,
+    index: number
+  ): ProductDropdownOption {
     return {
       label: row.name,
       value: row.id,
@@ -64,10 +67,13 @@ class ProductDropdownViewListModel extends BaseViewListModel<
       }
     );
     return {
-      data: result?.data ?? [],
+      data: (result?.data ?? []).map((row: any, index: number) =>
+        this.declarationMappingData(row, index)
+      ),
       total: result?.total ?? 0,
     };
   };
 }
 
-export default ProductDropdownViewListModel;
+export default ProductDropdownListModel;
+

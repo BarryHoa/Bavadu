@@ -1,7 +1,7 @@
-import { NextRequest } from "next/server";
 import { getAuthenticatedUser } from "@base/server/middleware/auth";
-import PriceListB2CViewListModel from "../../models/PriceList/PriceListB2CViewListModel";
 import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { NextRequest } from "next/server";
+import PriceListB2CModel from "../../models/PriceList/PriceListB2CModel";
 
 export async function PUT(request: NextRequest) {
   try {
@@ -17,7 +17,7 @@ export async function PUT(request: NextRequest) {
       });
     }
 
-    const model = new PriceListB2CViewListModel();
+    const model = new PriceListB2CModel();
 
     // Convert date strings to Date objects if present
     const processedData: any = { ...updateData };
@@ -44,4 +44,3 @@ export async function PUT(request: NextRequest) {
     return JSONResponse({ message, status: 400 });
   }
 }
-

@@ -1,5 +1,5 @@
-import { desc, eq, ilike, sql } from "drizzle-orm";
 import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
+import { desc, eq, ilike, sql } from "drizzle-orm";
 import {
   table_price_lists_b2c,
   TblPriceListB2C,
@@ -120,27 +120,45 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
 
   protected declarationSearch() {
     return new Map([
-      ["code", (text: string) =>
-        text ? ilike(table_price_lists_b2c.code, `%${text}%`) : undefined
+      [
+        "code",
+        (text: string) =>
+          text ? ilike(table_price_lists_b2c.code, `%${text}%`) : undefined,
       ],
-      ["name", (text: string) =>
-        text
-          ? sql`${table_price_lists_b2c.name}::text ILIKE ${`%${text}%`}`
-          : undefined
+      [
+        "name",
+        (text: string) =>
+          text
+            ? sql`${table_price_lists_b2c.name}::text ILIKE ${`%${text}%`}`
+            : undefined,
       ],
     ]);
   }
 
   protected declarationFilter() {
-    return new Map([
-      ["type", (value: string | undefined, filters: PriceListFilter | undefined) =>
-        value ? eq(table_price_lists_b2c.type, value) : undefined
+    return new Map<
+      string,
+      (
+        currentFilterValue: any,
+        filters: PriceListFilter | undefined
+      ) => any | undefined
+    >([
+      [
+        "type",
+        (value: string | undefined, filters: PriceListFilter | undefined) =>
+          value ? eq(table_price_lists_b2c.type, value) : undefined,
       ],
-      ["status", (value: string | undefined, filters: PriceListFilter | undefined) =>
-        value ? eq(table_price_lists_b2c.status, value) : undefined
+      [
+        "status",
+        (value: string | undefined, filters: PriceListFilter | undefined) =>
+          value ? eq(table_price_lists_b2c.status, value) : undefined,
       ],
-      ["isDefault", (value: boolean | undefined, filters: PriceListFilter | undefined) =>
-        value !== undefined ? eq(table_price_lists_b2c.isDefault, value) : undefined
+      [
+        "isDefault",
+        (value: boolean | undefined, filters: PriceListFilter | undefined) =>
+          value !== undefined
+            ? eq(table_price_lists_b2c.isDefault, value)
+            : undefined,
       ],
     ]);
   }
@@ -329,4 +347,3 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
     return result.length > 0;
   }
 }
-

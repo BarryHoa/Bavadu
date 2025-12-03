@@ -1,7 +1,7 @@
-import { NextRequest } from "next/server";
 import { getAuthenticatedUser } from "@base/server/middleware/auth";
-import PriceListB2CViewListModel from "../../models/PriceList/PriceListB2CViewListModel";
 import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { NextRequest } from "next/server";
+import PriceListB2CModel from "../../models/PriceList/PriceListB2CModel";
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const model = new PriceListB2CViewListModel();
+    const model = new PriceListB2CModel();
     const priceList = await model.create({
       code,
       name,
@@ -58,4 +58,3 @@ export async function POST(request: NextRequest) {
     return JSONResponse({ message, status: 400 });
   }
 }
-
