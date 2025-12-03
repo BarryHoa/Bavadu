@@ -11,5 +11,7 @@ export {
 export type {
   DataTableColumnDefinition as DataTableColumn,
   DataTableColumnDefinition,
+  DataTableRowSelection,
   ProcessedDataTableColumn,
+  RowSelectionMode,
 } from "./DataTableInterface";

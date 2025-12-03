@@ -59,6 +59,17 @@ export type {
 export { default as IBaseTabs, Tab } from "./IBaseTabs";
 export type { IBaseTabsProps } from "./IBaseTabs";
 export { default as IBaseTooltip } from "./IBaseTooltip";
+export {
+  default as IBaseTable,
+  useIBaseTableCore,
+} from "./IBaseTable";
+export type { IBaseTableProps } from "./IBaseTable";
+export type {
+  IBaseTableCoreProps,
+  IBaseTableCoreColumn,
+  IBaseTableCoreReturn,
+} from "./IBaseTable/IBaseTableCore";
+export type { IBaseTableUIProps } from "./IBaseTable/IBaseTableUI";
 export * from "./LoadingBar";
 export * from "./LoadingOverlay";
 export { default as MarkdownContent } from "./MarkdownContent";

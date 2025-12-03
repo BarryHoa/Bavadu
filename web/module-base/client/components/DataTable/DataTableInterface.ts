@@ -1,7 +1,17 @@
 import type { SortDescriptor, TableProps } from "@heroui/table";
 import type { CSSProperties, ReactNode } from "react";
 
-import type { DataTableRowSelection } from "./hooks/useDataTableSelection";
+export type RowSelectionMode = "single" | "multiple";
+
+export interface DataTableRowSelection<T = any> {
+  type?: RowSelectionMode;
+  selectedRowKeys?: Array<string | number>;
+  defaultSelectedRowKeys?: Array<string | number>;
+  onChange?: (
+    selectedRowKeys: Array<string | number>,
+    selectedRows: T[]
+  ) => void;
+}
 
 export const DATA_TABLE_COLUMN_KEY_ACTION = "__action__";
 export const DATA_TABLE_COLUMN_KEY_ROW_NUMBER = "__row-number__";
