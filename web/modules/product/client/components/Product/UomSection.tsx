@@ -19,8 +19,9 @@ import { Button } from "@heroui/button";
 import { addToast } from "@heroui/react";
 import { Plus, Trash } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useProductUoms } from "../../hooks/useProductUoms";
+import { useCallback, useMemo, useState } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
+import { uuidv7 } from "uuidv7";
 import {
   ProductMasterFeatures,
   ProductMasterFeaturesType,
@@ -28,81 +29,42 @@ import {
 import { UomConversions } from "./types";
 
 type UomSectionProps = {
-  baseUomId?: string;
-  saleUomId?: string;
-  purchaseUomId?: string;
-  manufacturingUomId?: string;
-  uomConversions?: UomConversions[];
+  variantIndex: number;
   masterFeatures: Record<ProductMasterFeaturesType, boolean>;
   uomOptions: SelectItemOption[];
   uomQueryLoading: boolean;
   isBusy: boolean;
   error?: { message?: string };
-  onBaseUomChange: (baseUomId: string | undefined) => void;
-  onSaleUomChange?: (saleUomId: string | undefined) => void;
-  onPurchaseUomChange?: (purchaseUomId: string | undefined) => void;
-  onManufacturingUomChange?: (manufacturingUomId: string | undefined) => void;
-  onUomConversionsChange?: (uomConversions: UomConversions[]) => void;
-};
-
-// Helper: Notify parent of uomConversions change
-const notifyUomConversionsChange = (
-  onUomConversionsChange: ((uoms: UomConversions[]) => void) | undefined,
-  updated: UomConversions[]
-) => {
-  if (onUomConversionsChange) {
-    setTimeout(() => onUomConversionsChange(updated), 0);
-  }
 };
 
 export default function UomSection({
-  baseUomId,
-  saleUomId: saleUomIdProp,
-  purchaseUomId: purchaseUomIdProp,
-  manufacturingUomId: manufacturingUomIdProp,
-  uomConversions: uomConversionsProp,
+  variantIndex,
   masterFeatures,
   uomOptions,
   uomQueryLoading,
   isBusy,
   error,
-  onBaseUomChange,
-  onSaleUomChange,
-  onPurchaseUomChange,
-  onManufacturingUomChange,
-  onUomConversionsChange,
 }: UomSectionProps) {
   const tProduct = useTranslations("mdl-product");
   const tProductForm = useTranslations("mdl-product.product-create");
   const t = useTranslations("common");
 
-  const {
-    uomConversions: hookUomConversions,
-    updateUom,
-    updateConversionRatio,
-    resetUom,
-    removeUom,
-    addOtherUom,
-    canAddOtherUom,
-    setUomConversionsData,
-  } = useProductUoms({ masterFeatures });
+  const { setValue } = useFormContext();
 
-  // Sync hook with prop
-  useEffect(() => {
-    if (uomConversionsProp) {
-      const propUuids = JSON.stringify(
-        uomConversionsProp.map((u) => u.uuid).sort()
-      );
-      const hookUuids = JSON.stringify(
-        hookUomConversions.map((u) => u.uuid).sort()
-      );
-      if (propUuids !== hookUuids) {
-        setUomConversionsData(uomConversionsProp);
-      }
-    }
-  }, [uomConversionsProp, hookUomConversions, setUomConversionsData]);
-
-  const uomConversions = uomConversionsProp || hookUomConversions;
+  // Watch form values directly
+  const baseUomId = useWatch({ name: `variants.${variantIndex}.baseUomId` });
+  const saleUomIdProp = useWatch({
+    name: `variants.${variantIndex}.saleUomId`,
+  });
+  const purchaseUomIdProp = useWatch({
+    name: `variants.${variantIndex}.purchaseUomId`,
+  });
+  const manufacturingUomIdProp = useWatch({
+    name: `variants.${variantIndex}.manufacturingUomId`,
+  });
+  const uomConversions = useWatch({
+    name: `variants.${variantIndex}.uomConversions`,
+  });
 
   const [deleteConfirmModal, setDeleteConfirmModal] = useState<{
     isOpen: boolean;
@@ -110,9 +72,78 @@ export default function UomSection({
     uomName?: string;
   }>({ isOpen: false });
 
+  // Check if UOM is duplicate based on type
+  const isDuplicateUom = useCallback(
+    (
+      uomId: string,
+      currentUuid: string,
+      currentType: ProductMasterFeaturesType | "other",
+      baseUomId?: string
+    ): { isDuplicate: boolean; duplicateLabel?: string } => {
+      const currentUom = uomConversions.find(
+        (uom: UomConversions) => uom.uuid === currentUuid
+      );
+
+      // If current type is "other", check against everything
+      if (currentType === "other") {
+        // Check against baseUomId
+        if (baseUomId && uomId === baseUomId) {
+          return { isDuplicate: true, duplicateLabel: "Base UOM" };
+        }
+
+        // Check against all other UOMs (sale, purchase, manufacture, and other "other" UOMs)
+        const duplicate = uomConversions.find(
+          (uom: UomConversions) =>
+            uom.uomId === uomId && uom.uuid !== currentUuid
+        );
+
+        if (duplicate) {
+          return { isDuplicate: true, duplicateLabel: duplicate.label };
+        }
+      } else {
+        // If current type is sale, purchase, or manufacture
+        // Only check against "other" UOMs and baseUomId
+        // Allow duplication with other sale/purchase/manufacture UOMs
+
+        // Check against baseUomId
+        if (baseUomId && uomId === baseUomId) {
+          return { isDuplicate: true, duplicateLabel: "Base UOM" };
+        }
+
+        // Check only against "other" type UOMs
+        const duplicateOther = uomConversions.find(
+          (uom: UomConversions) =>
+            uom.type === "other" &&
+            uom.uomId === uomId &&
+            uom.uuid !== currentUuid
+        );
+
+        if (duplicateOther) {
+          return { isDuplicate: true, duplicateLabel: duplicateOther.label };
+        }
+      }
+
+      return { isDuplicate: false };
+    },
+    [uomConversions]
+  );
+
+  // Update UOM conversions in form
+  const updateUomConversions = useCallback(
+    (updater: (prev: UomConversions[]) => UomConversions[]) => {
+      const current = uomConversions || [];
+      const updated = updater(current);
+      setValue(`variants.${variantIndex}.uomConversions`, updated, {
+        shouldDirty: true,
+        shouldValidate: false,
+      });
+    },
+    [uomConversions, variantIndex, setValue]
+  );
+
   // Filter "other" type for table
   const uomConversionsForTable = useMemo(
-    () => uomConversions.filter((uom) => uom.type === "other"),
+    () => uomConversions.filter((uom: UomConversions) => uom.type === "other"),
     [uomConversions]
   );
 
@@ -122,14 +153,28 @@ export default function UomSection({
 
     const baseUomOption = uomOptions.find((opt) => opt.value === baseUomId);
     const conversionOptions = uomConversions
-      .filter((uom) => uom.uomId !== null)
-      .map((uom) => uomOptions.find((opt) => opt.value === uom.uomId))
-      .filter((opt): opt is SelectItemOption => opt !== undefined);
+      .filter((uom: UomConversions) => uom.uomId !== null)
+      .map((uom: UomConversions) =>
+        uomOptions.find((opt: SelectItemOption) => opt.value === uom.uomId)
+      )
+      .filter(
+        (opt: SelectItemOption | undefined): opt is SelectItemOption =>
+          opt !== undefined
+      );
 
     return baseUomOption
       ? [baseUomOption, ...conversionOptions]
       : conversionOptions;
   }, [baseUomId, uomOptions, uomConversions]);
+
+  // Check if can add more UOMs
+  const canAddOtherUom = useMemo(() => {
+    const MAX_OTHER_UOMS = 9;
+    const uomConversionsCount = uomConversions.filter(
+      (uom: UomConversions) => uom.type === "other"
+    ).length;
+    return uomConversionsCount < MAX_OTHER_UOMS;
+  }, [uomConversions]);
 
   // Handle UOM selection
   const handleUomSelection = useCallback(
@@ -139,12 +184,31 @@ export default function UomSection({
       selectedUomName: string | null
     ) => {
       if (!selectedUomId) {
-        resetUom(uuid);
+        // Reset UOM
+        updateUomConversions((prev) =>
+          prev.map((item) =>
+            item.uuid === uuid ? { ...item, uomId: null, uomName: null } : item
+          )
+        );
         return;
       }
 
-      const uomIds = [...uomConversions.map((uom) => uom.uomId), baseUomId];
-      if (uomIds.includes(selectedUomId)) {
+      const currentUom = uomConversions.find(
+        (uom: UomConversions) => uom.uuid === uuid
+      );
+      if (!currentUom) {
+        return;
+      }
+
+      // Check for duplicates
+      const duplicateCheck = isDuplicateUom(
+        selectedUomId,
+        uuid,
+        currentUom.type,
+        baseUomId
+      );
+
+      if (duplicateCheck.isDuplicate) {
         addToast({
           title: tProductForm("duplicateUom"),
           description:
@@ -156,36 +220,32 @@ export default function UomSection({
         return;
       }
 
-      const result = updateUom(
-        uuid,
-        selectedUomId,
-        selectedUomName || "",
-        baseUomId
+      // Update UOM
+      updateUomConversions((prev) =>
+        prev.map((item) =>
+          item.uuid === uuid
+            ? {
+                ...item,
+                uomId: selectedUomId,
+                uomName: selectedUomName || "",
+              }
+            : item
+        )
       );
-      if (result.success) {
-        const updated = hookUomConversions.map((uom) =>
-          uom.uuid === uuid
-            ? { ...uom, uomId: selectedUomId, uomName: selectedUomName || "" }
-            : uom
-        );
-        notifyUomConversionsChange(onUomConversionsChange, updated);
-      }
     },
     [
       baseUomId,
       uomConversions,
-      updateUom,
-      resetUom,
-      hookUomConversions,
-      onUomConversionsChange,
-      // tProductForm - removed, translation functions are stable
+      isDuplicateUom,
+      updateUomConversions,
+      tProductForm,
     ]
   );
 
   // Handle delete
   const handleDeleteUom = useCallback(
     (uuid: string) => {
-      const uom = uomConversions.find((u) => u.uuid === uuid);
+      const uom = uomConversions.find((u: UomConversions) => u.uuid === uuid);
       if (uom) {
         setDeleteConfirmModal({
           isOpen: true,
@@ -200,39 +260,51 @@ export default function UomSection({
   const deleteUuid = deleteConfirmModal.uuid;
   const confirmDelete = useCallback(() => {
     if (deleteUuid) {
-      removeUom(deleteUuid);
-      const updated = hookUomConversions.filter(
-        (uom) => uom.uuid !== deleteUuid
+      updateUomConversions((prev) =>
+        prev.filter((item) => item.uuid !== deleteUuid)
       );
-      notifyUomConversionsChange(onUomConversionsChange, updated);
       setDeleteConfirmModal({ isOpen: false });
     }
-  }, [deleteUuid, removeUom, hookUomConversions, onUomConversionsChange]);
+  }, [deleteUuid, updateUomConversions]);
 
   // Handle add new UOM
   const handleAddNewUom = useCallback(() => {
-    addOtherUom();
-    if (onUomConversionsChange) {
-      setTimeout(() => onUomConversionsChange([...hookUomConversions]), 100);
-    }
-  }, [addOtherUom, onUomConversionsChange, hookUomConversions]);
+    if (!canAddOtherUom) return;
+
+    updateUomConversions((prev) => [
+      ...prev,
+      {
+        type: "other" as const,
+        label: tProduct("otherUnitOfMeasure") || "Other",
+        uomId: null,
+        uomName: null,
+        uuid: uuidv7(),
+        isActive: true,
+        conversionRatio: 1,
+      },
+    ]);
+  }, [canAddOtherUom, updateUomConversions, tProduct]);
 
   // Handle conversion ratio change
   const handleConversionRatioChange = useCallback(
     (uuid: string) => (ratio: number | null | undefined) => {
-      updateConversionRatio(uuid, ratio ?? null);
-      const updated = hookUomConversions.map((uom) =>
-        uom.uuid === uuid ? { ...uom, conversionRatio: ratio ?? null } : uom
+      updateUomConversions((prev) =>
+        prev.map((item) =>
+          item.uuid === uuid
+            ? { ...item, conversionRatio: ratio ?? null }
+            : item
+        )
       );
-      notifyUomConversionsChange(onUomConversionsChange, updated);
     },
-    [updateConversionRatio, hookUomConversions, onUomConversionsChange]
+    [updateUomConversions]
   );
 
   // Handle base UOM change
   const handleBaseUomChange = useCallback(
     (key: string | undefined) => {
-      const duplicate = uomConversionsForTable.find((uom) => uom.uomId === key);
+      const duplicate = uomConversionsForTable.find(
+        (uom: UomConversions) => uom.uomId === key
+      );
       if (duplicate) {
         addToast({
           title: tProductForm("duplicateUom"),
@@ -242,46 +314,50 @@ export default function UomSection({
         return;
       }
 
-      onBaseUomChange(key);
+      setValue(`variants.${variantIndex}.baseUomId`, key, {
+        shouldDirty: true,
+        shouldValidate: false,
+      });
 
       // Auto-set SALE, PURCHASE, MANUFACTURE to base if not already selected
       if (key) {
         setTimeout(() => {
-          if (
-            masterFeatures[ProductMasterFeatures.SALE] &&
-            onSaleUomChange &&
-            !saleUomIdProp
-          ) {
-            onSaleUomChange(key);
+          if (masterFeatures[ProductMasterFeatures.SALE] && !saleUomIdProp) {
+            setValue(`variants.${variantIndex}.saleUomId`, key, {
+              shouldDirty: true,
+              shouldValidate: false,
+            });
           }
           if (
             masterFeatures[ProductMasterFeatures.PURCHASE] &&
-            onPurchaseUomChange &&
             !purchaseUomIdProp
           ) {
-            onPurchaseUomChange(key);
+            setValue(`variants.${variantIndex}.purchaseUomId`, key, {
+              shouldDirty: true,
+              shouldValidate: false,
+            });
           }
           if (
             masterFeatures[ProductMasterFeatures.MANUFACTURE] &&
-            onManufacturingUomChange &&
             !manufacturingUomIdProp
           ) {
-            onManufacturingUomChange(key);
+            setValue(`variants.${variantIndex}.manufacturingUomId`, key, {
+              shouldDirty: true,
+              shouldValidate: false,
+            });
           }
         }, 100);
       }
     },
     [
       uomConversionsForTable,
-      onBaseUomChange,
+      variantIndex,
+      setValue,
       masterFeatures,
-      onSaleUomChange,
-      onPurchaseUomChange,
-      onManufacturingUomChange,
       saleUomIdProp,
       purchaseUomIdProp,
       manufacturingUomIdProp,
-      // tProductForm - removed, translation functions are stable
+      tProductForm,
     ]
   );
 
@@ -296,10 +372,11 @@ export default function UomSection({
           <IBaseSingleSelect
             aria-label={tProductForm("otherUnitOfMeasure") || "UOM"}
             items={uomOptions.filter(
-              (opt) =>
+              (opt: SelectItemOption) =>
                 opt.value !== baseUomId &&
                 !uomConversions.some(
-                  (uom) => uom.uuid !== record.uuid && uom.uomId === opt.value
+                  (uom: UomConversions) =>
+                    uom.uuid !== record.uuid && uom.uomId === opt.value
                 )
             )}
             selectedKey={record.uomId || undefined}
@@ -353,7 +430,8 @@ export default function UomSection({
       },
     ],
     [
-      // tProductForm, t - removed, translation functions are stable
+      tProductForm,
+      t,
       uomOptions,
       baseUomId,
       uomConversions,
@@ -378,30 +456,27 @@ export default function UomSection({
           key: ProductMasterFeatures.SALE,
           label: tProduct("productFeature.sale") || "Sale UOM",
           value: saleUomIdProp,
-          onChange: onSaleUomChange,
+          fieldName: "saleUomId",
         },
         {
           key: ProductMasterFeatures.PURCHASE,
           label: tProduct("productFeature.purchase") || "Purchase UOM",
           value: purchaseUomIdProp,
-          onChange: onPurchaseUomChange,
+          fieldName: "purchaseUomId",
         },
         {
           key: ProductMasterFeatures.MANUFACTURE,
           label: tProduct("productFeature.manufacture") || "MRP UOM",
           value: manufacturingUomIdProp,
-          onChange: onManufacturingUomChange,
+          fieldName: "manufacturingUomId",
         },
       ].filter((config) => masterFeatures[config.key]),
     [
-      // tProduct - removed, translation functions are stable
+      tProduct,
       masterFeatures,
       saleUomIdProp,
       purchaseUomIdProp,
       manufacturingUomIdProp,
-      onSaleUomChange,
-      onPurchaseUomChange,
-      onManufacturingUomChange,
     ]
   );
 
@@ -453,9 +528,10 @@ export default function UomSection({
                   }
                   isRefreshData={false}
                   isStriped={false}
+                  total={uomConversionsForTable.length}
                 />
               </div>
-              {canAddOtherUom() && (
+              {canAddOtherUom && (
                 <Button
                   size="sm"
                   variant="light"
@@ -477,7 +553,13 @@ export default function UomSection({
                     label={config.label}
                     items={availableUomOptions}
                     selectedKey={config.value}
-                    onSelectionChange={config.onChange}
+                    onSelectionChange={(key) => {
+                      const fieldPath = `variants.${variantIndex}.${config.fieldName}`;
+                      setValue(fieldPath, key ?? undefined, {
+                        shouldDirty: true,
+                        shouldValidate: false,
+                      });
+                    }}
                     isLoading={uomQueryLoading}
                     isDisabled={isBusy || uomQueryLoading || !baseUomId}
                   />

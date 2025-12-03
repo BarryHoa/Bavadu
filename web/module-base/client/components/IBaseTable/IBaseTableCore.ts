@@ -643,7 +643,7 @@ export function useIBaseTableCore<T = any>(
   });
 
   // Computed values - memoize to prevent recalculation
-  const rows = useMemo(() => table.getRowModel().rows, [table, data]);
+  const rows = table.getRowModel().rows;
   const headerGroups = useMemo(() => table.getHeaderGroups(), [table]);
   const visibleColumns = useMemo(() => table.getVisibleLeafColumns(), [table]);
 

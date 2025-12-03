@@ -287,7 +287,20 @@ export default function IBaseTableUI<T = any>({
                       )}
                     >
                       {renderCell
-                        ? renderCell(column!, row, cell.getValue())
+                        ? (() => {
+                            const customRender = renderCell(
+                              column!,
+                              row,
+                              cell.getValue()
+                            );
+                            return customRender !== null &&
+                              customRender !== undefined
+                              ? customRender
+                              : flexRender(
+                                  cell.column.columnDef.cell,
+                                  cell.getContext()
+                                );
+                          })()
                         : flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()

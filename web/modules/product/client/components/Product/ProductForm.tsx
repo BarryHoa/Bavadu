@@ -15,7 +15,7 @@ import { HelpCircle, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Resolver, SubmitHandler } from "react-hook-form";
-import { useForm, useWatch } from "react-hook-form";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 import {
   array,
   boolean,
@@ -747,20 +747,21 @@ export default function ProductForm({
             </div>
           </div>
 
-          <IBaseTabs
-            aria-label="Product form tabs"
-            color="primary"
-            selectedKey={selectedTab}
-            onSelectionChange={(key: React.Key) =>
-              setSelectedTab(key as string)
-            }
-            classNames={{
-              tabList: "overflow-x-auto mb-0",
-              tab: "max-w-[80px]",
-              tabContent: "max-w-[80px] truncate",
-              base: "mb-0",
-            }}
-          >
+          <FormProvider {...{ control, setValue, getValues }}>
+            <IBaseTabs
+              aria-label="Product form tabs"
+              color="primary"
+              selectedKey={selectedTab}
+              onSelectionChange={(key: React.Key) =>
+                setSelectedTab(key as string)
+              }
+              classNames={{
+                tabList: "overflow-x-auto mb-0",
+                tab: "max-w-[80px]",
+                tabContent: "max-w-[80px] truncate",
+                base: "mb-0",
+              }}
+            >
             <Tab key="master" title={t("master")}>
               <MasterTab
                 value={{
@@ -838,7 +839,8 @@ export default function ProductForm({
                 </Tab>
               );
             })}
-          </IBaseTabs>
+            </IBaseTabs>
+          </FormProvider>
         </CardBody>
       </Card>
 
