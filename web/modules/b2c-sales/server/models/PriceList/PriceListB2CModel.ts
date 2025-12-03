@@ -70,7 +70,7 @@ type PriceListFilter = {
   isDefault?: boolean;
 };
 
-export default class PriceListB2CModel extends BaseViewListModel<
+export default class PriceListB2CViewListModel extends BaseViewListModel<
   typeof table_price_lists_b2c,
   PriceListB2CRow,
   PriceListFilter
@@ -118,34 +118,31 @@ export default class PriceListB2CModel extends BaseViewListModel<
     return map;
   }
 
-  protected declarationSearch(): Array<(text: string) => any> {
-    return [
-      (text: string) =>
-        text ? ilike(table_price_lists_b2c.code, `%${text}%`) : undefined,
-      (text: string) =>
+  protected declarationSearch() {
+    return new Map([
+      ["code", (text: string) =>
+        text ? ilike(table_price_lists_b2c.code, `%${text}%`) : undefined
+      ],
+      ["name", (text: string) =>
         text
           ? sql`${table_price_lists_b2c.name}::text ILIKE ${`%${text}%`}`
-          : undefined,
-    ];
+          : undefined
+      ],
+    ]);
   }
 
-  protected declarationFilter(): Array<
-    (filters: PriceListFilter | undefined) => any
-  > {
-    return [
-      (filters) =>
-        filters?.type
-          ? eq(table_price_lists_b2c.type, filters.type)
-          : undefined,
-      (filters) =>
-        filters?.status
-          ? eq(table_price_lists_b2c.status, filters.status)
-          : undefined,
-      (filters) =>
-        filters?.isDefault !== undefined
-          ? eq(table_price_lists_b2c.isDefault, filters.isDefault)
-          : undefined,
-    ];
+  protected declarationFilter() {
+    return new Map([
+      ["type", (value: string | undefined, filters: PriceListFilter | undefined) =>
+        value ? eq(table_price_lists_b2c.type, value) : undefined
+      ],
+      ["status", (value: string | undefined, filters: PriceListFilter | undefined) =>
+        value ? eq(table_price_lists_b2c.status, value) : undefined
+      ],
+      ["isDefault", (value: boolean | undefined, filters: PriceListFilter | undefined) =>
+        value !== undefined ? eq(table_price_lists_b2c.isDefault, value) : undefined
+      ],
+    ]);
   }
 
   protected declarationMappingData(row: any): PriceListB2CRow {

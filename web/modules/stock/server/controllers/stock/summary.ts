@@ -5,7 +5,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
 
   return getModuleQueryByModel({
-    model: "list.stock.summary",
+    model: "stock.summary.view-list",
     modelMethod: "getData",
     params: {
       offset: 0,

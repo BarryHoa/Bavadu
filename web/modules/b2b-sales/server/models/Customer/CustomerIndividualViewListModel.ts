@@ -8,7 +8,7 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import { table_customer_individual } from "../../schemas";
 
-class ListCustomerIndividualModel extends BaseViewListModel<
+class CustomerIndividualViewListModel extends BaseViewListModel<
   typeof table_customer_individual,
   any
 > {
@@ -34,28 +34,43 @@ class ListCustomerIndividualModel extends BaseViewListModel<
     >([
       ["id", { column: table_customer_individual.id, sort: true }],
       ["code", { column: table_customer_individual.code, sort: true }],
-      ["firstName", { column: table_customer_individual.firstName, sort: true }],
+      [
+        "firstName",
+        { column: table_customer_individual.firstName, sort: true },
+      ],
       ["lastName", { column: table_customer_individual.lastName, sort: true }],
       ["phone", { column: table_customer_individual.phone, sort: true }],
       ["email", { column: table_customer_individual.email, sort: true }],
       ["isActive", { column: table_customer_individual.isActive, sort: true }],
-      ["createdAt", { column: table_customer_individual.createdAt, sort: true }],
-      ["updatedAt", { column: table_customer_individual.updatedAt, sort: true }],
+      [
+        "createdAt",
+        { column: table_customer_individual.createdAt, sort: true },
+      ],
+      [
+        "updatedAt",
+        { column: table_customer_individual.updatedAt, sort: true },
+      ],
     ]);
   }
 
   protected declarationSearch() {
-    return [
-      (text: string) => ilike(table_customer_individual.code, text),
-      (text: string) => ilike(table_customer_individual.firstName, text),
-      (text: string) => ilike(table_customer_individual.lastName, text),
-      (text: string) => ilike(table_customer_individual.phone, text),
-      (text: string) => ilike(table_customer_individual.email, text),
-    ];
+    return new Map([
+      ["code", (text: string) => ilike(table_customer_individual.code, text)],
+      [
+        "firstName",
+        (text: string) => ilike(table_customer_individual.firstName, text),
+      ],
+      [
+        "lastName",
+        (text: string) => ilike(table_customer_individual.lastName, text),
+      ],
+      ["phone", (text: string) => ilike(table_customer_individual.phone, text)],
+      ["email", (text: string) => ilike(table_customer_individual.email, text)],
+    ]);
   }
 
   protected declarationFilter() {
-    return [];
+    return new Map();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -84,5 +99,4 @@ class ListCustomerIndividualModel extends BaseViewListModel<
   };
 }
 
-export default ListCustomerIndividualModel;
-
+export default CustomerIndividualViewListModel;

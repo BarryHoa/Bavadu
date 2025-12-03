@@ -26,7 +26,7 @@ export interface ProductCategoryRow {
   updatedAt?: number;
 }
 
-class ListProductCategoryModel extends BaseViewListModel<
+class ProductCategoryViewListModel extends BaseViewListModel<
   typeof table_product_category,
   ProductCategoryRow
 > {
@@ -58,14 +58,14 @@ class ListProductCategoryModel extends BaseViewListModel<
   }
 
   protected declarationSearch() {
-    return [
-      (text: string) => ilike(table_product_category.code, text),
-      (text: string) => ilike(table_product_category.name, text),
-    ];
+    return new Map([
+      ["code", (text: string) => ilike(table_product_category.code, text)],
+      ["name", (text: string) => ilike(table_product_category.name, text)],
+    ]);
   }
 
   protected declarationFilter() {
-    return [];
+    return new Map();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -97,4 +97,4 @@ class ListProductCategoryModel extends BaseViewListModel<
   };
 }
 
-export default ListProductCategoryModel;
+export default ProductCategoryViewListModel;

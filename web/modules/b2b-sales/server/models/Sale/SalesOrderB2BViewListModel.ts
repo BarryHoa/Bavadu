@@ -8,7 +8,7 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import { table_sales_order_b2b } from "../../schemas";
 
-class ListSalesOrderB2BModel extends BaseViewListModel<
+class SalesOrderB2BViewListModel extends BaseViewListModel<
   typeof table_sales_order_b2b,
   any
 > {
@@ -48,14 +48,14 @@ class ListSalesOrderB2BModel extends BaseViewListModel<
   }
 
   protected declarationSearch() {
-    return [
-      (text: string) => ilike(table_sales_order_b2b.code, text),
-      (text: string) => ilike(table_sales_order_b2b.companyName, text),
-    ];
+    return new Map([
+      ["code", (text: string) => ilike(table_sales_order_b2b.code, text)],
+      ["companyName", (text: string) => ilike(table_sales_order_b2b.companyName, text)],
+    ]);
   }
 
   protected declarationFilter() {
-    return [];
+    return new Map();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -83,5 +83,5 @@ class ListSalesOrderB2BModel extends BaseViewListModel<
   };
 }
 
-export default ListSalesOrderB2BModel;
+export default SalesOrderB2BViewListModel;
 

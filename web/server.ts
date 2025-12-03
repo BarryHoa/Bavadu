@@ -42,6 +42,32 @@ async function startServer(): Promise<void> {
     // Initialize environment
     const envProcess = await Environment.create();
 
+    // Calculate and log envProcess size in KB
+    try {
+      const seen = new Set();
+      const envProcessJson = JSON.stringify(envProcess, (key, value) => {
+        // Skip functions
+        if (typeof value === "function") {
+          return "[Function]";
+        }
+        // Handle circular references
+        if (typeof value === "object" && value !== null) {
+          if (seen.has(value)) {
+            return "[Circular]";
+          }
+          seen.add(value);
+        }
+        return value;
+      });
+      const sizeInBytes = Buffer.byteLength(envProcessJson, "utf8");
+      const sizeInKB = (sizeInBytes / 1024).toFixed(2);
+      console.log(
+        `> 📊 Environment size: ${sizeInKB} KB (${sizeInBytes} bytes)`
+      );
+    } catch (error) {
+      console.log(`> ⚠️  Could not calculate environment size:`, error);
+    }
+
     // Set globalThis with env, database, and initial timestamp
     // This will be available for all requests
     (globalThis as any).systemRuntimeVariables = {

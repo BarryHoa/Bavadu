@@ -97,7 +97,7 @@ export default function SalesOrdersB2CListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<SalesOrderB2CRow>
-        model="list.b2c-sales.order"
+        model="b2c-sales.order.view-list"
         columns={columns}
         isDummyData={false}
         actionsRight={[

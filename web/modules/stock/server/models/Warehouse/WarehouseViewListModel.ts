@@ -33,7 +33,7 @@ export interface WarehouseViewRow {
   updatedAt: string | null;
 }
 
-class ListWarehouseModel extends BaseViewListModel<
+class WarehouseViewListModel extends BaseViewListModel<
   typeof table_stock_warehouse,
   WarehouseViewRow
 > {
@@ -114,16 +114,16 @@ class ListWarehouseModel extends BaseViewListModel<
   }
 
   protected declarationSearch() {
-    return [
-      (text: string) => ilike(table_stock_warehouse.code, text),
-      (text: string) => ilike(table_stock_warehouse.name, text),
-      (text: string) => ilike(table_stock_warehouse.typeCode, text),
-      (text: string) => ilike(table_stock_warehouse.status, text),
-    ];
+    return new Map([
+      ["code", (text: string) => ilike(table_stock_warehouse.code, text)],
+      ["name", (text: string) => ilike(table_stock_warehouse.name, text)],
+      ["typeCode", (text: string) => ilike(table_stock_warehouse.typeCode, text)],
+      ["status", (text: string) => ilike(table_stock_warehouse.status, text)],
+    ]);
   }
 
   protected declarationFilter() {
-    return [];
+    return new Map();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -159,5 +159,5 @@ class ListWarehouseModel extends BaseViewListModel<
   };
 }
 
-export default ListWarehouseModel;
+export default WarehouseViewListModel;
 

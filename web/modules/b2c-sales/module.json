@@ -7,11 +7,12 @@
   "icon": "User",
   "models": {
     "b2c-sales.order": "Sale/SalesOrderB2CModel",
-    "list.b2c-sales.order": "Sale/ListSalesOrderB2CModel",
+    "b2c-sales.order.view-list": "Sale/SalesOrderB2CViewListModel",
     "b2c-sales.customer": "Customer/CustomerModel",
-    "list.b2c-sales.customer.individual": "Customer/ListCustomerIndividualModel",
+    "b2c-sales.customer.individual.view-list": "Customer/CustomerIndividualViewListModel",
     "b2c-sales.delivery": "Delivery/DeliveryModel",
-    "list.b2c-sales.delivery": "Delivery/ListDeliveryModel",
-    "list.b2c-sales.price-list": "PriceList/ListPriceListB2CModel"
+    "b2c-sales.delivery.view-list": "Delivery/DeliveryViewListModel",
+    "b2c-sales.price-list.view-list": "PriceList/PriceListB2CViewListModel",
+    "b2c-sales.price-list.dropdown-list": "PriceList/PriceListB2CDropdownViewListModel"
   }
 }

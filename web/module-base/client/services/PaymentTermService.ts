@@ -19,15 +19,10 @@ export default class PaymentTermService extends ClientHttpService {
     super("/api/base/master-data/payment-terms");
   }
 
-  getList() {
-    return this.get<{
-      data: PaymentTermDto[];
-      message?: string;
-    }>("/");
-  }
-
   getOptionsDropdown() {
-    return dropdownOptionsService.getOptionsDropdown("payment-term");
+    return dropdownOptionsService.getOptionsDropdown(
+      "payment-term.dropdown-list"
+    );
   }
 }
 

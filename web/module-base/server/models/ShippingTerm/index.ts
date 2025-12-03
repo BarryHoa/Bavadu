@@ -1,3 +1,1 @@
-export { default } from "./ShippingTermModel";
-export * from "./ShippingTermModel";
-
+export { default as ShippingTermDropdownViewListModel } from "./ShippingTermDropdownViewListModel";

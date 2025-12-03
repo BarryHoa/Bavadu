@@ -120,7 +120,7 @@ export default function PriceListsB2CListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<PriceListB2CRow>
-        model="list.b2c-sales.price-list"
+        model="b2c-sales.price-list.view-list"
         columns={columns}
         isDummyData={false}
         actionsRight={[

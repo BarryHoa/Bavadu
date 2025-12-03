@@ -19,15 +19,10 @@ export default class ShippingMethodService extends ClientHttpService {
     super("/api/base/master-data/shipping-methods");
   }
 
-  getList() {
-    return this.get<{
-      data: ShippingMethodDto[];
-      message?: string;
-    }>("/");
-  }
-
   getOptionsDropdown() {
-    return dropdownOptionsService.getOptionsDropdown("shipping-method");
+    return dropdownOptionsService.getOptionsDropdown(
+      "shipping-method.dropdown-list"
+    );
   }
 }
 

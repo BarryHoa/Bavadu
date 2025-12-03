@@ -19,15 +19,8 @@ export default class TaxRateService extends ClientHttpService {
     super("/api/base/master-data/tax-rates");
   }
 
-  getList() {
-    return this.get<{
-      data: TaxRateDto[];
-      message?: string;
-    }>("/");
-  }
-
   getOptionsDropdown() {
-    return dropdownOptionsService.getOptionsDropdown("tax-rate");
+    return dropdownOptionsService.getOptionsDropdown("tax-rate.dropdown-list");
   }
 }
 

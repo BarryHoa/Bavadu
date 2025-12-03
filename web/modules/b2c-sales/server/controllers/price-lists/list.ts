@@ -1,10 +1,10 @@
 import { NextRequest } from "next/server";
-import PriceListB2CModel from "../../models/PriceList/PriceListB2CModel";
+import PriceListB2CViewListModel from "../../models/PriceList/PriceListB2CViewListModel";
 import { JSONResponse } from "@base/server/utils/JSONResponse";
 
 export async function GET(request: NextRequest) {
   try {
-    const model = new PriceListB2CModel();
+    const model = new PriceListB2CViewListModel();
     // Simple list
     const priceLists = await model.getList();
     return JSONResponse({
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 // POST for view list data table
 export async function POST(request: NextRequest) {
   try {
-    const model = new PriceListB2CModel();
+    const model = new PriceListB2CViewListModel();
     const body = await request.json().catch(() => ({}));
     const params = body.params || {};
 

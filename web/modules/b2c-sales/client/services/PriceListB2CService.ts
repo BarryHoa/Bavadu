@@ -130,7 +130,7 @@ export default class PriceListB2CService extends ClientHttpService {
     sorts?: Array<{ column: string; direction: "ascending" | "descending" }>;
   }) {
     return dropdownOptionsService.getOptionsDropdown(
-      "list.b2c-sales.price-list",
+      "b2c-sales.price-list.dropdown-list",
       params
     );
   }

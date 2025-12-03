@@ -14,7 +14,7 @@ import { table_product_master } from "../../schemas/product-master";
 
 import { ProductFilter, ProductVariantElm } from "./ProductModelInterface";
 
-class ListProductModel extends BaseViewListModel<
+class ProductViewListModel extends BaseViewListModel<
   typeof table_product_variant,
   // use a view row shape (any) and cast in the public API
   any,
@@ -79,20 +79,62 @@ class ListProductModel extends BaseViewListModel<
   }
 
   protected declarationSearch() {
-    return [
-      (text: string) => ilike(table_product_variant.sku, text),
-      (text: string) => ilike(table_product_variant.barcode, text),
-      (text: string) => ilike(table_product_variant.manufacturer, text),
-      (text: string) => ilike(table_product_variant.name, text),
-      (text: string) => ilike(table_product_master.code, text),
-      (text: string) => ilike(sql`${table_product_master.name}::text`, text),
-      (text: string) => ilike(table_product_category.code, text),
-      (text: string) => ilike(table_product_category.name, text),
-    ];
+    return new Map([
+      ["sku", (text: string) => ilike(table_product_variant.sku, text)],
+      ["barcode", (text: string) => ilike(table_product_variant.barcode, text)],
+      [
+        "manufacturer",
+        (text: string) => ilike(table_product_variant.manufacturer, text),
+      ],
+      ["name", (text: string) => ilike(table_product_variant.name, text)],
+      [
+        "productMasterCode",
+        (text: string) => ilike(table_product_master.code, text),
+      ],
+      [
+        "productMasterName",
+        (text: string) => ilike(sql`${table_product_master.name}::text`, text),
+      ],
+      [
+        "categoryCode",
+        (text: string) => ilike(table_product_category.code, text),
+      ],
+      [
+        "categoryName",
+        (text: string) => ilike(table_product_category.name, text),
+      ],
+    ]);
   }
 
   protected declarationFilter() {
-    return [];
+    return new Map([
+      [
+        "status",
+        (value: boolean, filters: ProductFilter | undefined) =>
+          value !== undefined ? eq(this.table.isActive, value) : undefined,
+      ],
+      [
+        "productMasterStatus",
+        (value: boolean, filters: ProductFilter | undefined) =>
+          value !== undefined
+            ? eq(table_product_master.isActive, value)
+            : undefined,
+      ],
+      [
+        "productCategoryStatus",
+        (value: boolean, filters: ProductFilter | undefined) =>
+          value !== undefined
+            ? eq(table_product_category.isActive, value)
+            : undefined,
+      ],
+      [
+        "baseUomStatus",
+        (value: boolean, filters: ProductFilter | undefined) =>
+          value !== undefined
+            ? eq(table_unit_of_measure.isActive, value)
+            : undefined,
+      ],
+    ]);
   }
 
   // Map raw DB row + joined columns -> view row
@@ -151,4 +193,4 @@ class ListProductModel extends BaseViewListModel<
   };
 }
 
-export default ListProductModel;
+export default ProductViewListModel;

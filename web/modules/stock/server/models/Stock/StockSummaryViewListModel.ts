@@ -29,7 +29,7 @@ interface StockSummaryFilter extends ParamFilter {
   warehouseId?: string;
 }
 
-class ListStockSummaryModel extends BaseViewListModel<
+class StockSummaryViewListModel extends BaseViewListModel<
   typeof table_stock_level,
   StockSummaryViewRow,
   StockSummaryFilter
@@ -121,34 +121,27 @@ class ListStockSummaryModel extends BaseViewListModel<
   }
 
   protected declarationSearch() {
-    return [
-      (text: string) => ilike(table_stock_level.productId, text),
-      (text: string) => ilike(table_product_master.code, text),
-      (text: string) => ilike(sql`${table_product_master.name}::text`, text),
-      (text: string) => ilike(table_stock_level.warehouseId, text),
-      (text: string) => ilike(table_stock_warehouse.code, text),
-      (text: string) => ilike(table_stock_warehouse.name, text),
-    ];
+    return new Map([
+      ["productId", (text: string) => ilike(table_stock_level.productId, text)],
+      ["productCode", (text: string) => ilike(table_product_master.code, text)],
+      ["productName", (text: string) => ilike(sql`${table_product_master.name}::text`, text)],
+      ["warehouseId", (text: string) => ilike(table_stock_level.warehouseId, text)],
+      ["warehouseCode", (text: string) => ilike(table_stock_warehouse.code, text)],
+      ["warehouseName", (text: string) => ilike(table_stock_warehouse.name, text)],
+    ]);
   }
 
   protected declarationFilter() {
-    return [
-      (filters: StockSummaryFilter | undefined) => {
-        const conditions: any[] = [];
-        if (filters?.productId) {
-          conditions.push(eq(table_stock_level.productId, filters.productId));
-        }
-        if (filters?.warehouseId) {
-          conditions.push(
-            eq(table_stock_level.warehouseId, filters.warehouseId)
-          );
-        }
-        if (conditions.length === 0) {
-          return undefined;
-        }
-        return and(...conditions);
-      },
-    ];
+    return new Map([
+      ["productId", (value: string | undefined, filters: StockSummaryFilter | undefined) => {
+        if (!value) return undefined;
+        return eq(table_stock_level.productId, value);
+      }],
+      ["warehouseId", (value: string | undefined, filters: StockSummaryFilter | undefined) => {
+        if (!value) return undefined;
+        return eq(table_stock_level.warehouseId, value);
+      }],
+    ]);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -187,4 +180,4 @@ class ListStockSummaryModel extends BaseViewListModel<
   };
 }
 
-export default ListStockSummaryModel;
+export default StockSummaryViewListModel;

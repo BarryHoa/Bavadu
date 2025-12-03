@@ -8,7 +8,7 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import { table_sales_order_delivery } from "../../schemas";
 
-class ListDeliveryModel extends BaseViewListModel<
+class DeliveryViewListModel extends BaseViewListModel<
   typeof table_sales_order_delivery,
   any
 > {
@@ -45,13 +45,13 @@ class ListDeliveryModel extends BaseViewListModel<
   }
 
   protected declarationSearch() {
-    return [
-      (text: string) => ilike(table_sales_order_delivery.reference, text),
-    ];
+    return new Map([
+      ["reference", (text: string) => ilike(table_sales_order_delivery.reference, text)],
+    ]);
   }
 
   protected declarationFilter() {
-    return [];
+    return new Map();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,5 +78,5 @@ class ListDeliveryModel extends BaseViewListModel<
   };
 }
 
-export default ListDeliveryModel;
+export default DeliveryViewListModel;
 

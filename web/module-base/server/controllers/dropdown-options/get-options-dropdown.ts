@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import getModuleQueryByModel from "../../utils/getModuleQueryByModel";
+import { validateModelName } from "../../validation/validateModelName";
 
 // Example edge handler for /view-list-data-table/data route (GET)
 export async function POST(request: NextRequest) {
@@ -8,9 +9,12 @@ export async function POST(request: NextRequest) {
 
   const { model, params } = body ?? {};
 
+  // validate model name
+  await validateModelName(model, "dropdown-list");
+
   return await getModuleQueryByModel({
     model,
-    modelMethod: "getOptionsDropdown",
+    modelMethod: "getData",
     params,
   });
 }

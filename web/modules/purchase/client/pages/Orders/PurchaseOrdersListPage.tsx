@@ -91,7 +91,7 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<PurchaseOrderRow>
-        model="list.purchase.order"
+        model="purchase.order.view-list"
         columns={columns}
         isDummyData={false}
         actionsRight={[

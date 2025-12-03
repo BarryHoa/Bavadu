@@ -7,10 +7,10 @@
   "models": {
     "user": "Users/UserModel",
     "location": "Locations/LocationModel",
-    "payment-method": "PaymentMethod/PaymentMethodModel",
-    "payment-term": "PaymentTerm/PaymentTermModel",
-    "shipping-method": "ShippingMethod/ShippingMethodModel",
-    "shipping-term": "ShippingTerm/ShippingTermModel",
-    "tax-rate": "TaxRate/TaxRateModel"
+    "payment-method.dropdown-list": "PaymentMethod/PaymentMethodDropdownViewListModel",
+    "payment-term.dropdown-list": "PaymentTerm/PaymentTermDropdownViewListModel",
+    "shipping-method.dropdown-list": "ShippingMethod/ShippingMethodDropdownViewListModel",
+    "shipping-term.dropdown-list": "ShippingTerm/ShippingTermDropdownViewListModel",
+    "tax-rate.dropdown-list": "TaxRate/TaxRateDropdownViewListModel"
   }
 }

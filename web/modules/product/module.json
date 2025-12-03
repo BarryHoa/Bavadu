@@ -8,7 +8,8 @@
   "models": {
     "product": "Product/ProductModel",
     "product.category": "ProductCategory/ProductCategoryModel",
-    "list.product": "Product/ListProductModel",
-    "list.product.category": "ProductCategory/ListProductCategoryModel"
+    "product.view-list": "Product/ProductViewListModel",
+    "product.dropdown-list": "Product/ProductDropdownViewListModel",
+    "product.category.view-list": "ProductCategory/ProductCategoryViewListModel"
   }
 }

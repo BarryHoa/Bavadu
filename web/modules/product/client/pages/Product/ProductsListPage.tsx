@@ -195,7 +195,7 @@ export default function ProductsListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable
-        model="list.product"
+        model="product.view-list"
         columns={columns}
         actionsRight={[
           {

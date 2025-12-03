@@ -1,3 +1,1 @@
-export { default } from "./TaxRateModel";
-export * from "./TaxRateModel";
-
+export { default as TaxRateDropdownViewListModel } from "./TaxRateDropdownViewListModel";

@@ -77,31 +77,6 @@
     ]
   },
   {
-    "path": "/master-data",
-    "routes": [
-      {
-        "path": "/payment-methods",
-        "handler": "/master-data/payment-methods/list"
-      },
-      {
-        "path": "/payment-terms",
-        "handler": "/master-data/payment-terms/list"
-      },
-      {
-        "path": "/shipping-methods",
-        "handler": "/master-data/shipping-methods/list"
-      },
-      {
-        "path": "/shipping-terms",
-        "handler": "/master-data/shipping-terms/list"
-      },
-      {
-        "path": "/tax-rates",
-        "handler": "/master-data/tax-rates/list"
-      }
-    ]
-  },
-  {
     "path": "/currency",
     "routes": [
       {

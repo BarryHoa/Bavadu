@@ -1,5 +1,5 @@
 import type { Column } from "drizzle-orm";
-import { eq, ilike, sql } from "drizzle-orm";
+import { ilike, sql } from "drizzle-orm";
 
 import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
 import type {
@@ -8,7 +8,7 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import { table_price_lists_b2c } from "../../schemas/price-list-b2c";
 
-class ListPriceListB2CModel extends BaseViewListModel<
+class PriceListB2CViewListModel extends BaseViewListModel<
   typeof table_price_lists_b2c,
   any
 > {
@@ -47,18 +47,24 @@ class ListPriceListB2CModel extends BaseViewListModel<
   }
 
   protected declarationSearch() {
-    return [
-      (text: string) =>
-        text ? ilike(table_price_lists_b2c.code, `%${text}%`) : undefined,
-      (text: string) =>
-        text
-          ? sql`${table_price_lists_b2c.name}::text ILIKE ${`%${text}%`}`
-          : undefined,
-    ];
+    return new Map([
+      [
+        "code",
+        (text: string) =>
+          text ? ilike(table_price_lists_b2c.code, `%${text}%`) : undefined,
+      ],
+      [
+        "name",
+        (text: string) =>
+          text
+            ? sql`${table_price_lists_b2c.name}::text ILIKE ${`%${text}%`}`
+            : undefined,
+      ],
+    ]);
   }
 
   protected declarationFilter() {
-    return [];
+    return new Map();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -86,49 +92,6 @@ class ListPriceListB2CModel extends BaseViewListModel<
   ): Promise<ListParamsResponse<any>> => {
     return this.buildQueryDataList(params);
   };
-
-  getOptionsDropdown = async (
-    params: ListParamsRequest
-  ): Promise<
-    ListParamsResponse<{
-      label: string;
-      value: string;
-      [key: string]: any;
-    }>
-  > => {
-    // Use buildQueryDataListWithSelect to select only needed columns
-    const result = await this.buildQueryDataListWithSelect(
-      params,
-      (qb) =>
-        qb.select({
-          id: table_price_lists_b2c.id,
-          code: table_price_lists_b2c.code,
-          name: table_price_lists_b2c.name,
-        }),
-      (query) => {
-        // Filter only active price lists
-        return query.where(eq(table_price_lists_b2c.status, "active"));
-      }
-    );
-
-    return {
-      data: result.data.map((item: any) => {
-        // Handle LocaleDataType<string> for name
-        const name =
-          typeof item.name === "string"
-            ? item.name
-            : item.name?.vi || item.name?.en || item.code || "";
-
-        return {
-          label: `${item.code} - ${name}`,
-          value: item.id,
-          code: item.code,
-          name: item.name,
-        };
-      }),
-      total: result.total,
-    };
-  };
 }
 
-export default ListPriceListB2CModel;
+export default PriceListB2CViewListModel;

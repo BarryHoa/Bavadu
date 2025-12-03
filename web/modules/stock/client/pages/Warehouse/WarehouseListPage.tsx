@@ -1,11 +1,11 @@
 "use client";
 
-import LinkAs from "@base/client/components/LinkAs";
-import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import {
   DATA_TABLE_COLUMN_KEY_ACTION,
   type DataTableColumn,
 } from "@base/client/components/DataTable";
+import LinkAs from "@base/client/components/LinkAs";
+import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
@@ -30,9 +30,16 @@ const formatLocation = (warehouse: WarehouseDto) => {
     return name.vi || name.en || "";
   };
   const parts = [
-    address.administrativeUnits?.find((u) => u.level === 2) ? getLocalizedName(address.administrativeUnits.find((u) => u.level === 2)?.name) : undefined,
-    address.country ? getLocalizedName(address.country.name) : undefined
-  ].filter((value): value is string => Boolean(value) && typeof value === "string" && value.trim().length > 0);
+    address.administrativeUnits?.find((u) => u.level === 2)
+      ? getLocalizedName(
+          address.administrativeUnits.find((u) => u.level === 2)?.name
+        )
+      : undefined,
+    address.country ? getLocalizedName(address.country.name) : undefined,
+  ].filter(
+    (value): value is string =>
+      Boolean(value) && typeof value === "string" && value.trim().length > 0
+  );
   return parts.length ? parts.join(", ") : "—";
 };
 
@@ -106,7 +113,7 @@ export default function WarehouseListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<WarehouseDto>
-        model="list.stock.warehouse"
+        model="stock.warehouse.view-list"
         columns={columns}
         isDummyData={false}
         actionsRight={[

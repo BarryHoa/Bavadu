@@ -86,9 +86,9 @@ const createFile = (filePath, content, type = "file") => {
   const dir = path.dirname(filePath);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(filePath, content);
-  console.log(
-    `  📄 Created ${type}: ${path.relative(process.cwd(), filePath)}`
-  );
+  // console.log(
+  //   `  📄 Created ${type}: ${path.relative(process.cwd(), filePath)}`
+  // );
 };
 
 // ============================================================================
@@ -114,7 +114,7 @@ const getControllerPath = (resourceType, moduleName, handlerPath) =>
 
 const getPagePaths = (resourceType, moduleName, pagePath) => {
   const base = getPath(resourceType, "client", moduleName, "pages", pagePath);
-  return [`${base}.tsx`, `${base}.ts`];
+  return [`${base}.tsx`, `${base}.ts`, `${base}/index.tsx`, `${base}/index.ts`];
 };
 
 const getLayoutPaths = (resourceType, moduleName, layoutPath) => {
@@ -289,7 +289,7 @@ const buildServerRoutesForResource = (resourceType, routeData) => {
   // Only create directory if it doesn't exist (already cleaned)
   if (!fs.existsSync(targetDir)) {
     fs.mkdirSync(targetDir, { recursive: true });
-    console.log(`📁 Created ${resource.server.target} directory`);
+    // console.log(`📁 Created ${resource.server.target} directory`);
   }
 
   let createdCount = 0;
@@ -398,7 +398,7 @@ const buildClientPagesForResource = (resourceType, routeData) => {
   // Only create directory if it doesn't exist (already cleaned)
   if (!fs.existsSync(targetDir)) {
     fs.mkdirSync(targetDir, { recursive: true });
-    console.log(`📁 Created ${resource.client.target} directory`);
+    // console.log(`📁 Created ${resource.client.target} directory`);
   }
 
   let created = 0;

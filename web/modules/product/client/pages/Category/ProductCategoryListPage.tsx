@@ -11,8 +11,8 @@ import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import { formatDate } from "@base/client/utils/date/formatDate";
 
 import { Chip } from "@heroui/react";
-import React, { useMemo } from "react";
 import { useTranslations } from "next-intl";
+import React, { useMemo } from "react";
 
 import LinkAs from "@base/client/components/LinkAs";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
@@ -135,7 +135,7 @@ const ProductCategoryListPage = (): React.ReactNode => {
   return (
     <div className="space-y-4">
       <ViewListDataTable
-        model="list.product.category"
+        model="product.category.view-list"
         columns={columns}
         actionsRight={[
           {

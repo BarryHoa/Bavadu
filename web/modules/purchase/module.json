@@ -7,7 +7,6 @@
   "icon": "ShoppingCart",
   "models": {
     "purchase.order": "Purchase/PurchaseOrderModel",
-    "list.purchase.order": "Purchase/ListPurchaseOrderModel"
+    "purchase.order.view-list": "Purchase/PurchaseOrderViewListModel"
   }
 }
-

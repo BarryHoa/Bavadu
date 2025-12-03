@@ -22,10 +22,15 @@ type ColumnMap = Map<
     sort?: boolean;
   }
 >;
-type SearchCondition = Array<(text: string) => any>;
+type SearchConditionMap = Map<string, (text: string) => any>;
 type FilterCondition<TFilter extends Record<string, any>> = (
+  currentFilterValue: any,
   filters: TFilter | undefined
 ) => any | undefined;
+type FilterConditionMap<TFilter extends Record<string, any>> = Map<
+  string,
+  FilterCondition<TFilter>
+>;
 
 export abstract class BaseViewListModel<
   TTable extends PgTable<any> = PgTable<any>,
@@ -33,8 +38,8 @@ export abstract class BaseViewListModel<
   TFilter extends Record<string, any> = Record<string, any>,
 > extends BaseModel<TTable> {
   protected readonly columns: ColumnMap;
-  protected readonly search: SearchCondition;
-  protected readonly filter: Array<FilterCondition<TFilter>>;
+  protected readonly search: SearchConditionMap;
+  protected readonly filter: FilterConditionMap<TFilter>;
   protected readonly sortDefault: ParamSortMultiple;
 
   constructor({
@@ -43,7 +48,7 @@ export abstract class BaseViewListModel<
     sortDefault,
   }: {
     table: TTable;
-    search?: SearchCondition;
+    search?: SearchConditionMap;
     sortDefault?: ParamSortMultiple;
   }) {
     super(table);
@@ -59,34 +64,52 @@ export abstract class BaseViewListModel<
   }
 
   // ============================================================================
-  // ABSTRACT METHODS - Must be implemented by subclasses
+  // PROTECTED METHODS - Can be overridden by subclasses
   // ============================================================================
 
   /**
-   * Subclass must declare which columns are available for select/sort.
+   * Declare which columns are available for select/sort.
+   * Default implementation returns an empty Map.
+   * Subclass can override to provide columns mapping.
    */
-  protected abstract declarationColumns(): ColumnMap;
+  protected declarationColumns(): ColumnMap {
+    return new Map();
+  }
 
   /**
-   * Subclass must declare how global search text is mapped to conditions.
-   * Each function receives the processed search text (may be empty string)
+   * Declare how global search text is mapped to conditions.
+   * Returns a Map where key is the search field name and value is a function
+   * that receives the processed search text (may be empty string)
    * and should return a drizzle condition or undefined.
+   * Default implementation returns an empty Map (no search).
+   * Subclass can override to provide search conditions.
    */
-  protected abstract declarationSearch(): SearchCondition;
+  protected declarationSearch(): SearchConditionMap {
+    return new Map();
+  }
 
   /**
-   * Optional: subclass can declare how filters are mapped to conditions.
-   * Default implementation returns no additional filter conditions.
+   * Declare how filters are mapped to conditions.
+   * Returns a Map where key is the filter field name and value is a function
+   * that receives the filters object and returns a drizzle condition or undefined.
+   * Default implementation returns an empty Map (no additional filters).
+   * Subclass can override to provide filter conditions.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected abstract declarationFilter(): Array<FilterCondition<TFilter>>;
+  protected declarationFilter(): FilterConditionMap<TFilter> {
+    return new Map();
+  }
 
   /**
-   * Subclass must declare how to map a raw DB row to the view row type (TRow)
+   * Declare how to map a raw DB row to the view row type (TRow)
    * when using shared list/query helpers.
+   * Default implementation returns the row as-is.
+   * Subclass can override to transform the row data.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected abstract declarationMappingData(row: any, index: number): TRow;
+  protected declarationMappingData(row: any, index: number): TRow {
+    return row as TRow;
+  }
 
   // ============================================================================
   // PROTECTED HELPER METHODS
@@ -141,18 +164,28 @@ export abstract class BaseViewListModel<
 
     // Apply filter, search, etc., as per buildQueryDataList
     // 1. Filter
-    const filterConditions = this.filter
-      .map((filterFn) => filterFn(filters))
+
+    // Lọc những key của filter có trong map this.filter
+    const filterKeys =
+      filters && typeof filters === "object" ? Object.keys(filters) : [];
+    const validFilterKeys = filterKeys.filter((key) => this.filter.has(key));
+    const filterConditionsByKeys = validFilterKeys
+      .map((key) => {
+        const filterFn = this.filter.get(key);
+        const filterValue = filters?.[key];
+
+        return filterFn ? filterFn(filterValue, filters) : undefined;
+      })
       .filter((expr): expr is Exclude<typeof expr, undefined> => Boolean(expr));
 
-    if (filterConditions.length > 0) {
-      query = query.where(...filterConditions);
+    if (filterConditionsByKeys.length > 0) {
+      query = query.where(...filterConditionsByKeys);
     }
 
     // 2. Search
     const searchText = isNil(search) ? undefined : String(search).trim();
     if (searchText) {
-      const searchExpressions = this.search
+      const searchExpressions = Array.from(this.search.values())
         .map((searchTerm) => searchTerm(searchText))
         .filter((expr): expr is Exclude<typeof expr, undefined> =>
           Boolean(expr)
@@ -264,21 +297,5 @@ export abstract class BaseViewListModel<
     params: ListParamsRequest<TFilter>
   ): Promise<ListParamsResponse<TRow>> => {
     return await this.buildQueryDataList(params);
-  };
-
-  /**
-   * Override this method to return the options for the dropdown
-   */
-  getOptionsDropdown = async (
-    params: ListParamsRequest<TFilter>
-  ): Promise<
-    ListParamsResponse<{
-      label: string;
-      value: string;
-      [key: string]: any;
-    }>
-  > => {
-    throw new Error("Method not implemented");
-    // return await this.buildQueryDataList(params);
   };
 }

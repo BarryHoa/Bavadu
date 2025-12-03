@@ -18,15 +18,10 @@ export default class ShippingTermService extends ClientHttpService {
     super("/api/base/master-data/shipping-terms");
   }
 
-  getList() {
-    return this.get<{
-      data: ShippingTermDto[];
-      message?: string;
-    }>("/");
-  }
-
   getOptionsDropdown() {
-    return dropdownOptionsService.getOptionsDropdown("shipping-term");
+    return dropdownOptionsService.getOptionsDropdown(
+      "shipping-term.dropdown-list"
+    );
   }
 }
 

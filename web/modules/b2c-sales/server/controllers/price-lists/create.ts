@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { getAuthenticatedUser } from "@base/server/middleware/auth";
-import PriceListB2CModel from "../../models/PriceList/PriceListB2CModel";
+import PriceListB2CViewListModel from "../../models/PriceList/PriceListB2CViewListModel";
 import { JSONResponse } from "@base/server/utils/JSONResponse";
 
 export async function POST(request: NextRequest) {
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const model = new PriceListB2CModel();
+    const model = new PriceListB2CViewListModel();
     const priceList = await model.create({
       code,
       name,

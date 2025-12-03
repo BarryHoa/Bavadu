@@ -1,3 +1,1 @@
-export { default } from "./ShippingMethodModel";
-export * from "./ShippingMethodModel";
-
+export { default as ShippingMethodDropdownViewListModel } from "./ShippingMethodDropdownViewListModel";

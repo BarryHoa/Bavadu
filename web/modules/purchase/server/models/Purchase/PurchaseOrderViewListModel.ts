@@ -8,7 +8,7 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import { table_purchase_order } from "../../schemas";
 
-class ListPurchaseOrderModel extends BaseViewListModel<
+class PurchaseOrderViewListModel extends BaseViewListModel<
   typeof table_purchase_order,
   any
 > {
@@ -65,14 +65,14 @@ class ListPurchaseOrderModel extends BaseViewListModel<
   }
 
   protected declarationSearch() {
-    return [
-      (text: string) => ilike(table_purchase_order.code, text),
-      (text: string) => ilike(table_purchase_order.vendorName, text),
-    ];
+    return new Map([
+      ["code", (text: string) => ilike(table_purchase_order.code, text)],
+      ["vendorName", (text: string) => ilike(table_purchase_order.vendorName, text)],
+    ]);
   }
 
   protected declarationFilter() {
-    return [];
+    return new Map();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -99,4 +99,4 @@ class ListPurchaseOrderModel extends BaseViewListModel<
   };
 }
 
-export default ListPurchaseOrderModel;
+export default PurchaseOrderViewListModel;

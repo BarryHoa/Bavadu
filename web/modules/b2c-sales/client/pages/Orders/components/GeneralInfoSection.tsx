@@ -42,7 +42,7 @@ export default function GeneralInfoSection({
             <IBaseSingleSelectAsync
               label={t("pricing")}
               size="sm"
-              model="list.b2c-sales.price-list"
+              model="b2c-sales.price-list.view-list"
               selectedKey={field.value}
               onSelectionChange={(key) => {
                 field.onChange(key || undefined);

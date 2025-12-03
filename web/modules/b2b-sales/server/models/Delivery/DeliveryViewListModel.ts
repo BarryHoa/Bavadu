@@ -8,7 +8,7 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import { table_sales_order_delivery } from "../../schemas";
 
-class ListDeliveryModel extends BaseViewListModel<
+class DeliveryViewListModel extends BaseViewListModel<
   typeof table_sales_order_delivery,
   any
 > {
@@ -33,25 +33,46 @@ class ListDeliveryModel extends BaseViewListModel<
       }
     >([
       ["id", { column: table_sales_order_delivery.id, sort: true }],
-      ["orderType", { column: table_sales_order_delivery.orderType, sort: true }],
+      [
+        "orderType",
+        { column: table_sales_order_delivery.orderType, sort: true },
+      ],
       ["orderId", { column: table_sales_order_delivery.orderId, sort: true }],
-      ["warehouseId", { column: table_sales_order_delivery.warehouseId, sort: true }],
-      ["deliveryDate", { column: table_sales_order_delivery.deliveryDate, sort: true }],
-      ["reference", { column: table_sales_order_delivery.reference, sort: true }],
+      [
+        "warehouseId",
+        { column: table_sales_order_delivery.warehouseId, sort: true },
+      ],
+      [
+        "deliveryDate",
+        { column: table_sales_order_delivery.deliveryDate, sort: true },
+      ],
+      [
+        "reference",
+        { column: table_sales_order_delivery.reference, sort: true },
+      ],
       ["status", { column: table_sales_order_delivery.status, sort: true }],
-      ["createdAt", { column: table_sales_order_delivery.createdAt, sort: true }],
-      ["updatedAt", { column: table_sales_order_delivery.updatedAt, sort: true }],
+      [
+        "createdAt",
+        { column: table_sales_order_delivery.createdAt, sort: true },
+      ],
+      [
+        "updatedAt",
+        { column: table_sales_order_delivery.updatedAt, sort: true },
+      ],
     ]);
   }
 
   protected declarationSearch() {
-    return [
-      (text: string) => ilike(table_sales_order_delivery.reference, text),
-    ];
+    return new Map([
+      [
+        "reference",
+        (text: string) => ilike(table_sales_order_delivery.reference, text),
+      ],
+    ]);
   }
 
   protected declarationFilter() {
-    return [];
+    return new Map();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,5 +99,4 @@ class ListDeliveryModel extends BaseViewListModel<
   };
 }
 
-export default ListDeliveryModel;
-
+export default DeliveryViewListModel;

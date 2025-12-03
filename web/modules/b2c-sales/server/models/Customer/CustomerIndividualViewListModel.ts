@@ -8,7 +8,7 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import { table_customer_individual } from "../../schemas";
 
-class ListCustomerIndividualModel extends BaseViewListModel<
+class CustomerIndividualViewListModel extends BaseViewListModel<
   typeof table_customer_individual,
   any
 > {
@@ -45,17 +45,17 @@ class ListCustomerIndividualModel extends BaseViewListModel<
   }
 
   protected declarationSearch() {
-    return [
-      (text: string) => ilike(table_customer_individual.code, text),
-      (text: string) => ilike(table_customer_individual.firstName, text),
-      (text: string) => ilike(table_customer_individual.lastName, text),
-      (text: string) => ilike(table_customer_individual.phone, text),
-      (text: string) => ilike(table_customer_individual.email, text),
-    ];
+    return new Map([
+      ["code", (text: string) => ilike(table_customer_individual.code, text)],
+      ["firstName", (text: string) => ilike(table_customer_individual.firstName, text)],
+      ["lastName", (text: string) => ilike(table_customer_individual.lastName, text)],
+      ["phone", (text: string) => ilike(table_customer_individual.phone, text)],
+      ["email", (text: string) => ilike(table_customer_individual.email, text)],
+    ]);
   }
 
   protected declarationFilter() {
-    return [];
+    return new Map();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -84,5 +84,5 @@ class ListCustomerIndividualModel extends BaseViewListModel<
   };
 }
 
-export default ListCustomerIndividualModel;
+export default CustomerIndividualViewListModel;
 

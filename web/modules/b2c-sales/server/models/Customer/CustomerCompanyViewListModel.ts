@@ -8,7 +8,7 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import { table_customer_company } from "../../schemas";
 
-class ListCustomerCompanyModel extends BaseViewListModel<
+class CustomerCompanyViewListModel extends BaseViewListModel<
   typeof table_customer_company,
   any
 > {
@@ -45,15 +45,15 @@ class ListCustomerCompanyModel extends BaseViewListModel<
   }
 
   protected declarationSearch() {
-    return [
-      (text: string) => ilike(table_customer_company.code, text),
-      (text: string) => ilike(table_customer_company.name, text),
-      (text: string) => ilike(table_customer_company.taxId, text),
-    ];
+    return new Map([
+      ["code", (text: string) => ilike(table_customer_company.code, text)],
+      ["name", (text: string) => ilike(table_customer_company.name, text)],
+      ["taxId", (text: string) => ilike(table_customer_company.taxId, text)],
+    ]);
   }
 
   protected declarationFilter() {
-    return [];
+    return new Map();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -84,5 +84,5 @@ class ListCustomerCompanyModel extends BaseViewListModel<
   };
 }
 
-export default ListCustomerCompanyModel;
+export default CustomerCompanyViewListModel;
 

@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
   const response = await getModuleQueryByModel({
-    model: "list.product.category",
+    model: "product.category.view-list",
     modelMethod: "getData",
     params: {
       offset: 0,

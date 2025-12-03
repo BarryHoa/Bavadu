@@ -18,15 +18,10 @@ export default class PaymentMethodService extends ClientHttpService {
     super("/api/base/master-data/payment-methods");
   }
 
-  getList() {
-    return this.get<{
-      data: PaymentMethodDto[];
-      message?: string;
-    }>("/");
-  }
-
   getOptionsDropdown() {
-    return dropdownOptionsService.getOptionsDropdown("payment-method");
+    return dropdownOptionsService.getOptionsDropdown(
+      "payment-method.dropdown-list"
+    );
   }
 }
 

@@ -8,8 +8,7 @@
   "models": {
     "stock": "Stock/StockModel",
     "stock.warehouse": "Warehouse/WarehouseModel",
-    "list.stock.warehouse": "Warehouse/ListWarehouseModel",
-    "list.stock.summary": "Stock/ListStockSummaryModel"
+    "stock.warehouse.view-list": "Warehouse/WarehouseViewListModel",
+    "stock.summary.view-list": "Stock/StockSummaryViewListModel"
   }
 }
-
