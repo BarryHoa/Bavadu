@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import getEnv from "../utils/getEnv";
+import {
+  sanitizeJsonRpcParams,
+  validateJsonRpcMethod,
+} from "../validation/schemas/jsonrpc";
 
 export interface JsonRpcRequest {
   jsonrpc: "2.0";
@@ -200,10 +204,24 @@ export class JsonRpcHandler {
       );
     }
 
+    // Validate method format
+    const methodValidation = validateJsonRpcMethod(request.method);
+    if (!methodValidation.valid) {
+      throw new JsonRpcError(
+        JSON_RPC_ERROR_CODES.INVALID_PARAMS,
+        methodValidation.error || "Invalid method format"
+      );
+    }
+
+    // Sanitize params to prevent XSS
+    const sanitizedParams = request.params
+      ? sanitizeJsonRpcParams(request.params)
+      : undefined;
+
     try {
       const result = await this.handleDynamicModelQuery(
         request.method,
-        request.params,
+        sanitizedParams,
         httpRequest
       );
 

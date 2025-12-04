@@ -5,6 +5,7 @@ import {
   checkCsrfProtection,
   checkRateLimit,
 } from "@base/server/middleware";
+import { checkSuspiciousRequest } from "@base/server/utils/request-monitor";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
@@ -145,10 +146,20 @@ export async function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // Check for suspicious requests (non-blocking, just logs)
+  checkSuspiciousRequest(req, pathname);
+
   // Handle API routes
   if (isApiRoute(pathname)) {
     const apiResponse = await handleApiRoute(req, pathname, nextHeaders);
     if (apiResponse) {
+      // Record error response for monitoring
+      if (apiResponse.status >= 400) {
+        const { recordErrorResponse } = await import(
+          "@base/server/utils/request-monitor"
+        );
+        recordErrorResponse(req, pathname, apiResponse.status);
+      }
       return apiResponse; // Rate limit, CSRF, or auth error
     }
   }

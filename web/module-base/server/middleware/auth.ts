@@ -1,5 +1,10 @@
 import { AUTH_CONFIG } from "@base/server/config";
 import SessionModel from "@base/server/models/Sessions/SessionModel";
+import {
+  getClientIp,
+  getUserAgent,
+  logAuthFailure,
+} from "@base/server/utils/security-logger";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -13,6 +18,13 @@ export async function authenticateRequest(
   const sessionToken = request.cookies.get(AUTH_CONFIG.sessionCookieName)?.value;
 
   if (!sessionToken) {
+    logAuthFailure("Missing session token", {
+      ip: getClientIp(request),
+      userAgent: getUserAgent(request),
+      path: request.nextUrl.pathname,
+      method: request.method,
+    });
+
     return NextResponse.json(
       {
         success: false,
@@ -28,6 +40,14 @@ export async function authenticateRequest(
     const validationResult = await sessionModel.validateSession(sessionToken);
 
     if (!validationResult.valid || !validationResult.session) {
+      logAuthFailure("Invalid or expired session", {
+        ip: getClientIp(request),
+        userAgent: getUserAgent(request),
+        path: request.nextUrl.pathname,
+        method: request.method,
+        reason: validationResult.valid ? "Session expired" : "Invalid session token",
+      });
+
       return NextResponse.json(
         {
           success: false,
@@ -51,7 +71,14 @@ export async function authenticateRequest(
 
     return null;
   } catch (error) {
-    console.error("Authentication error:", error);
+    logAuthFailure("Session validation error", {
+      ip: getClientIp(request),
+      userAgent: getUserAgent(request),
+      path: request.nextUrl.pathname,
+      method: request.method,
+      error: error instanceof Error ? error.message : String(error),
+    });
+
     return NextResponse.json(
       {
         success: false,

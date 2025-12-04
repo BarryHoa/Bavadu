@@ -1,5 +1,6 @@
 import { RATE_LIMIT_CONFIG } from "@base/server/config";
 import { rateLimitStore } from "@base/server/stores";
+import { logRateLimitViolation } from "@base/server/utils/security-logger";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -37,6 +38,17 @@ export function checkRateLimit(
       (rateLimitStore.getTimeUntilReset(key) + Date.now()) / 1000
     );
     const retryAfter = Math.ceil(rateLimitStore.getTimeUntilReset(key) / 1000);
+
+    // Log rate limit violation
+    logRateLimitViolation({
+      ip,
+      userAgent: request.headers.get("user-agent") || "unknown",
+      path: pathname,
+      method: request.method,
+      limit: config.max,
+      window: config.windowMs,
+      count,
+    });
 
     return NextResponse.json(
       {

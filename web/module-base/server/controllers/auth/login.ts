@@ -7,6 +7,12 @@ import SessionModel from "../../models/Sessions/SessionModel";
 import { table_user, table_user_login } from "../../schemas/user";
 import getDbConnect from "../../utils/getDbConnect";
 import { JSONResponse } from "../../utils/JSONResponse";
+import {
+  getClientIp,
+  getUserAgent,
+  logAuthFailure,
+  logAuthSuccess,
+} from "../../utils/security-logger";
 
 interface LoginRequest {
   username?: string;
@@ -16,27 +22,6 @@ interface LoginRequest {
   rememberMe?: boolean;
 }
 
-/**
- * Get client IP address from request
- */
-function getClientIp(request: NextRequest): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) {
-    return forwarded.split(",")[0].trim();
-  }
-  const realIp = request.headers.get("x-real-ip");
-  if (realIp) {
-    return realIp;
-  }
-  return "unknown";
-}
-
-/**
- * Get user agent from request
- */
-function getUserAgent(request: NextRequest): string {
-  return request.headers.get("user-agent") || "unknown";
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -95,7 +80,12 @@ export async function POST(request: NextRequest) {
     const userLogin = results.find((user) => user !== null);
 
     if (!userLogin) {
-      console.error("Login: User not found", { username });
+      logAuthFailure("User not found", {
+        ip: getClientIp(request),
+        userAgent: getUserAgent(request),
+        path: request.nextUrl.pathname,
+        username,
+      });
       return JSONResponse({
         error: "Invalid credentials",
         status: 401,
@@ -106,9 +96,12 @@ export async function POST(request: NextRequest) {
 
     const passwordValid = await compare(password, userLogin.passwordHash);
     if (!passwordValid) {
-      console.error("Login: Password mismatch", {
-        email: userLogin.email,
-        username: userLogin.username,
+      logAuthFailure("Password mismatch", {
+        ip: getClientIp(request),
+        userAgent: getUserAgent(request),
+        path: request.nextUrl.pathname,
+        username: userLogin.username || undefined,
+        email: userLogin.email || undefined,
       });
       return JSONResponse({
         error: "Invalid credentials",
@@ -195,6 +188,15 @@ export async function POST(request: NextRequest) {
 
     // Set CSRF token cookie after successful login
     setCsrfTokenCookie(response);
+
+    // Log successful authentication
+    logAuthSuccess({
+      ip: ipAddress,
+      userAgent,
+      path: request.nextUrl.pathname,
+      userId: user.id,
+      username: userLogin.username || "unknown",
+    });
 
     return response;
   } catch (error) {
