@@ -97,7 +97,7 @@ export default function DeliveriesListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<DeliveryRow>
-        model="b2c-sales.delivery.view-list"
+        model="b2c-sales-delivery"
         columns={columns}
         isDummyData={false}
         actionsRight={[

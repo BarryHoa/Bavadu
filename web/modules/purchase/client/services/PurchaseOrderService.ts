@@ -34,14 +34,14 @@ export default class PurchaseOrderService extends JsonRpcClientService {
     return this.call<{
       data: PurchaseOrderDto[];
       message?: string;
-    }>("purchase.order.list.getData", {});
+    }>("purchase-order.list.getData", {});
   }
 
   getById(id: string) {
     return this.call<{
       data: { order: PurchaseOrderDto; lines: PurchaseOrderLineDto[] };
       message?: string;
-    }>("purchase.order.curd.getById", { id });
+    }>("purchase-order.curd.getById", { id });
   }
 
   create(payload: {
@@ -61,14 +61,14 @@ export default class PurchaseOrderService extends JsonRpcClientService {
     return this.call<{
       data: { order: PurchaseOrderDto; lines: PurchaseOrderLineDto[] };
       message?: string;
-    }>("purchase.order.curd.create", payload);
+    }>("purchase-order.curd.create", payload);
   }
 
   confirm(orderId: string) {
     return this.call<{
       data: PurchaseOrderDto;
       message?: string;
-    }>("purchase.order.curd.confirm", { orderId });
+    }>("purchase-order.curd.confirm", { orderId });
   }
 
   receive(payload: {
@@ -82,7 +82,7 @@ export default class PurchaseOrderService extends JsonRpcClientService {
     return this.call<{
       data: { order: PurchaseOrderDto; lines: PurchaseOrderLineDto[] };
       message?: string;
-    }>("purchase.order.curd.receive", payload);
+    }>("purchase-order.curd.receive", payload);
   }
 }
 

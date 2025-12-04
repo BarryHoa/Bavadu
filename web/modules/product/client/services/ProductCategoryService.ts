@@ -20,7 +20,7 @@ class ProductCategoryService extends JsonRpcClientService {
     const response = await this.call<{
       success: boolean;
       data: ProductCategoryRow[];
-    }>("product.category.list.getData", {});
+    }>("product-category.list.getData", {});
 
     const data = response.data;
     return Array.isArray(data) ? data : [];
@@ -30,7 +30,7 @@ class ProductCategoryService extends JsonRpcClientService {
     const response = await this.call<{
       success: boolean;
       data: ProductCategoryRow;
-    }>("product.category.curd.getById", { id });
+    }>("product-category.curd.getById", { id });
 
     return response.data;
   }
@@ -41,7 +41,7 @@ class ProductCategoryService extends JsonRpcClientService {
     const response = await this.call<{
       success: boolean;
       data: ProductCategoryRow;
-    }>("product.category.curd.create", payload);
+    }>("product-category.curd.create", payload);
 
     return response.data;
   }
@@ -53,7 +53,7 @@ class ProductCategoryService extends JsonRpcClientService {
     const response = await this.call<{
       success: boolean;
       data: ProductCategoryRow;
-    }>("product.category.curd.update", { id, ...payload });
+    }>("product-category.curd.update", { id, ...payload });
 
     return response.data;
   }

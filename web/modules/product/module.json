@@ -9,7 +9,7 @@
     "product.curd": "Product/ProductModel",
     "product.list": "Product/ProductViewListModel",
     "product.dropdown": "Product/ProductDropdownListModel",
-    "product.category.curd": "ProductCategory/ProductCategoryModel",
-    "product.category.list": "ProductCategory/ProductCategoryViewListModel"
+    "product-category.curd": "ProductCategory/ProductCategoryModel",
+    "product-category.list": "ProductCategory/ProductCategoryViewListModel"
   }
 }

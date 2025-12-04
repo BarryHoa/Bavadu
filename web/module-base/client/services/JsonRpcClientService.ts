@@ -1,14 +1,14 @@
 import ClientHttpService from "./ClientHttpService";
 
 export interface JsonRpcRequest {
-  jsonrpc: "2.0";
+  jsonrpc: string;
   method: string;
   params?: any;
   id?: string | number | null;
 }
 
 export interface JsonRpcResponse<T = any> {
-  jsonrpc: "2.0";
+  jsonrpc: string;
   result?: T;
   error?: {
     code: number;
@@ -31,8 +31,9 @@ export class JsonRpcError extends Error {
 
 export class JsonRpcClientService extends ClientHttpService {
   private requestIdCounter = 0;
+  private readonly rpc_version = "2.0";
 
-  constructor(baseUrl: string = "/api/rpc") {
+  constructor(baseUrl: string = "/api/internal/json-rpc") {
     super(baseUrl);
   }
 
@@ -50,7 +51,7 @@ export class JsonRpcClientService extends ClientHttpService {
     options?: { notification?: boolean }
   ): Promise<T> {
     const request: JsonRpcRequest = {
-      jsonrpc: "2.0",
+      jsonrpc: this.rpc_version,
       method,
       params,
       id: options?.notification ? null : this.generateId(),
@@ -77,7 +78,7 @@ export class JsonRpcClientService extends ClientHttpService {
     calls: Array<{ method: string; params?: any }>
   ): Promise<T> {
     const requests: JsonRpcRequest[] = calls.map((call) => ({
-      jsonrpc: "2.0" as const,
+      jsonrpc: this.rpc_version,
       method: call.method,
       params: call.params,
       id: this.generateId(),
@@ -112,4 +113,3 @@ export class JsonRpcClientService extends ClientHttpService {
 }
 
 export default JsonRpcClientService;
-

@@ -35,7 +35,7 @@ export default class DeliveryService extends JsonRpcClientService {
     return this.call<{
       data: DeliveryDto;
       message?: string;
-    }>("b2b-sales.delivery.curd.create", payload);
+    }>("b2b-sales-delivery.curd.create", payload);
   }
 }
 

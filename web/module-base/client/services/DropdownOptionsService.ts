@@ -23,16 +23,17 @@ export interface DropdownOptionsResponse {
 /**
  * Convert model name from module.json to base model ID
  * Examples:
- * - "product.dropdown-list" -> "product"
- * - "product.view-list" -> "product"
+ * - "product.dropdown" -> "product"
+ * - "product.list" -> "product"
+ * - "product-category.dropdown" -> "product-category"
  * - "product" -> "product"
  */
 function getBaseModelId(modelId: string): string {
-  if (modelId.endsWith(".view-list")) {
-    return modelId.slice(0, -".view-list".length);
+  if (modelId.endsWith(".list")) {
+    return modelId.slice(0, -".list".length);
   }
-  if (modelId.endsWith(".dropdown-list")) {
-    return modelId.slice(0, -".dropdown-list".length);
+  if (modelId.endsWith(".dropdown")) {
+    return modelId.slice(0, -".dropdown".length);
   }
   return modelId;
 }
@@ -45,8 +46,8 @@ class DropdownOptionsService extends JsonRpcClientService {
   /**
    * Get dropdown options using JSON-RPC
    * Format: <base-model-id>.dropdown.getData
-   * 
-   * @param model - Model name from module.json (e.g., "product.dropdown-list", "product")
+   *
+   * @param model - Model name from module.json (e.g., "product.dropdown", "product")
    *                Will automatically convert to base model ID and use dropdown sub-type
    * @param params - Query parameters
    */
@@ -55,12 +56,12 @@ class DropdownOptionsService extends JsonRpcClientService {
     params?: DropdownOptionsParams
   ): Promise<DropdownOptionsResponse> => {
     // Convert model name to base model ID
-    // Example: "product.dropdown-list" -> "product"
+    // Example: "product.dropdown" -> "product"
     const baseModelId = getBaseModelId(model);
-    
+
     // Use new format: <base-model-id>.dropdown.getData
     const method = `${baseModelId}.dropdown.getData`;
-    
+
     const result = await this.call<DropdownOptionsResponse>(
       method,
       params ?? {}

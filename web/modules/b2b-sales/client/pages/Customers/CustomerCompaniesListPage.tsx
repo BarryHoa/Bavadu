@@ -12,7 +12,7 @@ import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 
-import { CustomerCompany } from "../../../interface/Customer";
+import { CustomerCompany } from "../../interface/Customer";
 
 type CustomerCompanyRow = CustomerCompany & {
   createdAt?: number | string | null;
@@ -105,7 +105,7 @@ export default function CustomerCompaniesListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<CustomerCompanyRow>
-        model="b2b-sales.customer.company.view-list"
+        model="b2b-sales-customer-company"
         columns={columns}
         isDummyData={false}
         actionsRight={[

@@ -1,12 +1,12 @@
 "use client";
 
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
-import LinkAs from "@base/client/components/LinkAs";
-import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import {
   DATA_TABLE_COLUMN_KEY_ACTION,
   DataTableColumn,
 } from "@base/client/components/DataTable";
+import LinkAs from "@base/client/components/LinkAs";
+import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
@@ -34,7 +34,9 @@ export default function DeliveriesListPage(): React.ReactNode {
         render: (value, row) => {
           if (!row?.id) return value || "-";
           return (
-            <LinkAs href={`/workspace/modules/b2b-sales/deliveries/view/${row.id}`}>
+            <LinkAs
+              href={`/workspace/modules/b2b-sales/deliveries/view/${row.id}`}
+            >
               {value || row.id.substring(0, 8)}
             </LinkAs>
           );
@@ -95,7 +97,7 @@ export default function DeliveriesListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<DeliveryRow>
-        model="b2b-sales.delivery.view-list"
+        model="b2b-sales-delivery"
         columns={columns}
         isDummyData={false}
         actionsRight={[
@@ -113,4 +115,3 @@ export default function DeliveriesListPage(): React.ReactNode {
     </div>
   );
 }
-

@@ -7,8 +7,8 @@
   "icon": "Boxes",
   "models": {
     "stock.curd": "Stock/StockModel",
-    "stock.warehouse.curd": "Warehouse/WarehouseModel",
-    "stock.warehouse.list": "Warehouse/WarehouseViewListModel",
-    "stock.summary.list": "Stock/StockSummaryViewListModel"
+    "stock-warehouse.curd": "Warehouse/WarehouseModel",
+    "stock-warehouse.list": "Warehouse/WarehouseViewListModel",
+    "stock-summary.list": "Stock/StockSummaryViewListModel"
   }
 }

@@ -48,14 +48,14 @@ export default class CustomerService extends JsonRpcClientService {
     return this.call<{
       data: CustomerCompanyDto[];
       message?: string;
-    }>("b2c-sales.customer.curd.list", {});
+    }>("b2c-sales-customer.curd.list", {});
   }
 
   getCompanyById(id: string) {
     return this.call<{
       data: CustomerCompanyDto;
       message?: string;
-    }>("b2c-sales.customer.curd.getById", { id });
+    }>("b2c-sales-customer.curd.getById", { id });
   }
 
   createCompany(payload: {
@@ -76,7 +76,7 @@ export default class CustomerService extends JsonRpcClientService {
     return this.call<{
       data: CustomerCompanyDto;
       message?: string;
-    }>("b2c-sales.customer.curd.create", payload);
+    }>("b2c-sales-customer.curd.create", payload);
   }
 
   updateCompany(payload: {
@@ -98,7 +98,7 @@ export default class CustomerService extends JsonRpcClientService {
     return this.call<{
       data: CustomerCompanyDto;
       message?: string;
-    }>("b2c-sales.customer.curd.update", payload);
+    }>("b2c-sales-customer.curd.update", payload);
   }
 
   // Individual methods
@@ -106,14 +106,14 @@ export default class CustomerService extends JsonRpcClientService {
     return this.call<{
       data: CustomerIndividualDto[];
       message?: string;
-    }>("b2c-sales.customer.individual.list.getData", {});
+    }>("b2c-sales-customer-individual.list.getData", {});
   }
 
   getIndividualById(id: string) {
     return this.call<{
       data: CustomerIndividualDto;
       message?: string;
-    }>("b2c-sales.customer.curd.getById", { id });
+    }>("b2c-sales-customer.curd.getById", { id });
   }
 
   createIndividual(payload: {
@@ -132,7 +132,7 @@ export default class CustomerService extends JsonRpcClientService {
     return this.call<{
       data: CustomerIndividualDto;
       message?: string;
-    }>("b2c-sales.customer.curd.create", payload);
+    }>("b2c-sales-customer.curd.create", payload);
   }
 
   updateIndividual(payload: {
@@ -152,7 +152,7 @@ export default class CustomerService extends JsonRpcClientService {
     return this.call<{
       data: CustomerIndividualDto;
       message?: string;
-    }>("b2c-sales.customer.curd.update", payload);
+    }>("b2c-sales-customer.curd.update", payload);
   }
 }
 

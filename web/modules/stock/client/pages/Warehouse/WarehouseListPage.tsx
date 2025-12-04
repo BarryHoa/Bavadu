@@ -113,7 +113,7 @@ export default function WarehouseListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<WarehouseDto>
-        model="stock.warehouse.view-list"
+        model="stock-warehouse"
         columns={columns}
         isDummyData={false}
         actionsRight={[

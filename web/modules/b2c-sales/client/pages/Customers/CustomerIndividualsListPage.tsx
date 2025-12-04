@@ -11,8 +11,7 @@ import { formatDate } from "@base/client/utils/date/formatDate";
 import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-
-import { CustomerIndividual } from "../../../interface/Customer";
+import { CustomerIndividual } from "../../interface/Customer";
 
 type CustomerIndividualRow = CustomerIndividual & {
   createdAt?: number | string | null;
@@ -106,7 +105,7 @@ export default function CustomerIndividualsListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<CustomerIndividualRow>
-        model="b2c-sales.customer.individual.view-list"
+        model="b2c-sales-customer-individual"
         columns={columns}
         isDummyData={false}
         actionsRight={[

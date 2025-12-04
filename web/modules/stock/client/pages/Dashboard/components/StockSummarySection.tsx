@@ -146,7 +146,7 @@ export default function StockSummarySection({
         <Divider />
 
         <ViewListDataTable<StockSummaryItem & { id: string }>
-          model="stock.summary.view-list"
+          model="stock-summary"
           columns={columns}
           isDummyData={false}
           search={{ hidden: true }}

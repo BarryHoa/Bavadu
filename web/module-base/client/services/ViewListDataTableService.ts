@@ -9,13 +9,11 @@ type DataTableParams = {
 /**
  * Convert model name from module.json to base model ID for list operations
  * Examples:
- * - "product.view-list" -> "product"
+ * - "product.list" -> "product"
+ * - "product-category.list" -> "product-category"
  * - "product" -> "product"
  */
 function getBaseModelIdForList(modelId: string): string {
-  if (modelId.endsWith(".view-list")) {
-    return modelId.slice(0, -".view-list".length);
-  }
   if (modelId.endsWith(".list")) {
     return modelId.slice(0, -".list".length);
   }

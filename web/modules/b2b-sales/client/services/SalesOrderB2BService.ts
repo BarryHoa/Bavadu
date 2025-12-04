@@ -56,14 +56,14 @@ export default class SalesOrderB2BService extends JsonRpcClientService {
     return this.call<{
       data: SalesOrderB2BDto[];
       message?: string;
-    }>("b2b-sales.order.list.getData", {});
+    }>("b2b-sales-order.list.getData", {});
   }
 
   getById(id: string) {
     return this.call<{
       data: { order: SalesOrderB2BDto; lines: SalesOrderB2BLineDto[] };
       message?: string;
-    }>("b2b-sales.order.curd.getById", { id });
+    }>("b2b-sales-order.curd.getById", { id });
   }
 
   create(payload: {
@@ -99,7 +99,7 @@ export default class SalesOrderB2BService extends JsonRpcClientService {
     return this.call<{
       data: { order: SalesOrderB2BDto; lines: SalesOrderB2BLineDto[] };
       message?: string;
-    }>("b2b-sales.order.curd.create", payload);
+    }>("b2b-sales-order.curd.create", payload);
   }
 
   update(payload: {
@@ -136,14 +136,14 @@ export default class SalesOrderB2BService extends JsonRpcClientService {
     return this.call<{
       data: { order: SalesOrderB2BDto; lines: SalesOrderB2BLineDto[] };
       message?: string;
-    }>("b2b-sales.order.curd.update", payload);
+    }>("b2b-sales-order.curd.update", payload);
   }
 
-  send(orderId: string) {
+  sendOrder(orderId: string) {
     return this.call<{
       data: SalesOrderB2BDto;
       message?: string;
-    }>("b2b-sales.order.curd.send", { orderId });
+    }>("b2b-sales-order.curd.send", { orderId });
   }
 
   deliver(payload: {
@@ -157,9 +157,8 @@ export default class SalesOrderB2BService extends JsonRpcClientService {
     return this.call<{
       data: { order: SalesOrderB2BDto; lines: SalesOrderB2BLineDto[] };
       message?: string;
-    }>("b2b-sales.order.curd.deliver", payload);
+    }>("b2b-sales-order.curd.deliver", payload);
   }
 }
 
 export const salesOrderB2BService = new SalesOrderB2BService();
-

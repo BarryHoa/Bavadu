@@ -65,7 +65,7 @@ export default class SalesOrderB2CModel extends BaseModel<
         )}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
     // Get currency rate
-    const currency = input.currency ?? "USD";
+    const currency = input.currency ?? "VND";
     let currencyRate: number | undefined;
     try {
       const [currencyRecord] = await this.db
@@ -93,15 +93,6 @@ export default class SalesOrderB2CModel extends BaseModel<
     return this.db.transaction(async (tx) => {
       // Tự động tìm default price list nếu không có priceListId
       let finalPriceListId = input.priceListId;
-      if (!finalPriceListId) {
-        const defaultPriceList = await this.findDefaultPriceList();
-        if (defaultPriceList) {
-          finalPriceListId = defaultPriceList.id;
-        }
-        // Nếu không có default price list → finalPriceListId = null
-        // Order vẫn được tạo, nhưng không có price list
-        // Giá sẽ dùng product default price
-      }
 
       let subtotal = 0;
       let totalDiscount = input.totalDiscount ?? 0;

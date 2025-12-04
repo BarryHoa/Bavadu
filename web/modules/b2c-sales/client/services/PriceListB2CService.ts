@@ -76,34 +76,34 @@ export default class PriceListB2CService extends JsonRpcClientService {
       data: PriceListB2CDto[];
       total: number;
       message?: string;
-    }>("b2c-sales.price-list.list.getData", {});
+    }>("b2c-sales-price-list.list.getData", {});
   }
 
   getById(id: string) {
     return this.call<{
       data: PriceListB2CDto;
       message?: string;
-    }>("b2c-sales.price-list.curd.getById", { id });
+    }>("b2c-sales-price-list.curd.getById", { id });
   }
 
   create(payload: CreatePriceListB2CParams) {
     return this.call<{
       data: PriceListB2CDto;
       message?: string;
-    }>("b2c-sales.price-list.curd.create", payload);
+    }>("b2c-sales-price-list.curd.create", payload);
   }
 
   update(payload: UpdatePriceListB2CParams) {
     return this.call<{
       data: PriceListB2CDto;
       message?: string;
-    }>("b2c-sales.price-list.curd.update", payload);
+    }>("b2c-sales-price-list.curd.update", payload);
   }
 
   deleteById(id: string) {
     return this.call<{
       message?: string;
-    }>("b2c-sales.price-list.curd.delete", { id });
+    }>("b2c-sales-price-list.curd.delete", { id });
   }
 
   // For view list data table
@@ -118,7 +118,7 @@ export default class PriceListB2CService extends JsonRpcClientService {
       data: PriceListB2CDto[];
       total: number;
       message?: string;
-    }>("b2c-sales.price-list.list.getData", params);
+    }>("b2c-sales-price-list.list.getData", params);
   }
 
   // Get dropdown options using dropdown-options API
@@ -130,7 +130,7 @@ export default class PriceListB2CService extends JsonRpcClientService {
     sorts?: Array<{ column: string; direction: "ascending" | "descending" }>;
   }) {
     return dropdownOptionsService.getOptionsDropdown(
-      "b2c-sales.price-list.dropdown",
+      "b2c-sales-price-list.dropdown",
       params
     );
   }
