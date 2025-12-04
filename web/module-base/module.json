@@ -5,12 +5,13 @@
   "category": "System",
   "icon": "Package",
   "models": {
-    "user": "Users/UserModel",
-    "location": "Locations/LocationModel",
-    "payment-method.dropdown-list": "PaymentMethod/PaymentMethodDropdownListModel",
-    "payment-term.dropdown-list": "PaymentTerm/PaymentTermDropdownListModel",
-    "shipping-method.dropdown-list": "ShippingMethod/ShippingMethodDropdownListModel",
-    "shipping-term.dropdown-list": "ShippingTerm/ShippingTermDropdownListModel",
-    "tax-rate.dropdown-list": "TaxRate/TaxRateDropdownListModel"
+    "user.curd": "Users/UserModel",
+    "location.curd": "Locations/LocationModel",
+    "guideline.curd": "Guidelines/GuidelineModel",
+    "payment-method.dropdown": "PaymentMethod/PaymentMethodDropdownListModel",
+    "payment-term.dropdown": "PaymentTerm/PaymentTermDropdownListModel",
+    "shipping-method.dropdown": "ShippingMethod/ShippingMethodDropdownListModel",
+    "shipping-term.dropdown": "ShippingTerm/ShippingTermDropdownListModel",
+    "tax-rate.dropdown": "TaxRate/TaxRateDropdownListModel"
   }
 }

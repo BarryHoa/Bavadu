@@ -1,4 +1,4 @@
-import ClientHttpService from "@base/client/services/ClientHttpService";
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export interface SalesOrderB2CLineDto {
   id: string;
@@ -45,23 +45,23 @@ export interface SalesOrderB2CDto {
   createdBy?: string | null;
 }
 
-export default class SalesOrderB2CService extends ClientHttpService {
+export default class SalesOrderB2CService extends JsonRpcClientService {
   constructor() {
-    super("/api/modules/b2c-sales/orders");
+    super("/api/base/internal/json-rpc");
   }
 
   list() {
-    return this.get<{
+    return this.call<{
       data: SalesOrderB2CDto[];
       message?: string;
-    }>("/");
+    }>("b2c-sales.order.list.getData", {});
   }
 
   getById(id: string) {
-    return this.get<{
+    return this.call<{
       data: { order: SalesOrderB2CDto; lines: SalesOrderB2CLineDto[] };
       message?: string;
-    }>(`/detail?id=${id}`);
+    }>("b2c-sales.order.curd.getById", { id });
   }
 
   create(payload: {
@@ -92,10 +92,10 @@ export default class SalesOrderB2CService extends ClientHttpService {
       taxRate?: number;
     }>;
   }) {
-    return this.post<{
+    return this.call<{
       data: { order: SalesOrderB2CDto; lines: SalesOrderB2CLineDto[] };
       message?: string;
-    }>("/create", payload);
+    }>("b2c-sales.order.curd.create", payload);
   }
 
   update(payload: {
@@ -126,24 +126,24 @@ export default class SalesOrderB2CService extends ClientHttpService {
       taxRate?: number;
     }>;
   }) {
-    return this.put<{
+    return this.call<{
       data: { order: SalesOrderB2CDto; lines: SalesOrderB2CLineDto[] };
       message?: string;
-    }>("/update", payload);
+    }>("b2c-sales.order.curd.update", payload);
   }
 
   confirm(orderId: string) {
-    return this.post<{
+    return this.call<{
       data: SalesOrderB2CDto;
       message?: string;
-    }>("/confirm", { orderId });
+    }>("b2c-sales.order.curd.confirm", { orderId });
   }
 
   complete(orderId: string) {
-    return this.post<{
+    return this.call<{
       data: SalesOrderB2CDto;
       message?: string;
-    }>("/complete", { orderId });
+    }>("b2c-sales.order.curd.complete", { orderId });
   }
 }
 

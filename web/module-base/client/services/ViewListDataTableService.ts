@@ -1,21 +1,38 @@
 import { ListParamsResponse } from "@base/server/models/interfaces/ListInterface";
-import ClientHttpService from "./ClientHttpService";
+import JsonRpcClientService from "./JsonRpcClientService";
 
 type DataTableParams = {
   model: string;
   params: any;
 };
 
-class ViewListDataTableService extends ClientHttpService {
+/**
+ * Convert model name from module.json to base model ID for list operations
+ * Examples:
+ * - "product.view-list" -> "product"
+ * - "product" -> "product"
+ */
+function getBaseModelIdForList(modelId: string): string {
+  if (modelId.endsWith(".view-list")) {
+    return modelId.slice(0, -".view-list".length);
+  }
+  if (modelId.endsWith(".list")) {
+    return modelId.slice(0, -".list".length);
+  }
+  return modelId;
+}
+
+class ViewListDataTableService extends JsonRpcClientService {
   constructor() {
-    super("/api/base/view-list-data-table");
+    super("/api/base/internal/json-rpc");
   }
 
   getData = async (req: DataTableParams) => {
     try {
-      const response = await this.post<{ data: ListParamsResponse<any> }>(
-        `/data`,
-        req
+      const baseModelId = getBaseModelIdForList(req.model);
+      const response = await this.call<{ data: ListParamsResponse<any> }>(
+        `${baseModelId}.list.getData`,
+        req.params
       );
       return {
         data: response.data?.data,
@@ -28,24 +45,34 @@ class ViewListDataTableService extends ClientHttpService {
   };
 
   getFilter = async (req: DataTableParams) => {
-    return this.post<{ success: boolean; data: any[] }>(`/filter`, req);
+    const baseModelId = getBaseModelIdForList(req.model);
+    return this.call<{ success: boolean; data: any[] }>(
+      `${baseModelId}.list.getFilter`,
+      req.params
+    );
   };
 
   getFavoriteFilter = async (req: DataTableParams) => {
-    return this.post<{ success: boolean; data: any[] }>(
-      `/favorite-filter`,
-      req
+    const baseModelId = getBaseModelIdForList(req.model);
+    return this.call<{ success: boolean; data: any[] }>(
+      `${baseModelId}.list.getFavoriteFilter`,
+      req.params
     );
   };
 
   getGroupBy = async (req: DataTableParams) => {
-    return this.post<{ success: boolean; data: any[] }>(`/group-by`, req);
+    const baseModelId = getBaseModelIdForList(req.model);
+    return this.call<{ success: boolean; data: any[] }>(
+      `${baseModelId}.list.getGroupBy`,
+      req.params
+    );
   };
 
   updateFavoriteFilter = async (req: DataTableParams) => {
-    return this.post<{ success: boolean; data: any[] }>(
-      `/favorite-filter-update`,
-      req
+    const baseModelId = getBaseModelIdForList(req.model);
+    return this.call<{ success: boolean; data: any[] }>(
+      `${baseModelId}.list.updateFavoriteFilter`,
+      req.params
     );
   };
 }

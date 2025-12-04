@@ -1,4 +1,3 @@
-import ClientHttpService from "@base/client/services/ClientHttpService";
 import { dropdownOptionsService } from "@base/client/services/DropdownOptionsService";
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
 
@@ -14,13 +13,9 @@ export interface TaxRateDto {
   updatedAt?: string;
 }
 
-export default class TaxRateService extends ClientHttpService {
-  constructor() {
-    super("/api/base/master-data/tax-rates");
-  }
-
+export default class TaxRateService {
   getOptionsDropdown() {
-    return dropdownOptionsService.getOptionsDropdown("tax-rate.dropdown-list");
+    return dropdownOptionsService.getOptionsDropdown("tax-rate.dropdown");
   }
 }
 

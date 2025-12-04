@@ -1,4 +1,4 @@
-import ClientHttpService from "./ClientHttpService";
+import JsonRpcClientService from "./JsonRpcClientService";
 
 export interface GuidelineData {
   key: string;
@@ -12,10 +12,9 @@ export interface GuidelineResponse {
   message?: string;
 }
 
-class GuidelineService extends ClientHttpService {
+class GuidelineService extends JsonRpcClientService {
   constructor() {
-    const BASE_URL = "/api/base/guideline";
-    super(BASE_URL);
+    super("/api/base/internal/json-rpc");
   }
 
   /**
@@ -24,11 +23,9 @@ class GuidelineService extends ClientHttpService {
    * @returns Guideline content
    */
   async getByKey(key: string): Promise<string> {
-    const searchParams = new URLSearchParams();
-    searchParams.set("key", key);
-
-    const response = await this.get<GuidelineResponse>(
-      `/get-by-key?${searchParams.toString()}`
+    const response = await this.call<GuidelineResponse>(
+      "guideline.curd.getByKey",
+      { key }
     );
 
     return response.data?.content || "";
@@ -40,11 +37,9 @@ class GuidelineService extends ClientHttpService {
    * @returns Full guideline data including metadata
    */
   async getByKeyFull(key: string): Promise<GuidelineData | null> {
-    const searchParams = new URLSearchParams();
-    searchParams.set("key", key);
-
-    const response = await this.get<GuidelineResponse>(
-      `/get-by-key?${searchParams.toString()}`
+    const response = await this.call<GuidelineResponse>(
+      "guideline.curd.getByKey",
+      { key }
     );
 
     return response.data || null;

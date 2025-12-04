@@ -1,4 +1,4 @@
-import ClientHttpService from "@base/client/services/ClientHttpService";
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 import type { ProductCategoryRow } from "../interface/ProductCategory";
 
@@ -11,26 +11,26 @@ export type ProductCategoryPayload = {
   isActive?: boolean;
 };
 
-class ProductCategoryService extends ClientHttpService {
+class ProductCategoryService extends JsonRpcClientService {
   constructor() {
-    super("/api/modules/product/categories");
+    super("/api/base/internal/json-rpc");
   }
 
   async fetchTree(): Promise<ProductCategoryRow[]> {
-    const response = await this.get<{
+    const response = await this.call<{
       success: boolean;
       data: ProductCategoryRow[];
-    }>("/get-list");
+    }>("product.category.list.getData", {});
 
     const data = response.data;
     return Array.isArray(data) ? data : [];
   }
 
   async getById(id: string): Promise<ProductCategoryRow> {
-    const response = await this.get<{
+    const response = await this.call<{
       success: boolean;
       data: ProductCategoryRow;
-    }>(`/${id}`);
+    }>("product.category.curd.getById", { id });
 
     return response.data;
   }
@@ -38,10 +38,10 @@ class ProductCategoryService extends ClientHttpService {
   async createCategory(
     payload: ProductCategoryPayload
   ): Promise<ProductCategoryRow> {
-    const response = await this.post<{
+    const response = await this.call<{
       success: boolean;
       data: ProductCategoryRow;
-    }>("", payload);
+    }>("product.category.curd.create", payload);
 
     return response.data;
   }
@@ -50,10 +50,10 @@ class ProductCategoryService extends ClientHttpService {
     id: string,
     payload: ProductCategoryPayload
   ): Promise<ProductCategoryRow> {
-    const response = await this.patch<{
+    const response = await this.call<{
       success: boolean;
       data: ProductCategoryRow;
-    }>(`/${id}`, payload);
+    }>("product.category.curd.update", { id, ...payload });
 
     return response.data;
   }

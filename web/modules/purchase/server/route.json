@@ -1,13 +1,2 @@
-[
-  {
-    "group": "orders",
-    "routes": [
-      { "path": "/", "handler": "/orders/list" },
-      { "path": "/create", "handler": "/orders/create" },
-      { "path": "/detail", "handler": "/orders/get-by-id" },
-      { "path": "/confirm", "handler": "/orders/confirm" },
-      { "path": "/receive", "handler": "/orders/receive" }
-    ]
-  }
-]
+[]
 

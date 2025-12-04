@@ -1,5 +1,5 @@
 import { Address } from "@base/client/interface/Address";
-import ClientHttpService from "@base/client/services/ClientHttpService";
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export interface WarehouseDto {
   id: string;
@@ -56,39 +56,43 @@ type ApiResponse<T> = {
   message?: string;
 };
 
-class StockService extends ClientHttpService {
+class StockService extends JsonRpcClientService {
   constructor() {
-    super("/api/modules/stock");
+    super("/api/base/internal/json-rpc");
   }
 
   listWarehouses() {
-    return this.get<ApiResponse<WarehouseDto[]>>("/warehouses");
+    return this.call<ApiResponse<WarehouseDto[]>>(
+      "stock.warehouse.list.getData",
+      {}
+    );
   }
 
   createWarehouse(payload: WarehousePayload) {
-    return this.post<ApiResponse<WarehouseDto>>("/warehouses/create", payload);
+    return this.call<ApiResponse<WarehouseDto>>(
+      "stock.warehouse.curd.create",
+      payload
+    );
   }
 
   getWarehouseById(id: string) {
-    const searchParams = new URLSearchParams({ id });
-    return this.get<ApiResponse<WarehouseDto>>(
-      `/warehouses/detail?${searchParams.toString()}`
+    return this.call<ApiResponse<WarehouseDto>>(
+      "stock.warehouse.curd.getById",
+      { id }
     );
   }
 
   updateWarehouse(payload: WarehousePayload & { id: string }) {
-    return this.put<ApiResponse<WarehouseDto>>("/warehouses/update", payload);
+    return this.call<ApiResponse<WarehouseDto>>(
+      "stock.warehouse.curd.update",
+      payload
+    );
   }
 
   getStockSummary(params?: { productId?: string; warehouseId?: string }) {
-    const searchParams = new URLSearchParams();
-    if (params?.productId) searchParams.set("productId", params.productId);
-    if (params?.warehouseId)
-      searchParams.set("warehouseId", params.warehouseId);
-    const query = searchParams.toString();
-
-    return this.get<ApiResponse<StockSummaryItem[]>>(
-      `/stock/summary${query ? `?${query}` : ""}`
+    return this.call<ApiResponse<StockSummaryItem[]>>(
+      "stock.summary.list.getData",
+      params || {}
     );
   }
 
@@ -100,7 +104,7 @@ class StockService extends ClientHttpService {
     note?: string;
     userId?: string;
   }) {
-    return this.post<ApiResponse<boolean>>("/movements/adjust", payload);
+    return this.call<ApiResponse<boolean>>("stock.curd.adjust", payload);
   }
 
   receiveStock(payload: {
@@ -111,7 +115,7 @@ class StockService extends ClientHttpService {
     note?: string;
     userId?: string;
   }) {
-    return this.post<ApiResponse<boolean>>("/movements/inbound", payload);
+    return this.call<ApiResponse<boolean>>("stock.curd.inbound", payload);
   }
 
   issueStock(payload: {
@@ -122,7 +126,7 @@ class StockService extends ClientHttpService {
     note?: string;
     userId?: string;
   }) {
-    return this.post<ApiResponse<boolean>>("/movements/outbound", payload);
+    return this.call<ApiResponse<boolean>>("stock.curd.outbound", payload);
   }
 
   transferStock(payload: {
@@ -134,7 +138,7 @@ class StockService extends ClientHttpService {
     note?: string;
     userId?: string;
   }) {
-    return this.post<ApiResponse<boolean>>("/movements/transfer", payload);
+    return this.call<ApiResponse<boolean>>("stock.curd.transfer", payload);
   }
 }
 

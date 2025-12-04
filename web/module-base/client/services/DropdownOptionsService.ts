@@ -1,4 +1,4 @@
-import ClientHttpService from "./ClientHttpService";
+import JsonRpcClientService from "./JsonRpcClientService";
 
 export interface DropdownOption {
   label: string;
@@ -20,27 +20,54 @@ export interface DropdownOptionsResponse {
   message?: string;
 }
 
-class DropdownOptionsService extends ClientHttpService {
+/**
+ * Convert model name from module.json to base model ID
+ * Examples:
+ * - "product.dropdown-list" -> "product"
+ * - "product.view-list" -> "product"
+ * - "product" -> "product"
+ */
+function getBaseModelId(modelId: string): string {
+  if (modelId.endsWith(".view-list")) {
+    return modelId.slice(0, -".view-list".length);
+  }
+  if (modelId.endsWith(".dropdown-list")) {
+    return modelId.slice(0, -".dropdown-list".length);
+  }
+  return modelId;
+}
+
+class DropdownOptionsService extends JsonRpcClientService {
   constructor() {
-    super("/api/base/dropdown-options");
+    super("/api/base/internal/json-rpc");
   }
 
+  /**
+   * Get dropdown options using JSON-RPC
+   * Format: <base-model-id>.dropdown.getData
+   * 
+   * @param model - Model name from module.json (e.g., "product.dropdown-list", "product")
+   *                Will automatically convert to base model ID and use dropdown sub-type
+   * @param params - Query parameters
+   */
   getOptionsDropdown = async (
     model: string,
     params?: DropdownOptionsParams
   ): Promise<DropdownOptionsResponse> => {
-    const response = await this.post<{
-      status: number;
-      data: DropdownOptionsResponse;
-      message?: string;
-    }>("/", {
-      model,
-      params: params ?? {},
-    });
-    return response.data;
+    // Convert model name to base model ID
+    // Example: "product.dropdown-list" -> "product"
+    const baseModelId = getBaseModelId(model);
+    
+    // Use new format: <base-model-id>.dropdown.getData
+    const method = `${baseModelId}.dropdown.getData`;
+    
+    const result = await this.call<DropdownOptionsResponse>(
+      method,
+      params ?? {}
+    );
+    return result;
   };
 }
 
 export default DropdownOptionsService;
 export const dropdownOptionsService = new DropdownOptionsService();
-

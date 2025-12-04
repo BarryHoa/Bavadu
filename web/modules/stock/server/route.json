@@ -1,25 +1,2 @@
-[
-  {
-    "group": "warehouses",
-    "routes": [
-      { "path": "/", "handler": "/warehouses/list" },
-      { "path": "/create", "handler": "/warehouses/create" },
-      { "path": "/detail", "handler": "/warehouses/get-by-id" },
-      { "path": "/update", "handler": "/warehouses/update" }
-    ]
-  },
-  {
-    "group": "movements",
-    "routes": [
-      { "path": "/adjust", "handler": "/movements/adjust" },
-      { "path": "/inbound", "handler": "/movements/inbound" },
-      { "path": "/outbound", "handler": "/movements/outbound" },
-      { "path": "/transfer", "handler": "/movements/transfer" }
-    ]
-  },
-  {
-    "group": "stock",
-    "routes": []
-  }
-]
+[]
 

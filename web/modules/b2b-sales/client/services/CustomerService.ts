@@ -1,4 +1,4 @@
-import ClientHttpService from "@base/client/services/ClientHttpService";
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export interface CustomerCompanyDto {
   id: string;
@@ -38,24 +38,24 @@ export interface CustomerIndividualDto {
   updatedBy?: string | null;
 }
 
-export default class CustomerService extends ClientHttpService {
+export default class CustomerService extends JsonRpcClientService {
   constructor() {
-    super("/api/modules/b2b-sales/customers");
+    super("/api/base/internal/json-rpc");
   }
 
   // Company methods
   listCompanies() {
-    return this.get<{
+    return this.call<{
       data: CustomerCompanyDto[];
       message?: string;
-    }>("/companies");
+    }>("b2b-sales.customer.company.list.getData", {});
   }
 
   getCompanyById(id: string) {
-    return this.get<{
+    return this.call<{
       data: CustomerCompanyDto;
       message?: string;
-    }>(`/companies/detail?id=${id}`);
+    }>("b2b-sales.customer.curd.getById", { id });
   }
 
   createCompany(payload: {
@@ -73,10 +73,10 @@ export default class CustomerService extends ClientHttpService {
     notes?: string;
     userId?: string;
   }) {
-    return this.post<{
+    return this.call<{
       data: CustomerCompanyDto;
       message?: string;
-    }>("/companies/create", payload);
+    }>("b2b-sales.customer.curd.create", payload);
   }
 
   updateCompany(payload: {
@@ -95,25 +95,25 @@ export default class CustomerService extends ClientHttpService {
     notes?: string;
     userId?: string;
   }) {
-    return this.put<{
+    return this.call<{
       data: CustomerCompanyDto;
       message?: string;
-    }>("/companies/update", payload);
+    }>("b2b-sales.customer.curd.update", payload);
   }
 
-  // Individual methods
+  // Individual methods (not used in B2B but kept for consistency)
   listIndividuals() {
-    return this.get<{
+    return this.call<{
       data: CustomerIndividualDto[];
       message?: string;
-    }>("/individuals");
+    }>("b2b-sales.customer.curd.list", {});
   }
 
   getIndividualById(id: string) {
-    return this.get<{
+    return this.call<{
       data: CustomerIndividualDto;
       message?: string;
-    }>(`/individuals/detail?id=${id}`);
+    }>("b2b-sales.customer.curd.getById", { id });
   }
 
   createIndividual(payload: {
@@ -129,10 +129,10 @@ export default class CustomerService extends ClientHttpService {
     notes?: string;
     userId?: string;
   }) {
-    return this.post<{
+    return this.call<{
       data: CustomerIndividualDto;
       message?: string;
-    }>("/individuals/create", payload);
+    }>("b2b-sales.customer.curd.create", payload);
   }
 
   updateIndividual(payload: {
@@ -149,10 +149,10 @@ export default class CustomerService extends ClientHttpService {
     notes?: string;
     userId?: string;
   }) {
-    return this.put<{
+    return this.call<{
       data: CustomerIndividualDto;
       message?: string;
-    }>("/individuals/update", payload);
+    }>("b2b-sales.customer.curd.update", payload);
   }
 }
 

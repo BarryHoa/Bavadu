@@ -1,4 +1,4 @@
-import ClientHttpService from "./ClientHttpService";
+import JsonRpcClientService from "./JsonRpcClientService";
 
 interface AdministrativeUnit {
   id: string;
@@ -26,15 +26,15 @@ interface Country {
   updatedBy?: string | null;
 }
 
-class LocationService extends ClientHttpService {
+class LocationService extends JsonRpcClientService {
   constructor() {
-    const BASE_URL = "/api/base/location";
-    super(BASE_URL);
+    super("/api/base/internal/json-rpc");
   }
 
   async getCountries() {
-    return this.get<{ success: boolean; data: Country[]; message: string }>(
-      "/countries"
+    return this.call<{ success: boolean; data: Country[]; message: string }>(
+      "location.curd.getCountries",
+      {}
     );
   }
 
@@ -45,32 +45,25 @@ class LocationService extends ClientHttpService {
       level?: number;
     }
   ) {
-    const searchParams = new URLSearchParams();
-    searchParams.set("countryCode", countryCode);
-    if (params?.parentId !== undefined) {
-      searchParams.set("parentId", params.parentId || "");
-    }
-    if (params?.level) {
-      searchParams.set("level", params.level.toString());
-    }
-
-    return this.get<{
+    return this.call<{
       success: boolean;
       data: AdministrativeUnit[];
       message: string;
-    }>(`/by-country-code?${searchParams.toString()}`);
+    }>("location.curd.getLocationByCountryCode", {
+      countryCode,
+      ...params,
+    });
   }
 
   async getLocationBy(parentId: string, type: string) {
-    const searchParams = new URLSearchParams();
-    searchParams.set("parentId", parentId);
-    searchParams.set("type", type);
-
-    return this.get<{
+    return this.call<{
       success: boolean;
       data: AdministrativeUnit[];
       message: string;
-    }>(`/by?${searchParams.toString()}`);
+    }>("location.curd.getLocationBy", {
+      parentId,
+      type,
+    });
   }
 }
 

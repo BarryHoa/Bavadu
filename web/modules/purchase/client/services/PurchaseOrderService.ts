@@ -1,4 +1,4 @@
-import ClientHttpService from "@base/client/services/ClientHttpService";
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export interface PurchaseOrderLineDto {
   id: string;
@@ -25,23 +25,23 @@ export interface PurchaseOrderDto {
   updatedAt?: string;
 }
 
-export default class PurchaseOrderService extends ClientHttpService {
+export default class PurchaseOrderService extends JsonRpcClientService {
   constructor() {
-    super("/api/modules/purchase/orders");
+    super("/api/base/internal/json-rpc");
   }
 
   list() {
-    return this.get<{
+    return this.call<{
       data: PurchaseOrderDto[];
       message?: string;
-    }>("/");
+    }>("purchase.order.list.getData", {});
   }
 
   getById(id: string) {
-    return this.get<{
+    return this.call<{
       data: { order: PurchaseOrderDto; lines: PurchaseOrderLineDto[] };
       message?: string;
-    }>(`/detail?id=${id}`);
+    }>("purchase.order.curd.getById", { id });
   }
 
   create(payload: {
@@ -58,17 +58,17 @@ export default class PurchaseOrderService extends ClientHttpService {
       description?: string;
     }>;
   }) {
-    return this.post<{
+    return this.call<{
       data: { order: PurchaseOrderDto; lines: PurchaseOrderLineDto[] };
       message?: string;
-    }>("/create", payload);
+    }>("purchase.order.curd.create", payload);
   }
 
   confirm(orderId: string) {
-    return this.post<{
+    return this.call<{
       data: PurchaseOrderDto;
       message?: string;
-    }>("/confirm", { orderId });
+    }>("purchase.order.curd.confirm", { orderId });
   }
 
   receive(payload: {
@@ -79,10 +79,10 @@ export default class PurchaseOrderService extends ClientHttpService {
     userId?: string;
     lines: Array<{ lineId: string; quantity: number }>;
   }) {
-    return this.post<{
+    return this.call<{
       data: { order: PurchaseOrderDto; lines: PurchaseOrderLineDto[] };
       message?: string;
-    }>("/receive", payload);
+    }>("purchase.order.curd.receive", payload);
   }
 }
 

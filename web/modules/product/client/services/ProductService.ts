@@ -1,4 +1,4 @@
-import ClientHttpService from "@base/client/services/ClientHttpService";
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
 
 import type { SelectItemOption } from "@base/client/components";
@@ -44,47 +44,57 @@ export type OptionalFieldsResponse = {
   data: OptionalFieldDefinition[];
 };
 
-class ProductService extends ClientHttpService {
+class ProductService extends JsonRpcClientService {
   constructor() {
-    const BASE_URL = "/api/modules/product";
-    super(BASE_URL);
+    super("/api/base/internal/json-rpc");
   }
 
   async getProductList(params: any) {
-    // POST to fetch list of products
-    return this.post<{ data: any[] }>(`/`, params);
+    return this.call<{ data: any[] }>(
+      "product.list.getData",
+      params
+    );
   }
 
   async getProductById(id: string) {
-    // GET to fetch product by ID
-    return this.get<{ data: ProductDetail }>(`/${id}`);
+    return this.call<{ data: ProductDetail }>(
+      "product.curd.getById",
+      { id }
+    );
   }
 
   async createProduct(payload: ProductFormPayload) {
-    return this.post<{ data: ProductDetail }>(
-      `/create`,
+    return this.call<{ data: ProductDetail }>(
+      "product.curd.create",
       payload
     );
   }
 
   async updateProduct(id: string, payload: ProductFormUpdatePayload) {
-    return this.patch<{ data: ProductDetail }>(
-      `/${id}`,
-      payload
+    return this.call<{ data: ProductDetail }>(
+      "product.curd.update",
+      { id, ...payload }
     );
   }
 
   async getProductTypes() {
-    return this.get<ProductTypesResponse>(`/types`);
+    return this.call<ProductTypesResponse>(
+      "product.curd.getProductTypes",
+      {}
+    );
   }
 
   async getProductFeatures() {
-    return this.get<ProductFeaturesResponse>(`/features`);
+    return this.call<ProductFeaturesResponse>(
+      "product.curd.getProductFeatures",
+      {}
+    );
   }
 
   async getOptionalFieldsByProductType(type: string) {
-    return this.get<OptionalFieldsResponse>(
-      `/optional-fields?type=${encodeURIComponent(type)}`
+    return this.call<OptionalFieldsResponse>(
+      "product.curd.getOptionalFieldsByProductType",
+      { type }
     );
   }
 }

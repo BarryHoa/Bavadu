@@ -1,4 +1,3 @@
-import ClientHttpService from "@base/client/services/ClientHttpService";
 import { dropdownOptionsService } from "@base/client/services/DropdownOptionsService";
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
 
@@ -13,14 +12,10 @@ export interface ShippingTermDto {
   updatedAt?: string;
 }
 
-export default class ShippingTermService extends ClientHttpService {
-  constructor() {
-    super("/api/base/master-data/shipping-terms");
-  }
-
+export default class ShippingTermService {
   getOptionsDropdown() {
     return dropdownOptionsService.getOptionsDropdown(
-      "shipping-term.dropdown-list"
+      "shipping-term.dropdown"
     );
   }
 }

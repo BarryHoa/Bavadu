@@ -1,4 +1,4 @@
-import ClientHttpService from "@base/client/services/ClientHttpService";
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export interface SalesOrderB2BLineDto {
   id: string;
@@ -47,23 +47,23 @@ export interface SalesOrderB2BDto {
   createdBy?: string | null;
 }
 
-export default class SalesOrderB2BService extends ClientHttpService {
+export default class SalesOrderB2BService extends JsonRpcClientService {
   constructor() {
-    super("/api/modules/b2b-sales/orders");
+    super("/api/base/internal/json-rpc");
   }
 
   list() {
-    return this.get<{
+    return this.call<{
       data: SalesOrderB2BDto[];
       message?: string;
-    }>("/");
+    }>("b2b-sales.order.list.getData", {});
   }
 
   getById(id: string) {
-    return this.get<{
+    return this.call<{
       data: { order: SalesOrderB2BDto; lines: SalesOrderB2BLineDto[] };
       message?: string;
-    }>(`/detail?id=${id}`);
+    }>("b2b-sales.order.curd.getById", { id });
   }
 
   create(payload: {
@@ -96,10 +96,10 @@ export default class SalesOrderB2BService extends ClientHttpService {
       taxRate?: number;
     }>;
   }) {
-    return this.post<{
+    return this.call<{
       data: { order: SalesOrderB2BDto; lines: SalesOrderB2BLineDto[] };
       message?: string;
-    }>("/create", payload);
+    }>("b2b-sales.order.curd.create", payload);
   }
 
   update(payload: {
@@ -133,17 +133,17 @@ export default class SalesOrderB2BService extends ClientHttpService {
       taxRate?: number;
     }>;
   }) {
-    return this.put<{
+    return this.call<{
       data: { order: SalesOrderB2BDto; lines: SalesOrderB2BLineDto[] };
       message?: string;
-    }>("/update", payload);
+    }>("b2b-sales.order.curd.update", payload);
   }
 
   send(orderId: string) {
-    return this.post<{
+    return this.call<{
       data: SalesOrderB2BDto;
       message?: string;
-    }>("/send", { orderId });
+    }>("b2b-sales.order.curd.send", { orderId });
   }
 
   deliver(payload: {
@@ -154,10 +154,10 @@ export default class SalesOrderB2BService extends ClientHttpService {
     userId?: string;
     lines: Array<{ lineId: string; quantity: number }>;
   }) {
-    return this.post<{
+    return this.call<{
       data: { order: SalesOrderB2BDto; lines: SalesOrderB2BLineDto[] };
       message?: string;
-    }>("/deliver", payload);
+    }>("b2b-sales.order.curd.deliver", payload);
   }
 }
 

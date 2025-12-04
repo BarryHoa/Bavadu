@@ -1,5 +1,5 @@
 import { dropdownOptionsService } from "@base/client/services";
-import ClientHttpService from "@base/client/services/ClientHttpService";
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export interface PriceListB2CDto {
   id: string;
@@ -66,44 +66,44 @@ export interface UpdatePriceListB2CParams {
   };
 }
 
-export default class PriceListB2CService extends ClientHttpService {
+export default class PriceListB2CService extends JsonRpcClientService {
   constructor() {
-    super("/api/b2c-sales/price-lists");
+    super("/api/base/internal/json-rpc");
   }
 
   list() {
-    return this.get<{
+    return this.call<{
       data: PriceListB2CDto[];
       total: number;
       message?: string;
-    }>("/");
+    }>("b2c-sales.price-list.list.getData", {});
   }
 
   getById(id: string) {
-    return this.get<{
+    return this.call<{
       data: PriceListB2CDto;
       message?: string;
-    }>(`/detail?id=${id}`);
+    }>("b2c-sales.price-list.curd.getById", { id });
   }
 
   create(payload: CreatePriceListB2CParams) {
-    return this.post<{
+    return this.call<{
       data: PriceListB2CDto;
       message?: string;
-    }>("/create", payload);
+    }>("b2c-sales.price-list.curd.create", payload);
   }
 
   update(payload: UpdatePriceListB2CParams) {
-    return this.put<{
+    return this.call<{
       data: PriceListB2CDto;
       message?: string;
-    }>("/update", payload);
+    }>("b2c-sales.price-list.curd.update", payload);
   }
 
   deleteById(id: string) {
-    return this.delete<{
+    return this.call<{
       message?: string;
-    }>(`/delete?id=${id}`);
+    }>("b2c-sales.price-list.curd.delete", { id });
   }
 
   // For view list data table
@@ -114,11 +114,11 @@ export default class PriceListB2CService extends ClientHttpService {
     filters?: Record<string, any>;
     sorts?: Array<{ column: string; direction: "ascending" | "descending" }>;
   }) {
-    return this.post<{
+    return this.call<{
       data: PriceListB2CDto[];
       total: number;
       message?: string;
-    }>("/", { params });
+    }>("b2c-sales.price-list.list.getData", params);
   }
 
   // Get dropdown options using dropdown-options API
@@ -130,7 +130,7 @@ export default class PriceListB2CService extends ClientHttpService {
     sorts?: Array<{ column: string; direction: "ascending" | "descending" }>;
   }) {
     return dropdownOptionsService.getOptionsDropdown(
-      "b2c-sales.price-list.dropdown-list",
+      "b2c-sales.price-list.dropdown",
       params
     );
   }

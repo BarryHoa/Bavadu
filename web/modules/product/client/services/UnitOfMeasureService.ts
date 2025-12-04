@@ -1,4 +1,4 @@
-import ClientHttpService from "@base/client/services/ClientHttpService";
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export type UnitOfMeasureOption = {
   id: string;
@@ -7,13 +7,16 @@ export type UnitOfMeasureOption = {
   isActive?: boolean;
 };
 
-class UnitOfMeasureService extends ClientHttpService {
+class UnitOfMeasureService extends JsonRpcClientService {
   constructor() {
-    super("/api/modules/product/uom");
+    super("/api/base/internal/json-rpc");
   }
 
   async getList() {
-    return this.get<{ success: boolean; data: UnitOfMeasureOption[] }>("/");
+    return this.call<{ success: boolean; data: UnitOfMeasureOption[] }>(
+      "product.curd.getUomList",
+      {}
+    );
   }
 }
 

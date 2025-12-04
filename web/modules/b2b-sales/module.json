@@ -6,11 +6,11 @@
   "category": "Operations",
   "icon": "Building2",
   "models": {
-    "b2b-sales.order": "Sale/SalesOrderB2BModel",
-    "b2b-sales.order.view-list": "Sale/SalesOrderB2BViewListModel",
-    "b2b-sales.customer": "Customer/CustomerModel",
-    "b2b-sales.customer.company.view-list": "Customer/CustomerCompanyViewListModel",
-    "b2b-sales.delivery": "Delivery/DeliveryModel",
-    "b2b-sales.delivery.view-list": "Delivery/DeliveryViewListModel"
+    "b2b-sales.order.curd": "Sale/SalesOrderB2BModel",
+    "b2b-sales.order.list": "Sale/SalesOrderB2BViewListModel",
+    "b2b-sales.customer.curd": "Customer/CustomerModel",
+    "b2b-sales.customer.company.list": "Customer/CustomerCompanyViewListModel",
+    "b2b-sales.delivery.curd": "Delivery/DeliveryModel",
+    "b2b-sales.delivery.list": "Delivery/DeliveryViewListModel"
   }
 }

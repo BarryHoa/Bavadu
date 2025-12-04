@@ -1,4 +1,4 @@
-import ClientHttpService from "./ClientHttpService";
+import JsonRpcClientService from "./JsonRpcClientService";
 
 export interface NewsItem {
   id: string;
@@ -27,10 +27,9 @@ export interface NewsListResponse {
   message?: string;
 }
 
-class NewsService extends ClientHttpService {
+class NewsService extends JsonRpcClientService {
   constructor() {
-    const BASE_URL = "/api/base/news";
-    super(BASE_URL);
+    super("/api/base/internal/json-rpc");
   }
 
   /**
@@ -40,15 +39,10 @@ class NewsService extends ClientHttpService {
    * @returns News list with pagination info
    */
   async getList(limit: number = 12, offset: number = 0): Promise<NewsListResponse> {
-    const searchParams = new URLSearchParams();
-    searchParams.set("limit", limit.toString());
-    searchParams.set("offset", offset.toString());
-
-    const response = await this.get<NewsListResponse>(
-      `?${searchParams.toString()}`
-    );
-
-    return response;
+    return this.call<NewsListResponse>("news.curd.getList", {
+      limit,
+      offset,
+    });
   }
 }
 

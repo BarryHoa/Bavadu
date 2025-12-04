@@ -6,10 +6,10 @@
   "category": "Business",
   "icon": "Package",
   "models": {
-    "product": "Product/ProductModel",
-    "product.category": "ProductCategory/ProductCategoryModel",
-    "product.view-list": "Product/ProductViewListModel",
-    "product.dropdown-list": "Product/ProductDropdownListModel",
-    "product.category.view-list": "ProductCategory/ProductCategoryViewListModel"
+    "product.curd": "Product/ProductModel",
+    "product.list": "Product/ProductViewListModel",
+    "product.dropdown": "Product/ProductDropdownListModel",
+    "product.category.curd": "ProductCategory/ProductCategoryModel",
+    "product.category.list": "ProductCategory/ProductCategoryViewListModel"
   }
 }

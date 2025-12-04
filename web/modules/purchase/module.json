@@ -6,7 +6,7 @@
   "category": "Operations",
   "icon": "ShoppingCart",
   "models": {
-    "purchase.order": "Purchase/PurchaseOrderModel",
-    "purchase.order.view-list": "Purchase/PurchaseOrderViewListModel"
+    "purchase.order.curd": "Purchase/PurchaseOrderModel",
+    "purchase.order.list": "Purchase/PurchaseOrderViewListModel"
   }
 }

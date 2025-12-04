@@ -6,9 +6,9 @@
   "category": "Operations",
   "icon": "Boxes",
   "models": {
-    "stock": "Stock/StockModel",
-    "stock.warehouse": "Warehouse/WarehouseModel",
-    "stock.warehouse.view-list": "Warehouse/WarehouseViewListModel",
-    "stock.summary.view-list": "Stock/StockSummaryViewListModel"
+    "stock.curd": "Stock/StockModel",
+    "stock.warehouse.curd": "Warehouse/WarehouseModel",
+    "stock.warehouse.list": "Warehouse/WarehouseViewListModel",
+    "stock.summary.list": "Stock/StockSummaryViewListModel"
   }
 }

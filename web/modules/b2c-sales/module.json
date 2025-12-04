@@ -6,13 +6,14 @@
   "category": "Operations",
   "icon": "User",
   "models": {
-    "b2c-sales.order": "Sale/SalesOrderB2CModel",
-    "b2c-sales.order.view-list": "Sale/SalesOrderB2CViewListModel",
-    "b2c-sales.customer": "Customer/CustomerModel",
-    "b2c-sales.customer.individual.view-list": "Customer/CustomerIndividualViewListModel",
-    "b2c-sales.delivery": "Delivery/DeliveryModel",
-    "b2c-sales.delivery.view-list": "Delivery/DeliveryViewListModel",
-    "b2c-sales.price-list.view-list": "PriceList/PriceListB2CViewListModel",
-    "b2c-sales.price-list.dropdown-list": "PriceList/PriceListB2CDropdownListModel"
+    "b2c-sales.order.curd": "Sale/SalesOrderB2CModel",
+    "b2c-sales.order.list": "Sale/SalesOrderB2CViewListModel",
+    "b2c-sales.customer.curd": "Customer/CustomerModel",
+    "b2c-sales.customer.individual.list": "Customer/CustomerIndividualViewListModel",
+    "b2c-sales.delivery.curd": "Delivery/DeliveryModel",
+    "b2c-sales.delivery.list": "Delivery/DeliveryViewListModel",
+    "b2c-sales.price-list.curd": "PriceList/PriceListB2CModel",
+    "b2c-sales.price-list.list": "PriceList/PriceListB2CViewListModel",
+    "b2c-sales.price-list.dropdown": "PriceList/PriceListB2CDropdownListModel"
   }
 }

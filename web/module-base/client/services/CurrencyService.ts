@@ -1,4 +1,4 @@
-import ClientHttpService from "./ClientHttpService";
+import JsonRpcClientService from "./JsonRpcClientService";
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
 
 export interface Currency {
@@ -38,10 +38,9 @@ export interface ExchangeRateResponse {
   error?: string;
 }
 
-class CurrencyService extends ClientHttpService {
+class CurrencyService extends JsonRpcClientService {
   constructor() {
-    const BASE_URL = "/api/base/currency";
-    super(BASE_URL);
+    super("/api/base/internal/json-rpc");
   }
 
   /**
@@ -49,8 +48,7 @@ class CurrencyService extends ClientHttpService {
    * @returns List of currencies with exchange rates
    */
   async getList(): Promise<CurrencyListResponse> {
-    const response = await this.get<CurrencyListResponse>("/");
-    return response;
+    return this.call<CurrencyListResponse>("currency.curd.getList", {});
   }
 
   /**
@@ -64,18 +62,10 @@ class CurrencyService extends ClientHttpService {
     currencyId?: string;
     currencyCode?: string;
   }): Promise<ExchangeRateResponse> {
-    const searchParams = new URLSearchParams();
-    if (options?.currencyId) {
-      searchParams.set("currencyId", options.currencyId);
-    }
-    if (options?.currencyCode) {
-      searchParams.set("currencyCode", options.currencyCode);
-    }
-
-    const queryString = searchParams.toString();
-    const url = queryString ? `/latest-rate?${queryString}` : "/latest-rate";
-
-    return this.get<ExchangeRateResponse>(url);
+    return this.call<ExchangeRateResponse>(
+      "currency.curd.getLatestRate",
+      options || {}
+    );
   }
 }
 

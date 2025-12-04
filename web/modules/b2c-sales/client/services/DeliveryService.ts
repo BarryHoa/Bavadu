@@ -1,4 +1,4 @@
-import ClientHttpService from "@base/client/services/ClientHttpService";
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export interface DeliveryDto {
   id: string;
@@ -14,9 +14,9 @@ export interface DeliveryDto {
   createdBy?: string | null;
 }
 
-export default class DeliveryService extends ClientHttpService {
+export default class DeliveryService extends JsonRpcClientService {
   constructor() {
-    super("/api/modules/b2c-sales/deliveries");
+    super("/api/base/internal/json-rpc");
   }
 
   createFromOrder(payload: {
@@ -32,10 +32,10 @@ export default class DeliveryService extends ClientHttpService {
       quantity: number;
     }>;
   }) {
-    return this.post<{
+    return this.call<{
       data: DeliveryDto;
       message?: string;
-    }>("/create", payload);
+    }>("b2c-sales.delivery.curd.create", payload);
   }
 }
 

@@ -8,3 +8,5 @@ export * from "./TaxRateService";
 // Dropdown Options Service
 export * from "./DropdownOptionsService";
 
+// JSON-RPC Client Service
+export * from "./JsonRpcClientService";
