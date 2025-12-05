@@ -93,6 +93,7 @@ export function useViewListDataTableQueries<T = any>({
     sort?: SortDescriptor;
   }) => {
     setParams(next);
+    console.log("onChangeTable", next);
     // Mỗi lần change table là gọi API mới
     fetchMutation.mutate();
   };

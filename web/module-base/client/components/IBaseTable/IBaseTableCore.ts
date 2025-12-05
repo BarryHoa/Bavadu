@@ -502,11 +502,14 @@ export function useIBaseTableCore<T = any>(
         const page = newPagination.pageIndex + 1;
         const pageSize = newPagination.pageSize;
 
-        console.log("newPagination", newPagination);
-        console.log("page", page);
-        console.log("pageSize", pageSize);
-        console.log("currentSort", currentSort);
-
+        if (onChangeTable ) {
+          onChangeTable({
+            page: page,
+            pageSize: pageSize,
+            sort: currentSort ?? undefined,
+          });
+        }
+    
         // Also call onPaginationChange if provided (IBaseTable style)
         return newPagination;
         
@@ -517,22 +520,21 @@ export function useIBaseTableCore<T = any>(
 
   const handleSortingChange = useCallback(
     (updater: any) => {
+      console.log("handleSortingChange", updater);
       setSortingState((prev) => {
         const newSorting =
           typeof updater === "function" ? updater(prev) : updater;
 
         const sortDescriptor = convertFromTanStackSorting(newSorting);
         setCurrentSort(sortDescriptor);
-
-        // Call onChangeTable if provided (DataTable style)
-        if (onChangeTable && pagination && typeof pagination === "object") {
+        if (onChangeTable) {
           onChangeTable({
-            page: pagination.page ?? 1,
-            pageSize: pagination.pageSize ?? 10,
+            page: 0,
+            pageSize: paginationState.pageSize,
             sort: sortDescriptor ?? undefined,
           });
         }
-
+      
         return newSorting;
       });
     },
@@ -612,8 +614,6 @@ export function useIBaseTableCore<T = any>(
   // Memoize state object to prevent unnecessary re-renders
   const tableState = useMemo(
     () => ({
-      pagination: paginationState,
-      sorting: sortingState,
       rowSelection: rowSelectionState,
       columnPinning: columnPinningState,
       columnSizing: enableColumnResizing ? columnSizingState : {},
