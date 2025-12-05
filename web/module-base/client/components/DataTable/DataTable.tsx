@@ -1,31 +1,26 @@
 "use client";
 
 import { RefreshCw } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo } from "react";
 
-import type {
-  IBaseTableCoreColumn,
-  IBaseTableCoreProps,
-} from "@base/client/components";
+import type { IBaseTableCoreColumn } from "@base/client/components";
 import { IBaseTooltip } from "@base/client/components";
 import { useIBaseTableCore } from "@base/client/components/IBaseTable/IBaseTableCore";
 import IBaseTableUI from "@base/client/components/IBaseTable/IBaseTableUI";
 import type { Selection } from "@heroui/react";
 import type { TableProps } from "@heroui/table";
-import type { SortDescriptor } from "@react-types/shared";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import PaginationComponent from "../Pagination/Pagination";
 import {
-  PAGINATION_DEFAULT_PAGE_SIZE,
-  PAGINATION_PAGE_SIZE_OPTIONS,
+  PAGINATION_DEFAULT_PAGE_SIZE
 } from "../Pagination/paginationConsts";
 import {
   DATA_TABLE_COLUMN_KEY_ROW_NUMBER,
-  type DataTablePagination,
   type DataTableProps,
 } from "./DataTableInterface";
 import useColumns from "./hooks/useColumns";
+import { useDataTablePagination } from "./hooks/useDataTablePagination";
 
 export default function DataTable<T = any>({
   columns,
@@ -49,36 +44,7 @@ export default function DataTable<T = any>({
 }: DataTableProps<T>) {
   const t = useTranslations("dataTable");
 
-  // Pagination setup
-  const isPaginationEnabled = pagination && typeof pagination === "object";
-  const total = Math.max(0, typeof totalProps === "number" ? totalProps : 0);
-  const paginationConfig = isPaginationEnabled
-    ? (pagination as DataTablePagination)
-    : undefined;
-
-  const paginationDefault = useMemo(() => {
-    if (!isPaginationEnabled) {
-      return {
-        page: 1,
-        pageSize: PAGINATION_DEFAULT_PAGE_SIZE,
-        pageSizeOptions: PAGINATION_PAGE_SIZE_OPTIONS,
-      };
-    }
-
-    return {
-      page: paginationConfig?.page ?? 1,
-      pageSize: paginationConfig?.pageSize ?? PAGINATION_DEFAULT_PAGE_SIZE,
-      pageSizeOptions:
-        paginationConfig?.pageSizeOptions ?? PAGINATION_PAGE_SIZE_OPTIONS,
-    };
-  }, [isPaginationEnabled, paginationConfig]);
-
   const processedColumns = useColumns(columns);
-
-  // Track initial sorting for onChangeTable callback
-  const [initialSort, setInitialSort] = useState<SortDescriptor | undefined>(
-    undefined
-  );
 
   // Convert ProcessedDataTableColumn to IBaseTableCoreColumn
   const iBaseTableColumns = useMemo<IBaseTableCoreColumn<T>[]>(() => {
@@ -110,165 +76,47 @@ export default function DataTable<T = any>({
     }));
   }, [processedColumns]);
 
-  // Core table logic using useIBaseTableCore
-  const coreProps: IBaseTableCoreProps<T> = useMemo(
-    () => ({
-      data: dataSource,
-      columns: iBaseTableColumns,
-      rowKey,
-      pagination: isPaginationEnabled
-        ? {
-            page: paginationConfig?.page ?? 1,
-            pageSize:
-              paginationConfig?.pageSize ?? PAGINATION_DEFAULT_PAGE_SIZE,
-            total,
-          }
-        : false,
-      manualPagination: true,
-      sorting: initialSort,
-      manualSorting: true,
-      rowSelection:
-        rowSelection === false
-          ? false
-          : {
-              type: rowSelection?.type || "multiple",
-              selectedRowKeys: rowSelection?.selectedRowKeys,
-              onChange: rowSelection?.onChange,
-            },
-      enableColumnResizing: isResizableColumns,
-      enableColumnPinning: true,
-      enableColumnOrdering: isDraggableColumns,
-      onPaginationChange: (page, pageSize) => {
-        if (onChangeTable) {
-          onChangeTable({
-            page,
-            pageSize,
-            sort: initialSort,
-          });
+  // Core table logic - all logic is now in useIBaseTableCore
+  const core = useIBaseTableCore<T>({
+    data: dataSource,
+    columns: iBaseTableColumns,
+    rowKey,
+    pagination: pagination && typeof pagination === "object"
+      ? {
+          page: pagination.page ?? 1,
+          pageSize:
+            pagination.pageSize ?? PAGINATION_DEFAULT_PAGE_SIZE,
+          total: Math.max(0, typeof totalProps === "number" ? totalProps : 0),
         }
-      },
-      onSortingChange: (sort) => {
-        setInitialSort(sort);
-        if (onChangeTable) {
-          onChangeTable({
-            page: paginationConfig?.page ?? 1,
-            pageSize:
-              paginationConfig?.pageSize ?? PAGINATION_DEFAULT_PAGE_SIZE,
-            sort: sort ?? undefined,
-          });
-        }
-      },
-      onRowSelectionChange: (selectedRowKeys, selectedRows) => {
-        if (rowSelection !== false && rowSelection?.onChange) {
-          rowSelection.onChange(selectedRowKeys, selectedRows);
-        }
-      },
-    }),
-    [
-      dataSource,
-      iBaseTableColumns,
-      rowKey,
-      isPaginationEnabled,
-      paginationConfig,
-      total,
-      initialSort,
-      rowSelection,
-      isResizableColumns,
-      isDraggableColumns,
-      onChangeTable,
-    ]
-  );
-
-  const core = useIBaseTableCore<T>(coreProps);
-
-  // Pagination info for UI
-  const paginationInfo = useMemo(() => {
-    const currentPage = core.paginationState.pageIndex + 1; // Convert 0-based to 1-based
-    const pageSize = core.paginationState.pageSize;
-    const pages = Math.max(1, Math.ceil(total / pageSize));
-    const from = total === 0 ? 0 : core.paginationState.pageIndex * pageSize;
-    const to = total === 0 ? 0 : Math.min(total, from + pageSize);
-
-    return {
-      currentPage,
-      pageSize,
-      pages,
-      from,
-      to,
-      total,
-    };
-  }, [core.paginationState, total]);
-
-  // Get row key function
-  const getRowKey = useCallback(
-    (record: T, index: number): string => {
-      if (typeof rowKey === "function") {
-        const keyValue = (
-          rowKey as (record: T, index: number) => string | number
-        )(record, index);
-        return String(keyValue);
+      : false,
+    manualPagination: true,
+    manualSorting: true,
+    rowSelection:
+      rowSelection === false
+        ? false
+        : {
+            type: rowSelection?.type || "multiple",
+            selectedRowKeys: rowSelection?.selectedRowKeys,
+            onChange: rowSelection?.onChange,
+          },
+    enableColumnResizing: isResizableColumns,
+    enableColumnPinning: true,
+    enableColumnOrdering: isDraggableColumns,
+    onChangeTable, // Combined callback for pagination + sorting
+    onRowSelectionChange: (selectedRowKeys, selectedRows) => {
+      if (rowSelection !== false && rowSelection?.onChange) {
+        rowSelection.onChange(selectedRowKeys, selectedRows);
       }
-      const key = (record as any)[rowKey as string];
-      return key !== undefined && key !== null ? String(key) : String(index);
     },
-    [rowKey]
-  );
+  });
 
-  // Handle page change
-  const handlePageChange = useCallback(
-    (nextPage: number) => {
-      if (!isPaginationEnabled) {
-        return;
-      }
+  // All pagination logic is handled by useDataTablePagination hook
+  const paginationState = useDataTablePagination({
+    pagination,
+    total: totalProps,
+    paginationInfo: core.paginationInfo,
+  });
 
-      const adjustedPage = Math.min(
-        Math.max(1, nextPage),
-        paginationInfo.pages
-      );
-      core.setPagination({
-        pageIndex: adjustedPage - 1, // Convert to 0-based
-        pageSize: paginationInfo.pageSize,
-      });
-    },
-    [isPaginationEnabled, paginationInfo.pages, paginationInfo.pageSize, core]
-  );
-
-  // Handle page size change
-  const handlePageSizeChange = useCallback(
-    (nextPageSize: number) => {
-      if (!isPaginationEnabled) return;
-
-      core.setPagination({
-        pageIndex: 0, // Reset to first page
-        pageSize: nextPageSize,
-      });
-    },
-    [isPaginationEnabled, core]
-  );
-
-  // Convert sorting state to SortDescriptor
-  const sortDescriptor = useMemo<SortDescriptor | undefined>(() => {
-    if (core.sortingState.length === 0) return undefined;
-
-    const firstSort = core.sortingState[0];
-    return {
-      column: String(firstSort.id),
-      direction: firstSort.desc ? "descending" : "ascending",
-    };
-  }, [core.sortingState]);
-
-  const handleSortChange = useCallback(
-    (sort: SortDescriptor) => {
-      core.setSorting([
-        {
-          id: String(sort.column),
-          desc: sort.direction === "descending",
-        },
-      ]);
-      // onChangeTable is called via onSortingChange in coreProps
-    },
-    [core]
-  );
 
   // Convert row selection state to HeroUI format
   const selectionProps = useMemo(() => {
@@ -299,21 +147,15 @@ export default function DataTable<T = any>({
     };
   }, [rowSelection, core]);
 
+  // Use pagination summary from hook and translate it
   const paginationSummary = useMemo(() => {
-    const rowsTotal = paginationInfo.total;
-    const from = Math.min(paginationInfo.from + 1, rowsTotal);
-    const to = Math.min(paginationInfo.to, rowsTotal);
-
-    return t("summary", { from, to, total: rowsTotal });
-  }, [paginationInfo.from, paginationInfo.to, paginationInfo.total, t]);
-
-  const showPaginationControls =
-    isPaginationEnabled && paginationInfo.total > 0;
+    return t("summary", paginationState.paginationSummary);
+  }, [paginationState.paginationSummary, t]);
 
   const shouldRenderFooter =
     isRefreshData ||
     Boolean(paginationSummary) ||
-    (showPaginationControls && paginationInfo.pages > 1);
+    (paginationState.showPaginationControls && paginationState.paginationInfo.pages > 1);
 
   return (
     <div className={clsx("w-full bg-content1", classNames.wrapper)}>
@@ -333,19 +175,14 @@ export default function DataTable<T = any>({
           selectionMode={selectionProps?.selectionMode}
           selectedKeys={selectionProps?.selectedKeys}
           onSelectionChange={selectionProps?.onSelectionChange}
-          sortDescriptor={sortDescriptor}
-          onSortChange={handleSortChange}
-          getRowKey={getRowKey}
+          sortDescriptor={core.sortDescriptor}
+          onSortChange={core.handleSortChange}
+          getRowKey={core.getRowKey}
           renderCell={(column, row, cellValue) => {
             // Handle row number column with pagination offset
             const meta = (column.columnDef.meta as Record<string, any>) || {};
-            if (meta.isRowNumber) {
-              const from =
-                total === 0
-                  ? 0
-                  : core.paginationState.pageIndex *
-                    core.paginationState.pageSize;
-              return from + row.index + 1;
+            if (meta.isRowNumber && paginationState.paginationInfo) {
+              return paginationState.paginationInfo.from + row.index + 1;
             }
             // Return undefined - IBaseTableUI will check and use flexRender if undefined
             return undefined;
@@ -378,16 +215,18 @@ export default function DataTable<T = any>({
             )}
           </div>
 
-          {showPaginationControls && (
-            <PaginationComponent
-              page={paginationInfo.currentPage}
-              pageSize={paginationInfo.pageSize}
-              pages={paginationInfo.pages}
-              pageSizeOptions={paginationDefault.pageSizeOptions}
-              onChange={handlePageChange}
-              onPageSizeChange={handlePageSizeChange}
-            />
-          )}
+          {paginationState.showPaginationControls &&
+            core.handlePageChange &&
+            core.handlePageSizeChange && (
+              <PaginationComponent
+                page={paginationState.paginationInfo.currentPage}
+                pageSize={paginationState.paginationInfo.pageSize}
+                pages={paginationState.paginationInfo.pages}
+                pageSizeOptions={paginationState.paginationDefault.pageSizeOptions}
+                onChange={core.handlePageChange}
+                onPageSizeChange={core.handlePageSizeChange}
+              />
+            )}
         </div>
       )}
     </div>

@@ -33,7 +33,7 @@ export class JsonRpcClientService extends ClientHttpService {
   private requestIdCounter = 0;
   private readonly rpc_version = "2.0";
 
-  constructor(baseUrl: string = "/api/internal/json-rpc") {
+  constructor(baseUrl: string = "/api/base/internal/json-rpc") {
     super(baseUrl);
   }
 

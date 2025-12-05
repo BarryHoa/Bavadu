@@ -6,7 +6,7 @@ import {
   DropdownTrigger,
 } from "@heroui/dropdown";
 import { cn } from "@heroui/react";
-import { EllipsisVertical, Link } from "lucide-react";
+import { Ellipsis, Link } from "lucide-react";
 
 type ButtonVariant = "solid" | "flat" | "bordered" | "light";
 
@@ -91,11 +91,11 @@ const ActionMenu = ({
           <DropdownTrigger>
             <Button
               isIconOnly
-              variant="light"
+              variant="faded"
               radius="full"
-              className="min-w-unit-8"
+              className="min-w-unit-8 h-6"
             >
-              <EllipsisVertical className="size-4" />
+              <Ellipsis className="size-4" />
             </Button>
           </DropdownTrigger>
           <DropdownMenu>

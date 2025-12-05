@@ -20,7 +20,7 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table";
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 // Column Definition Type (compatible with DataTableColumnDefinition)
 export interface IBaseTableCoreColumn<T = any> {
@@ -89,14 +89,18 @@ export interface IBaseTableCoreProps<T = any> {
   expanded?: ExpandedState;
   onExpandedChange?: (expanded: ExpandedState) => void;
 
-  // Callbacks
-  onPaginationChange?: (page: number, pageSize: number) => void;
-  onSortingChange?: (sort: SortDescriptor | undefined) => void;
   onRowSelectionChange?: (
     selectedRowKeys: (string | number)[],
     selectedRows: T[]
   ) => void;
   onColumnOrderChange?: (columnOrder: string[]) => void;
+  
+  // DataTable specific: Combined onChange callback
+  onChangeTable?: (params: {
+    page: number;
+    pageSize: number;
+    sort?: SortDescriptor;
+  }) => void;
 }
 
 // Return type for the core hook
@@ -136,6 +140,23 @@ export interface IBaseTableCoreReturn<T = any> {
   toggleRowSelection: (rowId: string, select?: boolean) => void;
   toggleAllRowsSelection: (select?: boolean) => void;
   resetRowSelection: () => void;
+  // Pagination info (1-based for UI)
+  paginationInfo?: {
+    currentPage: number;
+    pageSize: number;
+    pages: number;
+    from: number;
+    to: number;
+    total: number;
+  };
+  // Row key function
+  getRowKey: (record: T, index: number) => string;
+  // Sort descriptor for UI
+  sortDescriptor?: SortDescriptor;
+  // Page change handlers (for pagination UI)
+  handlePageChange?: (nextPage: number) => void;
+  handlePageSizeChange?: (nextPageSize: number) => void;
+  handleSortChange?: (sort: SortDescriptor) => void;
 }
 
 // Convert column definition to TanStack format
@@ -229,10 +250,9 @@ export function useIBaseTableCore<T = any>(
     onGroupingChange,
     expanded,
     onExpandedChange,
-    onPaginationChange,
-    onSortingChange,
     onRowSelectionChange,
     onColumnOrderChange,
+    onChangeTable,
   } = props;
 
   // Get row key function
@@ -389,14 +409,21 @@ export function useIBaseTableCore<T = any>(
             (prev[0].id !== externalSortingState[0].id ||
               prev[0].desc !== externalSortingState[0].desc))
         ) {
+          // Also update currentSort to keep it in sync
+          const sortDescriptor = convertFromTanStackSorting(externalSortingState);
+          setCurrentSort(sortDescriptor);
           return externalSortingState;
         }
         return prev;
       });
+    } else {
+      // Reset sort if external sorting becomes undefined/null
+      setCurrentSort(undefined);
     }
   }, [externalSortingState]);
 
   // Sync external pagination changes - memoize derived values
+  // Only sync if pagination props change from external source
   const externalPagination = useMemo(() => {
     if (pagination && typeof pagination === "object") {
       return {
@@ -407,9 +434,15 @@ export function useIBaseTableCore<T = any>(
     return null;
   }, [pagination]);
 
+  // Track if pagination change is from internal (user interaction) or external (props)
+  // Use ref to prevent sync loop between internal state updates and external props
+  const isInternalPaginationUpdateRef = useRef(false);
+
   useEffect(() => {
-    if (externalPagination !== null) {
+    // Only sync external pagination if update is not from internal state change
+    if (externalPagination !== null && !isInternalPaginationUpdateRef.current) {
       setPaginationState((prev) => {
+        // Only update if values actually differ to prevent unnecessary re-renders
         if (
           prev.pageIndex !== externalPagination.pageIndex ||
           prev.pageSize !== externalPagination.pageSize
@@ -419,6 +452,8 @@ export function useIBaseTableCore<T = any>(
         return prev;
       });
     }
+    // Reset flag after checking (allow external sync in next cycle if needed)
+    isInternalPaginationUpdateRef.current = false;
   }, [externalPagination]);
 
   // Sync external grouping changes - only update if different
@@ -449,24 +484,35 @@ export function useIBaseTableCore<T = any>(
     }
   }, [expanded]);
 
+  // Track current sort for onChangeTable callback
+  const [currentSort, setCurrentSort] = useState<SortDescriptor | undefined>(
+    sorting
+  );
+
   // Memoize handlers to prevent recreation
   const handlePaginationChange = useCallback(
     (updater: any) => {
+      // Mark as internal update to prevent sync loop
+      isInternalPaginationUpdateRef.current = true;
+      
       setPaginationState((prev) => {
         const newPagination =
           typeof updater === "function" ? updater(prev) : updater;
 
-        if (onPaginationChange) {
-          onPaginationChange(
-            newPagination.pageIndex + 1,
-            newPagination.pageSize
-          );
-        }
+        const page = newPagination.pageIndex + 1;
+        const pageSize = newPagination.pageSize;
 
+        console.log("newPagination", newPagination);
+        console.log("page", page);
+        console.log("pageSize", pageSize);
+        console.log("currentSort", currentSort);
+
+        // Also call onPaginationChange if provided (IBaseTable style)
         return newPagination;
+        
       });
     },
-    [onPaginationChange]
+    [onChangeTable,  currentSort]
   );
 
   const handleSortingChange = useCallback(
@@ -475,15 +521,22 @@ export function useIBaseTableCore<T = any>(
         const newSorting =
           typeof updater === "function" ? updater(prev) : updater;
 
-        if (onSortingChange) {
-          const sortDescriptor = convertFromTanStackSorting(newSorting);
-          onSortingChange(sortDescriptor);
+        const sortDescriptor = convertFromTanStackSorting(newSorting);
+        setCurrentSort(sortDescriptor);
+
+        // Call onChangeTable if provided (DataTable style)
+        if (onChangeTable && pagination && typeof pagination === "object") {
+          onChangeTable({
+            page: pagination.page ?? 1,
+            pageSize: pagination.pageSize ?? 10,
+            sort: sortDescriptor ?? undefined,
+          });
         }
 
         return newSorting;
       });
     },
-    [onSortingChange]
+    [onChangeTable,  pagination]
   );
 
   const handleRowSelectionChange = useCallback(
@@ -631,7 +684,8 @@ export function useIBaseTableCore<T = any>(
     manualExpanding: false, // TODO: support manual expanding if needed
 
     // Handlers - use memoized callbacks
-    onPaginationChange: handlePaginationChange,
+    // Enable onPaginationChange for manual pagination to allow internal state updates
+    onPaginationChange: manualPagination ? handlePaginationChange : undefined,
     onSortingChange: handleSortingChange,
     onRowSelectionChange: handleRowSelectionChange,
     onColumnPinningChange: setColumnPinningState,
@@ -702,6 +756,74 @@ export function useIBaseTableCore<T = any>(
     setRowSelectionState({});
   }, []);
 
+  // Pagination info for UI (1-based)
+  const paginationInfo = useMemo(() => {
+    if (!pagination || typeof pagination !== "object") return undefined;
+
+    const currentPage = paginationState.pageIndex + 1;
+    const pageSize = paginationState.pageSize;
+    const total = pagination.total ?? 0;
+    const pages = Math.max(1, Math.ceil(total / pageSize));
+    const from = total === 0 ? 0 : paginationState.pageIndex * pageSize;
+    const to = total === 0 ? 0 : Math.min(total, from + pageSize);
+
+    return {
+      currentPage,
+      pageSize,
+      pages,
+      from,
+      to,
+      total,
+    };
+  }, [pagination, paginationState]);
+
+  // Sort descriptor for UI
+  const sortDescriptor = useMemo<SortDescriptor | undefined>(() => {
+    return convertFromTanStackSorting(sortingState);
+  }, [sortingState]);
+
+  // Handle page change (for pagination UI components)
+  const handlePageChange = useCallback(
+    (nextPage: number) => {
+      if (!pagination || typeof pagination !== "object") return;
+
+      const pages = paginationInfo?.pages ?? 1;
+      const adjustedPage = Math.min(Math.max(1, nextPage), pages);
+
+      handlePaginationChange({
+        pageIndex: adjustedPage - 1,
+        pageSize: paginationState.pageSize,
+      });
+    },
+    [pagination, paginationInfo, paginationState.pageSize, handlePaginationChange]
+  );
+
+  // Handle page size change
+  const handlePageSizeChange = useCallback(
+    (nextPageSize: number) => {
+      if (!pagination || typeof pagination !== "object") return;
+
+      handlePaginationChange({
+        pageIndex: 0,
+        pageSize: nextPageSize,
+      });
+    },
+    [pagination, handlePaginationChange]
+  );
+
+  // Handle sort change (for UI components)
+  const handleSortChange = useCallback(
+    (sort: SortDescriptor) => {
+      handleSortingChange([
+        {
+          id: String(sort.column),
+          desc: sort.direction === "descending",
+        },
+      ]);
+    },
+    [handleSortingChange]
+  );
+
   return {
     table,
     paginationState,
@@ -718,14 +840,20 @@ export function useIBaseTableCore<T = any>(
     visibleColumns,
     selectedRows,
     selectedRowKeys,
-    setPagination: setPaginationState,
-    setSorting: setSortingState,
+    paginationInfo,
+    getRowKey,
+    sortDescriptor,
+    setPagination: handlePaginationChange,
+    setSorting: handleSortingChange,
     setRowSelection: setRowSelectionState,
-    setColumnOrder: setColumnOrderState,
-    setGrouping: setGroupingState,
-    setExpanded: setExpandedState,
+    setColumnOrder: handleColumnOrderChange,
+    setGrouping: handleGroupingChange,
+    setExpanded: handleExpandedChange,
     toggleRowSelection,
     toggleAllRowsSelection,
     resetRowSelection,
+    handlePageChange,
+    handlePageSizeChange,
+    handleSortChange,
   };
 }

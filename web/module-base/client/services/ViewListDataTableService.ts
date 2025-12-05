@@ -6,35 +6,23 @@ type DataTableParams = {
   params: any;
 };
 
-/**
- * Convert model name from module.json to base model ID for list operations
- * Examples:
- * - "product.list" -> "product"
- * - "product-category.list" -> "product-category"
- * - "product" -> "product"
- */
-function getBaseModelIdForList(modelId: string): string {
-  if (modelId.endsWith(".list")) {
-    return modelId.slice(0, -".list".length);
-  }
-  return modelId;
-}
-
 class ViewListDataTableService extends JsonRpcClientService {
-  constructor() {
-    super("/api/base/internal/json-rpc");
-  }
-
+  getBaseModelIdForList = (modelId: string): string => {
+    if (modelId.endsWith(".list")) {
+      return modelId;
+    }
+    return `${modelId}.list`;
+  };
   getData = async (req: DataTableParams) => {
     try {
-      const baseModelId = getBaseModelIdForList(req.model);
-      const response = await this.call<{ data: ListParamsResponse<any> }>(
-        `${baseModelId}.list.getData`,
+      const baseModelId = this.getBaseModelIdForList(req.model);
+      const response = await this.call<ListParamsResponse<any>>(
+        `${baseModelId}.getData`,
         req.params
       );
       return {
-        data: response.data?.data,
-        total: response.data?.total,
+        data: response?.data,
+        total: response?.total,
       };
     } catch (error) {
       console.error(error);
@@ -43,33 +31,33 @@ class ViewListDataTableService extends JsonRpcClientService {
   };
 
   getFilter = async (req: DataTableParams) => {
-    const baseModelId = getBaseModelIdForList(req.model);
+    const baseModelId = this.getBaseModelIdForList(req.model);
     return this.call<{ success: boolean; data: any[] }>(
-      `${baseModelId}.list.getFilter`,
+      `${baseModelId}.getFilter`,
       req.params
     );
   };
 
   getFavoriteFilter = async (req: DataTableParams) => {
-    const baseModelId = getBaseModelIdForList(req.model);
+    const baseModelId = this.getBaseModelIdForList(req.model);
     return this.call<{ success: boolean; data: any[] }>(
-      `${baseModelId}.list.getFavoriteFilter`,
+      `${baseModelId}.getFavoriteFilter`,
       req.params
     );
   };
 
   getGroupBy = async (req: DataTableParams) => {
-    const baseModelId = getBaseModelIdForList(req.model);
+    const baseModelId = this.getBaseModelIdForList(req.model);
     return this.call<{ success: boolean; data: any[] }>(
-      `${baseModelId}.list.getGroupBy`,
+      `${baseModelId}.getGroupBy`,
       req.params
     );
   };
 
   updateFavoriteFilter = async (req: DataTableParams) => {
-    const baseModelId = getBaseModelIdForList(req.model);
+    const baseModelId = this.getBaseModelIdForList(req.model);
     return this.call<{ success: boolean; data: any[] }>(
-      `${baseModelId}.list.updateFavoriteFilter`,
+      `${baseModelId}.updateFavoriteFilter`,
       req.params
     );
   };

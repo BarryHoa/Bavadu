@@ -8,9 +8,14 @@ class ClientHttpService {
   }
 
   private getFullUrl(url: string) {
-    if (!this.baseUrl) return url;
-    // Avoid double slashes
-    return `${this.baseUrl.replace(/\/$/, "")}/${url.replace(/^\//, "")}`;
+    if (!this.baseUrl) {
+      // Nếu url kết thúc bằng "/" thì xoá luôn
+      return url.replace(/\/$/, "");
+    }
+    // Avoid double slashes và nếu kết thúc là / thì remove luôn
+    let cleanUrl = `${this.baseUrl.replace(/\/$/, "")}/${url.replace(/^\//, "")}`.replace(/\/$/, "");
+   
+    return cleanUrl;
   }
 
   private async getHeadersWithCsrf(

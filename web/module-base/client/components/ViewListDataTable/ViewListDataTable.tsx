@@ -72,11 +72,7 @@ export default function ViewListDataTable<T = any>(
   const groupByOptions = useMemo<GroupOption[]>(() => {
     return [];
   }, []);
-  const initialFavoriteFilter = useMemo<
-    ((row: T) => boolean) | undefined
-  >(() => {
-    return undefined;
-  }, []);
+
 
   // Prepare columns list with only visible columns
   const displayColumns = useMemo(() => {
