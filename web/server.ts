@@ -5,6 +5,7 @@
  */
 
 import Environment from "@base/server/env";
+import { getLogModel } from "@base/server/models/Logs/LogModel";
 import { Database } from "@base/server/stores/database";
 import dayjs from "dayjs";
 import http from "http";
@@ -28,6 +29,10 @@ const handle = app.getRequestHandler();
 async function startServer(): Promise<void> {
   try {
     await app.prepare();
+
+    // Initialize logging system FIRST
+    getLogModel();
+    console.log("> 📝 Logging system initialized");
 
     // Initialize database
     const database = new Database(process.cwd());

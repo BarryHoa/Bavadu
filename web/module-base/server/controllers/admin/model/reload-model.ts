@@ -1,4 +1,5 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { escapeHtml } from "@base/server/utils/xss-protection";
 import getEnv from "../../../utils/getEnv";
 
 type ReloadModelRequest = {
@@ -27,14 +28,18 @@ export async function POST(request: Request) {
 
     const reloaded = await env.reloadModel(modelKey);
     if (!reloaded) {
+      // Sanitize modelKey to prevent XSS in error message
+      const safeModelKey = escapeHtml(modelKey);
       return JSONResponse({
-        message: `Failed to reload model "${modelKey}".`,
+        message: `Failed to reload model "${safeModelKey}".`,
         status: 404,
       });
     }
 
+    // Sanitize modelKey to prevent XSS in success message
+    const safeModelKey = escapeHtml(modelKey);
     return JSONResponse({
-      message: `Model "${modelKey}" reloaded successfully.`,
+      message: `Model "${safeModelKey}" reloaded successfully.`,
       status: 200,
     });
   } catch (error) {

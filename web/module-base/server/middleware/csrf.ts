@@ -3,6 +3,11 @@ import {
   createSignedCsrfToken,
   verifyCsrfToken,
 } from "@base/server/utils/csrf-token";
+import {
+  getClientIp,
+  getUserAgent,
+  logSuspiciousRequest,
+} from "@base/server/utils/security-logger";
 import { NextRequest, NextResponse } from "next/server";
 
 // CSRF configuration
@@ -31,6 +36,14 @@ export function checkCsrfProtection(request: NextRequest): NextResponse | null {
 
   // Both are required for Double Submit Cookie Pattern
   if (!headerToken || !cookieSignedToken) {
+    logSuspiciousRequest("CSRF token missing", {
+      ip: getClientIp(request),
+      userAgent: getUserAgent(request),
+      path: request.nextUrl.pathname,
+      method: request.method,
+      reason: !headerToken ? "Missing header token" : "Missing cookie token",
+    });
+
     return NextResponse.json(
       {
         success: false,
@@ -49,6 +62,16 @@ export function checkCsrfProtection(request: NextRequest): NextResponse | null {
       ? "CSRF token has expired"
       : "Invalid CSRF token";
 
+    logSuspiciousRequest("CSRF token validation failed", {
+      ip: getClientIp(request),
+      userAgent: getUserAgent(request),
+      path: request.nextUrl.pathname,
+      method: request.method,
+      reason: verification.expired
+        ? "Token expired"
+        : "Invalid token signature",
+    });
+
     return NextResponse.json(
       {
         success: false,
@@ -64,6 +87,14 @@ export function checkCsrfProtection(request: NextRequest): NextResponse | null {
   const cookiePlainToken = verification.token;
 
   if (!cookiePlainToken || cookiePlainToken !== headerToken) {
+    logSuspiciousRequest("CSRF token mismatch", {
+      ip: getClientIp(request),
+      userAgent: getUserAgent(request),
+      path: request.nextUrl.pathname,
+      method: request.method,
+      reason: "Cookie token does not match header token",
+    });
+
     return NextResponse.json(
       {
         success: false,

@@ -1,4 +1,5 @@
 import * as v from "valibot";
+import { escapeHtml, sanitizeObject } from "../../utils/xss-protection";
 
 /**
  * JSON-RPC request schema
@@ -85,6 +86,7 @@ export function validateJsonRpcMethod(method: string): {
 /**
  * Sanitize JSON-RPC params
  * Recursively sanitizes string values in params object to prevent XSS
+ * Uses XSS protection utilities from xss-protection.ts
  */
 export function sanitizeJsonRpcParams(params: unknown): unknown {
   if (params === null || params === undefined) {
@@ -92,13 +94,8 @@ export function sanitizeJsonRpcParams(params: unknown): unknown {
   }
 
   if (typeof params === "string") {
-    // Basic sanitization - escape HTML entities
-    return params
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#x27;");
+    // Use escapeHtml from xss-protection utilities
+    return escapeHtml(params);
   }
 
   if (typeof params === "number" || typeof params === "boolean") {
@@ -110,11 +107,13 @@ export function sanitizeJsonRpcParams(params: unknown): unknown {
   }
 
   if (typeof params === "object") {
-    const sanitized: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(params)) {
-      sanitized[key] = sanitizeJsonRpcParams(value);
-    }
-    return sanitized;
+    // Use sanitizeObject from xss-protection utilities for comprehensive sanitization
+    return sanitizeObject(params as Record<string, unknown>, {
+      escapeHtml: true,
+      escapeAttributes: false,
+      sanitizeUrls: true, // Sanitize URLs in params to prevent javascript: and data: attacks
+      maxDepth: 10,
+    });
   }
 
   return params;
