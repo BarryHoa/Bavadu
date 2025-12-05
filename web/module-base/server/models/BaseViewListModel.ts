@@ -2,6 +2,7 @@ import { asc, desc, or, sql, type Column } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { isNil, omitBy } from "lodash";
 import { BaseModel } from "./BaseModel";
+import type { ParamFilter } from "./interfaces/FilterInterface";
 import type {
   ListParamsRequest,
   ListParamsResponse,
@@ -18,24 +19,24 @@ import type { ParamSortMultiple } from "./interfaces/SortInterface";
 type ColumnMap = Map<
   string,
   {
-    column: Column<any>;
+    column: Column;
     sort?: boolean;
   }
 >;
-type SearchConditionMap = Map<string, (text: string) => any>;
-type FilterCondition<TFilter extends Record<string, any>> = (
-  currentFilterValue: any,
+type SearchConditionMap = Map<string, (text: string) => unknown>;
+type FilterCondition<TFilter extends ParamFilter> = (
+  currentFilterValue: unknown,
   filters: TFilter | undefined
-) => any | undefined;
-type FilterConditionMap<TFilter extends Record<string, any>> = Map<
+) => unknown | undefined;
+type FilterConditionMap<TFilter extends ParamFilter> = Map<
   string,
   FilterCondition<TFilter>
 >;
 
 export abstract class BaseViewListModel<
-  TTable extends PgTable<any> = PgTable<any>,
-  TRow = any,
-  TFilter extends Record<string, any> = Record<string, any>,
+  TTable extends PgTable = PgTable,
+  TRow = unknown,
+  TFilter extends ParamFilter = ParamFilter,
 > extends BaseModel<TTable> {
   protected readonly columns: ColumnMap;
   protected readonly search: SearchConditionMap;
@@ -106,8 +107,7 @@ export abstract class BaseViewListModel<
    * Default implementation returns the row as-is.
    * Subclass can override to transform the row data.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(row: any, index?: number): TRow {
+  protected declarationMappingData(row: unknown, index?: number): TRow {
     return row as TRow;
   }
 
@@ -123,9 +123,16 @@ export abstract class BaseViewListModel<
    */
   buildQueryDataListWithSelect = async (
     params: ListParamsRequest<TFilter>,
-    select?: Record<string, Column<any>>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    callBackBuildQuery?: (query: any) => any
+    select?: Record<string, Column>,
+    callBackBuildQuery?: (query: {
+      where: (...args: unknown[]) => unknown;
+      orderBy: (...args: unknown[]) => unknown;
+      limit: (n: number) => { offset: (n: number) => Promise<unknown[]> };
+    }) => {
+      where: (...args: unknown[]) => unknown;
+      orderBy: (...args: unknown[]) => unknown;
+      limit: (n: number) => { offset: (n: number) => Promise<unknown[]> };
+    }
   ): Promise<ListParamsResponse<TRow>> => {
     const {
       filters = undefined,
@@ -135,10 +142,10 @@ export abstract class BaseViewListModel<
       limit = 50,
     } = params;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const totalResultKey = "total-data-response" as keyof TRow;
 
     // Start with a query builder: allow calling with select clauses
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let query: any;
     switch (typeof select) {
       case "object":
@@ -147,7 +154,10 @@ export abstract class BaseViewListModel<
             ...select,
             [totalResultKey]: sql<number>`count(*) over()::int`.as("total"),
           };
-          query = this.db.select(selectWithTotal).from(this.table as any);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          query = this.db
+            .select(selectWithTotal as any)
+            .from(this.table as any);
         }
         break;
 
@@ -157,7 +167,10 @@ export abstract class BaseViewListModel<
             ...this.table, // select all columns (i.e., SELECT *)
             [totalResultKey]: sql<number>`count(*) over()::int`.as("total"),
           };
-          query = this.db.select(selectWithTotal).from(this.table as any);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          query = this.db
+            .select(selectWithTotal as any)
+            .from(this.table as any);
         }
         break;
     }
@@ -192,7 +205,8 @@ export abstract class BaseViewListModel<
         );
 
       if (searchExpressions.length > 0) {
-        query = query.where(or(...searchExpressions));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        query = query.where(or(...(searchExpressions as any[])) as any);
       }
     }
 
@@ -234,13 +248,15 @@ export abstract class BaseViewListModel<
     query = query.orderBy(...orderByExpressions);
 
     // drizzle select is then-able, so await directly
-    const result = (await query.limit(limit).offset(offset)) as any[];
+    const result = (await query.limit(limit).offset(offset)) as Array<
+      Record<string, unknown>
+    >;
     // Try to determine total if result includes it, otherwise fallback to length
     // Check for both "total-data-response" (from buildQueryDataList) and "totalResult" keys
 
-    const total = result?.[0]?.[totalResultKey] ?? 0;
-    const data = result?.map((row: any) =>
-      omitBy(row, totalResultKey)
+    const total = (result?.[0]?.[totalResultKey as string] as number) ?? 0;
+    const data = result?.map((row) =>
+      omitBy(row, totalResultKey as string)
     ) as TRow[];
 
     return { data, total };
@@ -257,7 +273,6 @@ export abstract class BaseViewListModel<
    * 5) Apply ORDER BY from `sorts` or `sortDefault`
    * 6) Apply LIMIT/OFFSET and return `{ data, total, meta }`
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected buildQueryDataList = async (
     params: ListParamsRequest<TFilter>,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -274,12 +289,12 @@ export abstract class BaseViewListModel<
     // Use buildQueryDataListWithSelect with custom select and callback
     const result = await this.buildQueryDataListWithSelect(
       params,
-      selectColumns as Record<string, never>,
+      selectColumns as Record<string, Column>,
       callBackBuildQuery
     );
     return {
       data:
-        result?.data?.map((row: any, index: number) =>
+        result?.data?.map((row, index) =>
           this.declarationMappingData(row, index)
         ) ?? [],
       total: result?.total ?? 0,

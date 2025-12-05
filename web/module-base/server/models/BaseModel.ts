@@ -1,16 +1,17 @@
 import type { Column } from "drizzle-orm";
 import { and, eq } from "drizzle-orm";
-import type { PgDatabase, PgTable } from "drizzle-orm/pg-core";
+import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import type { PgTable } from "drizzle-orm/pg-core";
 import { isEmpty } from "lodash";
 import getDbConnect from "../utils/getDbConnect";
 
-export class BaseModel<TTable extends PgTable<any> = PgTable<any>> {
+export class BaseModel<TTable extends PgTable = PgTable> {
   /**Main table of the model */
   protected readonly table: TTable;
-  protected readonly db: PgDatabase<any>;
+  protected readonly db: PostgresJsDatabase<Record<string, never>>;
   constructor(table: TTable) {
     this.table = table;
-    this.db = getDbConnect() as unknown as PgDatabase<any>;
+    this.db = getDbConnect() as PostgresJsDatabase<Record<string, never>>;
   }
 
   /**Check if a field and value exists in the model */
@@ -24,8 +25,8 @@ export class BaseModel<TTable extends PgTable<any> = PgTable<any>> {
       throw new Error("Database not initialized");
     }
     // check if field exists in table schema
-    const column = this.table[field as keyof typeof this.table] as unknown as
-      | Column<any>
+    const column = this.table[field as keyof typeof this.table] as
+      | Column
       | undefined;
     if (!column) {
       throw new Error(`Field ${field} not found in table definition.`);
@@ -36,9 +37,7 @@ export class BaseModel<TTable extends PgTable<any> = PgTable<any>> {
       const ignoredColumns = Object.keys(ignore || {});
       const ignoredColumnsInTable = ignoredColumns.filter((columnName) =>
         Boolean(
-          this.table[columnName as keyof typeof this.table] as
-            | Column<any>
-            | undefined
+          this.table[columnName as keyof typeof this.table] as Column | undefined
         )
       );
       if (ignoredColumnsInTable.length !== ignoredColumns.length) {
@@ -48,11 +47,11 @@ export class BaseModel<TTable extends PgTable<any> = PgTable<any>> {
 
     const whereClause = !isEmpty(ignore)
       ? and(
-          eq(column as Column<any>, value),
+          eq(column, value),
           ...Object.entries(ignore).map(([key, value]) => {
             const ignoreColumn = this.table[
               key as keyof typeof this.table
-            ] as unknown as Column<any> | undefined;
+            ] as Column | undefined;
             if (!ignoreColumn) {
               throw new Error(
                 `Ignored column ${key} not found in table definition.`
@@ -65,7 +64,7 @@ export class BaseModel<TTable extends PgTable<any> = PgTable<any>> {
 
     const result = await this.db
       .select()
-      .from(this.table as any)
+      .from(this.table)
       .where(whereClause)
       .limit(1);
 

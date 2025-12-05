@@ -8,8 +8,8 @@
  * - Rate limit violations
  */
 
-import { getLogModel, type LogEntry } from '../models/Logs/LogModel';
-import { LogSeverity, LogType } from '../models/Logs/LogTypes';
+import { getLogModel, type LogEntry } from "../models/Logs/LogModel";
+import { LogSeverity, LogType } from "../models/Logs/LogTypes";
 
 /**
  * Format security log entry (for console output)
@@ -47,11 +47,11 @@ async function writeLog(
   await logModel.write(entry);
 
   // Also output to console for development/debugging
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     const formatted = formatSecurityLog(entry);
-    if (severity === 'high' || severity === 'critical') {
+    if (severity === "high" || severity === "critical") {
       console.error(formatted);
-    } else if (severity === 'medium') {
+    } else if (severity === "medium") {
       console.warn(formatted);
     } else {
       console.log(formatted);
@@ -74,11 +74,16 @@ export function logAuthFailure(
     [key: string]: unknown;
   } = {}
 ): void {
-  writeLog(LogType.AUTH_FAILURE, LogSeverity.HIGH, `Authentication failure: ${reason}`, {
-    ...metadata,
-    reason,
-  }).catch((error) => {
-    console.error('Failed to write auth failure log:', error);
+  writeLog(
+    LogType.AUTH_FAILURE,
+    LogSeverity.HIGH,
+    `Authentication failure: ${reason}`,
+    {
+      ...metadata,
+      reason,
+    }
+  ).catch((error) => {
+    console.error("Failed to write auth failure log:", error);
   });
 }
 
@@ -97,8 +102,13 @@ export function logAuthSuccess(metadata: {
     process.env.LOG_AUTH_SUCCESS === "true" ||
     process.env.NODE_ENV === "development"
   ) {
-    writeLog(LogType.AUTH_SUCCESS, LogSeverity.LOW, 'Authentication successful', metadata).catch((error) => {
-      console.error('Failed to write auth success log:', error);
+    writeLog(
+      LogType.AUTH_SUCCESS,
+      LogSeverity.LOW,
+      "Authentication successful",
+      metadata
+    ).catch((error) => {
+      console.error("Failed to write auth success log:", error);
     });
   }
 }
@@ -119,11 +129,16 @@ export function logAuthzFailure(
     [key: string]: unknown;
   } = {}
 ): void {
-  writeLog(LogType.AUTHZ_FAILURE, LogSeverity.HIGH, `Authorization failure: ${reason}`, {
-    ...metadata,
-    reason,
-  }).catch((error) => {
-    console.error('Failed to write authz failure log:', error);
+  writeLog(
+    LogType.AUTHZ_FAILURE,
+    LogSeverity.HIGH,
+    `Authorization failure: ${reason}`,
+    {
+      ...metadata,
+      reason,
+    }
+  ).catch((error) => {
+    console.error("Failed to write authz failure log:", error);
   });
 }
 
@@ -141,11 +156,16 @@ export function logSuspiciousRequest(
     [key: string]: unknown;
   } = {}
 ): void {
-  writeLog(LogType.SUSPICIOUS_REQUEST, LogSeverity.MEDIUM, `Suspicious request detected: ${reason}`, {
-    ...metadata,
-    reason,
-  }).catch((error) => {
-    console.error('Failed to write suspicious request log:', error);
+  writeLog(
+    LogType.SUSPICIOUS_REQUEST,
+    LogSeverity.MEDIUM,
+    `Suspicious request detected: ${reason}`,
+    {
+      ...metadata,
+      reason,
+    }
+  ).catch((error) => {
+    console.error("Failed to write suspicious request log:", error);
   });
 }
 
@@ -163,20 +183,29 @@ export function logRateLimitViolation(
     [key: string]: unknown;
   } = {}
 ): void {
-  writeLog(LogType.RATE_LIMIT, LogSeverity.MEDIUM, 'Rate limit exceeded', metadata).catch((error) => {
-    console.error('Failed to write rate limit log:', error);
+  writeLog(
+    LogType.RATE_LIMIT,
+    LogSeverity.MEDIUM,
+    "Rate limit exceeded",
+    metadata
+  ).catch((error) => {
+    console.error("Failed to write rate limit log:", error);
   });
 }
 
 /**
  * Get client IP from request
+ * Supports both NextRequest and objects with headers property
  */
-export function getClientIp(request: { headers: Headers }): string {
-  const forwarded = request.headers.get("x-forwarded-for");
+export function getClientIp(request: {
+  headers: Headers | { get: (key: string) => string | null };
+}): string {
+  const headers = request.headers;
+  const forwarded = headers.get("x-forwarded-for");
   if (forwarded) {
     return forwarded.split(",")[0].trim();
   }
-  const realIp = request.headers.get("x-real-ip");
+  const realIp = headers.get("x-real-ip");
   if (realIp) {
     return realIp;
   }
@@ -185,7 +214,11 @@ export function getClientIp(request: { headers: Headers }): string {
 
 /**
  * Get user agent from request
+ * Supports both NextRequest and objects with headers property
  */
-export function getUserAgent(request: { headers: Headers }): string {
-  return request.headers.get("user-agent") || "unknown";
+export function getUserAgent(request: {
+  headers: Headers | { get: (key: string) => string | null };
+}): string {
+  const headers = request.headers;
+  return headers.get("user-agent") || "unknown";
 }

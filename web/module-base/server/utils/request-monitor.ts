@@ -1,11 +1,11 @@
 /**
  * Request Monitor Utility
- * 
+ *
  * Monitors requests for suspicious patterns and anomalies
  */
 
 import { NextRequest } from "next/server";
-import { logSuspiciousRequest } from "./security-logger";
+import { getClientIp, logSuspiciousRequest } from "./security-logger";
 
 interface RequestMetrics {
   ip: string;
@@ -84,21 +84,6 @@ function cleanupHistory() {
 }
 
 /**
- * Get client IP from request
- */
-function getClientIp(request: NextRequest): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) {
-    return forwarded.split(",")[0].trim();
-  }
-  const realIp = request.headers.get("x-real-ip");
-  if (realIp) {
-    return realIp;
-  }
-  return "unknown";
-}
-
-/**
  * Check for suspicious patterns in request
  */
 export function checkSuspiciousRequest(
@@ -153,12 +138,19 @@ export function checkSuspiciousRequest(
 
   // Check for rapid endpoint changes
   const recentRequests = history.filter(
-    (entry) => now - entry.timestamp < SUSPICIOUS_PATTERNS.RAPID_ENDPOINT_CHANGES.windowMs
+    (entry) =>
+      now - entry.timestamp <
+      SUSPICIOUS_PATTERNS.RAPID_ENDPOINT_CHANGES.windowMs
   );
 
-  if (recentRequests.length >= SUSPICIOUS_PATTERNS.RAPID_ENDPOINT_CHANGES.threshold) {
+  if (
+    recentRequests.length >=
+    SUSPICIOUS_PATTERNS.RAPID_ENDPOINT_CHANGES.threshold
+  ) {
     const uniquePaths = new Set(recentRequests.map((r) => r.path));
-    if (uniquePaths.size >= SUSPICIOUS_PATTERNS.RAPID_ENDPOINT_CHANGES.threshold) {
+    if (
+      uniquePaths.size >= SUSPICIOUS_PATTERNS.RAPID_ENDPOINT_CHANGES.threshold
+    ) {
       logSuspiciousRequest("Rapid endpoint changes detected", {
         ip,
         userAgent,
@@ -228,4 +220,3 @@ export function getRequestStats(ip: string): {
     recentRequests: recent.length,
   };
 }
-

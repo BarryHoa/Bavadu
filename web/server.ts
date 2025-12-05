@@ -7,6 +7,7 @@
 import Environment from "@base/server/env";
 import { getLogModel } from "@base/server/models/Logs/LogModel";
 import { Database } from "@base/server/stores/database";
+import type { SystemRuntimeVariables } from "@base/server/types/global";
 import dayjs from "dayjs";
 import http from "http";
 import next from "next";
@@ -40,9 +41,9 @@ async function startServer(): Promise<void> {
 
     // Set database to globalThis BEFORE initializing environment
     // because models need database during initialization
-    (globalThis as any).systemRuntimeVariables = {
+    globalThis.systemRuntimeVariables = {
       database: database,
-    };
+    } as SystemRuntimeVariables;
 
     // Initialize environment
     const envProcess = await Environment.create();
@@ -75,11 +76,11 @@ async function startServer(): Promise<void> {
 
     // Set globalThis with env, database, and initial timestamp
     // This will be available for all requests
-    (globalThis as any).systemRuntimeVariables = {
+    globalThis.systemRuntimeVariables = {
       env: envProcess,
       database: database,
       timestamp: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-    };
+    } as SystemRuntimeVariables;
 
     // Initialize and start cron scheduler
     const scheduler = new ScheduledTask();
@@ -87,9 +88,11 @@ async function startServer(): Promise<void> {
 
     const server = http.createServer(async (req, res) => {
       // Update timestamp for each request
-      (globalThis as any).systemRuntimeVariables.timestamp = dayjs().format(
-        "YYYY-MM-DD HH:mm:ss"
-      );
+      if (globalThis.systemRuntimeVariables) {
+        globalThis.systemRuntimeVariables.timestamp = dayjs().format(
+          "YYYY-MM-DD HH:mm:ss"
+        );
+      }
       await handle(req, res);
     });
 

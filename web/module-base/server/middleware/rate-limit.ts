@@ -1,22 +1,7 @@
 import { RATE_LIMIT_CONFIG } from "@base/server/config";
 import { rateLimitStore } from "@base/server/stores";
-import { logRateLimitViolation } from "@base/server/utils/security-logger";
+import { getClientIp, logRateLimitViolation } from "@base/server/utils/security-logger";
 import { NextRequest, NextResponse } from "next/server";
-
-/**
- * Get client IP address from request
- */
-function getClientIp(request: NextRequest): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) {
-    return forwarded.split(",")[0].trim();
-  }
-  const realIp = request.headers.get("x-real-ip");
-  if (realIp) {
-    return realIp;
-  }
-  return "unknown";
-}
 
 /**
  * Check rate limit for request
