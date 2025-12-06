@@ -42,14 +42,19 @@ export function useViewListDataTableQueries<T = any>({
   });
 
   const fetchMutation = useMutation({
-    mutationFn: async () => {
-      const offset = (params.page - 1) * params.pageSize;
+    mutationFn: async (requestParams?: {
+      page: number;
+      pageSize: number;
+      sort?: SortDescriptor;
+    }) => {
+      const body = requestParams || params;
+      const offset = (body.page - 1) * body.pageSize;
       const response = await service.getData({
         model: modelKey,
         params: {
           offset,
-          limit: params.pageSize,
-          sorts: params.sort ? [params.sort] : [],
+          limit: body.pageSize,
+          sorts: body.sort ? [body.sort] : [],
         },
       });
 
@@ -75,16 +80,16 @@ export function useViewListDataTableQueries<T = any>({
     },
   });
 
-  // Initial fetch
+  // Initial fetch - sử dụng params từ state
   useEffect(() => {
     if (!modelKey) return;
-    fetchMutation.mutate();
+    fetchMutation.mutate(undefined); // undefined = dùng params từ state
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modelKey]);
 
   const refresh = () => {
     if (!modelKey) return;
-    fetchMutation.mutate();
+    fetchMutation.mutate(undefined); // undefined = dùng params từ state
   };
 
   const onChangeTable = (next: {
@@ -93,9 +98,9 @@ export function useViewListDataTableQueries<T = any>({
     sort?: SortDescriptor;
   }) => {
     setParams(next);
-    console.log("onChangeTable", next);
-    // Mỗi lần change table là gọi API mới
-    fetchMutation.mutate();
+    // FIX: Pass params trực tiếp để tránh race condition
+    // setParams là async, nên mutate với params mới ngay lập tức
+    fetchMutation.mutate(next);
   };
 
   return {

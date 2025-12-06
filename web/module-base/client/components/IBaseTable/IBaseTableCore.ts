@@ -20,7 +20,8 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table";
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 
 // Column Definition Type (compatible with DataTableColumnDefinition)
 export interface IBaseTableCoreColumn<T = any> {
@@ -94,7 +95,7 @@ export interface IBaseTableCoreProps<T = any> {
     selectedRows: T[]
   ) => void;
   onColumnOrderChange?: (columnOrder: string[]) => void;
-  
+
   // DataTable specific: Combined onChange callback
   onChangeTable?: (params: {
     page: number;
@@ -122,13 +123,6 @@ export interface IBaseTableCoreReturn<T = any> {
   visibleColumns: ReturnType<TanStackTable<T>["getVisibleLeafColumns"]>;
   selectedRows: T[];
   selectedRowKeys: (string | number)[];
-  // Handlers
-  setPagination: (
-    pagination: PaginationState | ((prev: PaginationState) => PaginationState)
-  ) => void;
-  setSorting: (
-    sorting: SortingState | ((prev: SortingState) => SortingState)
-  ) => void;
   setRowSelection: (
     selection:
       | RowSelectionState
@@ -295,11 +289,11 @@ export function useIBaseTableCore<T = any>(
   const [paginationState, setPaginationState] = useState<PaginationState>(
     () => {
       if (pagination === false) {
-        return { pageIndex: 0, pageSize: 10 };
+        return { pageIndex: 0, pageSize: PAGINATION_DEFAULT_PAGE_SIZE };
       }
       return {
-        pageIndex: (pagination.page ?? 1) - 1, // TanStack uses 0-based index
-        pageSize: pagination.pageSize ?? 10,
+        pageIndex: (pagination?.page ?? 1) - 1, // TanStack uses 0-based index
+        pageSize: pagination?.pageSize ?? PAGINATION_DEFAULT_PAGE_SIZE,
       };
     }
   );
@@ -410,7 +404,8 @@ export function useIBaseTableCore<T = any>(
               prev[0].desc !== externalSortingState[0].desc))
         ) {
           // Also update currentSort to keep it in sync
-          const sortDescriptor = convertFromTanStackSorting(externalSortingState);
+          const sortDescriptor =
+            convertFromTanStackSorting(externalSortingState);
           setCurrentSort(sortDescriptor);
           return externalSortingState;
         }
@@ -421,40 +416,6 @@ export function useIBaseTableCore<T = any>(
       setCurrentSort(undefined);
     }
   }, [externalSortingState]);
-
-  // Sync external pagination changes - memoize derived values
-  // Only sync if pagination props change from external source
-  const externalPagination = useMemo(() => {
-    if (pagination && typeof pagination === "object") {
-      return {
-        pageIndex: (pagination.page ?? 1) - 1,
-        pageSize: pagination.pageSize ?? 10,
-      };
-    }
-    return null;
-  }, [pagination]);
-
-  // Track if pagination change is from internal (user interaction) or external (props)
-  // Use ref to prevent sync loop between internal state updates and external props
-  const isInternalPaginationUpdateRef = useRef(false);
-
-  useEffect(() => {
-    // Only sync external pagination if update is not from internal state change
-    if (externalPagination !== null && !isInternalPaginationUpdateRef.current) {
-      setPaginationState((prev) => {
-        // Only update if values actually differ to prevent unnecessary re-renders
-        if (
-          prev.pageIndex !== externalPagination.pageIndex ||
-          prev.pageSize !== externalPagination.pageSize
-        ) {
-          return externalPagination;
-        }
-        return prev;
-      });
-    }
-    // Reset flag after checking (allow external sync in next cycle if needed)
-    isInternalPaginationUpdateRef.current = false;
-  }, [externalPagination]);
 
   // Sync external grouping changes - only update if different
   useEffect(() => {
@@ -491,31 +452,22 @@ export function useIBaseTableCore<T = any>(
 
   // Memoize handlers to prevent recreation
   const handlePaginationChange = useCallback(
-    (updater: any) => {
-      // Mark as internal update to prevent sync loop
-      isInternalPaginationUpdateRef.current = true;
-      
-      setPaginationState((prev) => {
-        const newPagination =
-          typeof updater === "function" ? updater(prev) : updater;
-
-        const page = newPagination.pageIndex + 1;
-        const pageSize = newPagination.pageSize;
-
-        if (onChangeTable ) {
-          onChangeTable({
-            page: page,
-            pageSize: pageSize,
-            sort: currentSort ?? undefined,
-          });
-        }
-    
-        // Also call onPaginationChange if provided (IBaseTable style)
-        return newPagination;
-        
+    (newPagination: PaginationState) => {
+      const page = newPagination.pageIndex + 1;
+      const pageSize = newPagination.pageSize;
+      if (onChangeTable) {
+        onChangeTable({
+          page: page,
+          pageSize: pageSize,
+          sort: currentSort ?? undefined,
+        });
+      }
+      setPaginationState({
+        pageIndex: newPagination.pageIndex,
+        pageSize: newPagination.pageSize,
       });
     },
-    [onChangeTable,  currentSort]
+    [onChangeTable, currentSort]
   );
 
   const handleSortingChange = useCallback(
@@ -534,11 +486,11 @@ export function useIBaseTableCore<T = any>(
             sort: sortDescriptor ?? undefined,
           });
         }
-      
+
         return newSorting;
       });
     },
-    [onChangeTable,  pagination]
+    [onChangeTable, pagination]
   );
 
   const handleRowSelectionChange = useCallback(
@@ -685,7 +637,7 @@ export function useIBaseTableCore<T = any>(
 
     // Handlers - use memoized callbacks
     // Enable onPaginationChange for manual pagination to allow internal state updates
-    onPaginationChange: manualPagination ? handlePaginationChange : undefined,
+    // onPaginationChange: handlePaginationChange,
     onSortingChange: handleSortingChange,
     onRowSelectionChange: handleRowSelectionChange,
     onColumnPinningChange: setColumnPinningState,
@@ -795,7 +747,12 @@ export function useIBaseTableCore<T = any>(
         pageSize: paginationState.pageSize,
       });
     },
-    [pagination, paginationInfo, paginationState.pageSize, handlePaginationChange]
+    [
+      pagination,
+      paginationInfo,
+      paginationState.pageSize,
+      handlePaginationChange,
+    ]
   );
 
   // Handle page size change
@@ -843,8 +800,6 @@ export function useIBaseTableCore<T = any>(
     paginationInfo,
     getRowKey,
     sortDescriptor,
-    setPagination: handlePaginationChange,
-    setSorting: handleSortingChange,
     setRowSelection: setRowSelectionState,
     setColumnOrder: handleColumnOrderChange,
     setGrouping: handleGroupingChange,
