@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { salesOrderB2CService } from "../../../services/SalesOrderB2CService";
 import SalesOrderB2CForm, {
   type SalesOrderB2CFormValues,
-} from "../components/SalesOrderB2CForm";
+} from "../components/SalesOrderB2BForm/SalesOrderB2CForm";
+import { SalesOrderB2BFormProvider } from "../contexts/SalesOrderB2BFormContext";
 
 type SalesOrderB2CCreatePageClientProps = {
   currency: string;
@@ -33,9 +34,7 @@ export default function SalesOrderB2CCreatePageClient({
     mutationFn: async (payload) => {
       const response = await salesOrderB2CService.create(payload);
       if (!response.data) {
-        throw new Error(
-          response.message ?? t("errors.failedToCreateOrder")
-        );
+        throw new Error(response.message ?? t("errors.failedToCreateOrder"));
       }
       return response.data;
     },
@@ -82,15 +81,17 @@ export default function SalesOrderB2CCreatePageClient({
   };
 
   return (
-    <SalesOrderB2CForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push("/workspace/modules/b2c-sales")}
-      submitError={submitError}
-      isSubmitting={isPending}
-      defaultValues={{
-        currency,
-        customerName,
-      }}
-    />
+    <SalesOrderB2BFormProvider page="create">
+      <SalesOrderB2CForm
+        onSubmit={handleSubmit}
+        onCancel={() => router.push("/workspace/modules/b2c-sales")}
+        submitError={submitError}
+        isSubmitting={isPending}
+        defaultValues={{
+          currency,
+          customerName,
+        }}
+      />
+    </SalesOrderB2BFormProvider>
   );
 }

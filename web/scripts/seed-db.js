@@ -59,10 +59,23 @@ async function main() {
   const sql = postgres(conn, { max: 1 });
 
   const migDir = path.join(root, "server/db/migrations");
-  const files = fs
-    .readdirSync(migDir)
-    .filter((f) => /^01\d{2}_seed_.*\.sql$/.test(f))
-    .sort();
+
+  // Tìm tất cả các file seed_*.sql trong tất cả các thư mục con
+  function getAllSeedFiles(dir, fileList = []) {
+    const files = fs.readdirSync(dir);
+    files.forEach((file) => {
+      const filePath = path.join(dir, file);
+      const stat = fs.statSync(filePath);
+      if (stat.isDirectory()) {
+        getAllSeedFiles(filePath, fileList);
+      } else if (/^seed_.*\.sql$/.test(file)) {
+        fileList.push(filePath);
+      }
+    });
+    return fileList.sort();
+  }
+
+  const files = getAllSeedFiles(migDir);
 
   if (files.length === 0) {
     console.log("No seed files found.");
@@ -70,18 +83,29 @@ async function main() {
   }
 
   console.log(`Found ${files.length} seed files`);
-  for (const f of files) {
-    const full = path.join(migDir, f);
-    const sqlText = fs.readFileSync(full, "utf8");
-    console.log(`Seeding: ${f}`);
+  for (const filePath of files) {
+    const relativePath = path.relative(migDir, filePath);
+    const sqlText = fs.readFileSync(filePath, "utf8");
+    console.log(`Seeding: ${relativePath}`);
     try {
       await sql.unsafe(sqlText);
-      console.log(`✔ Done: ${f}`);
+      console.log(`✔ Done: ${relativePath}`);
     } catch (e) {
-      console.error(`✖ Failed: ${f}`);
-      console.error(e.message);
-      await sql.end();
-      process.exit(1);
+      // Bỏ qua lỗi nếu là duplicate key hoặc conflict
+      if (
+        e.message &&
+        (e.message.includes("duplicate key") ||
+          e.message.includes("already exists") ||
+          e.code === "23505" || // unique violation
+          e.code === "23503") // foreign key violation (có thể do data đã tồn tại)
+      ) {
+        console.log(`⚠ Skipped (duplicate/conflict): ${relativePath}`);
+      } else {
+        console.error(`✖ Failed: ${relativePath}`);
+        console.error(e.message);
+        await sql.end();
+        process.exit(1);
+      }
     }
   }
 

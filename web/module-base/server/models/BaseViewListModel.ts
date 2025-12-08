@@ -25,8 +25,8 @@ type ColumnMap = Map<
 >;
 type SearchConditionMap = Map<string, (text: string) => unknown>;
 type FilterCondition<TFilter extends ParamFilter> = (
-  currentFilterValue: unknown,
-  filters: TFilter | undefined
+  currentFilterValue?: unknown,
+  filters?: TFilter | undefined
 ) => unknown | undefined;
 type FilterConditionMap<TFilter extends ParamFilter> = Map<
   string,
@@ -124,15 +124,7 @@ export abstract class BaseViewListModel<
   buildQueryDataListWithSelect = async (
     params: ListParamsRequest<TFilter>,
     select?: Record<string, Column>,
-    callBackBuildQuery?: (query: {
-      where: (...args: unknown[]) => unknown;
-      orderBy: (...args: unknown[]) => unknown;
-      limit: (n: number) => { offset: (n: number) => Promise<unknown[]> };
-    }) => {
-      where: (...args: unknown[]) => unknown;
-      orderBy: (...args: unknown[]) => unknown;
-      limit: (n: number) => { offset: (n: number) => Promise<unknown[]> };
-    }
+    callBackBuildQuery?: (query: any) => any
   ): Promise<ListParamsResponse<TRow>> => {
     const {
       filters = undefined,

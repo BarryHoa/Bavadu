@@ -22,20 +22,24 @@ import type { SelectItemOption } from "./IBaseSingleSelect";
 
 export interface FetchOptionsParams extends DropdownOptionsParams {}
 
-export type FetchOptionsFn = (
+export type ServiceFetch = (
   params: FetchOptionsParams
 ) => Promise<DropdownOptionsResponse>;
 
-export interface IBaseSingleSelectAsyncProps
-  extends Omit<
-    IBaseSelectProps,
-    "children" | "selectionMode" | "onSelectionChange" | "selectedKeys"
-  > {
+export interface IBaseSingleSelectAsyncProps extends Omit<
+  IBaseSelectProps,
+  "children" | "selectionMode" | "onSelectionChange" | "selectedKeys"
+> {
   selectedKey?: string;
   onSelectionChange?: (key?: string, item?: SelectItemOption) => void;
   // Either provide a fetch function or a model string
-  fetchOptions?: FetchOptionsFn;
   model?: string;
+  serviceFn?: ServiceFetch;
+  callWhen?: "open" | "mount";
+  onTheFirstFetchSuccess?: (data: DropdownOptionsResponse) => void;
+  onFinishFetch?: (data: DropdownOptionsResponse) => void;
+  onErrorFetch?: (error: Error) => void;
+  onFetching?: (isFetching: boolean) => void;
   searchPlaceholder?: string;
   defaultLimit?: number;
   // Additional params to pass to fetch function
@@ -47,10 +51,15 @@ const IBaseSingleSelectAsync = React.forwardRef<
   IBaseSingleSelectAsyncProps
 >((props, ref) => {
   const {
-    fetchOptions,
+    serviceFn,
     model,
+    callWhen = "open",
     selectedKey,
     onSelectionChange,
+    onTheFirstFetchSuccess,
+    onFinishFetch,
+    onErrorFetch,
+    onFetching,
     searchPlaceholder,
     defaultLimit = 20,
     defaultParams = {},
@@ -65,11 +74,11 @@ const IBaseSingleSelectAsync = React.forwardRef<
   const [isOpen, setIsOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
-
+  const isFirstFetchRef = useRef(true);
   // Memoize fetch function to avoid recreating on every render
   const fetchFn = useMemo(() => {
-    if (fetchOptions) {
-      return fetchOptions;
+    if (serviceFn) {
+      return serviceFn;
     }
     if (model) {
       return async (params: FetchOptionsParams) => {
@@ -77,7 +86,7 @@ const IBaseSingleSelectAsync = React.forwardRef<
       };
     }
     return null;
-  }, [fetchOptions, model]);
+  }, [serviceFn, model]);
 
   // Memoize defaultParams to prevent unnecessary query key changes
   const stableDefaultParams = useMemo(
@@ -109,14 +118,43 @@ const IBaseSingleSelectAsync = React.forwardRef<
       if (!fetchFn) {
         throw new Error("Either fetchOptions or model must be provided");
       }
-      return fetchFn({
+      onFetching?.(true);
+
+      const data = await fetchFn({
         offset: pageParam,
         limit: defaultLimit,
         search: debouncedSearchTerm || undefined,
         ...stableDefaultParams,
-      });
+      })
+        .then((data) => {
+          if (isFirstFetchRef.current) {
+            onTheFirstFetchSuccess?.(data);
+            isFirstFetchRef.current = false;
+          }
+          onFinishFetch?.(data);
+          return data;
+        })
+        .catch((error) => {
+          onErrorFetch?.(error);
+          return {
+            data: [],
+            total: 0,
+          };
+        })
+        .finally(() => {
+          onFetching?.(false);
+        });
+      return data;
     },
-    [fetchFn, defaultLimit, debouncedSearchTerm, stableDefaultParams]
+    [
+      fetchFn,
+      defaultLimit,
+      debouncedSearchTerm,
+      stableDefaultParams,
+      onTheFirstFetchSuccess,
+      onFetching,
+      onFinishFetch,
+    ]
   );
 
   // Memoize getNextPageParam to prevent recreation
@@ -165,7 +203,7 @@ const IBaseSingleSelectAsync = React.forwardRef<
   } = useInfiniteQuery({
     queryKey,
     queryFn,
-    enabled: !!fetchFn && isOpen,
+    enabled: !!fetchFn && (callWhen === "open" ? isOpen : true),
     initialPageParam: 0,
     getNextPageParam,
     staleTime: 30000, // Cache for 30 seconds
@@ -183,11 +221,11 @@ const IBaseSingleSelectAsync = React.forwardRef<
     );
   }, [data?.pages]);
 
-  // Get total from last page
-  const total = useMemo(() => {
-    if (!data?.pages || data.pages.length === 0) return 0;
-    return data.pages[data.pages.length - 1].total || 0;
-  }, [data?.pages]);
+  // // Get total from last page
+  // const total = useMemo(() => {
+  //   if (!data?.pages || data.pages.length === 0) return 0;
+  //   return data.pages[data.pages.length - 1].total || 0;
+  // }, [data?.pages]);
 
   // Handle scroll for infinite loading - memoized to prevent recreation
   const handleScroll = useCallback(

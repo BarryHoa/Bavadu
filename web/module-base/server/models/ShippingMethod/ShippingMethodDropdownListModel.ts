@@ -4,8 +4,9 @@ import type {
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, inArray } from "drizzle-orm";
 import { table_shipping_method } from "../../schemas/shipping-method";
+import { ParamFilter } from "../interfaces/FilterInterface";
 
 type ShippingMethodDropdownOption = {
   label: string;
@@ -54,17 +55,25 @@ class ShippingMethodDropdownListModel extends BaseViewListModel<
     return new Map([
       [
         "isActive",
-        (value: boolean | undefined) => {
-          return eq(table_shipping_method.isActive, true);
-        },
+        (value) =>
+          value
+            ? eq(table_shipping_method.isActive, value as boolean)
+            : undefined,
       ],
-    ]);
+      [
+        "type",
+        (value) =>
+          value && Array.isArray(value)
+            ? inArray(table_shipping_method.type, value as string[])
+            : undefined,
+      ],
+    ]) as Map<string, (value?: unknown, filters?: ParamFilter) => unknown>;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData(
     row: any,
-    index: number
+    index?: number
   ): ShippingMethodDropdownOption {
     const name =
       typeof row.name === "string"
@@ -92,8 +101,8 @@ class ShippingMethodDropdownListModel extends BaseViewListModel<
       },
       (query) => {
         return query
-          .where(eq(table_shipping_method.isActive, true))
-          .orderBy(asc(table_shipping_method.order));
+          .orderBy(asc(table_shipping_method.order))
+          .limit(params.limit);
       }
     );
 
@@ -107,4 +116,3 @@ class ShippingMethodDropdownListModel extends BaseViewListModel<
 }
 
 export default ShippingMethodDropdownListModel;
-
