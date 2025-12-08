@@ -4,8 +4,9 @@ import type {
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, inArray } from "drizzle-orm";
 import { table_payment_term } from "../../schemas/payment-term";
+import { ParamFilter } from "../interfaces/FilterInterface";
 
 type PaymentTermDropdownOption = {
   label: string;
@@ -54,17 +55,23 @@ class PaymentTermDropdownListModel extends BaseViewListModel<
     return new Map([
       [
         "isActive",
-        (value: boolean | undefined) => {
-          return eq(table_payment_term.isActive, true);
-        },
+        (value) =>
+          value ? eq(table_payment_term.isActive, value as boolean) : undefined,
       ],
-    ]);
+      [
+        "type",
+        (value) =>
+          value && Array.isArray(value)
+            ? inArray(table_payment_term.type, value as string[])
+            : undefined,
+      ],
+    ]) as Map<string, (value?: unknown, filters?: ParamFilter) => unknown>;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData(
     row: any,
-    index: number
+    index?: number
   ): PaymentTermDropdownOption {
     const name =
       typeof row.name === "string"
@@ -91,9 +98,7 @@ class PaymentTermDropdownListModel extends BaseViewListModel<
         order: table_payment_term.order,
       },
       (query) => {
-        return query
-          .where(eq(table_payment_term.isActive, true))
-          .orderBy(asc(table_payment_term.order));
+        return query.orderBy(asc(table_payment_term.order)).limit(params.limit);
       }
     );
 
@@ -107,4 +112,3 @@ class PaymentTermDropdownListModel extends BaseViewListModel<
 }
 
 export default PaymentTermDropdownListModel;
-

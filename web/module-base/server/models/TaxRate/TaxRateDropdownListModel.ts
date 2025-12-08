@@ -4,8 +4,9 @@ import type {
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, inArray } from "drizzle-orm";
 import { table_tax_rate } from "../../schemas/tax-rate";
+import { ParamFilter } from "../interfaces/FilterInterface";
 
 type TaxRateDropdownOption = {
   label: string;
@@ -54,17 +55,23 @@ class TaxRateDropdownListModel extends BaseViewListModel<
     return new Map([
       [
         "isActive",
-        (value: boolean | undefined) => {
-          return eq(table_tax_rate.isActive, true);
-        },
+        (value) =>
+          value ? eq(table_tax_rate.isActive, value as boolean) : undefined,
       ],
-    ]);
+      [
+        "type",
+        (value) =>
+          value && Array.isArray(value)
+            ? inArray(table_tax_rate.type, value as string[])
+            : undefined,
+      ],
+    ]) as Map<string, (value?: unknown, filters?: ParamFilter) => unknown>;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData(
     row: any,
-    index: number
+    index?: number
   ): TaxRateDropdownOption {
     const name =
       typeof row.name === "string"
@@ -91,9 +98,7 @@ class TaxRateDropdownListModel extends BaseViewListModel<
         order: table_tax_rate.order,
       },
       (query) => {
-        return query
-          .where(eq(table_tax_rate.isActive, true))
-          .orderBy(asc(table_tax_rate.order));
+        return query.orderBy(asc(table_tax_rate.order)).limit(params.limit);
       }
     );
 
@@ -107,4 +112,3 @@ class TaxRateDropdownListModel extends BaseViewListModel<
 }
 
 export default TaxRateDropdownListModel;
-

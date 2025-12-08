@@ -1,9 +1,10 @@
 "use client";
 
+import { ProductMasterFeaturesEnum } from "@/modules/product/server/models/interfaces/ProductMaster";
 import {
-  IBaseInput,
   IBaseInputNumber,
   IBaseSingleSelect,
+  IBaseSingleSelectAsync,
   SelectItemOption,
 } from "@base/client/components";
 import ClientHttpService from "@base/client/services/ClientHttpService";
@@ -170,15 +171,23 @@ export default function OrderLinesSection({
                     name={`lines.${index}.productId`}
                     control={control}
                     render={({ field, fieldState }) => (
-                      <IBaseInput
-                        {...field}
-                        value={field.value}
-                        onValueChange={field.onChange}
+                      <IBaseSingleSelectAsync
                         label={t("product")}
                         size="sm"
+                        model="product.dropdown"
+                        selectedKey={field.value}
+                        onSelectionChange={(key) => {
+                          field.onChange(key || undefined);
+                        }}
                         isRequired
                         isInvalid={fieldState.invalid}
                         errorMessage={fieldState.error?.message}
+                        defaultParams={{
+                          filters: {
+                            isActive: true,
+                            features: [ProductMasterFeaturesEnum.SALE],
+                          },
+                        }}
                       />
                     )}
                   />

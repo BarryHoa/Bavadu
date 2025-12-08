@@ -239,6 +239,8 @@ export abstract class BaseViewListModel<
 
     query = query.orderBy(...orderByExpressions);
 
+    // console.log(query.toSQL());
+
     // drizzle select is then-able, so await directly
     const result = (await query.limit(limit).offset(offset)) as Array<
       Record<string, unknown>

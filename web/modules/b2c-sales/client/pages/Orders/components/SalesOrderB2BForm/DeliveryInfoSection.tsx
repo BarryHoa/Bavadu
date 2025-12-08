@@ -1,27 +1,27 @@
 "use client";
 
-import { IBaseInput, IBaseInputNumber, IBaseSingleSelect, SelectItemOption } from "@base/client/components";
+import {
+  IBaseInput,
+  IBaseInputNumber,
+  IBaseSingleSelectAsync,
+} from "@base/client/components";
 import { useTranslations } from "next-intl";
 import { Control, Controller } from "react-hook-form";
+import { useSalesOrderB2BForm } from "../../contexts/SalesOrderB2BFormContext";
 
 interface DeliveryInfoSectionProps {
   control: Control<any>;
-  paymentMethodOptions: SelectItemOption[];
-  shippingMethodOptions: SelectItemOption[];
-  shippingTermOptions: SelectItemOption[];
   isShippingOtherThanPickup: boolean;
   errors?: any;
 }
 
 export default function DeliveryInfoSection({
   control,
-  paymentMethodOptions,
-  shippingMethodOptions,
-  shippingTermOptions,
   isShippingOtherThanPickup,
   errors,
 }: DeliveryInfoSectionProps) {
   const t = useTranslations("b2cSales.order.create.labels");
+  const { page } = useSalesOrderB2BForm();
   return (
     <div>
       <h2 className="text-base font-semibold mb-2">{t("deliveryInfo")}</h2>
@@ -30,16 +30,34 @@ export default function DeliveryInfoSection({
           name="paymentMethodId"
           control={control}
           render={({ field, fieldState }) => (
-            <IBaseSingleSelect
+            <IBaseSingleSelectAsync
               label={t("paymentMethod")}
               size="sm"
-              items={paymentMethodOptions}
+              model="payment-method"
+              defaultParams={{ filters: { type: ["b2c", "all"] } }}
               selectedKey={field.value}
               onSelectionChange={(key) => {
                 field.onChange(key || undefined);
               }}
+              callWhen="mount"
+              isRequired
               isInvalid={fieldState.invalid}
               errorMessage={fieldState.error?.message}
+              onTheFirstFetchSuccess={(data) => {
+                if (page === "create") {
+                  if (!field.value && data?.data?.length > 0) {
+                    // Prefer payment method with value 'CASH' if present; else fallback
+                    const cashItem = data.data.find(
+                      (item: any) => item.code === "CASH"
+                    );
+                    if (cashItem) {
+                      field.onChange(cashItem.value);
+                    } else {
+                      field.onChange(data?.data[0].value);
+                    }
+                  }
+                }
+              }}
             />
           )}
         />
@@ -47,16 +65,34 @@ export default function DeliveryInfoSection({
           name="shippingMethodId"
           control={control}
           render={({ field, fieldState }) => (
-            <IBaseSingleSelect
+            <IBaseSingleSelectAsync
               label={t("shippingMethod")}
               size="sm"
-              items={shippingMethodOptions}
+              model="shipping-method"
               selectedKey={field.value}
               onSelectionChange={(key) => {
                 field.onChange(key || undefined);
               }}
+              defaultParams={{ filters: { type: ["b2c", "all"] } }}
+              callWhen="mount"
+              isRequired
               isInvalid={fieldState.invalid}
               errorMessage={fieldState.error?.message}
+              onTheFirstFetchSuccess={(data) => {
+                if (page === "create") {
+                  if (!field.value && data?.data?.length > 0) {
+                    // find pickup value in data.data
+                    const pickupValue = data.data.find(
+                      (item: any) => item.code === "pickup"
+                    );
+                    if (pickupValue) {
+                      field.onChange(pickupValue.value);
+                    } else {
+                      field.onChange(data.data[0].value);
+                    }
+                  }
+                }
+              }}
             />
           )}
         />
@@ -97,7 +133,9 @@ export default function DeliveryInfoSection({
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   value={field.value ? Number(field.value) : 0}
-                  onValueChange={(val) => field.onChange(val?.toString() ?? "0")}
+                  onValueChange={(val) =>
+                    field.onChange(val?.toString() ?? "0")
+                  }
                   size="sm"
                   label={t("shippingFee")}
                   min={0}
@@ -130,4 +168,3 @@ export default function DeliveryInfoSection({
     </div>
   );
 }
-

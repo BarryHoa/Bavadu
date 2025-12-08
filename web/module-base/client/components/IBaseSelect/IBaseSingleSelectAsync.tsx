@@ -16,6 +16,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { useLocalizedText } from "../../hooks/useLocalizedText";
 import IBaseInputSearch from "../IBaseInputSearch";
 import IBaseSelect, { IBaseSelectProps } from "./IBaseSelect";
 import type { SelectItemOption } from "./IBaseSingleSelect";
@@ -31,6 +32,7 @@ export interface IBaseSingleSelectAsyncProps extends Omit<
   "children" | "selectionMode" | "onSelectionChange" | "selectedKeys"
 > {
   selectedKey?: string;
+  onRenderOption?: (item: SelectItemOption) => React.ReactNode;
   onSelectionChange?: (key?: string, item?: SelectItemOption) => void;
   // Either provide a fetch function or a model string
   model?: string;
@@ -63,9 +65,12 @@ const IBaseSingleSelectAsync = React.forwardRef<
     searchPlaceholder,
     defaultLimit = 20,
     defaultParams = {},
+    onRenderOption,
     ...rest
   } = props;
   const componentKeyId = useId();
+
+  const localizedText = useLocalizedText();
 
   const tSelectAsync = useTranslations("components.selectAsync");
 
@@ -420,8 +425,8 @@ const IBaseSingleSelectAsync = React.forwardRef<
         )}
 
         {allItems.map((item) => (
-          <SelectItem key={item.value} textValue={item.label}>
-            {item.label}
+          <SelectItem key={item.value} textValue={localizedText(item.label)}>
+            {onRenderOption ? onRenderOption(item) : localizedText(item.label)}
           </SelectItem>
         ))}
 

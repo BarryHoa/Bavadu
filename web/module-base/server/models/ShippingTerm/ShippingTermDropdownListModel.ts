@@ -4,8 +4,9 @@ import type {
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, inArray } from "drizzle-orm";
 import { table_shipping_term } from "../../schemas/shipping-term";
+import { ParamFilter } from "../interfaces/FilterInterface";
 
 type ShippingTermDropdownOption = {
   label: string;
@@ -54,17 +55,25 @@ class ShippingTermDropdownListModel extends BaseViewListModel<
     return new Map([
       [
         "isActive",
-        (value: boolean | undefined) => {
-          return eq(table_shipping_term.isActive, true);
-        },
+        (value) =>
+          value
+            ? eq(table_shipping_term.isActive, value as boolean)
+            : undefined,
       ],
-    ]);
+      [
+        "type",
+        (value) =>
+          value && Array.isArray(value)
+            ? inArray(table_shipping_term.type, value as string[])
+            : undefined,
+      ],
+    ]) as Map<string, (value?: unknown, filters?: ParamFilter) => unknown>;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData(
     row: any,
-    index: number
+    index?: number
   ): ShippingTermDropdownOption {
     const name =
       typeof row.name === "string"
@@ -92,8 +101,8 @@ class ShippingTermDropdownListModel extends BaseViewListModel<
       },
       (query) => {
         return query
-          .where(eq(table_shipping_term.isActive, true))
-          .orderBy(asc(table_shipping_term.order));
+          .orderBy(asc(table_shipping_term.order))
+          .limit(params.limit);
       }
     );
 
@@ -107,4 +116,3 @@ class ShippingTermDropdownListModel extends BaseViewListModel<
 }
 
 export default ShippingTermDropdownListModel;
-

@@ -240,33 +240,6 @@ export default function SalesOrderB2CForm({
     });
   }, []);
 
-  const paymentMethodOptions = useMemo<SelectItemOption[]>(
-    () =>
-      (paymentMethodsQuery.data ?? []).map((pm) => ({
-        value: pm.value,
-        label: pm.label,
-      })),
-    [paymentMethodsQuery.data]
-  );
-
-  const shippingMethodOptions = useMemo<SelectItemOption[]>(
-    () =>
-      (shippingMethodsQuery.data ?? []).map((sm) => ({
-        value: sm.value,
-        label: sm.label,
-      })),
-    [shippingMethodsQuery.data]
-  );
-
-  const shippingTermOptions = useMemo<SelectItemOption[]>(
-    () =>
-      (shippingTermsQuery.data ?? []).map((st) => ({
-        value: st.value,
-        label: st.label,
-      })),
-    [shippingTermsQuery.data]
-  );
-
   const taxRateOptions = useMemo<SelectItemOption[]>(
     () =>
       (taxRatesQuery.data ?? []).map((tr) => {
@@ -359,9 +332,6 @@ export default function SalesOrderB2CForm({
         <CardBody className="p-4">
           <DeliveryInfoSection
             control={control}
-            paymentMethodOptions={paymentMethodOptions}
-            shippingMethodOptions={shippingMethodOptions}
-            shippingTermOptions={shippingTermOptions}
             isShippingOtherThanPickup={isShippingOtherThanPickup}
             errors={errors}
           />

@@ -1,13 +1,13 @@
 import { ParamFilter } from "@base/server";
 import { LocaleDataType } from "@base/server/interfaces/Locale";
-import { ProductVariant } from "../interfaces/ProductVariant";
+import { ProductAttribute } from "../interfaces/ProductAttribute";
 import {
   MasterProduct,
   ProductMasterEnum,
   ProductMasterFeatures,
 } from "../interfaces/ProductMaster";
 import { ProductPacking } from "../interfaces/ProductPacking";
-import { ProductAttribute } from "../interfaces/ProductAttribute";
+import { ProductVariant } from "../interfaces/ProductVariant";
 
 export interface ProductFilter extends ParamFilter {
   productMasterId?: string;
@@ -16,6 +16,7 @@ export interface ProductFilter extends ParamFilter {
   sku?: string;
   barcode?: string;
   manufacturer?: string;
+  isActive?: boolean;
 }
 export interface ProductVariantElm extends ProductVariant {}
 

@@ -4,8 +4,9 @@ import type {
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, inArray } from "drizzle-orm";
 import { table_payment_method } from "../../schemas/payment-method";
+import { ParamFilter } from "../interfaces/FilterInterface";
 
 type PaymentMethodDropdownOption = {
   label: string;
@@ -54,18 +55,25 @@ class PaymentMethodDropdownListModel extends BaseViewListModel<
     return new Map([
       [
         "isActive",
-        (value: boolean | undefined) => {
-          // Always filter active items for dropdown
-          return eq(table_payment_method.isActive, true);
-        },
+        (value) =>
+          value
+            ? eq(table_payment_method.isActive, value as boolean)
+            : undefined,
       ],
-    ]);
+      [
+        "type",
+        (value) =>
+          value && Array.isArray(value)
+            ? inArray(table_payment_method.type, value as string[])
+            : undefined,
+      ],
+    ]) as Map<string, (value?: unknown, filters?: ParamFilter) => unknown>;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData(
     row: any,
-    index: number
+    index?: number
   ): PaymentMethodDropdownOption {
     // Handle LocaleDataType<string> for name
     const name =
@@ -93,10 +101,9 @@ class PaymentMethodDropdownListModel extends BaseViewListModel<
         order: table_payment_method.order,
       },
       (query) => {
-        // Filter only active payment methods
         return query
-          .where(eq(table_payment_method.isActive, true))
-          .orderBy(asc(table_payment_method.order));
+          .orderBy(asc(table_payment_method.order))
+          .limit(params.limit);
       }
     );
 
