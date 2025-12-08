@@ -1,11 +1,16 @@
 // Explicit exports to avoid Next.js analyzing all files in the directory
-export { default as DataTable } from "./DataTable";
+// Backward compatibility: DataTable is now IBaseTable
+export { default as DataTable } from "./IBaseTable";
 export type {
-  DataTableColumn,
-  DataTableColumnDefinition,
-  DataTableProps,
-  DataTableSummary,
-} from "./DataTable";
+  IBaseTableColumnDefinition as DataTableColumn,
+  IBaseTableColumnDefinition as DataTableColumnDefinition,
+  IBaseTableProps as DataTableProps,
+  IBaseTableSummary as DataTableSummary,
+} from "./IBaseTable/IBaseTableInterface";
+export {
+  I_BASE_TABLE_COLUMN_KEY_ACTION as DATA_TABLE_COLUMN_KEY_ACTION,
+  I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER as DATA_TABLE_COLUMN_KEY_ROW_NUMBER,
+} from "./IBaseTable/IBaseTableInterface";
 
 export { default as ViewListDataTable } from "./ViewListDataTable";
 export type { FilterOption } from "./ViewListDataTable/components/FilterMenu";
@@ -22,8 +27,6 @@ export { default as IBaseInputNumber } from "./IBaseInputNumber";
 export type { IBaseInputNumberProps } from "./IBaseInputNumber";
 export { default as IBaseInputSearch } from "./IBaseInputSearch";
 export type { IBaseInputSearchProps } from "./IBaseInputSearch";
-export { default as IBaseTextarea, default as Textarea } from "./IBaseTextarea";
-export type { IBaseTextareaProps } from "./IBaseTextarea";
 export {
   default as IBaseModal,
   IBaseModalBody,
@@ -56,20 +59,24 @@ export type {
   FetchOptionsParams,
   IBaseSingleSelectAsyncProps,
 } from "./IBaseSelect/IBaseSingleSelectAsync";
-export { default as IBaseTabs, Tab } from "./IBaseTabs";
-export type { IBaseTabsProps } from "./IBaseTabs";
-export { default as IBaseTooltip } from "./IBaseTooltip";
 export {
   default as IBaseTable,
+  useColumns as useIBaseTableColumns,
   useIBaseTableCore,
+  useIBaseTablePagination,
 } from "./IBaseTable";
-export type { IBaseTableProps } from "./IBaseTable";
 export type {
-  IBaseTableCoreProps,
   IBaseTableCoreColumn,
+  IBaseTableCoreProps,
   IBaseTableCoreReturn,
 } from "./IBaseTable/IBaseTableCore";
+export type { IBaseTableProps } from "./IBaseTable/IBaseTableInterface";
 export type { IBaseTableUIProps } from "./IBaseTable/IBaseTableUI";
+export { default as IBaseTabs, Tab } from "./IBaseTabs";
+export type { IBaseTabsProps } from "./IBaseTabs";
+export { default as IBaseTextarea, default as Textarea } from "./IBaseTextarea";
+export type { IBaseTextareaProps } from "./IBaseTextarea";
+export { default as IBaseTooltip } from "./IBaseTooltip";
 export * from "./LoadingBar";
 export * from "./LoadingOverlay";
 export { default as MarkdownContent } from "./MarkdownContent";

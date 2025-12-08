@@ -3,7 +3,7 @@ import type { CSSProperties, ReactNode } from "react";
 
 export type RowSelectionMode = "single" | "multiple";
 
-export interface DataTableRowSelection<T = any> {
+export interface IBaseTableRowSelection<T = any> {
   type?: RowSelectionMode;
   selectedRowKeys?: Array<string | number>;
   defaultSelectedRowKeys?: Array<string | number>;
@@ -13,22 +13,23 @@ export interface DataTableRowSelection<T = any> {
   ) => void;
 }
 
-export const DATA_TABLE_COLUMN_KEY_ACTION = "__action__";
-export const DATA_TABLE_COLUMN_KEY_ROW_NUMBER = "__row-number__";
+export const I_BASE_TABLE_COLUMN_KEY_ACTION = "__action__";
+export const I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER = "__row-number__";
 
-export type DataTablePagination = {
+export type IBaseTablePagination = {
   pageSize?: number;
   pageSizeOptions?: number[];
   page?: number;
   showTotal?: boolean;
 };
 
-export type DataTableOnChange = (params: {
+export type IBaseTableOnChange = (params: {
   page: number;
   pageSize: number;
   sort?: SortDescriptor;
 }) => void;
-type DataTableClassNames = {
+
+type IBaseTableClassNames = {
   wrapper?: string;
   table?: string;
   thead?: string;
@@ -40,7 +41,7 @@ type DataTableClassNames = {
   pagination?: string;
 };
 
-export type DataTableColumnSortIcon =
+export type IBaseTableColumnSortIcon =
   | ReactNode
   | {
       default?: ReactNode;
@@ -48,7 +49,7 @@ export type DataTableColumnSortIcon =
       descending?: ReactNode;
     };
 
-export interface DataTableColumnDefinition<T = any> {
+export interface IBaseTableColumnDefinition<T = any> {
   key: string;
   title?: ReactNode;
   label?: string;
@@ -60,25 +61,26 @@ export interface DataTableColumnDefinition<T = any> {
   sortable?: boolean;
   fixed?: "left" | "right";
   render?: (value: any, record: T, index: number) => ReactNode;
-  sortIcon?: DataTableColumnSortIcon;
+  sortIcon?: IBaseTableColumnSortIcon;
   isResizable?: boolean;
   isDraggable?: boolean;
 }
 
-export interface ProcessedDataTableColumn<T = any>
-  extends DataTableColumnDefinition<T> {
+export interface ProcessedIBaseTableColumn<
+  T = any,
+> extends IBaseTableColumnDefinition<T> {
   frozenStyle?: CSSProperties;
   frozenClassName?: string;
   renderValue: (record: T, index: number) => ReactNode;
 }
 
-export interface DataTableSummary {
+export interface IBaseTableSummary {
   label?: string;
   values: Record<string, ReactNode>;
 }
 
-export type DataTableProps<T = any> = TableProps & {
-  columns: DataTableColumnDefinition<T>[];
+export type IBaseTableProps<T = any> = TableProps & {
+  columns: IBaseTableColumnDefinition<T>[];
   dataSource: T[];
   total?: number;
   rowKey?: string;
@@ -88,12 +90,12 @@ export type DataTableProps<T = any> = TableProps & {
   isRefreshData?: boolean;
   loading?: boolean;
 
-  pagination?: DataTablePagination | false;
-  summary?: DataTableSummary;
-  rowSelection?: DataTableRowSelection<T> | false;
-  classNames?: DataTableClassNames;
+  pagination?: IBaseTablePagination | false;
+  summary?: IBaseTableSummary;
+  rowSelection?: IBaseTableRowSelection<T> | false;
+  classNames?: IBaseTableClassNames;
   emptyContent?: ReactNode;
   //On change Table
-  onChangeTable?: DataTableOnChange;
+  onChangeTable?: IBaseTableOnChange;
   onRefresh?: () => void;
 };

@@ -1,129 +1,119 @@
 "use client";
 
-import type { Selection, SortDescriptor, TableProps } from "@heroui/table";
+import { RefreshCw } from "lucide-react";
+import { useMemo } from "react";
+
+import type { IBaseTableCoreColumn } from "@base/client/components";
+import { IBaseTooltip } from "@base/client/components";
+import type { Selection } from "@heroui/react";
+import type { TableProps } from "@heroui/table";
 import clsx from "clsx";
-import { useCallback, useMemo } from "react";
+import { useTranslations } from "next-intl";
+import PaginationComponent from "../Pagination/Pagination";
+import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
+import { useIBaseTableCore } from "./IBaseTableCore";
 import {
-  useIBaseTableCore,
-  type IBaseTableCoreColumn,
-  type IBaseTableCoreProps,
-} from "./IBaseTableCore";
+  I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
+  type IBaseTableProps as IBaseTablePropsType,
+} from "./IBaseTableInterface";
 import IBaseTableUI from "./IBaseTableUI";
+import useColumns from "./hooks/useColumns";
+import { useIBaseTablePagination } from "./hooks/useIBaseTablePagination";
 
-export interface IBaseTableProps<T = any>
-  extends Omit<IBaseTableCoreProps<T>, "columns"> {
-  columns: IBaseTableCoreColumn<T>[];
-  // UI Props
-  loading?: boolean;
-  emptyContent?: React.ReactNode;
-  classNames?: {
-    wrapper?: string;
-    table?: string;
-    thead?: string;
-    tbody?: string;
-    tr?: string;
-    th?: string;
-    td?: string;
-  };
-  tableLayout?: "auto" | "fixed";
-  color?: TableProps["color"];
-  isStriped?: boolean;
-  isCompact?: boolean;
-  isHeaderSticky?: boolean;
-  // Additional props
-  "aria-label"?: string;
-}
+export default function IBaseTable<T = any>({
+  columns,
+  dataSource,
+  total: totalProps = 0,
+  rowKey = "id",
+  pagination = { pageSize: PAGINATION_DEFAULT_PAGE_SIZE, page: 1 },
+  loading = false,
+  color = "primary",
+  summary: _summary,
+  rowSelection = false,
+  onChangeTable,
+  classNames = {},
+  emptyContent = "No data available",
+  tableLayout = "auto",
+  isResizableColumns = true,
+  isDraggableColumns = true,
+  isRefreshData = true,
+  onRefresh,
+  ...rest
+}: IBaseTablePropsType<T>) {
+  const t = useTranslations("dataTable");
 
-export default function IBaseTable<T = any>(props: IBaseTableProps<T>) {
-  const {
-    columns,
-    data,
-    loading = false,
-    emptyContent = "No data available",
-    classNames = {},
-    tableLayout = "auto",
-    color = "primary",
-    isStriped = true,
-    isCompact = true,
-    isHeaderSticky = true,
-    rowKey = "id",
-    pagination,
-    sorting,
-    rowSelection,
-    enableColumnResizing = true,
-    enableColumnPinning = true,
-    enableColumnVisibility = false,
-    enableColumnOrdering = false,
-    enableGrouping = false,
-    grouping,
-    onGroupingChange,
-    expanded,
-    onExpandedChange,
-    onColumnOrderChange,
-    manualPagination = false,
-    manualSorting = false,
-    onPaginationChange,
-    onSortingChange,
-    onRowSelectionChange,
-    ...rest
-  } = props;
+  const processedColumns = useColumns(columns);
 
-  // Core logic
+  // Convert ProcessedIBaseTableColumn to IBaseTableCoreColumn
+  const iBaseTableColumns = useMemo<IBaseTableCoreColumn<T>[]>(() => {
+    return processedColumns.map((col) => ({
+      key: col.key,
+      title: col.title,
+      label: col.label,
+      dataIndex: col.dataIndex,
+      align: col.align,
+      width: col.width,
+      minWidth: col.minWidth,
+      maxWidth: col.maxWidth,
+      sortable: col.sortable,
+      fixed: col.fixed,
+      render: (value: any, record: T, index: number) => {
+        // Use renderValue from processed column
+        return col.renderValue(record, index);
+      },
+      isResizable: col.isResizable,
+      isDraggable: col.isDraggable,
+      enableSorting: col.sortable,
+      enablePinning: !!col.fixed,
+      enableResizing: col.isResizable,
+      meta: {
+        frozenStyle: col.frozenStyle,
+        frozenClassName: col.frozenClassName,
+        isRowNumber: col.key === I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
+      },
+    }));
+  }, [processedColumns]);
+
+  // Core table logic - all logic is now in useIBaseTableCore
   const core = useIBaseTableCore<T>({
-    data,
-    columns,
+    data: dataSource,
+    columns: iBaseTableColumns,
     rowKey,
-    pagination,
-    manualPagination,
-    sorting,
-    manualSorting,
-    rowSelection,
-    enableColumnResizing,
-    enableColumnPinning,
-    enableColumnVisibility,
-    enableColumnOrdering,
-    enableGrouping,
-    grouping,
-    onGroupingChange,
-    expanded,
-    onExpandedChange,
-    onColumnOrderChange,
-    onPaginationChange,
-    onSortingChange,
-    onRowSelectionChange,
-  });
-
-  // Get row key function
-  const getRowKey = useMemo(() => {
-    if (typeof rowKey === "function") {
-      return rowKey;
-    }
-    return (record: T, index: number): string => {
-      const key = (record as any)[rowKey];
-      return key !== undefined && key !== null ? String(key) : String(index);
-    };
-  }, [rowKey]);
-
-  // Memoize selection change handler
-  const handleSelectionChange = useCallback(
-    (keys: Selection) => {
-      if (rowSelection === false) return;
-
-      if (keys === "all") {
-        core.toggleAllRowsSelection(true);
-      } else if (keys instanceof Set) {
-        // Update selection based on HeroUI Selection
-        const newSelection: Record<string, boolean> = {};
-        keys.forEach((key) => {
-          newSelection[String(key)] = true;
-        });
-        core.setRowSelection(newSelection);
-      } else {
-        core.resetRowSelection();
+    pagination:
+      pagination && typeof pagination === "object"
+        ? {
+            page: pagination.page ?? 1,
+            pageSize: pagination.pageSize ?? PAGINATION_DEFAULT_PAGE_SIZE,
+            total: Math.max(0, typeof totalProps === "number" ? totalProps : 0),
+          }
+        : false,
+    manualPagination: true,
+    manualSorting: true,
+    rowSelection:
+      rowSelection === false
+        ? false
+        : {
+            type: rowSelection?.type || "multiple",
+            selectedRowKeys: rowSelection?.selectedRowKeys,
+            onChange: rowSelection?.onChange,
+          },
+    enableColumnResizing: isResizableColumns,
+    enableColumnPinning: true,
+    enableColumnOrdering: isDraggableColumns,
+    onChangeTable, // Combined callback for pagination + sorting
+    onRowSelectionChange: (selectedRowKeys, selectedRows) => {
+      if (rowSelection !== false && rowSelection?.onChange) {
+        rowSelection.onChange(selectedRowKeys, selectedRows);
       }
     },
-    [rowSelection, core]
-  );
+  });
+
+  // All pagination logic is handled by useIBaseTablePagination hook
+  const paginationState = useIBaseTablePagination({
+    pagination,
+    total: totalProps,
+    paginationInfo: core.paginationInfo,
+  });
 
   // Convert row selection state to HeroUI format
   const selectionProps = useMemo(() => {
@@ -131,70 +121,114 @@ export default function IBaseTable<T = any>(props: IBaseTableProps<T>) {
       return undefined;
     }
 
-    if (!rowSelection) {
-      return undefined;
-    }
-
     const selectedKeysSet = new Set(core.selectedRowKeys);
 
     return {
-      selectionMode: (rowSelection.type === "single"
+      selectionMode: (rowSelection?.type === "single"
         ? "single"
         : "multiple") as TableProps["selectionMode"],
       selectedKeys: selectedKeysSet.size > 0 ? selectedKeysSet : undefined,
-      onSelectionChange: handleSelectionChange,
+      onSelectionChange: (keys: Selection) => {
+        if (keys === "all") {
+          core.toggleAllRowsSelection(true);
+        } else if (keys instanceof Set) {
+          const newSelection: Record<string, boolean> = {};
+          keys.forEach((key) => {
+            newSelection[String(key)] = true;
+          });
+          core.setRowSelection(newSelection);
+        } else {
+          core.resetRowSelection();
+        }
+      },
     };
-  }, [rowSelection, core.selectedRowKeys, handleSelectionChange]);
+  }, [rowSelection, core]);
 
-  // Convert sorting state to SortDescriptor
-  const sortDescriptor = useMemo<SortDescriptor | undefined>(() => {
-    if (core.sortingState.length === 0) return undefined;
+  // Use pagination summary from hook and translate it
+  const paginationSummary = useMemo(() => {
+    return t("summary", paginationState.paginationSummary);
+  }, [paginationState.paginationSummary, t]);
 
-    const firstSort = core.sortingState[0];
-    return {
-      column: String(firstSort.id),
-      direction: firstSort.desc ? "descending" : "ascending",
-    };
-  }, [core.sortingState]);
-
-  const handleSortChange = useCallback(
-    (sort: SortDescriptor) => {
-      core.setSorting([
-        {
-          id: String(sort.column),
-          desc: sort.direction === "descending",
-        },
-      ]);
-
-      if (onSortingChange) {
-        onSortingChange(sort);
-      }
-    },
-    [core, onSortingChange]
-  );
+  const shouldRenderFooter =
+    isRefreshData ||
+    Boolean(paginationSummary) ||
+    (paginationState.showPaginationControls &&
+      paginationState.paginationInfo.pages > 1);
 
   return (
     <div className={clsx("w-full bg-content1", classNames.wrapper)}>
-      <IBaseTableUI
-        headerGroups={core.headerGroups}
-        rows={core.rows}
-        visibleColumns={core.visibleColumns}
-        loading={loading}
-        emptyContent={emptyContent}
-        classNames={classNames}
-        tableLayout={tableLayout}
-        color={color}
-        isStriped={isStriped}
-        isCompact={isCompact}
-        isHeaderSticky={isHeaderSticky}
-        selectionMode={selectionProps?.selectionMode}
-        selectedKeys={selectionProps?.selectedKeys}
-        onSelectionChange={selectionProps?.onSelectionChange}
-        sortDescriptor={sortDescriptor}
-        onSortChange={handleSortChange}
-        getRowKey={getRowKey}
-        {...rest}
-      />
+      <div className="flex flex-1 flex-col gap-4">
+        <IBaseTableUI
+          headerGroups={core.headerGroups}
+          rows={core.rows}
+          visibleColumns={core.visibleColumns}
+          loading={loading}
+          emptyContent={emptyContent ?? t("empty")}
+          classNames={classNames}
+          tableLayout={tableLayout}
+          color={color}
+          isStriped={true}
+          isCompact={true}
+          isHeaderSticky={true}
+          selectionMode={selectionProps?.selectionMode}
+          selectedKeys={selectionProps?.selectedKeys}
+          onSelectionChange={selectionProps?.onSelectionChange}
+          sortDescriptor={core.sortDescriptor}
+          onSortChange={core.handleSortChange}
+          getRowKey={core.getRowKey}
+          renderCell={(column, row, cellValue) => {
+            // Handle row number column with pagination offset
+            const meta = (column.columnDef.meta as Record<string, any>) || {};
+            if (meta.isRowNumber && paginationState.paginationInfo) {
+              return paginationState.paginationInfo.from + row.index + 1;
+            }
+            // Return undefined - IBaseTableUI will check and use flexRender if undefined
+            return undefined;
+          }}
+          aria-label={t("ariaLabel")}
+          {...rest}
+        />
+      </div>
+
+      {shouldRenderFooter && (
+        <div
+          className={clsx(
+            "flex flex-col items-center justify-between px-2 sm:flex-row",
+            classNames.pagination
+          )}
+        >
+          <div className="flex items-center py-2 text-small text-default-500">
+            {paginationSummary}
+            {isRefreshData && (
+              <IBaseTooltip content={t("refresh")}>
+                <button
+                  type="button"
+                  aria-label={t("refresh")}
+                  className="ml-2 inline-flex items-center rounded p-1 transition-colors hover:bg-default-100"
+                  onClick={onRefresh}
+                >
+                  <RefreshCw className="h-4 w-4 text-default-500 hover:text-primary" />
+                </button>
+              </IBaseTooltip>
+            )}
+          </div>
+
+          {paginationState.showPaginationControls &&
+            core.handlePageChange &&
+            core.handlePageSizeChange && (
+              <PaginationComponent
+                page={paginationState.paginationInfo.currentPage}
+                pageSize={paginationState.paginationInfo.pageSize}
+                pages={paginationState.paginationInfo.pages}
+                pageSizeOptions={
+                  paginationState.paginationDefault.pageSizeOptions
+                }
+                onChange={core.handlePageChange}
+                onPageSizeChange={core.handlePageSizeChange}
+              />
+            )}
+        </div>
+      )}
     </div>
   );
 }

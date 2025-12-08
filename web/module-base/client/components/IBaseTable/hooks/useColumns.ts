@@ -3,10 +3,10 @@ import { useMemo } from "react";
 
 import { useTranslations } from "next-intl";
 import {
-  DATA_TABLE_COLUMN_KEY_ROW_NUMBER,
-  type DataTableColumnDefinition,
-  type ProcessedDataTableColumn,
-} from "../DataTableInterface";
+  I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
+  type IBaseTableColumnDefinition,
+  type ProcessedIBaseTableColumn,
+} from "../IBaseTableInterface";
 
 type FrozenColumn = {
   key: string;
@@ -20,7 +20,7 @@ type FrozenMeta = {
 };
 
 const computeFrozenMeta = <T>(
-  columns: DataTableColumnDefinition<T>[]
+  columns: IBaseTableColumnDefinition<T>[]
 ): FrozenMeta => {
   let leftOffset = 0;
   let rightOffset = 0;
@@ -102,7 +102,7 @@ const getFrozenClassName = (
 };
 
 const buildRenderValue = <T>(
-  column: DataTableColumnDefinition<T>
+  column: IBaseTableColumnDefinition<T>
 ): ((record: T, index: number) => ReactNode) => {
   return (record: T, index: number) => {
     const value = (record as any)[column.key];
@@ -116,21 +116,21 @@ const buildRenderValue = <T>(
 };
 
 const useColumns = <T>(
-  columns: DataTableColumnDefinition<T>[]
-): ProcessedDataTableColumn<T>[] => {
+  columns: IBaseTableColumnDefinition<T>[]
+): ProcessedIBaseTableColumn<T>[] => {
   const t = useTranslations("dataTable");
   return useMemo(() => {
     const frozenMeta = computeFrozenMeta(columns);
 
-    const numberColumn: ProcessedDataTableColumn<T> = {
-      key: DATA_TABLE_COLUMN_KEY_ROW_NUMBER,
+    const numberColumn: ProcessedIBaseTableColumn<T> = {
+      key: I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
       label: t("columns.number"),
       width: 64,
       align: "center",
       fixed: "left",
-      frozenStyle: getFrozenStyle(DATA_TABLE_COLUMN_KEY_ROW_NUMBER, frozenMeta),
+      frozenStyle: getFrozenStyle(I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER, frozenMeta),
       frozenClassName: getFrozenClassName(
-        DATA_TABLE_COLUMN_KEY_ROW_NUMBER,
+        I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
         frozenMeta
       ),
       renderValue: (_record: T, index: number) => index + 1,
@@ -149,20 +149,22 @@ const useColumns = <T>(
         frozenStyle,
         frozenClassName,
         renderValue: buildRenderValue(column),
-        isResizable: [DATA_TABLE_COLUMN_KEY_ROW_NUMBER, "__action__"].includes(
+        isResizable: [I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER, "__action__"].includes(
           column.key
         )
           ? false
           : column.isResizable,
-        isDraggable: [DATA_TABLE_COLUMN_KEY_ROW_NUMBER, "__action__"].includes(
+        isDraggable: [I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER, "__action__"].includes(
           column.key
         )
           ? false
           : column.isDraggable,
-      } satisfies ProcessedDataTableColumn<T>;
+      } satisfies ProcessedIBaseTableColumn<T>;
     });
     return [numberColumn, ...processed];
-  }, [columns]);
+  }, [columns, t]);
 };
 
 export default useColumns;
+
+

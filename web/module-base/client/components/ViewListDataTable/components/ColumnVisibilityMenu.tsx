@@ -12,10 +12,10 @@ import {
 import { Table } from "lucide-react";
 import MiniSearch from "minisearch";
 import { useMemo, useState } from "react";
-import { DataTableColumn } from "../../DataTable";
+import { IBaseTableColumnDefinition } from "../../IBaseTable/IBaseTableInterface";
 
 interface ColumnVisibilityMenuProps<T = any> {
-  columns: DataTableColumn<T>[];
+  columns: IBaseTableColumnDefinition<T>[];
   visibleColumns: Set<string>;
   onToggleColumn: (key: string) => void;
 }
@@ -29,7 +29,7 @@ export default function ColumnVisibilityMenu<T = any>({
   const [isOpen, setIsOpen] = useState(false);
 
   const { miniSearch, columnMap } = useMemo(() => {
-    const toLabel = (column: DataTableColumn<T>) => {
+    const toLabel = (column: IBaseTableColumnDefinition<T>) => {
       const source = column.label ?? column.title ?? column.key;
       if (typeof source === "string") return source;
       if (typeof source === "number" || typeof source === "boolean") {
@@ -59,7 +59,7 @@ export default function ColumnVisibilityMenu<T = any>({
     });
     ms.addAll(docs);
 
-    const map = new Map<string, DataTableColumn<T>>();
+    const map = new Map<string, IBaseTableColumnDefinition<T>>();
     columns.forEach((column) => {
       map.set(column.key.toString(), column);
     });
@@ -80,7 +80,9 @@ export default function ColumnVisibilityMenu<T = any>({
 
     return results
       .map((result) => columnMap.get(result.id))
-      .filter((column): column is DataTableColumn<T> => Boolean(column));
+      .filter((column): column is IBaseTableColumnDefinition<T> =>
+        Boolean(column)
+      );
   }, [columns, columnMap, miniSearch, searchTerm]);
 
   const handleToggleColumn = (key: string | number) => {

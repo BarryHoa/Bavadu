@@ -3,7 +3,7 @@
 import {
   DATA_TABLE_COLUMN_KEY_ACTION,
   type DataTableColumn,
-} from "@base/client/components/DataTable";
+} from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { Chip } from "@heroui/react";

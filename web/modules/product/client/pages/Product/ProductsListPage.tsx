@@ -3,7 +3,7 @@ import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import {
   DATA_TABLE_COLUMN_KEY_ACTION,
   DataTableColumn,
-} from "@base/client/components/DataTable";
+} from "@base/client/components";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import type { LocalizeText } from "@base/client/interface/LocalizeText";

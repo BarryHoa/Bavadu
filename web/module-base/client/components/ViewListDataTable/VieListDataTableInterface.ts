@@ -1,7 +1,7 @@
 import { LocaleDataType } from "@base/server";
 import { ButtonProps, LinkProps } from "@heroui/react";
 import { ReactNode } from "react";
-import type { DataTableProps } from "../DataTable/DataTableInterface";
+import type { IBaseTableProps } from "../IBaseTable/IBaseTableInterface";
 import { FilterOption } from "./components/FilterMenu";
 import { GroupOption } from "./components/GroupByMenu";
 
@@ -17,7 +17,7 @@ export type ActionElm = {
     | (Omit<LinkProps, "as"> & { hrefAs?: any });
 };
 export type ViewListDataTableProps<T = any> = Omit<
-  DataTableProps<T>,
+  IBaseTableProps<T>,
   "dataSource"
 > & {
   title?: LocaleDataType<string> | string;

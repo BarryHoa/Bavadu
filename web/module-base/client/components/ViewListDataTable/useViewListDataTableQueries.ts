@@ -4,13 +4,13 @@ import { SortDescriptor } from "@heroui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import ViewListDataTableService from "../../services/ViewListDataTableService";
-import { DataTablePagination } from "../DataTable/DataTableInterface";
+import { IBaseTablePagination } from "../IBaseTable/IBaseTableInterface";
 import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 
 interface UseViewListDataTableQueriesOptions<T = any> {
   model: string;
   isDummyData?: boolean;
-  pagination: DataTablePagination;
+  pagination: IBaseTablePagination;
 }
 
 export function useViewListDataTableQueries<T = any>({

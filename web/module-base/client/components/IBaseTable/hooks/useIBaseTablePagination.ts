@@ -3,10 +3,10 @@ import {
   PAGINATION_DEFAULT_PAGE_SIZE,
   PAGINATION_PAGE_SIZE_OPTIONS,
 } from "../../Pagination/paginationConsts";
-import type { DataTablePagination } from "../DataTableInterface";
+import type { IBaseTablePagination } from "../IBaseTableInterface";
 
-export interface UseDataTablePaginationProps {
-  pagination?: DataTablePagination | false;
+export interface UseIBaseTablePaginationProps {
+  pagination?: IBaseTablePagination | false;
   total?: number;
   paginationInfo?: {
     currentPage: number;
@@ -18,9 +18,9 @@ export interface UseDataTablePaginationProps {
   };
 }
 
-export interface UseDataTablePaginationReturn {
+export interface UseIBaseTablePaginationReturn {
   isPaginationEnabled: boolean;
-  paginationConfig: DataTablePagination | undefined;
+  paginationConfig: IBaseTablePagination | undefined;
   paginationDefault: {
     page: number;
     pageSize: number;
@@ -42,16 +42,16 @@ export interface UseDataTablePaginationReturn {
   showPaginationControls: boolean;
 }
 
-export function useDataTablePagination({
+export function useIBaseTablePagination({
   pagination,
   total: totalProps = 0,
   paginationInfo: corePaginationInfo,
-}: UseDataTablePaginationProps): UseDataTablePaginationReturn {
+}: UseIBaseTablePaginationProps): UseIBaseTablePaginationReturn {
   // Pagination setup
   const isPaginationEnabled = Boolean(pagination && typeof pagination === "object");
   const total = Math.max(0, typeof totalProps === "number" ? totalProps : 0);
   const paginationConfig = isPaginationEnabled
-    ? (pagination as DataTablePagination)
+    ? (pagination as IBaseTablePagination)
     : undefined;
 
   const paginationDefault = useMemo(() => {
@@ -112,4 +112,5 @@ export function useDataTablePagination({
     showPaginationControls,
   };
 }
+
 

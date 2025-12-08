@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { DataTable } from "../DataTable";
+import { IBaseTable } from "../IBaseTable";
 import type { FilterOption } from "./components/FilterMenu";
 import type { GroupOption } from "./components/GroupByMenu";
 
 import { Button, Card, CardBody, Divider, LinkProps } from "@heroui/react";
 import { useLocalizedText } from "../../hooks/useLocalizedText";
-import { DataTablePagination } from "../DataTable/DataTableInterface";
+import { IBaseTablePagination } from "../IBaseTable/IBaseTableInterface";
 import LinkAs from "../LinkAs";
 import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 import ColumnVisibilityMenu from "./components/ColumnVisibilityMenu";
@@ -62,7 +62,7 @@ export default function ViewListDataTable<T = any>(
   } = useViewListDataTableQueries<T>({
     model,
     isDummyData,
-    pagination: _pagination as DataTablePagination,
+    pagination: _pagination as IBaseTablePagination,
     // enabled: !propDataSource, // Only fetch if dataSource is not provided as prop
   });
 
@@ -72,7 +72,6 @@ export default function ViewListDataTable<T = any>(
   const groupByOptions = useMemo<GroupOption[]>(() => {
     return [];
   }, []);
-
 
   // Prepare columns list with only visible columns
   const displayColumns = useMemo(() => {
@@ -187,7 +186,7 @@ export default function ViewListDataTable<T = any>(
         </div>
 
         {/* Table */}
-        <DataTable
+        <IBaseTable
           {...dataTableProps}
           total={total}
           columns={displayColumns}

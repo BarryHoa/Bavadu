@@ -6,7 +6,7 @@ import {
   IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
-import type { DataTableColumn } from "@base/client/components/DataTable";
+import type { DataTableColumn } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { Button } from "@heroui/button";

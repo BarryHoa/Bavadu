@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { DataTableColumn } from "../DataTable";
+import { IBaseTableColumnDefinition } from "../IBaseTable/IBaseTableInterface";
 
 export interface ViewListDataTableStoreState<T = any> {
   // Search state
@@ -45,17 +45,16 @@ export interface ViewListDataTableStoreActions {
 }
 
 export interface ViewListDataTableStore<T = any>
-  extends ViewListDataTableStoreState<T>,
-    ViewListDataTableStoreActions {}
+  extends ViewListDataTableStoreState<T>, ViewListDataTableStoreActions {}
 
 function getDefaultVisibleColumns<T>(
-  columns: DataTableColumn<T>[]
+  columns: IBaseTableColumnDefinition<T>[]
 ): Set<string> {
   return new Set(columns.map((c) => c.key));
 }
 
 export interface UseViewListDataTableStoreOptions<T = any> {
-  columns: DataTableColumn<T>[];
+  columns: IBaseTableColumnDefinition<T>[];
   initialVisibleColumns?: Set<string>;
   initialSearch?: string;
   initialActiveFilters?: Set<string>;

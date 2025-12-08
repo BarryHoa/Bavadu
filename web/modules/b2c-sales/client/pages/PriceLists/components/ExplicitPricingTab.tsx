@@ -5,8 +5,8 @@ import {
   IBaseInputSearch,
   SelectItemOption,
 } from "@base/client/components";
-import type { DataTableColumnDefinition } from "@base/client/components/DataTable/DataTableInterface";
-import { DATA_TABLE_COLUMN_KEY_ACTION } from "@base/client/components/DataTable/DataTableInterface";
+import type { DataTableColumnDefinition } from "@base/client/components";
+import { DATA_TABLE_COLUMN_KEY_ACTION } from "@base/client/components";
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/react";
 import ProductService from "@mdl/product/client/services/ProductService";

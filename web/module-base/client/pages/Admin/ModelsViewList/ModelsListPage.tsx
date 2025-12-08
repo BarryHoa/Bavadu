@@ -7,7 +7,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import MiniSearch from "minisearch";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import DataTable, { DataTableColumn } from "@base/client/components/DataTable";
+import {
+  IBaseTable,
+  IBaseTableColumnDefinition,
+} from "@base/client/components/IBaseTable";
 import { useTranslations } from "next-intl";
 
 import adminModelService, {
@@ -142,7 +145,7 @@ export default function ModelsListPage() {
     return results.map(({ key, module, path }) => ({ key, module, path }));
   }, [miniSearch, models, searchTerm]);
 
-  const columns = useMemo<DataTableColumn<ModelRow>[]>(
+  const columns = useMemo<IBaseTableColumnDefinition<ModelRow>[]>(
     () => [
       { key: "key", label: t("table.columns.key") },
       { key: "module", label: t("table.columns.module") },
@@ -204,7 +207,7 @@ export default function ModelsListPage() {
               onValueChange={setSearchTerm}
             />
           </div>
-          <DataTable
+          <IBaseTable
             rowKey="key"
             columns={columns}
             dataSource={filteredModels}

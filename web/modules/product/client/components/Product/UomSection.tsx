@@ -14,7 +14,7 @@ import {
 import {
   DATA_TABLE_COLUMN_KEY_ACTION,
   type DataTableColumnDefinition,
-} from "@base/client/components/DataTable/DataTableInterface";
+} from "@base/client/components";
 import { Button } from "@heroui/button";
 import { addToast } from "@heroui/react";
 import { Plus, Trash } from "lucide-react";
