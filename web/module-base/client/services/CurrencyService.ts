@@ -1,5 +1,5 @@
-import JsonRpcClientService from "./JsonRpcClientService";
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
+import JsonRpcClientService from "./JsonRpcClientService";
 
 export interface Currency {
   id: string;
@@ -39,10 +39,6 @@ export interface ExchangeRateResponse {
 }
 
 class CurrencyService extends JsonRpcClientService {
-  constructor() {
-    super("/api/base/internal/json-rpc");
-  }
-
   /**
    * Get list of all active currencies with their latest exchange rates
    * @returns List of currencies with exchange rates
@@ -71,4 +67,3 @@ class CurrencyService extends JsonRpcClientService {
 
 const currencyService = new CurrencyService();
 export default currencyService;
-

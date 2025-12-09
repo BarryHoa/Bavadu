@@ -39,10 +39,6 @@ export interface CustomerIndividualDto {
 }
 
 export default class CustomerService extends JsonRpcClientService {
-  constructor() {
-    super("/api/base/internal/json-rpc");
-  }
-
   // Company methods (not used in B2C but kept for consistency)
   listCompanies() {
     return this.call<{
@@ -157,4 +153,3 @@ export default class CustomerService extends JsonRpcClientService {
 }
 
 export const customerService = new CustomerService();
-

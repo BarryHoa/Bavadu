@@ -8,10 +8,6 @@ export type UnitOfMeasureOption = {
 };
 
 class UnitOfMeasureService extends JsonRpcClientService {
-  constructor() {
-    super("/api/base/internal/json-rpc");
-  }
-
   async getList() {
     return this.call<{ success: boolean; data: UnitOfMeasureOption[] }>(
       "product.curd.getUomList",

@@ -8,7 +8,7 @@ import type {
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
-import { eq, or, sql } from "drizzle-orm";
+import { eq, ilike, or, sql } from "drizzle-orm";
 import { table_product_master, table_product_variant } from "../../schemas";
 import { ProductMasterFeaturesEnum } from "../interfaces/ProductMaster";
 import { ProductFilter } from "./ProductModelInterface";
@@ -48,14 +48,24 @@ class ProductDropdownListModel extends BaseViewListModel<
       ["name", { column: table_product_variant.name, sort: false }],
       ["sku", { column: table_product_variant.sku, sort: false }],
       ["barcode", { column: table_product_variant.barcode, sort: false }],
-      [
-        "manufacturer",
-        { column: table_product_variant.manufacturer, sort: false },
-      ],
       ["baseUomId", { column: table_product_variant.baseUomId, sort: false }],
+      ["features", { column: table_product_master.features, sort: false }],
     ]);
 
-  protected declarationSearch = () => new Map();
+  protected declarationSearch = () =>
+    new Map([
+      // name is jsonb, need to cast to text before using ilike
+      [
+        "name",
+        (text: string) =>
+          ilike(sql`${table_product_variant.name}::text`, `%${text}%`),
+      ],
+      ["sku", (text: string) => ilike(table_product_variant.sku, `%${text}%`)],
+      [
+        "barcode",
+        (text: string) => ilike(table_product_variant.barcode, `%${text}%`),
+      ],
+    ]);
 
   protected declarationFilter = (): FilterConditionMap<ProductFilter> => {
     const filters: Array<[string, FilterCondition<ProductFilter>]> = [
@@ -88,36 +98,23 @@ class ProductDropdownListModel extends BaseViewListModel<
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData = (
-    row: any,
-    index?: number
-  ): ProductDropdownOption => {
-    const name =
-      typeof row.name === "string"
-        ? row.name
-        : row.name?.vi || row.name?.en || "";
-
+  protected declarationMappingData = (row: any): ProductDropdownOption => {
     return {
-      label: name,
+      label: row.name,
       value: row.id,
+      ...row,
     };
   };
 
   getData = async (
     params: ListParamsRequest<ProductFilter>
   ): Promise<ListParamsResponse<ProductDropdownOption>> => {
-    const result = await this.buildQueryDataList(params, (query) => {
+    return this.buildQueryDataList(params, (query) => {
       return query.innerJoin(
         table_product_master,
         eq(table_product_variant.productMasterId, table_product_master.id)
       );
     });
-    return {
-      data: (result?.data ?? []).map((row: any, index: number) =>
-        this.declarationMappingData(row, index)
-      ),
-      total: result?.total ?? 0,
-    };
   };
 }
 

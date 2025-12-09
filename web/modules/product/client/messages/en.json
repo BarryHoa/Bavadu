@@ -18,6 +18,7 @@
       "asset": "Asset",
       "accounting": "Accounting"
     },
+
     "product-create": {
       "baseUnitOfMeasure": "Base unit of measure",
       "unitOfMeasure": "Unit of measure",
@@ -43,13 +44,16 @@
       "deleteUom": "Delete UOM",
       "addOtherUom": "Add Other UOM",
       "otherUnitOfMeasure": "Other",
+      "duplicateUom": "Duplicate UOM",
       "duplicateUomTitle": "Duplicate UOM",
       "duplicateUomMessage": "This UOM is already selected in another field",
+      "duplicateUomDescription": "This UOM is already selected in another field",
       "sameAsBaseUom": "Same as Base UOM",
       "noOtherUoms": "No other UOMs added yet",
       "errors": {
         "productCodeRequired": "Product code is required",
         "baseUnitOfMeasureRequired": "Base unit of measure is required",
+        "conversionRatioRequired": "Conversion ratio is required and must be greater than 0",
         "atLeastOneVariantRequired": "At least one variant is required",
         "maxVariantsAllowed": "Maximum {count} variants allowed"
       },

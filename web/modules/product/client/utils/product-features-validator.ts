@@ -1,7 +1,4 @@
-import {
-  ProductMasterFeatures,
-  ProductMasterType,
-} from "../interface/Product";
+import { ProductMasterFeatures, ProductMasterType } from "../interface/Product";
 
 /**
  * Default features for each product type
@@ -176,4 +173,3 @@ export function getDefaultFeaturesForType(
 ): Partial<Record<ProductMasterFeatures, boolean>> {
   return DEFAULT_FEATURES_BY_TYPE[type] || {};
 }
-

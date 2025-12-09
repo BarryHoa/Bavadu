@@ -57,10 +57,6 @@ type ApiResponse<T> = {
 };
 
 class StockService extends JsonRpcClientService {
-  constructor() {
-    super("/api/base/internal/json-rpc");
-  }
-
   listWarehouses() {
     return this.call<ApiResponse<WarehouseDto[]>>(
       "stock-warehouse.list.getData",

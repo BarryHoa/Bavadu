@@ -2,7 +2,7 @@ import type {
   ProductMasterFeatures,
   ProductMasterFeaturesType,
   ProductMasterType,
-} from "../../interface/Product";
+} from "../../../interface/Product";
 
 export type LocaleFieldValue = {
   en: string;
@@ -26,10 +26,10 @@ export type VariantFieldValue = {
   barcode: string;
   manufacturerName: string;
   manufacturerCode: string;
-  baseUomId?: string;
-  saleUomId?: string;
-  purchaseUomId?: string;
-  manufacturingUomId?: string;
+  baseUom?: { id: string; name: string };
+  saleUom?: { id: string; name: string };
+  purchaseUom?: { id: string; name: string };
+  manufacturingUom?: { id: string; name: string };
   uomConversions: UomConversions[];
   isActive: boolean;
   packings: Array<{

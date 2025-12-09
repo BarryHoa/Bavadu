@@ -26,10 +26,6 @@ export interface PurchaseOrderDto {
 }
 
 export default class PurchaseOrderService extends JsonRpcClientService {
-  constructor() {
-    super("/api/base/internal/json-rpc");
-  }
-
   list() {
     return this.call<{
       data: PurchaseOrderDto[];
@@ -87,4 +83,3 @@ export default class PurchaseOrderService extends JsonRpcClientService {
 }
 
 export const purchaseOrderService = new PurchaseOrderService();
-

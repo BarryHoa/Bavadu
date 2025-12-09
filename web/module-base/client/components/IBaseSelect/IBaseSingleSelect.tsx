@@ -3,23 +3,26 @@
 import { SelectItem } from "@heroui/select";
 import MiniSearch from "minisearch";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useLocalizedText } from "../../hooks/useLocalizedText";
+import { LocalizeText } from "../../interface/LocalizeText";
 import IBaseInputSearch from "../IBaseInputSearch";
 import IBaseSelect, { IBaseSelectProps } from "./IBaseSelect";
 
 export interface SelectItemOption extends Record<string, unknown> {
-  value: string;
-  label: string;
+  value: string | number;
+  label: string | LocalizeText;
+  localizedLabel?: string;
   searchText?: string; // Optional additional text for search
   [key: string]: unknown;
 }
 
-interface IBaseSingleSelectProps
-  extends Omit<
-    IBaseSelectProps,
-    "children" | "selectionMode" | "onSelectionChange" | "selectedKeys"
-  > {
+interface IBaseSingleSelectProps extends Omit<
+  IBaseSelectProps,
+  "children" | "selectionMode" | "onSelectionChange" | "selectedKeys"
+> {
   selectedKey?: string;
   onSelectionChange?: (key?: string, item?: SelectItemOption) => void;
+  onRenderOption?: (item: SelectItemOption) => React.ReactNode;
   items?: SelectItemOption[];
   searchPlaceholder?: string;
   searchShowMaxResults?: number;
@@ -41,12 +44,13 @@ const IBaseSingleSelect = React.forwardRef<
     searchPlaceholder = "Search...",
     searchRules = [{ by: "label", prefix: true, fuzzy: 0.2 }],
     searchShowMaxResults = 10,
+    onRenderOption,
     ...rest
   } = props;
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
-
+  const localizedText = useLocalizedText();
   // Create MiniSearch index for items with phrase support
   const miniSearch = useMemo(() => {
     if (!items || items.length === 0) {
@@ -55,7 +59,8 @@ const IBaseSingleSelect = React.forwardRef<
 
     // Filter out items with invalid values and ensure value is a string
     const validItems = items.filter(
-      (item) => item.value !== undefined && item.value !== null && item.value !== ""
+      (item) =>
+        item.value !== undefined && item.value !== null && item.value !== ""
     );
 
     if (validItems.length === 0) {
@@ -150,7 +155,7 @@ const IBaseSingleSelect = React.forwardRef<
     // Map results back to original items
     const resultMap = new Map(results.map((result) => [result.id, result]));
 
-    return items.filter((item) => resultMap.has(item.value));
+    return items.filter((item) => resultMap.has(String(item.value)));
   }, [items, miniSearch, searchTerm]);
 
   // Focus search input when dropdown opens
@@ -256,11 +261,19 @@ const IBaseSingleSelect = React.forwardRef<
           </SelectItem>
         )}
 
-        {filteredItems.map((item) => (
-          <SelectItem key={item.value} textValue={item.label}>
-            {item.label}
-          </SelectItem>
-        ))}
+        {filteredItems.map((item) => {
+          const localizedLabel = localizedText(item.label);
+          return (
+            <SelectItem key={item.value} textValue={localizedLabel}>
+              {onRenderOption
+                ? onRenderOption({
+                    ...item,
+                    localizedLabel,
+                  })
+                : localizedLabel}
+            </SelectItem>
+          );
+        })}
       </>
     </IBaseSelect>
   );

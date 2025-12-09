@@ -28,17 +28,16 @@ export interface NewsListResponse {
 }
 
 class NewsService extends JsonRpcClientService {
-  constructor() {
-    super("/api/base/internal/json-rpc");
-  }
-
   /**
    * Get list of news with pagination
    * @param limit - Number of items per page (default: 12)
    * @param offset - Number of items to skip (default: 0)
    * @returns News list with pagination info
    */
-  async getList(limit: number = 12, offset: number = 0): Promise<NewsListResponse> {
+  async getList(
+    limit: number = 12,
+    offset: number = 0
+  ): Promise<NewsListResponse> {
     return this.call<NewsListResponse>("news.curd.getList", {
       limit,
       offset,
@@ -48,4 +47,3 @@ class NewsService extends JsonRpcClientService {
 
 const newsService = new NewsService();
 export default newsService;
-

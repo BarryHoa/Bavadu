@@ -12,10 +12,6 @@ export type ProductCategoryPayload = {
 };
 
 class ProductCategoryService extends JsonRpcClientService {
-  constructor() {
-    super("/api/base/internal/json-rpc");
-  }
-
   async fetchTree(): Promise<ProductCategoryRow[]> {
     const response = await this.call<{
       success: boolean;

@@ -27,10 +27,6 @@ interface Country {
 }
 
 class LocationService extends JsonRpcClientService {
-  constructor() {
-    super("/api/base/internal/json-rpc");
-  }
-
   async getCountries() {
     return this.call<{ success: boolean; data: Country[]; message: string }>(
       "location.curd.getCountries",

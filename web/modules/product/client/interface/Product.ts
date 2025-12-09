@@ -120,7 +120,7 @@ export type ProductFormValues = {
     brand: string;
     categoryId?: string;
   };
-  variant: {
+  variants: Array<{
     name: LocaleFormValue;
     description: string;
     sku: string;
@@ -141,9 +141,9 @@ export type ProductFormValues = {
       conversionRatio: number | null;
     }>;
     isActive: boolean;
-  };
-  packings: ProductFormPacking[];
-  attributes: ProductFormAttribute[];
+    packings: ProductFormPacking[];
+    attributes: ProductFormAttribute[];
+  }>;
 };
 
 export type ProductFormPayload = {

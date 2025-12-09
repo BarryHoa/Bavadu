@@ -15,10 +15,6 @@ export interface DeliveryDto {
 }
 
 export default class DeliveryService extends JsonRpcClientService {
-  constructor() {
-    super("/api/base/internal/json-rpc");
-  }
-
   createFromOrder(payload: {
     orderType: "B2B" | "B2C";
     orderId: string;
@@ -40,4 +36,3 @@ export default class DeliveryService extends JsonRpcClientService {
 }
 
 export const deliveryService = new DeliveryService();
-

@@ -44,6 +44,7 @@ export interface IBaseSingleSelectAsyncProps extends Omit<
   onFetching?: (isFetching: boolean) => void;
   searchPlaceholder?: string;
   defaultLimit?: number;
+  isShowSearch?: boolean;
   // Additional params to pass to fetch function
   defaultParams?: Omit<FetchOptionsParams, "limit" | "offset" | "search">;
 }
@@ -65,6 +66,7 @@ const IBaseSingleSelectAsync = React.forwardRef<
     searchPlaceholder,
     defaultLimit = 20,
     defaultParams = {},
+    isShowSearch = true,
     onRenderOption,
     ...rest
   } = props;
@@ -259,12 +261,12 @@ const IBaseSingleSelectAsync = React.forwardRef<
     if (!isOpen) {
       setSearchTerm("");
       setDebouncedSearchTerm("");
-    } else if (isOpen && searchInputRef.current) {
+    } else if (isOpen && isShowSearch && searchInputRef.current) {
       setTimeout(() => {
         searchInputRef.current?.focus();
       }, 100);
     }
-  }, [isOpen]);
+  }, [isOpen, isShowSearch]);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -370,25 +372,27 @@ const IBaseSingleSelectAsync = React.forwardRef<
       listboxProps={listboxPropsMemo}
     >
       <>
-        <SelectItem
-          key="__search__"
-          textValue={tSelectAsync("searchLabel")}
-          className="sticky top-0 z-100 pointer-events-auto data-[hover=true]:bg-content1 bg-content1 border-default-200 p-0 py-1"
-          isReadOnly
-          hideSelectedIcon
-        >
-          <IBaseInputSearch
-            ref={searchInputRef}
-            value={searchTerm}
-            onValueChange={setSearchTerm}
-            size="sm"
-            placeholder={searchPlaceholder}
-            autoFocus={isOpen}
-            classNames={searchInputClassNames}
-            onKeyDown={handleSearchKeyDown}
-            showClearButton={false}
-          />
-        </SelectItem>
+        {isShowSearch && (
+          <SelectItem
+            key="__search__"
+            textValue={tSelectAsync("searchLabel")}
+            className="sticky top-0 z-100 pointer-events-auto data-[hover=true]:bg-content1 bg-content1 border-default-200 p-0 py-1"
+            isReadOnly
+            hideSelectedIcon
+          >
+            <IBaseInputSearch
+              ref={searchInputRef}
+              value={searchTerm}
+              onValueChange={setSearchTerm}
+              size="sm"
+              placeholder={searchPlaceholder}
+              autoFocus={isOpen}
+              classNames={searchInputClassNames}
+              onKeyDown={handleSearchKeyDown}
+              showClearButton={false}
+            />
+          </SelectItem>
+        )}
 
         {error && (
           <SelectItem
@@ -424,11 +428,19 @@ const IBaseSingleSelectAsync = React.forwardRef<
           </SelectItem>
         )}
 
-        {allItems.map((item) => (
-          <SelectItem key={item.value} textValue={localizedText(item.label)}>
-            {onRenderOption ? onRenderOption(item) : localizedText(item.label)}
-          </SelectItem>
-        ))}
+        {allItems.map((item) => {
+          const localizedLabel = localizedText(item.label);
+          return (
+            <SelectItem key={item.value} textValue={localizedLabel}>
+              {onRenderOption
+                ? onRenderOption({
+                    ...item,
+                    localizedLabel,
+                  })
+                : localizedLabel}
+            </SelectItem>
+          );
+        })}
 
         {isFetchingNextPage && (
           <SelectItem

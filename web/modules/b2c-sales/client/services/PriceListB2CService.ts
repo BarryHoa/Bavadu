@@ -67,10 +67,6 @@ export interface UpdatePriceListB2CParams {
 }
 
 export default class PriceListB2CService extends JsonRpcClientService {
-  constructor() {
-    super("/api/base/internal/json-rpc");
-  }
-
   list() {
     return this.call<{
       data: PriceListB2CDto[];

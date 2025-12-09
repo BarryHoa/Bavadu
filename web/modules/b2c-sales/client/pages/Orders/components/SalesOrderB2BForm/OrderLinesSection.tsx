@@ -188,27 +188,16 @@ export default function OrderLinesSection({
                             features: [ProductMasterFeaturesEnum.SALE],
                           },
                         }}
-                      />
-                    )}
-                  />
-                </div>
-
-                {/* Unit of Measure - fixed width on lg */}
-                <div className="md:col-span-1 lg:w-[250px] lg:flex-shrink-0">
-                  <Controller
-                    name={`lines.${index}.unitId`}
-                    control={control}
-                    render={({ field, fieldState }) => (
-                      <IBaseSingleSelect
-                        label={t("unit")}
-                        size="sm"
-                        items={uomOptions}
-                        selectedKey={field.value}
-                        onSelectionChange={(key) => {
-                          field.onChange(key || undefined);
+                        onRenderOption={(item: any) => {
+                          return (
+                            <div className="flex flex-col igap-2">
+                              <div>{item.localizedLabel}</div>
+                              <div className="text-xs text-default-500">
+                                SKU: {item.sku} - Barcode: {item.barcode}
+                              </div>
+                            </div>
+                          );
                         }}
-                        isInvalid={fieldState.invalid}
-                        errorMessage={fieldState.error?.message}
                       />
                     )}
                   />

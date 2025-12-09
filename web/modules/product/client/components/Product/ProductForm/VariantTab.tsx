@@ -3,13 +3,13 @@
 import {
   IBaseInput,
   IBaseInputMultipleLang,
-  SelectItemOption,
+  IBaseTextarea,
 } from "@base/client/components";
 import { Button } from "@heroui/button";
-import { Card, CardBody, Divider, Textarea } from "@heroui/react";
+import { Card, CardBody, Divider } from "@heroui/react";
 import { Plus, Trash } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { ProductMasterFeaturesType } from "../../interface/Product";
+import { ProductMasterFeaturesType } from "../../../interface/Product";
 import type { LocaleFieldValue, VariantFieldValue } from "./types";
 import { updateLocaleValue } from "./types";
 import UomSection from "./UomSection";
@@ -24,15 +24,13 @@ type VariantTabProps = {
     barcode?: { message?: string };
     manufacturerName?: { message?: string };
     manufacturerCode?: { message?: string };
-    baseUomId?: { message?: string };
+    baseUom?: { message?: string };
     attributes?: Array<{
       code?: { message?: string };
       value?: { message?: string };
     }>;
   };
-  uomOptions: SelectItemOption[];
   isBusy: boolean;
-  uomQueryLoading: boolean;
   canRemove: boolean;
   onRemove: () => void;
   onUpdate: (
@@ -45,15 +43,12 @@ export default function VariantTab({
   masterFeatures,
   variantIndex,
   variantErrors,
-  uomOptions,
   isBusy,
-  uomQueryLoading,
   canRemove,
   onRemove,
   onUpdate,
 }: VariantTabProps) {
   const t = useTranslations("common");
-  const tProduct = useTranslations("mdl-product");
   const tProductForm = useTranslations("mdl-product.product-create");
 
   return (
@@ -139,10 +134,8 @@ export default function VariantTab({
       <UomSection
         variantIndex={variantIndex}
         masterFeatures={masterFeatures}
-        uomOptions={uomOptions}
-        uomQueryLoading={uomQueryLoading}
         isBusy={isBusy}
-        error={variantErrors?.baseUomId}
+        error={variantErrors?.baseUom}
       />
 
       <Divider />
@@ -150,7 +143,9 @@ export default function VariantTab({
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-medium font-medium">{tProductForm("packings")}</h4>
+            <h4 className="text-medium font-medium">
+              {tProductForm("packings")}
+            </h4>
             <p className="text-small text-default-500">
               {tProductForm("definePackaging")}
             </p>
@@ -246,7 +241,7 @@ export default function VariantTab({
                       isDisabled={isBusy}
                     />
                   </div>
-                  <Textarea
+                  <IBaseTextarea
                     label={t("description")}
                     value={packing.description ?? ""}
                     onValueChange={(next) =>
@@ -420,7 +415,7 @@ export default function VariantTab({
         )}
       </div>
 
-      <Textarea
+      <IBaseTextarea
         label={t("description")}
         value={value.description ?? ""}
         onValueChange={(next) =>

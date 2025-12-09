@@ -29,10 +29,6 @@ export interface DropdownOptionsResponse {
  * @param params - Query parameters
  */
 class DropdownOptionsService extends JsonRpcClientService {
-  constructor() {
-    super("/api/base/internal/json-rpc");
-  }
-
   private getBaseModelId(modelId: string): string {
     return modelId.endsWith(".dropdown") ? modelId : `${modelId}.dropdown`;
   }

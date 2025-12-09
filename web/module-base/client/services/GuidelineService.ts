@@ -13,10 +13,6 @@ export interface GuidelineResponse {
 }
 
 class GuidelineService extends JsonRpcClientService {
-  constructor() {
-    super("/api/base/internal/json-rpc");
-  }
-
   /**
    * Get guideline by key
    * @param key - Guideline key
@@ -48,4 +44,3 @@ class GuidelineService extends JsonRpcClientService {
 
 const guidelineService = new GuidelineService();
 export default guidelineService;
-

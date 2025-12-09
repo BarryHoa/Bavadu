@@ -38,30 +38,56 @@ export abstract class BaseViewListModel<
   TRow = unknown,
   TFilter extends ParamFilter = ParamFilter,
 > extends BaseModel<TTable> {
-  protected readonly columns: ColumnMap;
-  protected readonly search: SearchConditionMap;
-  protected readonly filter: FilterConditionMap<TFilter>;
-  protected readonly sortDefault: ParamSortMultiple;
+  private _columns?: ColumnMap;
+  private _search?: SearchConditionMap;
+  private _filter?: FilterConditionMap<TFilter>;
+  private _sortDefault?: ParamSortMultiple;
+  private readonly _searchOverride?: SearchConditionMap;
+  private readonly _sortDefaultOverride?: ParamSortMultiple;
 
   constructor({
     table,
-    search,
     sortDefault,
   }: {
     table: TTable;
-    search?: SearchConditionMap;
     sortDefault?: ParamSortMultiple;
   }) {
     super(table);
-    this.columns = this.declarationColumns();
-    this.search = search ?? this.declarationSearch();
-    this.filter = this.declarationFilter();
-    this.sortDefault = sortDefault ?? [
-      {
-        column: "createdAt",
-        direction: "descending",
-      },
-    ];
+    this._sortDefaultOverride = sortDefault;
+  }
+
+  // Lazy getters that call overridden methods when first accessed
+  protected get columns(): ColumnMap {
+    if (!this._columns) {
+      this._columns = this.declarationColumns();
+    }
+    return this._columns;
+  }
+
+  protected get search(): SearchConditionMap {
+    if (!this._search) {
+      this._search = this.declarationSearch();
+    }
+    return this._search;
+  }
+
+  protected get filter(): FilterConditionMap<TFilter> {
+    if (!this._filter) {
+      this._filter = this.declarationFilter();
+    }
+    return this._filter;
+  }
+
+  protected get sortDefault(): ParamSortMultiple {
+    if (!this._sortDefault) {
+      this._sortDefault = this._sortDefaultOverride ?? [
+        {
+          column: "createdAt",
+          direction: "descending",
+        },
+      ];
+    }
+    return this._sortDefault;
   }
 
   // ============================================================================
@@ -197,6 +223,9 @@ export abstract class BaseViewListModel<
         );
 
       if (searchExpressions.length > 0) {
+        console.log("searchExpressions", searchExpressions);
+        console.log("searchText", searchText);
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         query = query.where(or(...(searchExpressions as any[])) as any);
       }
@@ -245,6 +274,7 @@ export abstract class BaseViewListModel<
     const result = (await query.limit(limit).offset(offset)) as Array<
       Record<string, unknown>
     >;
+
     // Try to determine total if result includes it, otherwise fallback to length
     // Check for both "total-data-response" (from buildQueryDataList) and "totalResult" keys
 
@@ -273,7 +303,6 @@ export abstract class BaseViewListModel<
     callBackBuildQuery?: (query: any) => any
   ) => {
     // Build base SELECT list from column map with total count
-    console.log(this.columns, this.columns.entries());
     const selectColumns = Object.fromEntries(
       Array.from(this.columns.entries()).map(([key, config]) => [
         key,
@@ -287,7 +316,7 @@ export abstract class BaseViewListModel<
       selectColumns as Record<string, Column>,
       callBackBuildQuery
     );
-    console.log(result);
+
     return {
       data:
         result?.data?.map((row, index) =>

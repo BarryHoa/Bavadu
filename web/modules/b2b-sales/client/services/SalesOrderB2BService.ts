@@ -48,10 +48,6 @@ export interface SalesOrderB2BDto {
 }
 
 export default class SalesOrderB2BService extends JsonRpcClientService {
-  constructor() {
-    super("/api/base/internal/json-rpc");
-  }
-
   list() {
     return this.call<{
       data: SalesOrderB2BDto[];

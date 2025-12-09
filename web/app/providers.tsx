@@ -8,6 +8,7 @@ import { useLayoutEffect, useState } from "react";
 
 import { NavigationLoader } from "@base/client/components/NavigationLoader";
 import { GlobalSettingsProvider } from "@base/client/contexts/global-settings";
+import { usePreventBackspaceNavigation } from "@base/client/hooks/usePreventBackspaceNavigation";
 // Import root-store để khởi tạo và test DevTools
 import { setRootStoreValue } from "@base/client/stores/root-store";
 
@@ -44,6 +45,9 @@ export function Providers({ children }: ProvidersProps) {
   useLayoutEffect(() => {
     setRootStoreValue("__init__", { timestamp: Date.now() });
   }, []);
+
+  // Prevent Backspace from navigating back in browser
+  usePreventBackspaceNavigation();
 
   return (
     <QueryClientProvider client={queryClient}>

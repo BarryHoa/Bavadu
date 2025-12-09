@@ -10,6 +10,9 @@
     "product.list": "Product/ProductViewListModel",
     "product.dropdown": "Product/ProductDropdownListModel",
     "product-category.curd": "ProductCategory/ProductCategoryModel",
-    "product-category.list": "ProductCategory/ProductCategoryViewListModel"
+    "product-category.list": "ProductCategory/ProductCategoryViewListModel",
+    "product-uom.dropdown": "ProductUom/ProductUomDropdownListModel",
+    "product-type.dropdown": "ProductMasterType/ProductMasterTypeDropdownListModel",
+    "product-features.dropdown": "ProductFeatures/ProductFeaturesDropdownListModel"
   }
 }
