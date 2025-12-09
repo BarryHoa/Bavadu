@@ -76,7 +76,7 @@ class ProductDropdownListModel extends BaseViewListModel<
             ? or(
                 ...featureList.map(
                   (feature) =>
-                    sql`${table_product_master.features} ->> ${feature} = 'true'`
+                    sql`${table_product_master.features} ->> '${feature}' = 'true'`
                 )
               )
             : undefined;

@@ -2,11 +2,11 @@ import {
   BaseViewListModel,
   type FilterConditionMap,
 } from "@base/server/models/BaseViewListModel";
+import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
-import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type { Column } from "drizzle-orm";
 import { eq, ilike, sql } from "drizzle-orm";
 import { table_price_lists_b2c } from "../../schemas/price-list-b2c";
@@ -37,7 +37,7 @@ class PriceListB2CDropdownListModel extends BaseViewListModel<
 
   protected declarationColumns = () =>
     // Minimal columns for dropdown
-    return new Map<
+    new Map<
       string,
       {
         column: Column<any>;
@@ -48,7 +48,6 @@ class PriceListB2CDropdownListModel extends BaseViewListModel<
       ["code", { column: table_price_lists_b2c.code, sort: true }],
       ["name", { column: table_price_lists_b2c.name, sort: false }],
     ]);
-  }
 
   protected declarationSearch = () =>
     new Map([
@@ -65,7 +64,6 @@ class PriceListB2CDropdownListModel extends BaseViewListModel<
             : undefined,
       ],
     ]);
-  }
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
@@ -116,4 +114,3 @@ class PriceListB2CDropdownListModel extends BaseViewListModel<
 }
 
 export default PriceListB2CDropdownListModel;
-

@@ -273,6 +273,7 @@ export abstract class BaseViewListModel<
     callBackBuildQuery?: (query: any) => any
   ) => {
     // Build base SELECT list from column map with total count
+    console.log(this.columns, this.columns.entries());
     const selectColumns = Object.fromEntries(
       Array.from(this.columns.entries()).map(([key, config]) => [
         key,
@@ -286,6 +287,7 @@ export abstract class BaseViewListModel<
       selectColumns as Record<string, Column>,
       callBackBuildQuery
     );
+    console.log(result);
     return {
       data:
         result?.data?.map((row, index) =>
