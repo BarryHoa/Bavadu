@@ -5,14 +5,18 @@ import JsonRpcHandler from "../../rpc/jsonRpcHandler";
 const rpcHandler = new JsonRpcHandler();
 
 export async function POST(request: NextRequest) {
+  // get header X-RPC-Method
+  const method = request.headers.get("X-RPC-Method") || "";
   try {
     // Handle JSON-RPC request directly without authentication or rate limiting
     // Authentication and rate limiting are handled by middleware
-    return rpcHandler.handle(request);
+    const response = await rpcHandler.handle(request);
+    response.headers.set("X-RPC-Method", method);
+    return response;
   } catch (error) {
     console.error("Internal JSON-RPC handler error:", error);
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         jsonrpc: "2.0",
         error: {
@@ -24,5 +28,7 @@ export async function POST(request: NextRequest) {
       },
       { status: 400 }
     );
+    response.headers.set("X-RPC-Method", method);
+    return response;
   }
 }

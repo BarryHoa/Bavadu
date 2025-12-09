@@ -58,7 +58,11 @@ export class JsonRpcClientService extends ClientHttpService {
     };
 
     // Sử dụng post method từ ClientHttpService
-    const response = await this.post<JsonRpcResponse<T>>("", request);
+    const response = await this.post<JsonRpcResponse<T>>("", request, {
+      headers: {
+        "X-RPC-Method": method,
+      },
+    });
 
     if (response.error) {
       throw new JsonRpcError(
