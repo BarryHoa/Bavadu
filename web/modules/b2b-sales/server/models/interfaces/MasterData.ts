@@ -7,27 +7,27 @@ import type {
   TblTaxRate,
 } from "@base/server/schemas";
 
-export interface PaymentMethod extends TblPaymentMethod {
+export interface PaymentMethod extends Omit<TblPaymentMethod, "name" | "description"> {
   name: LocaleDataType<string>;
-  description?: LocaleDataType<string>;
+  description?: LocaleDataType<string> | null;
 }
 
-export interface PaymentTerm extends TblPaymentTerm {
+export interface PaymentTerm extends Omit<TblPaymentTerm, "name" | "description"> {
   name: LocaleDataType<string>;
-  description?: LocaleDataType<string>;
+  description?: LocaleDataType<string> | null;
 }
 
-export interface ShippingMethod extends TblShippingMethod {
+export interface ShippingMethod extends Omit<TblShippingMethod, "name" | "description"> {
   name: LocaleDataType<string>;
-  description?: LocaleDataType<string>;
+  description?: LocaleDataType<string> | null;
 }
 
-export interface ShippingTerm extends TblShippingTerm {
+export interface ShippingTerm extends Omit<TblShippingTerm, "name" | "description"> {
   name: LocaleDataType<string>;
-  description?: LocaleDataType<string>;
+  description?: LocaleDataType<string> | null;
 }
 
-export interface TaxRate extends TblTaxRate {
+export interface TaxRate extends Omit<TblTaxRate, "name" | "description"> {
   name: LocaleDataType<string>;
-  description?: LocaleDataType<string>;
+  description?: LocaleDataType<string> | null;
 }

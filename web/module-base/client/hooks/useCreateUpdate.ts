@@ -57,6 +57,7 @@ export function useCreateUpdate<TPayload, TResult>({
 
   return {
     handleSubmit,
+    mutate: mutation.mutate,
     isPending: mutation.isPending,
     error: errorMessage,
     resetError,

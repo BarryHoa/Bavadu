@@ -1,5 +1,6 @@
 "use client";
 
+import { SelectItemOption } from "@base/client/components";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/react";

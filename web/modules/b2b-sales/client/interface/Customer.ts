@@ -1,4 +1,4 @@
-export type {
+import type {
   CustomerCompanyDto,
   CustomerIndividualDto,
 } from "../services/CustomerService";

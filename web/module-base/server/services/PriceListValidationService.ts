@@ -4,7 +4,7 @@ import {
   table_price_lists_b2c,
   TblPriceListB2C,
   NewTblPriceListB2C,
-} from "../schemas/price-list-b2c";
+} from "@mdl/b2c-sales/server/schemas/price-list-b2c";
 
 export interface ValidationResult {
   valid: boolean;

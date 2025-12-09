@@ -138,7 +138,10 @@ export default function PriceListB2CCreatePage(): React.ReactNode {
 
     const payload: CreatePriceListB2CParams = {
       code: data.code,
-      name: data.name,
+      name: {
+        en: data.name.en || "",
+        vi: data.name.vi || "",
+      },
       description: data.description,
       type: data.type as any,
       status: data.status as any,

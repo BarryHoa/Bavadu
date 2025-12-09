@@ -120,9 +120,10 @@ class SessionModel extends BaseModel<typeof table_session> {
   async destroySession(sessionToken: string): Promise<boolean> {
     const result = await this.db
       .delete(this.table)
-      .where(eq(this.table.sessionToken, sessionToken));
+      .where(eq(this.table.sessionToken, sessionToken))
+      .returning();
 
-    return result.rowCount ? result.rowCount > 0 : false;
+    return result.length > 0;
   }
 
   /**
@@ -131,9 +132,10 @@ class SessionModel extends BaseModel<typeof table_session> {
   async destroyAllUserSessions(userId: string): Promise<number> {
     const result = await this.db
       .delete(this.table)
-      .where(eq(this.table.userId, userId));
+      .where(eq(this.table.userId, userId))
+      .returning();
 
-    return result.rowCount || 0;
+    return result.length;
   }
 
   /**
@@ -145,9 +147,10 @@ class SessionModel extends BaseModel<typeof table_session> {
     // Delete sessions where expiresAt < now (expired)
     const result = await this.db
       .delete(this.table)
-      .where(lt(this.table.expiresAt, now));
+      .where(lt(this.table.expiresAt, now))
+      .returning();
 
-    return result.rowCount || 0;
+    return result.length;
   }
 
   /**
@@ -168,9 +171,10 @@ class SessionModel extends BaseModel<typeof table_session> {
         expiresAt: newExpiresAt,
         updatedAt: now,
       })
-      .where(eq(this.table.sessionToken, sessionToken));
+      .where(eq(this.table.sessionToken, sessionToken))
+      .returning();
 
-    return result.rowCount ? result.rowCount > 0 : false;
+    return result.length > 0;
   }
 }
 

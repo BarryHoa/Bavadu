@@ -1,7 +1,7 @@
 import type { Column } from "drizzle-orm";
 import { and, eq } from "drizzle-orm";
-import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import type { PgTable } from "drizzle-orm/pg-core";
+import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { isEmpty } from "lodash";
 import getDbConnect from "../utils/getDbConnect";
 
@@ -37,7 +37,9 @@ export class BaseModel<TTable extends PgTable = PgTable> {
       const ignoredColumns = Object.keys(ignore || {});
       const ignoredColumnsInTable = ignoredColumns.filter((columnName) =>
         Boolean(
-          this.table[columnName as keyof typeof this.table] as Column | undefined
+          this.table[columnName as keyof typeof this.table] as
+            | Column
+            | undefined
         )
       );
       if (ignoredColumnsInTable.length !== ignoredColumns.length) {
@@ -49,9 +51,9 @@ export class BaseModel<TTable extends PgTable = PgTable> {
       ? and(
           eq(column, value),
           ...Object.entries(ignore).map(([key, value]) => {
-            const ignoreColumn = this.table[
-              key as keyof typeof this.table
-            ] as Column | undefined;
+            const ignoreColumn = this.table[key as keyof typeof this.table] as
+              | Column
+              | undefined;
             if (!ignoreColumn) {
               throw new Error(
                 `Ignored column ${key} not found in table definition.`
@@ -64,7 +66,7 @@ export class BaseModel<TTable extends PgTable = PgTable> {
 
     const result = await this.db
       .select()
-      .from(this.table)
+      .from(this.table as any)
       .where(whereClause)
       .limit(1);
 

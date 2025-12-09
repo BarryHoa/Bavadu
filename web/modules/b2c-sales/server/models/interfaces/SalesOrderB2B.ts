@@ -1,6 +1,6 @@
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
 import type { User } from "@base/server/interfaces/User";
-import type { TblSalesOrderB2B, TblSalesOrderLineB2B } from "../../schemas";
+import type { TblSalesOrderB2B, TblSalesOrderLineB2B } from "@mdl/b2b-sales/server/schemas";
 
 export type SalesOrderB2BStatus = "draft" | "sent" | "delivered" | "cancelled";
 

@@ -1,16 +1,16 @@
-export type {
+import type {
   PaymentMethodDto,
 } from "@base/client/services/PaymentMethodService";
-export type {
+import type {
   PaymentTermDto,
 } from "@base/client/services/PaymentTermService";
-export type {
+import type {
   ShippingMethodDto,
 } from "@base/client/services/ShippingMethodService";
-export type {
+import type {
   ShippingTermDto,
 } from "@base/client/services/ShippingTermService";
-export type {
+import type {
   TaxRateDto,
 } from "@base/client/services/TaxRateService";
 

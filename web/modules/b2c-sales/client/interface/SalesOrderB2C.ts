@@ -1,4 +1,4 @@
-export type {
+import type {
   SalesOrderB2CDto,
   SalesOrderB2CLineDto,
 } from "../services/SalesOrderB2CService";

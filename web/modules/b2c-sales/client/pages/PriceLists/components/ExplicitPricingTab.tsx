@@ -258,7 +258,7 @@ export default function ExplicitPricingTab({
           minQty: Number(item.minimumQuantity) || 0,
           price: Number(item.unitPrice) || 0,
         }))
-        .sort((a, b) => a.minQty - b.minQty);
+        .sort((a: { minQty: number; price: number }, b: { minQty: number; price: number }) => a.minQty - b.minQty);
     },
     [watchedPriceItems]
   );
