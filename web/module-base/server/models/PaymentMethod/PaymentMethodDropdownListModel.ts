@@ -1,4 +1,7 @@
-import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
@@ -32,8 +35,8 @@ class PaymentMethodDropdownListModel extends BaseViewListModel<
     });
   }
 
-  protected declarationColumns() {
-    return new Map<
+  protected declarationColumns = () =>
+    new Map<
       string,
       {
         column: Column<any>;
@@ -45,36 +48,32 @@ class PaymentMethodDropdownListModel extends BaseViewListModel<
       ["name", { column: table_payment_method.name, sort: false }],
       ["order", { column: table_payment_method.order, sort: true }],
     ]);
-  }
 
-  protected declarationSearch() {
-    return new Map();
-  }
+  protected declarationSearch = () => new Map();
 
-  protected declarationFilter() {
-    return new Map([
+  protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
+    new Map([
       [
         "isActive",
-        (value) =>
-          value
-            ? eq(table_payment_method.isActive, value as boolean)
+        (value?: unknown, _filters?: ParamFilter) =>
+          typeof value === "boolean"
+            ? eq(table_payment_method.isActive, value)
             : undefined,
       ],
       [
         "type",
-        (value) =>
-          value && Array.isArray(value)
+        (value?: unknown, _filters?: ParamFilter) =>
+          Array.isArray(value) && value.length > 0
             ? inArray(table_payment_method.type, value as string[])
             : undefined,
       ],
-    ]) as Map<string, (value?: unknown, filters?: ParamFilter) => unknown>;
-  }
+    ]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(
+  protected declarationMappingData = (
     row: any,
     index?: number
-  ): PaymentMethodDropdownOption {
+  ): PaymentMethodDropdownOption => {
     // Handle LocaleDataType<string> for name
     const name =
       typeof row.name === "string"
@@ -87,7 +86,7 @@ class PaymentMethodDropdownListModel extends BaseViewListModel<
       code: row.code,
       name: row.name,
     };
-  }
+  };
 
   getData = async (
     params: ListParamsRequest

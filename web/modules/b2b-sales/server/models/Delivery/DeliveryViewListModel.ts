@@ -1,11 +1,15 @@
 import type { Column } from "drizzle-orm";
 import { ilike } from "drizzle-orm";
 
-import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
+import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import { table_sales_order_delivery } from "../../schemas";
 
 class DeliveryViewListModel extends BaseViewListModel<
@@ -24,8 +28,8 @@ class DeliveryViewListModel extends BaseViewListModel<
     });
   }
 
-  protected declarationColumns() {
-    return new Map<
+  protected declarationColumns = () =>
+    new Map<
       string,
       {
         column: Column<any>;
@@ -60,37 +64,32 @@ class DeliveryViewListModel extends BaseViewListModel<
         { column: table_sales_order_delivery.updatedAt, sort: true },
       ],
     ]);
-  }
 
-  protected declarationSearch() {
-    return new Map([
+  protected declarationSearch = () =>
+    new Map([
       [
         "reference",
         (text: string) => ilike(table_sales_order_delivery.reference, text),
       ],
     ]);
-  }
 
-  protected declarationFilter() {
-    return new Map();
-  }
+  protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
+    new Map() as FilterConditionMap<ParamFilter>;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(row: any): any {
-    return {
-      id: row.id,
-      orderType: row.orderType,
-      orderId: row.orderId,
-      warehouseId: row.warehouseId ?? undefined,
-      deliveryDate: row.deliveryDate?.getTime(),
-      reference: row.reference ?? undefined,
-      note: row.note ?? undefined,
-      status: row.status,
-      createdAt: row.createdAt?.getTime(),
-      updatedAt: row.updatedAt?.getTime(),
-      createdBy: row.createdBy ?? undefined,
-    };
-  }
+  protected declarationMappingData = (row: any): any => ({
+    id: row.id,
+    orderType: row.orderType,
+    orderId: row.orderId,
+    warehouseId: row.warehouseId ?? undefined,
+    deliveryDate: row.deliveryDate?.getTime(),
+    reference: row.reference ?? undefined,
+    note: row.note ?? undefined,
+    status: row.status,
+    createdAt: row.createdAt?.getTime(),
+    updatedAt: row.updatedAt?.getTime(),
+    createdBy: row.createdBy ?? undefined,
+  });
 
   getData = async (
     params: ListParamsRequest

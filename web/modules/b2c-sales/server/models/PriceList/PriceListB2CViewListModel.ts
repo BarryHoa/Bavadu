@@ -1,11 +1,15 @@
 import type { Column } from "drizzle-orm";
 import { ilike, sql } from "drizzle-orm";
 
-import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
+import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import { table_price_lists_b2c } from "../../schemas/price-list-b2c";
 
 class PriceListB2CViewListModel extends BaseViewListModel<
@@ -24,8 +28,8 @@ class PriceListB2CViewListModel extends BaseViewListModel<
     });
   }
 
-  protected declarationColumns() {
-    return new Map<
+  protected declarationColumns = () =>
+    new Map<
       string,
       {
         column: Column<any>;
@@ -44,10 +48,9 @@ class PriceListB2CViewListModel extends BaseViewListModel<
       ["createdAt", { column: table_price_lists_b2c.createdAt, sort: true }],
       ["updatedAt", { column: table_price_lists_b2c.updatedAt, sort: true }],
     ]);
-  }
 
-  protected declarationSearch() {
-    return new Map([
+  protected declarationSearch = () =>
+    new Map([
       [
         "code",
         (text: string) =>
@@ -61,31 +64,27 @@ class PriceListB2CViewListModel extends BaseViewListModel<
             : undefined,
       ],
     ]);
-  }
 
-  protected declarationFilter() {
-    return new Map();
-  }
+  protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
+    new Map() as FilterConditionMap<ParamFilter>;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(row: any): any {
-    return {
-      id: row.id,
-      code: row.code,
-      name: row.name,
-      description: row.description,
-      type: row.type,
-      status: row.status,
-      priority: row.priority,
-      currencyId: row.currencyId ?? undefined,
-      validFrom: row.validFrom?.getTime(),
-      validTo: row.validTo?.getTime(),
-      isDefault: row.isDefault,
-      applicableTo: row.applicableTo,
-      createdAt: row.createdAt?.getTime(),
-      updatedAt: row.updatedAt?.getTime(),
-    };
-  }
+  protected declarationMappingData = (row: any): any => ({
+    id: row.id,
+    code: row.code,
+    name: row.name,
+    description: row.description,
+    type: row.type,
+    status: row.status,
+    priority: row.priority,
+    currencyId: row.currencyId ?? undefined,
+    validFrom: row.validFrom?.getTime(),
+    validTo: row.validTo?.getTime(),
+    isDefault: row.isDefault,
+    applicableTo: row.applicableTo,
+    createdAt: row.createdAt?.getTime(),
+    updatedAt: row.updatedAt?.getTime(),
+  });
 
   getData = async (
     params: ListParamsRequest

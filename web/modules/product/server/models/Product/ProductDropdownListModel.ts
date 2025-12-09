@@ -1,12 +1,14 @@
-import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
-import { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
+import {
+  BaseViewListModel,
+  type FilterCondition,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
 import { eq, or, sql } from "drizzle-orm";
-import { isArray } from "lodash";
 import { table_product_master, table_product_variant } from "../../schemas";
 import { ProductMasterFeaturesEnum } from "../interfaces/ProductMaster";
 import { ProductFilter } from "./ProductModelInterface";
@@ -34,8 +36,8 @@ class ProductDropdownListModel extends BaseViewListModel<
     });
   }
 
-  protected declarationColumns() {
-    return new Map<
+  protected declarationColumns = () =>
+    new Map<
       string,
       {
         column: Column<any>;
@@ -52,42 +54,44 @@ class ProductDropdownListModel extends BaseViewListModel<
       ],
       ["baseUomId", { column: table_product_variant.baseUomId, sort: false }],
     ]);
-  }
 
-  protected declarationSearch() {
-    return new Map();
-  }
+  protected declarationSearch = () => new Map();
 
-  protected declarationFilter() {
-    return new Map([
+  protected declarationFilter = (): FilterConditionMap<ProductFilter> => {
+    const filters: Array<[string, FilterCondition<ProductFilter>]> = [
       [
         "isActive",
-        (value: any) =>
-          value
-            ? eq(table_product_variant.isActive, value as boolean)
+        (value?: unknown) =>
+          typeof value === "boolean"
+            ? eq(table_product_variant.isActive, value)
             : undefined,
       ],
       [
         "features",
-        (value: any, filters: ProductFilter) => {
-          return value && isArray(value)
+        (value?: unknown) => {
+          const featureList = Array.isArray(value)
+            ? (value as ProductMasterFeaturesEnum[])
+            : undefined;
+          return featureList && featureList.length > 0
             ? or(
-                ...(value as ProductMasterFeaturesEnum[]).map(
+                ...featureList.map(
                   (feature) =>
                     sql`${table_product_master.features} ->> ${feature} = 'true'`
                 )
               )
             : undefined;
         },
-      ] as any,
-    ]) as Map<string, (value?: unknown, filters?: ParamFilter) => unknown>;
-  }
+      ],
+    ];
+
+    return new Map(filters);
+  };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(
+  protected declarationMappingData = (
     row: any,
     index?: number
-  ): ProductDropdownOption {
+  ): ProductDropdownOption => {
     const name =
       typeof row.name === "string"
         ? row.name
@@ -97,7 +101,7 @@ class ProductDropdownListModel extends BaseViewListModel<
       label: name,
       value: row.id,
     };
-  }
+  };
 
   getData = async (
     params: ListParamsRequest<ProductFilter>

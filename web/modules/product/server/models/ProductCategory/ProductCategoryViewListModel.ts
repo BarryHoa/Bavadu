@@ -1,8 +1,12 @@
-import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
+import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type { Column } from "drizzle-orm";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -30,8 +34,8 @@ class ProductCategoryViewListModel extends BaseViewListModel<
   typeof table_product_category,
   ProductCategoryRow
 > {
-  protected declarationColumns() {
-    return new Map<
+  protected declarationColumns = () =>
+    new Map<
       string,
       {
         column: Column<any>;
@@ -51,42 +55,37 @@ class ProductCategoryViewListModel extends BaseViewListModel<
       ["createdAt", { column: table_product_category.createdAt, sort: true }],
       ["updatedAt", { column: table_product_category.updatedAt, sort: true }],
     ]);
-  }
 
   constructor() {
     super({ table: table_product_category });
   }
 
-  protected declarationSearch() {
-    return new Map([
+  protected declarationSearch = () =>
+    new Map([
       ["code", (text: string) => ilike(table_product_category.code, text)],
       ["name", (text: string) => ilike(table_product_category.name, text)],
     ]);
-  }
 
-  protected declarationFilter() {
-    return new Map();
-  }
+  protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
+    new Map() as FilterConditionMap<ParamFilter>;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(row: any): ProductCategoryRow {
-    return {
-      id: row.id,
-      code: row.code,
-      name: row.name,
-      description: row.description,
-      level: row.level ?? undefined,
-      isActive: row.isActive ?? undefined,
-      parent: row.parentId
-        ? {
-            id: row.parentId,
-            name: row.parentName ?? undefined,
-          }
-        : null,
-      createdAt: row.createdAt?.getTime(),
-      updatedAt: row.updatedAt?.getTime(),
-    };
-  }
+  protected declarationMappingData = (row: any): ProductCategoryRow => ({
+    id: row.id,
+    code: row.code,
+    name: row.name,
+    description: row.description,
+    level: row.level ?? undefined,
+    isActive: row.isActive ?? undefined,
+    parent: row.parentId
+      ? {
+          id: row.parentId,
+          name: row.parentName ?? undefined,
+        }
+      : null,
+    createdAt: row.createdAt?.getTime(),
+    updatedAt: row.updatedAt?.getTime(),
+  });
 
   getData = async (
     params: ListParamsRequest

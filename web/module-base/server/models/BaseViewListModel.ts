@@ -16,19 +16,19 @@ import type { ParamSortMultiple } from "./interfaces/SortInterface";
  * Models that need view list functionality should extend this class
  * and implement the getViewDataList method
  */
-type ColumnMap = Map<
+export type ColumnMap = Map<
   string,
   {
     column: Column;
     sort?: boolean;
   }
 >;
-type SearchConditionMap = Map<string, (text: string) => unknown>;
-type FilterCondition<TFilter extends ParamFilter> = (
+export type SearchConditionMap = Map<string, (text: string) => unknown>;
+export type FilterCondition<TFilter extends ParamFilter> = (
   currentFilterValue?: unknown,
   filters?: TFilter | undefined
 ) => unknown | undefined;
-type FilterConditionMap<TFilter extends ParamFilter> = Map<
+export type FilterConditionMap<TFilter extends ParamFilter> = Map<
   string,
   FilterCondition<TFilter>
 >;
@@ -73,9 +73,9 @@ export abstract class BaseViewListModel<
    * Default implementation returns an empty Map.
    * Subclass can override to provide columns mapping.
    */
-  protected declarationColumns(): ColumnMap {
+  protected declarationColumns = (): ColumnMap => {
     return new Map();
-  }
+  };
 
   /**
    * Declare how global search text is mapped to conditions.
@@ -85,9 +85,9 @@ export abstract class BaseViewListModel<
    * Default implementation returns an empty Map (no search).
    * Subclass can override to provide search conditions.
    */
-  protected declarationSearch(): SearchConditionMap {
+  protected declarationSearch = (): SearchConditionMap => {
     return new Map();
-  }
+  };
 
   /**
    * Declare how filters are mapped to conditions.
@@ -97,9 +97,9 @@ export abstract class BaseViewListModel<
    * Subclass can override to provide filter conditions.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected declarationFilter(): FilterConditionMap<TFilter> {
+  protected declarationFilter = (): FilterConditionMap<TFilter> => {
     return new Map();
-  }
+  };
 
   /**
    * Declare how to map a raw DB row to the view row type (TRow)
@@ -107,9 +107,9 @@ export abstract class BaseViewListModel<
    * Default implementation returns the row as-is.
    * Subclass can override to transform the row data.
    */
-  protected declarationMappingData(row: unknown, index?: number): TRow {
+  protected declarationMappingData = (row: unknown, index?: number): TRow => {
     return row as TRow;
-  }
+  };
 
   // ============================================================================
   // PROTECTED HELPER METHODS

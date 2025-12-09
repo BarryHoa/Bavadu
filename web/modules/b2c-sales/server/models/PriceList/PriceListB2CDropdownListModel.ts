@@ -1,8 +1,12 @@
-import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
+import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type { Column } from "drizzle-orm";
 import { eq, ilike, sql } from "drizzle-orm";
 import { table_price_lists_b2c } from "../../schemas/price-list-b2c";
@@ -31,7 +35,7 @@ class PriceListB2CDropdownListModel extends BaseViewListModel<
     });
   }
 
-  protected declarationColumns() {
+  protected declarationColumns = () =>
     // Minimal columns for dropdown
     return new Map<
       string,
@@ -46,8 +50,8 @@ class PriceListB2CDropdownListModel extends BaseViewListModel<
     ]);
   }
 
-  protected declarationSearch() {
-    return new Map([
+  protected declarationSearch = () =>
+    new Map([
       [
         "code",
         (text: string) =>
@@ -63,15 +67,14 @@ class PriceListB2CDropdownListModel extends BaseViewListModel<
     ]);
   }
 
-  protected declarationFilter() {
-    return new Map();
-  }
+  protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
+    new Map() as FilterConditionMap<ParamFilter>;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(
+  protected declarationMappingData = (
     row: any,
-    index: number
-  ): PriceListB2CDropdownOption {
+    index?: number
+  ): PriceListB2CDropdownOption => {
     // Handle LocaleDataType<string> for name
     const name =
       typeof row.name === "string"
@@ -84,7 +87,7 @@ class PriceListB2CDropdownListModel extends BaseViewListModel<
       code: row.code,
       name: row.name,
     };
-  }
+  };
 
   getData = async (
     params: ListParamsRequest

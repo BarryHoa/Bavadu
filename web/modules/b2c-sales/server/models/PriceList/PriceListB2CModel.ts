@@ -1,4 +1,7 @@
-import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { desc, eq, ilike, sql } from "drizzle-orm";
 import {
   table_price_lists_b2c,
@@ -90,7 +93,7 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
     this.validationService = new PriceListValidationService();
   }
 
-  protected declarationColumns() {
+  protected declarationColumns = () => {
     const map = new Map();
     map.set("id", { column: table_price_lists_b2c.id, sort: false });
     map.set("code", { column: table_price_lists_b2c.code, sort: true });
@@ -116,10 +119,10 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
       sort: true,
     });
     return map;
-  }
+  };
 
-  protected declarationSearch() {
-    return new Map([
+  protected declarationSearch = () =>
+    new Map([
       [
         "code",
         (text: string) =>
@@ -133,37 +136,33 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
             : undefined,
       ],
     ]);
-  }
 
-  protected declarationFilter() {
-    return new Map<
-      string,
-      (
-        currentFilterValue: any,
-        filters: PriceListFilter | undefined
-      ) => any | undefined
-    >([
+  protected declarationFilter = (): FilterConditionMap<PriceListFilter> =>
+    new Map([
       [
         "type",
-        (value: string | undefined, filters: PriceListFilter | undefined) =>
-          value ? eq(table_price_lists_b2c.type, value) : undefined,
+        (value?: unknown, _filters?: PriceListFilter) =>
+          typeof value === "string" && value
+            ? eq(table_price_lists_b2c.type, value)
+            : undefined,
       ],
       [
         "status",
-        (value: string | undefined, filters: PriceListFilter | undefined) =>
-          value ? eq(table_price_lists_b2c.status, value) : undefined,
+        (value?: unknown, _filters?: PriceListFilter) =>
+          typeof value === "string" && value
+            ? eq(table_price_lists_b2c.status, value)
+            : undefined,
       ],
       [
         "isDefault",
-        (value: boolean | undefined, filters: PriceListFilter | undefined) =>
-          value !== undefined
+        (value?: unknown, _filters?: PriceListFilter) =>
+          typeof value === "boolean"
             ? eq(table_price_lists_b2c.isDefault, value)
             : undefined,
       ],
     ]);
-  }
 
-  protected declarationMappingData(row: any): PriceListB2CRow {
+  protected declarationMappingData = (row: any): PriceListB2CRow => {
     return {
       id: row.id,
       code: row.code,
@@ -180,7 +179,7 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     };
-  }
+  };
 
   /**
    * Get list of price lists (simple list, not for view list data table)

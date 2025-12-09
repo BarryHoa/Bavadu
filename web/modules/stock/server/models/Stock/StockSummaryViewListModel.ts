@@ -2,7 +2,10 @@ import type { Column } from "drizzle-orm";
 import { and, eq, ilike, sql } from "drizzle-orm";
 
 import { ParamFilter } from "@base/server";
-import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
@@ -34,8 +37,8 @@ class StockSummaryViewListModel extends BaseViewListModel<
   StockSummaryViewRow,
   StockSummaryFilter
 > {
-  protected declarationColumns() {
-    return new Map<
+  protected declarationColumns = () =>
+    new Map<
       string,
       {
         column: Column<any>;
@@ -106,7 +109,6 @@ class StockSummaryViewListModel extends BaseViewListModel<
         },
       ],
     ]);
-  }
 
   constructor() {
     super({
@@ -120,8 +122,8 @@ class StockSummaryViewListModel extends BaseViewListModel<
     });
   }
 
-  protected declarationSearch() {
-    return new Map([
+  protected declarationSearch = () =>
+    new Map([
       ["productId", (text: string) => ilike(table_stock_level.productId, text)],
       ["productCode", (text: string) => ilike(table_product_master.code, text)],
       ["productName", (text: string) => ilike(sql`${table_product_master.name}::text`, text)],
@@ -129,39 +131,41 @@ class StockSummaryViewListModel extends BaseViewListModel<
       ["warehouseCode", (text: string) => ilike(table_stock_warehouse.code, text)],
       ["warehouseName", (text: string) => ilike(table_stock_warehouse.name, text)],
     ]);
-  }
 
-  protected declarationFilter() {
-    return new Map([
-      ["productId", (value: string | undefined, filters: StockSummaryFilter | undefined) => {
-        if (!value) return undefined;
-        return eq(table_stock_level.productId, value);
-      }],
-      ["warehouseId", (value: string | undefined, filters: StockSummaryFilter | undefined) => {
-        if (!value) return undefined;
-        return eq(table_stock_level.warehouseId, value);
-      }],
+  protected declarationFilter = (): FilterConditionMap<StockSummaryFilter> =>
+    new Map([
+      [
+        "productId",
+        (value?: unknown, _filters?: StockSummaryFilter) => {
+          if (typeof value !== "string" || !value) return undefined;
+          return eq(table_stock_level.productId, value);
+        },
+      ],
+      [
+        "warehouseId",
+        (value?: unknown, _filters?: StockSummaryFilter) => {
+          if (typeof value !== "string" || !value) return undefined;
+          return eq(table_stock_level.warehouseId, value);
+        },
+      ],
     ]);
-  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(row: any): StockSummaryViewRow {
-    return {
-      id: `${row.productId}-${row.warehouseId}`,
-      productId: row.productId,
-      productCode: row.productCode || row.productId,
-      productName:
-        typeof row.productName === "string"
-          ? row.productName
-          : row.productName?.en || row.productName?.vi || row.productId,
-      warehouseId: row.warehouseId,
-      warehouseCode: row.warehouseCode || row.warehouseId,
-      warehouseName: row.warehouseName || row.warehouseId,
-      quantity: Number(row.quantity),
-      reservedQuantity: Number(row.reservedQuantity),
-      minStock: row.minStock ? Number(row.minStock) : null,
-    };
-  }
+  protected declarationMappingData = (row: any): StockSummaryViewRow => ({
+    id: `${row.productId}-${row.warehouseId}`,
+    productId: row.productId,
+    productCode: row.productCode || row.productId,
+    productName:
+      typeof row.productName === "string"
+        ? row.productName
+        : row.productName?.en || row.productName?.vi || row.productId,
+    warehouseId: row.warehouseId,
+    warehouseCode: row.warehouseCode || row.warehouseId,
+    warehouseName: row.warehouseName || row.warehouseId,
+    quantity: Number(row.quantity),
+    reservedQuantity: Number(row.reservedQuantity),
+    minStock: row.minStock ? Number(row.minStock) : null,
+  });
 
   getData = async (
     params: ListParamsRequest<StockSummaryFilter> = {}

@@ -1,11 +1,15 @@
 import type { Column } from "drizzle-orm";
 import { ilike } from "drizzle-orm";
 
-import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
+import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import { table_purchase_order } from "../../schemas";
 
 class PurchaseOrderViewListModel extends BaseViewListModel<
@@ -24,8 +28,8 @@ class PurchaseOrderViewListModel extends BaseViewListModel<
     });
   }
 
-  protected declarationColumns() {
-    return new Map<
+  protected declarationColumns = () =>
+    new Map<
       string,
       {
         column: Column<any>;
@@ -62,35 +66,30 @@ class PurchaseOrderViewListModel extends BaseViewListModel<
         { column: table_purchase_order.updatedAt, sort: true },
       ],
     ]);
-  }
 
-  protected declarationSearch() {
-    return new Map([
+  protected declarationSearch = () =>
+    new Map([
       ["code", (text: string) => ilike(table_purchase_order.code, text)],
       ["vendorName", (text: string) => ilike(table_purchase_order.vendorName, text)],
     ]);
-  }
 
-  protected declarationFilter() {
-    return new Map();
-  }
+  protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
+    new Map() as FilterConditionMap<ParamFilter>;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(row: any): any {
-    return {
-      id: row.id,
-      code: row.code,
-      vendorName: row.vendorName,
-      status: row.status,
-      warehouseId: row.warehouseId ?? undefined,
-      expectedDate: row.expectedDate?.getTime(),
-      totalAmount: row.totalAmount ?? "0",
-      currency: row.currency ?? "USD",
-      notes: row.notes ?? undefined,
-      createdAt: row.createdAt?.getTime(),
-      updatedAt: row.updatedAt?.getTime(),
-    };
-  }
+  protected declarationMappingData = (row: any): any => ({
+    id: row.id,
+    code: row.code,
+    vendorName: row.vendorName,
+    status: row.status,
+    warehouseId: row.warehouseId ?? undefined,
+    expectedDate: row.expectedDate?.getTime(),
+    totalAmount: row.totalAmount ?? "0",
+    currency: row.currency ?? "USD",
+    notes: row.notes ?? undefined,
+    createdAt: row.createdAt?.getTime(),
+    updatedAt: row.updatedAt?.getTime(),
+  });
 
   getData = async (
     params: ListParamsRequest

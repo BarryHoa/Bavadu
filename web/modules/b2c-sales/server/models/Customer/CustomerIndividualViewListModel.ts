@@ -1,11 +1,15 @@
 import type { Column } from "drizzle-orm";
 import { ilike } from "drizzle-orm";
 
-import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
+import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import { table_customer_individual } from "../../schemas";
 
 class CustomerIndividualViewListModel extends BaseViewListModel<
@@ -24,8 +28,8 @@ class CustomerIndividualViewListModel extends BaseViewListModel<
     });
   }
 
-  protected declarationColumns() {
-    return new Map<
+  protected declarationColumns = () =>
+    new Map<
       string,
       {
         column: Column<any>;
@@ -42,40 +46,35 @@ class CustomerIndividualViewListModel extends BaseViewListModel<
       ["createdAt", { column: table_customer_individual.createdAt, sort: true }],
       ["updatedAt", { column: table_customer_individual.updatedAt, sort: true }],
     ]);
-  }
 
-  protected declarationSearch() {
-    return new Map([
+  protected declarationSearch = () =>
+    new Map([
       ["code", (text: string) => ilike(table_customer_individual.code, text)],
       ["firstName", (text: string) => ilike(table_customer_individual.firstName, text)],
       ["lastName", (text: string) => ilike(table_customer_individual.lastName, text)],
       ["phone", (text: string) => ilike(table_customer_individual.phone, text)],
       ["email", (text: string) => ilike(table_customer_individual.email, text)],
     ]);
-  }
 
-  protected declarationFilter() {
-    return new Map();
-  }
+  protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
+    new Map() as FilterConditionMap<ParamFilter>;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(row: any): any {
-    return {
-      id: row.id,
-      code: row.code,
-      firstName: row.firstName,
-      lastName: row.lastName,
-      phone: row.phone ?? undefined,
-      email: row.email ?? undefined,
-      address: row.address ?? undefined,
-      dateOfBirth: row.dateOfBirth?.getTime(),
-      gender: row.gender ?? undefined,
-      isActive: row.isActive,
-      notes: row.notes ?? undefined,
-      createdAt: row.createdAt?.getTime(),
-      updatedAt: row.updatedAt?.getTime(),
-    };
-  }
+  protected declarationMappingData = (row: any): any => ({
+    id: row.id,
+    code: row.code,
+    firstName: row.firstName,
+    lastName: row.lastName,
+    phone: row.phone ?? undefined,
+    email: row.email ?? undefined,
+    address: row.address ?? undefined,
+    dateOfBirth: row.dateOfBirth?.getTime(),
+    gender: row.gender ?? undefined,
+    isActive: row.isActive,
+    notes: row.notes ?? undefined,
+    createdAt: row.createdAt?.getTime(),
+    updatedAt: row.updatedAt?.getTime(),
+  });
 
   getData = async (
     params: ListParamsRequest

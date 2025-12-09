@@ -1,4 +1,7 @@
-import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
@@ -32,8 +35,8 @@ class ProductViewListModel extends BaseViewListModel<
     });
   }
 
-  protected declarationColumns() {
-    return new Map<
+  protected declarationColumns = () =>
+    new Map<
       string,
       {
         column: Column<any>;
@@ -76,10 +79,9 @@ class ProductViewListModel extends BaseViewListModel<
       ["createdAt", { column: table_product_variant.createdAt, sort: true }],
       ["updatedAt", { column: table_product_variant.updatedAt, sort: true }],
     ]);
-  }
 
-  protected declarationSearch() {
-    return new Map([
+  protected declarationSearch = () =>
+    new Map([
       ["sku", (text: string) => ilike(table_product_variant.sku, text)],
       ["barcode", (text: string) => ilike(table_product_variant.barcode, text)],
       [
@@ -104,42 +106,42 @@ class ProductViewListModel extends BaseViewListModel<
         (text: string) => ilike(table_product_category.name, text),
       ],
     ]);
-  }
 
-  protected declarationFilter() {
-    return new Map([
+  protected declarationFilter = (): FilterConditionMap<ProductFilter> =>
+    new Map([
       [
         "status",
-        (value: boolean, filters: ProductFilter | undefined) =>
-          value !== undefined ? eq(this.table.isActive, value) : undefined,
+        (value?: unknown, _filters?: ProductFilter) =>
+          typeof value === "boolean"
+            ? eq(this.table.isActive, value)
+            : undefined,
       ],
       [
         "productMasterStatus",
-        (value: boolean, filters: ProductFilter | undefined) =>
-          value !== undefined
+        (value?: unknown, _filters?: ProductFilter) =>
+          typeof value === "boolean"
             ? eq(table_product_master.isActive, value)
             : undefined,
       ],
       [
         "productCategoryStatus",
-        (value: boolean, filters: ProductFilter | undefined) =>
-          value !== undefined
+        (value?: unknown, _filters?: ProductFilter) =>
+          typeof value === "boolean"
             ? eq(table_product_category.isActive, value)
             : undefined,
       ],
       [
         "baseUomStatus",
-        (value: boolean, filters: ProductFilter | undefined) =>
-          value !== undefined
+        (value?: unknown, _filters?: ProductFilter) =>
+          typeof value === "boolean"
             ? eq(table_unit_of_measure.isActive, value)
             : undefined,
       ],
     ]);
-  }
 
   // Map raw DB row + joined columns -> view row
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(row: any): ProductVariantElm {
+  protected declarationMappingData = (row: any): ProductVariantElm => {
     return {
       id: row.id,
       name: row.name,
@@ -168,7 +170,7 @@ class ProductViewListModel extends BaseViewListModel<
       createdAt: row.createdAt?.getTime(),
       updatedAt: row.updatedAt?.getTime(),
     } as unknown as ProductVariantElm;
-  }
+  };
 
   getData = async (
     params: ListParamsRequest<ProductFilter>

@@ -1,11 +1,15 @@
 import { ilike } from "drizzle-orm";
 import type { Column } from "drizzle-orm";
 
-import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
+import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 
 import {
   WarehouseAddress,
@@ -49,8 +53,8 @@ class WarehouseViewListModel extends BaseViewListModel<
     });
   }
 
-  protected declarationColumns() {
-    return new Map<
+  protected declarationColumns = () =>
+    new Map<
       string,
       {
         column: Column<any>;
@@ -111,46 +115,41 @@ class WarehouseViewListModel extends BaseViewListModel<
         { column: table_stock_warehouse.updatedAt, sort: true },
       ],
     ]);
-  }
 
-  protected declarationSearch() {
-    return new Map([
+  protected declarationSearch = () =>
+    new Map([
       ["code", (text: string) => ilike(table_stock_warehouse.code, text)],
       ["name", (text: string) => ilike(table_stock_warehouse.name, text)],
       ["typeCode", (text: string) => ilike(table_stock_warehouse.typeCode, text)],
       ["status", (text: string) => ilike(table_stock_warehouse.status, text)],
     ]);
-  }
 
-  protected declarationFilter() {
-    return new Map();
-  }
+  protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
+    new Map() as FilterConditionMap<ParamFilter>;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(row: any): WarehouseViewRow {
-    return {
-      id: row.id,
-      code: row.code,
-      name: row.name,
-      typeCode: row.typeCode,
-      status: row.status,
-      companyId: row.companyId ?? null,
-      managerId: row.managerId ?? null,
-      contactId: row.contactId ?? null,
-      address: row.address as WarehouseAddress,
-      valuationMethod: row.valuationMethod,
-      minStock: Number(row.minStock ?? 0),
-      maxStock:
-        row.maxStock === null || row.maxStock === undefined
-          ? null
-          : Number(row.maxStock),
-      accountInventory: row.accountInventory ?? null,
-      accountAdjustment: row.accountAdjustment ?? null,
-      notes: row.notes ?? null,
-      createdAt: row.createdAt ? row.createdAt.toISOString() : null,
-      updatedAt: row.updatedAt ? row.updatedAt.toISOString() : null,
-    };
-  }
+  protected declarationMappingData = (row: any): WarehouseViewRow => ({
+    id: row.id,
+    code: row.code,
+    name: row.name,
+    typeCode: row.typeCode,
+    status: row.status,
+    companyId: row.companyId ?? null,
+    managerId: row.managerId ?? null,
+    contactId: row.contactId ?? null,
+    address: row.address as WarehouseAddress,
+    valuationMethod: row.valuationMethod,
+    minStock: Number(row.minStock ?? 0),
+    maxStock:
+      row.maxStock === null || row.maxStock === undefined
+        ? null
+        : Number(row.maxStock),
+    accountInventory: row.accountInventory ?? null,
+    accountAdjustment: row.accountAdjustment ?? null,
+    notes: row.notes ?? null,
+    createdAt: row.createdAt ? row.createdAt.toISOString() : null,
+    updatedAt: row.updatedAt ? row.updatedAt.toISOString() : null,
+  });
 
   getData = async (
     params: ListParamsRequest = {}

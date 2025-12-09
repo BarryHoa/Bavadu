@@ -1,4 +1,7 @@
-import { BaseViewListModel } from "@base/server/models/BaseViewListModel";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
@@ -32,8 +35,8 @@ class TaxRateDropdownListModel extends BaseViewListModel<
     });
   }
 
-  protected declarationColumns() {
-    return new Map<
+  protected declarationColumns = () =>
+    new Map<
       string,
       {
         column: Column<any>;
@@ -45,34 +48,32 @@ class TaxRateDropdownListModel extends BaseViewListModel<
       ["name", { column: table_tax_rate.name, sort: false }],
       ["order", { column: table_tax_rate.order, sort: true }],
     ]);
-  }
 
-  protected declarationSearch() {
-    return new Map();
-  }
+  protected declarationSearch = () => new Map();
 
-  protected declarationFilter() {
-    return new Map([
+  protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
+    new Map([
       [
         "isActive",
-        (value) =>
-          value ? eq(table_tax_rate.isActive, value as boolean) : undefined,
+        (value?: unknown, _filters?: ParamFilter) =>
+          typeof value === "boolean"
+            ? eq(table_tax_rate.isActive, value)
+            : undefined,
       ],
       [
         "type",
-        (value) =>
-          value && Array.isArray(value)
+        (value?: unknown, _filters?: ParamFilter) =>
+          Array.isArray(value) && value.length > 0
             ? inArray(table_tax_rate.type, value as string[])
             : undefined,
       ],
-    ]) as Map<string, (value?: unknown, filters?: ParamFilter) => unknown>;
-  }
+    ]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected declarationMappingData(
+  protected declarationMappingData = (
     row: any,
     index?: number
-  ): TaxRateDropdownOption {
+  ): TaxRateDropdownOption => {
     const name =
       typeof row.name === "string"
         ? row.name
