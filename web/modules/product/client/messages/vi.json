@@ -18,6 +18,7 @@
       "asset": "Tài sản",
       "accounting": "Kế toán"
     },
+    "images": "Hình ảnh",
     "product-create": {
       "baseUnitOfMeasure": "Đơn vị đo cơ bản",
       "unitOfMeasure": "Đơn vị đo",
@@ -49,12 +50,14 @@
       "duplicateUomDescription": "UOM này đã được chọn ở trường khác",
       "sameAsBaseUom": "Giống với Base UOM",
       "noOtherUoms": "Chưa có UOM khác nào",
+      "images": "Hình ảnh",
       "errors": {
         "productCodeRequired": "Mã sản phẩm là bắt buộc",
         "baseUnitOfMeasureRequired": "Đơn vị đo cơ bản là bắt buộc",
         "conversionRatioRequired": "Tỷ lệ chuyển đổi là bắt buộc và phải lớn hơn 0",
         "atLeastOneVariantRequired": "Cần ít nhất một biến thể",
-        "maxVariantsAllowed": "Tối đa {count} biến thể"
+        "maxVariantsAllowed": "Tối đa {count} biến thể",
+        "masterImageRequired": "Cần ít nhất một hình ảnh cho sản phẩm master"
       },
       "uom-section": {
         "uom": "UOM",

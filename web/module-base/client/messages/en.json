@@ -149,6 +149,20 @@
       "loading": "Loading...",
       "noResults": "No results found",
       "loadingMore": "Loading more..."
+    },
+    "uploadImage": {
+      "tooManyFiles": "Too many files",
+      "tooManyFilesDescription": "You can only upload {count} more file(s)",
+      "invalidFile": "Invalid file",
+      "uploadFailed": "Upload failed",
+      "uploadFailedDescription": "Failed to upload image. Please try again.",
+      "clickOrDrag": "Click or drag images here to upload",
+      "maxReached": "Maximum {count} images reached",
+      "accepted": "Accepted: {types}",
+      "maxSize": "(Max {size}MB per file)",
+      "uploading": "Uploading...",
+      "uploadImages": "Upload images",
+      "removeImage": "Remove image"
     }
   }
 }

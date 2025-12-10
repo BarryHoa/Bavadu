@@ -1,4 +1,5 @@
 import {
+  any,
   array,
   boolean,
   fallback,
@@ -101,6 +102,7 @@ export const createVariantSchema = (
     ),
 
     isActive: boolean(),
+    images: optional(array(any())),
     packings: array(
       object({
         id: optional(pipe(string(), trim())),
@@ -142,6 +144,10 @@ export const createProductFormSchema = (
       isActive: boolean(),
       brand: fallback(pipe(string(), trim()), ""),
       categoryId: optional(pipe(string(), trim())),
+      images: pipe(
+        array(any()),
+        minLength(1, tProductForm("errors.masterImageRequired"))
+      ),
     }),
     variants: pipe(
       array(createVariantSchema(t, tProduct, tProductForm)),

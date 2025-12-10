@@ -21,6 +21,9 @@ const config = {
         ],
         satoshi: ["Satoshi", "system-ui", "sans-serif"],
       },
+      animation: {
+        "spin-slow": "spin 3s linear infinite",
+      },
     },
   },
   darkMode: "class",

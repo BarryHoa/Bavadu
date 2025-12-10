@@ -4,6 +4,7 @@ import {
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseTextarea,
+  IBaseUploadImageTiny,
 } from "@base/client/components";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Divider } from "@heroui/react";
@@ -422,6 +423,15 @@ export default function VariantTab({
           onUpdate((current) => ({ ...current, description: next }))
         }
         isDisabled={isBusy}
+      />
+
+      <IBaseUploadImageTiny
+        label={tProductForm("images")}
+        values={value.images ?? []}
+        onChange={(images) => onUpdate((current) => ({ ...current, images }))}
+        isDisabled={isBusy}
+        maxCount={10}
+        maxSize={5 * 1024 * 1024} // 5MB
       />
     </div>
   );

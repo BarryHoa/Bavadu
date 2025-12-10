@@ -7,6 +7,7 @@ import {
   IBaseSingleSelectAsync,
   IBaseTextarea,
   IBaseTooltip,
+  IBaseUploadImageTiny,
   SelectItemOption,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
@@ -34,6 +35,7 @@ type MasterTabProps = {
     code?: { message?: string };
     categoryId?: { message?: string };
     type?: { message?: string };
+    images?: { message?: string };
   };
   isBusy: boolean;
   categoryQueryLoading: boolean;
@@ -249,6 +251,17 @@ export default function MasterTab({
           onUpdate((current) => ({ ...current, description: next }))
         }
         isDisabled={isBusy}
+      />
+
+      <IBaseUploadImageTiny
+        label={tProduct("images")}
+        values={value.images ?? []}
+        onChange={(images) => onUpdate((current) => ({ ...current, images }))}
+        isDisabled={isBusy}
+        maxCount={10}
+        maxSize={5 * 1024 * 1024} // 5MB
+        required
+        error={errors?.images?.message}
       />
     </div>
   );

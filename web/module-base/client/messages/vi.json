@@ -148,6 +148,20 @@
       "loading": "Đang tải...",
       "noResults": "Không tìm thấy dữ liệu",
       "loadingMore": "Đang tải thêm..."
+    },
+    "uploadImage": {
+      "tooManyFiles": "Quá nhiều file",
+      "tooManyFilesDescription": "Bạn chỉ có thể tải lên thêm {count} file",
+      "invalidFile": "File không hợp lệ",
+      "uploadFailed": "Tải lên thất bại",
+      "uploadFailedDescription": "Không thể tải lên hình ảnh. Vui lòng thử lại.",
+      "clickOrDrag": "Nhấp hoặc kéo hình ảnh vào đây để tải lên",
+      "maxReached": "Đã đạt tối đa {count} hình ảnh",
+      "accepted": "Chấp nhận: {types}",
+      "maxSize": "(Tối đa {size}MB mỗi file)",
+      "uploading": "Đang tải lên...",
+      "uploadImages": "Tải lên hình ảnh",
+      "removeImage": "Xóa hình ảnh"
     }
   }
 }

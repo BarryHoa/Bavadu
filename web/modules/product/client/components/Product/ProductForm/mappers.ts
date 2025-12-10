@@ -1,3 +1,4 @@
+import type { ImageUploadItem } from "@base/client/components";
 import {
   ProductFormValues,
   ProductMasterFeatures,
@@ -19,6 +20,7 @@ export type ProductFormFieldValues = {
     isActive: boolean;
     brand: string;
     categoryId?: string;
+    images: ImageUploadItem[];
   };
   variants: VariantFieldValue[];
 };
@@ -38,6 +40,7 @@ const createDefaultVariant = (): VariantFieldValue => ({
   manufacturingUom: undefined,
   uomConversions: [],
   isActive: true,
+  images: [],
   packings: [],
   attributes: [],
 });
@@ -68,6 +71,7 @@ export const createDefaultValues = (
       isActive: true,
       brand: "",
       categoryId: undefined,
+      images: [],
     },
     variants: [createDefaultVariant()],
   };
@@ -129,6 +133,33 @@ export const mapToFieldValues = (
           : undefined,
         uomConversions: (variant.uomConversions ?? []) as UomConversions[],
         isActive: variant.isActive ?? true,
+        images: ((
+          variant.images as
+            | Array<{ id?: string; url?: string } | string>
+            | undefined
+        )?.map((img: { id?: string; url?: string } | string) => {
+          if (typeof img === "string") {
+            return {
+              uid: img,
+              name: "image",
+              size: 0,
+              extension: "jpg",
+              url: img,
+              status: "done" as const,
+            } as ImageUploadItem;
+          } else if (img && typeof img === "object" && img.id) {
+            return {
+              uid: img.id,
+              name: "image",
+              size: 0,
+              extension: "jpg",
+              id: img.id,
+              url: img.url,
+              status: "done" as const,
+            } as ImageUploadItem;
+          }
+          return img as ImageUploadItem;
+        }) ?? []) as ImageUploadItem[],
         packings:
           variant.packings?.map((packing) => ({
             id: packing.id,
@@ -168,6 +199,33 @@ export const mapToFieldValues = (
           ? initialValues.master.brand
           : "",
       categoryId: initialValues.master.categoryId ?? undefined,
+      images: ((
+        initialValues.master.images as
+          | Array<{ id?: string; url?: string } | string>
+          | undefined
+      )?.map((img: { id?: string; url?: string } | string) => {
+        if (typeof img === "string") {
+          return {
+            uid: img,
+            name: "image",
+            size: 0,
+            extension: "jpg",
+            url: img,
+            status: "done" as const,
+          } as ImageUploadItem;
+        } else if (img && typeof img === "object" && img.id) {
+          return {
+            uid: img.id,
+            name: "image",
+            size: 0,
+            extension: "jpg",
+            id: img.id,
+            url: img.url,
+            status: "done" as const,
+          } as ImageUploadItem;
+        }
+        return img as ImageUploadItem;
+      }) ?? []) as ImageUploadItem[],
     },
     variants: mappedVariants,
   };
@@ -207,6 +265,14 @@ export const mapToProductFormValues = (
         conversionRatio: uom.conversionRatio,
       })),
     isActive: variant.isActive,
+    images: variant.images
+      .filter(
+        (img: ImageUploadItem) => img.status === "done" && (img.id || img.url)
+      )
+      .map((img: ImageUploadItem) => ({
+        id: img.id,
+        url: img.url,
+      })),
     packings: variant.packings.map((packing) => ({
       id: packing.id,
       name: {
@@ -240,6 +306,14 @@ export const mapToProductFormValues = (
       isActive: values.master.isActive,
       brand: values.master.brand.trim() || "",
       categoryId: values.master.categoryId,
+      images: values.master.images
+        .filter(
+          (img: ImageUploadItem) => img.status === "done" && (img.id || img.url)
+        )
+        .map((img: ImageUploadItem) => ({
+          id: img.id,
+          url: img.url,
+        })),
     },
     variants: mappedVariants,
   };

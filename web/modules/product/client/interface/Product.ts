@@ -119,6 +119,7 @@ export type ProductFormValues = {
     isActive: boolean;
     brand: string;
     categoryId?: string;
+    images?: Array<{ id?: string; url?: string } | string>;
   };
   variants: Array<{
     name: LocaleFormValue;
@@ -141,6 +142,7 @@ export type ProductFormValues = {
       conversionRatio: number | null;
     }>;
     isActive: boolean;
+    images?: Array<{ id?: string; url?: string } | string>;
     packings: ProductFormPacking[];
     attributes: ProductFormAttribute[];
   }>;

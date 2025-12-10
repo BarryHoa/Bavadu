@@ -17,6 +17,7 @@ export type { FilterOption } from "./ViewListDataTable/components/FilterMenu";
 export type { GroupOption } from "./ViewListDataTable/components/GroupByMenu";
 
 // Direct component exports
+export type { ImageUploadItem } from "../../interface/ImageUpdload";
 export { default as AddressPicker } from "./AddressPicker/AddressPicker";
 export { default as DatePicker } from "./DatePicker";
 export { default as IBaseDigitViewer } from "./IBaseDigitViewer";
@@ -77,6 +78,8 @@ export type { IBaseTabsProps } from "./IBaseTabs";
 export { default as IBaseTextarea, default as Textarea } from "./IBaseTextarea";
 export type { IBaseTextareaProps } from "./IBaseTextarea";
 export { default as IBaseTooltip } from "./IBaseTooltip";
+export { IBaseUploadImageDrag } from "./IBaseUploadImageDrag";
+export { IBaseUploadImageTiny } from "./IBaseUploadImageTiny";
 export * from "./LoadingBar";
 export * from "./LoadingOverlay";
 export { default as MarkdownContent } from "./MarkdownContent";

@@ -1,3 +1,4 @@
+import type { ImageUploadItem } from "@base/client/components";
 import type {
   ProductMasterFeatures,
   ProductMasterFeaturesType,
@@ -32,6 +33,7 @@ export type VariantFieldValue = {
   manufacturingUom?: { id: string; name: string };
   uomConversions: UomConversions[];
   isActive: boolean;
+  images: ImageUploadItem[];
   packings: Array<{
     id?: string;
     name: LocaleFieldValue;
@@ -55,6 +57,7 @@ export type MasterFieldValue = {
   isActive: boolean;
   brand: string;
   categoryId?: string;
+  images: ImageUploadItem[];
 };
 
 export const updateLocaleValue = (
