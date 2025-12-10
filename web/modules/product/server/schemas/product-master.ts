@@ -20,7 +20,7 @@ export const table_product_master = pgTable(
       .default(sql`uuid_generate_v7()`),
     code: varchar("code", { length: 100 }).notNull().unique(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
-    image: text("image"),
+    images: jsonb("images"), // Array<{ id?: string; url?: string }>
     description: text("description"), // string
     type: varchar("type", {
       length: 20,

@@ -158,6 +158,7 @@ export type ProductFormPayload = {
     isActive?: boolean;
     brand?: string | null;
     categoryId?: string | null;
+    images?: Array<{ id?: string; url?: string }>;
   };
   variant: {
     name: LocaleDataType<string>;

@@ -36,6 +36,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
       features: dbProduct.features as MasterProduct["features"],
       isActive: dbProduct.isActive,
       brand: dbProduct.brand ?? undefined,
+      images: dbProduct.images as MasterProduct["images"],
       createdAt: dbProduct.createdAt?.getTime(),
       updatedAt: dbProduct.updatedAt?.getTime(),
       // Note: createdBy and updatedBy are stored as user IDs (strings) in DB
@@ -193,6 +194,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
           isActive: payload.master.isActive ?? true,
           brand: payload.master.brand?.trim() || null,
           categoryId: payload.master.categoryId || null,
+          images: payload.master.images ?? null,
           createdAt: now,
           updatedAt: now,
         })
@@ -336,6 +338,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
           isActive: payload.master.isActive ?? true,
           brand: payload.master.brand?.trim() || null,
           categoryId: payload.master.categoryId || null,
+          images: payload.master.images ?? null,
           updatedAt: now,
         })
         .where(eq(table_product_master.id, variantRow.masterId));

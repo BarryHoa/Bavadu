@@ -32,6 +32,7 @@ export interface ProductMasterInput {
   isActive?: boolean;
   brand?: string | null;
   categoryId?: string | null;
+  images?: Array<{ id?: string; url?: string }>;
 }
 
 export interface ProductVariantInput {

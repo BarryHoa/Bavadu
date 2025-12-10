@@ -64,6 +64,7 @@ export interface MasterProduct {
   // Metadata
   brand?: string;
   category?: ProductCategory;
+  images?: Array<{ id?: string; url?: string }>;
 
   createdAt?: number; // unix timestamp (ms)
   updatedAt?: number; // unix timestamp (ms)
