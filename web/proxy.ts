@@ -15,6 +15,7 @@ const PUBLIC_ROUTES = [
   "/api/base/auth/logout",
   "/api/base/health",
   "/api/base/health/ping",
+  "/api/base/media", // Allow public access to media files (images/files) for viewing
   "/login",
   "/reset-password",
   "/",
@@ -82,6 +83,7 @@ async function handleApiRoute(
 
   // 2. CSRF Protection (skip for public routes and GET requests)
   // Also skip CSRF endpoint itself
+  // Upload endpoint requires CSRF even if media viewing is public
   if (
     !isPublicRoute(pathname) &&
     pathname !== "/api/base/utils/get-csrf-token"
@@ -90,10 +92,17 @@ async function handleApiRoute(
     if (csrfResponse) {
       return addSecurityHeaders(csrfResponse);
     }
+  } else if (pathname === "/api/base/media/upload") {
+    // Upload endpoint requires CSRF protection even though media viewing is public
+    const csrfResponse = checkCsrfProtection(req);
+    if (csrfResponse) {
+      return addSecurityHeaders(csrfResponse);
+    }
   }
 
   // 3. Authentication (skip for public routes)
-  if (!isPublicRoute(pathname)) {
+  // Upload endpoint requires authentication even though media viewing is public
+  if (!isPublicRoute(pathname) || pathname === "/api/base/media/upload") {
     const authResponse = await authenticateRequest(req, nextHeaders);
     if (authResponse) {
       return addSecurityHeaders(authResponse);
@@ -155,9 +164,8 @@ export async function proxy(req: NextRequest) {
     if (apiResponse) {
       // Record error response for monitoring
       if (apiResponse.status >= 400) {
-        const { recordErrorResponse } = await import(
-          "@base/server/utils/request-monitor"
-        );
+        const { recordErrorResponse } =
+          await import("@base/server/utils/request-monitor");
         recordErrorResponse(req, pathname, apiResponse.status);
       }
       return apiResponse; // Rate limit, CSRF, or auth error

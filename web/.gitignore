@@ -86,6 +86,11 @@ dist
 # Temporary folders
 tmp/
 temp/
+
+# Storage (uploaded files)
+storage/
+
+# Generated routes
 app/api/base/*
 app/api/modules/*
 app/workspace/modules/*

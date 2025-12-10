@@ -10,3 +10,6 @@ export * from "./DropdownOptionsService";
 
 // JSON-RPC Client Service
 export * from "./JsonRpcClientService";
+
+// Media Service
+export { default as MediaService } from "./MediaService";

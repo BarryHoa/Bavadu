@@ -68,5 +68,18 @@
         "handler": "/utils/get-csrf-token"
       }
     ]
+  },
+  {
+    "path": "/media",
+    "routes": [
+      {
+        "path": "/upload",
+        "handler": "/media/upload"
+      },
+      {
+        "path": "/[type]/[filename]",
+        "handler": "/media/get"
+      }
+    ]
   }
 ]

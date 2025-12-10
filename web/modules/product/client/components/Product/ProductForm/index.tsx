@@ -26,6 +26,7 @@ import {
   ProductMasterFeatures,
   ProductMasterType,
 } from "../../../interface/Product";
+import { MediaService } from "@base/client/services";
 import ProductCategoryService from "../../../services/ProductCategoryService";
 import ProductService from "../../../services/ProductService";
 import { FORBIDDEN_FEATURES_BY_TYPE } from "../../../utils/product-features-validator";
@@ -267,8 +268,49 @@ export default function ProductForm({
   const handleValidSubmit: SubmitHandler<ProductFormFieldValues> = async (
     formValues
   ) => {
-    const payload = mapToProductFormValues(formValues);
-    await onSubmit(payload);
+    try {
+      // Upload images before mapping to payload
+      const uploadedFormValues = { ...formValues };
+
+      // Upload master images
+      if (formValues.master.images.length > 0) {
+        uploadedFormValues.master.images =
+          await MediaService.uploadImageItems(formValues.master.images);
+      }
+
+      // Upload variant images
+      uploadedFormValues.variants = await Promise.all(
+        formValues.variants.map(async (variant) => {
+          if (variant.images.length > 0) {
+            const uploadedImages = await MediaService.uploadImageItems(
+              variant.images
+            );
+            return { ...variant, images: uploadedImages };
+          }
+          return variant;
+        })
+      );
+
+      // Check for upload errors
+      const hasUploadErrors =
+        uploadedFormValues.master.images.some(
+          (img) => img.status === "error"
+        ) ||
+        uploadedFormValues.variants.some((variant) =>
+          variant.images.some((img) => img.status === "error")
+        );
+
+      if (hasUploadErrors) {
+        throw new Error("Some images failed to upload. Please try again.");
+      }
+
+      // Map to payload after upload
+      const payload = mapToProductFormValues(uploadedFormValues);
+      await onSubmit(payload);
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      throw error;
+    }
   };
 
   // Handle submit error - focus on first error field
@@ -316,9 +358,50 @@ export default function ProductForm({
       return;
     }
 
-    const payload = mapToProductFormValues(formValues);
-    await onSubmitAndContinue(payload);
-    reset(createDefaultValues(featureOptions));
+    try {
+      // Upload images before mapping to payload
+      const uploadedFormValues = { ...formValues };
+
+      // Upload master images
+      if (formValues.master.images.length > 0) {
+        uploadedFormValues.master.images =
+          await MediaService.uploadImageItems(formValues.master.images);
+      }
+
+      // Upload variant images
+      uploadedFormValues.variants = await Promise.all(
+        formValues.variants.map(async (variant) => {
+          if (variant.images.length > 0) {
+            const uploadedImages = await MediaService.uploadImageItems(
+              variant.images
+            );
+            return { ...variant, images: uploadedImages };
+          }
+          return variant;
+        })
+      );
+
+      // Check for upload errors
+      const hasUploadErrors =
+        uploadedFormValues.master.images.some(
+          (img) => img.status === "error"
+        ) ||
+        uploadedFormValues.variants.some((variant) =>
+          variant.images.some((img) => img.status === "error")
+        );
+
+      if (hasUploadErrors) {
+        throw new Error("Some images failed to upload. Please try again.");
+      }
+
+      // Map to payload after upload
+      const payload = mapToProductFormValues(uploadedFormValues);
+      await onSubmitAndContinue(payload);
+      reset(createDefaultValues(featureOptions));
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      throw error;
+    }
   };
 
   const submitForm = handleSubmit(handleValidSubmit, handleSubmitError);
