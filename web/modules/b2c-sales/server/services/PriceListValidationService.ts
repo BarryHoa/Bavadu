@@ -1,10 +1,10 @@
 import { and, eq, gte, lte, or, sql } from "drizzle-orm";
 import getDbConnect from "@base/server/utils/getDbConnect";
 import {
-  table_price_lists_b2c,
-  TblPriceListB2C,
-  NewTblPriceListB2C,
-} from "../schemas/price-list-b2c";
+  sale_b2c_tb_price_lists,
+  SaleB2cTbPriceList,
+  NewSaleB2cTbPriceList,
+} from "../schemas/b2c-sales.price-list";
 
 export interface ValidationResult {
   valid: boolean;
@@ -29,7 +29,7 @@ export class PriceListValidationService {
    * Validate tất cả rules trước khi tạo/cập nhật price list
    */
   async validatePriceList(
-    data: NewTblPriceListB2C | TblPriceListB2C,
+    data: NewSaleB2cTbPriceList | SaleB2cTbPriceList,
     existingId?: string
   ): Promise<ValidationResult> {
     const errors: string[] = [];
@@ -100,7 +100,7 @@ export class PriceListValidationService {
    * Kiểm tra không trùng valid dates cho standard price lists với cùng applicableTo
    */
   private async checkStandardPriceListOverlap(
-    data: NewTblPriceListB2C | TblPriceListB2C,
+    data: NewSaleB2cTbPriceList | SaleB2cTbPriceList,
     existingId?: string
   ): Promise<string | null> {
     if (!data.applicableTo || !data.validFrom) {
@@ -112,14 +112,14 @@ export class PriceListValidationService {
     // Tìm các standard price lists khác với cùng applicableTo
     const existing = await this.db
       .select()
-      .from(table_price_lists_b2c)
+      .from(sale_b2c_tb_price_lists)
       .where(
         and(
-          eq(table_price_lists_b2c.type, "standard"),
-          eq(table_price_lists_b2c.status, "active"),
-          sql`${table_price_lists_b2c.applicableTo} = ${JSON.stringify(applicableTo)}::jsonb`,
+          eq(sale_b2c_tb_price_lists.type, "standard"),
+          eq(sale_b2c_tb_price_lists.status, "active"),
+          sql`${sale_b2c_tb_price_lists.applicableTo} = ${JSON.stringify(applicableTo)}::jsonb`,
           existingId
-            ? sql`${table_price_lists_b2c.id} != ${existingId}::uuid`
+            ? sql`${sale_b2c_tb_price_lists.id} != ${existingId}::uuid`
             : sql`1=1`
         )
       );
@@ -164,14 +164,14 @@ export class PriceListValidationService {
    * Kiểm tra ít nhất 1 standard price list đang active
    */
   private async checkAtLeastOneActiveStandard(
-    data: NewTblPriceListB2C | TblPriceListB2C,
+    data: NewSaleB2cTbPriceList | SaleB2cTbPriceList,
     existingId: string
   ): Promise<string | null> {
     // Lấy record hiện tại
     const existing = await this.db
       .select()
-      .from(table_price_lists_b2c)
-      .where(eq(table_price_lists_b2c.id, existingId))
+      .from(sale_b2c_tb_price_lists)
+      .where(eq(sale_b2c_tb_price_lists.id, existingId))
       .limit(1);
 
     if (existing.length === 0) {
@@ -193,12 +193,12 @@ export class PriceListValidationService {
     // Đếm số standard price list còn lại đang active
     const activeStandardCount = await this.db
       .select({ count: sql<number>`count(*)::int` })
-      .from(table_price_lists_b2c)
+      .from(sale_b2c_tb_price_lists)
       .where(
         and(
-          eq(table_price_lists_b2c.type, "standard"),
-          eq(table_price_lists_b2c.status, "active"),
-          sql`${table_price_lists_b2c.id} != ${existingId}::uuid`
+          eq(sale_b2c_tb_price_lists.type, "standard"),
+          eq(sale_b2c_tb_price_lists.status, "active"),
+          sql`${sale_b2c_tb_price_lists.id} != ${existingId}::uuid`
         )
       );
 
@@ -217,11 +217,11 @@ export class PriceListValidationService {
   async hasActiveStandardPriceList(): Promise<boolean> {
     const result = await this.db
       .select({ count: sql<number>`count(*)::int` })
-      .from(table_price_lists_b2c)
+      .from(sale_b2c_tb_price_lists)
       .where(
         and(
-          eq(table_price_lists_b2c.type, "standard"),
-          eq(table_price_lists_b2c.status, "active")
+          eq(sale_b2c_tb_price_lists.type, "standard"),
+          eq(sale_b2c_tb_price_lists.status, "active")
         )
       );
 

@@ -10,15 +10,15 @@ import type {
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
-import { table_customer_company } from "../../schemas";
+import { sale_b2c_tb_customer_companies } from "../../schemas";
 
 class CustomerCompanyViewListModel extends BaseViewListModel<
-  typeof table_customer_company,
+  typeof sale_b2c_tb_customer_companies,
   any
 > {
   constructor() {
     super({
-      table: table_customer_company,
+      table: sale_b2c_tb_customer_companies,
       sortDefault: [
         {
           column: "createdAt",
@@ -36,22 +36,22 @@ class CustomerCompanyViewListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_customer_company.id, sort: true }],
-      ["code", { column: table_customer_company.code, sort: true }],
-      ["name", { column: table_customer_company.name, sort: true }],
-      ["taxId", { column: table_customer_company.taxId, sort: true }],
-      ["phone", { column: table_customer_company.phone, sort: true }],
-      ["email", { column: table_customer_company.email, sort: true }],
-      ["isActive", { column: table_customer_company.isActive, sort: true }],
-      ["createdAt", { column: table_customer_company.createdAt, sort: true }],
-      ["updatedAt", { column: table_customer_company.updatedAt, sort: true }],
+      ["id", { column: sale_b2c_tb_customer_companies.id, sort: true }],
+      ["code", { column: sale_b2c_tb_customer_companies.code, sort: true }],
+      ["name", { column: sale_b2c_tb_customer_companies.name, sort: true }],
+      ["taxId", { column: sale_b2c_tb_customer_companies.taxId, sort: true }],
+      ["phone", { column: sale_b2c_tb_customer_companies.phone, sort: true }],
+      ["email", { column: sale_b2c_tb_customer_companies.email, sort: true }],
+      ["isActive", { column: sale_b2c_tb_customer_companies.isActive, sort: true }],
+      ["createdAt", { column: sale_b2c_tb_customer_companies.createdAt, sort: true }],
+      ["updatedAt", { column: sale_b2c_tb_customer_companies.updatedAt, sort: true }],
     ]);
 
   protected declarationSearch = () =>
     new Map([
-      ["code", (text: string) => ilike(table_customer_company.code, text)],
-      ["name", (text: string) => ilike(table_customer_company.name, text)],
-      ["taxId", (text: string) => ilike(table_customer_company.taxId, text)],
+      ["code", (text: string) => ilike(sale_b2c_tb_customer_companies.code, text)],
+      ["name", (text: string) => ilike(sale_b2c_tb_customer_companies.name, text)],
+      ["taxId", (text: string) => ilike(sale_b2c_tb_customer_companies.taxId, text)],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>

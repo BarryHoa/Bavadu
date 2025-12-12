@@ -10,18 +10,18 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlProductSchema } from "./schema";
-import { table_product_master } from "./product.master";
-import { table_unit_of_measure } from "./product.uom";
+import { product_tb_product_masters } from "./product.master";
+import { product_tb_units_of_measure } from "./product.uom";
 
 // Product Variants
-export const table_product_variant = mdlProductSchema.table(
+export const product_tb_product_variants = mdlProductSchema.table(
   "variants",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     productMasterId: uuid("product_master_id")
-      .references(() => table_product_master.id)
+      .references(() => product_tb_product_masters.id)
       .notNull(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
     description: text("description"), // string
@@ -29,13 +29,13 @@ export const table_product_variant = mdlProductSchema.table(
     sku: varchar("sku", { length: 100 }),
     barcode: varchar("barcode", { length: 100 }),
     manufacturer: jsonb("manufacturer"), // { name?: string, code?: string }
-    baseUomId: uuid("base_uom_id").references(() => table_unit_of_measure.id),
-    saleUomId: uuid("sale_uom_id").references(() => table_unit_of_measure.id),
+    baseUomId: uuid("base_uom_id").references(() => product_tb_units_of_measure.id),
+    saleUomId: uuid("sale_uom_id").references(() => product_tb_units_of_measure.id),
     purchaseUomId: uuid("purchase_uom_id").references(
-      () => table_unit_of_measure.id
+      () => product_tb_units_of_measure.id
     ),
     manufacturingUomId: uuid("manufacturing_uom_id").references(
-      () => table_unit_of_measure.id
+      () => product_tb_units_of_measure.id
     ),
     
     // Cost calculation method
@@ -73,5 +73,5 @@ export const table_product_variant = mdlProductSchema.table(
   ]
 );
 
-export type TblProductVariant = typeof table_product_variant.$inferSelect;
-export type NewTblProductVariant = typeof table_product_variant.$inferInsert;
+export type ProductTbProductVariant = typeof product_tb_product_variants.$inferSelect;
+export type NewProductTbProductVariant = typeof product_tb_product_variants.$inferInsert;

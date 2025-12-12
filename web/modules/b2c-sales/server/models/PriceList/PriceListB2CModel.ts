@@ -4,9 +4,9 @@ import {
 } from "@base/server/models/BaseViewListModel";
 import { desc, eq, ilike, sql } from "drizzle-orm";
 import {
-  table_price_lists_b2c,
-  TblPriceListB2C,
-} from "../../schemas/price-list-b2c";
+  sale_b2c_tb_price_lists,
+  SaleB2cTbPriceList,
+} from "../../schemas/b2c-sales.price-list";
 import { PriceListValidationService } from "../../services/PriceListValidationService";
 
 export interface PriceListB2CRow {
@@ -74,7 +74,7 @@ type PriceListFilter = {
 };
 
 export default class PriceListB2CViewListModel extends BaseViewListModel<
-  typeof table_price_lists_b2c,
+  typeof sale_b2c_tb_price_lists,
   PriceListB2CRow,
   PriceListFilter
 > {
@@ -82,7 +82,7 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
 
   constructor() {
     super({
-      table: table_price_lists_b2c,
+      table: sale_b2c_tb_price_lists,
       sortDefault: [
         {
           column: "createdAt",
@@ -95,27 +95,27 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
 
   protected declarationColumns = () => {
     const map = new Map();
-    map.set("id", { column: table_price_lists_b2c.id, sort: false });
-    map.set("code", { column: table_price_lists_b2c.code, sort: true });
-    map.set("name", { column: table_price_lists_b2c.name, sort: false });
-    map.set("type", { column: table_price_lists_b2c.type, sort: true });
-    map.set("status", { column: table_price_lists_b2c.status, sort: true });
-    map.set("priority", { column: table_price_lists_b2c.priority, sort: true });
+    map.set("id", { column: sale_b2c_tb_price_lists.id, sort: false });
+    map.set("code", { column: sale_b2c_tb_price_lists.code, sort: true });
+    map.set("name", { column: sale_b2c_tb_price_lists.name, sort: false });
+    map.set("type", { column: sale_b2c_tb_price_lists.type, sort: true });
+    map.set("status", { column: sale_b2c_tb_price_lists.status, sort: true });
+    map.set("priority", { column: sale_b2c_tb_price_lists.priority, sort: true });
     map.set("validFrom", {
-      column: table_price_lists_b2c.validFrom,
+      column: sale_b2c_tb_price_lists.validFrom,
       sort: true,
     });
-    map.set("validTo", { column: table_price_lists_b2c.validTo, sort: true });
+    map.set("validTo", { column: sale_b2c_tb_price_lists.validTo, sort: true });
     map.set("isDefault", {
-      column: table_price_lists_b2c.isDefault,
+      column: sale_b2c_tb_price_lists.isDefault,
       sort: true,
     });
     map.set("createdAt", {
-      column: table_price_lists_b2c.createdAt,
+      column: sale_b2c_tb_price_lists.createdAt,
       sort: true,
     });
     map.set("updatedAt", {
-      column: table_price_lists_b2c.updatedAt,
+      column: sale_b2c_tb_price_lists.updatedAt,
       sort: true,
     });
     return map;
@@ -126,13 +126,13 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
       [
         "code",
         (text: string) =>
-          text ? ilike(table_price_lists_b2c.code, `%${text}%`) : undefined,
+          text ? ilike(sale_b2c_tb_price_lists.code, `%${text}%`) : undefined,
       ],
       [
         "name",
         (text: string) =>
           text
-            ? sql`${table_price_lists_b2c.name}::text ILIKE ${`%${text}%`}`
+            ? sql`${sale_b2c_tb_price_lists.name}::text ILIKE ${`%${text}%`}`
             : undefined,
       ],
     ]);
@@ -143,21 +143,21 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
         "type",
         (value?: unknown, _filters?: PriceListFilter) =>
           typeof value === "string" && value
-            ? eq(table_price_lists_b2c.type, value)
+            ? eq(sale_b2c_tb_price_lists.type, value)
             : undefined,
       ],
       [
         "status",
         (value?: unknown, _filters?: PriceListFilter) =>
           typeof value === "string" && value
-            ? eq(table_price_lists_b2c.status, value)
+            ? eq(sale_b2c_tb_price_lists.status, value)
             : undefined,
       ],
       [
         "isDefault",
         (value?: unknown, _filters?: PriceListFilter) =>
           typeof value === "boolean"
-            ? eq(table_price_lists_b2c.isDefault, value)
+            ? eq(sale_b2c_tb_price_lists.isDefault, value)
             : undefined,
       ],
     ]);
@@ -184,24 +184,24 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
   /**
    * Get list of price lists (simple list, not for view list data table)
    */
-  async getList(): Promise<TblPriceListB2C[]> {
+  async getList(): Promise<SaleB2cTbPriceList[]> {
     return this.db
       .select()
-      .from(table_price_lists_b2c)
+      .from(sale_b2c_tb_price_lists)
       .orderBy(
-        desc(table_price_lists_b2c.priority),
-        desc(table_price_lists_b2c.createdAt)
+        desc(sale_b2c_tb_price_lists.priority),
+        desc(sale_b2c_tb_price_lists.createdAt)
       );
   }
 
   /**
    * Get price list by ID
    */
-  async getById(id: string): Promise<TblPriceListB2C | null> {
+  async getById(id: string): Promise<SaleB2cTbPriceList | null> {
     const [priceList] = await this.db
       .select()
-      .from(table_price_lists_b2c)
-      .where(eq(table_price_lists_b2c.id, id))
+      .from(sale_b2c_tb_price_lists)
+      .where(eq(sale_b2c_tb_price_lists.id, id))
       .limit(1);
 
     return priceList || null;
@@ -210,7 +210,9 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
   /**
    * Create a new price list
    */
-  async create(params: CreatePriceListB2CParams): Promise<TblPriceListB2C> {
+  async create(
+    params: CreatePriceListB2CParams
+  ): Promise<SaleB2cTbPriceList> {
     // Validate
     const validation = await this.validationService.validatePriceList(params);
     if (!validation.valid) {
@@ -229,7 +231,7 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
     const now = new Date();
 
     const [priceList] = await this.db
-      .insert(table_price_lists_b2c)
+      .insert(sale_b2c_tb_price_lists)
       .values({
         code: params.code,
         name: params.name,
@@ -261,7 +263,7 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
   async update(
     id: string,
     params: UpdatePriceListB2CParams
-  ): Promise<TblPriceListB2C> {
+  ): Promise<SaleB2cTbPriceList> {
     // Get existing price list
     const existing = await this.getById(id);
     if (!existing) {
@@ -289,7 +291,7 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
     const now = new Date();
 
     const [priceList] = await this.db
-      .update(table_price_lists_b2c)
+      .update(sale_b2c_tb_price_lists)
       .set({
         name: params.name,
         description: params.description,
@@ -304,7 +306,7 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
         updatedBy: params.updatedBy,
         updatedAt: now,
       })
-      .where(eq(table_price_lists_b2c.id, id))
+      .where(eq(sale_b2c_tb_price_lists.id, id))
       .returning();
 
     if (!priceList) {
@@ -339,8 +341,8 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
     }
 
     const result = await this.db
-      .delete(table_price_lists_b2c)
-      .where(eq(table_price_lists_b2c.id, id))
+      .delete(sale_b2c_tb_price_lists)
+      .where(eq(sale_b2c_tb_price_lists.id, id))
       .returning();
 
     return result.length > 0;

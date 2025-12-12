@@ -2,47 +2,47 @@ import { desc, eq, sql } from "drizzle-orm";
 
 import { BaseModel } from "@base/server/models/BaseModel";
 import {
-  table_currency,
-  table_currency_exchange_rate,
+  base_tb_currencies,
+  base_tb_currencies_exchange_rate,
 } from "@base/server/schemas/currency";
 import type {
   CreateSalesOrderB2CInput,
   UpdateSalesOrderB2CInput,
 } from "../../models/interfaces/SalesOrderB2C";
-import type { NewTblSalesOrderB2C, TblSalesOrderB2C } from "../../schemas";
+import type { NewSaleB2cTbOrder, SaleB2cTbOrder } from "../../schemas";
 import {
-  table_order_currency_rate,
-  table_sales_order_b2c,
-  table_sales_order_line_b2c,
+  sale_b2c_tb_currency_rates,
+  sale_b2c_tb_orders,
+  sale_b2c_tb_order_lines,
 } from "../../schemas";
 
 export default class SalesOrderB2CModel extends BaseModel<
-  typeof table_sales_order_b2c
+  typeof sale_b2c_tb_orders
 > {
   constructor() {
-    super(table_sales_order_b2c);
+    super(sale_b2c_tb_orders);
   }
 
-  list = async (): Promise<TblSalesOrderB2C[]> => {
+  list = async (): Promise<SaleB2cTbOrder[]> => {
     return this.db
       .select()
-      .from(table_sales_order_b2c)
-      .orderBy(desc(table_sales_order_b2c.createdAt));
+      .from(sale_b2c_tb_orders)
+      .orderBy(desc(sale_b2c_tb_orders.createdAt));
   };
 
   getById = async (id: string) => {
     const [order] = await this.db
       .select()
-      .from(table_sales_order_b2c)
-      .where(eq(table_sales_order_b2c.id, id))
+      .from(sale_b2c_tb_orders)
+      .where(eq(sale_b2c_tb_orders.id, id))
       .limit(1);
     if (!order) {
       return null;
     }
     const lines = await this.db
       .select()
-      .from(table_sales_order_line_b2c)
-      .where(eq(table_sales_order_line_b2c.orderId, order.id));
+      .from(sale_b2c_tb_order_lines)
+      .where(eq(sale_b2c_tb_order_lines.orderId, order.id));
     return { order, lines };
   };
 
@@ -70,16 +70,16 @@ export default class SalesOrderB2CModel extends BaseModel<
     try {
       const [currencyRecord] = await this.db
         .select()
-        .from(table_currency)
-        .where(eq(table_currency.code, currency))
+        .from(base_tb_currencies)
+        .where(eq(base_tb_currencies.code, currency))
         .limit(1);
 
       if (currencyRecord) {
         const [latestRate] = await this.db
           .select()
-          .from(table_currency_exchange_rate)
-          .where(eq(table_currency_exchange_rate.currencyId, currencyRecord.id))
-          .orderBy(desc(table_currency_exchange_rate.rateDate))
+          .from(base_tb_currencies_exchange_rate)
+          .where(eq(base_tb_currencies_exchange_rate.currencyId, currencyRecord.id))
+          .orderBy(desc(base_tb_currencies_exchange_rate.rateDate))
           .limit(1);
 
         if (latestRate?.exchangeRate) {
@@ -142,7 +142,7 @@ export default class SalesOrderB2CModel extends BaseModel<
 
       const grandTotal = subtotal - totalDiscount + totalTax + shippingFee;
 
-      const orderPayload: NewTblSalesOrderB2C = {
+      const orderPayload: NewSaleB2cTbOrder = {
         code: generatedCode,
         customerName: input.customerName.trim(),
         customerPhone: input.customerPhone,
@@ -171,13 +171,13 @@ export default class SalesOrderB2CModel extends BaseModel<
       };
 
       const [order] = await tx
-        .insert(table_sales_order_b2c)
+        .insert(sale_b2c_tb_orders)
         .values(orderPayload)
         .returning();
 
       // Save currency rate snapshot
       if (currencyRate) {
-        await tx.insert(table_order_currency_rate).values({
+        await tx.insert(sale_b2c_tb_currency_rates).values({
           orderType: "B2C",
           orderId: order.id,
           currencyCode: currency,
@@ -189,7 +189,7 @@ export default class SalesOrderB2CModel extends BaseModel<
 
       // Insert lines
       for (const line of lineData) {
-        await tx.insert(table_sales_order_line_b2c).values({
+        await tx.insert(sale_b2c_tb_order_lines).values({
           orderId: order.id,
           productId: line.productId,
           description: line.description,
@@ -205,11 +205,11 @@ export default class SalesOrderB2CModel extends BaseModel<
       }
 
       await tx
-        .update(table_sales_order_b2c)
+        .update(sale_b2c_tb_orders)
         .set({
           updatedAt: now,
         })
-        .where(eq(table_sales_order_b2c.id, order.id));
+        .where(eq(sale_b2c_tb_orders.id, order.id));
 
       const result = await this.getById(order.id);
       if (!result) {
@@ -282,7 +282,7 @@ export default class SalesOrderB2CModel extends BaseModel<
 
     return this.db.transaction(async (tx) => {
       // Update order
-      const updatePayload: Partial<NewTblSalesOrderB2C> = {
+      const updatePayload: Partial<NewSaleB2cTbOrder> = {
         customerName: input.customerName?.trim(),
         customerPhone: input.customerPhone,
         customerEmail: input.customerEmail,
@@ -307,18 +307,18 @@ export default class SalesOrderB2CModel extends BaseModel<
       };
 
       await tx
-        .update(table_sales_order_b2c)
+        .update(sale_b2c_tb_orders)
         .set(updatePayload)
-        .where(eq(table_sales_order_b2c.id, input.id));
+        .where(eq(sale_b2c_tb_orders.id, input.id));
 
       // Delete existing lines
       await tx
-        .delete(table_sales_order_line_b2c)
-        .where(eq(table_sales_order_line_b2c.orderId, input.id));
+        .delete(sale_b2c_tb_order_lines)
+        .where(eq(sale_b2c_tb_order_lines.orderId, input.id));
 
       // Insert new lines
       for (const line of lineData) {
-        await tx.insert(table_sales_order_line_b2c).values({
+        await tx.insert(sale_b2c_tb_order_lines).values({
           orderId: input.id,
           productId: line.productId,
           description: line.description,
@@ -339,12 +339,12 @@ export default class SalesOrderB2CModel extends BaseModel<
 
   confirm = async (orderId: string) => {
     const [updated] = await this.db
-      .update(table_sales_order_b2c)
+      .update(sale_b2c_tb_orders)
       .set({
         status: "confirmed",
         updatedAt: sql`now()`,
       })
-      .where(eq(table_sales_order_b2c.id, orderId))
+      .where(eq(sale_b2c_tb_orders.id, orderId))
       .returning();
 
     if (!updated) {
@@ -357,13 +357,13 @@ export default class SalesOrderB2CModel extends BaseModel<
   complete = async (orderId: string) => {
     const now = new Date();
     const [updated] = await this.db
-      .update(table_sales_order_b2c)
+      .update(sale_b2c_tb_orders)
       .set({
         status: "completed",
         completedAt: now,
         updatedAt: sql`now()`,
       })
-      .where(eq(table_sales_order_b2c.id, orderId))
+      .where(eq(sale_b2c_tb_orders.id, orderId))
       .returning();
 
     if (!updated) {
@@ -375,12 +375,12 @@ export default class SalesOrderB2CModel extends BaseModel<
 
   cancel = async (orderId: string) => {
     const [updated] = await this.db
-      .update(table_sales_order_b2c)
+      .update(sale_b2c_tb_orders)
       .set({
         status: "cancelled",
         updatedAt: sql`now()`,
       })
-      .where(eq(table_sales_order_b2c.id, orderId))
+      .where(eq(sale_b2c_tb_orders.id, orderId))
       .returning();
 
     if (!updated) {

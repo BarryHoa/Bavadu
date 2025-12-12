@@ -9,17 +9,17 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_employee } from "./hrm.employee";
+import { hrm_tb_employees } from "./hrm.employee";
 
 // Certificates - Chứng chỉ
-export const table_certificate = mdlHrmSchema.table(
+export const hrm_tb_certificates = mdlHrmSchema.table(
   "certificates",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     employeeId: uuid("employee_id")
-      .references(() => table_employee.id, { onDelete: "cascade" })
+      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
       .notNull(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
     issuer: varchar("issuer", { length: 255 }).notNull(),
@@ -40,6 +40,6 @@ export const table_certificate = mdlHrmSchema.table(
   ]
 );
 
-export type TblCertificate = typeof table_certificate.$inferSelect;
-export type NewTblCertificate = typeof table_certificate.$inferInsert;
+export type HrmTbCertificate = typeof hrm_tb_certificates.$inferSelect;
+export type NewHrmTbCertificate = typeof hrm_tb_certificates.$inferInsert;
 

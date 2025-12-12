@@ -9,7 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { mdBaseSchema } from "./schema";
 
-export const table_news = mdBaseSchema.table(
+export const base_tb_news = mdBaseSchema.table(
   "news",
   {
     id: uuid("id")
@@ -40,6 +40,6 @@ export const table_news = mdBaseSchema.table(
   })
 );
 
-export type TblNews = typeof table_news.$inferSelect;
-export type NewTblNews = typeof table_news.$inferInsert;
+export type BaseTbNews = typeof base_tb_news.$inferSelect;
+export type NewBaseTbNews = typeof base_tb_news.$inferInsert;
 

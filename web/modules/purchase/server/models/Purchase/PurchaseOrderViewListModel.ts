@@ -10,15 +10,15 @@ import type {
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
-import { table_purchase_order } from "../../schemas";
+import { purchase_tb_purchase_orders } from "../../schemas";
 
 class PurchaseOrderViewListModel extends BaseViewListModel<
-  typeof table_purchase_order,
+  typeof purchase_tb_purchase_orders,
   any
 > {
   constructor() {
     super({
-      table: table_purchase_order,
+      table: purchase_tb_purchase_orders,
       sortDefault: [
         {
           column: "createdAt",
@@ -36,41 +36,41 @@ class PurchaseOrderViewListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_purchase_order.id, sort: true }],
-      ["code", { column: table_purchase_order.code, sort: true }],
+      ["id", { column: purchase_tb_purchase_orders.id, sort: true }],
+      ["code", { column: purchase_tb_purchase_orders.code, sort: true }],
       [
         "vendorName",
-        { column: table_purchase_order.vendorName, sort: true },
+        { column: purchase_tb_purchase_orders.vendorName, sort: true },
       ],
-      ["status", { column: table_purchase_order.status, sort: true }],
+      ["status", { column: purchase_tb_purchase_orders.status, sort: true }],
       [
         "expectedDate",
-        { column: table_purchase_order.expectedDate, sort: true },
+        { column: purchase_tb_purchase_orders.expectedDate, sort: true },
       ],
       [
         "warehouseId",
-        { column: table_purchase_order.warehouseId, sort: true },
+        { column: purchase_tb_purchase_orders.warehouseId, sort: true },
       ],
       [
         "totalAmount",
-        { column: table_purchase_order.totalAmount, sort: true },
+        { column: purchase_tb_purchase_orders.totalAmount, sort: true },
       ],
-      ["currency", { column: table_purchase_order.currency, sort: true }],
-      ["notes", { column: table_purchase_order.notes, sort: false }],
+      ["currency", { column: purchase_tb_purchase_orders.currency, sort: true }],
+      ["notes", { column: purchase_tb_purchase_orders.notes, sort: false }],
       [
         "createdAt",
-        { column: table_purchase_order.createdAt, sort: true },
+        { column: purchase_tb_purchase_orders.createdAt, sort: true },
       ],
       [
         "updatedAt",
-        { column: table_purchase_order.updatedAt, sort: true },
+        { column: purchase_tb_purchase_orders.updatedAt, sort: true },
       ],
     ]);
 
   protected declarationSearch = () =>
     new Map([
-      ["code", (text: string) => ilike(table_purchase_order.code, text)],
-      ["vendorName", (text: string) => ilike(table_purchase_order.vendorName, text)],
+      ["code", (text: string) => ilike(purchase_tb_purchase_orders.code, text)],
+      ["vendorName", (text: string) => ilike(purchase_tb_purchase_orders.vendorName, text)],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>

@@ -2,7 +2,7 @@ import { LocaleDataType } from "@base/server/interfaces/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 
-import { NewTblHrmRole, table_hrm_role } from "../../schemas";
+import { NewHrmTbRole, hrm_tb_roles } from "../../schemas";
 
 export interface RoleRow {
   id: string;
@@ -25,9 +25,9 @@ export interface RoleInput {
   isActive?: boolean;
 }
 
-export default class RoleModel extends BaseModel<typeof table_hrm_role> {
+export default class RoleModel extends BaseModel<typeof hrm_tb_roles> {
   constructor() {
-    super(table_hrm_role);
+    super(hrm_tb_roles);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -69,7 +69,7 @@ export default class RoleModel extends BaseModel<typeof table_hrm_role> {
 
   createRole = async (payload: RoleInput): Promise<RoleRow> => {
     const now = new Date();
-    const insertData: NewTblHrmRole = {
+    const insertData: NewHrmTbRole = {
       code: payload.code,
       name: payload.name,
       description: payload.description ?? null,

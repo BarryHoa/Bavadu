@@ -9,7 +9,7 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
 import { eq, ilike, sql } from "drizzle-orm";
-import { table_price_lists_b2c } from "../../schemas/price-list-b2c";
+import { sale_b2c_tb_price_lists } from "../../schemas/b2c-sales.price-list";
 
 type PriceListB2CDropdownOption = {
   label: string;
@@ -20,12 +20,12 @@ type PriceListB2CDropdownOption = {
 };
 
 class PriceListB2CDropdownListModel extends BaseViewListModel<
-  typeof table_price_lists_b2c,
+  typeof sale_b2c_tb_price_lists,
   PriceListB2CDropdownOption
 > {
   constructor() {
     super({
-      table: table_price_lists_b2c,
+      table: sale_b2c_tb_price_lists,
       sortDefault: [
         {
           column: "createdAt",
@@ -44,9 +44,9 @@ class PriceListB2CDropdownListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_price_lists_b2c.id, sort: false }],
-      ["code", { column: table_price_lists_b2c.code, sort: true }],
-      ["name", { column: table_price_lists_b2c.name, sort: false }],
+      ["id", { column: sale_b2c_tb_price_lists.id, sort: false }],
+      ["code", { column: sale_b2c_tb_price_lists.code, sort: true }],
+      ["name", { column: sale_b2c_tb_price_lists.name, sort: false }],
     ]);
 
   protected declarationSearch = () =>
@@ -54,13 +54,13 @@ class PriceListB2CDropdownListModel extends BaseViewListModel<
       [
         "code",
         (text: string) =>
-          text ? ilike(table_price_lists_b2c.code, `%${text}%`) : undefined,
+          text ? ilike(sale_b2c_tb_price_lists.code, `%${text}%`) : undefined,
       ],
       [
         "name",
         (text: string) =>
           text
-            ? sql`${table_price_lists_b2c.name}::text ILIKE ${`%${text}%`}`
+            ? sql`${sale_b2c_tb_price_lists.name}::text ILIKE ${`%${text}%`}`
             : undefined,
       ],
     ]);
@@ -94,13 +94,13 @@ class PriceListB2CDropdownListModel extends BaseViewListModel<
     const result = await this.buildQueryDataListWithSelect(
       params,
       {
-        id: table_price_lists_b2c.id,
-        code: table_price_lists_b2c.code,
-        name: table_price_lists_b2c.name,
+        id: sale_b2c_tb_price_lists.id,
+        code: sale_b2c_tb_price_lists.code,
+        name: sale_b2c_tb_price_lists.name,
       },
       (query) => {
         // Filter only active price lists
-        return query.where(eq(table_price_lists_b2c.status, "active"));
+        return query.where(eq(sale_b2c_tb_price_lists.status, "active"));
       }
     );
 

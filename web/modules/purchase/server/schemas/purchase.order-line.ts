@@ -8,19 +8,19 @@ import {
 } from "drizzle-orm/pg-core";
 import { mdlPurchaseSchema } from "./schema";
 
-import { table_product_master } from "../../../product/server/schemas/product.master";
-import { table_purchase_order } from "./purchase.order";
+import { product_tb_product_masters } from "../../../product/server/schemas/product.master";
+import { purchase_tb_purchase_orders } from "./purchase.order";
 
-export const table_purchase_order_line = mdlPurchaseSchema.table(
+export const purchase_tb_purchase_orders_line = mdlPurchaseSchema.table(
   "order_lines",
   {
     id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
     orderId: uuid("order_id")
       .notNull()
-      .references(() => table_purchase_order.id, { onDelete: "cascade" }),
+      .references(() => purchase_tb_purchase_orders.id, { onDelete: "cascade" }),
     productId: uuid("product_id")
       .notNull()
-      .references(() => table_product_master.id, { onDelete: "restrict" }),
+      .references(() => product_tb_product_masters.id, { onDelete: "restrict" }),
     description: varchar("description", { length: 256 }),
     quantityOrdered: numeric("quantity_ordered", { precision: 14, scale: 2 })
       .notNull()
@@ -40,8 +40,8 @@ export const table_purchase_order_line = mdlPurchaseSchema.table(
   ]
 );
 
-export type TblPurchaseOrderLine =
-  typeof table_purchase_order_line.$inferSelect;
-export type NewTblPurchaseOrderLine =
-  typeof table_purchase_order_line.$inferInsert;
+export type PurchaseTbPurchaseOrderLine =
+  typeof purchase_tb_purchase_orders_line.$inferSelect;
+export type NewPurchaseTbPurchaseOrderLine =
+  typeof purchase_tb_purchase_orders_line.$inferInsert;
 

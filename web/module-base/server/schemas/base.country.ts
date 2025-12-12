@@ -10,7 +10,7 @@ import {
 import { mdBaseSchema } from "./schema";
 
 // Location Countries
-export const table_location_countries = mdBaseSchema.table(
+export const base_tb_location_countries = mdBaseSchema.table(
   "location_countries",
   {
     id: uuid("id")
@@ -30,6 +30,6 @@ export const table_location_countries = mdBaseSchema.table(
   ]
 );
 
-export type TblLocationCountry = typeof table_location_countries.$inferSelect;
-export type NewTblLocationCountry =
-  typeof table_location_countries.$inferInsert;
+export type BaseTbLocationCountry = typeof base_tb_location_countries.$inferSelect;
+export type NewBaseTbLocationCountry =
+  typeof base_tb_location_countries.$inferInsert;

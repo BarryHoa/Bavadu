@@ -1,14 +1,10 @@
-import { table_product_type_goods } from "@mdl/product/server/schemas/product-type-goods";
-import { table_product_variant } from "@mdl/product/server/schemas/product-variant";
+import { product_tb_product_type_goods } from "@mdl/product/server/schemas/product.type-goods";
+import { product_tb_product_variants } from "@mdl/product/server/schemas/product.variant";
 import { and, eq, gte, lte, or, sql } from "drizzle-orm";
-import {
-  table_price_list_items_b2c,
-  table_price_lists_b2c,
-  table_price_tiers_b2c,
-  table_pricing_rules_b2c,
-  TblPriceListItemB2C,
-  TblPricingRuleB2C,
-} from "@mdl/b2c-sales/server/schemas/price-list-b2c";
+import { sale_b2c_tb_price_lists } from "@mdl/b2c-sales/server/schemas/b2c-sales.price-list";
+import { sale_b2c_tb_price_list_items, SaleB2cTbPriceListItem } from "@mdl/b2c-sales/server/schemas/b2c-sales.price-list-item";
+import { sale_b2c_tb_pricing_rules, SaleB2cTbPricingRule } from "@mdl/b2c-sales/server/schemas/b2c-sales.pricing-rule";
+import { sale_b2c_tb_price_tiers } from "@mdl/b2c-sales/server/schemas/b2c-sales.price-tier";
 import getDbConnect from "../utils/getDbConnect";
 
 export interface CalculatePriceParams {
@@ -221,25 +217,25 @@ export class PricingService {
   } | null> {
     const rows = await this.db
       .select({
-        id: table_price_lists_b2c.id,
-        code: table_price_lists_b2c.code,
+        id: sale_b2c_tb_price_lists.id,
+        code: sale_b2c_tb_price_lists.code,
       })
-      .from(table_price_lists_b2c)
+      .from(sale_b2c_tb_price_lists)
       .where(
         and(
-          eq(table_price_lists_b2c.isDefault, true),
-          eq(table_price_lists_b2c.status, "active"),
+          eq(sale_b2c_tb_price_lists.isDefault, true),
+          eq(sale_b2c_tb_price_lists.status, "active"),
           or(
-            sql`${table_price_lists_b2c.validFrom} IS NULL`,
-            lte(table_price_lists_b2c.validFrom, new Date())
+            sql`${sale_b2c_tb_price_lists.validFrom} IS NULL`,
+            lte(sale_b2c_tb_price_lists.validFrom, new Date())
           ),
           or(
-            sql`${table_price_lists_b2c.validTo} IS NULL`,
-            gte(table_price_lists_b2c.validTo, new Date())
+            sql`${sale_b2c_tb_price_lists.validTo} IS NULL`,
+            gte(sale_b2c_tb_price_lists.validTo, new Date())
           )
         )
       )
-      .orderBy(sql`${table_price_lists_b2c.priority} DESC`)
+      .orderBy(sql`${sale_b2c_tb_price_lists.priority} DESC`)
       .limit(1);
 
     return rows[0] || null;
@@ -254,14 +250,14 @@ export class PricingService {
   ): Promise<{ defaultSalePrice: number } | null> {
     const rows = await this.db
       .select({
-        defaultSalePrice: table_product_type_goods.defaultSalePrice,
+        defaultSalePrice: product_tb_product_type_goods.defaultSalePrice,
       })
-      .from(table_product_variant)
+      .from(product_tb_product_variants)
       .leftJoin(
-        table_product_type_goods,
-        eq(table_product_variant.id, table_product_type_goods.productVariantId)
+        product_tb_product_type_goods,
+        eq(product_tb_product_variants.id, product_tb_product_type_goods.productVariantId)
       )
-      .where(eq(table_product_variant.id, productVariantId))
+      .where(eq(product_tb_product_variants.id, productVariantId))
       .limit(1);
 
     const record = rows[0];
@@ -280,31 +276,31 @@ export class PricingService {
     productVariantId: string,
     quantity: number,
     currentDate: Date
-  ): Promise<TblPriceListItemB2C | null> {
+  ): Promise<SaleB2cTbPriceListItem | null> {
     const rows = await this.db
       .select()
-      .from(table_price_list_items_b2c)
+      .from(sale_b2c_tb_price_list_items)
       .where(
         and(
-          eq(table_price_list_items_b2c.priceListId, priceListId),
-          eq(table_price_list_items_b2c.productVariantId, productVariantId),
-          eq(table_price_list_items_b2c.isActive, true),
-          gte(table_price_list_items_b2c.minQuantity, quantity.toString()),
+          eq(sale_b2c_tb_price_list_items.priceListId, priceListId),
+          eq(sale_b2c_tb_price_list_items.productVariantId, productVariantId),
+          eq(sale_b2c_tb_price_list_items.isActive, true),
+          gte(sale_b2c_tb_price_list_items.minQuantity, quantity.toString()),
           or(
-            sql`${table_price_list_items_b2c.maxQuantity} IS NULL`,
-            lte(table_price_list_items_b2c.maxQuantity, quantity.toString())
+            sql`${sale_b2c_tb_price_list_items.maxQuantity} IS NULL`,
+            lte(sale_b2c_tb_price_list_items.maxQuantity, quantity.toString())
           ),
           or(
-            sql`${table_price_list_items_b2c.validFrom} IS NULL`,
-            lte(table_price_list_items_b2c.validFrom, currentDate)
+            sql`${sale_b2c_tb_price_list_items.validFrom} IS NULL`,
+            lte(sale_b2c_tb_price_list_items.validFrom, currentDate)
           ),
           or(
-            sql`${table_price_list_items_b2c.validTo} IS NULL`,
-            gte(table_price_list_items_b2c.validTo, currentDate)
+            sql`${sale_b2c_tb_price_list_items.validTo} IS NULL`,
+            gte(sale_b2c_tb_price_list_items.validTo, currentDate)
           )
         )
       )
-      .orderBy(sql`${table_price_list_items_b2c.priority} DESC`)
+      .orderBy(sql`${sale_b2c_tb_price_list_items.priority} DESC`)
       .limit(1);
 
     return rows[0] || null;
@@ -325,22 +321,22 @@ export class PricingService {
     region?: string,
     currentDate?: Date,
     applyToExceptionsOnly?: boolean
-  ): Promise<TblPricingRuleB2C[]> {
+  ): Promise<SaleB2cTbPricingRule[]> {
     const whereConditions = [
-      eq(table_pricing_rules_b2c.priceListId, priceListId),
-      eq(table_pricing_rules_b2c.isActive, true),
-      gte(table_pricing_rules_b2c.minQuantity, quantity.toString()),
+      eq(sale_b2c_tb_pricing_rules.priceListId, priceListId),
+      eq(sale_b2c_tb_pricing_rules.isActive, true),
+      gte(sale_b2c_tb_pricing_rules.minQuantity, quantity.toString()),
       or(
-        sql`${table_pricing_rules_b2c.maxQuantity} IS NULL`,
-        lte(table_pricing_rules_b2c.maxQuantity, quantity.toString())
+        sql`${sale_b2c_tb_pricing_rules.maxQuantity} IS NULL`,
+        lte(sale_b2c_tb_pricing_rules.maxQuantity, quantity.toString())
       ),
       or(
-        sql`${table_pricing_rules_b2c.validFrom} IS NULL`,
-        lte(table_pricing_rules_b2c.validFrom, currentDate || new Date())
+        sql`${sale_b2c_tb_pricing_rules.validFrom} IS NULL`,
+        lte(sale_b2c_tb_pricing_rules.validFrom, currentDate || new Date())
       ),
       or(
-        sql`${table_pricing_rules_b2c.validTo} IS NULL`,
-        gte(table_pricing_rules_b2c.validTo, currentDate || new Date())
+        sql`${sale_b2c_tb_pricing_rules.validTo} IS NULL`,
+        gte(sale_b2c_tb_pricing_rules.validTo, currentDate || new Date())
       ),
     ];
 
@@ -348,15 +344,15 @@ export class PricingService {
     // Nếu applyToExceptionsOnly = false hoặc undefined, chỉ lấy rules có applyToExceptions = false
     if (applyToExceptionsOnly !== undefined) {
       whereConditions.push(
-        eq(table_pricing_rules_b2c.applyToExceptions, applyToExceptionsOnly)
+        eq(sale_b2c_tb_pricing_rules.applyToExceptions, applyToExceptionsOnly)
       );
     }
 
     const rules = await this.db
       .select()
-      .from(table_pricing_rules_b2c)
+      .from(sale_b2c_tb_pricing_rules)
       .where(and(...whereConditions))
-      .orderBy(sql`${table_pricing_rules_b2c.priority} DESC`);
+      .orderBy(sql`${sale_b2c_tb_pricing_rules.priority} DESC`);
 
     // Filter rules by conditions
     return rules.filter((rule) => {
@@ -439,7 +435,7 @@ export class PricingService {
    * Áp dụng pricing rule
    */
   private async applyRule(
-    rule: TblPricingRuleB2C,
+    rule: SaleB2cTbPricingRule,
     basePrice: number,
     quantity: number
   ): Promise<number | null> {
@@ -510,18 +506,18 @@ export class PricingService {
   ): Promise<number | null> {
     const tiers = await this.db
       .select()
-      .from(table_price_tiers_b2c)
+      .from(sale_b2c_tb_price_tiers)
       .where(
         and(
-          eq(table_price_tiers_b2c.pricingRuleId, ruleId),
-          gte(table_price_tiers_b2c.minQuantity, quantity.toString()),
+          eq(sale_b2c_tb_price_tiers.pricingRuleId, ruleId),
+          gte(sale_b2c_tb_price_tiers.minQuantity, quantity.toString()),
           or(
-            sql`${table_price_tiers_b2c.maxQuantity} IS NULL`,
-            lte(table_price_tiers_b2c.maxQuantity, quantity.toString())
+            sql`${sale_b2c_tb_price_tiers.maxQuantity} IS NULL`,
+            lte(sale_b2c_tb_price_tiers.maxQuantity, quantity.toString())
           )
         )
       )
-      .orderBy(sql`${table_price_tiers_b2c.priority} DESC`)
+      .orderBy(sql`${sale_b2c_tb_price_tiers.priority} DESC`)
       .limit(1);
 
     return tiers[0] ? Number(tiers[0].price) : null;

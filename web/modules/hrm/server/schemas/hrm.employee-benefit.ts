@@ -7,21 +7,21 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_benefit_package } from "./hrm.benefit-package";
-import { table_employee } from "./hrm.employee";
+import { hrm_tb_benefit_packages } from "./hrm.benefit-package";
+import { hrm_tb_employees } from "./hrm.employee";
 
 // Employee Benefits - Phúc lợi của nhân viên
-export const table_employee_benefit = mdlHrmSchema.table(
+export const hrm_tb_employees_benefit = mdlHrmSchema.table(
   "employee_benefits",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     employeeId: uuid("employee_id")
-      .references(() => table_employee.id, { onDelete: "cascade" })
+      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
       .notNull(),
     benefitPackageId: uuid("benefit_package_id")
-      .references(() => table_benefit_package.id, { onDelete: "restrict" })
+      .references(() => hrm_tb_benefit_packages.id, { onDelete: "restrict" })
       .notNull(),
     effectiveDate: date("effective_date").notNull(),
     expiryDate: date("expiry_date"), // null = no expiry
@@ -42,6 +42,6 @@ export const table_employee_benefit = mdlHrmSchema.table(
   ]
 );
 
-export type TblEmployeeBenefit = typeof table_employee_benefit.$inferSelect;
-export type NewTblEmployeeBenefit = typeof table_employee_benefit.$inferInsert;
+export type HrmTbEmployeeBenefit = typeof hrm_tb_employees_benefit.$inferSelect;
+export type NewHrmTbEmployeeBenefit = typeof hrm_tb_employees_benefit.$inferInsert;
 

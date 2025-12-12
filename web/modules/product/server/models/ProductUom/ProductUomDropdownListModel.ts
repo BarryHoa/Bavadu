@@ -9,7 +9,7 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
 import { asc, eq, ilike, sql } from "drizzle-orm";
-import { table_unit_of_measure } from "../../schemas";
+import { product_tb_units_of_measure } from "../../schemas";
 
 type UomFilter = {
   isActive?: boolean;
@@ -22,13 +22,13 @@ type ProductUomDropdownOption = {
 };
 
 class ProductUomDropdownListModel extends BaseViewListModel<
-  typeof table_unit_of_measure,
+  typeof product_tb_units_of_measure,
   ProductUomDropdownOption,
   UomFilter
 > {
   constructor() {
     super({
-      table: table_unit_of_measure,
+      table: product_tb_units_of_measure,
       sortDefault: [
         {
           column: "name",
@@ -46,10 +46,10 @@ class ProductUomDropdownListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_unit_of_measure.id, sort: false }],
-      ["name", { column: table_unit_of_measure.name, sort: false }],
-      ["symbol", { column: table_unit_of_measure.symbol, sort: false }],
-      ["isActive", { column: table_unit_of_measure.isActive, sort: false }],
+      ["id", { column: product_tb_units_of_measure.id, sort: false }],
+      ["name", { column: product_tb_units_of_measure.name, sort: false }],
+      ["symbol", { column: product_tb_units_of_measure.symbol, sort: false }],
+      ["isActive", { column: product_tb_units_of_measure.isActive, sort: false }],
     ]);
 
   protected declarationSearch = () =>
@@ -58,11 +58,11 @@ class ProductUomDropdownListModel extends BaseViewListModel<
       [
         "name",
         (text: string) =>
-          ilike(sql`${table_unit_of_measure.name}::text`, `%${text}%`),
+          ilike(sql`${product_tb_units_of_measure.name}::text`, `%${text}%`),
       ],
       [
         "symbol",
-        (text: string) => ilike(table_unit_of_measure.symbol, `%${text}%`),
+        (text: string) => ilike(product_tb_units_of_measure.symbol, `%${text}%`),
       ],
     ]);
 
@@ -72,7 +72,7 @@ class ProductUomDropdownListModel extends BaseViewListModel<
         "isActive",
         (value?: unknown) =>
           typeof value === "boolean"
-            ? eq(table_unit_of_measure.isActive, value)
+            ? eq(product_tb_units_of_measure.isActive, value)
             : undefined,
       ],
     ];
@@ -93,7 +93,7 @@ class ProductUomDropdownListModel extends BaseViewListModel<
     params: ListParamsRequest<UomFilter>
   ): Promise<ListParamsResponse<ProductUomDropdownOption>> => {
     return this.buildQueryDataList(params, (query) => {
-      return query.orderBy(asc(table_unit_of_measure.name));
+      return query.orderBy(asc(product_tb_units_of_measure.name));
     });
   };
 }

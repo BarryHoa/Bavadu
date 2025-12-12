@@ -12,7 +12,7 @@ import {
 import { mdBaseSchema } from "./schema";
 
 // Tax Rates
-export const table_tax_rate = mdBaseSchema.table(
+export const base_tb_tax_rates = mdBaseSchema.table(
   "tax_rates",
   {
     id: uuid("id")
@@ -38,5 +38,5 @@ export const table_tax_rate = mdBaseSchema.table(
   ]
 );
 
-export type TblTaxRate = typeof table_tax_rate.$inferSelect;
-export type NewTblTaxRate = typeof table_tax_rate.$inferInsert;
+export type BaseTbTaxRate = typeof base_tb_tax_rates.$inferSelect;
+export type NewBaseTbTaxRate = typeof base_tb_tax_rates.$inferInsert;

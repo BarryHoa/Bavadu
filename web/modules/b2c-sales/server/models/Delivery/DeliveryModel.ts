@@ -3,19 +3,19 @@ import { eq } from "drizzle-orm";
 import { getEnv } from "@base/server";
 import { BaseModel } from "@base/server/models/BaseModel";
 import {
-  table_sales_order_b2b,
-  table_sales_order_line_b2b,
+  sale_b2b_tb_orders,
+  sale_b2b_tb_order_lines,
 } from "@mdl/b2b-sales/server/schemas";
 import type StockModel from "@mdl/stock/server/models/Stock/StockModel";
 import type {
-  NewTblSalesOrderDelivery,
-  NewTblSalesOrderDeliveryLine,
+  NewSaleB2cTbDelivery,
+  NewSaleB2cTbDeliveryLine,
 } from "../../schemas";
 import {
-  table_sales_order_b2c,
-  table_sales_order_delivery,
-  table_sales_order_delivery_line,
-  table_sales_order_line_b2c,
+  sale_b2c_tb_orders,
+  sale_b2c_tb_deliveries,
+  sale_b2c_tb_deliveries_line,
+  sale_b2c_tb_order_lines,
 } from "../../schemas";
 
 export interface CreateDeliveryInput {
@@ -33,10 +33,10 @@ export interface CreateDeliveryInput {
 }
 
 export default class DeliveryModel extends BaseModel<
-  typeof table_sales_order_delivery
+  typeof sale_b2c_tb_deliveries
 > {
   constructor() {
-    super(table_sales_order_delivery);
+    super(sale_b2c_tb_deliveries);
   }
 
   create = async (input: CreateDeliveryInput) => {
@@ -53,8 +53,8 @@ export default class DeliveryModel extends BaseModel<
     if (input.orderType === "B2B") {
       const [b2bOrder] = await this.db
         .select()
-        .from(table_sales_order_b2b)
-        .where(eq(table_sales_order_b2b.id, input.orderId))
+        .from(sale_b2b_tb_orders)
+        .where(eq(sale_b2b_tb_orders.id, input.orderId))
         .limit(1);
       if (!b2bOrder) {
         throw new Error("Order not found");
@@ -64,8 +64,8 @@ export default class DeliveryModel extends BaseModel<
     } else {
       const [b2cOrder] = await this.db
         .select()
-        .from(table_sales_order_b2c)
-        .where(eq(table_sales_order_b2c.id, input.orderId))
+        .from(sale_b2c_tb_orders)
+        .where(eq(sale_b2c_tb_orders.id, input.orderId))
         .limit(1);
       if (!b2cOrder) {
         throw new Error("Order not found");
@@ -77,8 +77,8 @@ export default class DeliveryModel extends BaseModel<
     // Get order lines
     const lineTable =
       input.orderType === "B2B"
-        ? table_sales_order_line_b2b
-        : table_sales_order_line_b2c;
+        ? sale_b2b_tb_order_lines
+        : sale_b2c_tb_order_lines;
     const orderLines = await this.db
       .select()
       .from(lineTable)
@@ -94,7 +94,7 @@ export default class DeliveryModel extends BaseModel<
 
     return this.db.transaction(async (tx) => {
       // Create delivery record
-      const deliveryPayload: NewTblSalesOrderDelivery = {
+      const deliveryPayload: NewSaleB2cTbDelivery = {
         orderType: input.orderType,
         orderId: input.orderId,
         warehouseId: input.warehouseId,
@@ -106,7 +106,7 @@ export default class DeliveryModel extends BaseModel<
       };
 
       const [delivery] = await tx
-        .insert(table_sales_order_delivery)
+        .insert(sale_b2c_tb_deliveries)
         .values(deliveryPayload)
         .returning();
 
@@ -131,7 +131,7 @@ export default class DeliveryModel extends BaseModel<
         }
 
         // Create delivery line
-        const deliveryLinePayload: NewTblSalesOrderDeliveryLine = {
+        const deliveryLinePayload: NewSaleB2cTbDeliveryLine = {
           deliveryId: delivery.id,
           orderType: input.orderType,
           orderLineId: deliveryLine.lineId,
@@ -139,7 +139,7 @@ export default class DeliveryModel extends BaseModel<
         };
 
         await tx
-          .insert(table_sales_order_delivery_line)
+          .insert(sale_b2c_tb_deliveries_line)
           .values(deliveryLinePayload);
 
         // Update order line delivered quantity
@@ -164,12 +164,12 @@ export default class DeliveryModel extends BaseModel<
 
       // Update delivery status to completed
       await tx
-        .update(table_sales_order_delivery)
+        .update(sale_b2c_tb_deliveries)
         .set({
           status: "completed",
           updatedAt: now,
         })
-        .where(eq(table_sales_order_delivery.id, delivery.id));
+        .where(eq(sale_b2c_tb_deliveries.id, delivery.id));
 
       return delivery;
     });

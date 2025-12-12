@@ -10,15 +10,15 @@ import type {
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
-import { table_sales_order_delivery } from "../../schemas";
+import { sale_b2c_tb_deliveries } from "../../schemas";
 
 class DeliveryViewListModel extends BaseViewListModel<
-  typeof table_sales_order_delivery,
+  typeof sale_b2c_tb_deliveries,
   any
 > {
   constructor() {
     super({
-      table: table_sales_order_delivery,
+      table: sale_b2c_tb_deliveries,
       sortDefault: [
         {
           column: "createdAt",
@@ -36,32 +36,32 @@ class DeliveryViewListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_sales_order_delivery.id, sort: true }],
+      ["id", { column: sale_b2c_tb_deliveries.id, sort: true }],
       [
         "orderType",
-        { column: table_sales_order_delivery.orderType, sort: true },
+        { column: sale_b2c_tb_deliveries.orderType, sort: true },
       ],
-      ["orderId", { column: table_sales_order_delivery.orderId, sort: true }],
+      ["orderId", { column: sale_b2c_tb_deliveries.orderId, sort: true }],
       [
         "warehouseId",
-        { column: table_sales_order_delivery.warehouseId, sort: true },
+        { column: sale_b2c_tb_deliveries.warehouseId, sort: true },
       ],
       [
         "deliveryDate",
-        { column: table_sales_order_delivery.deliveryDate, sort: true },
+        { column: sale_b2c_tb_deliveries.deliveryDate, sort: true },
       ],
       [
         "reference",
-        { column: table_sales_order_delivery.reference, sort: true },
+        { column: sale_b2c_tb_deliveries.reference, sort: true },
       ],
-      ["status", { column: table_sales_order_delivery.status, sort: true }],
+      ["status", { column: sale_b2c_tb_deliveries.status, sort: true }],
       [
         "createdAt",
-        { column: table_sales_order_delivery.createdAt, sort: true },
+        { column: sale_b2c_tb_deliveries.createdAt, sort: true },
       ],
       [
         "updatedAt",
-        { column: table_sales_order_delivery.updatedAt, sort: true },
+        { column: sale_b2c_tb_deliveries.updatedAt, sort: true },
       ],
     ]);
 
@@ -69,7 +69,7 @@ class DeliveryViewListModel extends BaseViewListModel<
     new Map([
       [
         "reference",
-        (text: string) => ilike(table_sales_order_delivery.reference, text),
+        (text: string) => ilike(sale_b2c_tb_deliveries.reference, text),
       ],
     ]);
 

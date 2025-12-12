@@ -3,13 +3,13 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblEmployee, table_employee } from "../../schemas";
-import { table_department } from "../../schemas/department";
-import { table_position } from "../../schemas/position";
+import { NewHrmTbEmployee, hrm_tb_employees } from "../../schemas";
+import { hrm_tb_departments } from "../../schemas/hrm.department";
+import { hrm_tb_positions } from "../../schemas/hrm.position";
 
-const department = alias(table_department, "department");
-const position = alias(table_position, "position");
-const manager = alias(table_employee, "manager");
+const department = alias(hrm_tb_departments, "department");
+const position = alias(hrm_tb_positions, "position");
+const manager = alias(hrm_tb_employees, "manager");
 
 export interface EmployeeRow {
   id: string;
@@ -77,9 +77,9 @@ export interface EmployeeInput {
   isActive?: boolean;
 }
 
-export default class EmployeeModel extends BaseModel<typeof table_employee> {
+export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
   constructor() {
-    super(table_employee);
+    super(hrm_tb_employees);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -191,7 +191,7 @@ export default class EmployeeModel extends BaseModel<typeof table_employee> {
 
   createEmployee = async (payload: EmployeeInput): Promise<EmployeeRow> => {
     const now = new Date();
-    const insertData: NewTblEmployee = {
+    const insertData: NewHrmTbEmployee = {
       employeeCode: payload.employeeCode,
       firstName: payload.firstName ?? null,
       lastName: payload.lastName ?? null,

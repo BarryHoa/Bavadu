@@ -7,10 +7,10 @@ import {
   text,
 } from "drizzle-orm/pg-core";
 import { mdBaseSchema } from "./schema";
-import { table_user } from "./base.user";
+import { base_tb_users } from "./base.user";
 
 // Sessions
-export const table_session = mdBaseSchema.table(
+export const base_tb_sessions = mdBaseSchema.table(
   "sessions",
   {
     id: uuid("id")
@@ -18,7 +18,7 @@ export const table_session = mdBaseSchema.table(
       .default(sql`uuid_generate_v7()`), // UUID v7
     userId: uuid("user_id")
       .notNull()
-      .references(() => table_user.id, { onDelete: "cascade" }),
+      .references(() => base_tb_users.id, { onDelete: "cascade" }),
     sessionToken: varchar("session_token", { length: 255 })
       .notNull()
       .unique(),
@@ -39,6 +39,6 @@ export const table_session = mdBaseSchema.table(
   ]
 );
 
-export type TblSession = typeof table_session.$inferSelect;
-export type NewTblSession = typeof table_session.$inferInsert;
+export type BaseTbSession = typeof base_tb_sessions.$inferSelect;
+export type NewBaseTbSession = typeof base_tb_sessions.$inferInsert;
 

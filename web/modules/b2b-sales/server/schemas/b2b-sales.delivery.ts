@@ -8,10 +8,10 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlSaleB2bSchema } from "./schema";
-import { table_stock_warehouse } from "@mdl/stock/server/schemas/stock.warehouse";
+import { stock_tb_stock_warehouses } from "@mdl/stock/server/schemas/stock.warehouse";
 
 // Sales Order Delivery - Track deliveries from orders (warehouse receipts)
-export const table_sales_order_delivery = mdlSaleB2bSchema.table(
+export const sale_b2c_tb_deliveries = mdlSaleB2bSchema.table(
   "deliveries",
   {
     id: uuid("id")
@@ -21,7 +21,7 @@ export const table_sales_order_delivery = mdlSaleB2bSchema.table(
     orderId: uuid("order_id").notNull(),
     warehouseId: uuid("warehouse_id")
       .notNull()
-      .references(() => table_stock_warehouse.id, { onDelete: "restrict" }),
+      .references(() => stock_tb_stock_warehouses.id, { onDelete: "restrict" }),
     deliveryDate: timestamp("delivery_date", { withTimezone: true }).notNull(),
     reference: varchar("reference", { length: 128 }), // Reference number for the delivery
     note: text("note"),
@@ -41,13 +41,13 @@ export const table_sales_order_delivery = mdlSaleB2bSchema.table(
   ]
 );
 
-export type TblSalesOrderDelivery =
-  typeof table_sales_order_delivery.$inferSelect;
-export type NewTblSalesOrderDelivery =
-  typeof table_sales_order_delivery.$inferInsert;
+export type SaleB2cTbDelivery =
+  typeof sale_b2c_tb_deliveries.$inferSelect;
+export type NewSaleB2cTbDelivery =
+  typeof sale_b2c_tb_deliveries.$inferInsert;
 
 // Delivery Lines - Track which order lines are delivered
-export const table_sales_order_delivery_line = mdlSaleB2bSchema.table(
+export const sale_b2c_tb_deliveries_line = mdlSaleB2bSchema.table(
   "delivery_lines",
   {
     id: uuid("id")
@@ -55,7 +55,7 @@ export const table_sales_order_delivery_line = mdlSaleB2bSchema.table(
       .default(sql`uuid_generate_v7()`),
     deliveryId: uuid("delivery_id")
       .notNull()
-      .references(() => table_sales_order_delivery.id, { onDelete: "cascade" }),
+      .references(() => sale_b2c_tb_deliveries.id, { onDelete: "cascade" }),
     orderType: varchar("order_type", { length: 10 }).notNull(), // 'B2B' | 'B2C'
     orderLineId: uuid("order_line_id").notNull(), // Reference to order line (B2B or B2C)
     quantity: numeric("quantity", { precision: 14, scale: 2 }).notNull(),
@@ -70,7 +70,7 @@ export const table_sales_order_delivery_line = mdlSaleB2bSchema.table(
   ]
 );
 
-export type TblSalesOrderDeliveryLine =
-  typeof table_sales_order_delivery_line.$inferSelect;
-export type NewTblSalesOrderDeliveryLine =
-  typeof table_sales_order_delivery_line.$inferInsert;
+export type SaleB2cTbDeliveryLine =
+  typeof sale_b2c_tb_deliveries_line.$inferSelect;
+export type NewSaleB2cTbDeliveryLine =
+  typeof sale_b2c_tb_deliveries_line.$inferInsert;

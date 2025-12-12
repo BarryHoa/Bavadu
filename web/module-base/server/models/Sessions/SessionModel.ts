@@ -1,7 +1,7 @@
 import { randomBytes } from "crypto";
 import { and, eq, gt, lt } from "drizzle-orm";
-import { table_session } from "../../schemas/session";
-import { table_user, table_user_login } from "../../schemas/user";
+import { base_tb_sessions } from "../../schemas/base.session";
+import { base_tb_users, base_tb_users_login } from "../../schemas/base.user";
 import { BaseModel } from "../BaseModel";
 import type {
   CreateSessionParams,
@@ -9,9 +9,9 @@ import type {
   ValidateSessionResult,
 } from "./SessionInterface";
 
-class SessionModel extends BaseModel<typeof table_session> {
+class SessionModel extends BaseModel<typeof base_tb_sessions> {
   constructor() {
-    super(table_session);
+    super(base_tb_sessions);
   }
 
   /**
@@ -72,12 +72,12 @@ class SessionModel extends BaseModel<typeof table_session> {
     const [session] = await this.db
       .select({
         session: this.table,
-        user: table_user,
-        userLogin: table_user_login,
+        user: base_tb_users,
+        userLogin: base_tb_users_login,
       })
       .from(this.table)
-      .innerJoin(table_user, eq(this.table.userId, table_user.id))
-      .leftJoin(table_user_login, eq(table_user.id, table_user_login.userId))
+      .innerJoin(base_tb_users, eq(this.table.userId, base_tb_users.id))
+      .leftJoin(base_tb_users_login, eq(base_tb_users.id, base_tb_users_login.userId))
       .where(
         and(
           eq(this.table.sessionToken, sessionToken),

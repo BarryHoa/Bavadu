@@ -3,12 +3,12 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblJobRequisition, table_job_requisition } from "../../schemas";
-import { table_department } from "../../schemas/department";
-import { table_position } from "../../schemas/position";
+import { NewHrmTbJobRequisition, hrm_tb_job_requisitions } from "../../schemas";
+import { hrm_tb_departments } from "../../schemas/hrm.department";
+import { hrm_tb_positions } from "../../schemas/hrm.position";
 
-const department = alias(table_department, "department");
-const position = alias(table_position, "position");
+const department = alias(hrm_tb_departments, "department");
+const position = alias(hrm_tb_positions, "position");
 
 export interface JobRequisitionRow {
   id: string;
@@ -64,10 +64,10 @@ export interface JobRequisitionInput {
 }
 
 export default class JobRequisitionModel extends BaseModel<
-  typeof table_job_requisition
+  typeof hrm_tb_job_requisitions
 > {
   constructor() {
-    super(table_job_requisition);
+    super(hrm_tb_job_requisitions);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -162,7 +162,7 @@ export default class JobRequisitionModel extends BaseModel<
     payload: JobRequisitionInput
   ): Promise<JobRequisitionRow> => {
     const now = new Date();
-    const insertData: NewTblJobRequisition = {
+    const insertData: NewHrmTbJobRequisition = {
       requisitionNumber: payload.requisitionNumber,
       title: payload.title,
       description: payload.description ?? null,

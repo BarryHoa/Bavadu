@@ -10,11 +10,11 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { table_employee } from "./hrm.employee";
+import { hrm_tb_employees } from "./hrm.employee";
 import { mdlHrmSchema } from "./schema";
 
 // Contracts - Hợp đồng lao động
-export const table_contract = mdlHrmSchema.table(
+export const hrm_tb_contracts = mdlHrmSchema.table(
   "contracts",
   {
     id: uuid("id")
@@ -24,7 +24,7 @@ export const table_contract = mdlHrmSchema.table(
       .notNull()
       .unique(), // Số hợp đồng
     employeeId: uuid("employee_id")
-      .references(() => table_employee.id, { onDelete: "restrict" })
+      .references(() => hrm_tb_employees.id, { onDelete: "restrict" })
       .notNull(),
     contractType: varchar("contract_type", { length: 50 }).notNull(), // probation, fixed_term, indefinite, part_time
     startDate: date("start_date").notNull(),
@@ -37,7 +37,7 @@ export const table_contract = mdlHrmSchema.table(
     status: varchar("status", { length: 50 }).notNull().default("active"), // draft, active, expired, terminated
     documentUrl: varchar("document_url", { length: 500 }), // Link to contract document
     signedDate: date("signed_date"), // Ngày ký
-    signedBy: uuid("signed_by").references(() => table_employee.id), // Employee ID who signed
+    signedBy: uuid("signed_by").references(() => hrm_tb_employees.id), // Employee ID who signed
     notes: text("notes"),
     metadata: jsonb("metadata"), // Additional contract terms, allowances, etc.
     isActive: boolean("is_active").default(true).notNull(),
@@ -56,5 +56,5 @@ export const table_contract = mdlHrmSchema.table(
   ]
 );
 
-export type TblContract = typeof table_contract.$inferSelect;
-export type NewTblContract = typeof table_contract.$inferInsert;
+export type HrmTbContract = typeof hrm_tb_contracts.$inferSelect;
+export type NewHrmTbContract = typeof hrm_tb_contracts.$inferInsert;

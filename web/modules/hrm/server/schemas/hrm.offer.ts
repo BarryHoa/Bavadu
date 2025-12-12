@@ -10,18 +10,18 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_candidate } from "./hrm.candidate";
-import { table_employee } from "./hrm.employee";
+import { hrm_tb_candidates } from "./hrm.candidate";
+import { hrm_tb_employees } from "./hrm.employee";
 
 // Offers - Đề nghị làm việc
-export const table_offer = mdlHrmSchema.table(
+export const hrm_tb_offers = mdlHrmSchema.table(
   "offers",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     candidateId: uuid("candidate_id")
-      .references(() => table_candidate.id, { onDelete: "restrict" })
+      .references(() => hrm_tb_candidates.id, { onDelete: "restrict" })
       .notNull(),
     offerNumber: varchar("offer_number", { length: 100 }).notNull().unique(),
     positionTitle: jsonb("position_title").notNull(), // LocaleDataType<string>
@@ -37,7 +37,7 @@ export const table_offer = mdlHrmSchema.table(
     acceptedDate: timestamp("accepted_date", { withTimezone: true }),
     rejectedDate: timestamp("rejected_date", { withTimezone: true }),
     rejectionReason: text("rejection_reason"),
-    approvedBy: uuid("approved_by").references(() => table_employee.id),
+    approvedBy: uuid("approved_by").references(() => hrm_tb_employees.id),
     approvedAt: timestamp("approved_at", { withTimezone: true }),
     notes: text("notes"),
     createdAt: timestamp("created_at", { withTimezone: true }),
@@ -52,6 +52,6 @@ export const table_offer = mdlHrmSchema.table(
   ]
 );
 
-export type TblOffer = typeof table_offer.$inferSelect;
-export type NewTblOffer = typeof table_offer.$inferInsert;
+export type HrmTbOffer = typeof hrm_tb_offers.$inferSelect;
+export type NewHrmTbOffer = typeof hrm_tb_offers.$inferInsert;
 

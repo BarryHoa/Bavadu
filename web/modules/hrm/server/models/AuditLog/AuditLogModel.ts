@@ -1,7 +1,7 @@
 import { BaseModel } from "@base/server/models/BaseModel";
 import { and, eq, gte, lte, sql } from "drizzle-orm";
 
-import { NewTblAuditLog, table_audit_log } from "../../schemas";
+import { NewHrmTbAuditLog, hrm_tb_audit_logs } from "../../schemas";
 
 export interface AuditLogRow {
   id: string;
@@ -38,13 +38,13 @@ export interface AuditLogQuery {
   offset?: number;
 }
 
-export default class AuditLogModel extends BaseModel<typeof table_audit_log> {
+export default class AuditLogModel extends BaseModel<typeof hrm_tb_audit_logs> {
   constructor() {
-    super(table_audit_log);
+    super(hrm_tb_audit_logs);
   }
 
   createAuditLog = async (payload: AuditLogInput): Promise<AuditLogRow> => {
-    const insertData: NewTblAuditLog = {
+    const insertData: NewHrmTbAuditLog = {
       entityType: payload.entityType,
       entityId: payload.entityId,
       action: payload.action,

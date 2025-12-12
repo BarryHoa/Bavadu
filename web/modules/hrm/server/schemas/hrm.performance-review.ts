@@ -10,23 +10,23 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_employee } from "./hrm.employee";
+import { hrm_tb_employees } from "./hrm.employee";
 
 // Performance Reviews - Đánh giá hiệu suất
-export const table_performance_review = mdlHrmSchema.table(
+export const hrm_tb_performance_reviews = mdlHrmSchema.table(
   "performance_reviews",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     employeeId: uuid("employee_id")
-      .references(() => table_employee.id, { onDelete: "cascade" })
+      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
       .notNull(),
     reviewType: varchar("review_type", { length: 50 }).notNull(), // annual, quarterly, monthly, 1on1, 360
     reviewPeriod: varchar("review_period", { length: 50 }), // e.g., "2024-Q1"
     reviewDate: date("review_date").notNull(),
     reviewerId: uuid("reviewer_id")
-      .references(() => table_employee.id, { onDelete: "set null" })
+      .references(() => hrm_tb_employees.id, { onDelete: "set null" })
       .notNull(), // Manager/HR who conducts review
     overallRating: integer("overall_rating"), // 1-5 rating
     strengths: text("strengths"),
@@ -49,6 +49,6 @@ export const table_performance_review = mdlHrmSchema.table(
   ]
 );
 
-export type TblPerformanceReview = typeof table_performance_review.$inferSelect;
-export type NewTblPerformanceReview = typeof table_performance_review.$inferInsert;
+export type HrmTbPerformanceReview = typeof hrm_tb_performance_reviews.$inferSelect;
+export type NewHrmTbPerformanceReview = typeof hrm_tb_performance_reviews.$inferInsert;
 

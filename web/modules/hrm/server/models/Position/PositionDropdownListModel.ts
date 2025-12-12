@@ -11,10 +11,10 @@ import type { Column } from "drizzle-orm";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { table_position } from "../../schemas";
-import { table_department } from "../../schemas/department";
+import { hrm_tb_positions } from "../../schemas";
+import { hrm_tb_departments } from "../../schemas/hrm.department";
 
-const department = alias(table_department, "department");
+const department = alias(hrm_tb_departments, "department");
 
 export interface PositionDropdownRow {
   id: string;
@@ -29,7 +29,7 @@ export interface PositionDropdownRow {
 }
 
 class PositionDropdownListModel extends BaseViewListModel<
-  typeof table_position,
+  typeof hrm_tb_positions,
   PositionDropdownRow
 > {
   protected declarationColumns = () =>
@@ -40,21 +40,21 @@ class PositionDropdownListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_position.id, sort: true }],
-      ["code", { column: table_position.code, sort: true }],
-      ["name", { column: table_position.name, sort: true }],
-      ["departmentId", { column: table_position.departmentId, sort: true }],
-      ["isActive", { column: table_position.isActive, sort: true }],
+      ["id", { column: hrm_tb_positions.id, sort: true }],
+      ["code", { column: hrm_tb_positions.code, sort: true }],
+      ["name", { column: hrm_tb_positions.name, sort: true }],
+      ["departmentId", { column: hrm_tb_positions.departmentId, sort: true }],
+      ["isActive", { column: hrm_tb_positions.isActive, sort: true }],
     ]);
 
   constructor() {
-    super({ table: table_position });
+    super({ table: hrm_tb_positions });
   }
 
   protected declarationSearch = () =>
     new Map([
-      ["code", (text: string) => ilike(table_position.code, text)],
-      ["name", (text: string) => ilike(table_position.name, text)],
+      ["code", (text: string) => ilike(hrm_tb_positions.code, text)],
+      ["name", (text: string) => ilike(hrm_tb_positions.name, text)],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>

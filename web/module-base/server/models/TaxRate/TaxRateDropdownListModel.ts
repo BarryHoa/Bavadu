@@ -8,7 +8,7 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
 import { asc, eq, inArray } from "drizzle-orm";
-import { table_tax_rate } from "../../schemas/tax-rate";
+import { base_tb_tax_rates } from "../../schemas/base.tax-rate";
 import { ParamFilter } from "../interfaces/FilterInterface";
 
 type TaxRateDropdownOption = {
@@ -20,12 +20,12 @@ type TaxRateDropdownOption = {
 };
 
 class TaxRateDropdownListModel extends BaseViewListModel<
-  typeof table_tax_rate,
+  typeof base_tb_tax_rates,
   TaxRateDropdownOption
 > {
   constructor() {
     super({
-      table: table_tax_rate,
+      table: base_tb_tax_rates,
       sortDefault: [
         {
           column: "order",
@@ -43,10 +43,10 @@ class TaxRateDropdownListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_tax_rate.id, sort: false }],
-      ["code", { column: table_tax_rate.code, sort: true }],
-      ["name", { column: table_tax_rate.name, sort: false }],
-      ["order", { column: table_tax_rate.order, sort: true }],
+      ["id", { column: base_tb_tax_rates.id, sort: false }],
+      ["code", { column: base_tb_tax_rates.code, sort: true }],
+      ["name", { column: base_tb_tax_rates.name, sort: false }],
+      ["order", { column: base_tb_tax_rates.order, sort: true }],
     ]);
 
   protected declarationSearch = () => new Map();
@@ -57,14 +57,14 @@ class TaxRateDropdownListModel extends BaseViewListModel<
         "isActive",
         (value?: unknown, _filters?: ParamFilter) =>
           typeof value === "boolean"
-            ? eq(table_tax_rate.isActive, value)
+            ? eq(base_tb_tax_rates.isActive, value)
             : undefined,
       ],
       [
         "type",
         (value?: unknown, _filters?: ParamFilter) =>
           Array.isArray(value) && value.length > 0
-            ? inArray(table_tax_rate.type, value as string[])
+            ? inArray(base_tb_tax_rates.type, value as string[])
             : undefined,
       ],
     ]);
@@ -93,13 +93,13 @@ class TaxRateDropdownListModel extends BaseViewListModel<
     const result = await this.buildQueryDataListWithSelect(
       params,
       {
-        id: table_tax_rate.id,
-        code: table_tax_rate.code,
-        name: table_tax_rate.name,
-        order: table_tax_rate.order,
+        id: base_tb_tax_rates.id,
+        code: base_tb_tax_rates.code,
+        name: base_tb_tax_rates.name,
+        order: base_tb_tax_rates.order,
       },
       (query) => {
-        return query.orderBy(asc(table_tax_rate.order)).limit(params.limit);
+        return query.orderBy(asc(base_tb_tax_rates.order)).limit(params.limit);
       }
     );
 

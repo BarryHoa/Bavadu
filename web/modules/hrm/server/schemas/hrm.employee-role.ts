@@ -6,21 +6,21 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_employee } from "./hrm.employee";
-import { table_hrm_role } from "./hrm.role";
+import { hrm_tb_employees } from "./hrm.employee";
+import { hrm_tb_roles } from "./hrm.role";
 
 // Employee Role Assignments - Phân quyền cho nhân viên
-export const table_employee_role = mdlHrmSchema.table(
+export const hrm_tb_employees_role = mdlHrmSchema.table(
   "employee_roles",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     employeeId: uuid("employee_id")
-      .references(() => table_employee.id, { onDelete: "cascade" })
+      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
       .notNull(),
     roleId: uuid("role_id")
-      .references(() => table_hrm_role.id, { onDelete: "restrict" })
+      .references(() => hrm_tb_roles.id, { onDelete: "restrict" })
       .notNull(),
     departmentId: uuid("department_id"), // Scope: chỉ áp dụng cho phòng ban này (null = toàn công ty)
     locationId: uuid("location_id"), // Scope: chỉ áp dụng cho địa điểm này (null = tất cả)
@@ -37,6 +37,6 @@ export const table_employee_role = mdlHrmSchema.table(
   ]
 );
 
-export type TblEmployeeRole = typeof table_employee_role.$inferSelect;
-export type NewTblEmployeeRole = typeof table_employee_role.$inferInsert;
+export type HrmTbEmployeeRole = typeof hrm_tb_employees_role.$inferSelect;
+export type NewHrmTbEmployeeRole = typeof hrm_tb_employees_role.$inferInsert;
 

@@ -10,10 +10,10 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlSaleB2cSchema } from "./schema";
-import { table_payment_term } from "@base/server/schemas/base.payment-term";
+import { base_tb_payment_terms } from "@base/server/schemas/base.payment-term";
 
 // Customer Companies (B2B customers) - Note: This should be in b2b-sales module
-export const table_customer_company = mdlSaleB2cSchema.table(
+export const sale_b2c_tb_customer_companies = mdlSaleB2cSchema.table(
   "customer_companies",
   {
     id: uuid("id")
@@ -29,7 +29,7 @@ export const table_customer_company = mdlSaleB2cSchema.table(
     contactPerson: varchar("contact_person", { length: 128 }),
     creditLimit: numeric("credit_limit", { precision: 14, scale: 2 }),
     paymentTermsId: uuid("payment_terms_id").references(
-      () => table_payment_term.id,
+      () => base_tb_payment_terms.id,
       { onDelete: "set null" }
     ),
     isActive: boolean("is_active").default(true).notNull(),
@@ -47,11 +47,11 @@ export const table_customer_company = mdlSaleB2cSchema.table(
   ]
 );
 
-export type TblCustomerCompany = typeof table_customer_company.$inferSelect;
-export type NewTblCustomerCompany = typeof table_customer_company.$inferInsert;
+export type SaleB2cTbCustomerCompany = typeof sale_b2c_tb_customer_companies.$inferSelect;
+export type NewSaleB2cTbCustomerCompany = typeof sale_b2c_tb_customer_companies.$inferInsert;
 
 // Customer Individuals (B2C customers)
-export const table_customer_individual = mdlSaleB2cSchema.table(
+export const sale_b2c_tb_customers = mdlSaleB2cSchema.table(
   "customers",
   {
     id: uuid("id")
@@ -81,6 +81,6 @@ export const table_customer_individual = mdlSaleB2cSchema.table(
   ]
 );
 
-export type TblCustomerIndividual = typeof table_customer_individual.$inferSelect;
-export type NewTblCustomerIndividual = typeof table_customer_individual.$inferInsert;
+export type SaleB2cTbCustomer = typeof sale_b2c_tb_customers.$inferSelect;
+export type NewSaleB2cTbCustomer = typeof sale_b2c_tb_customers.$inferInsert;
 

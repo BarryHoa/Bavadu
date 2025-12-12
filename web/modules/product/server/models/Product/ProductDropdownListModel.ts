@@ -9,7 +9,7 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
 import { eq, ilike, or, sql } from "drizzle-orm";
-import { table_product_master, table_product_variant } from "../../schemas";
+import { product_tb_product_masters, product_tb_product_variants } from "../../schemas";
 import { ProductMasterFeaturesEnum } from "../interfaces/ProductMaster";
 import { ProductFilter } from "./ProductModelInterface";
 
@@ -20,13 +20,13 @@ type ProductDropdownOption = {
 };
 
 class ProductDropdownListModel extends BaseViewListModel<
-  typeof table_product_variant,
+  typeof product_tb_product_variants,
   ProductDropdownOption,
   ProductFilter
 > {
   constructor() {
     super({
-      table: table_product_variant,
+      table: product_tb_product_variants,
       sortDefault: [
         {
           column: "createdAt",
@@ -44,12 +44,12 @@ class ProductDropdownListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_product_variant.id, sort: false }],
-      ["name", { column: table_product_variant.name, sort: false }],
-      ["sku", { column: table_product_variant.sku, sort: false }],
-      ["barcode", { column: table_product_variant.barcode, sort: false }],
-      ["baseUomId", { column: table_product_variant.baseUomId, sort: false }],
-      ["features", { column: table_product_master.features, sort: false }],
+      ["id", { column: product_tb_product_variants.id, sort: false }],
+      ["name", { column: product_tb_product_variants.name, sort: false }],
+      ["sku", { column: product_tb_product_variants.sku, sort: false }],
+      ["barcode", { column: product_tb_product_variants.barcode, sort: false }],
+      ["baseUomId", { column: product_tb_product_variants.baseUomId, sort: false }],
+      ["features", { column: product_tb_product_masters.features, sort: false }],
     ]);
 
   protected declarationSearch = () =>
@@ -58,12 +58,12 @@ class ProductDropdownListModel extends BaseViewListModel<
       [
         "name",
         (text: string) =>
-          ilike(sql`${table_product_variant.name}::text`, `%${text}%`),
+          ilike(sql`${product_tb_product_variants.name}::text`, `%${text}%`),
       ],
-      ["sku", (text: string) => ilike(table_product_variant.sku, `%${text}%`)],
+      ["sku", (text: string) => ilike(product_tb_product_variants.sku, `%${text}%`)],
       [
         "barcode",
-        (text: string) => ilike(table_product_variant.barcode, `%${text}%`),
+        (text: string) => ilike(product_tb_product_variants.barcode, `%${text}%`),
       ],
     ]);
 
@@ -73,7 +73,7 @@ class ProductDropdownListModel extends BaseViewListModel<
         "isActive",
         (value?: unknown) =>
           typeof value === "boolean"
-            ? eq(table_product_variant.isActive, value)
+            ? eq(product_tb_product_variants.isActive, value)
             : undefined,
       ],
       [
@@ -86,7 +86,7 @@ class ProductDropdownListModel extends BaseViewListModel<
             ? or(
                 ...featureList.map(
                   (feature) =>
-                    sql`${table_product_master.features} ->> '${feature}' = 'true'`
+                    sql`${product_tb_product_masters.features} ->> '${feature}' = 'true'`
                 )
               )
             : undefined;
@@ -111,8 +111,8 @@ class ProductDropdownListModel extends BaseViewListModel<
   ): Promise<ListParamsResponse<ProductDropdownOption>> => {
     return this.buildQueryDataList(params, (query) => {
       return query.innerJoin(
-        table_product_master,
-        eq(table_product_variant.productMasterId, table_product_master.id)
+        product_tb_product_masters,
+        eq(product_tb_product_variants.productMasterId, product_tb_product_masters.id)
       );
     });
   };

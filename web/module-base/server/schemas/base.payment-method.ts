@@ -12,7 +12,7 @@ import {
 import { mdBaseSchema } from "./schema";
 
 // Payment Methods
-export const table_payment_method = mdBaseSchema.table(
+export const base_tb_payment_methods = mdBaseSchema.table(
   "payment_methods",
   {
     id: uuid("id")
@@ -37,5 +37,5 @@ export const table_payment_method = mdBaseSchema.table(
   ]
 );
 
-export type TblPaymentMethod = typeof table_payment_method.$inferSelect;
-export type NewTblPaymentMethod = typeof table_payment_method.$inferInsert;
+export type BaseTbPaymentMethod = typeof base_tb_payment_methods.$inferSelect;
+export type NewBaseTbPaymentMethod = typeof base_tb_payment_methods.$inferInsert;

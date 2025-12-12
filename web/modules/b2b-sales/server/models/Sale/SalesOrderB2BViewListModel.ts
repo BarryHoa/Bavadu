@@ -10,15 +10,15 @@ import type {
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
-import { table_sales_order_b2b } from "../../schemas";
+import { sale_b2b_tb_orders } from "../../schemas";
 
 class SalesOrderB2BViewListModel extends BaseViewListModel<
-  typeof table_sales_order_b2b,
+  typeof sale_b2b_tb_orders,
   any
 > {
   constructor() {
     super({
-      table: table_sales_order_b2b,
+      table: sale_b2b_tb_orders,
       sortDefault: [
         {
           column: "createdAt",
@@ -36,24 +36,24 @@ class SalesOrderB2BViewListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_sales_order_b2b.id, sort: true }],
-      ["code", { column: table_sales_order_b2b.code, sort: true }],
-      ["companyName", { column: table_sales_order_b2b.companyName, sort: true }],
-      ["status", { column: table_sales_order_b2b.status, sort: true }],
-      ["warehouseId", { column: table_sales_order_b2b.warehouseId, sort: true }],
-      ["expectedDate", { column: table_sales_order_b2b.expectedDate, sort: true }],
-      ["grandTotal", { column: table_sales_order_b2b.grandTotal, sort: true }],
-      ["totalAmount", { column: table_sales_order_b2b.totalAmount, sort: true }],
-      ["currency", { column: table_sales_order_b2b.currency, sort: true }],
-      ["notes", { column: table_sales_order_b2b.notes, sort: false }],
-      ["createdAt", { column: table_sales_order_b2b.createdAt, sort: true }],
-      ["updatedAt", { column: table_sales_order_b2b.updatedAt, sort: true }],
+      ["id", { column: sale_b2b_tb_orders.id, sort: true }],
+      ["code", { column: sale_b2b_tb_orders.code, sort: true }],
+      ["companyName", { column: sale_b2b_tb_orders.companyName, sort: true }],
+      ["status", { column: sale_b2b_tb_orders.status, sort: true }],
+      ["warehouseId", { column: sale_b2b_tb_orders.warehouseId, sort: true }],
+      ["expectedDate", { column: sale_b2b_tb_orders.expectedDate, sort: true }],
+      ["grandTotal", { column: sale_b2b_tb_orders.grandTotal, sort: true }],
+      ["totalAmount", { column: sale_b2b_tb_orders.totalAmount, sort: true }],
+      ["currency", { column: sale_b2b_tb_orders.currency, sort: true }],
+      ["notes", { column: sale_b2b_tb_orders.notes, sort: false }],
+      ["createdAt", { column: sale_b2b_tb_orders.createdAt, sort: true }],
+      ["updatedAt", { column: sale_b2b_tb_orders.updatedAt, sort: true }],
     ]);
 
   protected declarationSearch = () =>
     new Map([
-      ["code", (text: string) => ilike(table_sales_order_b2b.code, text)],
-      ["companyName", (text: string) => ilike(table_sales_order_b2b.companyName, text)],
+      ["code", (text: string) => ilike(sale_b2b_tb_orders.code, text)],
+      ["companyName", (text: string) => ilike(sale_b2b_tb_orders.companyName, text)],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>

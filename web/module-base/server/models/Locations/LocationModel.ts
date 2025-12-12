@@ -1,12 +1,12 @@
 import { and, asc, eq, isNull } from "drizzle-orm";
 
-import { table_location_administrative_units } from "../../schemas/administrative-unit";
-import { table_location_countries } from "../../schemas/country";
+import { base_tb_location_administrative_units } from "../../schemas/base.administrative-unit";
+import { base_tb_location_countries } from "../../schemas/base.country";
 import { BaseModel } from "../BaseModel";
 
-class LocationModel extends BaseModel<typeof table_location_countries> {
+class LocationModel extends BaseModel<typeof base_tb_location_countries> {
   constructor() {
-    super(table_location_countries);
+    super(base_tb_location_countries);
   }
 
   getLocationById = async (id: string) => {
@@ -52,16 +52,16 @@ class LocationModel extends BaseModel<typeof table_location_countries> {
     countryId?: string;
     level?: number;
   }) => {
-    const conditions = [eq(table_location_administrative_units.isActive, true)];
+    const conditions = [eq(base_tb_location_administrative_units.isActive, true)];
 
     // Filter by parentId
     if (params?.parentId !== undefined) {
       if (params.parentId === null) {
         // Get root level (level 1, no parent)
-        conditions.push(isNull(table_location_administrative_units.parentId));
+        conditions.push(isNull(base_tb_location_administrative_units.parentId));
       } else {
         conditions.push(
-          eq(table_location_administrative_units.parentId, params.parentId)
+          eq(base_tb_location_administrative_units.parentId, params.parentId)
         );
       }
     }
@@ -69,24 +69,24 @@ class LocationModel extends BaseModel<typeof table_location_countries> {
     // Filter by countryId
     if (params?.countryId) {
       conditions.push(
-        eq(table_location_administrative_units.countryId, params.countryId)
+        eq(base_tb_location_administrative_units.countryId, params.countryId)
       );
     }
 
     // Filter by level
     if (params?.level) {
       conditions.push(
-        eq(table_location_administrative_units.level, params.level)
+        eq(base_tb_location_administrative_units.level, params.level)
       );
     }
 
     const administrativeUnits = await this.db
       .select()
-      .from(table_location_administrative_units)
+      .from(base_tb_location_administrative_units)
       .where(and(...conditions))
       .orderBy(
-        asc(table_location_administrative_units.level),
-        asc(table_location_administrative_units.name)
+        asc(base_tb_location_administrative_units.level),
+        asc(base_tb_location_administrative_units.name)
       );
 
     return administrativeUnits;
@@ -101,16 +101,16 @@ class LocationModel extends BaseModel<typeof table_location_countries> {
   getLocationBy = async (params: { parentId: string; type: string }) => {
 
     const conditions = [
-      eq(table_location_administrative_units.isActive, true),
-      eq(table_location_administrative_units.parentId, params.parentId),
-      eq(table_location_administrative_units.type, params.type),
+      eq(base_tb_location_administrative_units.isActive, true),
+      eq(base_tb_location_administrative_units.parentId, params.parentId),
+      eq(base_tb_location_administrative_units.type, params.type),
     ];
 
     const administrativeUnits = await this.db
       .select()
-      .from(table_location_administrative_units)
+      .from(base_tb_location_administrative_units)
       .where(and(...conditions))
-      .orderBy(asc(table_location_administrative_units.name));
+      .orderBy(asc(base_tb_location_administrative_units.name));
 
     return administrativeUnits;
   };
@@ -132,8 +132,8 @@ class LocationModel extends BaseModel<typeof table_location_countries> {
     // First, get the country by code
     const country = await this.db
       .select()
-      .from(table_location_countries)
-      .where(eq(table_location_countries.code, countryCode))
+      .from(base_tb_location_countries)
+      .where(eq(base_tb_location_countries.code, countryCode))
       .limit(1);
 
     if (!country[0]) {
@@ -141,33 +141,33 @@ class LocationModel extends BaseModel<typeof table_location_countries> {
     }
 
     const conditions = [
-      eq(table_location_administrative_units.isActive, true),
-      eq(table_location_administrative_units.countryId, country[0].id),
+      eq(base_tb_location_administrative_units.isActive, true),
+      eq(base_tb_location_administrative_units.countryId, country[0].id),
     ];
 
     // Filter by parentId
     if (params?.parentId !== undefined) {
       if (params.parentId === null) {
         // Get root level (level 1, no parent)
-        conditions.push(isNull(table_location_administrative_units.parentId));
+        conditions.push(isNull(base_tb_location_administrative_units.parentId));
       } else {
         conditions.push(
-          eq(table_location_administrative_units.parentId, params.parentId)
+          eq(base_tb_location_administrative_units.parentId, params.parentId)
         );
       }
     }
 
     // Filter by level
     const level = params?.level ?? 1;
-    conditions.push(eq(table_location_administrative_units.level, level));
+    conditions.push(eq(base_tb_location_administrative_units.level, level));
 
     const administrativeUnits = await this.db
       .select()
-      .from(table_location_administrative_units)
+      .from(base_tb_location_administrative_units)
       .where(and(...conditions))
       .orderBy(
-        asc(table_location_administrative_units.level),
-        asc(table_location_administrative_units.name)
+        asc(base_tb_location_administrative_units.level),
+        asc(base_tb_location_administrative_units.name)
       );
 
     return administrativeUnits;

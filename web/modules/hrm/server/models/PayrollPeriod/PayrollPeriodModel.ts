@@ -1,7 +1,7 @@
 import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 
-import { NewTblPayrollPeriod, table_payroll_period } from "../../schemas";
+import { NewHrmTbPayrollPeriod, hrm_tb_payrolls_period } from "../../schemas";
 
 export interface PayrollPeriodRow {
   id: string;
@@ -27,10 +27,10 @@ export interface PayrollPeriodInput {
 }
 
 export default class PayrollPeriodModel extends BaseModel<
-  typeof table_payroll_period
+  typeof hrm_tb_payrolls_period
 > {
   constructor() {
-    super(table_payroll_period);
+    super(hrm_tb_payrolls_period);
   }
 
   getPayrollPeriodById = async (
@@ -69,7 +69,7 @@ export default class PayrollPeriodModel extends BaseModel<
     payload: PayrollPeriodInput
   ): Promise<PayrollPeriodRow> => {
     const now = new Date();
-    const insertData: NewTblPayrollPeriod = {
+    const insertData: NewHrmTbPayrollPeriod = {
       code: payload.code,
       name: payload.name ?? null,
       startDate: payload.startDate,

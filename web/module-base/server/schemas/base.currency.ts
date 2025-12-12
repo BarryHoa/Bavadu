@@ -21,7 +21,7 @@ import { mdBaseSchema } from "./schema";
  * - Các currency khác: tỷ giá = số VND tương ứng với 1 đơn vị currency đó
  *   Ví dụ: USD = 24500 VND, EUR = 26500 VND
  */
-export const table_currency = mdBaseSchema.table(
+export const base_tb_currencies = mdBaseSchema.table(
   "currencies",
   {
     id: uuid("id")
@@ -52,8 +52,8 @@ export const table_currency = mdBaseSchema.table(
   ]
 );
 
-export type TblCurrency = typeof table_currency.$inferSelect;
-export type NewTblCurrency = typeof table_currency.$inferInsert;
+export type BaseTbCurrency = typeof base_tb_currencies.$inferSelect;
+export type NewBaseTbCurrency = typeof base_tb_currencies.$inferInsert;
 
 /**
  * Currency Exchange Rates - Lưu lịch sử tỷ giá theo ngày
@@ -63,7 +63,7 @@ export type NewTblCurrency = typeof table_currency.$inferInsert;
  * - VND luôn có tỷ giá = 1.0 cho mọi ngày
  * - Ví dụ: USD ngày 2024-01-01 = 24500, EUR ngày 2024-01-01 = 26500
  */
-export const table_currency_exchange_rate = mdBaseSchema.table(
+export const base_tb_currencies_exchange_rate = mdBaseSchema.table(
   "currency_exchange_rate_for_vnd",
   {
     id: uuid("id")
@@ -71,7 +71,7 @@ export const table_currency_exchange_rate = mdBaseSchema.table(
       .default(sql`uuid_generate_v7()`), // UUID v7
     currencyId: uuid("currency_id")
       .notNull()
-      .references(() => table_currency.id, { onDelete: "cascade" }), // Reference đến currency
+      .references(() => base_tb_currencies.id, { onDelete: "cascade" }), // Reference đến currency
     rateDate: date("rate_date").notNull(), // Ngày của tỷ giá
     exchangeRate: decimal("exchange_rate", {
       precision: 18,
@@ -100,7 +100,7 @@ export const table_currency_exchange_rate = mdBaseSchema.table(
   ]
 );
 
-export type TblCurrencyExchangeRate =
-  typeof table_currency_exchange_rate.$inferSelect;
-export type NewTblCurrencyExchangeRate =
-  typeof table_currency_exchange_rate.$inferInsert;
+export type BaseTbCurrencyExchangeRate =
+  typeof base_tb_currencies_exchange_rate.$inferSelect;
+export type NewBaseTbCurrencyExchangeRate =
+  typeof base_tb_currencies_exchange_rate.$inferInsert;

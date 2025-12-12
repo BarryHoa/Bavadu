@@ -3,10 +3,10 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblCandidate, table_candidate } from "../../schemas";
-import { table_job_requisition } from "../../schemas/job-requisition";
+import { NewHrmTbCandidate, hrm_tb_candidates } from "../../schemas";
+import { hrm_tb_job_requisitions } from "../../schemas/hrm.job-requisition";
 
-const requisition = alias(table_job_requisition, "requisition");
+const requisition = alias(hrm_tb_job_requisitions, "requisition");
 
 export interface CandidateRow {
   id: string;
@@ -55,9 +55,9 @@ export interface CandidateInput {
   notes?: string | null;
 }
 
-export default class CandidateModel extends BaseModel<typeof table_candidate> {
+export default class CandidateModel extends BaseModel<typeof hrm_tb_candidates> {
   constructor() {
-    super(table_candidate);
+    super(hrm_tb_candidates);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -138,7 +138,7 @@ export default class CandidateModel extends BaseModel<typeof table_candidate> {
 
   createCandidate = async (payload: CandidateInput): Promise<CandidateRow> => {
     const now = new Date();
-    const insertData: NewTblCandidate = {
+    const insertData: NewHrmTbCandidate = {
       requisitionId: payload.requisitionId,
       firstName: payload.firstName ?? null,
       lastName: payload.lastName ?? null,

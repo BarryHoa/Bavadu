@@ -4,3 +4,6 @@ export * from "./b2c-sales.currency";
 export * from "./b2c-sales.delivery";
 export * from "./b2c-sales.order-line";
 export * from "./b2c-sales.price-list";
+export * from "./b2c-sales.price-list-item";
+export * from "./b2c-sales.pricing-rule";
+export * from "./b2c-sales.price-tier";

@@ -11,9 +11,9 @@ import type { Column } from "drizzle-orm";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { table_department } from "../../schemas";
+import { hrm_tb_departments } from "../../schemas";
 
-const parentDepartment = alias(table_department, "parent_department");
+const parentDepartment = alias(hrm_tb_departments, "parent_department");
 
 export interface DepartmentRow {
   id: string;
@@ -33,7 +33,7 @@ export interface DepartmentRow {
 }
 
 class DepartmentViewListModel extends BaseViewListModel<
-  typeof table_department,
+  typeof hrm_tb_departments,
   DepartmentRow
 > {
   protected declarationColumns = () =>
@@ -44,30 +44,30 @@ class DepartmentViewListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_department.id, sort: true }],
-      ["code", { column: table_department.code, sort: true }],
-      ["name", { column: table_department.name, sort: true }],
+      ["id", { column: hrm_tb_departments.id, sort: true }],
+      ["code", { column: hrm_tb_departments.code, sort: true }],
+      ["name", { column: hrm_tb_departments.name, sort: true }],
       [
         "description",
-        { column: table_department.description, sort: false },
+        { column: hrm_tb_departments.description, sort: false },
       ],
-      ["level", { column: table_department.level, sort: true }],
-      ["isActive", { column: table_department.isActive, sort: true }],
-      ["parentId", { column: table_department.parentId, sort: true }],
-      ["managerId", { column: table_department.managerId, sort: true }],
-      ["locationId", { column: table_department.locationId, sort: true }],
-      ["createdAt", { column: table_department.createdAt, sort: true }],
-      ["updatedAt", { column: table_department.updatedAt, sort: true }],
+      ["level", { column: hrm_tb_departments.level, sort: true }],
+      ["isActive", { column: hrm_tb_departments.isActive, sort: true }],
+      ["parentId", { column: hrm_tb_departments.parentId, sort: true }],
+      ["managerId", { column: hrm_tb_departments.managerId, sort: true }],
+      ["locationId", { column: hrm_tb_departments.locationId, sort: true }],
+      ["createdAt", { column: hrm_tb_departments.createdAt, sort: true }],
+      ["updatedAt", { column: hrm_tb_departments.updatedAt, sort: true }],
     ]);
 
   constructor() {
-    super({ table: table_department });
+    super({ table: hrm_tb_departments });
   }
 
   protected declarationSearch = () =>
     new Map([
-      ["code", (text: string) => ilike(table_department.code, text)],
-      ["name", (text: string) => ilike(table_department.name, text)],
+      ["code", (text: string) => ilike(hrm_tb_departments.code, text)],
+      ["name", (text: string) => ilike(hrm_tb_departments.name, text)],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>

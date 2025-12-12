@@ -11,10 +11,10 @@ import type { Column } from "drizzle-orm";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { table_contract } from "../../schemas";
-import { table_employee } from "../../schemas/employee";
+import { hrm_tb_contracts } from "../../schemas";
+import { hrm_tb_employees } from "../../schemas/hrm.employee";
 
-const employee = alias(table_employee, "employee");
+const employee = alias(hrm_tb_employees, "employee");
 
 export interface ContractRow {
   id: string;
@@ -36,7 +36,7 @@ export interface ContractRow {
 }
 
 class ContractViewListModel extends BaseViewListModel<
-  typeof table_contract,
+  typeof hrm_tb_contracts,
   ContractRow
 > {
   protected declarationColumns = () =>
@@ -47,28 +47,28 @@ class ContractViewListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_contract.id, sort: true }],
-      ["contractNumber", { column: table_contract.contractNumber, sort: true }],
-      ["employeeId", { column: table_contract.employeeId, sort: true }],
-      ["contractType", { column: table_contract.contractType, sort: true }],
-      ["startDate", { column: table_contract.startDate, sort: true }],
-      ["endDate", { column: table_contract.endDate, sort: true }],
-      ["baseSalary", { column: table_contract.baseSalary, sort: true }],
-      ["status", { column: table_contract.status, sort: true }],
-      ["isActive", { column: table_contract.isActive, sort: true }],
-      ["createdAt", { column: table_contract.createdAt, sort: true }],
-      ["updatedAt", { column: table_contract.updatedAt, sort: true }],
+      ["id", { column: hrm_tb_contracts.id, sort: true }],
+      ["contractNumber", { column: hrm_tb_contracts.contractNumber, sort: true }],
+      ["employeeId", { column: hrm_tb_contracts.employeeId, sort: true }],
+      ["contractType", { column: hrm_tb_contracts.contractType, sort: true }],
+      ["startDate", { column: hrm_tb_contracts.startDate, sort: true }],
+      ["endDate", { column: hrm_tb_contracts.endDate, sort: true }],
+      ["baseSalary", { column: hrm_tb_contracts.baseSalary, sort: true }],
+      ["status", { column: hrm_tb_contracts.status, sort: true }],
+      ["isActive", { column: hrm_tb_contracts.isActive, sort: true }],
+      ["createdAt", { column: hrm_tb_contracts.createdAt, sort: true }],
+      ["updatedAt", { column: hrm_tb_contracts.updatedAt, sort: true }],
     ]);
 
   constructor() {
-    super({ table: table_contract });
+    super({ table: hrm_tb_contracts });
   }
 
   protected declarationSearch = () =>
     new Map([
       [
         "contractNumber",
-        (text: string) => ilike(table_contract.contractNumber, text),
+        (text: string) => ilike(hrm_tb_contracts.contractNumber, text),
       ],
     ]);
 

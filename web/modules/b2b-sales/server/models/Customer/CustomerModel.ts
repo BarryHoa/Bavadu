@@ -2,14 +2,14 @@ import { desc, eq } from "drizzle-orm";
 
 import { BaseModel } from "@base/server/models/BaseModel";
 import {
-  table_customer_company,
-  table_customer_individual,
+  sale_b2c_tb_customer_companies,
+  sale_b2c_tb_customers,
 } from "../../schemas";
 import type {
-  NewTblCustomerCompany,
-  TblCustomerCompany,
-  NewTblCustomerIndividual,
-  TblCustomerIndividual,
+  NewSaleB2cTbCustomerCompany,
+  SaleB2cTbCustomerCompany,
+  NewSaleB2cTbCustomer,
+  SaleB2cTbCustomer,
 } from "../../schemas";
 import type {
   CreateCustomerCompanyInput,
@@ -19,27 +19,27 @@ import type {
 } from "../../models/interfaces/Customer";
 
 export default class CustomerModel {
-  private companyModel: BaseModel<typeof table_customer_company>;
-  private individualModel: BaseModel<typeof table_customer_individual>;
+  private companyModel: BaseModel<typeof sale_b2c_tb_customer_companies>;
+  private individualModel: BaseModel<typeof sale_b2c_tb_customers>;
 
   constructor() {
-    this.companyModel = new BaseModel(table_customer_company);
-    this.individualModel = new BaseModel(table_customer_individual);
+    this.companyModel = new BaseModel(sale_b2c_tb_customer_companies);
+    this.individualModel = new BaseModel(sale_b2c_tb_customers);
   }
 
   // Company methods
-  listCompanies = async (): Promise<TblCustomerCompany[]> => {
+  listCompanies = async (): Promise<SaleB2cTbCustomerCompany[]> => {
     return this.companyModel.db
       .select()
-      .from(table_customer_company)
-      .orderBy(desc(table_customer_company.createdAt));
+      .from(sale_b2c_tb_customer_companies)
+      .orderBy(desc(sale_b2c_tb_customer_companies.createdAt));
   };
 
-  getCompanyById = async (id: string): Promise<TblCustomerCompany | null> => {
+  getCompanyById = async (id: string): Promise<SaleB2cTbCustomerCompany | null> => {
     const [company] = await this.companyModel.db
       .select()
-      .from(table_customer_company)
-      .where(eq(table_customer_company.id, id))
+      .from(sale_b2c_tb_customer_companies)
+      .where(eq(sale_b2c_tb_customer_companies.id, id))
       .limit(1);
     return company ?? null;
   };
@@ -55,7 +55,7 @@ export default class CustomerModel {
         .toString()
         .padStart(2, "0")}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
-    const payload: NewTblCustomerCompany = {
+    const payload: NewSaleB2cTbCustomerCompany = {
       code: generatedCode,
       name: input.name.trim(),
       taxId: input.taxId,
@@ -72,7 +72,7 @@ export default class CustomerModel {
     };
 
     const [company] = await this.companyModel.db
-      .insert(table_customer_company)
+      .insert(sale_b2c_tb_customer_companies)
       .values(payload)
       .returning();
 
@@ -81,7 +81,7 @@ export default class CustomerModel {
 
   updateCompany = async (input: UpdateCustomerCompanyInput) => {
     const now = new Date();
-    const updatePayload: Partial<NewTblCustomerCompany> = {
+    const updatePayload: Partial<NewSaleB2cTbCustomerCompany> = {
       name: input.name?.trim(),
       taxId: input.taxId,
       address: input.address,
@@ -98,9 +98,9 @@ export default class CustomerModel {
     };
 
     const [updated] = await this.companyModel.db
-      .update(table_customer_company)
+      .update(sale_b2c_tb_customer_companies)
       .set(updatePayload)
-      .where(eq(table_customer_company.id, input.id))
+      .where(eq(sale_b2c_tb_customer_companies.id, input.id))
       .returning();
 
     if (!updated) {
@@ -111,18 +111,18 @@ export default class CustomerModel {
   };
 
   // Individual methods
-  listIndividuals = async (): Promise<TblCustomerIndividual[]> => {
+  listIndividuals = async (): Promise<SaleB2cTbCustomer[]> => {
     return this.individualModel.db
       .select()
-      .from(table_customer_individual)
-      .orderBy(desc(table_customer_individual.createdAt));
+      .from(sale_b2c_tb_customers)
+      .orderBy(desc(sale_b2c_tb_customers.createdAt));
   };
 
-  getIndividualById = async (id: string): Promise<TblCustomerIndividual | null> => {
+  getIndividualById = async (id: string): Promise<SaleB2cTbCustomer | null> => {
     const [individual] = await this.individualModel.db
       .select()
-      .from(table_customer_individual)
-      .where(eq(table_customer_individual.id, id))
+      .from(sale_b2c_tb_customers)
+      .where(eq(sale_b2c_tb_customers.id, id))
       .limit(1);
     return individual ?? null;
   };
@@ -138,7 +138,7 @@ export default class CustomerModel {
         .toString()
         .padStart(2, "0")}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
-    const payload: NewTblCustomerIndividual = {
+    const payload: NewSaleB2cTbCustomer = {
       code: generatedCode,
       firstName: input.firstName.trim(),
       lastName: input.lastName.trim(),
@@ -153,7 +153,7 @@ export default class CustomerModel {
     };
 
     const [individual] = await this.individualModel.db
-      .insert(table_customer_individual)
+      .insert(sale_b2c_tb_customers)
       .values(payload)
       .returning();
 
@@ -162,7 +162,7 @@ export default class CustomerModel {
 
   updateIndividual = async (input: UpdateCustomerIndividualInput) => {
     const now = new Date();
-    const updatePayload: Partial<NewTblCustomerIndividual> = {
+    const updatePayload: Partial<NewSaleB2cTbCustomer> = {
       firstName: input.firstName?.trim(),
       lastName: input.lastName?.trim(),
       phone: input.phone,
@@ -177,9 +177,9 @@ export default class CustomerModel {
     };
 
     const [updated] = await this.individualModel.db
-      .update(table_customer_individual)
+      .update(sale_b2c_tb_customers)
       .set(updatePayload)
-      .where(eq(table_customer_individual.id, input.id))
+      .where(eq(sale_b2c_tb_customers.id, input.id))
       .returning();
 
     if (!updated) {

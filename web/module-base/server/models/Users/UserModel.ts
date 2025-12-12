@@ -1,11 +1,11 @@
 import { eq } from "drizzle-orm";
 
-import { table_user } from "../../schemas/user";
+import { base_tb_users } from "../../schemas/base.user";
 import { BaseModel } from "../BaseModel";
 
-class UserModel extends BaseModel<typeof table_user> {
+class UserModel extends BaseModel<typeof base_tb_users> {
   constructor() {
-    super(table_user);
+    super(base_tb_users);
   }
 
   getUserById = async (id: string) => {

@@ -1,6 +1,6 @@
-import { table_payment_term } from "@base/server/schemas/base.payment-term";
-import { table_shipping_method } from "@base/server/schemas/base.shipping-method";
-import { table_shipping_term } from "@base/server/schemas/base.shipping-term";
+import { base_tb_payment_terms } from "@base/server/schemas/base.payment-term";
+import { base_tb_shipping_methods } from "@base/server/schemas/base.shipping-method";
+import { base_tb_shipping_terms } from "@base/server/schemas/base.shipping-term";
 import { sql } from "drizzle-orm";
 import {
   boolean,
@@ -12,9 +12,9 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlSaleB2bSchema } from "./schema";
-import { table_stock_warehouse } from "@mdl/stock/server/schemas/stock.warehouse";
+import { stock_tb_stock_warehouses } from "@mdl/stock/server/schemas/stock.warehouse";
 
-export const table_sales_order_b2b = mdlSaleB2bSchema.table(
+export const sale_b2b_tb_orders = mdlSaleB2bSchema.table(
   "orders",
   {
     id: uuid("id")
@@ -33,23 +33,23 @@ export const table_sales_order_b2b = mdlSaleB2bSchema.table(
 
     // Business fields
     paymentTermsId: uuid("payment_terms_id").references(
-      () => table_payment_term.id,
+      () => base_tb_payment_terms.id,
       { onDelete: "set null" }
     ),
     creditLimit: numeric("credit_limit", { precision: 14, scale: 2 }),
     invoiceRequired: boolean("invoice_required").default(true).notNull(),
     shippingMethodId: uuid("shipping_method_id").references(
-      () => table_shipping_method.id,
+      () => base_tb_shipping_methods.id,
       { onDelete: "set null" }
     ),
     shippingTermsId: uuid("shipping_terms_id").references(
-      () => table_shipping_term.id,
+      () => base_tb_shipping_terms.id,
       { onDelete: "set null" }
     ),
 
     // Common fields
     warehouseId: uuid("warehouse_id").references(
-      () => table_stock_warehouse.id,
+      () => stock_tb_stock_warehouses.id,
       { onDelete: "set null" }
     ),
     expectedDate: timestamp("expected_date", { withTimezone: true }),
@@ -91,5 +91,5 @@ export const table_sales_order_b2b = mdlSaleB2bSchema.table(
   ]
 );
 
-export type TblSalesOrderB2B = typeof table_sales_order_b2b.$inferSelect;
-export type NewTblSalesOrderB2B = typeof table_sales_order_b2b.$inferInsert;
+export type SaleB2bTbOrder = typeof sale_b2b_tb_orders.$inferSelect;
+export type NewSaleB2bTbOrder = typeof sale_b2b_tb_orders.$inferInsert;

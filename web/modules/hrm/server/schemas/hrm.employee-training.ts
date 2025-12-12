@@ -9,21 +9,21 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_course } from "./hrm.course";
-import { table_employee } from "./hrm.employee";
+import { hrm_tb_courses } from "./hrm.course";
+import { hrm_tb_employees } from "./hrm.employee";
 
 // Employee Training - Đào tạo nhân viên
-export const table_employee_training = mdlHrmSchema.table(
+export const hrm_tb_employees_training = mdlHrmSchema.table(
   "employee_trainings",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     employeeId: uuid("employee_id")
-      .references(() => table_employee.id, { onDelete: "cascade" })
+      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
       .notNull(),
     courseId: uuid("course_id")
-      .references(() => table_course.id, { onDelete: "restrict" })
+      .references(() => hrm_tb_courses.id, { onDelete: "restrict" })
       .notNull(),
     enrollmentDate: date("enrollment_date").notNull(),
     completionDate: date("completion_date"),
@@ -43,6 +43,6 @@ export const table_employee_training = mdlHrmSchema.table(
   ]
 );
 
-export type TblEmployeeTraining = typeof table_employee_training.$inferSelect;
-export type NewTblEmployeeTraining = typeof table_employee_training.$inferInsert;
+export type HrmTbEmployeeTraining = typeof hrm_tb_employees_training.$inferSelect;
+export type NewHrmTbEmployeeTraining = typeof hrm_tb_employees_training.$inferInsert;
 

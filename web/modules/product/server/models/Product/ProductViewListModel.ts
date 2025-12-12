@@ -9,23 +9,23 @@ import type {
 import type { Column } from "drizzle-orm";
 import { eq, ilike, sql } from "drizzle-orm";
 import {
-  table_product_category,
-  table_product_variant,
-  table_unit_of_measure,
+  product_tb_product_categories,
+  product_tb_product_variants,
+  product_tb_units_of_measure,
 } from "../../schemas";
-import { table_product_master } from "../../schemas/product-master";
+import { product_tb_product_masters } from "../../schemas/product.master";
 
 import { ProductFilter, ProductVariantElm } from "./ProductModelInterface";
 
 class ProductViewListModel extends BaseViewListModel<
-  typeof table_product_variant,
+  typeof product_tb_product_variants,
   // use a view row shape (any) and cast in the public API
   any,
   ProductFilter
 > {
   constructor() {
     super({
-      table: table_product_variant,
+      table: product_tb_product_variants,
       sortDefault: [
         {
           column: "createdAt",
@@ -43,67 +43,67 @@ class ProductViewListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_product_variant.id, sort: true }],
-      ["name", { column: table_product_variant.name, sort: true }],
+      ["id", { column: product_tb_product_variants.id, sort: true }],
+      ["name", { column: product_tb_product_variants.name, sort: true }],
       [
         "description",
-        { column: table_product_variant.description, sort: true },
+        { column: product_tb_product_variants.description, sort: true },
       ],
-      ["sku", { column: table_product_variant.sku, sort: true }],
-      ["barcode", { column: table_product_variant.barcode, sort: true }],
+      ["sku", { column: product_tb_product_variants.sku, sort: true }],
+      ["barcode", { column: product_tb_product_variants.barcode, sort: true }],
       [
         "manufacturer",
-        { column: table_product_variant.manufacturer, sort: true },
+        { column: product_tb_product_variants.manufacturer, sort: true },
       ],
-      ["images", { column: table_product_variant.images, sort: true }],
-      ["isActive", { column: table_product_variant.isActive, sort: true }],
+      ["images", { column: product_tb_product_variants.images, sort: true }],
+      ["isActive", { column: product_tb_product_variants.isActive, sort: true }],
       [
         "productMasterId",
-        { column: table_product_variant.productMasterId, sort: true },
+        { column: product_tb_product_variants.productMasterId, sort: true },
       ],
-      ["productMasterName", { column: table_product_master.name, sort: true }],
-      ["productMasterType", { column: table_product_master.type, sort: true }],
+      ["productMasterName", { column: product_tb_product_masters.name, sort: true }],
+      ["productMasterType", { column: product_tb_product_masters.type, sort: true }],
       [
         "productMasterBrand",
-        { column: table_product_master.brand, sort: true },
+        { column: product_tb_product_masters.brand, sort: true },
       ],
       [
         "productMasterFeatures",
-        { column: table_product_master.features, sort: true },
+        { column: product_tb_product_masters.features, sort: true },
       ],
-      ["categoryId", { column: table_product_category.id, sort: true }],
-      ["categoryName", { column: table_product_category.name, sort: true }],
-      ["categoryCode", { column: table_product_category.code, sort: true }],
-      ["baseUomId", { column: table_product_variant.baseUomId, sort: true }],
-      ["baseUomName", { column: table_unit_of_measure.name, sort: true }],
-      ["createdAt", { column: table_product_variant.createdAt, sort: true }],
-      ["updatedAt", { column: table_product_variant.updatedAt, sort: true }],
+      ["categoryId", { column: product_tb_product_categories.id, sort: true }],
+      ["categoryName", { column: product_tb_product_categories.name, sort: true }],
+      ["categoryCode", { column: product_tb_product_categories.code, sort: true }],
+      ["baseUomId", { column: product_tb_product_variants.baseUomId, sort: true }],
+      ["baseUomName", { column: product_tb_units_of_measure.name, sort: true }],
+      ["createdAt", { column: product_tb_product_variants.createdAt, sort: true }],
+      ["updatedAt", { column: product_tb_product_variants.updatedAt, sort: true }],
     ]);
 
   protected declarationSearch = () =>
     new Map([
-      ["sku", (text: string) => ilike(table_product_variant.sku, text)],
-      ["barcode", (text: string) => ilike(table_product_variant.barcode, text)],
+      ["sku", (text: string) => ilike(product_tb_product_variants.sku, text)],
+      ["barcode", (text: string) => ilike(product_tb_product_variants.barcode, text)],
       [
         "manufacturer",
-        (text: string) => ilike(table_product_variant.manufacturer, text),
+        (text: string) => ilike(product_tb_product_variants.manufacturer, text),
       ],
-      ["name", (text: string) => ilike(table_product_variant.name, text)],
+      ["name", (text: string) => ilike(product_tb_product_variants.name, text)],
       [
         "productMasterCode",
-        (text: string) => ilike(table_product_master.code, text),
+        (text: string) => ilike(product_tb_product_masters.code, text),
       ],
       [
         "productMasterName",
-        (text: string) => ilike(sql`${table_product_master.name}::text`, text),
+        (text: string) => ilike(sql`${product_tb_product_masters.name}::text`, text),
       ],
       [
         "categoryCode",
-        (text: string) => ilike(table_product_category.code, text),
+        (text: string) => ilike(product_tb_product_categories.code, text),
       ],
       [
         "categoryName",
-        (text: string) => ilike(table_product_category.name, text),
+        (text: string) => ilike(product_tb_product_categories.name, text),
       ],
     ]);
 
@@ -120,21 +120,21 @@ class ProductViewListModel extends BaseViewListModel<
         "productMasterStatus",
         (value?: unknown, _filters?: ProductFilter) =>
           typeof value === "boolean"
-            ? eq(table_product_master.isActive, value)
+            ? eq(product_tb_product_masters.isActive, value)
             : undefined,
       ],
       [
         "productCategoryStatus",
         (value?: unknown, _filters?: ProductFilter) =>
           typeof value === "boolean"
-            ? eq(table_product_category.isActive, value)
+            ? eq(product_tb_product_categories.isActive, value)
             : undefined,
       ],
       [
         "baseUomStatus",
         (value?: unknown, _filters?: ProductFilter) =>
           typeof value === "boolean"
-            ? eq(table_unit_of_measure.isActive, value)
+            ? eq(product_tb_units_of_measure.isActive, value)
             : undefined,
       ],
     ]);
@@ -179,16 +179,16 @@ class ProductViewListModel extends BaseViewListModel<
     const result = await this.buildQueryDataList(params, (query) => {
       return query
         .innerJoin(
-          table_product_master,
-          eq(this.table.productMasterId, table_product_master.id)
+          product_tb_product_masters,
+          eq(this.table.productMasterId, product_tb_product_masters.id)
         )
         .leftJoin(
-          table_product_category,
-          eq(table_product_master.categoryId, table_product_category.id)
+          product_tb_product_categories,
+          eq(product_tb_product_masters.categoryId, product_tb_product_categories.id)
         )
         .leftJoin(
-          table_unit_of_measure,
-          eq(this.table.baseUomId, table_unit_of_measure.id)
+          product_tb_units_of_measure,
+          eq(this.table.baseUomId, product_tb_units_of_measure.id)
         );
     });
     return result as ListParamsResponse<ProductVariantElm>;

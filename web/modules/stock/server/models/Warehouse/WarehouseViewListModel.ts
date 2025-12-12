@@ -14,8 +14,8 @@ import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface
 import {
   WarehouseAddress,
 } from "../../../common/constants";
-import type { TblStockWarehouse } from "../../schemas";
-import { table_stock_warehouse } from "../../schemas";
+import type { StockTbStockWarehouse } from "../../schemas";
+import { stock_tb_stock_warehouses } from "../../schemas";
 
 export interface WarehouseViewRow {
   id: string;
@@ -38,12 +38,12 @@ export interface WarehouseViewRow {
 }
 
 class WarehouseViewListModel extends BaseViewListModel<
-  typeof table_stock_warehouse,
+  typeof stock_tb_stock_warehouses,
   WarehouseViewRow
 > {
   constructor() {
     super({
-      table: table_stock_warehouse,
+      table: stock_tb_stock_warehouses,
       sortDefault: [
         {
           column: "name",
@@ -61,67 +61,67 @@ class WarehouseViewListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_stock_warehouse.id, sort: true }],
-      ["code", { column: table_stock_warehouse.code, sort: true }],
-      ["name", { column: table_stock_warehouse.name, sort: true }],
+      ["id", { column: stock_tb_stock_warehouses.id, sort: true }],
+      ["code", { column: stock_tb_stock_warehouses.code, sort: true }],
+      ["name", { column: stock_tb_stock_warehouses.name, sort: true }],
       [
         "typeCode",
-        { column: table_stock_warehouse.typeCode, sort: true },
+        { column: stock_tb_stock_warehouses.typeCode, sort: true },
       ],
-      ["status", { column: table_stock_warehouse.status, sort: true }],
+      ["status", { column: stock_tb_stock_warehouses.status, sort: true }],
       [
         "companyId",
-        { column: table_stock_warehouse.companyId, sort: true },
+        { column: stock_tb_stock_warehouses.companyId, sort: true },
       ],
       [
         "managerId",
-        { column: table_stock_warehouse.managerId, sort: true },
+        { column: stock_tb_stock_warehouses.managerId, sort: true },
       ],
       [
         "contactId",
-        { column: table_stock_warehouse.contactId, sort: true },
+        { column: stock_tb_stock_warehouses.contactId, sort: true },
       ],
       [
         "address",
-        { column: table_stock_warehouse.address, sort: false },
+        { column: stock_tb_stock_warehouses.address, sort: false },
       ],
       [
         "valuationMethod",
-        { column: table_stock_warehouse.valuationMethod, sort: true },
+        { column: stock_tb_stock_warehouses.valuationMethod, sort: true },
       ],
       [
         "minStock",
-        { column: table_stock_warehouse.minStock, sort: true },
+        { column: stock_tb_stock_warehouses.minStock, sort: true },
       ],
       [
         "maxStock",
-        { column: table_stock_warehouse.maxStock, sort: true },
+        { column: stock_tb_stock_warehouses.maxStock, sort: true },
       ],
       [
         "accountInventory",
-        { column: table_stock_warehouse.accountInventory, sort: false },
+        { column: stock_tb_stock_warehouses.accountInventory, sort: false },
       ],
       [
         "accountAdjustment",
-        { column: table_stock_warehouse.accountAdjustment, sort: false },
+        { column: stock_tb_stock_warehouses.accountAdjustment, sort: false },
       ],
-      ["notes", { column: table_stock_warehouse.notes, sort: false }],
+      ["notes", { column: stock_tb_stock_warehouses.notes, sort: false }],
       [
         "createdAt",
-        { column: table_stock_warehouse.createdAt, sort: true },
+        { column: stock_tb_stock_warehouses.createdAt, sort: true },
       ],
       [
         "updatedAt",
-        { column: table_stock_warehouse.updatedAt, sort: true },
+        { column: stock_tb_stock_warehouses.updatedAt, sort: true },
       ],
     ]);
 
   protected declarationSearch = () =>
     new Map([
-      ["code", (text: string) => ilike(table_stock_warehouse.code, text)],
-      ["name", (text: string) => ilike(table_stock_warehouse.name, text)],
-      ["typeCode", (text: string) => ilike(table_stock_warehouse.typeCode, text)],
-      ["status", (text: string) => ilike(table_stock_warehouse.status, text)],
+      ["code", (text: string) => ilike(stock_tb_stock_warehouses.code, text)],
+      ["name", (text: string) => ilike(stock_tb_stock_warehouses.name, text)],
+      ["typeCode", (text: string) => ilike(stock_tb_stock_warehouses.typeCode, text)],
+      ["status", (text: string) => ilike(stock_tb_stock_warehouses.status, text)],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>

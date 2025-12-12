@@ -11,8 +11,8 @@ import type {
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 
-import { table_product_master } from "../../../../product/server/schemas/product-master";
-import { table_stock_level, table_stock_warehouse } from "../../schemas";
+import { product_tb_product_masters } from "@mdl/product/server/schemas/product.master";
+import { stock_tb_stock_levels, stock_tb_stock_warehouses } from "../../schemas";
 
 export interface StockSummaryViewRow {
   id: string;
@@ -33,7 +33,7 @@ interface StockSummaryFilter extends ParamFilter {
 }
 
 class StockSummaryViewListModel extends BaseViewListModel<
-  typeof table_stock_level,
+  typeof stock_tb_stock_levels,
   StockSummaryViewRow,
   StockSummaryFilter
 > {
@@ -48,63 +48,63 @@ class StockSummaryViewListModel extends BaseViewListModel<
       [
         "productId",
         {
-          column: table_stock_level.productId,
+          column: stock_tb_stock_levels.productId,
           sort: true,
         },
       ],
       [
         "productCode",
         {
-          column: table_product_master.code,
+          column: product_tb_product_masters.code,
           sort: true,
         },
       ],
       [
         "productName",
         {
-          column: table_product_master.name,
+          column: product_tb_product_masters.name,
           sort: true,
         },
       ],
       [
         "warehouseId",
         {
-          column: table_stock_level.warehouseId,
+          column: stock_tb_stock_levels.warehouseId,
           sort: true,
         },
       ],
       [
         "warehouseCode",
         {
-          column: table_stock_warehouse.code,
+          column: stock_tb_stock_warehouses.code,
           sort: true,
         },
       ],
       [
         "warehouseName",
         {
-          column: table_stock_warehouse.name,
+          column: stock_tb_stock_warehouses.name,
           sort: true,
         },
       ],
       [
         "quantity",
         {
-          column: table_stock_level.quantity,
+          column: stock_tb_stock_levels.quantity,
           sort: true,
         },
       ],
       [
         "reservedQuantity",
         {
-          column: table_stock_level.reservedQuantity,
+          column: stock_tb_stock_levels.reservedQuantity,
           sort: true,
         },
       ],
       [
         "minStock",
         {
-          column: table_stock_warehouse.minStock,
+          column: stock_tb_stock_warehouses.minStock,
           sort: true,
         },
       ],
@@ -112,7 +112,7 @@ class StockSummaryViewListModel extends BaseViewListModel<
 
   constructor() {
     super({
-      table: table_stock_level,
+      table: stock_tb_stock_levels,
       sortDefault: [
         {
           column: "productId",
@@ -124,12 +124,12 @@ class StockSummaryViewListModel extends BaseViewListModel<
 
   protected declarationSearch = () =>
     new Map([
-      ["productId", (text: string) => ilike(table_stock_level.productId, text)],
-      ["productCode", (text: string) => ilike(table_product_master.code, text)],
-      ["productName", (text: string) => ilike(sql`${table_product_master.name}::text`, text)],
-      ["warehouseId", (text: string) => ilike(table_stock_level.warehouseId, text)],
-      ["warehouseCode", (text: string) => ilike(table_stock_warehouse.code, text)],
-      ["warehouseName", (text: string) => ilike(table_stock_warehouse.name, text)],
+      ["productId", (text: string) => ilike(stock_tb_stock_levels.productId, text)],
+      ["productCode", (text: string) => ilike(product_tb_product_masters.code, text)],
+      ["productName", (text: string) => ilike(sql`${product_tb_product_masters.name}::text`, text)],
+      ["warehouseId", (text: string) => ilike(stock_tb_stock_levels.warehouseId, text)],
+      ["warehouseCode", (text: string) => ilike(stock_tb_stock_warehouses.code, text)],
+      ["warehouseName", (text: string) => ilike(stock_tb_stock_warehouses.name, text)],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<StockSummaryFilter> =>
@@ -138,14 +138,14 @@ class StockSummaryViewListModel extends BaseViewListModel<
         "productId",
         (value?: unknown, _filters?: StockSummaryFilter) => {
           if (typeof value !== "string" || !value) return undefined;
-          return eq(table_stock_level.productId, value);
+          return eq(stock_tb_stock_levels.productId, value);
         },
       ],
       [
         "warehouseId",
         (value?: unknown, _filters?: StockSummaryFilter) => {
           if (typeof value !== "string" || !value) return undefined;
-          return eq(table_stock_level.warehouseId, value);
+          return eq(stock_tb_stock_levels.warehouseId, value);
         },
       ],
     ]);
@@ -173,12 +173,12 @@ class StockSummaryViewListModel extends BaseViewListModel<
     return this.buildQueryDataList(params, (query) =>
       query
         .leftJoin(
-          table_product_master,
-          eq(table_stock_level.productId, table_product_master.id)
+          product_tb_product_masters,
+          eq(stock_tb_stock_levels.productId, product_tb_product_masters.id)
         )
         .leftJoin(
-          table_stock_warehouse,
-          eq(table_stock_level.warehouseId, table_stock_warehouse.id)
+          stock_tb_stock_warehouses,
+          eq(stock_tb_stock_levels.warehouseId, stock_tb_stock_warehouses.id)
         )
     );
   };

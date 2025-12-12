@@ -2,12 +2,12 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblPayroll, table_payroll } from "../../schemas";
-import { table_employee } from "../../schemas/employee";
-import { table_payroll_period } from "../../schemas/payroll-period";
+import { NewHrmTbPayroll, hrm_tb_payrolls } from "../../schemas";
+import { hrm_tb_employees } from "../../schemas/hrm.employee";
+import { hrm_tb_payrolls_period } from "../../schemas/hrm.payroll-period";
 
-const employee = alias(table_employee, "employee");
-const period = alias(table_payroll_period, "period");
+const employee = alias(hrm_tb_employees, "employee");
+const period = alias(hrm_tb_payrolls_period, "period");
 
 export interface PayrollRow {
   id: string;
@@ -65,9 +65,9 @@ export interface PayrollInput {
   notes?: string | null;
 }
 
-export default class PayrollModel extends BaseModel<typeof table_payroll> {
+export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
   constructor() {
-    super(table_payroll);
+    super(hrm_tb_payrolls);
   }
 
   getPayrollById = async (id: string): Promise<PayrollRow | null> => {
@@ -182,7 +182,7 @@ export default class PayrollModel extends BaseModel<typeof table_payroll> {
 
     const netSalary = grossSalary - totalDeductions;
 
-    const insertData: NewTblPayroll = {
+    const insertData: NewHrmTbPayroll = {
       payrollPeriodId: payload.payrollPeriodId,
       employeeId: payload.employeeId,
       baseSalary: payload.baseSalary,

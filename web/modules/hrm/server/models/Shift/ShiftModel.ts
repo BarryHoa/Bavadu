@@ -2,7 +2,7 @@ import { LocaleDataType } from "@base/server/interfaces/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 
-import { NewTblShift, table_shift } from "../../schemas";
+import { NewHrmTbShift, hrm_tb_shifts } from "../../schemas";
 
 export interface ShiftRow {
   id: string;
@@ -31,9 +31,9 @@ export interface ShiftInput {
   isActive?: boolean;
 }
 
-export default class ShiftModel extends BaseModel<typeof table_shift> {
+export default class ShiftModel extends BaseModel<typeof hrm_tb_shifts> {
   constructor() {
-    super(table_shift);
+    super(hrm_tb_shifts);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -75,7 +75,7 @@ export default class ShiftModel extends BaseModel<typeof table_shift> {
 
   createShift = async (payload: ShiftInput): Promise<ShiftRow> => {
     const now = new Date();
-    const insertData: NewTblShift = {
+    const insertData: NewHrmTbShift = {
       code: payload.code,
       name: payload.name,
       description: payload.description ?? null,

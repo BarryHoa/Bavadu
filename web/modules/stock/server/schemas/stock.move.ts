@@ -7,24 +7,24 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlStockSchema } from "./schema";
-import { table_product_master } from "../../../product/server/schemas/product.master";
-import { table_stock_warehouse } from "./stock.warehouse";
+import { product_tb_product_masters } from "../../../product/server/schemas/product.master";
+import { stock_tb_stock_warehouses } from "./stock.warehouse";
 
-export const table_stock_move = mdlStockSchema.table(
+export const stock_tb_stock_moves = mdlStockSchema.table(
   "moves",
   {
     id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
     productId: uuid("product_id")
       .notNull()
-      .references(() => table_product_master.id, { onDelete: "cascade" }),
+      .references(() => product_tb_product_masters.id, { onDelete: "cascade" }),
     quantity: numeric("quantity", { precision: 14, scale: 2 }).notNull(),
     type: varchar("type", { length: 32 }).notNull(), // inbound | outbound | adjustment | transfer
     sourceWarehouseId: uuid("source_warehouse_id").references(
-      () => table_stock_warehouse.id,
+      () => stock_tb_stock_warehouses.id,
       { onDelete: "set null" }
     ),
     targetWarehouseId: uuid("target_warehouse_id").references(
-      () => table_stock_warehouse.id,
+      () => stock_tb_stock_warehouses.id,
       { onDelete: "set null" }
     ),
     reference: varchar("reference", { length: 128 }),
@@ -57,5 +57,5 @@ export const table_stock_move = mdlStockSchema.table(
   ]
 );
 
-export type TblStockMove = typeof table_stock_move.$inferSelect;
-export type NewTblStockMove = typeof table_stock_move.$inferInsert;
+export type StockTbStockMove = typeof stock_tb_stock_moves.$inferSelect;
+export type NewStockTbStockMove = typeof stock_tb_stock_moves.$inferInsert;

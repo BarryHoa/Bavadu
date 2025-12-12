@@ -9,15 +9,15 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlProductSchema } from "./schema";
-import { table_product_variant } from "./product.variant";
+import { product_tb_product_variants } from "./product.variant";
 
 // Product Type: Consumable - Vật tư tiêu hao
-export const table_product_type_consumable = mdlProductSchema.table(
+export const product_tb_product_type_consumables = mdlProductSchema.table(
   "type_consumable",
   {
     id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
     productVariantId: uuid("product_variant_id")
-      .references(() => table_product_variant.id, { onDelete: "cascade" })
+      .references(() => product_tb_product_variants.id, { onDelete: "cascade" })
       .notNull()
       .unique(),
 
@@ -50,8 +50,8 @@ export const table_product_type_consumable = mdlProductSchema.table(
   ]
 );
 
-export type TblProductTypeConsumable =
-  typeof table_product_type_consumable.$inferSelect;
-export type NewTblProductTypeConsumable =
-  typeof table_product_type_consumable.$inferInsert;
+export type ProductTbProductTypeConsumable =
+  typeof product_tb_product_type_consumables.$inferSelect;
+export type NewProductTbProductTypeConsumable =
+  typeof product_tb_product_type_consumables.$inferInsert;
 

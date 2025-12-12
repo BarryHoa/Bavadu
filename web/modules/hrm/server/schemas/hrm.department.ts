@@ -12,7 +12,7 @@ import {
 import { mdlHrmSchema } from "./schema";
 
 // Departments - Phòng ban
-export const table_department = mdlHrmSchema.table(
+export const hrm_tb_departments = mdlHrmSchema.table(
   "departments",
   {
     id: uuid("id")
@@ -42,5 +42,5 @@ export const table_department = mdlHrmSchema.table(
   ]
 );
 
-export type TblDepartment = typeof table_department.$inferSelect;
-export type NewTblDepartment = typeof table_department.$inferInsert;
+export type HrmTbDepartment = typeof hrm_tb_departments.$inferSelect;
+export type NewHrmTbDepartment = typeof hrm_tb_departments.$inferInsert;

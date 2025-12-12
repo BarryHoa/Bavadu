@@ -2,12 +2,12 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { and, eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblTimesheet, table_timesheet } from "../../schemas";
-import { table_employee } from "../../schemas/employee";
-import { table_shift } from "../../schemas/shift";
+import { NewHrmTbTimesheet, hrm_tb_timesheets } from "../../schemas";
+import { hrm_tb_employees } from "../../schemas/hrm.employee";
+import { hrm_tb_shifts } from "../../schemas/hrm.shift";
 
-const employee = alias(table_employee, "employee");
-const shift = alias(table_shift, "shift");
+const employee = alias(hrm_tb_employees, "employee");
+const shift = alias(hrm_tb_shifts, "shift");
 
 export interface TimesheetRow {
   id: string;
@@ -58,9 +58,9 @@ export interface TimesheetInput {
   notes?: string | null;
 }
 
-export default class TimesheetModel extends BaseModel<typeof table_timesheet> {
+export default class TimesheetModel extends BaseModel<typeof hrm_tb_timesheets> {
   constructor() {
-    super(table_timesheet);
+    super(hrm_tb_timesheets);
   }
 
   getTimesheetById = async (id: string): Promise<TimesheetRow | null> => {
@@ -160,7 +160,7 @@ export default class TimesheetModel extends BaseModel<typeof table_timesheet> {
       regularHours = actualHours;
     }
 
-    const insertData: NewTblTimesheet = {
+    const insertData: NewHrmTbTimesheet = {
       employeeId: payload.employeeId,
       rosterId: payload.rosterId ?? null,
       workDate: payload.workDate,

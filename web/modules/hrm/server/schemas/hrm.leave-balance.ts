@@ -1,21 +1,21 @@
 import { sql } from "drizzle-orm";
 import { index, integer, timestamp, uuid } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_employee } from "./hrm.employee";
-import { table_leave_type } from "./hrm.leave-type";
+import { hrm_tb_employees } from "./hrm.employee";
+import { hrm_tb_leave_types } from "./hrm.leave-type";
 
 // Leave Balance - Tồn phép
-export const table_leave_balance = mdlHrmSchema.table(
+export const hrm_tb_leave_balances = mdlHrmSchema.table(
   "leave_balances",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     employeeId: uuid("employee_id")
-      .references(() => table_employee.id, { onDelete: "cascade" })
+      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
       .notNull(),
     leaveTypeId: uuid("leave_type_id")
-      .references(() => table_leave_type.id, { onDelete: "restrict" })
+      .references(() => hrm_tb_leave_types.id, { onDelete: "restrict" })
       .notNull(),
     year: integer("year").notNull(),
     accrued: integer("accrued").default(0).notNull(), // Days accrued this year
@@ -37,5 +37,5 @@ export const table_leave_balance = mdlHrmSchema.table(
   ]
 );
 
-export type TblLeaveBalance = typeof table_leave_balance.$inferSelect;
-export type NewTblLeaveBalance = typeof table_leave_balance.$inferInsert;
+export type HrmTbLeaveBalance = typeof hrm_tb_leave_balances.$inferSelect;
+export type NewHrmTbLeaveBalance = typeof hrm_tb_leave_balances.$inferInsert;

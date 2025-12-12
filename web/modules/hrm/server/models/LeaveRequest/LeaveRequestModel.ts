@@ -2,12 +2,12 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblLeaveRequest, table_leave_request } from "../../schemas";
-import { table_employee } from "../../schemas/employee";
-import { table_leave_type } from "../../schemas/leave-type";
+import { NewHrmTbLeaveRequest, hrm_tb_leave_requests } from "../../schemas";
+import { hrm_tb_employees } from "../../schemas/hrm.employee";
+import { hrm_tb_leave_types } from "../../schemas/hrm.leave-type";
 
-const employee = alias(table_employee, "employee");
-const leaveType = alias(table_leave_type, "leave_type");
+const employee = alias(hrm_tb_employees, "employee");
+const leaveType = alias(hrm_tb_leave_types, "leave_type");
 
 export interface LeaveRequestRow {
   id: string;
@@ -48,9 +48,9 @@ export interface LeaveRequestInput {
   workflowInstanceId?: string | null;
 }
 
-export default class LeaveRequestModel extends BaseModel<typeof table_leave_request> {
+export default class LeaveRequestModel extends BaseModel<typeof hrm_tb_leave_requests> {
   constructor() {
-    super(table_leave_request);
+    super(hrm_tb_leave_requests);
   }
 
   getLeaveRequestById = async (id: string): Promise<LeaveRequestRow | null> => {
@@ -124,7 +124,7 @@ export default class LeaveRequestModel extends BaseModel<typeof table_leave_requ
 
   createLeaveRequest = async (payload: LeaveRequestInput): Promise<LeaveRequestRow> => {
     const now = new Date();
-    const insertData: NewTblLeaveRequest = {
+    const insertData: NewHrmTbLeaveRequest = {
       employeeId: payload.employeeId,
       leaveTypeId: payload.leaveTypeId,
       startDate: payload.startDate,

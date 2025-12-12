@@ -8,7 +8,7 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
 import { asc, eq, inArray } from "drizzle-orm";
-import { table_payment_term } from "../../schemas/payment-term";
+import { base_tb_payment_terms } from "../../schemas/base.payment-term";
 import { ParamFilter } from "../interfaces/FilterInterface";
 
 type PaymentTermDropdownOption = {
@@ -20,12 +20,12 @@ type PaymentTermDropdownOption = {
 };
 
 class PaymentTermDropdownListModel extends BaseViewListModel<
-  typeof table_payment_term,
+  typeof base_tb_payment_terms,
   PaymentTermDropdownOption
 > {
   constructor() {
     super({
-      table: table_payment_term,
+      table: base_tb_payment_terms,
       sortDefault: [
         {
           column: "order",
@@ -43,10 +43,10 @@ class PaymentTermDropdownListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_payment_term.id, sort: false }],
-      ["code", { column: table_payment_term.code, sort: true }],
-      ["name", { column: table_payment_term.name, sort: false }],
-      ["order", { column: table_payment_term.order, sort: true }],
+      ["id", { column: base_tb_payment_terms.id, sort: false }],
+      ["code", { column: base_tb_payment_terms.code, sort: true }],
+      ["name", { column: base_tb_payment_terms.name, sort: false }],
+      ["order", { column: base_tb_payment_terms.order, sort: true }],
     ]);
 
   protected declarationSearch = () => new Map();
@@ -57,14 +57,14 @@ class PaymentTermDropdownListModel extends BaseViewListModel<
         "isActive",
         (value?: unknown, _filters?: ParamFilter) =>
           typeof value === "boolean"
-            ? eq(table_payment_term.isActive, value)
+            ? eq(base_tb_payment_terms.isActive, value)
             : undefined,
       ],
       [
         "type",
         (value?: unknown, _filters?: ParamFilter) =>
           Array.isArray(value) && value.length > 0
-            ? inArray(table_payment_term.type, value as string[])
+            ? inArray(base_tb_payment_terms.type, value as string[])
             : undefined,
       ],
     ]);
@@ -93,13 +93,13 @@ class PaymentTermDropdownListModel extends BaseViewListModel<
     const result = await this.buildQueryDataListWithSelect(
       params,
       {
-        id: table_payment_term.id,
-        code: table_payment_term.code,
-        name: table_payment_term.name,
-        order: table_payment_term.order,
+        id: base_tb_payment_terms.id,
+        code: base_tb_payment_terms.code,
+        name: base_tb_payment_terms.name,
+        order: base_tb_payment_terms.order,
       },
       (query) => {
-        return query.orderBy(asc(table_payment_term.order)).limit(params.limit);
+        return query.orderBy(asc(base_tb_payment_terms.order)).limit(params.limit);
       }
     );
 

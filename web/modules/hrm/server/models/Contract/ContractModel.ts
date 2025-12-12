@@ -2,11 +2,11 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblContract, table_contract } from "../../schemas";
-import { table_employee } from "../../schemas/employee";
+import { NewHrmTbContract, hrm_tb_contracts } from "../../schemas";
+import { hrm_tb_employees } from "../../schemas/hrm.employee";
 
-const employee = alias(table_employee, "employee");
-const signedByEmployee = alias(table_employee, "signed_by_employee");
+const employee = alias(hrm_tb_employees, "employee");
+const signedByEmployee = alias(hrm_tb_employees, "signed_by_employee");
 
 export interface ContractRow {
   id: string;
@@ -61,9 +61,9 @@ export interface ContractInput {
   isActive?: boolean;
 }
 
-export default class ContractModel extends BaseModel<typeof table_contract> {
+export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
   constructor() {
-    super(table_contract);
+    super(hrm_tb_contracts);
   }
 
   getContractById = async (id: string): Promise<ContractRow | null> => {
@@ -152,7 +152,7 @@ export default class ContractModel extends BaseModel<typeof table_contract> {
 
   createContract = async (payload: ContractInput): Promise<ContractRow> => {
     const now = new Date();
-    const insertData: NewTblContract = {
+    const insertData: NewHrmTbContract = {
       contractNumber: payload.contractNumber,
       employeeId: payload.employeeId,
       contractType: payload.contractType,

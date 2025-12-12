@@ -1,33 +1,33 @@
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
 import type {
-  TblPaymentMethod,
-  TblPaymentTerm,
-  TblShippingMethod,
-  TblShippingTerm,
-  TblTaxRate,
+  BaseTbPaymentMethod,
+  BaseTbPaymentTerm,
+  BaseTbShippingMethod,
+  BaseTbShippingTerm,
+  BaseTbTaxRate,
 } from "@base/server/schemas";
 
-export interface PaymentMethod extends Omit<TblPaymentMethod, "name" | "description"> {
+export interface PaymentMethod extends Omit<BaseTbPaymentMethod, "name" | "description"> {
   name: LocaleDataType<string>;
   description?: LocaleDataType<string> | null;
 }
 
-export interface PaymentTerm extends Omit<TblPaymentTerm, "name" | "description"> {
+export interface PaymentTerm extends Omit<BaseTbPaymentTerm, "name" | "description"> {
   name: LocaleDataType<string>;
   description?: LocaleDataType<string> | null;
 }
 
-export interface ShippingMethod extends Omit<TblShippingMethod, "name" | "description"> {
+export interface ShippingMethod extends Omit<BaseTbShippingMethod, "name" | "description"> {
   name: LocaleDataType<string>;
   description?: LocaleDataType<string> | null;
 }
 
-export interface ShippingTerm extends Omit<TblShippingTerm, "name" | "description"> {
+export interface ShippingTerm extends Omit<BaseTbShippingTerm, "name" | "description"> {
   name: LocaleDataType<string>;
   description?: LocaleDataType<string> | null;
 }
 
-export interface TaxRate extends Omit<TblTaxRate, "name" | "description"> {
+export interface TaxRate extends Omit<BaseTbTaxRate, "name" | "description"> {
   name: LocaleDataType<string>;
   description?: LocaleDataType<string> | null;
 }

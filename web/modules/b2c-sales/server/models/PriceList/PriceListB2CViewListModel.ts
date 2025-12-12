@@ -10,15 +10,15 @@ import type {
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
-import { table_price_lists_b2c } from "../../schemas/price-list-b2c";
+import { sale_b2c_tb_price_lists } from "../../schemas/b2c-sales.price-list";
 
 class PriceListB2CViewListModel extends BaseViewListModel<
-  typeof table_price_lists_b2c,
+  typeof sale_b2c_tb_price_lists,
   any
 > {
   constructor() {
     super({
-      table: table_price_lists_b2c,
+      table: sale_b2c_tb_price_lists,
       sortDefault: [
         {
           column: "createdAt",
@@ -36,17 +36,17 @@ class PriceListB2CViewListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_price_lists_b2c.id, sort: false }],
-      ["code", { column: table_price_lists_b2c.code, sort: true }],
-      ["name", { column: table_price_lists_b2c.name, sort: false }],
-      ["type", { column: table_price_lists_b2c.type, sort: true }],
-      ["status", { column: table_price_lists_b2c.status, sort: true }],
-      ["priority", { column: table_price_lists_b2c.priority, sort: true }],
-      ["isDefault", { column: table_price_lists_b2c.isDefault, sort: true }],
-      ["validFrom", { column: table_price_lists_b2c.validFrom, sort: true }],
-      ["validTo", { column: table_price_lists_b2c.validTo, sort: true }],
-      ["createdAt", { column: table_price_lists_b2c.createdAt, sort: true }],
-      ["updatedAt", { column: table_price_lists_b2c.updatedAt, sort: true }],
+      ["id", { column: sale_b2c_tb_price_lists.id, sort: false }],
+      ["code", { column: sale_b2c_tb_price_lists.code, sort: true }],
+      ["name", { column: sale_b2c_tb_price_lists.name, sort: false }],
+      ["type", { column: sale_b2c_tb_price_lists.type, sort: true }],
+      ["status", { column: sale_b2c_tb_price_lists.status, sort: true }],
+      ["priority", { column: sale_b2c_tb_price_lists.priority, sort: true }],
+      ["isDefault", { column: sale_b2c_tb_price_lists.isDefault, sort: true }],
+      ["validFrom", { column: sale_b2c_tb_price_lists.validFrom, sort: true }],
+      ["validTo", { column: sale_b2c_tb_price_lists.validTo, sort: true }],
+      ["createdAt", { column: sale_b2c_tb_price_lists.createdAt, sort: true }],
+      ["updatedAt", { column: sale_b2c_tb_price_lists.updatedAt, sort: true }],
     ]);
 
   protected declarationSearch = () =>
@@ -54,13 +54,13 @@ class PriceListB2CViewListModel extends BaseViewListModel<
       [
         "code",
         (text: string) =>
-          text ? ilike(table_price_lists_b2c.code, `%${text}%`) : undefined,
+          text ? ilike(sale_b2c_tb_price_lists.code, `%${text}%`) : undefined,
       ],
       [
         "name",
         (text: string) =>
           text
-            ? sql`${table_price_lists_b2c.name}::text ILIKE ${`%${text}%`}`
+            ? sql`${sale_b2c_tb_price_lists.name}::text ILIKE ${`%${text}%`}`
             : undefined,
       ],
     ]);

@@ -2,10 +2,10 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblOffboarding, table_offboarding } from "../../schemas";
-import { table_employee } from "../../schemas/employee";
+import { NewHrmTbOffboarding, hrm_tb_offboardings } from "../../schemas";
+import { hrm_tb_employees } from "../../schemas/hrm.employee";
 
-const employee = alias(table_employee, "employee");
+const employee = alias(hrm_tb_employees, "employee");
 
 export interface OffboardingRow {
   id: string;
@@ -42,9 +42,9 @@ export interface OffboardingInput {
   status?: string;
 }
 
-export default class OffboardingModel extends BaseModel<typeof table_offboarding> {
+export default class OffboardingModel extends BaseModel<typeof hrm_tb_offboardings> {
   constructor() {
-    super(table_offboarding);
+    super(hrm_tb_offboardings);
   }
 
   getOffboardingById = async (id: string): Promise<OffboardingRow | null> => {
@@ -106,7 +106,7 @@ export default class OffboardingModel extends BaseModel<typeof table_offboarding
 
   createOffboarding = async (payload: OffboardingInput): Promise<OffboardingRow> => {
     const now = new Date();
-    const insertData: NewTblOffboarding = {
+    const insertData: NewHrmTbOffboarding = {
       employeeId: payload.employeeId,
       resignationDate: payload.resignationDate,
       lastWorkingDate: payload.lastWorkingDate,

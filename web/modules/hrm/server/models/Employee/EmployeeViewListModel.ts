@@ -11,12 +11,12 @@ import type { Column } from "drizzle-orm";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { table_employee } from "../../schemas";
-import { table_department } from "../../schemas/department";
-import { table_position } from "../../schemas/position";
+import { hrm_tb_employees } from "../../schemas";
+import { hrm_tb_departments } from "../../schemas/hrm.department";
+import { hrm_tb_positions } from "../../schemas/hrm.position";
 
-const department = alias(table_department, "department");
-const position = alias(table_position, "position");
+const department = alias(hrm_tb_departments, "department");
+const position = alias(hrm_tb_positions, "position");
 
 export interface EmployeeRow {
   id: string;
@@ -43,7 +43,7 @@ export interface EmployeeRow {
 }
 
 class EmployeeViewListModel extends BaseViewListModel<
-  typeof table_employee,
+  typeof hrm_tb_employees,
   EmployeeRow
 > {
   protected declarationColumns = () =>
@@ -54,30 +54,30 @@ class EmployeeViewListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_employee.id, sort: true }],
-      ["employeeCode", { column: table_employee.employeeCode, sort: true }],
-      ["fullName", { column: table_employee.fullName, sort: true }],
-      ["email", { column: table_employee.email, sort: true }],
-      ["phone", { column: table_employee.phone, sort: true }],
-      ["positionId", { column: table_employee.positionId, sort: true }],
-      ["departmentId", { column: table_employee.departmentId, sort: true }],
-      ["employmentStatus", { column: table_employee.employmentStatus, sort: true }],
-      ["hireDate", { column: table_employee.hireDate, sort: true }],
-      ["baseSalary", { column: table_employee.baseSalary, sort: true }],
-      ["isActive", { column: table_employee.isActive, sort: true }],
-      ["createdAt", { column: table_employee.createdAt, sort: true }],
-      ["updatedAt", { column: table_employee.updatedAt, sort: true }],
+      ["id", { column: hrm_tb_employees.id, sort: true }],
+      ["employeeCode", { column: hrm_tb_employees.employeeCode, sort: true }],
+      ["fullName", { column: hrm_tb_employees.fullName, sort: true }],
+      ["email", { column: hrm_tb_employees.email, sort: true }],
+      ["phone", { column: hrm_tb_employees.phone, sort: true }],
+      ["positionId", { column: hrm_tb_employees.positionId, sort: true }],
+      ["departmentId", { column: hrm_tb_employees.departmentId, sort: true }],
+      ["employmentStatus", { column: hrm_tb_employees.employmentStatus, sort: true }],
+      ["hireDate", { column: hrm_tb_employees.hireDate, sort: true }],
+      ["baseSalary", { column: hrm_tb_employees.baseSalary, sort: true }],
+      ["isActive", { column: hrm_tb_employees.isActive, sort: true }],
+      ["createdAt", { column: hrm_tb_employees.createdAt, sort: true }],
+      ["updatedAt", { column: hrm_tb_employees.updatedAt, sort: true }],
     ]);
 
   constructor() {
-    super({ table: table_employee });
+    super({ table: hrm_tb_employees });
   }
 
   protected declarationSearch = () =>
     new Map([
-      ["employeeCode", (text: string) => ilike(table_employee.employeeCode, text)],
-      ["fullName", (text: string) => ilike(table_employee.fullName, text)],
-      ["email", (text: string) => ilike(table_employee.email, text)],
+      ["employeeCode", (text: string) => ilike(hrm_tb_employees.employeeCode, text)],
+      ["fullName", (text: string) => ilike(hrm_tb_employees.fullName, text)],
+      ["email", (text: string) => ilike(hrm_tb_employees.email, text)],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>

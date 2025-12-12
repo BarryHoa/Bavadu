@@ -12,14 +12,14 @@ import {
 } from "drizzle-orm/pg-core";
 import { mdlStockSchema } from "./schema";
 
-import { table_user } from "@base/server/schemas/base.user";
+import { base_tb_users } from "@base/server/schemas/base.user";
 import {
   WarehouseAddress,
   warehouseStatuses,
   warehouseValuationMethods,
 } from "../../common/constants";
 
-export const table_stock_warehouse = mdlStockSchema.table(
+export const stock_tb_stock_warehouses = mdlStockSchema.table(
   "warehouses",
   {
     id: uuid("id")
@@ -30,10 +30,10 @@ export const table_stock_warehouse = mdlStockSchema.table(
     typeCode: varchar("type_code", { length: 30 }).notNull(),
     status: varchar("status", { length: 20 }).notNull().default("ACTIVE"),
     companyId: uuid("company_id"),
-    managerId: uuid("manager_id").references(() => table_user.id, {
+    managerId: uuid("manager_id").references(() => base_tb_users.id, {
       onDelete: "set null",
     }),
-    contactId: uuid("contact_id").references(() => table_user.id, {
+    contactId: uuid("contact_id").references(() => base_tb_users.id, {
       onDelete: "set null",
     }),
     address: jsonb("address").$type<WarehouseAddress>().notNull(),
@@ -84,5 +84,5 @@ export const table_stock_warehouse = mdlStockSchema.table(
   ]
 );
 
-export type TblStockWarehouse = typeof table_stock_warehouse.$inferSelect;
-export type NewTblStockWarehouse = typeof table_stock_warehouse.$inferInsert;
+export type StockTbStockWarehouse = typeof stock_tb_stock_warehouses.$inferSelect;
+export type NewStockTbStockWarehouse = typeof stock_tb_stock_warehouses.$inferInsert;

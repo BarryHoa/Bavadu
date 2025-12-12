@@ -3,10 +3,10 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblOffer, table_offer } from "../../schemas";
-import { table_candidate } from "../../schemas/candidate";
+import { NewHrmTbOffer, hrm_tb_offers } from "../../schemas";
+import { hrm_tb_candidates } from "../../schemas/hrm.candidate";
 
-const candidate = alias(table_candidate, "candidate");
+const candidate = alias(hrm_tb_candidates, "candidate");
 
 export interface OfferRow {
   id: string;
@@ -51,9 +51,9 @@ export interface OfferInput {
   notes?: string | null;
 }
 
-export default class OfferModel extends BaseModel<typeof table_offer> {
+export default class OfferModel extends BaseModel<typeof hrm_tb_offers> {
   constructor() {
-    super(table_offer);
+    super(hrm_tb_offers);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -134,7 +134,7 @@ export default class OfferModel extends BaseModel<typeof table_offer> {
 
   createOffer = async (payload: OfferInput): Promise<OfferRow> => {
     const now = new Date();
-    const insertData: NewTblOffer = {
+    const insertData: NewHrmTbOffer = {
       candidateId: payload.candidateId,
       offerNumber: payload.offerNumber,
       positionTitle: payload.positionTitle,

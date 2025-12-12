@@ -2,7 +2,7 @@ import { LocaleDataType } from "@base/server/interfaces/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 
-import { NewTblWorkflow, table_workflow } from "../../schemas";
+import { NewHrmTbWorkflow, hrm_tb_workflows } from "../../schemas";
 
 export interface WorkflowStep {
   step: number;
@@ -34,9 +34,9 @@ export interface WorkflowInput {
   isActive?: boolean;
 }
 
-export default class WorkflowModel extends BaseModel<typeof table_workflow> {
+export default class WorkflowModel extends BaseModel<typeof hrm_tb_workflows> {
   constructor() {
-    super(table_workflow);
+    super(hrm_tb_workflows);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -78,7 +78,7 @@ export default class WorkflowModel extends BaseModel<typeof table_workflow> {
 
   createWorkflow = async (payload: WorkflowInput): Promise<WorkflowRow> => {
     const now = new Date();
-    const insertData: NewTblWorkflow = {
+    const insertData: NewHrmTbWorkflow = {
       code: payload.code,
       name: payload.name,
       description: payload.description ?? null,

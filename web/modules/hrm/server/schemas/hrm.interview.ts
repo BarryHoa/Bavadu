@@ -9,18 +9,18 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_candidate } from "./hrm.candidate";
-import { table_employee } from "./hrm.employee";
+import { hrm_tb_candidates } from "./hrm.candidate";
+import { hrm_tb_employees } from "./hrm.employee";
 
 // Interviews - Phỏng vấn
-export const table_interview = mdlHrmSchema.table(
+export const hrm_tb_interviews = mdlHrmSchema.table(
   "interviews",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     candidateId: uuid("candidate_id")
-      .references(() => table_candidate.id, { onDelete: "cascade" })
+      .references(() => hrm_tb_candidates.id, { onDelete: "cascade" })
       .notNull(),
     interviewType: varchar("interview_type", { length: 50 }).notNull(), // phone_screen, technical, final, etc.
     scheduledDate: timestamp("scheduled_date", { withTimezone: true }).notNull(),
@@ -32,7 +32,7 @@ export const table_interview = mdlHrmSchema.table(
     rating: integer("rating"), // 1-5 rating
     recommendation: varchar("recommendation", { length: 50 }), // hire, no_hire, maybe
     notes: text("notes"),
-    conductedBy: uuid("conducted_by").references(() => table_employee.id),
+    conductedBy: uuid("conducted_by").references(() => hrm_tb_employees.id),
     completedAt: timestamp("completed_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }),
     updatedAt: timestamp("updated_at", { withTimezone: true }),
@@ -46,6 +46,6 @@ export const table_interview = mdlHrmSchema.table(
   ]
 );
 
-export type TblInterview = typeof table_interview.$inferSelect;
-export type NewTblInterview = typeof table_interview.$inferInsert;
+export type HrmTbInterview = typeof hrm_tb_interviews.$inferSelect;
+export type NewHrmTbInterview = typeof hrm_tb_interviews.$inferInsert;
 

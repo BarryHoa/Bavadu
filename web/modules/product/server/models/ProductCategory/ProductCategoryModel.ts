@@ -4,9 +4,9 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblProductCategory, table_product_category } from "../../schemas";
+import { NewProductTbProductCategory, product_tb_product_categories } from "../../schemas";
 
-const parentCategory = alias(table_product_category, "parent_category");
+const parentCategory = alias(product_tb_product_categories, "parent_category");
 
 export interface ProductCategoryRow {
   id: string;
@@ -33,10 +33,10 @@ export interface ProductCategoryInput {
 }
 
 export default class ProductCategoryModel extends BaseModel<
-  typeof table_product_category
+  typeof product_tb_product_categories
 > {
   constructor() {
-    super(table_product_category);
+    super(product_tb_product_categories);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -100,7 +100,7 @@ export default class ProductCategoryModel extends BaseModel<
     payload: ProductCategoryInput
   ): Promise<ProductCategoryRow> => {
     const now = new Date();
-    const insertData: NewTblProductCategory = {
+    const insertData: NewProductTbProductCategory = {
       code: payload.code,
       name: payload.name,
       description: payload.description ?? null,

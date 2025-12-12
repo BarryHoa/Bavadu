@@ -1,6 +1,6 @@
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
 import type { User } from "@base/server/interfaces/User";
-import type { TblSalesOrderB2C, TblSalesOrderLineB2C } from "@mdl/b2c-sales/server/schemas";
+import type { SaleB2cTbOrder, SaleB2cTbOrderLine } from "@mdl/b2c-sales/server/schemas";
 
 export type SalesOrderB2CStatus = "draft" | "confirmed" | "completed" | "cancelled";
 
@@ -20,7 +20,7 @@ export interface SalesOrderB2CLine {
   updatedAt?: Date | string;
 }
 
-export interface SalesOrderB2C extends Omit<TblSalesOrderB2C, "status"> {
+export interface SalesOrderB2C extends Omit<SaleB2cTbOrder, "status"> {
   status: SalesOrderB2CStatus;
   lines?: SalesOrderB2CLine[];
   createdByUser?: User;

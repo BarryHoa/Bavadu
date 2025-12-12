@@ -8,7 +8,7 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
 import { asc, eq, inArray } from "drizzle-orm";
-import { table_shipping_method } from "../../schemas/shipping-method";
+import { base_tb_shipping_methods } from "../../schemas/base.shipping-method";
 import { ParamFilter } from "../interfaces/FilterInterface";
 
 type ShippingMethodDropdownOption = {
@@ -20,12 +20,12 @@ type ShippingMethodDropdownOption = {
 };
 
 class ShippingMethodDropdownListModel extends BaseViewListModel<
-  typeof table_shipping_method,
+  typeof base_tb_shipping_methods,
   ShippingMethodDropdownOption
 > {
   constructor() {
     super({
-      table: table_shipping_method,
+      table: base_tb_shipping_methods,
       sortDefault: [
         {
           column: "order",
@@ -43,10 +43,10 @@ class ShippingMethodDropdownListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_shipping_method.id, sort: false }],
-      ["code", { column: table_shipping_method.code, sort: true }],
-      ["name", { column: table_shipping_method.name, sort: false }],
-      ["order", { column: table_shipping_method.order, sort: true }],
+      ["id", { column: base_tb_shipping_methods.id, sort: false }],
+      ["code", { column: base_tb_shipping_methods.code, sort: true }],
+      ["name", { column: base_tb_shipping_methods.name, sort: false }],
+      ["order", { column: base_tb_shipping_methods.order, sort: true }],
     ]);
 
   protected declarationSearch = () => new Map();
@@ -57,14 +57,14 @@ class ShippingMethodDropdownListModel extends BaseViewListModel<
         "isActive",
         (value?: unknown, _filters?: ParamFilter) =>
           typeof value === "boolean"
-            ? eq(table_shipping_method.isActive, value)
+            ? eq(base_tb_shipping_methods.isActive, value)
             : undefined,
       ],
       [
         "type",
         (value?: unknown, _filters?: ParamFilter) =>
           Array.isArray(value) && value.length > 0
-            ? inArray(table_shipping_method.type, value as string[])
+            ? inArray(base_tb_shipping_methods.type, value as string[])
             : undefined,
       ],
     ]);
@@ -93,14 +93,14 @@ class ShippingMethodDropdownListModel extends BaseViewListModel<
     const result = await this.buildQueryDataListWithSelect(
       params,
       {
-        id: table_shipping_method.id,
-        code: table_shipping_method.code,
-        name: table_shipping_method.name,
-        order: table_shipping_method.order,
+        id: base_tb_shipping_methods.id,
+        code: base_tb_shipping_methods.code,
+        name: base_tb_shipping_methods.name,
+        order: base_tb_shipping_methods.order,
       },
       (query) => {
         return query
-          .orderBy(asc(table_shipping_method.order))
+          .orderBy(asc(base_tb_shipping_methods.order))
           .limit(params.limit);
       }
     );

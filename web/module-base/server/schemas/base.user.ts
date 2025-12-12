@@ -10,7 +10,7 @@ import {
 import { mdBaseSchema } from "./schema";
 
 // Users
-export const table_user = mdBaseSchema.table(
+export const base_tb_users = mdBaseSchema.table(
   "users",
   {
     id: uuid("id")
@@ -46,16 +46,16 @@ export const table_user = mdBaseSchema.table(
   ]
 );
 
-export type TblUser = typeof table_user.$inferSelect;
-export type NewTblUser = typeof table_user.$inferInsert;
+export type BaseTbUser = typeof base_tb_users.$inferSelect;
+export type NewBaseTbUser = typeof base_tb_users.$inferInsert;
 
 // Users Login
-export const table_user_login = mdBaseSchema.table(
+export const base_tb_users_login = mdBaseSchema.table(
   "users_login",
   {
     userId: uuid("user_id")
       .notNull()
-      .references(() => table_user.id),
+      .references(() => base_tb_users.id),
     username: varchar("username", { length: 50 }).unique(),
     email: varchar("email", { length: 255 }).unique(),
     phone: varchar("phone", { length: 20 }),
@@ -77,5 +77,5 @@ export const table_user_login = mdBaseSchema.table(
   ]
 );
 
-export type TblUserLogin = typeof table_user_login.$inferSelect;
-export type NewTblUserLogin = typeof table_user_login.$inferInsert;
+export type BaseTbUserLogin = typeof base_tb_users_login.$inferSelect;
+export type NewBaseTbUserLogin = typeof base_tb_users_login.$inferInsert;

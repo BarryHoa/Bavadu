@@ -10,7 +10,7 @@ import {
 import { mdlHrmSchema } from "./schema";
 
 // Leave Types - Loại nghỉ phép
-export const table_leave_type = mdlHrmSchema.table(
+export const hrm_tb_leave_types = mdlHrmSchema.table(
   "leave_types",
   {
     id: uuid("id")
@@ -35,5 +35,5 @@ export const table_leave_type = mdlHrmSchema.table(
   (table) => []
 );
 
-export type TblLeaveType = typeof table_leave_type.$inferSelect;
-export type NewTblLeaveType = typeof table_leave_type.$inferInsert;
+export type HrmTbLeaveType = typeof hrm_tb_leave_types.$inferSelect;
+export type NewHrmTbLeaveType = typeof hrm_tb_leave_types.$inferInsert;

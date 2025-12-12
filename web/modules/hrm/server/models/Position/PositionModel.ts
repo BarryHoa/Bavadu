@@ -3,10 +3,10 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblPosition, table_position } from "../../schemas";
-import { table_department } from "../../schemas/department";
+import { NewHrmTbPosition, hrm_tb_positions } from "../../schemas";
+import { hrm_tb_departments } from "../../schemas/hrm.department";
 
-const department = alias(table_department, "department");
+const department = alias(hrm_tb_departments, "department");
 
 export interface PositionRow {
   id: string;
@@ -45,9 +45,9 @@ export interface PositionInput {
   isActive?: boolean;
 }
 
-export default class PositionModel extends BaseModel<typeof table_position> {
+export default class PositionModel extends BaseModel<typeof hrm_tb_positions> {
   constructor() {
-    super(table_position);
+    super(hrm_tb_positions);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -58,7 +58,7 @@ export default class PositionModel extends BaseModel<typeof table_position> {
   }
 
   getPositionById = async (id: string): Promise<PositionRow | null> => {
-    const reportingPosition = alias(table_position, "reporting_position");
+    const reportingPosition = alias(hrm_tb_positions, "reporting_position");
     const result = await this.db
       .select({
         id: this.table.id,
@@ -126,7 +126,7 @@ export default class PositionModel extends BaseModel<typeof table_position> {
 
   createPosition = async (payload: PositionInput): Promise<PositionRow> => {
     const now = new Date();
-    const insertData: NewTblPosition = {
+    const insertData: NewHrmTbPosition = {
       code: payload.code,
       name: payload.name,
       description: payload.description ?? null,

@@ -11,7 +11,7 @@ import {
 import { mdlProductSchema } from "./schema";
 
 // Units of Measure
-export const table_unit_of_measure = mdlProductSchema.table(
+export const product_tb_units_of_measure = mdlProductSchema.table(
   "units_of_measure",
   {
     id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
@@ -29,16 +29,16 @@ export const table_unit_of_measure = mdlProductSchema.table(
   ]
 );
 
-export type TblUnitOfMeasure = typeof table_unit_of_measure.$inferSelect;
-export type NewTblUnitOfMeasure = typeof table_unit_of_measure.$inferInsert;
+export type ProductTbUnitOfMeasure = typeof product_tb_units_of_measure.$inferSelect;
+export type NewProductTbUnitOfMeasure = typeof product_tb_units_of_measure.$inferInsert;
 
 // Unit of Measure Conversions
-export const table_uom_conversion = mdlProductSchema.table(
+export const product_tb_uom_conversions = mdlProductSchema.table(
   "uom_conversions",
   {
     id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
     uomId: uuid("uom_id")
-      .references(() => table_unit_of_measure.id)
+      .references(() => product_tb_units_of_measure.id)
       .notNull(),
     conversionRatio: decimal("conversion_ratio", {
       precision: 15,
@@ -52,6 +52,6 @@ export const table_uom_conversion = mdlProductSchema.table(
   (table) => [index("uom_conversions_uom_idx").on(table.uomId)]
 );
 
-export type TblUomConversion = typeof table_uom_conversion.$inferSelect;
-export type NewTblUomConversion = typeof table_uom_conversion.$inferInsert;
+export type ProductTbUomConversion = typeof product_tb_uom_conversions.$inferSelect;
+export type NewProductTbUomConversion = typeof product_tb_uom_conversions.$inferInsert;
 

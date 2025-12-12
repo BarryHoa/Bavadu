@@ -12,7 +12,7 @@ import {
 import { mdlHrmSchema } from "./schema";
 
 // Payroll Rules - Quy tắc tính lương (compliance rules)
-export const table_payroll_rule = mdlHrmSchema.table(
+export const hrm_tb_payrolls_rule = mdlHrmSchema.table(
   "payroll_rules",
   {
     id: uuid("id")
@@ -39,6 +39,6 @@ export const table_payroll_rule = mdlHrmSchema.table(
   ]
 );
 
-export type TblPayrollRule = typeof table_payroll_rule.$inferSelect;
-export type NewTblPayrollRule = typeof table_payroll_rule.$inferInsert;
+export type HrmTbPayrollRule = typeof hrm_tb_payrolls_rule.$inferSelect;
+export type NewHrmTbPayrollRule = typeof hrm_tb_payrolls_rule.$inferInsert;
 

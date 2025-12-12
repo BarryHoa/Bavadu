@@ -11,9 +11,9 @@ import type { Column } from "drizzle-orm";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { table_product_category } from "../../schemas";
+import { product_tb_product_categories } from "../../schemas";
 
-const parentCategory = alias(table_product_category, "parent_category");
+const parentCategory = alias(product_tb_product_categories, "parent_category");
 
 export interface ProductCategoryRow {
   id: string;
@@ -31,7 +31,7 @@ export interface ProductCategoryRow {
 }
 
 class ProductCategoryViewListModel extends BaseViewListModel<
-  typeof table_product_category,
+  typeof product_tb_product_categories,
   ProductCategoryRow
 > {
   protected declarationColumns = () =>
@@ -42,28 +42,28 @@ class ProductCategoryViewListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_product_category.id, sort: true }],
-      ["code", { column: table_product_category.code, sort: true }],
-      ["name", { column: table_product_category.name, sort: true }],
+      ["id", { column: product_tb_product_categories.id, sort: true }],
+      ["code", { column: product_tb_product_categories.code, sort: true }],
+      ["name", { column: product_tb_product_categories.name, sort: true }],
       [
         "description",
-        { column: table_product_category.description, sort: false },
+        { column: product_tb_product_categories.description, sort: false },
       ],
-      ["level", { column: table_product_category.level, sort: true }],
-      ["isActive", { column: table_product_category.isActive, sort: true }],
-      ["parentId", { column: table_product_category.parentId, sort: true }],
-      ["createdAt", { column: table_product_category.createdAt, sort: true }],
-      ["updatedAt", { column: table_product_category.updatedAt, sort: true }],
+      ["level", { column: product_tb_product_categories.level, sort: true }],
+      ["isActive", { column: product_tb_product_categories.isActive, sort: true }],
+      ["parentId", { column: product_tb_product_categories.parentId, sort: true }],
+      ["createdAt", { column: product_tb_product_categories.createdAt, sort: true }],
+      ["updatedAt", { column: product_tb_product_categories.updatedAt, sort: true }],
     ]);
 
   constructor() {
-    super({ table: table_product_category });
+    super({ table: product_tb_product_categories });
   }
 
   protected declarationSearch = () =>
     new Map([
-      ["code", (text: string) => ilike(table_product_category.code, text)],
-      ["name", (text: string) => ilike(table_product_category.name, text)],
+      ["code", (text: string) => ilike(product_tb_product_categories.code, text)],
+      ["name", (text: string) => ilike(product_tb_product_categories.name, text)],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>

@@ -2,8 +2,8 @@ import { and, eq, sql } from "drizzle-orm";
 
 import { BaseModel } from "@base/server/models/BaseModel";
 
-import type { TblStockLevel } from "../../schemas";
-import { table_stock_level, table_stock_move } from "../../schemas";
+import type { StockTbStockLevel } from "../../schemas";
+import { stock_tb_stock_levels, stock_tb_stock_moves } from "../../schemas";
 
 type StockMovementKind = "inbound" | "outbound" | "adjustment" | "transfer";
 
@@ -35,9 +35,9 @@ interface TransferStockInput extends MovementBaseInput {
   quantity: number;
 }
 
-export default class StockModel extends BaseModel<typeof table_stock_move> {
+export default class StockModel extends BaseModel<typeof stock_tb_stock_moves> {
   constructor() {
-    super(table_stock_move);
+    super(stock_tb_stock_moves);
   }
 
   adjustStock = async (input: AdjustStockInput) => {
@@ -121,14 +121,14 @@ export default class StockModel extends BaseModel<typeof table_stock_move> {
   getStockLevel = async (
     productId: string,
     warehouseId: string
-  ): Promise<TblStockLevel | null> => {
+  ): Promise<StockTbStockLevel | null> => {
     const [record] = await this.db
       .select()
-      .from(table_stock_level)
+      .from(stock_tb_stock_levels)
       .where(
         and(
-          eq(table_stock_level.productId, productId),
-          eq(table_stock_level.warehouseId, warehouseId)
+          eq(stock_tb_stock_levels.productId, productId),
+          eq(stock_tb_stock_levels.warehouseId, warehouseId)
         )
       )
       .limit(1);
@@ -149,11 +149,11 @@ export default class StockModel extends BaseModel<typeof table_stock_move> {
 
     const [currentLevel] = await db
       .select()
-      .from(table_stock_level)
+      .from(stock_tb_stock_levels)
       .where(
         and(
-          eq(table_stock_level.productId, input.productId),
-          eq(table_stock_level.warehouseId, input.warehouseId)
+          eq(stock_tb_stock_levels.productId, input.productId),
+          eq(stock_tb_stock_levels.warehouseId, input.warehouseId)
         )
       )
       .limit(1);
@@ -168,7 +168,7 @@ export default class StockModel extends BaseModel<typeof table_stock_move> {
     }
 
     await db
-      .insert(table_stock_level)
+      .insert(stock_tb_stock_levels)
       .values({
         productId: input.productId,
         warehouseId: input.warehouseId,
@@ -177,15 +177,15 @@ export default class StockModel extends BaseModel<typeof table_stock_move> {
         updatedAt: now,
       })
       .onConflictDoUpdate({
-        target: [table_stock_level.productId, table_stock_level.warehouseId],
+        target: [stock_tb_stock_levels.productId, stock_tb_stock_levels.warehouseId],
         set: {
-          quantity: sql`${table_stock_level.quantity} + ${quantityDelta}`,
+          quantity: sql`${stock_tb_stock_levels.quantity} + ${quantityDelta}`,
           updatedAt: now,
         },
       });
 
     const [moveRecord] = await db
-      .insert(table_stock_move)
+      .insert(stock_tb_stock_moves)
       .values({
         productId: input.productId,
         quantity: quantityDelta.toString(),

@@ -12,7 +12,7 @@ import {
 import { mdlHrmSchema } from "./schema";
 
 // Compliance Reports - Báo cáo tuân thủ
-export const table_compliance_report = mdlHrmSchema.table(
+export const hrm_tb_compliance_reports = mdlHrmSchema.table(
   "compliance_reports",
   {
     id: uuid("id")
@@ -42,6 +42,6 @@ export const table_compliance_report = mdlHrmSchema.table(
   ]
 );
 
-export type TblComplianceReport = typeof table_compliance_report.$inferSelect;
-export type NewTblComplianceReport = typeof table_compliance_report.$inferInsert;
+export type HrmTbComplianceReport = typeof hrm_tb_compliance_reports.$inferSelect;
+export type NewHrmTbComplianceReport = typeof hrm_tb_compliance_reports.$inferInsert;
 

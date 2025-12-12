@@ -7,21 +7,21 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_employee } from "./hrm.employee";
-import { table_shift } from "./hrm.shift";
+import { hrm_tb_employees } from "./hrm.employee";
+import { hrm_tb_shifts } from "./hrm.shift";
 
 // Roster - Lịch phân ca
-export const table_roster = mdlHrmSchema.table(
+export const hrm_tb_rosters = mdlHrmSchema.table(
   "rosters",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     employeeId: uuid("employee_id")
-      .references(() => table_employee.id, { onDelete: "cascade" })
+      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
       .notNull(),
     shiftId: uuid("shift_id")
-      .references(() => table_shift.id, { onDelete: "restrict" })
+      .references(() => hrm_tb_shifts.id, { onDelete: "restrict" })
       .notNull(),
     workDate: date("work_date").notNull(),
     status: varchar("status", { length: 50 }).notNull().default("scheduled"), // scheduled, confirmed, cancelled
@@ -39,5 +39,5 @@ export const table_roster = mdlHrmSchema.table(
   ]
 );
 
-export type TblRoster = typeof table_roster.$inferSelect;
-export type NewTblRoster = typeof table_roster.$inferInsert;
+export type HrmTbRoster = typeof hrm_tb_rosters.$inferSelect;
+export type NewHrmTbRoster = typeof hrm_tb_rosters.$inferInsert;

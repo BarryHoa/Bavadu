@@ -10,7 +10,7 @@ import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface
 import type { Column } from "drizzle-orm";
 import { eq, ilike } from "drizzle-orm";
 
-import { table_department } from "../../schemas";
+import { hrm_tb_departments } from "../../schemas";
 
 export interface DepartmentDropdownRow {
   id: string;
@@ -20,7 +20,7 @@ export interface DepartmentDropdownRow {
 }
 
 class DepartmentDropdownListModel extends BaseViewListModel<
-  typeof table_department,
+  typeof hrm_tb_departments,
   DepartmentDropdownRow
 > {
   protected declarationColumns = () =>
@@ -31,20 +31,20 @@ class DepartmentDropdownListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_department.id, sort: true }],
-      ["code", { column: table_department.code, sort: true }],
-      ["name", { column: table_department.name, sort: true }],
-      ["isActive", { column: table_department.isActive, sort: true }],
+      ["id", { column: hrm_tb_departments.id, sort: true }],
+      ["code", { column: hrm_tb_departments.code, sort: true }],
+      ["name", { column: hrm_tb_departments.name, sort: true }],
+      ["isActive", { column: hrm_tb_departments.isActive, sort: true }],
     ]);
 
   constructor() {
-    super({ table: table_department });
+    super({ table: hrm_tb_departments });
   }
 
   protected declarationSearch = () =>
     new Map([
-      ["code", (text: string) => ilike(table_department.code, text)],
-      ["name", (text: string) => ilike(table_department.name, text)],
+      ["code", (text: string) => ilike(hrm_tb_departments.code, text)],
+      ["name", (text: string) => ilike(hrm_tb_departments.name, text)],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>

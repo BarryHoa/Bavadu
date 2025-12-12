@@ -11,7 +11,7 @@ import {
 import { mdlHrmSchema } from "./schema";
 
 // Benefit Packages - Gói phúc lợi
-export const table_benefit_package = mdlHrmSchema.table(
+export const hrm_tb_benefit_packages = mdlHrmSchema.table(
   "benefit_packages",
   {
     id: uuid("id")
@@ -37,5 +37,5 @@ export const table_benefit_package = mdlHrmSchema.table(
   ]
 );
 
-export type TblBenefitPackage = typeof table_benefit_package.$inferSelect;
-export type NewTblBenefitPackage = typeof table_benefit_package.$inferInsert;
+export type HrmTbBenefitPackage = typeof hrm_tb_benefit_packages.$inferSelect;
+export type NewHrmTbBenefitPackage = typeof hrm_tb_benefit_packages.$inferInsert;

@@ -10,7 +10,7 @@ import {
 import { mdlHrmSchema } from "./schema";
 
 // Payroll Periods - Kỳ lương
-export const table_payroll_period = mdlHrmSchema.table(
+export const hrm_tb_payrolls_period = mdlHrmSchema.table(
   "payroll_periods",
   {
     id: uuid("id")
@@ -35,6 +35,6 @@ export const table_payroll_period = mdlHrmSchema.table(
   ]
 );
 
-export type TblPayrollPeriod = typeof table_payroll_period.$inferSelect;
-export type NewTblPayrollPeriod = typeof table_payroll_period.$inferInsert;
+export type HrmTbPayrollPeriod = typeof hrm_tb_payrolls_period.$inferSelect;
+export type NewHrmTbPayrollPeriod = typeof hrm_tb_payrolls_period.$inferInsert;
 

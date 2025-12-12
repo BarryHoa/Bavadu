@@ -9,17 +9,17 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_employee } from "./hrm.employee";
+import { hrm_tb_employees } from "./hrm.employee";
 
 // Employee History - Lịch sử thay đổi nhân viên
-export const table_employee_history = mdlHrmSchema.table(
+export const hrm_tb_employees_history = mdlHrmSchema.table(
   "employee_history",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     employeeId: uuid("employee_id")
-      .references(() => table_employee.id, { onDelete: "cascade" })
+      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
       .notNull(),
     changeType: varchar("change_type", { length: 50 }).notNull(), // position_change, department_change, salary_change, status_change, contract_change
     effectiveDate: date("effective_date").notNull(),
@@ -38,6 +38,6 @@ export const table_employee_history = mdlHrmSchema.table(
   ]
 );
 
-export type TblEmployeeHistory = typeof table_employee_history.$inferSelect;
-export type NewTblEmployeeHistory = typeof table_employee_history.$inferInsert;
+export type HrmTbEmployeeHistory = typeof hrm_tb_employees_history.$inferSelect;
+export type NewHrmTbEmployeeHistory = typeof hrm_tb_employees_history.$inferInsert;
 

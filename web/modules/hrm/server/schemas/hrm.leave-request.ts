@@ -10,21 +10,21 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_employee } from "./hrm.employee";
-import { table_leave_type } from "./hrm.leave-type";
+import { hrm_tb_employees } from "./hrm.employee";
+import { hrm_tb_leave_types } from "./hrm.leave-type";
 
 // Leave Requests - Đơn xin nghỉ phép
-export const table_leave_request = mdlHrmSchema.table(
+export const hrm_tb_leave_requests = mdlHrmSchema.table(
   "leave_requests",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     employeeId: uuid("employee_id")
-      .references(() => table_employee.id, { onDelete: "cascade" })
+      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
       .notNull(),
     leaveTypeId: uuid("leave_type_id")
-      .references(() => table_leave_type.id, { onDelete: "restrict" })
+      .references(() => hrm_tb_leave_types.id, { onDelete: "restrict" })
       .notNull(),
     startDate: date("start_date").notNull(),
     endDate: date("end_date").notNull(),
@@ -50,6 +50,6 @@ export const table_leave_request = mdlHrmSchema.table(
   ]
 );
 
-export type TblLeaveRequest = typeof table_leave_request.$inferSelect;
-export type NewTblLeaveRequest = typeof table_leave_request.$inferInsert;
+export type HrmTbLeaveRequest = typeof hrm_tb_leave_requests.$inferSelect;
+export type NewHrmTbLeaveRequest = typeof hrm_tb_leave_requests.$inferInsert;
 

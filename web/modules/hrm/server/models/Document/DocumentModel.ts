@@ -3,10 +3,10 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblDocument, table_document } from "../../schemas";
-import { table_employee } from "../../schemas/employee";
+import { NewHrmTbDocument, hrm_tb_documents } from "../../schemas";
+import { hrm_tb_employees } from "../../schemas/hrm.employee";
 
-const employee = alias(table_employee, "employee");
+const employee = alias(hrm_tb_employees, "employee");
 
 export interface DocumentRow {
   id: string;
@@ -48,9 +48,9 @@ export interface DocumentInput {
   isActive?: boolean;
 }
 
-export default class DocumentModel extends BaseModel<typeof table_document> {
+export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
   constructor() {
-    super(table_document);
+    super(hrm_tb_documents);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -126,7 +126,7 @@ export default class DocumentModel extends BaseModel<typeof table_document> {
 
   createDocument = async (payload: DocumentInput): Promise<DocumentRow> => {
     const now = new Date();
-    const insertData: NewTblDocument = {
+    const insertData: NewHrmTbDocument = {
       documentNumber: payload.documentNumber ?? null,
       documentType: payload.documentType,
       title: payload.title,

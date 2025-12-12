@@ -9,10 +9,10 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlProductSchema } from "./schema";
-import { table_product_category } from "./product.category";
+import { product_tb_product_categories } from "./product.category";
 
 // Product Masters
-export const table_product_master = mdlProductSchema.table(
+export const product_tb_product_masters = mdlProductSchema.table(
   "masters",
   {
     id: uuid("id")
@@ -28,7 +28,7 @@ export const table_product_master = mdlProductSchema.table(
     features: jsonb("features"), // Partial<ProductMasterFeatures>
     isActive: boolean("is_active").default(true).notNull(),
     brand: text("brand"), // string
-    categoryId: uuid("category_id").references(() => table_product_category.id),
+    categoryId: uuid("category_id").references(() => product_tb_product_categories.id),
     createdAt: timestamp("created_at", { withTimezone: true }),
     updatedAt: timestamp("updated_at", { withTimezone: true }),
     createdBy: varchar("created_by", { length: 36 }), // uuid user id
@@ -48,5 +48,5 @@ export const table_product_master = mdlProductSchema.table(
   ]
 );
 
-export type TblProductMaster = typeof table_product_master.$inferSelect;
-export type NewTblProductMaster = typeof table_product_master.$inferInsert;
+export type ProductTbProductMaster = typeof product_tb_product_masters.$inferSelect;
+export type NewProductTbProductMaster = typeof product_tb_product_masters.$inferInsert;

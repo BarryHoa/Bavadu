@@ -3,7 +3,7 @@ import { jsonb, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
 
 // Audit Log - Nhật ký kiểm toán cho compliance
-export const table_audit_log = mdlHrmSchema.table(
+export const hrm_tb_audit_logs = mdlHrmSchema.table(
   "audit_logs",
   {
     id: uuid("id")
@@ -22,5 +22,5 @@ export const table_audit_log = mdlHrmSchema.table(
   (table) => []
 );
 
-export type TblAuditLog = typeof table_audit_log.$inferSelect;
-export type NewTblAuditLog = typeof table_audit_log.$inferInsert;
+export type HrmTbAuditLog = typeof hrm_tb_audit_logs.$inferSelect;
+export type NewHrmTbAuditLog = typeof hrm_tb_audit_logs.$inferInsert;

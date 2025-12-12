@@ -1,5 +1,5 @@
 import type { User } from "@base/server/interfaces/User";
-import type { TblSalesOrderB2C } from "../../schemas";
+import type { SaleB2cTbOrder } from "../../schemas";
 
 export type SalesOrderB2CStatus =
   | "draft"
@@ -23,7 +23,7 @@ export interface SalesOrderB2CLine {
   updatedAt?: Date | string;
 }
 
-export interface SalesOrderB2C extends Omit<TblSalesOrderB2C, "status"> {
+export interface SalesOrderB2C extends Omit<SaleB2cTbOrder, "status"> {
   status: SalesOrderB2CStatus;
   lines?: SalesOrderB2CLine[];
   createdByUser?: User;

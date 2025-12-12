@@ -9,7 +9,7 @@ import {
 import { mdlHrmSchema } from "./schema";
 
 // HR Roles - Vai trò trong HRM
-export const table_hrm_role = mdlHrmSchema.table(
+export const hrm_tb_roles = mdlHrmSchema.table(
   "roles",
   {
     id: uuid("id")
@@ -29,6 +29,6 @@ export const table_hrm_role = mdlHrmSchema.table(
   (table) => []
 );
 
-export type TblHrmRole = typeof table_hrm_role.$inferSelect;
-export type NewTblHrmRole = typeof table_hrm_role.$inferInsert;
+export type HrmTbRole = typeof hrm_tb_roles.$inferSelect;
+export type NewHrmTbRole = typeof hrm_tb_roles.$inferInsert;
 

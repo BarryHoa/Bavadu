@@ -8,10 +8,10 @@ import {
 } from "drizzle-orm/pg-core";
 import { mdlSaleB2cSchema } from "./schema";
 
-import { table_product_master } from "@mdl/product/server/schemas/product.master";
-import { table_sales_order_b2c } from "./b2c-sales.order";
+import { product_tb_product_masters } from "@mdl/product/server/schemas/product.master";
+import { sale_b2c_tb_orders } from "./b2c-sales.order";
 
-export const table_sales_order_line_b2c = mdlSaleB2cSchema.table(
+export const sale_b2c_tb_order_lines = mdlSaleB2cSchema.table(
   "order_lines",
   {
     id: uuid("id")
@@ -19,10 +19,10 @@ export const table_sales_order_line_b2c = mdlSaleB2cSchema.table(
       .default(sql`uuid_generate_v7()`),
     orderId: uuid("order_id")
       .notNull()
-      .references(() => table_sales_order_b2c.id, { onDelete: "cascade" }),
+      .references(() => sale_b2c_tb_orders.id, { onDelete: "cascade" }),
     productId: uuid("product_id")
       .notNull()
-      .references(() => table_product_master.id, { onDelete: "restrict" }),
+      .references(() => product_tb_product_masters.id, { onDelete: "restrict" }),
     description: varchar("description", { length: 256 }),
     quantityOrdered: numeric("quantity_ordered", { precision: 14, scale: 2 })
       .notNull()
@@ -76,7 +76,7 @@ export const table_sales_order_line_b2c = mdlSaleB2cSchema.table(
   ]
 );
 
-export type TblSalesOrderLineB2C =
-  typeof table_sales_order_line_b2c.$inferSelect;
-export type NewTblSalesOrderLineB2C =
-  typeof table_sales_order_line_b2c.$inferInsert;
+export type SaleB2cTbOrderLine =
+  typeof sale_b2c_tb_order_lines.$inferSelect;
+export type NewSaleB2cTbOrderLine =
+  typeof sale_b2c_tb_order_lines.$inferInsert;

@@ -11,17 +11,17 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_employee } from "./hrm.employee";
+import { hrm_tb_employees } from "./hrm.employee";
 
 // Goals - Mục tiêu (KPI/OKR)
-export const table_goal = mdlHrmSchema.table(
+export const hrm_tb_goals = mdlHrmSchema.table(
   "goals",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     employeeId: uuid("employee_id")
-      .references(() => table_employee.id, { onDelete: "cascade" })
+      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
       .notNull(),
     goalType: varchar("goal_type", { length: 50 }).notNull(), // kpi, okr
     title: jsonb("title").notNull(), // LocaleDataType<string>
@@ -47,6 +47,6 @@ export const table_goal = mdlHrmSchema.table(
   ]
 );
 
-export type TblGoal = typeof table_goal.$inferSelect;
-export type NewTblGoal = typeof table_goal.$inferInsert;
+export type HrmTbGoal = typeof hrm_tb_goals.$inferSelect;
+export type NewHrmTbGoal = typeof hrm_tb_goals.$inferInsert;
 

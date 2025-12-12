@@ -1,16 +1,16 @@
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
 import type { User } from "@base/server/interfaces/User";
 import type {
-  TblCustomerCompany,
-  TblCustomerIndividual,
+  SaleB2cTbCustomerCompany,
+  SaleB2cTbCustomer,
 } from "../../schemas";
 
-export interface CustomerCompany extends TblCustomerCompany {
+export interface CustomerCompany extends SaleB2cTbCustomerCompany {
   createdByUser?: User;
   updatedByUser?: User;
 }
 
-export interface CustomerIndividual extends TblCustomerIndividual {
+export interface CustomerIndividual extends SaleB2cTbCustomer {
   createdByUser?: User;
   updatedByUser?: User;
 }

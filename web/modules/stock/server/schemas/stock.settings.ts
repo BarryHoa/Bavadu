@@ -8,11 +8,11 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { mdlStockSchema } from "./schema";
-import { table_product_master } from "../../../product/server/schemas/product.master";
-import { table_stock_warehouse } from "./stock.warehouse";
+import { product_tb_product_masters } from "../../../product/server/schemas/product.master";
+import { stock_tb_stock_warehouses } from "./stock.warehouse";
 
 // Stock Settings - Cấu hình tồn kho theo từng kho
-export const table_stock_settings = mdlStockSchema.table(
+export const stock_tb_stock_settings = mdlStockSchema.table(
   "settings",
   {
     id: uuid("id")
@@ -20,10 +20,10 @@ export const table_stock_settings = mdlStockSchema.table(
       .default(sql`uuid_generate_v7()`),
     productId: uuid("product_id")
       .notNull()
-      .references(() => table_product_master.id, { onDelete: "cascade" }),
+      .references(() => product_tb_product_masters.id, { onDelete: "cascade" }),
     warehouseId: uuid("warehouse_id")
       .notNull()
-      .references(() => table_stock_warehouse.id, { onDelete: "cascade" }),
+      .references(() => stock_tb_stock_warehouses.id, { onDelete: "cascade" }),
 
     // Stock levels
     minStockLevel: numeric("min_stock_level", { precision: 14, scale: 2 }),
@@ -52,5 +52,5 @@ export const table_stock_settings = mdlStockSchema.table(
   ]
 );
 
-export type TblStockSettings = typeof table_stock_settings.$inferSelect;
-export type NewTblStockSettings = typeof table_stock_settings.$inferInsert;
+export type StockTbStockSettings = typeof stock_tb_stock_settings.$inferSelect;
+export type NewStockTbStockSettings = typeof stock_tb_stock_settings.$inferInsert;

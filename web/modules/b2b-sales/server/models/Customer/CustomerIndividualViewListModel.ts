@@ -10,15 +10,15 @@ import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
-import { table_customer_individual } from "../../schemas";
+import { sale_b2c_tb_customers } from "../../schemas";
 
 class CustomerIndividualViewListModel extends BaseViewListModel<
-  typeof table_customer_individual,
+  typeof sale_b2c_tb_customers,
   any
 > {
   constructor() {
     super({
-      table: table_customer_individual,
+      table: sale_b2c_tb_customers,
       sortDefault: [
         {
           column: "createdAt",
@@ -36,39 +36,39 @@ class CustomerIndividualViewListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_customer_individual.id, sort: true }],
-      ["code", { column: table_customer_individual.code, sort: true }],
+      ["id", { column: sale_b2c_tb_customers.id, sort: true }],
+      ["code", { column: sale_b2c_tb_customers.code, sort: true }],
       [
         "firstName",
-        { column: table_customer_individual.firstName, sort: true },
+        { column: sale_b2c_tb_customers.firstName, sort: true },
       ],
-      ["lastName", { column: table_customer_individual.lastName, sort: true }],
-      ["phone", { column: table_customer_individual.phone, sort: true }],
-      ["email", { column: table_customer_individual.email, sort: true }],
-      ["isActive", { column: table_customer_individual.isActive, sort: true }],
+      ["lastName", { column: sale_b2c_tb_customers.lastName, sort: true }],
+      ["phone", { column: sale_b2c_tb_customers.phone, sort: true }],
+      ["email", { column: sale_b2c_tb_customers.email, sort: true }],
+      ["isActive", { column: sale_b2c_tb_customers.isActive, sort: true }],
       [
         "createdAt",
-        { column: table_customer_individual.createdAt, sort: true },
+        { column: sale_b2c_tb_customers.createdAt, sort: true },
       ],
       [
         "updatedAt",
-        { column: table_customer_individual.updatedAt, sort: true },
+        { column: sale_b2c_tb_customers.updatedAt, sort: true },
       ],
     ]);
 
   protected declarationSearch = () =>
     new Map([
-      ["code", (text: string) => ilike(table_customer_individual.code, text)],
+      ["code", (text: string) => ilike(sale_b2c_tb_customers.code, text)],
       [
         "firstName",
-        (text: string) => ilike(table_customer_individual.firstName, text),
+        (text: string) => ilike(sale_b2c_tb_customers.firstName, text),
       ],
       [
         "lastName",
-        (text: string) => ilike(table_customer_individual.lastName, text),
+        (text: string) => ilike(sale_b2c_tb_customers.lastName, text),
       ],
-      ["phone", (text: string) => ilike(table_customer_individual.phone, text)],
-      ["email", (text: string) => ilike(table_customer_individual.email, text)],
+      ["phone", (text: string) => ilike(sale_b2c_tb_customers.phone, text)],
+      ["email", (text: string) => ilike(sale_b2c_tb_customers.email, text)],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>

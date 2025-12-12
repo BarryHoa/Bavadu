@@ -7,12 +7,12 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlStockSchema } from "./schema";
-import { table_product_variant } from "../../../product/server/schemas/product.variant";
-import { table_purchase_order_line } from "../../../purchase/server/schemas/purchase.order-line";
-import { table_stock_warehouse } from "./stock.warehouse";
+import { product_tb_product_variants } from "../../../product/server/schemas/product.variant";
+import { purchase_tb_purchase_orders_line } from "../../../purchase/server/schemas/purchase.order-line";
+import { stock_tb_stock_warehouses } from "./stock.warehouse";
 
 // Stock Lots - Quản lý từng lô hàng nhập (cho FIFO/LIFO)
-export const table_stock_lot = mdlStockSchema.table(
+export const stock_tb_stock_lots = mdlStockSchema.table(
   "lots",
   {
     id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
@@ -20,10 +20,10 @@ export const table_stock_lot = mdlStockSchema.table(
     // Product & Warehouse
     productVariantId: uuid("product_variant_id")
       .notNull()
-      .references(() => table_product_variant.id, { onDelete: "cascade" }),
+      .references(() => product_tb_product_variants.id, { onDelete: "cascade" }),
     warehouseId: uuid("warehouse_id")
       .notNull()
-      .references(() => table_stock_warehouse.id, { onDelete: "cascade" }),
+      .references(() => stock_tb_stock_warehouses.id, { onDelete: "cascade" }),
 
     // Lot identification
     lotNumber: varchar("lot_number", { length: 100 }),
@@ -31,7 +31,7 @@ export const table_stock_lot = mdlStockSchema.table(
 
     // Purchase info
     purchaseOrderLineId: uuid("purchase_order_line_id").references(
-      () => table_purchase_order_line.id,
+      () => purchase_tb_purchase_orders_line.id,
       { onDelete: "set null" }
     ),
     purchaseDate: timestamp("purchase_date", { withTimezone: true }).notNull(),
@@ -90,6 +90,6 @@ export const table_stock_lot = mdlStockSchema.table(
   ]
 );
 
-export type TblStockLot = typeof table_stock_lot.$inferSelect;
-export type NewTblStockLot = typeof table_stock_lot.$inferInsert;
+export type StockTbStockLot = typeof stock_tb_stock_lots.$inferSelect;
+export type NewStockTbStockLot = typeof stock_tb_stock_lots.$inferInsert;
 

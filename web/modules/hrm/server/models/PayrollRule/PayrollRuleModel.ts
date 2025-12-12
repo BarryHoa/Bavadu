@@ -2,7 +2,7 @@ import { LocaleDataType } from "@base/server/interfaces/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 
-import { NewTblPayrollRule, table_payroll_rule } from "../../schemas";
+import { NewHrmTbPayrollRule, hrm_tb_payrolls_rule } from "../../schemas";
 
 export interface PayrollRuleRow {
   id: string;
@@ -29,9 +29,9 @@ export interface PayrollRuleInput {
   isActive?: boolean;
 }
 
-export default class PayrollRuleModel extends BaseModel<typeof table_payroll_rule> {
+export default class PayrollRuleModel extends BaseModel<typeof hrm_tb_payrolls_rule> {
   constructor() {
-    super(table_payroll_rule);
+    super(hrm_tb_payrolls_rule);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -72,7 +72,7 @@ export default class PayrollRuleModel extends BaseModel<typeof table_payroll_rul
 
   createPayrollRule = async (payload: PayrollRuleInput): Promise<PayrollRuleRow> => {
     const now = new Date();
-    const insertData: NewTblPayrollRule = {
+    const insertData: NewHrmTbPayrollRule = {
       code: payload.code,
       name: payload.name,
       description: payload.description ?? null,

@@ -1,6 +1,6 @@
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
 import type { User } from "@base/server/interfaces/User";
-import type { TblSalesOrderB2B, TblSalesOrderLineB2B } from "../../schemas";
+import type { SaleB2bTbOrder, SaleB2bTbOrderLine } from "../../schemas";
 
 export type SalesOrderB2BStatus = "draft" | "sent" | "delivered" | "cancelled";
 
@@ -20,7 +20,7 @@ export interface SalesOrderB2BLine {
   updatedAt?: Date | string;
 }
 
-export interface SalesOrderB2B extends Omit<TblSalesOrderB2B, "status"> {
+export interface SalesOrderB2B extends Omit<SaleB2bTbOrder, "status"> {
   status: SalesOrderB2BStatus;
   lines?: SalesOrderB2BLine[];
   createdByUser?: User;

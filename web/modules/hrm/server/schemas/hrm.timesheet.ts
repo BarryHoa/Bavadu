@@ -8,25 +8,25 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_employee } from "./hrm.employee";
-import { table_roster } from "./hrm.roster";
-import { table_shift } from "./hrm.shift";
+import { hrm_tb_employees } from "./hrm.employee";
+import { hrm_tb_rosters } from "./hrm.roster";
+import { hrm_tb_shifts } from "./hrm.shift";
 
 // Timesheet - Chấm công
-export const table_timesheet = mdlHrmSchema.table(
+export const hrm_tb_timesheets = mdlHrmSchema.table(
   "timesheets",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     employeeId: uuid("employee_id")
-      .references(() => table_employee.id, { onDelete: "cascade" })
+      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
       .notNull(),
-    rosterId: uuid("roster_id").references(() => table_roster.id, {
+    rosterId: uuid("roster_id").references(() => hrm_tb_rosters.id, {
       onDelete: "set null",
     }),
     workDate: date("work_date").notNull(),
-    shiftId: uuid("shift_id").references(() => table_shift.id, {
+    shiftId: uuid("shift_id").references(() => hrm_tb_shifts.id, {
       onDelete: "set null",
     }),
     checkInTime: timestamp("check_in_time", { withTimezone: true }),
@@ -59,5 +59,5 @@ export const table_timesheet = mdlHrmSchema.table(
   ]
 );
 
-export type TblTimesheet = typeof table_timesheet.$inferSelect;
-export type NewTblTimesheet = typeof table_timesheet.$inferInsert;
+export type HrmTbTimesheet = typeof hrm_tb_timesheets.$inferSelect;
+export type NewHrmTbTimesheet = typeof hrm_tb_timesheets.$inferInsert;

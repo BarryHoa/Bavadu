@@ -1,7 +1,7 @@
 import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 
-import { NewTblComplianceReport, table_compliance_report } from "../../schemas";
+import { NewHrmTbComplianceReport, hrm_tb_compliance_reports } from "../../schemas";
 
 export interface ComplianceReportRow {
   id: string;
@@ -33,10 +33,10 @@ export interface ComplianceReportInput {
 }
 
 export default class ComplianceReportModel extends BaseModel<
-  typeof table_compliance_report
+  typeof hrm_tb_compliance_reports
 > {
   constructor() {
-    super(table_compliance_report);
+    super(hrm_tb_compliance_reports);
   }
 
   getComplianceReportById = async (
@@ -79,7 +79,7 @@ export default class ComplianceReportModel extends BaseModel<
     payload: ComplianceReportInput
   ): Promise<ComplianceReportRow> => {
     const now = new Date();
-    const insertData: NewTblComplianceReport = {
+    const insertData: NewHrmTbComplianceReport = {
       reportNumber: payload.reportNumber,
       reportType: payload.reportType,
       reportingPeriod: payload.reportingPeriod,

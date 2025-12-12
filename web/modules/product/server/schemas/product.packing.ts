@@ -9,17 +9,17 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlProductSchema } from "./schema";
-import { table_product_variant } from "./product.variant";
+import { product_tb_product_variants } from "./product.variant";
 
 // Product Packing
-export const table_product_packing = mdlProductSchema.table(
+export const product_tb_product_packings = mdlProductSchema.table(
   "packings",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     productVariantId: uuid("product_variant_id")
-      .references(() => table_product_variant.id)
+      .references(() => product_tb_product_variants.id)
       .notNull(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
     description: text("description"), // string
@@ -35,5 +35,5 @@ export const table_product_packing = mdlProductSchema.table(
   ]
 );
 
-export type TblProductPacking = typeof table_product_packing.$inferSelect;
-export type NewTblProductPacking = typeof table_product_packing.$inferInsert;
+export type ProductTbProductPacking = typeof product_tb_product_packings.$inferSelect;
+export type NewProductTbProductPacking = typeof product_tb_product_packings.$inferInsert;

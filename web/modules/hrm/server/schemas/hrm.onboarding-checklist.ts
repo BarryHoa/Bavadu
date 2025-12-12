@@ -10,17 +10,17 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_employee } from "./hrm.employee";
+import { hrm_tb_employees } from "./hrm.employee";
 
 // Onboarding Checklists - Checklist onboarding
-export const table_onboarding_checklist = mdlHrmSchema.table(
+export const hrm_tb_onboarding_checklists = mdlHrmSchema.table(
   "onboarding_checklists",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     employeeId: uuid("employee_id")
-      .references(() => table_employee.id, { onDelete: "cascade" })
+      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
       .notNull(),
     taskName: jsonb("task_name").notNull(), // LocaleDataType<string>
     taskDescription: jsonb("task_description"), // LocaleDataType<string>
@@ -42,7 +42,7 @@ export const table_onboarding_checklist = mdlHrmSchema.table(
   ]
 );
 
-export type TblOnboardingChecklist =
-  typeof table_onboarding_checklist.$inferSelect;
-export type NewTblOnboardingChecklist =
-  typeof table_onboarding_checklist.$inferInsert;
+export type HrmTbOnboardingChecklist =
+  typeof hrm_tb_onboarding_checklists.$inferSelect;
+export type NewHrmTbOnboardingChecklist =
+  typeof hrm_tb_onboarding_checklists.$inferInsert;

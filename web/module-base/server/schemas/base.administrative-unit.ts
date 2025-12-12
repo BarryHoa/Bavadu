@@ -10,18 +10,18 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdBaseSchema } from "./schema";
-import { table_location_countries } from "./base.country";
+import { base_tb_location_countries } from "./base.country";
 
 // Location Administrative Units - hierarchical structure for provinces, districts, wards, etc.
 // Supports flexible levels: Level 1 (province/state), Level 2 (district - optional), Level 3 (ward/commune)
-export const table_location_administrative_units = mdBaseSchema.table(
+export const base_tb_location_administrative_units = mdBaseSchema.table(
   "location_administrative_units",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`), // UUID v7
     countryId: uuid("country_id")
-      .references(() => table_location_countries.id)
+      .references(() => base_tb_location_countries.id)
       .notNull(),
     code: varchar("code", { length: 50 }), // Optional code for the unit
     name: jsonb("name").notNull(), // LocalizeText - name of the administrative unit
@@ -47,7 +47,7 @@ export const table_location_administrative_units = mdBaseSchema.table(
   ]
 );
 
-export type TblLocationAdministrativeUnit =
-  typeof table_location_administrative_units.$inferSelect;
-export type NewTblLocationAdministrativeUnit =
-  typeof table_location_administrative_units.$inferInsert;
+export type BaseTbLocationAdministrativeUnit =
+  typeof base_tb_location_administrative_units.$inferSelect;
+export type NewBaseTbLocationAdministrativeUnit =
+  typeof base_tb_location_administrative_units.$inferInsert;

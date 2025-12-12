@@ -9,17 +9,17 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_employee } from "./hrm.employee";
+import { hrm_tb_employees } from "./hrm.employee";
 
 // Offboarding - Quy trình nghỉ việc
-export const table_offboarding = mdlHrmSchema.table(
+export const hrm_tb_offboardings = mdlHrmSchema.table(
   "offboarding",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     employeeId: uuid("employee_id")
-      .references(() => table_employee.id, { onDelete: "cascade" })
+      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
       .notNull(),
     resignationDate: date("resignation_date").notNull(),
     lastWorkingDate: date("last_working_date").notNull(),
@@ -42,6 +42,6 @@ export const table_offboarding = mdlHrmSchema.table(
   ]
 );
 
-export type TblOffboarding = typeof table_offboarding.$inferSelect;
-export type NewTblOffboarding = typeof table_offboarding.$inferInsert;
+export type HrmTbOffboarding = typeof hrm_tb_offboardings.$inferSelect;
+export type NewHrmTbOffboarding = typeof hrm_tb_offboardings.$inferInsert;
 

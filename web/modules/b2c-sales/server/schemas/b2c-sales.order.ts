@@ -1,8 +1,8 @@
-import { table_payment_method } from "@base/server/schemas/base.payment-method";
-import { table_price_lists_b2c } from "./b2c-sales.price-list";
-import { table_shipping_method } from "@base/server/schemas/base.shipping-method";
-import { table_shipping_term } from "@base/server/schemas/base.shipping-term";
-import { table_stock_warehouse } from "@mdl/stock/server/schemas/stock.warehouse";
+import { base_tb_payment_methods } from "@base/server/schemas/base.payment-method";
+import { sale_b2c_tb_price_lists } from "./b2c-sales.price-list";
+import { base_tb_shipping_methods } from "@base/server/schemas/base.shipping-method";
+import { base_tb_shipping_terms } from "@base/server/schemas/base.shipping-term";
+import { stock_tb_stock_warehouses } from "@mdl/stock/server/schemas/stock.warehouse";
 import { sql } from "drizzle-orm";
 import {
   boolean,
@@ -15,7 +15,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { mdlSaleB2cSchema } from "./schema";
 
-export const table_sales_order_b2c = mdlSaleB2cSchema.table(
+export const sale_b2c_tb_orders = mdlSaleB2cSchema.table(
   "orders",
   {
     id: uuid("id")
@@ -32,28 +32,28 @@ export const table_sales_order_b2c = mdlSaleB2cSchema.table(
 
     // Business fields
     paymentMethodId: uuid("payment_method_id").references(
-      () => table_payment_method.id,
+      () => base_tb_payment_methods.id,
       { onDelete: "set null" }
     ),
     shippingMethodId: uuid("shipping_method_id").references(
-      () => table_shipping_method.id,
+      () => base_tb_shipping_methods.id,
       { onDelete: "set null" }
     ),
     shippingTermsId: uuid("shipping_terms_id").references(
-      () => table_shipping_term.id,
+      () => base_tb_shipping_terms.id,
       { onDelete: "set null" }
     ),
     requireInvoice: boolean("require_invoice").default(false).notNull(),
 
     // Pricing
     priceListId: uuid("price_list_id").references(
-      () => table_price_lists_b2c.id,
+      () => sale_b2c_tb_price_lists.id,
       { onDelete: "set null" }
     ),
 
     // Common fields
     warehouseId: uuid("warehouse_id").references(
-      () => table_stock_warehouse.id,
+      () => stock_tb_stock_warehouses.id,
       { onDelete: "set null" }
     ),
     expectedDate: timestamp("expected_date", { withTimezone: true }),
@@ -100,5 +100,5 @@ export const table_sales_order_b2c = mdlSaleB2cSchema.table(
   ]
 );
 
-export type TblSalesOrderB2C = typeof table_sales_order_b2c.$inferSelect;
-export type NewTblSalesOrderB2C = typeof table_sales_order_b2c.$inferInsert;
+export type SaleB2cTbOrder = typeof sale_b2c_tb_orders.$inferSelect;
+export type NewSaleB2cTbOrder = typeof sale_b2c_tb_orders.$inferInsert;

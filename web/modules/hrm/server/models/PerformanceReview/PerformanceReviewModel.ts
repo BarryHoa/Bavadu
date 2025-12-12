@@ -2,11 +2,11 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblPerformanceReview, table_performance_review } from "../../schemas";
-import { table_employee } from "../../schemas/employee";
+import { NewHrmTbPerformanceReview, hrm_tb_performance_reviews } from "../../schemas";
+import { hrm_tb_employees } from "../../schemas/hrm.employee";
 
-const employee = alias(table_employee, "employee");
-const reviewer = alias(table_employee, "reviewer");
+const employee = alias(hrm_tb_employees, "employee");
+const reviewer = alias(hrm_tb_employees, "reviewer");
 
 export interface PerformanceReviewRow {
   id: string;
@@ -53,10 +53,10 @@ export interface PerformanceReviewInput {
 }
 
 export default class PerformanceReviewModel extends BaseModel<
-  typeof table_performance_review
+  typeof hrm_tb_performance_reviews
 > {
   constructor() {
-    super(table_performance_review);
+    super(hrm_tb_performance_reviews);
   }
 
   getPerformanceReviewById = async (
@@ -138,7 +138,7 @@ export default class PerformanceReviewModel extends BaseModel<
     payload: PerformanceReviewInput
   ): Promise<PerformanceReviewRow> => {
     const now = new Date();
-    const insertData: NewTblPerformanceReview = {
+    const insertData: NewHrmTbPerformanceReview = {
       employeeId: payload.employeeId,
       reviewType: payload.reviewType,
       reviewPeriod: payload.reviewPeriod ?? null,

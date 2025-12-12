@@ -3,10 +3,10 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { and, eq, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblNotification, table_notification } from "../../schemas";
-import { table_employee } from "../../schemas/employee";
+import { NewHrmTbNotification, hrm_tb_notifications } from "../../schemas";
+import { hrm_tb_employees } from "../../schemas/hrm.employee";
 
-const employee = alias(table_employee, "employee");
+const employee = alias(hrm_tb_employees, "employee");
 
 export interface NotificationRow {
   id: string;
@@ -43,9 +43,9 @@ export interface NotificationQuery {
   offset?: number;
 }
 
-export default class NotificationModel extends BaseModel<typeof table_notification> {
+export default class NotificationModel extends BaseModel<typeof hrm_tb_notifications> {
   constructor() {
-    super(table_notification);
+    super(hrm_tb_notifications);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -107,7 +107,7 @@ export default class NotificationModel extends BaseModel<typeof table_notificati
   createNotification = async (
     payload: NotificationInput
   ): Promise<NotificationRow> => {
-    const insertData: NewTblNotification = {
+    const insertData: NewHrmTbNotification = {
       employeeId: payload.employeeId,
       type: payload.type,
       title: payload.title,

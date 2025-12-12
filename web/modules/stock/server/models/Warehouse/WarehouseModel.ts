@@ -9,8 +9,8 @@ import {
   warehouseStatuses,
   warehouseValuationMethods,
 } from "../../../common/constants";
-import type { NewTblStockWarehouse, TblStockWarehouse } from "../../schemas";
-import { table_stock_warehouse } from "../../schemas";
+import type { NewStockTbStockWarehouse, StockTbStockWarehouse } from "../../schemas";
+import { stock_tb_stock_warehouses } from "../../schemas";
 
 export interface WarehousePayload {
   code: string;
@@ -50,24 +50,24 @@ export interface WarehouseViewRow {
 }
 
 export default class WarehouseModel extends BaseModel<
-  typeof table_stock_warehouse
+  typeof stock_tb_stock_warehouses
 > {
   constructor() {
-    super(table_stock_warehouse);
+    super(stock_tb_stock_warehouses);
   }
 
-  listWarehouses = async (): Promise<TblStockWarehouse[]> => {
+  listWarehouses = async (): Promise<StockTbStockWarehouse[]> => {
     return this.db
       .select()
-      .from(table_stock_warehouse)
-      .orderBy(asc(table_stock_warehouse.name));
+      .from(stock_tb_stock_warehouses)
+      .orderBy(asc(stock_tb_stock_warehouses.name));
   };
 
-  getWarehouse = async (id: string): Promise<TblStockWarehouse | null> => {
+  getWarehouse = async (id: string): Promise<StockTbStockWarehouse | null> => {
     const [record] = await this.db
       .select()
-      .from(table_stock_warehouse)
-      .where(eq(table_stock_warehouse.id, id))
+      .from(stock_tb_stock_warehouses)
+      .where(eq(stock_tb_stock_warehouses.id, id))
       .limit(1);
 
     return record ?? null;
@@ -75,11 +75,11 @@ export default class WarehouseModel extends BaseModel<
 
   createWarehouse = async (
     payload: WarehousePayload
-  ): Promise<TblStockWarehouse> => {
+  ): Promise<StockTbStockWarehouse> => {
     const insertPayload = this.normalizeWarehousePayload(payload);
 
     const [record] = await this.db
-      .insert(table_stock_warehouse)
+      .insert(stock_tb_stock_warehouses)
       .values(insertPayload)
       .returning();
 
@@ -89,14 +89,14 @@ export default class WarehouseModel extends BaseModel<
   updateWarehouse = async (
     id: string,
     payload: WarehousePayload
-  ): Promise<TblStockWarehouse> => {
+  ): Promise<StockTbStockWarehouse> => {
     const [record] = await this.db
-      .update(table_stock_warehouse)
+      .update(stock_tb_stock_warehouses)
       .set({
         ...this.normalizeWarehousePayload(payload),
         updatedAt: sql`now()`,
       })
-      .where(eq(table_stock_warehouse.id, id))
+      .where(eq(stock_tb_stock_warehouses.id, id))
       .returning();
 
     if (!record) {
@@ -108,7 +108,7 @@ export default class WarehouseModel extends BaseModel<
 
   private normalizeWarehousePayload = (
     payload: WarehousePayload
-  ): Omit<NewTblStockWarehouse, "id" | "createdAt" | "updatedAt"> => {
+  ): Omit<NewStockTbStockWarehouse, "id" | "createdAt" | "updatedAt"> => {
     return {
       code: payload.code.trim(),
       name: payload.name.trim(),

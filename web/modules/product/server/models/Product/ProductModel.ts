@@ -1,17 +1,17 @@
 import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import {
-  table_product_attribute,
-  table_product_category,
-  table_product_packing,
-  table_product_variant,
-  table_unit_of_measure,
-  table_uom_conversion,
+  product_tb_product_attributes,
+  product_tb_product_categories,
+  product_tb_product_packings,
+  product_tb_product_variants,
+  product_tb_units_of_measure,
+  product_tb_uom_conversions,
 } from "../../schemas";
 import {
-  table_product_master,
-  TblProductMaster,
-} from "../../schemas/product-master";
+  product_tb_product_masters,
+  ProductTbProductMaster,
+} from "../../schemas/product.master";
 
 import { MasterProduct } from "../interfaces/ProductMaster";
 import {
@@ -22,12 +22,12 @@ import {
   ProductUpdateInput,
 } from "./ProductModelInterface";
 
-class ProductModel extends BaseModel<typeof table_product_variant> {
+class ProductModel extends BaseModel<typeof product_tb_product_variants> {
   constructor() {
-    super(table_product_variant);
+    super(product_tb_product_variants);
   }
 
-  private mapToMasterProduct = (dbProduct: TblProductMaster): MasterProduct => {
+  private mapToMasterProduct = (dbProduct: ProductTbProductMaster): MasterProduct => {
     return {
       id: dbProduct.id,
       code: dbProduct.code,
@@ -64,22 +64,22 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
     const rows = await db
       .select({
         variant: this.table,
-        master: table_product_master,
-        category: table_product_category,
-        baseUom: table_unit_of_measure,
+        master: product_tb_product_masters,
+        category: product_tb_product_categories,
+        baseUom: product_tb_units_of_measure,
       })
       .from(this.table)
       .innerJoin(
-        table_product_master,
-        eq(this.table.productMasterId, table_product_master.id)
+        product_tb_product_masters,
+        eq(this.table.productMasterId, product_tb_product_masters.id)
       )
       .leftJoin(
-        table_product_category,
-        eq(table_product_master.categoryId, table_product_category.id)
+        product_tb_product_categories,
+        eq(product_tb_product_masters.categoryId, product_tb_product_categories.id)
       )
       .leftJoin(
-        table_unit_of_measure,
-        eq(this.table.baseUomId, table_unit_of_measure.id)
+        product_tb_units_of_measure,
+        eq(this.table.baseUomId, product_tb_units_of_measure.id)
       )
       .where(eq(this.table.id, id))
       .limit(1);
@@ -92,13 +92,13 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
 
     const packings = await db
       .select()
-      .from(table_product_packing)
-      .where(eq(table_product_packing.productVariantId, id));
+      .from(product_tb_product_packings)
+      .where(eq(product_tb_product_packings.productVariantId, id));
 
     const attributes = await db
       .select()
-      .from(table_product_attribute)
-      .where(eq(table_product_attribute.productVariantId, id));
+      .from(product_tb_product_attributes)
+      .where(eq(product_tb_product_attributes.productVariantId, id));
 
     return {
       variant: {
@@ -182,7 +182,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
 
     const result = await this.db.transaction(async (tx) => {
       const [master] = await tx
-        .insert(table_product_master)
+        .insert(product_tb_product_masters)
         .values({
           code: payload.master.code.trim(),
           name: this.normalizeLocale(payload.master.name) ?? {
@@ -198,7 +198,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
           createdAt: now,
           updatedAt: now,
         })
-        .returning({ id: table_product_master.id });
+        .returning({ id: product_tb_product_masters.id });
 
       if (!master) {
         throw new Error("Failed to create product master");
@@ -238,7 +238,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
       const normalizedPackings = this.ensurePackingValues(payload.packings);
 
       if (normalizedPackings.length) {
-        await tx.insert(table_product_packing).values(
+        await tx.insert(product_tb_product_packings).values(
           normalizedPackings.map((packing) => ({
             productVariantId: variant.id,
             name: this.normalizeLocale(packing.name) ?? {
@@ -257,7 +257,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
       );
 
       if (normalizedAttributes.length) {
-        await tx.insert(table_product_attribute).values(
+        await tx.insert(product_tb_product_attributes).values(
           normalizedAttributes.map((attribute) => ({
             productVariantId: variant.id,
             code: attribute.code.trim(),
@@ -276,7 +276,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
       if (normalizedUomConversions.length > 0 && variant.baseUomId) {
         // Insert UOM records first
         const uomInserts = await tx
-          .insert(table_unit_of_measure)
+          .insert(product_tb_units_of_measure)
           .values(
             normalizedUomConversions.map((conversion) => ({
               name: this.normalizeLocale(conversion.uomName) ?? {
@@ -288,11 +288,11 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
               updatedAt: now,
             }))
           )
-          .returning({ id: table_unit_of_measure.id });
+          .returning({ id: product_tb_units_of_measure.id });
 
         // Then insert conversion records linking to baseUomId
         if (uomInserts.length > 0) {
-          await tx.insert(table_uom_conversion).values(
+          await tx.insert(product_tb_uom_conversions).values(
             normalizedUomConversions.map((conversion, index) => ({
               uomId: uomInserts[index]?.id || conversion.uomId,
               conversionRatio: conversion.conversionRatio.toString(),
@@ -326,7 +326,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
       }
 
       await tx
-        .update(table_product_master)
+        .update(product_tb_product_masters)
         .set({
           code: payload.master.code.trim(),
           name: this.normalizeLocale(payload.master.name) ?? {
@@ -341,7 +341,7 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
           images: payload.master.images ?? null,
           updatedAt: now,
         })
-        .where(eq(table_product_master.id, variantRow.masterId));
+        .where(eq(product_tb_product_masters.id, variantRow.masterId));
 
       await tx
         .update(this.table)
@@ -369,13 +369,13 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
         .where(eq(this.table.id, payload.id));
 
       await tx
-        .delete(table_product_packing)
-        .where(eq(table_product_packing.productVariantId, payload.id));
+        .delete(product_tb_product_packings)
+        .where(eq(product_tb_product_packings.productVariantId, payload.id));
 
       const normalizedPackings = this.ensurePackingValues(payload.packings);
 
       if (normalizedPackings.length) {
-        await tx.insert(table_product_packing).values(
+        await tx.insert(product_tb_product_packings).values(
           normalizedPackings.map((packing) => ({
             productVariantId: payload.id,
             name: this.normalizeLocale(packing.name) ?? {
@@ -390,15 +390,15 @@ class ProductModel extends BaseModel<typeof table_product_variant> {
       }
 
       await tx
-        .delete(table_product_attribute)
-        .where(eq(table_product_attribute.productVariantId, payload.id));
+        .delete(product_tb_product_attributes)
+        .where(eq(product_tb_product_attributes.productVariantId, payload.id));
 
       const normalizedAttributes = this.ensureAttributeValues(
         payload.attributes
       );
 
       if (normalizedAttributes.length) {
-        await tx.insert(table_product_attribute).values(
+        await tx.insert(product_tb_product_attributes).values(
           normalizedAttributes.map((attribute) => ({
             productVariantId: payload.id,
             code: attribute.code.trim(),

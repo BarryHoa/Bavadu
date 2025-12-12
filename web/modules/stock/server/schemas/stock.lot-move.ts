@@ -7,11 +7,11 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlStockSchema } from "./schema";
-import { table_stock_lot } from "./stock.lot";
-import { table_stock_move } from "./stock.move";
+import { stock_tb_stock_lots } from "./stock.lot";
+import { stock_tb_stock_moves } from "./stock.move";
 
 // Stock Lot Moves - Theo dõi xuất từ lot nào
-export const table_stock_lot_move = mdlStockSchema.table(
+export const stock_tb_stock_lots_move = mdlStockSchema.table(
   "lot_moves",
   {
     id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
@@ -19,12 +19,12 @@ export const table_stock_lot_move = mdlStockSchema.table(
     // Link to stock move
     stockMoveId: uuid("stock_move_id")
       .notNull()
-      .references(() => table_stock_move.id, { onDelete: "cascade" }),
+      .references(() => stock_tb_stock_moves.id, { onDelete: "cascade" }),
 
     // Link to lot
     stockLotId: uuid("stock_lot_id")
       .notNull()
-      .references(() => table_stock_lot.id, { onDelete: "cascade" }),
+      .references(() => stock_tb_stock_lots.id, { onDelete: "cascade" }),
 
     // Quantity & Cost
     quantity: numeric("quantity", { precision: 14, scale: 2 }).notNull(),
@@ -43,6 +43,6 @@ export const table_stock_lot_move = mdlStockSchema.table(
   ]
 );
 
-export type TblStockLotMove = typeof table_stock_lot_move.$inferSelect;
-export type NewTblStockLotMove = typeof table_stock_lot_move.$inferInsert;
+export type StockTbStockLotMove = typeof stock_tb_stock_lots_move.$inferSelect;
+export type NewStockTbStockLotMove = typeof stock_tb_stock_lots_move.$inferInsert;
 

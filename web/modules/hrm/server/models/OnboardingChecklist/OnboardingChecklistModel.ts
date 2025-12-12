@@ -3,11 +3,11 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblOnboardingChecklist, table_onboarding_checklist } from "../../schemas";
-import { table_employee } from "../../schemas/employee";
+import { NewHrmTbOnboardingChecklist, hrm_tb_onboarding_checklists } from "../../schemas";
+import { hrm_tb_employees } from "../../schemas/hrm.employee";
 
-const employee = alias(table_employee, "employee");
-const assignedEmployee = alias(table_employee, "assigned_employee");
+const employee = alias(hrm_tb_employees, "employee");
+const assignedEmployee = alias(hrm_tb_employees, "assigned_employee");
 
 export interface OnboardingChecklistRow {
   id: string;
@@ -46,10 +46,10 @@ export interface OnboardingChecklistInput {
 }
 
 export default class OnboardingChecklistModel extends BaseModel<
-  typeof table_onboarding_checklist
+  typeof hrm_tb_onboarding_checklists
 > {
   constructor() {
-    super(table_onboarding_checklist);
+    super(hrm_tb_onboarding_checklists);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -130,7 +130,7 @@ export default class OnboardingChecklistModel extends BaseModel<
     payload: OnboardingChecklistInput
   ): Promise<OnboardingChecklistRow> => {
     const now = new Date();
-    const insertData: NewTblOnboardingChecklist = {
+    const insertData: NewHrmTbOnboardingChecklist = {
       employeeId: payload.employeeId,
       taskName: payload.taskName,
       taskDescription: payload.taskDescription ?? null,

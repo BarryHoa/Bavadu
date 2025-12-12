@@ -8,7 +8,7 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
 import { asc, eq, inArray } from "drizzle-orm";
-import { table_shipping_term } from "../../schemas/shipping-term";
+import { base_tb_shipping_terms } from "../../schemas/base.shipping-term";
 import { ParamFilter } from "../interfaces/FilterInterface";
 
 type ShippingTermDropdownOption = {
@@ -20,12 +20,12 @@ type ShippingTermDropdownOption = {
 };
 
 class ShippingTermDropdownListModel extends BaseViewListModel<
-  typeof table_shipping_term,
+  typeof base_tb_shipping_terms,
   ShippingTermDropdownOption
 > {
   constructor() {
     super({
-      table: table_shipping_term,
+      table: base_tb_shipping_terms,
       sortDefault: [
         {
           column: "order",
@@ -43,10 +43,10 @@ class ShippingTermDropdownListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_shipping_term.id, sort: false }],
-      ["code", { column: table_shipping_term.code, sort: true }],
-      ["name", { column: table_shipping_term.name, sort: false }],
-      ["order", { column: table_shipping_term.order, sort: true }],
+      ["id", { column: base_tb_shipping_terms.id, sort: false }],
+      ["code", { column: base_tb_shipping_terms.code, sort: true }],
+      ["name", { column: base_tb_shipping_terms.name, sort: false }],
+      ["order", { column: base_tb_shipping_terms.order, sort: true }],
     ]);
 
   protected declarationSearch = () => new Map();
@@ -57,14 +57,14 @@ class ShippingTermDropdownListModel extends BaseViewListModel<
         "isActive",
         (value?: unknown, _filters?: ParamFilter) =>
           typeof value === "boolean"
-            ? eq(table_shipping_term.isActive, value)
+            ? eq(base_tb_shipping_terms.isActive, value)
             : undefined,
       ],
       [
         "type",
         (value?: unknown, _filters?: ParamFilter) =>
           Array.isArray(value) && value.length > 0
-            ? inArray(table_shipping_term.type, value as string[])
+            ? inArray(base_tb_shipping_terms.type, value as string[])
             : undefined,
       ],
     ]);
@@ -93,14 +93,14 @@ class ShippingTermDropdownListModel extends BaseViewListModel<
     const result = await this.buildQueryDataListWithSelect(
       params,
       {
-        id: table_shipping_term.id,
-        code: table_shipping_term.code,
-        name: table_shipping_term.name,
-        order: table_shipping_term.order,
+        id: base_tb_shipping_terms.id,
+        code: base_tb_shipping_terms.code,
+        name: base_tb_shipping_terms.name,
+        order: base_tb_shipping_terms.order,
       },
       (query) => {
         return query
-          .orderBy(asc(table_shipping_term.order))
+          .orderBy(asc(base_tb_shipping_terms.order))
           .limit(params.limit);
       }
     );

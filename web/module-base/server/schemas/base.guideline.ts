@@ -3,7 +3,7 @@ import { index, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { mdBaseSchema } from "./schema";
 
 // Guidelines table
-export const table_guideline = mdBaseSchema.table(
+export const base_tb_guidelines = mdBaseSchema.table(
   "guidelines",
   {
     id: uuid("id")
@@ -25,6 +25,6 @@ export const table_guideline = mdBaseSchema.table(
   ]
 );
 
-export type TblGuideline = typeof table_guideline.$inferSelect;
-export type NewTblGuideline = typeof table_guideline.$inferInsert;
+export type BaseTbGuideline = typeof base_tb_guidelines.$inferSelect;
+export type NewBaseTbGuideline = typeof base_tb_guidelines.$inferInsert;
 

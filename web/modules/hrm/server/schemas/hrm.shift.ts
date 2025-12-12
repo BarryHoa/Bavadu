@@ -12,7 +12,7 @@ import {
 import { mdlHrmSchema } from "./schema";
 
 // Shifts - Ca làm việc
-export const table_shift = mdlHrmSchema.table(
+export const hrm_tb_shifts = mdlHrmSchema.table(
   "shifts",
   {
     id: uuid("id")
@@ -37,6 +37,6 @@ export const table_shift = mdlHrmSchema.table(
   ]
 );
 
-export type TblShift = typeof table_shift.$inferSelect;
-export type NewTblShift = typeof table_shift.$inferInsert;
+export type HrmTbShift = typeof hrm_tb_shifts.$inferSelect;
+export type NewHrmTbShift = typeof hrm_tb_shifts.$inferInsert;
 

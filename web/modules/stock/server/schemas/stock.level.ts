@@ -7,10 +7,10 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { mdlStockSchema } from "./schema";
-import { table_product_master } from "../../../product/server/schemas/product.master";
-import { table_stock_warehouse } from "./stock.warehouse";
+import { product_tb_product_masters } from "../../../product/server/schemas/product.master";
+import { stock_tb_stock_warehouses } from "./stock.warehouse";
 
-export const table_stock_level = mdlStockSchema.table(
+export const stock_tb_stock_levels = mdlStockSchema.table(
   "levels",
   {
     id: uuid("id")
@@ -18,12 +18,12 @@ export const table_stock_level = mdlStockSchema.table(
       .default(sql`uuid_generate_v7()`),
     productId: uuid("product_id")
       .notNull()
-      .references(() => table_product_master.id, {
+      .references(() => product_tb_product_masters.id, {
         onDelete: "cascade",
       }),
     warehouseId: uuid("warehouse_id")
       .notNull()
-      .references(() => table_stock_warehouse.id, {
+      .references(() => stock_tb_stock_warehouses.id, {
         onDelete: "cascade",
       }),
     quantity: numeric("quantity", { precision: 14, scale: 2 })
@@ -62,5 +62,5 @@ export const table_stock_level = mdlStockSchema.table(
   ]
 );
 
-export type TblStockLevel = typeof table_stock_level.$inferSelect;
-export type NewTblStockLevel = typeof table_stock_level.$inferInsert;
+export type StockTbStockLevel = typeof stock_tb_stock_levels.$inferSelect;
+export type NewStockTbStockLevel = typeof stock_tb_stock_levels.$inferInsert;

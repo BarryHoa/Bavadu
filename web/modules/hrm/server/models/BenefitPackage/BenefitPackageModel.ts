@@ -2,7 +2,7 @@ import { LocaleDataType } from "@base/server/interfaces/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 
-import { NewTblBenefitPackage, table_benefit_package } from "../../schemas";
+import { NewHrmTbBenefitPackage, hrm_tb_benefit_packages } from "../../schemas";
 
 export interface BenefitPackageRow {
   id: string;
@@ -30,10 +30,10 @@ export interface BenefitPackageInput {
 }
 
 export default class BenefitPackageModel extends BaseModel<
-  typeof table_benefit_package
+  typeof hrm_tb_benefit_packages
 > {
   constructor() {
-    super(table_benefit_package);
+    super(hrm_tb_benefit_packages);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -80,7 +80,7 @@ export default class BenefitPackageModel extends BaseModel<
     payload: BenefitPackageInput
   ): Promise<BenefitPackageRow> => {
     const now = new Date();
-    const insertData: NewTblBenefitPackage = {
+    const insertData: NewHrmTbBenefitPackage = {
       code: payload.code,
       name: payload.name,
       description: payload.description ?? null,

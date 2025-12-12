@@ -8,7 +8,7 @@ import type {
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
 import { asc, eq, inArray } from "drizzle-orm";
-import { table_payment_method } from "../../schemas/payment-method";
+import { base_tb_payment_methods } from "../../schemas/base.payment-method";
 import { ParamFilter } from "../interfaces/FilterInterface";
 
 type PaymentMethodDropdownOption = {
@@ -20,12 +20,12 @@ type PaymentMethodDropdownOption = {
 };
 
 class PaymentMethodDropdownListModel extends BaseViewListModel<
-  typeof table_payment_method,
+  typeof base_tb_payment_methods,
   PaymentMethodDropdownOption
 > {
   constructor() {
     super({
-      table: table_payment_method,
+      table: base_tb_payment_methods,
       sortDefault: [
         {
           column: "order",
@@ -43,10 +43,10 @@ class PaymentMethodDropdownListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: table_payment_method.id, sort: false }],
-      ["code", { column: table_payment_method.code, sort: true }],
-      ["name", { column: table_payment_method.name, sort: false }],
-      ["order", { column: table_payment_method.order, sort: true }],
+      ["id", { column: base_tb_payment_methods.id, sort: false }],
+      ["code", { column: base_tb_payment_methods.code, sort: true }],
+      ["name", { column: base_tb_payment_methods.name, sort: false }],
+      ["order", { column: base_tb_payment_methods.order, sort: true }],
     ]);
 
   protected declarationSearch = () => new Map();
@@ -57,14 +57,14 @@ class PaymentMethodDropdownListModel extends BaseViewListModel<
         "isActive",
         (value?: unknown, _filters?: ParamFilter) =>
           typeof value === "boolean"
-            ? eq(table_payment_method.isActive, value)
+            ? eq(base_tb_payment_methods.isActive, value)
             : undefined,
       ],
       [
         "type",
         (value?: unknown, _filters?: ParamFilter) =>
           Array.isArray(value) && value.length > 0
-            ? inArray(table_payment_method.type, value as string[])
+            ? inArray(base_tb_payment_methods.type, value as string[])
             : undefined,
       ],
     ]);
@@ -94,14 +94,14 @@ class PaymentMethodDropdownListModel extends BaseViewListModel<
     const result = await this.buildQueryDataListWithSelect(
       params,
       {
-        id: table_payment_method.id,
-        code: table_payment_method.code,
-        name: table_payment_method.name,
-        order: table_payment_method.order,
+        id: base_tb_payment_methods.id,
+        code: base_tb_payment_methods.code,
+        name: base_tb_payment_methods.name,
+        order: base_tb_payment_methods.order,
       },
       (query) => {
         return query
-          .orderBy(asc(table_payment_method.order))
+          .orderBy(asc(base_tb_payment_methods.order))
           .limit(params.limit);
       }
     );

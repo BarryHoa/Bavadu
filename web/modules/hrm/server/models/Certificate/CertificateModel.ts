@@ -3,10 +3,10 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblCertificate, table_certificate } from "../../schemas";
-import { table_employee } from "../../schemas/employee";
+import { NewHrmTbCertificate, hrm_tb_certificates } from "../../schemas";
+import { hrm_tb_employees } from "../../schemas/hrm.employee";
 
-const employee = alias(table_employee, "employee");
+const employee = alias(hrm_tb_employees, "employee");
 
 export interface CertificateRow {
   id: string;
@@ -38,9 +38,9 @@ export interface CertificateInput {
   isActive?: boolean;
 }
 
-export default class CertificateModel extends BaseModel<typeof table_certificate> {
+export default class CertificateModel extends BaseModel<typeof hrm_tb_certificates> {
   constructor() {
-    super(table_certificate);
+    super(hrm_tb_certificates);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -107,7 +107,7 @@ export default class CertificateModel extends BaseModel<typeof table_certificate
     payload: CertificateInput
   ): Promise<CertificateRow> => {
     const now = new Date();
-    const insertData: NewTblCertificate = {
+    const insertData: NewHrmTbCertificate = {
       employeeId: payload.employeeId,
       name: payload.name,
       issuer: payload.issuer,

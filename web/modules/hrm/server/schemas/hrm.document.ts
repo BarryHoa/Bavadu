@@ -7,11 +7,11 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { table_employee } from "./hrm.employee";
+import { hrm_tb_employees } from "./hrm.employee";
 import { mdlHrmSchema } from "./schema";
 
 // Documents - Tài liệu pháp lý và hồ sơ
-export const table_document = mdlHrmSchema.table(
+export const hrm_tb_documents = mdlHrmSchema.table(
   "documents",
   {
     id: uuid("id")
@@ -21,7 +21,7 @@ export const table_document = mdlHrmSchema.table(
     documentType: varchar("document_type", { length: 50 }).notNull(), // contract, amendment, certificate, id_card, etc.
     title: jsonb("title").notNull(), // LocaleDataType<string>
     description: jsonb("description"), // LocaleDataType<string>
-    employeeId: uuid("employee_id").references(() => table_employee.id, {
+    employeeId: uuid("employee_id").references(() => hrm_tb_employees.id, {
       onDelete: "cascade",
     }),
     fileUrl: varchar("file_url", { length: 500 }).notNull(),
@@ -42,5 +42,5 @@ export const table_document = mdlHrmSchema.table(
   (table) => []
 );
 
-export type TblDocument = typeof table_document.$inferSelect;
-export type NewTblDocument = typeof table_document.$inferInsert;
+export type HrmTbDocument = typeof hrm_tb_documents.$inferSelect;
+export type NewHrmTbDocument = typeof hrm_tb_documents.$inferInsert;

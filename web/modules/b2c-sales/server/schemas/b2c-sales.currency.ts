@@ -9,7 +9,7 @@ import {
 import { mdlSaleB2cSchema } from "./schema";
 
 // Currency Rate Snapshot - Store exchange rate at order creation time
-export const table_order_currency_rate = mdlSaleB2cSchema.table(
+export const sale_b2c_tb_currency_rates = mdlSaleB2cSchema.table(
   "currency_rates",
   {
     id: uuid("id")
@@ -31,6 +31,6 @@ export const table_order_currency_rate = mdlSaleB2cSchema.table(
   ]
 );
 
-export type TblOrderCurrencyRate = typeof table_order_currency_rate.$inferSelect;
-export type NewTblOrderCurrencyRate = typeof table_order_currency_rate.$inferInsert;
+export type SaleB2cTbCurrencyRate = typeof sale_b2c_tb_currency_rates.$inferSelect;
+export type NewSaleB2cTbCurrencyRate = typeof sale_b2c_tb_currency_rates.$inferInsert;
 

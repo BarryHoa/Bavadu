@@ -2,7 +2,7 @@ import { LocaleDataType } from "@base/server/interfaces/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 
-import { NewTblCourse, table_course } from "../../schemas";
+import { NewHrmTbCourse, hrm_tb_courses } from "../../schemas";
 
 export interface CourseRow {
   id: string;
@@ -29,9 +29,9 @@ export interface CourseInput {
   isActive?: boolean;
 }
 
-export default class CourseModel extends BaseModel<typeof table_course> {
+export default class CourseModel extends BaseModel<typeof hrm_tb_courses> {
   constructor() {
-    super(table_course);
+    super(hrm_tb_courses);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -72,7 +72,7 @@ export default class CourseModel extends BaseModel<typeof table_course> {
 
   createCourse = async (payload: CourseInput): Promise<CourseRow> => {
     const now = new Date();
-    const insertData: NewTblCourse = {
+    const insertData: NewHrmTbCourse = {
       code: payload.code,
       name: payload.name,
       description: payload.description ?? null,

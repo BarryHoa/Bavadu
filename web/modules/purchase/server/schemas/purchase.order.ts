@@ -9,7 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { mdlPurchaseSchema } from "./schema";
 
-export const table_purchase_order = mdlPurchaseSchema.table(
+export const purchase_tb_purchase_orders = mdlPurchaseSchema.table(
   "orders",
   {
     id: uuid("id")
@@ -39,5 +39,5 @@ export const table_purchase_order = mdlPurchaseSchema.table(
   ]
 );
 
-export type TblPurchaseOrder = typeof table_purchase_order.$inferSelect;
-export type NewTblPurchaseOrder = typeof table_purchase_order.$inferInsert;
+export type PurchaseTbPurchaseOrder = typeof purchase_tb_purchase_orders.$inferSelect;
+export type NewPurchaseTbPurchaseOrder = typeof purchase_tb_purchase_orders.$inferInsert;

@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 import { SESSION_CONFIG } from "../../config";
 import { setCsrfTokenCookie } from "../../middleware/csrf";
 import SessionModel from "../../models/Sessions/SessionModel";
-import { table_user, table_user_login } from "../../schemas/user";
+import { base_tb_users, base_tb_users_login } from "../../schemas/base.user";
 import getDbConnect from "../../utils/getDbConnect";
 import { JSONResponse } from "../../utils/JSONResponse";
 import {
@@ -52,24 +52,24 @@ export async function POST(request: NextRequest) {
       queries.push(
         db
           .select()
-          .from(table_user_login)
-          .where(eq(table_user_login.username, username))
+          .from(base_tb_users_login)
+          .where(eq(base_tb_users_login.username, username))
           .limit(1)
           .then((result) => result[0] || null)
       );
       queries.push(
         db
           .select()
-          .from(table_user_login)
-          .where(eq(table_user_login.email, username))
+          .from(base_tb_users_login)
+          .where(eq(base_tb_users_login.email, username))
           .limit(1)
           .then((result) => result[0] || null)
       );
       queries.push(
         db
           .select()
-          .from(table_user_login)
-          .where(eq(table_user_login.phone, username))
+          .from(base_tb_users_login)
+          .where(eq(base_tb_users_login.phone, username))
           .limit(1)
           .then((result) => result[0] || null)
       );
@@ -112,8 +112,8 @@ export async function POST(request: NextRequest) {
     // Get user info
     const [user] = await db
       .select()
-      .from(table_user)
-      .where(eq(table_user.id, userLogin.userId))
+      .from(base_tb_users)
+      .where(eq(base_tb_users.id, userLogin.userId))
       .limit(1);
 
     if (!user) {
@@ -152,14 +152,14 @@ export async function POST(request: NextRequest) {
     // Update last login info
     const now = new Date();
     await db
-      .update(table_user_login)
+      .update(base_tb_users_login)
       .set({
         lastLoginAt: now,
         lastLoginIp: ipAddress,
         lastLoginUserAgent: userAgent,
         updatedAt: now,
       })
-      .where(eq(table_user_login.userId, user.id));
+      .where(eq(base_tb_users_login.userId, user.id));
 
     // Create response with session cookie
     const response = JSONResponse({

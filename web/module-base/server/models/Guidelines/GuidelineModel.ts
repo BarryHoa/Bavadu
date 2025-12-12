@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { table_guideline } from "../../schemas/guideline";
+import { base_tb_guidelines } from "../../schemas/base.guideline";
 import { BaseModel } from "../BaseModel";
 
 export interface GuidelineData {
@@ -19,9 +19,9 @@ export interface UpdateGuidelineParams {
   content?: string;
 }
 
-class GuidelineModel extends BaseModel<typeof table_guideline> {
+class GuidelineModel extends BaseModel<typeof base_tb_guidelines> {
   constructor() {
-    super(table_guideline);
+    super(base_tb_guidelines);
   }
 
   /**

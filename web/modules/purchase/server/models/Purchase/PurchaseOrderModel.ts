@@ -3,13 +3,13 @@ import { and, desc, eq, sql } from "drizzle-orm";
 import { BaseModel } from "@base/server/models/BaseModel";
 import { getEnv } from "@base/server";
 import {
-  table_purchase_order,
-  table_purchase_order_line,
+  purchase_tb_purchase_orders,
+  purchase_tb_purchase_orders_line,
 } from "../../schemas";
 import type {
-  NewTblPurchaseOrder,
-  TblPurchaseOrder,
-  TblPurchaseOrderLine,
+  NewPurchaseTbPurchaseOrder,
+  PurchaseTbPurchaseOrder,
+  PurchaseTbPurchaseOrderLine,
 } from "../../schemas";
 import type StockModel from "@mdl/stock/server/models/Stock/StockModel";
 
@@ -46,32 +46,32 @@ interface ReceivePurchaseOrderInput {
 }
 
 export default class PurchaseOrderModel extends BaseModel<
-  typeof table_purchase_order
+  typeof purchase_tb_purchase_orders
 > {
   constructor() {
-    super(table_purchase_order);
+    super(purchase_tb_purchase_orders);
   }
 
-  list = async (): Promise<TblPurchaseOrder[]> => {
+  list = async (): Promise<PurchaseTbPurchaseOrder[]> => {
     return this.db
       .select()
-      .from(table_purchase_order)
-      .orderBy(desc(table_purchase_order.createdAt));
+      .from(purchase_tb_purchase_orders)
+      .orderBy(desc(purchase_tb_purchase_orders.createdAt));
   };
 
   getById = async (id: string) => {
     const [order] = await this.db
       .select()
-      .from(table_purchase_order)
-      .where(eq(table_purchase_order.id, id))
+      .from(purchase_tb_purchase_orders)
+      .where(eq(purchase_tb_purchase_orders.id, id))
       .limit(1);
     if (!order) {
       return null;
     }
     const lines = await this.db
       .select()
-      .from(table_purchase_order_line)
-      .where(eq(table_purchase_order_line.orderId, order.id));
+      .from(purchase_tb_purchase_orders_line)
+      .where(eq(purchase_tb_purchase_orders_line.orderId, order.id));
     return { order, lines };
   };
 
@@ -91,7 +91,7 @@ export default class PurchaseOrderModel extends BaseModel<
         .padStart(2, "0")}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
     return this.db.transaction(async (tx) => {
-      const orderPayload: NewTblPurchaseOrder = {
+      const orderPayload: NewPurchaseTbPurchaseOrder = {
         code: generatedCode,
         vendorName: input.vendorName.trim(),
         status: "draft",
@@ -106,7 +106,7 @@ export default class PurchaseOrderModel extends BaseModel<
       };
 
       const [order] = await tx
-        .insert(table_purchase_order)
+        .insert(purchase_tb_purchase_orders)
         .values(orderPayload)
         .returning();
 
@@ -119,7 +119,7 @@ export default class PurchaseOrderModel extends BaseModel<
         const unitPrice = Number(line.unitPrice ?? 0);
         totalAmount += quantity * unitPrice;
 
-        await tx.insert(table_purchase_order_line).values({
+        await tx.insert(purchase_tb_purchase_orders_line).values({
           orderId: order.id,
           productId: line.productId,
           description: line.description,
@@ -130,12 +130,12 @@ export default class PurchaseOrderModel extends BaseModel<
       }
 
       await tx
-        .update(table_purchase_order)
+        .update(purchase_tb_purchase_orders)
         .set({
           totalAmount: totalAmount.toString(),
           updatedAt: now,
         })
-        .where(eq(table_purchase_order.id, order.id));
+        .where(eq(purchase_tb_purchase_orders.id, order.id));
 
       const result = await this.getById(order.id);
       if (!result) {
@@ -147,12 +147,12 @@ export default class PurchaseOrderModel extends BaseModel<
 
   confirm = async (orderId: string) => {
     const [updated] = await this.db
-      .update(table_purchase_order)
+      .update(purchase_tb_purchase_orders)
       .set({
         status: "confirmed",
         updatedAt: sql`now()`,
       })
-      .where(eq(table_purchase_order.id, orderId))
+      .where(eq(purchase_tb_purchase_orders.id, orderId))
       .returning();
 
     if (!updated) {
@@ -183,7 +183,7 @@ export default class PurchaseOrderModel extends BaseModel<
       throw new Error("Warehouse is required to receive purchase order");
     }
 
-    const linesById = new Map<string, TblPurchaseOrderLine>();
+    const linesById = new Map<string, PurchaseTbPurchaseOrderLine>();
     for (const line of lines) {
       linesById.set(line.id, line);
     }
@@ -215,12 +215,12 @@ export default class PurchaseOrderModel extends BaseModel<
         }
 
         await tx
-          .update(table_purchase_order_line)
+          .update(purchase_tb_purchase_orders_line)
           .set({
             quantityReceived: nextReceived.toString(),
             updatedAt: now,
           })
-          .where(eq(table_purchase_order_line.id, line.id));
+          .where(eq(purchase_tb_purchase_orders_line.id, line.id));
 
         await stockModel.receiveStock({
           productId: line.productId,
@@ -236,24 +236,24 @@ export default class PurchaseOrderModel extends BaseModel<
         .select({
           unreceivedCount: sql`
             count(*) FILTER (
-              WHERE ${table_purchase_order_line.quantityOrdered} > ${table_purchase_order_line.quantityReceived}
+              WHERE ${purchase_tb_purchase_orders_line.quantityOrdered} > ${purchase_tb_purchase_orders_line.quantityReceived}
             )
           `,
         })
-        .from(table_purchase_order_line)
-        .where(eq(table_purchase_order_line.orderId, order.id));
+        .from(purchase_tb_purchase_orders_line)
+        .where(eq(purchase_tb_purchase_orders_line.orderId, order.id));
 
       const status: PurchaseStatus =
         Number(sumRow?.unreceivedCount ?? 0) === 0 ? "received" : "confirmed";
 
       await tx
-        .update(table_purchase_order)
+        .update(purchase_tb_purchase_orders)
         .set({
           status,
           warehouseId: defaultWarehouseId,
           updatedAt: now,
         })
-        .where(eq(table_purchase_order.id, order.id));
+        .where(eq(purchase_tb_purchase_orders.id, order.id));
     });
 
     return this.getById(order.id);
@@ -261,12 +261,12 @@ export default class PurchaseOrderModel extends BaseModel<
 
   cancel = async (orderId: string) => {
     const [updated] = await this.db
-      .update(table_purchase_order)
+      .update(purchase_tb_purchase_orders)
       .set({
         status: "cancelled",
         updatedAt: sql`now()`,
       })
-      .where(eq(table_purchase_order.id, orderId))
+      .where(eq(purchase_tb_purchase_orders.id, orderId))
       .returning();
 
     if (!updated) {

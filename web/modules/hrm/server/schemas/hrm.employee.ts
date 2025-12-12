@@ -10,12 +10,12 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { table_department } from "./hrm.department";
-import { table_position } from "./hrm.position";
+import { hrm_tb_departments } from "./hrm.department";
+import { hrm_tb_positions } from "./hrm.position";
 import { mdlHrmSchema } from "./schema";
 
 // Employees - Nhân viên
-export const table_employee = mdlHrmSchema.table(
+export const hrm_tb_employees = mdlHrmSchema.table(
   "employees",
   {
     id: uuid("id")
@@ -33,10 +33,10 @@ export const table_employee = mdlHrmSchema.table(
     taxId: varchar("tax_id", { length: 50 }), // Mã số thuế cá nhân
     address: jsonb("address"), // Address object
     positionId: uuid("position_id")
-      .references(() => table_position.id, { onDelete: "restrict" })
+      .references(() => hrm_tb_positions.id, { onDelete: "restrict" })
       .notNull(),
     departmentId: uuid("department_id")
-      .references(() => table_department.id, { onDelete: "restrict" })
+      .references(() => hrm_tb_departments.id, { onDelete: "restrict" })
       .notNull(),
     managerId: uuid("manager_id"), // Direct manager (employee ID)
     employmentStatus: varchar("employment_status", { length: 50 })
@@ -69,5 +69,5 @@ export const table_employee = mdlHrmSchema.table(
   ]
 );
 
-export type TblEmployee = typeof table_employee.$inferSelect;
-export type NewTblEmployee = typeof table_employee.$inferInsert;
+export type HrmTbEmployee = typeof hrm_tb_employees.$inferSelect;
+export type NewHrmTbEmployee = typeof hrm_tb_employees.$inferInsert;

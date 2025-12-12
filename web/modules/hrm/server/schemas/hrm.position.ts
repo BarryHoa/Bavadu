@@ -10,10 +10,10 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_department } from "./hrm.department";
+import { hrm_tb_departments } from "./hrm.department";
 
 // Positions - Vị trí công việc
-export const table_position = mdlHrmSchema.table(
+export const hrm_tb_positions = mdlHrmSchema.table(
   "positions",
   {
     id: uuid("id")
@@ -23,7 +23,7 @@ export const table_position = mdlHrmSchema.table(
     name: jsonb("name").notNull(), // LocaleDataType<string>
     description: jsonb("description"), // LocaleDataType<string>
     departmentId: uuid("department_id")
-      .references(() => table_department.id, { onDelete: "restrict" })
+      .references(() => hrm_tb_departments.id, { onDelete: "restrict" })
       .notNull(),
     jobFamily: varchar("job_family", { length: 100 }), // Job family/category
     jobGrade: varchar("job_grade", { length: 50 }), // Grade level (e.g., P1, P2, M1, M2)
@@ -47,5 +47,5 @@ export const table_position = mdlHrmSchema.table(
   ]
 );
 
-export type TblPosition = typeof table_position.$inferSelect;
-export type NewTblPosition = typeof table_position.$inferInsert;
+export type HrmTbPosition = typeof hrm_tb_positions.$inferSelect;
+export type NewHrmTbPosition = typeof hrm_tb_positions.$inferInsert;

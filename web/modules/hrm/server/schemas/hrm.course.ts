@@ -12,7 +12,7 @@ import {
 import { mdlHrmSchema } from "./schema";
 
 // Courses - Khóa học
-export const table_course = mdlHrmSchema.table(
+export const hrm_tb_courses = mdlHrmSchema.table(
   "courses",
   {
     id: uuid("id")
@@ -38,6 +38,6 @@ export const table_course = mdlHrmSchema.table(
   ]
 );
 
-export type TblCourse = typeof table_course.$inferSelect;
-export type NewTblCourse = typeof table_course.$inferInsert;
+export type HrmTbCourse = typeof hrm_tb_courses.$inferSelect;
+export type NewHrmTbCourse = typeof hrm_tb_courses.$inferInsert;
 

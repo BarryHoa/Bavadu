@@ -2,7 +2,7 @@ import { LocaleDataType } from "@base/server/interfaces/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 
-import { NewTblLeaveType, table_leave_type } from "../../schemas";
+import { NewHrmTbLeaveType, hrm_tb_leave_types } from "../../schemas";
 
 export interface LeaveTypeRow {
   id: string;
@@ -35,9 +35,9 @@ export interface LeaveTypeInput {
   isActive?: boolean;
 }
 
-export default class LeaveTypeModel extends BaseModel<typeof table_leave_type> {
+export default class LeaveTypeModel extends BaseModel<typeof hrm_tb_leave_types> {
   constructor() {
-    super(table_leave_type);
+    super(hrm_tb_leave_types);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -81,7 +81,7 @@ export default class LeaveTypeModel extends BaseModel<typeof table_leave_type> {
 
   createLeaveType = async (payload: LeaveTypeInput): Promise<LeaveTypeRow> => {
     const now = new Date();
-    const insertData: NewTblLeaveType = {
+    const insertData: NewHrmTbLeaveType = {
       code: payload.code,
       name: payload.name,
       description: payload.description ?? null,

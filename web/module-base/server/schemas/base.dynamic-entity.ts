@@ -12,7 +12,7 @@ import {
 import { mdBaseSchema } from "./schema";
 
 // Dynamic Entities allow defining custom fields per model and can be nested via parentId
-export const table_dynamic_entity = mdBaseSchema.table(
+export const base_tb_dynamic_entities = mdBaseSchema.table(
   "dynamic_entities",
   {
     id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
@@ -45,5 +45,5 @@ export const table_dynamic_entity = mdBaseSchema.table(
   ]
 );
 
-export type TblDynamicEntity = typeof table_dynamic_entity.$inferSelect;
-export type NewTblDynamicEntity = typeof table_dynamic_entity.$inferInsert;
+export type BaseTbDynamicEntity = typeof base_tb_dynamic_entities.$inferSelect;
+export type NewBaseTbDynamicEntity = typeof base_tb_dynamic_entities.$inferInsert;

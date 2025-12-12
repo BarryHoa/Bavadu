@@ -8,21 +8,21 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_employee } from "./hrm.employee";
-import { table_payroll_period } from "./hrm.payroll-period";
+import { hrm_tb_employees } from "./hrm.employee";
+import { hrm_tb_payrolls_period } from "./hrm.payroll-period";
 
 // Payroll - Bảng lương
-export const table_payroll = mdlHrmSchema.table(
+export const hrm_tb_payrolls = mdlHrmSchema.table(
   "payrolls",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     payrollPeriodId: uuid("payroll_period_id")
-      .references(() => table_payroll_period.id, { onDelete: "restrict" })
+      .references(() => hrm_tb_payrolls_period.id, { onDelete: "restrict" })
       .notNull(),
     employeeId: uuid("employee_id")
-      .references(() => table_employee.id, { onDelete: "restrict" })
+      .references(() => hrm_tb_employees.id, { onDelete: "restrict" })
       .notNull(),
     // Earnings - Thu nhập
     baseSalary: integer("base_salary").notNull(),
@@ -62,5 +62,5 @@ export const table_payroll = mdlHrmSchema.table(
   ]
 );
 
-export type TblPayroll = typeof table_payroll.$inferSelect;
-export type NewTblPayroll = typeof table_payroll.$inferInsert;
+export type HrmTbPayroll = typeof hrm_tb_payrolls.$inferSelect;
+export type NewHrmTbPayroll = typeof hrm_tb_payrolls.$inferInsert;

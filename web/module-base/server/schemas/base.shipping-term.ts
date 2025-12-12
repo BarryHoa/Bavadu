@@ -12,7 +12,7 @@ import {
 import { mdBaseSchema } from "./schema";
 
 // Shipping Terms
-export const table_shipping_term = mdBaseSchema.table(
+export const base_tb_shipping_terms = mdBaseSchema.table(
   "shipping_terms",
   {
     id: uuid("id")
@@ -37,5 +37,5 @@ export const table_shipping_term = mdBaseSchema.table(
   ]
 );
 
-export type TblShippingTerm = typeof table_shipping_term.$inferSelect;
-export type NewTblShippingTerm = typeof table_shipping_term.$inferInsert;
+export type BaseTbShippingTerm = typeof base_tb_shipping_terms.$inferSelect;
+export type NewBaseTbShippingTerm = typeof base_tb_shipping_terms.$inferInsert;

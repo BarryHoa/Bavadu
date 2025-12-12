@@ -12,11 +12,11 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
-import { table_department } from "./hrm.department";
-import { table_position } from "./hrm.position";
+import { hrm_tb_departments } from "./hrm.department";
+import { hrm_tb_positions } from "./hrm.position";
 
 // Job Requisitions - Yêu cầu tuyển dụng
-export const table_job_requisition = mdlHrmSchema.table(
+export const hrm_tb_job_requisitions = mdlHrmSchema.table(
   "job_requisitions",
   {
     id: uuid("id")
@@ -26,10 +26,10 @@ export const table_job_requisition = mdlHrmSchema.table(
     title: jsonb("title").notNull(), // LocaleDataType<string>
     description: jsonb("description"), // LocaleDataType<string>
     departmentId: uuid("department_id")
-      .references(() => table_department.id, { onDelete: "restrict" })
+      .references(() => hrm_tb_departments.id, { onDelete: "restrict" })
       .notNull(),
     positionId: uuid("position_id")
-      .references(() => table_position.id, { onDelete: "restrict" })
+      .references(() => hrm_tb_positions.id, { onDelete: "restrict" })
       .notNull(),
     numberOfOpenings: integer("number_of_openings").default(1).notNull(),
     priority: varchar("priority", { length: 50 }).default("normal"), // low, normal, high, urgent
@@ -57,6 +57,6 @@ export const table_job_requisition = mdlHrmSchema.table(
   ]
 );
 
-export type TblJobRequisition = typeof table_job_requisition.$inferSelect;
-export type NewTblJobRequisition = typeof table_job_requisition.$inferInsert;
+export type HrmTbJobRequisition = typeof hrm_tb_job_requisitions.$inferSelect;
+export type NewHrmTbJobRequisition = typeof hrm_tb_job_requisitions.$inferInsert;
 

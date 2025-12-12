@@ -3,9 +3,9 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblDepartment, table_department } from "../../schemas";
+import { NewHrmTbDepartment, hrm_tb_departments } from "../../schemas";
 
-const parentDepartment = alias(table_department, "parent_department");
+const parentDepartment = alias(hrm_tb_departments, "parent_department");
 
 export interface DepartmentRow {
   id: string;
@@ -36,10 +36,10 @@ export interface DepartmentInput {
 }
 
 export default class DepartmentModel extends BaseModel<
-  typeof table_department
+  typeof hrm_tb_departments
 > {
   constructor() {
-    super(table_department);
+    super(hrm_tb_departments);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -109,7 +109,7 @@ export default class DepartmentModel extends BaseModel<
     payload: DepartmentInput
   ): Promise<DepartmentRow> => {
     const now = new Date();
-    const insertData: NewTblDepartment = {
+    const insertData: NewHrmTbDepartment = {
       code: payload.code,
       name: payload.name,
       description: payload.description ?? null,

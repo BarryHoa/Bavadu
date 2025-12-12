@@ -12,7 +12,7 @@ import {
 import { mdBaseSchema } from "./schema";
 
 // Shipping Methods
-export const table_shipping_method = mdBaseSchema.table(
+export const base_tb_shipping_methods = mdBaseSchema.table(
   "shipping_methods",
   {
     id: uuid("id")
@@ -36,5 +36,5 @@ export const table_shipping_method = mdBaseSchema.table(
   ]
 );
 
-export type TblShippingMethod = typeof table_shipping_method.$inferSelect;
-export type NewTblShippingMethod = typeof table_shipping_method.$inferInsert;
+export type BaseTbShippingMethod = typeof base_tb_shipping_methods.$inferSelect;
+export type NewBaseTbShippingMethod = typeof base_tb_shipping_methods.$inferInsert;

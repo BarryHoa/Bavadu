@@ -9,18 +9,18 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { table_job_requisition } from "./hrm.job-requisition";
+import { hrm_tb_job_requisitions } from "./hrm.job-requisition";
 import { mdlHrmSchema } from "./schema";
 
 // Candidates - Ứng viên
-export const table_candidate = mdlHrmSchema.table(
+export const hrm_tb_candidates = mdlHrmSchema.table(
   "candidates",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
     requisitionId: uuid("requisition_id")
-      .references(() => table_job_requisition.id, { onDelete: "restrict" })
+      .references(() => hrm_tb_job_requisitions.id, { onDelete: "restrict" })
       .notNull(),
     firstName: varchar("first_name", { length: 255 }),
     lastName: varchar("last_name", { length: 255 }),
@@ -50,5 +50,5 @@ export const table_candidate = mdlHrmSchema.table(
   ]
 );
 
-export type TblCandidate = typeof table_candidate.$inferSelect;
-export type NewTblCandidate = typeof table_candidate.$inferInsert;
+export type HrmTbCandidate = typeof hrm_tb_candidates.$inferSelect;
+export type NewHrmTbCandidate = typeof hrm_tb_candidates.$inferInsert;

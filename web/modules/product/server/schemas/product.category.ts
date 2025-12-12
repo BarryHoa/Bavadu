@@ -12,7 +12,7 @@ import {
 import { mdlProductSchema } from "./schema";
 
 // Product Categories
-export const table_product_category = mdlProductSchema.table(
+export const product_tb_product_categories = mdlProductSchema.table(
   "categories",
   {
     id: uuid("id")
@@ -39,5 +39,5 @@ export const table_product_category = mdlProductSchema.table(
   ]
 );
 
-export type TblProductCategory = typeof table_product_category.$inferSelect;
-export type NewTblProductCategory = typeof table_product_category.$inferInsert;
+export type ProductTbProductCategory = typeof product_tb_product_categories.$inferSelect;
+export type NewProductTbProductCategory = typeof product_tb_product_categories.$inferInsert;

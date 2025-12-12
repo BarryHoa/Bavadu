@@ -3,10 +3,10 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewTblGoal, table_goal } from "../../schemas";
-import { table_employee } from "../../schemas/employee";
+import { NewHrmTbGoal, hrm_tb_goals } from "../../schemas";
+import { hrm_tb_employees } from "../../schemas/hrm.employee";
 
-const employee = alias(table_employee, "employee");
+const employee = alias(hrm_tb_employees, "employee");
 
 export interface GoalRow {
   id: string;
@@ -45,9 +45,9 @@ export interface GoalInput {
   status?: string;
 }
 
-export default class GoalModel extends BaseModel<typeof table_goal> {
+export default class GoalModel extends BaseModel<typeof hrm_tb_goals> {
   constructor() {
-    super(table_goal);
+    super(hrm_tb_goals);
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -135,7 +135,7 @@ export default class GoalModel extends BaseModel<typeof table_goal> {
           )
         : 0;
 
-    const insertData: NewTblGoal = {
+    const insertData: NewHrmTbGoal = {
       employeeId: payload.employeeId,
       goalType: payload.goalType,
       title: payload.title,
