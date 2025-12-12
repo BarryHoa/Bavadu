@@ -25,6 +25,11 @@
     "leave-request.curd": "LeaveRequest/LeaveRequestModel",
     "timesheet.curd": "Timesheet/TimesheetModel",
     "payroll-period.curd": "PayrollPeriod/PayrollPeriodModel",
-    "payroll.curd": "Payroll/PayrollModel"
+    "payroll.curd": "Payroll/PayrollModel",
+    "job-requisition.curd": "JobRequisition/JobRequisitionModel",
+    "candidate.curd": "Candidate/CandidateModel",
+    "offer.curd": "Offer/OfferModel",
+    "onboarding-checklist.curd": "OnboardingChecklist/OnboardingChecklistModel",
+    "offboarding.curd": "Offboarding/OffboardingModel"
   }
 }
