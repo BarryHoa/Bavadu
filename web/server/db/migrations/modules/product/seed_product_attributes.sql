@@ -2,11 +2,11 @@
 
 WITH variant_rows AS (
   SELECT id, ROW_NUMBER() OVER (ORDER BY created_at, id) AS rn
-  FROM "product_variants"
+  FROM "mdl_product"."variants"
   ORDER BY created_at, id
   LIMIT 20
 )
-INSERT INTO "product_attributes" (
+INSERT INTO "mdl_product"."attributes" (
   "product_variant_id",
   "code",
   "name",

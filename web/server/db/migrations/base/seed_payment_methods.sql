@@ -2,7 +2,7 @@
 -- Seed dữ liệu mẫu cho payment_methods
 
 -- B2C Payment Methods
-INSERT INTO "payment_methods" (
+INSERT INTO "md_base"."payment_methods" (
   "code",
   "name",
   "description",
@@ -36,7 +36,7 @@ VALUES
 ON CONFLICT ("code", "type") DO NOTHING;
 
 -- B2B Payment Methods
-INSERT INTO "payment_methods" (
+INSERT INTO "md_base"."payment_methods" (
   "code",
   "name",
   "description",
@@ -66,7 +66,7 @@ VALUES
 ON CONFLICT ("code", "type") DO NOTHING;
 
 -- All (Common) Payment Methods
-INSERT INTO "payment_methods" (
+INSERT INTO "md_base"."payment_methods" (
   "code",
   "name",
   "description",

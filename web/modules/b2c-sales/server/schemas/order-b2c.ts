@@ -8,15 +8,15 @@ import {
   boolean,
   index,
   numeric,
-  pgTable,
   text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { mdlSaleB2cSchema } from "./schema";
 
-export const table_sales_order_b2c = pgTable(
-  "sales_orders_b2c",
+export const table_sales_order_b2c = mdlSaleB2cSchema.table(
+  "orders",
   {
     id: uuid("id")
       .primaryKey()
@@ -89,14 +89,14 @@ export const table_sales_order_b2c = pgTable(
     createdBy: varchar("created_by", { length: 36 }),
   },
   (table) => [
-    index("sales_orders_b2c_code_idx").on(table.code),
-    index("sales_orders_b2c_customer_idx").on(table.customerName),
-    index("sales_orders_b2c_status_idx").on(table.status),
-    index("sales_orders_b2c_warehouse_idx").on(table.warehouseId),
-    index("sales_orders_b2c_expected_idx").on(table.expectedDate),
-    index("sales_orders_b2c_created_idx").on(table.createdAt),
-    index("sales_orders_b2c_completed_idx").on(table.completedAt),
-    index("idx_sales_orders_b2c_price_list").on(table.priceListId),
+    index("orders_code_idx").on(table.code),
+    index("orders_customer_idx").on(table.customerName),
+    index("orders_status_idx").on(table.status),
+    index("orders_warehouse_idx").on(table.warehouseId),
+    index("orders_expected_idx").on(table.expectedDate),
+    index("orders_created_idx").on(table.createdAt),
+    index("orders_completed_idx").on(table.completedAt),
+    index("orders_price_list_idx").on(table.priceListId),
   ]
 );
 

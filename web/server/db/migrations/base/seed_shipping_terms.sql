@@ -2,7 +2,7 @@
 -- Seed dữ liệu mẫu cho shipping_terms
 
 -- B2C Shipping Terms
-INSERT INTO "shipping_terms" (
+INSERT INTO "md_base"."shipping_terms" (
   "code",
   "name",
   "description",
@@ -28,7 +28,7 @@ VALUES
 ON CONFLICT ("code", "type") DO NOTHING;
 
 -- B2B Shipping Terms
-INSERT INTO "shipping_terms" (
+INSERT INTO "md_base"."shipping_terms" (
   "code",
   "name",
   "description",
@@ -62,7 +62,7 @@ VALUES
 ON CONFLICT ("code", "type") DO NOTHING;
 
 -- All (Common) Shipping Terms
-INSERT INTO "shipping_terms" (
+INSERT INTO "md_base"."shipping_terms" (
   "code",
   "name",
   "description",

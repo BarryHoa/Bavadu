@@ -8,12 +8,12 @@ import {
   integer,
   jsonb,
   numeric,
-  pgTable,
   text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { mdlSaleB2cSchema } from "./schema";
 
 // ============================================
 // Price Lists B2C
@@ -26,8 +26,8 @@ import {
 //   regions?: string[],        // Region codes
 //   customerGroups?: string[]  // Customer group IDs
 // }
-export const table_price_lists_b2c = pgTable(
-  "price_lists_b2c",
+export const table_price_lists_b2c = mdlSaleB2cSchema.table(
+  "price_lists",
   {
     id: uuid("id")
       .primaryKey()
@@ -49,23 +49,23 @@ export const table_price_lists_b2c = pgTable(
     updatedBy: varchar("updated_by", { length: 36 }),
   },
   (table) => [
-    index("idx_price_lists_b2c_code").on(table.code),
-    index("idx_price_lists_b2c_status").on(table.status),
-    index("idx_price_lists_b2c_type").on(table.type),
-    index("idx_price_lists_b2c_valid_dates").on(table.validFrom, table.validTo),
-    index("idx_price_lists_b2c_default")
+    index("price_lists_code_idx").on(table.code),
+    index("price_lists_status_idx").on(table.status),
+    index("price_lists_type_idx").on(table.type),
+    index("price_lists_valid_dates_idx").on(table.validFrom, table.validTo),
+    index("price_lists_default_idx")
       .on(table.isDefault)
       .where(sql`${table.isDefault} = true`),
-    index("idx_price_lists_b2c_applicable_to").on(table.applicableTo),
-    index("idx_price_lists_b2c_type_status").on(table.type, table.status),
+    index("price_lists_applicable_to_idx").on(table.applicableTo),
+    index("price_lists_type_status_idx").on(table.type, table.status),
     // Check constraint: validTo phải >= validFrom (nếu có)
     check(
-      "price_lists_b2c_valid_dates_check",
+      "price_lists_valid_dates_check",
       sql`(${table.validTo} IS NULL) OR (${table.validTo} >= ${table.validFrom})`
     ),
     // Check constraint: Nếu type != 'standard' thì validTo không được NULL
     check(
-      "price_lists_b2c_valid_to_required_check",
+      "price_lists_valid_to_required_check",
       sql`(${table.type} = 'standard') OR (${table.validTo} IS NOT NULL)`
     ),
   ]
@@ -77,8 +77,8 @@ export type NewTblPriceListB2C = typeof table_price_lists_b2c.$inferInsert;
 // ============================================
 // Price List Items B2C
 // ============================================
-export const table_price_list_items_b2c = pgTable(
-  "price_list_items_b2c",
+export const table_price_list_items_b2c = mdlSaleB2cSchema.table(
+  "price_list_items",
   {
     id: uuid("id")
       .primaryKey()
@@ -116,19 +116,19 @@ export const table_price_list_items_b2c = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
   (table) => [
-    index("idx_price_list_items_b2c_price_list").on(table.priceListId),
-    index("idx_price_list_items_b2c_product_variant").on(
+    index("price_list_items_price_list_idx").on(table.priceListId),
+    index("price_list_items_product_variant_idx").on(
       table.productVariantId
     ),
-    index("idx_price_list_items_b2c_product_master").on(table.productMasterId),
-    index("idx_price_list_items_b2c_active")
+    index("price_list_items_product_master_idx").on(table.productMasterId),
+    index("price_list_items_active_idx")
       .on(table.isActive)
       .where(sql`${table.isActive} = true`),
-    index("idx_price_list_items_b2c_valid_dates").on(
+    index("price_list_items_valid_dates_idx").on(
       table.validFrom,
       table.validTo
     ),
-    index("idx_price_list_items_b2c_lookup").on(
+    index("price_list_items_lookup_idx").on(
       table.productVariantId,
       table.priceListId,
       table.isActive
@@ -154,8 +154,8 @@ export type NewTblPriceListItemB2C =
 //   channels?: string[],
 //   regions?: string[]
 // }
-export const table_pricing_rules_b2c = pgTable(
-  "pricing_rules_b2c",
+export const table_pricing_rules_b2c = mdlSaleB2cSchema.table(
+  "pricing_rules",
   {
     id: uuid("id")
       .primaryKey()
@@ -185,11 +185,11 @@ export const table_pricing_rules_b2c = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
   (table) => [
-    index("idx_pricing_rules_b2c_price_list").on(table.priceListId),
-    index("idx_pricing_rules_b2c_active")
+    index("pricing_rules_price_list_idx").on(table.priceListId),
+    index("pricing_rules_active_idx")
       .on(table.isActive)
       .where(sql`${table.isActive} = true`),
-    index("idx_pricing_rules_b2c_priority").on(
+    index("pricing_rules_priority_idx").on(
       table.priceListId,
       table.priority
     ),
@@ -202,8 +202,8 @@ export type NewTblPricingRuleB2C = typeof table_pricing_rules_b2c.$inferInsert;
 // ============================================
 // Price Tiers B2C
 // ============================================
-export const table_price_tiers_b2c = pgTable(
-  "price_tiers_b2c",
+export const table_price_tiers_b2c = mdlSaleB2cSchema.table(
+  "price_tiers",
   {
     id: uuid("id")
       .primaryKey()
@@ -228,9 +228,9 @@ export const table_price_tiers_b2c = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
   (table) => [
-    index("idx_price_tiers_b2c_item").on(table.priceListItemId),
-    index("idx_price_tiers_b2c_rule").on(table.pricingRuleId),
-    index("idx_price_tiers_b2c_quantity").on(
+    index("price_tiers_item_idx").on(table.priceListItemId),
+    index("price_tiers_rule_idx").on(table.pricingRuleId),
+    index("price_tiers_quantity_idx").on(
       table.minQuantity,
       table.maxQuantity
     ),

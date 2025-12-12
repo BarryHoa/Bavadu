@@ -4,7 +4,7 @@
 -- Generated at: 2025-11-15T11:59:17.504Z
 
 -- First, ensure Vietnam country exists
-INSERT INTO "location_countries" (
+INSERT INTO "md_base"."location_countries" (
   "code",
   "name",
   "is_active",

@@ -2,7 +2,7 @@
 -- Seed dữ liệu mẫu cho payment_terms
 
 -- B2C Payment Terms
-INSERT INTO "payment_terms" (
+INSERT INTO "md_base"."payment_terms" (
   "code",
   "name",
   "description",
@@ -29,7 +29,7 @@ VALUES
 ON CONFLICT ("code", "type") DO NOTHING;
 
 -- B2B Payment Terms
-INSERT INTO "payment_terms" (
+INSERT INTO "md_base"."payment_terms" (
   "code",
   "name",
   "description",
@@ -68,7 +68,7 @@ VALUES
 ON CONFLICT ("code", "type") DO NOTHING;
 
 -- All (Common) Payment Terms
-INSERT INTO "payment_terms" (
+INSERT INTO "md_base"."payment_terms" (
   "code",
   "name",
   "description",

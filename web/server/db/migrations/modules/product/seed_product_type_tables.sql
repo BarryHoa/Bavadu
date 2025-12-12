@@ -4,12 +4,12 @@
 -- Product Type: Goods
 WITH variants AS (
   SELECT pv.id, pv.product_master_id, pm.type, ROW_NUMBER() OVER (ORDER BY pm.code, pv.sku) AS rn
-  FROM "product_variants" pv
+  FROM "mdl_product"."variants" pv
   INNER JOIN "product_masters" pm ON pm.id = pv.product_master_id
   WHERE pm.type = 'goods'
   ORDER BY pm.code, pv.sku
 )
-INSERT INTO "product_type_goods" (
+INSERT INTO "mdl_product"."type_goods" (
   "product_variant_id",
   "default_sale_price",
   "default_purchase_price",
@@ -41,12 +41,12 @@ FROM variants;
 -- Product Type: Raw Material
 WITH variants AS (
   SELECT pv.id, pv.product_master_id, pm.type, ROW_NUMBER() OVER (ORDER BY pm.code, pv.sku) AS rn
-  FROM "product_variants" pv
+  FROM "mdl_product"."variants" pv
   INNER JOIN "product_masters" pm ON pm.id = pv.product_master_id
   WHERE pm.type = 'raw_material'
   ORDER BY pm.code, pv.sku
 )
-INSERT INTO "product_type_raw_material" (
+INSERT INTO "mdl_product"."type_raw_material" (
   "product_variant_id",
   "default_purchase_price",
   "specifications",
@@ -79,12 +79,12 @@ FROM variants;
 -- Product Type: Finished Good
 WITH variants AS (
   SELECT pv.id, pv.product_master_id, pm.type, ROW_NUMBER() OVER (ORDER BY pm.code, pv.sku) AS rn
-  FROM "product_variants" pv
+  FROM "mdl_product"."variants" pv
   INNER JOIN "product_masters" pm ON pm.id = pv.product_master_id
   WHERE pm.type = 'finished_good'
   ORDER BY pm.code, pv.sku
 )
-INSERT INTO "product_type_finished_good" (
+INSERT INTO "mdl_product"."type_finished_good" (
   "product_variant_id",
   "default_sale_price",
   "default_manufacturing_cost",
@@ -110,12 +110,12 @@ FROM variants;
 -- Product Type: Consumable
 WITH variants AS (
   SELECT pv.id, pv.product_master_id, pm.type, ROW_NUMBER() OVER (ORDER BY pm.code, pv.sku) AS rn
-  FROM "product_variants" pv
+  FROM "mdl_product"."variants" pv
   INNER JOIN "product_masters" pm ON pm.id = pv.product_master_id
   WHERE pm.type = 'consumable'
   ORDER BY pm.code, pv.sku
 )
-INSERT INTO "product_type_consumable" (
+INSERT INTO "mdl_product"."type_consumable" (
   "product_variant_id",
   "default_purchase_price",
   "default_min_stock_level",
@@ -141,12 +141,12 @@ FROM variants;
 -- Product Type: Tool
 WITH variants AS (
   SELECT pv.id, pv.product_master_id, pm.type, ROW_NUMBER() OVER (ORDER BY pm.code, pv.sku) AS rn
-  FROM "product_variants" pv
+  FROM "mdl_product"."variants" pv
   INNER JOIN "product_masters" pm ON pm.id = pv.product_master_id
   WHERE pm.type = 'tool'
   ORDER BY pm.code, pv.sku
 )
-INSERT INTO "product_type_tool" (
+INSERT INTO "mdl_product"."type_tool" (
   "product_variant_id",
   "serial_number",
   "model_number",
@@ -182,12 +182,12 @@ FROM variants;
 -- Product Type: Asset
 WITH variants AS (
   SELECT pv.id, pv.product_master_id, pm.type, ROW_NUMBER() OVER (ORDER BY pm.code, pv.sku) AS rn
-  FROM "product_variants" pv
+  FROM "mdl_product"."variants" pv
   INNER JOIN "product_masters" pm ON pm.id = pv.product_master_id
   WHERE pm.type = 'asset'
   ORDER BY pm.code, pv.sku
 )
-INSERT INTO "product_type_asset" (
+INSERT INTO "mdl_product"."type_asset" (
   "product_variant_id",
   "asset_code",
   "purchase_date",
@@ -223,12 +223,12 @@ FROM variants;
 -- Product Type: Service
 WITH variants AS (
   SELECT pv.id, pv.product_master_id, pm.type, ROW_NUMBER() OVER (ORDER BY pm.code, pv.sku) AS rn
-  FROM "product_variants" pv
+  FROM "mdl_product"."variants" pv
   INNER JOIN "product_masters" pm ON pm.id = pv.product_master_id
   WHERE pm.type = 'service'
   ORDER BY pm.code, pv.sku
 )
-INSERT INTO "product_type_service" (
+INSERT INTO "mdl_product"."type_service" (
   "product_variant_id",
   "default_service_price",
   "unit",
@@ -252,7 +252,7 @@ FROM variants;
 -- Stock Settings (based on product_masters and stock_warehouses)
 WITH products AS (
   SELECT id, ROW_NUMBER() OVER (ORDER BY code) AS rn
-  FROM "product_masters"
+  FROM "mdl_product"."masters"
   ORDER BY code
   LIMIT 20
 ),
@@ -289,7 +289,7 @@ WHERE (p.rn + w.rn) % 3 = 0; -- Create settings for some product-warehouse combi
 -- Only create lots for stockable products (goods, raw_material, consumable, finished_good)
 WITH stockable_variants AS (
   SELECT pv.id AS variant_id, pv.product_master_id, pm.type, ROW_NUMBER() OVER (ORDER BY pm.code, pv.sku) AS rn
-  FROM "product_variants" pv
+  FROM "mdl_product"."variants" pv
   INNER JOIN "product_masters" pm ON pm.id = pv.product_master_id
   WHERE pm.type IN ('goods', 'raw_material', 'consumable', 'finished_good')
   ORDER BY pm.code, pv.sku
@@ -384,7 +384,7 @@ WITH variants_with_standard_cost AS (
     pv.id AS variant_id,
     pv.standard_cost,
     ROW_NUMBER() OVER (ORDER BY pv.sku) AS rn
-  FROM "product_variants" pv
+  FROM "mdl_product"."variants" pv
   WHERE pv.cost_method = 'standard' AND pv.standard_cost IS NOT NULL
   LIMIT 15
 ),

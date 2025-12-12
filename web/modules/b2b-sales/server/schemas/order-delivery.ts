@@ -2,17 +2,17 @@ import { sql } from "drizzle-orm";
 import {
   index,
   numeric,
-  pgTable,
   text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { mdlSaleB2bSchema } from "./schema";
 import { table_stock_warehouse } from "@mdl/stock/server/schemas/warehouse";
 
 // Sales Order Delivery - Track deliveries from orders (warehouse receipts)
-export const table_sales_order_delivery = pgTable(
-  "sales_order_deliveries",
+export const table_sales_order_delivery = mdlSaleB2bSchema.table(
+  "deliveries",
   {
     id: uuid("id")
       .primaryKey()
@@ -31,13 +31,13 @@ export const table_sales_order_delivery = pgTable(
     createdBy: varchar("created_by", { length: 36 }),
   },
   (table) => [
-    index("sales_order_deliveries_order_idx").on(
+    index("deliveries_order_idx").on(
       table.orderType,
       table.orderId
     ),
-    index("sales_order_deliveries_warehouse_idx").on(table.warehouseId),
-    index("sales_order_deliveries_date_idx").on(table.deliveryDate),
-    index("sales_order_deliveries_status_idx").on(table.status),
+    index("deliveries_warehouse_idx").on(table.warehouseId),
+    index("deliveries_date_idx").on(table.deliveryDate),
+    index("deliveries_status_idx").on(table.status),
   ]
 );
 
@@ -47,8 +47,8 @@ export type NewTblSalesOrderDelivery =
   typeof table_sales_order_delivery.$inferInsert;
 
 // Delivery Lines - Track which order lines are delivered
-export const table_sales_order_delivery_line = pgTable(
-  "sales_order_delivery_lines",
+export const table_sales_order_delivery_line = mdlSaleB2bSchema.table(
+  "delivery_lines",
   {
     id: uuid("id")
       .primaryKey()
@@ -62,8 +62,8 @@ export const table_sales_order_delivery_line = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
   (table) => [
-    index("sales_order_delivery_lines_delivery_idx").on(table.deliveryId),
-    index("sales_order_delivery_lines_order_line_idx").on(
+    index("delivery_lines_delivery_idx").on(table.deliveryId),
+    index("delivery_lines_order_line_idx").on(
       table.orderType,
       table.orderLineId
     ),

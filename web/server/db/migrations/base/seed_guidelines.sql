@@ -1,7 +1,7 @@
 -- Seed data for guideline: product-infor-needed
 -- Content from modules/product/client/components/Product/ProductFormGuideModal.tsx
 
-INSERT INTO "guidelines" (
+INSERT INTO "md_base"."guidelines" (
   "key",
   "content",
   "created_at",

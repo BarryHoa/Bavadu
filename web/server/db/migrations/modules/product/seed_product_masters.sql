@@ -2,11 +2,11 @@
 
 WITH cats AS (
   SELECT id, ROW_NUMBER() OVER (ORDER BY code) AS rn
-  FROM "product_categories"
+  FROM "mdl_product"."categories"
   ORDER BY code
   LIMIT 20
 )
-INSERT INTO "product_masters" (
+INSERT INTO "mdl_product"."masters" (
   "code",
   "name",
   "image",

@@ -1,7 +1,7 @@
 -- Seed data for units_of_measure and uom_conversions tables
 
 -- Units of measure
-INSERT INTO "units_of_measure" (
+INSERT INTO "mdl_product"."units_of_measure" (
   "name",
   "symbol",
   "is_active",
@@ -23,11 +23,11 @@ FROM generate_series(1, 20) AS gs;
 -- Unit conversions
 WITH uoms AS (
   SELECT id, ROW_NUMBER() OVER (ORDER BY created_at, id) AS rn
-  FROM "units_of_measure"
+  FROM "mdl_product"."units_of_measure"
   ORDER BY created_at, id
   LIMIT 20
 )
-INSERT INTO "uom_conversions" (
+INSERT INTO "mdl_product"."uom_conversions" (
   "uom_id",
   "conversion_ratio",
   "created_at",

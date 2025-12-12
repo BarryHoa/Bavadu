@@ -7,7 +7,7 @@ WITH warehouses AS (
   ORDER BY code
   LIMIT 20
 )
-INSERT INTO "purchase_orders" (
+INSERT INTO "mdl_purchase"."orders" (
   "code",
   "vendor_name",
   "status",
@@ -37,7 +37,7 @@ FROM generate_series(1, 20) AS gs;
 -- Purchase order lines
 WITH orders AS (
   SELECT id, ROW_NUMBER() OVER (ORDER BY created_at, id) AS rn
-  FROM "purchase_orders"
+  FROM "mdl_purchase"."orders"
   ORDER BY created_at, id
   LIMIT 20
 ),
@@ -47,7 +47,7 @@ products AS (
   ORDER BY code
   LIMIT 20
 )
-INSERT INTO "purchase_order_lines" (
+INSERT INTO "mdl_purchase"."order_lines" (
   "order_id",
   "product_id",
   "description",

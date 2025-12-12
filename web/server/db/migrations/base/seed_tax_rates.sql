@@ -2,7 +2,7 @@
 -- Seed dữ liệu mẫu cho tax_rates
 
 -- B2C Tax Rates
-INSERT INTO "tax_rates" (
+INSERT INTO "md_base"."tax_rates" (
   "code",
   "name",
   "description",
@@ -29,7 +29,7 @@ VALUES
 ON CONFLICT ("code", "type") DO NOTHING;
 
 -- B2B Tax Rates
-INSERT INTO "tax_rates" (
+INSERT INTO "md_base"."tax_rates" (
   "code",
   "name",
   "description",
@@ -60,7 +60,7 @@ VALUES
 ON CONFLICT ("code", "type") DO NOTHING;
 
 -- All (Common) Tax Rates
-INSERT INTO "tax_rates" (
+INSERT INTO "md_base"."tax_rates" (
   "code",
   "name",
   "description",

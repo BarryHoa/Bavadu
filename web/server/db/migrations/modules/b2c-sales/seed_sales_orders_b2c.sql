@@ -3,7 +3,7 @@
 
 WITH customers AS (
   SELECT id, ROW_NUMBER() OVER (ORDER BY code) AS rn
-  FROM "customer_individuals"
+  FROM "mdl_sale_b2c"."customers"
   LIMIT 15
 ),
 warehouses AS (
@@ -29,7 +29,7 @@ shipping_terms AS (
   WHERE "type" IN ('b2c', 'all')
   LIMIT 5
 )
-INSERT INTO "sales_orders_b2c" (
+INSERT INTO "mdl_sale_b2c"."orders" (
   "code",
   "status",
   "customer_name",
@@ -84,5 +84,5 @@ SELECT
   CONCAT('user', ((gs - 1) % 20) + 1)
 FROM generate_series(1, 15) AS gs
 WHERE NOT EXISTS (
-  SELECT 1 FROM "sales_orders_b2c" WHERE "code" = CONCAT('SO-B2C-', LPAD(gs::text, 4, '0'))
+  SELECT 1 FROM "mdl_sale_b2c"."orders" WHERE "code" = CONCAT('SO-B2C-', LPAD(gs::text, 4, '0'))
 );

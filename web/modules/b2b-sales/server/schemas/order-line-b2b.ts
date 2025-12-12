@@ -2,17 +2,17 @@ import { sql } from "drizzle-orm";
 import {
   index,
   numeric,
-  pgTable,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { mdlSaleB2bSchema } from "./schema";
 
 import { table_product_master } from "@mdl/product/server/schemas/product-master";
 import { table_sales_order_b2b } from "./order-b2b";
 
-export const table_sales_order_line_b2b = pgTable(
-  "sales_order_lines_b2b",
+export const table_sales_order_line_b2b = mdlSaleB2bSchema.table(
+  "order_lines",
   {
     id: uuid("id")
       .primaryKey()
@@ -58,8 +58,8 @@ export const table_sales_order_line_b2b = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
   (table) => [
-    index("sales_order_lines_b2b_order_idx").on(table.orderId),
-    index("sales_order_lines_b2b_product_idx").on(table.productId),
+    index("order_lines_order_idx").on(table.orderId),
+    index("order_lines_product_idx").on(table.productId),
   ]
 );
 

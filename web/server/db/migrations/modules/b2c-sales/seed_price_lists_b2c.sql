@@ -7,7 +7,7 @@
 WITH vnd_currency AS (
   SELECT id FROM "currencies" WHERE code = 'VND' LIMIT 1
 )
-INSERT INTO "price_lists_b2c" (
+INSERT INTO "mdl_sale_b2c"."price_lists" (
   "code",
   "name",
   "description",
@@ -42,7 +42,7 @@ SELECT
   NOW(),
   NOW()
 FROM vnd_currency
-WHERE NOT EXISTS (SELECT 1 FROM "price_lists_b2c" WHERE code = 'PL-STD-001')
+WHERE NOT EXISTS (SELECT 1 FROM "mdl_sale_b2c"."price_lists" WHERE code = 'PL-STD-001')
 RETURNING id AS standard_price_list_id;
 
 -- ============================================
@@ -51,7 +51,7 @@ RETURNING id AS standard_price_list_id;
 WITH vnd_currency AS (
   SELECT id FROM "currencies" WHERE code = 'VND' LIMIT 1
 )
-INSERT INTO "price_lists_b2c" (
+INSERT INTO "mdl_sale_b2c"."price_lists" (
   "code",
   "name",
   "description",
@@ -86,7 +86,7 @@ SELECT
   NOW(),
   NOW()
 FROM vnd_currency
-WHERE NOT EXISTS (SELECT 1 FROM "price_lists_b2c" WHERE code = 'PL-PROMO-001')
+WHERE NOT EXISTS (SELECT 1 FROM "mdl_sale_b2c"."price_lists" WHERE code = 'PL-PROMO-001')
 RETURNING id AS promo_price_list_id;
 
 -- ============================================
@@ -94,7 +94,7 @@ RETURNING id AS promo_price_list_id;
 -- ============================================
 -- Lấy 5 sản phẩm đầu tiên và tạo price list items cho standard price list
 WITH standard_pl AS (
-  SELECT id FROM "price_lists_b2c" WHERE code = 'PL-STD-001' LIMIT 1
+  SELECT id FROM "mdl_sale_b2c"."price_lists" WHERE code = 'PL-STD-001' LIMIT 1
 ),
 sample_products AS (
   SELECT 
@@ -106,7 +106,7 @@ sample_products AS (
   ORDER BY pm.code, pv.id
   LIMIT 5
 )
-INSERT INTO "price_list_items_b2c" (
+INSERT INTO "mdl_sale_b2c"."price_list_items" (
   "price_list_id",
   "product_variant_id",
   "product_master_id",
@@ -135,7 +135,7 @@ SELECT
   NOW()
 FROM standard_pl, sample_products sp
 WHERE NOT EXISTS (
-  SELECT 1 FROM "price_list_items_b2c" pli
+  SELECT 1 FROM "mdl_sale_b2c"."price_list_items" pli
   WHERE pli.price_list_id = standard_pl.id 
     AND pli.product_variant_id = sp.variant_id
 )
@@ -146,9 +146,9 @@ LIMIT 5;
 -- ============================================
 -- Rule 1: Giảm 10% cho tất cả sản phẩm (percentage discount)
 WITH standard_pl AS (
-  SELECT id FROM "price_lists_b2c" WHERE code = 'PL-STD-001' LIMIT 1
+  SELECT id FROM "mdl_sale_b2c"."price_lists" WHERE code = 'PL-STD-001' LIMIT 1
 )
-INSERT INTO "pricing_rules_b2c" (
+INSERT INTO "mdl_sale_b2c"."pricing_rules" (
   "price_list_id",
   "conditions",
   "pricing_method",
@@ -179,7 +179,7 @@ SELECT
   NOW()
 FROM standard_pl
 WHERE NOT EXISTS (
-  SELECT 1 FROM "pricing_rules_b2c" pr
+  SELECT 1 FROM "mdl_sale_b2c"."pricing_rules" pr
   WHERE pr.price_list_id = standard_pl.id 
     AND pr.pricing_method = 'percentage'
     AND pr.discount_value = 10.0000
@@ -187,9 +187,9 @@ WHERE NOT EXISTS (
 
 -- Rule 2: Fixed price cho số lượng >= 10
 WITH standard_pl AS (
-  SELECT id FROM "price_lists_b2c" WHERE code = 'PL-STD-001' LIMIT 1
+  SELECT id FROM "mdl_sale_b2c"."price_lists" WHERE code = 'PL-STD-001' LIMIT 1
 )
-INSERT INTO "pricing_rules_b2c" (
+INSERT INTO "mdl_sale_b2c"."pricing_rules" (
   "price_list_id",
   "conditions",
   "pricing_method",
@@ -219,7 +219,7 @@ SELECT
   NOW()
 FROM standard_pl
 WHERE NOT EXISTS (
-  SELECT 1 FROM "pricing_rules_b2c" pr
+  SELECT 1 FROM "mdl_sale_b2c"."pricing_rules" pr
   WHERE pr.price_list_id = standard_pl.id 
     AND pr.pricing_method = 'fixed'
     AND pr.min_quantity = 10
@@ -227,9 +227,9 @@ WHERE NOT EXISTS (
 
 -- Rule 3: Promotion rule - Giảm 20% cho promotion price list
 WITH promo_pl AS (
-  SELECT id FROM "price_lists_b2c" WHERE code = 'PL-PROMO-001' LIMIT 1
+  SELECT id FROM "mdl_sale_b2c"."price_lists" WHERE code = 'PL-PROMO-001' LIMIT 1
 )
-INSERT INTO "pricing_rules_b2c" (
+INSERT INTO "mdl_sale_b2c"."pricing_rules" (
   "price_list_id",
   "conditions",
   "pricing_method",
@@ -259,7 +259,7 @@ SELECT
   NOW()
 FROM promo_pl
 WHERE NOT EXISTS (
-  SELECT 1 FROM "pricing_rules_b2c" pr
+  SELECT 1 FROM "mdl_sale_b2c"."pricing_rules" pr
   WHERE pr.price_list_id = promo_pl.id 
     AND pr.pricing_method = 'percentage'
     AND pr.discount_value = 20.0000

@@ -2,7 +2,7 @@
 -- Seed dataset providing ~20 records per table for development and testing
 
 -- Users
-INSERT INTO "users" (
+INSERT INTO "md_base"."users" (
   "avatar",
   "gender",
   "date_of_birth",
@@ -52,11 +52,11 @@ FROM generate_series(1, 20) AS gs;
 -- User login credentials
 WITH user_rows AS (
   SELECT id, ROW_NUMBER() OVER (ORDER BY created_at, id) AS rn
-  FROM "users"
+  FROM "md_base"."users"
   ORDER BY created_at, id
   LIMIT 20
 )
-INSERT INTO "users_login" (
+INSERT INTO "md_base"."users_login" (
   "user_id",
   "username",
   "email",

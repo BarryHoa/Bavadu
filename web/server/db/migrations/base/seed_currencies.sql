@@ -1,7 +1,7 @@
 -- Seed currencies: USD, RUB, JPY, CNY, VND
 
 -- VND (Việt Nam Đồng) - Currency mặc định
-INSERT INTO "currencies" (
+INSERT INTO "md_base"."currencies" (
   "code",
   "name",
   "symbol",
@@ -23,7 +23,7 @@ INSERT INTO "currencies" (
 ON CONFLICT ("code") DO NOTHING;
 
 -- USD (US Dollar)
-INSERT INTO "currencies" (
+INSERT INTO "md_base"."currencies" (
   "code",
   "name",
   "symbol",
@@ -45,7 +45,7 @@ INSERT INTO "currencies" (
 ON CONFLICT ("code") DO NOTHING;
 
 -- RUB (Russian Ruble)
-INSERT INTO "currencies" (
+INSERT INTO "md_base"."currencies" (
   "code",
   "name",
   "symbol",
@@ -67,7 +67,7 @@ INSERT INTO "currencies" (
 ON CONFLICT ("code") DO NOTHING;
 
 -- JPY (Japanese Yen)
-INSERT INTO "currencies" (
+INSERT INTO "md_base"."currencies" (
   "code",
   "name",
   "symbol",
@@ -89,7 +89,7 @@ INSERT INTO "currencies" (
 ON CONFLICT ("code") DO NOTHING;
 
 -- CNY (Chinese Yuan - Nhân dân tệ)
-INSERT INTO "currencies" (
+INSERT INTO "md_base"."currencies" (
   "code",
   "name",
   "symbol",
@@ -129,7 +129,7 @@ SELECT
   'VND base currency - always 1.0',
   NOW(),
   NOW()
-FROM "currencies" c
+FROM "md_base"."currencies" c
 WHERE c.code = 'VND'
 ON CONFLICT ("currency_id", "rate_date") DO UPDATE
 SET 
@@ -154,7 +154,7 @@ SELECT
   'Seed data - approximate rate',
   NOW(),
   NOW()
-FROM "currencies" c
+FROM "md_base"."currencies" c
 WHERE c.code = 'USD'
 ON CONFLICT ("currency_id", "rate_date") DO UPDATE
 SET 
@@ -179,7 +179,7 @@ SELECT
   'Seed data - approximate rate',
   NOW(),
   NOW()
-FROM "currencies" c
+FROM "md_base"."currencies" c
 WHERE c.code = 'RUB'
 ON CONFLICT ("currency_id", "rate_date") DO UPDATE
 SET 
@@ -204,7 +204,7 @@ SELECT
   'Seed data - approximate rate',
   NOW(),
   NOW()
-FROM "currencies" c
+FROM "md_base"."currencies" c
 WHERE c.code = 'JPY'
 ON CONFLICT ("currency_id", "rate_date") DO UPDATE
 SET 
@@ -229,7 +229,7 @@ SELECT
   'Seed data - approximate rate',
   NOW(),
   NOW()
-FROM "currencies" c
+FROM "md_base"."currencies" c
 WHERE c.code = 'CNY'
 ON CONFLICT ("currency_id", "rate_date") DO UPDATE
 SET 

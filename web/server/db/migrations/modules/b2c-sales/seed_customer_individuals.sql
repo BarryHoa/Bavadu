@@ -1,7 +1,7 @@
 -- Seed: Customer Individuals
 -- Seed dữ liệu mẫu cho customer_individuals
 
-INSERT INTO "customer_individuals" (
+INSERT INTO "mdl_sale_b2c"."customers" (
   "code",
   "first_name",
   "last_name",
@@ -34,5 +34,5 @@ SELECT
   NULL
 FROM generate_series(1, 15) AS gs
 WHERE NOT EXISTS (
-  SELECT 1 FROM "customer_individuals" WHERE "code" = CONCAT('B2C', LPAD(gs::text, 4, '0'))
+  SELECT 1 FROM "mdl_sale_b2c"."customers" WHERE "code" = CONCAT('B2C', LPAD(gs::text, 4, '0'))
 );

@@ -2,17 +2,17 @@ import { sql } from "drizzle-orm";
 import {
   index,
   numeric,
-  pgTable,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { mdlPurchaseSchema } from "./schema";
 
 import { table_product_master } from "../../../product/server/schemas/product-master";
 import { table_purchase_order } from "./order";
 
-export const table_purchase_order_line = pgTable(
-  "purchase_order_lines",
+export const table_purchase_order_line = mdlPurchaseSchema.table(
+  "order_lines",
   {
     id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
     orderId: uuid("order_id")
@@ -35,8 +35,8 @@ export const table_purchase_order_line = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
   (table) => [
-    index("purchase_order_lines_order_idx").on(table.orderId),
-    index("purchase_order_lines_product_idx").on(table.productId),
+    index("order_lines_order_idx").on(table.orderId),
+    index("order_lines_product_idx").on(table.productId),
   ]
 );
 

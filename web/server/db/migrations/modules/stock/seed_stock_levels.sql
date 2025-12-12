@@ -8,11 +8,11 @@ WITH products AS (
 ),
 warehouses AS (
   SELECT id, ROW_NUMBER() OVER (ORDER BY code) AS rn
-  FROM "stock_warehouses"
+  FROM "mdl_stock"."warehouses"
   ORDER BY code
   LIMIT 20
 )
-INSERT INTO "stock_levels" (
+INSERT INTO "mdl_stock"."levels" (
   "product_id",
   "warehouse_id",
   "quantity",

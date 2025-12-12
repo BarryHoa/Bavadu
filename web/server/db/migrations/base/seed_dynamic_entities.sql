@@ -1,6 +1,6 @@
 -- Seed data for dynamic_entities table
 
-INSERT INTO "dynamic_entities" (
+INSERT INTO "md_base"."dynamic_entities" (
   "code",
   "name",
   "description",

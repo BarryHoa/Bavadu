@@ -2,7 +2,7 @@
 
 -- Product categories (roots and children)
 WITH roots AS (
-  INSERT INTO "product_categories" (
+  INSERT INTO "mdl_product"."categories" (
     "code",
     "name",
     "description",
@@ -32,7 +32,7 @@ ranked_roots AS (
   SELECT id, ROW_NUMBER() OVER (ORDER BY code) AS rn
   FROM roots
 )
-INSERT INTO "product_categories" (
+INSERT INTO "mdl_product"."categories" (
   "code",
   "name",
   "description",

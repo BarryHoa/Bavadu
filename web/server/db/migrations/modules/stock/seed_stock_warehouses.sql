@@ -6,7 +6,7 @@ WITH user_rows AS (
   ORDER BY created_at, id
   LIMIT 20
 )
-INSERT INTO "stock_warehouses" (
+INSERT INTO "mdl_stock"."warehouses" (
   "code",
   "name",
   "type_code",

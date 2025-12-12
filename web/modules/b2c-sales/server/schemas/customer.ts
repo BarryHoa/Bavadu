@@ -4,16 +4,16 @@ import {
   index,
   jsonb,
   numeric,
-  pgTable,
   text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { mdlSaleB2cSchema } from "./schema";
 import { table_payment_term } from "@base/server/schemas/payment-term";
 
-// Customer Companies (B2B customers)
-export const table_customer_company = pgTable(
+// Customer Companies (B2B customers) - Note: This should be in b2b-sales module
+export const table_customer_company = mdlSaleB2cSchema.table(
   "customer_companies",
   {
     id: uuid("id")
@@ -51,8 +51,8 @@ export type TblCustomerCompany = typeof table_customer_company.$inferSelect;
 export type NewTblCustomerCompany = typeof table_customer_company.$inferInsert;
 
 // Customer Individuals (B2C customers)
-export const table_customer_individual = pgTable(
-  "customer_individuals",
+export const table_customer_individual = mdlSaleB2cSchema.table(
+  "customers",
   {
     id: uuid("id")
       .primaryKey()
@@ -73,11 +73,11 @@ export const table_customer_individual = pgTable(
     updatedBy: varchar("updated_by", { length: 36 }),
   },
   (table) => [
-    index("customer_individuals_code_idx").on(table.code),
-    index("customer_individuals_name_idx").on(table.firstName, table.lastName),
-    index("customer_individuals_phone_idx").on(table.phone),
-    index("customer_individuals_email_idx").on(table.email),
-    index("customer_individuals_active_idx").on(table.isActive),
+    index("customers_code_idx").on(table.code),
+    index("customers_name_idx").on(table.firstName, table.lastName),
+    index("customers_phone_idx").on(table.phone),
+    index("customers_email_idx").on(table.email),
+    index("customers_active_idx").on(table.isActive),
   ]
 );
 

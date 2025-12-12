@@ -2,17 +2,17 @@
 
 WITH masters AS (
   SELECT id, ROW_NUMBER() OVER (ORDER BY code) AS rn
-  FROM "product_masters"
+  FROM "mdl_product"."masters"
   ORDER BY code
   LIMIT 20
 ),
 uoms AS (
   SELECT id, ROW_NUMBER() OVER (ORDER BY symbol) AS rn
-  FROM "units_of_measure"
+  FROM "mdl_product"."units_of_measure"
   ORDER BY symbol
   LIMIT 20
 )
-INSERT INTO "product_variants" (
+INSERT INTO "mdl_product"."variants" (
   "product_master_id",
   "name",
   "description",

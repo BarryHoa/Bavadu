@@ -6,16 +6,16 @@ import {
   boolean,
   index,
   numeric,
-  pgTable,
   text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { mdlSaleB2bSchema } from "./schema";
 import { table_stock_warehouse } from "@mdl/stock/server/schemas/warehouse";
 
-export const table_sales_order_b2b = pgTable(
-  "sales_orders_b2b",
+export const table_sales_order_b2b = mdlSaleB2bSchema.table(
+  "orders",
   {
     id: uuid("id")
       .primaryKey()
@@ -82,12 +82,12 @@ export const table_sales_order_b2b = pgTable(
     createdBy: varchar("created_by", { length: 36 }),
   },
   (table) => [
-    index("sales_orders_b2b_code_idx").on(table.code),
-    index("sales_orders_b2b_company_idx").on(table.companyName),
-    index("sales_orders_b2b_status_idx").on(table.status),
-    index("sales_orders_b2b_warehouse_idx").on(table.warehouseId),
-    index("sales_orders_b2b_expected_idx").on(table.expectedDate),
-    index("sales_orders_b2b_created_idx").on(table.createdAt),
+    index("orders_code_idx").on(table.code),
+    index("orders_company_idx").on(table.companyName),
+    index("orders_status_idx").on(table.status),
+    index("orders_warehouse_idx").on(table.warehouseId),
+    index("orders_expected_idx").on(table.expectedDate),
+    index("orders_created_idx").on(table.createdAt),
   ]
 );
 
