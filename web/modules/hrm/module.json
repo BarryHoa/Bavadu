@@ -30,6 +30,8 @@
     "candidate.curd": "Candidate/CandidateModel",
     "offer.curd": "Offer/OfferModel",
     "onboarding-checklist.curd": "OnboardingChecklist/OnboardingChecklistModel",
-    "offboarding.curd": "Offboarding/OffboardingModel"
+    "offboarding.curd": "Offboarding/OffboardingModel",
+    "benefit-package.curd": "BenefitPackage/BenefitPackageModel",
+    "payroll-rule.curd": "PayrollRule/PayrollRuleModel"
   }
 }

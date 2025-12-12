@@ -1,12 +1,18 @@
 // HRM Schemas
 export * from "./audit-log";
+export * from "./benefit-package";
 export * from "./candidate";
+export * from "./certificate";
 export * from "./contract";
+export * from "./course";
 export * from "./department";
 export * from "./document";
 export * from "./employee";
+export * from "./employee-benefit";
 export * from "./employee-history";
 export * from "./employee-role";
+export * from "./employee-training";
+export * from "./goal";
 export * from "./interview";
 export * from "./job-requisition";
 export * from "./leave-balance";
@@ -17,6 +23,8 @@ export * from "./offer";
 export * from "./onboarding-checklist";
 export * from "./payroll";
 export * from "./payroll-period";
+export * from "./payroll-rule";
+export * from "./performance-review";
 export * from "./position";
 export * from "./role";
 export * from "./roster";
