@@ -42,6 +42,7 @@ export const table_onboarding_checklist = pgTable(
   ]
 );
 
-export type TblOnboardingChecklist = typeof table_onboarding_checklist.$inferSelect;
-export type NewTblOnboardingChecklist = typeof table_onboarding_checklist.$inferInsert;
-
+export type TblOnboardingChecklist =
+  typeof table_onboarding_checklist.$inferSelect;
+export type NewTblOnboardingChecklist =
+  typeof table_onboarding_checklist.$inferInsert;

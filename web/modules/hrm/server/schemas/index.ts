@@ -1,12 +1,12 @@
 // HRM Schemas
 export * from "./audit-log";
+export * from "./candidate";
 export * from "./contract";
 export * from "./department";
 export * from "./document";
 export * from "./employee";
 export * from "./employee-history";
 export * from "./employee-role";
-export * from "./candidate";
 export * from "./interview";
 export * from "./job-requisition";
 export * from "./leave-balance";
