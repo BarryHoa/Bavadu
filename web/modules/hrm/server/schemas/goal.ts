@@ -2,7 +2,6 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   date,
-  foreignKey,
   index,
   integer,
   jsonb,

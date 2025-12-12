@@ -32,6 +32,12 @@
     "onboarding-checklist.curd": "OnboardingChecklist/OnboardingChecklistModel",
     "offboarding.curd": "Offboarding/OffboardingModel",
     "benefit-package.curd": "BenefitPackage/BenefitPackageModel",
-    "payroll-rule.curd": "PayrollRule/PayrollRuleModel"
+    "payroll-rule.curd": "PayrollRule/PayrollRuleModel",
+    "goal.curd": "Goal/GoalModel",
+    "performance-review.curd": "PerformanceReview/PerformanceReviewModel",
+    "course.curd": "Course/CourseModel",
+    "certificate.curd": "Certificate/CertificateModel",
+    "compliance-report.curd": "ComplianceReport/ComplianceReportModel",
+    "notification.curd": "Notification/NotificationModel"
   }
 }
