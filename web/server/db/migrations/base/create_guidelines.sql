@@ -4,7 +4,7 @@
 -- ============================================
 -- Guidelines
 -- ============================================
-CREATE TABLE IF NOT EXISTS "guidelines" (
+CREATE TABLE IF NOT EXISTS "md_base"."guidelines" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"key" varchar(255) NOT NULL,
 	"content" text NOT NULL,
@@ -16,5 +16,5 @@ CREATE TABLE IF NOT EXISTS "guidelines" (
 -- ============================================
 -- Indexes
 -- ============================================
-CREATE INDEX IF NOT EXISTS "guidelines_key_idx" ON "guidelines" USING btree ("key");
+CREATE INDEX IF NOT EXISTS "guidelines_key_idx" ON "md_base"."guidelines" USING btree ("key");
 

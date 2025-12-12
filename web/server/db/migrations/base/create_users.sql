@@ -4,7 +4,7 @@
 -- ============================================
 -- Users
 -- ============================================
-CREATE TABLE IF NOT EXISTS "users" (
+CREATE TABLE IF NOT EXISTS "md_base"."users" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"avatar" varchar(512),
 	"gender" varchar(10),
@@ -32,8 +32,8 @@ CREATE TABLE IF NOT EXISTS "users" (
 -- ============================================
 -- Indexes
 -- ============================================
-CREATE INDEX IF NOT EXISTS "users_status_idx" ON "users" USING btree ("status");
-CREATE INDEX IF NOT EXISTS "users_department_idx" ON "users" USING btree ("department");
-CREATE INDEX IF NOT EXISTS "users_joined_idx" ON "users" USING btree ("joined_at");
-CREATE INDEX IF NOT EXISTS "users_lastname_idx" ON "users" USING btree ("last_name");
+CREATE INDEX IF NOT EXISTS "users_status_idx" ON "md_base"."users" USING btree ("status");
+CREATE INDEX IF NOT EXISTS "users_department_idx" ON "md_base"."users" USING btree ("department");
+CREATE INDEX IF NOT EXISTS "users_joined_idx" ON "md_base"."users" USING btree ("joined_at");
+CREATE INDEX IF NOT EXISTS "users_lastname_idx" ON "md_base"."users" USING btree ("last_name");
 

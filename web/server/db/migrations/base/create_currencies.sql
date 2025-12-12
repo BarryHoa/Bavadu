@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS "currencies" (
+CREATE TABLE IF NOT EXISTS "md_base"."currencies" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(3) NOT NULL,
 	"name" jsonb NOT NULL,
@@ -13,21 +13,24 @@ CREATE TABLE IF NOT EXISTS "currencies" (
 	CONSTRAINT "currencies_code_unique" UNIQUE("code")
 );
 --> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "currencies_code_idx" ON "currencies" USING btree ("code");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "currencies_is_default_idx" ON "currencies" USING btree ("is_default");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "currencies_is_active_idx" ON "currencies" USING btree ("is_active");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "currencies_default_active_idx" ON "currencies" USING btree ("is_default","is_active");
+CREATE INDEX IF NOT EXISTS "currencies_code_idx" ON "md_base"."currencies" USING btree ("code");
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "currencies_is_default_idx" ON "md_base"."currencies" USING btree ("is_default");
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "currencies_is_active_idx" ON "md_base"."currencies" USING btree ("is_active");
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "currencies_default_active_idx" ON "md_base"."currencies" USING btree ("is_default","is_active");
 --> statement-breakpoint
 -- Partial unique index to ensure only one currency can be default at a time
 CREATE UNIQUE INDEX IF NOT EXISTS "currencies_only_one_default_idx" 
-ON "currencies" USING btree ("is_default") 
+ON "md_base"."currencies" USING btree ("is_default") 
 WHERE "is_default" = true;
 --> statement-breakpoint
 -- Currency Exchange Rate For VND table - Lưu lịch sử tỷ giá theo ngày
 -- Tỷ giá luôn được quy đổi về VND (1 đơn vị currency = bao nhiêu VND)
 -- Ví dụ: USD = 24500 VND, EUR = 26500 VND
 -- VND luôn có tỷ giá = 1.0 (phải được đảm bảo ở application level)
-CREATE TABLE IF NOT EXISTS "currency_exchange_rate_for_vnd" (
+CREATE TABLE IF NOT EXISTS "md_base"."currency_exchange_rate_for_vnd" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"currency_id" uuid NOT NULL,
 	"rate_date" date NOT NULL,
@@ -38,14 +41,16 @@ CREATE TABLE IF NOT EXISTS "currency_exchange_rate_for_vnd" (
 	"updated_at" timestamp with time zone,
 	"created_by" varchar(36),
 	"updated_by" varchar(36),
-	CONSTRAINT "currency_exchange_rate_for_vnd_currency_id_fkey" FOREIGN KEY ("currency_id") REFERENCES "currencies"("id") ON DELETE CASCADE
+	CONSTRAINT "currency_exchange_rate_for_vnd_currency_id_fkey" FOREIGN KEY ("currency_id") REFERENCES "md_base"."currencies"("id") ON DELETE CASCADE
 );
 --> statement-breakpoint
 -- Unique constraint: mỗi currency chỉ có một tỷ giá mỗi ngày
 CREATE UNIQUE INDEX IF NOT EXISTS "currency_exchange_rate_for_vnd_currency_date_unique" 
-ON "currency_exchange_rate_for_vnd" USING btree ("currency_id","rate_date");
+ON "md_base"."currency_exchange_rate_for_vnd" USING btree ("currency_id","rate_date");
 --> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "currency_exchange_rate_for_vnd_currency_idx" ON "currency_exchange_rate_for_vnd" USING btree ("currency_id");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "currency_exchange_rate_for_vnd_date_idx" ON "currency_exchange_rate_for_vnd" USING btree ("rate_date");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "currency_exchange_rate_for_vnd_currency_date_idx" ON "currency_exchange_rate_for_vnd" USING btree ("currency_id","rate_date");
+CREATE INDEX IF NOT EXISTS "currency_exchange_rate_for_vnd_currency_idx" ON "md_base"."currency_exchange_rate_for_vnd" USING btree ("currency_id");
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "currency_exchange_rate_for_vnd_date_idx" ON "md_base"."currency_exchange_rate_for_vnd" USING btree ("rate_date");
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "currency_exchange_rate_for_vnd_currency_date_idx" ON "md_base"."currency_exchange_rate_for_vnd" USING btree ("currency_id","rate_date");
 

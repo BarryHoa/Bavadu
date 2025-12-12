@@ -4,7 +4,7 @@
 -- ============================================
 -- Users Login
 -- ============================================
-CREATE TABLE IF NOT EXISTS "users_login" (
+CREATE TABLE IF NOT EXISTS "md_base"."users_login" (
 	"user_id" uuid NOT NULL,
 	"username" varchar(50),
 	"email" varchar(255),
@@ -26,13 +26,13 @@ CREATE TABLE IF NOT EXISTS "users_login" (
 -- ============================================
 -- Foreign Keys
 -- ============================================
-ALTER TABLE "users_login" ADD CONSTRAINT "users_login_user_id_users_id_fk" 
-FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "md_base"."users_login" ADD CONSTRAINT "users_login_user_id_users_id_fk" 
+FOREIGN KEY ("user_id") REFERENCES "md_base"."users"("id") ON DELETE no action ON UPDATE no action;
 
 -- ============================================
 -- Indexes
 -- ============================================
-CREATE INDEX IF NOT EXISTS "users_login_user_id_idx" ON "users_login" USING btree ("user_id");
-CREATE INDEX IF NOT EXISTS "users_login_phone_idx" ON "users_login" USING btree ("phone");
-CREATE INDEX IF NOT EXISTS "users_login_last_login_idx" ON "users_login" USING btree ("last_login_at");
+CREATE INDEX IF NOT EXISTS "users_login_user_id_idx" ON "md_base"."users_login" USING btree ("user_id");
+CREATE INDEX IF NOT EXISTS "users_login_phone_idx" ON "md_base"."users_login" USING btree ("phone");
+CREATE INDEX IF NOT EXISTS "users_login_last_login_idx" ON "md_base"."users_login" USING btree ("last_login_at");
 

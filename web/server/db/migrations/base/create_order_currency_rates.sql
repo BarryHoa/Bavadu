@@ -4,7 +4,7 @@
 -- ============================================
 -- Order Currency Rates
 -- ============================================
-CREATE TABLE IF NOT EXISTS "order_currency_rates" (
+CREATE TABLE IF NOT EXISTS "md_base"."currency_rates" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"order_type" varchar(10) NOT NULL,
 	"order_id" uuid NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS "order_currency_rates" (
 -- ============================================
 -- Indexes
 -- ============================================
-CREATE INDEX IF NOT EXISTS "order_currency_rates_order_idx" ON "order_currency_rates" USING btree ("order_type","order_id");
-CREATE INDEX IF NOT EXISTS "order_currency_rates_currency_idx" ON "order_currency_rates" USING btree ("currency_code");
-CREATE INDEX IF NOT EXISTS "order_currency_rates_date_idx" ON "order_currency_rates" USING btree ("rate_date");
+CREATE INDEX IF NOT EXISTS "order_currency_rates_order_idx" ON "md_base"."currency_rates" USING btree ("order_type","order_id");
+CREATE INDEX IF NOT EXISTS "order_currency_rates_currency_idx" ON "md_base"."currency_rates" USING btree ("currency_code");
+CREATE INDEX IF NOT EXISTS "order_currency_rates_date_idx" ON "md_base"."currency_rates" USING btree ("rate_date");
 

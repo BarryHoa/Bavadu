@@ -4,7 +4,7 @@
 -- ============================================
 -- Location Countries
 -- ============================================
-CREATE TABLE IF NOT EXISTS "location_countries" (
+CREATE TABLE IF NOT EXISTS "md_base"."countries" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(2) NOT NULL,
 	"name" jsonb NOT NULL,
@@ -19,6 +19,6 @@ CREATE TABLE IF NOT EXISTS "location_countries" (
 -- ============================================
 -- Indexes
 -- ============================================
-CREATE INDEX IF NOT EXISTS "location_countries_code_idx" ON "location_countries" USING btree ("code");
-CREATE INDEX IF NOT EXISTS "location_countries_is_active_idx" ON "location_countries" USING btree ("is_active");
+CREATE INDEX IF NOT EXISTS "location_countries_code_idx" ON "md_base"."countries" USING btree ("code");
+CREATE INDEX IF NOT EXISTS "location_countries_is_active_idx" ON "md_base"."countries" USING btree ("is_active");
 

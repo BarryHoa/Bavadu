@@ -4,7 +4,7 @@
 -- ============================================
 -- Tax Rates
 -- ============================================
-CREATE TABLE IF NOT EXISTS "tax_rates" (
+CREATE TABLE IF NOT EXISTS "md_base"."tax_rates" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(50) NOT NULL,
 	"name" jsonb NOT NULL,
@@ -23,10 +23,10 @@ COMMENT ON COLUMN "tax_rates"."type" IS
 -- ============================================
 -- Indexes
 -- ============================================
-CREATE INDEX IF NOT EXISTS "tax_rates_code_idx" ON "tax_rates" USING btree ("code");
-CREATE INDEX IF NOT EXISTS "tax_rates_active_idx" ON "tax_rates" USING btree ("is_active");
-CREATE INDEX IF NOT EXISTS "tax_rates_type_idx" ON "tax_rates" USING btree ("type");
-CREATE INDEX IF NOT EXISTS "tax_rates_type_active_idx" ON "tax_rates" USING btree ("type", "is_active");
+CREATE INDEX IF NOT EXISTS "tax_rates_code_idx" ON "md_base"."tax_rates" USING btree ("code");
+CREATE INDEX IF NOT EXISTS "tax_rates_active_idx" ON "md_base"."tax_rates" USING btree ("is_active");
+CREATE INDEX IF NOT EXISTS "tax_rates_type_idx" ON "md_base"."tax_rates" USING btree ("type");
+CREATE INDEX IF NOT EXISTS "tax_rates_type_active_idx" ON "md_base"."tax_rates" USING btree ("type", "is_active");
 
 -- ============================================
 -- Unique Constraint

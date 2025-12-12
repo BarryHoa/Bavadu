@@ -4,7 +4,7 @@
 -- ============================================
 -- Shipping Terms
 -- ============================================
-CREATE TABLE IF NOT EXISTS "shipping_terms" (
+CREATE TABLE IF NOT EXISTS "md_base"."shipping_terms" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(50) NOT NULL,
 	"name" jsonb NOT NULL,
@@ -22,10 +22,10 @@ COMMENT ON COLUMN "shipping_terms"."type" IS
 -- ============================================
 -- Indexes
 -- ============================================
-CREATE INDEX IF NOT EXISTS "shipping_terms_code_idx" ON "shipping_terms" USING btree ("code");
-CREATE INDEX IF NOT EXISTS "shipping_terms_active_idx" ON "shipping_terms" USING btree ("is_active");
-CREATE INDEX IF NOT EXISTS "shipping_terms_type_idx" ON "shipping_terms" USING btree ("type");
-CREATE INDEX IF NOT EXISTS "shipping_terms_type_active_idx" ON "shipping_terms" USING btree ("type", "is_active");
+CREATE INDEX IF NOT EXISTS "shipping_terms_code_idx" ON "md_base"."shipping_terms" USING btree ("code");
+CREATE INDEX IF NOT EXISTS "shipping_terms_active_idx" ON "md_base"."shipping_terms" USING btree ("is_active");
+CREATE INDEX IF NOT EXISTS "shipping_terms_type_idx" ON "md_base"."shipping_terms" USING btree ("type");
+CREATE INDEX IF NOT EXISTS "shipping_terms_type_active_idx" ON "md_base"."shipping_terms" USING btree ("type", "is_active");
 
 -- ============================================
 -- Unique Constraint

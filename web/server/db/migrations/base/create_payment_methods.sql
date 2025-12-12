@@ -4,7 +4,7 @@
 -- ============================================
 -- Payment Methods
 -- ============================================
-CREATE TABLE IF NOT EXISTS "payment_methods" (
+CREATE TABLE IF NOT EXISTS "md_base"."payment_methods" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(50) NOT NULL,
 	"name" jsonb NOT NULL,
@@ -22,10 +22,10 @@ COMMENT ON COLUMN "payment_methods"."type" IS
 -- ============================================
 -- Indexes
 -- ============================================
-CREATE INDEX IF NOT EXISTS "payment_methods_code_idx" ON "payment_methods" USING btree ("code");
-CREATE INDEX IF NOT EXISTS "payment_methods_active_idx" ON "payment_methods" USING btree ("is_active");
-CREATE INDEX IF NOT EXISTS "payment_methods_type_idx" ON "payment_methods" USING btree ("type");
-CREATE INDEX IF NOT EXISTS "payment_methods_type_active_idx" ON "payment_methods" USING btree ("type", "is_active");
+CREATE INDEX IF NOT EXISTS "payment_methods_code_idx" ON "md_base"."payment_methods" USING btree ("code");
+CREATE INDEX IF NOT EXISTS "payment_methods_active_idx" ON "md_base"."payment_methods" USING btree ("is_active");
+CREATE INDEX IF NOT EXISTS "payment_methods_type_idx" ON "md_base"."payment_methods" USING btree ("type");
+CREATE INDEX IF NOT EXISTS "payment_methods_type_active_idx" ON "md_base"."payment_methods" USING btree ("type", "is_active");
 
 -- ============================================
 -- Unique Constraint

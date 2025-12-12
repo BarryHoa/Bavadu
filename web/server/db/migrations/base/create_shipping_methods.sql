@@ -4,7 +4,7 @@
 -- ============================================
 -- Shipping Methods
 -- ============================================
-CREATE TABLE IF NOT EXISTS "shipping_methods" (
+CREATE TABLE IF NOT EXISTS "md_base"."shipping_methods" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(50) NOT NULL,
 	"name" jsonb NOT NULL,
@@ -23,10 +23,10 @@ COMMENT ON COLUMN "shipping_methods"."type" IS
 -- ============================================
 -- Indexes
 -- ============================================
-CREATE INDEX IF NOT EXISTS "shipping_methods_code_idx" ON "shipping_methods" USING btree ("code");
-CREATE INDEX IF NOT EXISTS "shipping_methods_active_idx" ON "shipping_methods" USING btree ("is_active");
-CREATE INDEX IF NOT EXISTS "shipping_methods_type_idx" ON "shipping_methods" USING btree ("type");
-CREATE INDEX IF NOT EXISTS "shipping_methods_type_active_idx" ON "shipping_methods" USING btree ("type", "is_active");
+CREATE INDEX IF NOT EXISTS "shipping_methods_code_idx" ON "md_base"."shipping_methods" USING btree ("code");
+CREATE INDEX IF NOT EXISTS "shipping_methods_active_idx" ON "md_base"."shipping_methods" USING btree ("is_active");
+CREATE INDEX IF NOT EXISTS "shipping_methods_type_idx" ON "md_base"."shipping_methods" USING btree ("type");
+CREATE INDEX IF NOT EXISTS "shipping_methods_type_active_idx" ON "md_base"."shipping_methods" USING btree ("type", "is_active");
 
 -- ============================================
 -- Unique Constraint

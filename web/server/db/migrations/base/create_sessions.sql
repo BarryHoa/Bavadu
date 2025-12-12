@@ -4,7 +4,7 @@
 -- ============================================
 -- Sessions
 -- ============================================
-CREATE TABLE IF NOT EXISTS "sessions" (
+CREATE TABLE IF NOT EXISTS "md_base"."sessions" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"user_id" uuid NOT NULL,
 	"session_token" varchar(255) NOT NULL,
@@ -19,13 +19,13 @@ CREATE TABLE IF NOT EXISTS "sessions" (
 -- ============================================
 -- Foreign Keys
 -- ============================================
-ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_users_id_fk" 
-FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "md_base"."sessions" ADD CONSTRAINT "sessions_user_id_users_id_fk" 
+FOREIGN KEY ("user_id") REFERENCES "md_base"."users"("id") ON DELETE cascade ON UPDATE no action;
 
 -- ============================================
 -- Indexes
 -- ============================================
-CREATE INDEX IF NOT EXISTS "sessions_user_id_idx" ON "sessions" USING btree ("user_id");
-CREATE INDEX IF NOT EXISTS "sessions_token_idx" ON "sessions" USING btree ("session_token");
-CREATE INDEX IF NOT EXISTS "sessions_expires_at_idx" ON "sessions" USING btree ("expires_at");
+CREATE INDEX IF NOT EXISTS "sessions_user_id_idx" ON "md_base"."sessions" USING btree ("user_id");
+CREATE INDEX IF NOT EXISTS "sessions_token_idx" ON "md_base"."sessions" USING btree ("session_token");
+CREATE INDEX IF NOT EXISTS "sessions_expires_at_idx" ON "md_base"."sessions" USING btree ("expires_at");
 

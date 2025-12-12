@@ -4,7 +4,7 @@
 -- ============================================
 -- Payment Terms
 -- ============================================
-CREATE TABLE IF NOT EXISTS "payment_terms" (
+CREATE TABLE IF NOT EXISTS "md_base"."payment_terms" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(50) NOT NULL,
 	"name" jsonb NOT NULL,
@@ -23,16 +23,16 @@ COMMENT ON COLUMN "payment_terms"."type" IS
 -- ============================================
 -- Indexes
 -- ============================================
-CREATE INDEX IF NOT EXISTS "payment_terms_code_idx" ON "payment_terms" USING btree ("code");
-CREATE INDEX IF NOT EXISTS "payment_terms_active_idx" ON "payment_terms" USING btree ("is_active");
-CREATE INDEX IF NOT EXISTS "payment_terms_type_idx" ON "payment_terms" USING btree ("type");
-CREATE INDEX IF NOT EXISTS "payment_terms_type_active_idx" ON "payment_terms" USING btree ("type", "is_active");
+CREATE INDEX IF NOT EXISTS "payment_terms_code_idx" ON "md_base"."payment_terms" USING btree ("code");
+CREATE INDEX IF NOT EXISTS "payment_terms_active_idx" ON "md_base"."payment_terms" USING btree ("is_active");
+CREATE INDEX IF NOT EXISTS "payment_terms_type_idx" ON "md_base"."payment_terms" USING btree ("type");
+CREATE INDEX IF NOT EXISTS "payment_terms_type_active_idx" ON "md_base"."payment_terms" USING btree ("type", "is_active");
 
 -- ============================================
 -- Unique Constraint
 -- ============================================
 CREATE UNIQUE INDEX IF NOT EXISTS "payment_terms_code_type_unique" 
-ON "payment_terms" USING btree ("code", "type");
+ON "md_base"."payment_terms" USING btree ("code", "type");
 
 COMMENT ON INDEX "payment_terms_code_type_unique" IS 
 'Unique constraint: không được trùng code và type. Một code có thể tồn tại nhiều lần nhưng với các type khác nhau.';

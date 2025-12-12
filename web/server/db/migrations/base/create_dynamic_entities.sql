@@ -4,7 +4,7 @@
 -- ============================================
 -- Dynamic Entities
 -- ============================================
-CREATE TABLE IF NOT EXISTS "dynamic_entities" (
+CREATE TABLE IF NOT EXISTS "md_base"."dynamic_entities" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(20) NOT NULL,
 	"name" jsonb NOT NULL,
@@ -28,13 +28,13 @@ CREATE TABLE IF NOT EXISTS "dynamic_entities" (
 -- ============================================
 -- Foreign Keys
 -- ============================================
-ALTER TABLE "dynamic_entities" ADD CONSTRAINT "dynamic_entities_parent_id_dynamic_entities_id_fk" 
-FOREIGN KEY ("parent_id") REFERENCES "public"."dynamic_entities"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "md_base"."dynamic_entities" ADD CONSTRAINT "dynamic_entities_parent_id_dynamic_entities_id_fk" 
+FOREIGN KEY ("parent_id") REFERENCES "md_base"."dynamic_entities"("id") ON DELETE no action ON UPDATE no action;
 
 -- ============================================
 -- Indexes
 -- ============================================
-CREATE INDEX IF NOT EXISTS "dynamic_entities_model_idx" ON "dynamic_entities" USING btree ("model");
-CREATE INDEX IF NOT EXISTS "dynamic_entities_parent_idx" ON "dynamic_entities" USING btree ("parent_id");
-CREATE INDEX IF NOT EXISTS "dynamic_entities_active_idx" ON "dynamic_entities" USING btree ("is_active");
+CREATE INDEX IF NOT EXISTS "dynamic_entities_model_idx" ON "md_base"."dynamic_entities" USING btree ("model");
+CREATE INDEX IF NOT EXISTS "dynamic_entities_parent_idx" ON "md_base"."dynamic_entities" USING btree ("parent_id");
+CREATE INDEX IF NOT EXISTS "dynamic_entities_active_idx" ON "md_base"."dynamic_entities" USING btree ("is_active");
 
