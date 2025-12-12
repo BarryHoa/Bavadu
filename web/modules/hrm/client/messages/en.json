@@ -1,0 +1,30 @@
+{
+  "hrm": {
+    "title": "Human Resource Management",
+    "employees": {
+      "title": "Employees",
+      "list": "Employee List",
+      "create": "Create Employee",
+      "edit": "Edit Employee",
+      "view": "Employee Details"
+    },
+    "departments": {
+      "title": "Departments",
+      "list": "Department List",
+      "create": "Create Department",
+      "edit": "Edit Department"
+    },
+    "positions": {
+      "title": "Positions",
+      "list": "Position List",
+      "create": "Create Position",
+      "edit": "Edit Position"
+    },
+    "contracts": {
+      "title": "Contracts",
+      "list": "Contract List",
+      "create": "Create Contract",
+      "edit": "Edit Contract"
+    }
+  }
+}

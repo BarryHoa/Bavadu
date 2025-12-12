@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "hrm",
+      "label": "HRM",
+      "icon": "Users",
+      "children": [
+        {
+          "id": "hrm-employees",
+          "label": "Employees",
+          "path": "/workspace/modules/hrm/employees"
+        },
+        {
+          "id": "hrm-departments",
+          "label": "Departments",
+          "path": "/workspace/modules/hrm/departments"
+        },
+        {
+          "id": "hrm-positions",
+          "label": "Positions",
+          "path": "/workspace/modules/hrm/positions"
+        },
+        {
+          "id": "hrm-contracts",
+          "label": "Contracts",
+          "path": "/workspace/modules/hrm/contracts"
+        }
+      ]
+    }
+  ]
+}

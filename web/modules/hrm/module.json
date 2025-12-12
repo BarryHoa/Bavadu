@@ -1,0 +1,30 @@
+{
+  "name": "hrm",
+  "title": "Human Resource Management",
+  "version": "0.1.0",
+  "description": "HRM module for employee management, payroll, time tracking, and compliance",
+  "category": "Business",
+  "icon": "Users",
+  "models": {
+    "employee.curd": "Employee/EmployeeModel",
+    "employee.list": "Employee/EmployeeViewListModel",
+    "employee.dropdown": "Employee/EmployeeDropdownListModel",
+    "department.curd": "Department/DepartmentModel",
+    "department.list": "Department/DepartmentViewListModel",
+    "department.dropdown": "Department/DepartmentDropdownListModel",
+    "position.curd": "Position/PositionModel",
+    "position.list": "Position/PositionViewListModel",
+    "position.dropdown": "Position/PositionDropdownListModel",
+    "contract.curd": "Contract/ContractModel",
+    "contract.list": "Contract/ContractViewListModel",
+    "role.curd": "Role/RoleModel",
+    "workflow.curd": "Workflow/WorkflowModel",
+    "document.curd": "Document/DocumentModel",
+    "shift.curd": "Shift/ShiftModel",
+    "leave-type.curd": "LeaveType/LeaveTypeModel",
+    "leave-request.curd": "LeaveRequest/LeaveRequestModel",
+    "timesheet.curd": "Timesheet/TimesheetModel",
+    "payroll-period.curd": "PayrollPeriod/PayrollPeriodModel",
+    "payroll.curd": "Payroll/PayrollModel"
+  }
+}

@@ -1,0 +1,60 @@
+import { sql } from "drizzle-orm";
+import {
+  boolean,
+  date,
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
+import { table_employee } from "./employee";
+
+// Contracts - Hợp đồng lao động
+export const table_contract = pgTable(
+  "hrm_contracts",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuid_generate_v7()`),
+    contractNumber: varchar("contract_number", { length: 100 })
+      .notNull()
+      .unique(), // Số hợp đồng
+    employeeId: uuid("employee_id")
+      .references(() => table_employee.id, { onDelete: "restrict" })
+      .notNull(),
+    contractType: varchar("contract_type", { length: 50 }).notNull(), // probation, fixed_term, indefinite, part_time
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date"), // null for indefinite contracts
+    baseSalary: integer("base_salary").notNull(),
+    currency: varchar("currency", { length: 10 }).default("VND"),
+    workingHours: integer("working_hours").default(40), // Số giờ làm việc/tuần
+    probationPeriod: integer("probation_period"), // Thời gian thử việc (ngày)
+    probationEndDate: date("probation_end_date"),
+    status: varchar("status", { length: 50 }).notNull().default("active"), // draft, active, expired, terminated
+    documentUrl: varchar("document_url", { length: 500 }), // Link to contract document
+    signedDate: date("signed_date"), // Ngày ký
+    signedBy: uuid("signed_by").references(() => table_employee.id), // Employee ID who signed
+    notes: text("notes"),
+    metadata: jsonb("metadata"), // Additional contract terms, allowances, etc.
+    isActive: boolean("is_active").default(true).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }),
+    createdBy: varchar("created_by", { length: 36 }),
+    updatedBy: varchar("updated_by", { length: 36 }),
+  },
+  (table) => [
+    index("hrm_contracts_number_idx").on(table.contractNumber),
+    index("hrm_contracts_employee_idx").on(table.employeeId),
+    index("hrm_contracts_type_idx").on(table.contractType),
+    index("hrm_contracts_status_idx").on(table.status),
+    index("hrm_contracts_dates_idx").on(table.startDate, table.endDate),
+    index("hrm_contracts_active_idx").on(table.isActive),
+  ]
+);
+
+export type TblContract = typeof table_contract.$inferSelect;
+export type NewTblContract = typeof table_contract.$inferInsert;

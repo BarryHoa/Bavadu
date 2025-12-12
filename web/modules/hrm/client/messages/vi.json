@@ -1,0 +1,30 @@
+{
+  "hrm": {
+    "title": "Quản lý Nhân sự",
+    "employees": {
+      "title": "Nhân viên",
+      "list": "Danh sách nhân viên",
+      "create": "Thêm nhân viên",
+      "edit": "Sửa nhân viên",
+      "view": "Chi tiết nhân viên"
+    },
+    "departments": {
+      "title": "Phòng ban",
+      "list": "Danh sách phòng ban",
+      "create": "Thêm phòng ban",
+      "edit": "Sửa phòng ban"
+    },
+    "positions": {
+      "title": "Vị trí",
+      "list": "Danh sách vị trí",
+      "create": "Thêm vị trí",
+      "edit": "Sửa vị trí"
+    },
+    "contracts": {
+      "title": "Hợp đồng",
+      "list": "Danh sách hợp đồng",
+      "create": "Thêm hợp đồng",
+      "edit": "Sửa hợp đồng"
+    }
+  }
+}
