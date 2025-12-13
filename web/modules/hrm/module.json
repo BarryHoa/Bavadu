@@ -29,6 +29,7 @@
     "timesheet.list": "Timesheet/TimesheetViewListModel",
     "payroll-period.curd": "PayrollPeriod/PayrollPeriodModel",
     "payroll.curd": "Payroll/PayrollModel",
+    "payroll.list": "Payroll/PayrollViewListModel",
     "job-requisition.curd": "JobRequisition/JobRequisitionModel",
     "job-requisition.list": "JobRequisition/JobRequisitionViewListModel",
     "candidate.curd": "Candidate/CandidateModel",

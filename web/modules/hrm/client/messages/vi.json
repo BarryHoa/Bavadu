@@ -439,6 +439,129 @@
         "failedToLoadLeaveType": "Không thể tải thông tin loại nghỉ phép",
         "failedToUpdateLeaveType": "Không thể cập nhật loại nghỉ phép"
       }
+    },
+    "jobRequisitions": {
+      "title": "Yêu cầu tuyển dụng",
+      "create": "Thêm yêu cầu tuyển dụng",
+      "generalInfo": "Thông tin yêu cầu tuyển dụng",
+      "labels": {
+        "requisitionNumber": "Số yêu cầu",
+        "title": "Tiêu đề",
+        "department": "Phòng ban",
+        "position": "Vị trí",
+        "numberOfOpenings": "Số lượng tuyển",
+        "priority": "Ưu tiên",
+        "employmentType": "Loại công việc",
+        "minSalary": "Lương tối thiểu",
+        "maxSalary": "Lương tối đa",
+        "currency": "Tiền tệ",
+        "requirements": "Yêu cầu",
+        "status": "Trạng thái",
+        "openedDate": "Ngày mở",
+        "closedDate": "Ngày đóng",
+        "hiringManager": "Người quản lý tuyển dụng",
+        "recruiter": "Người tuyển dụng",
+        "notes": "Ghi chú"
+      },
+      "validation": {
+        "requisitionNumber": {
+          "required": "Số yêu cầu là bắt buộc"
+        },
+        "title": {
+          "required": "Tiêu đề là bắt buộc"
+        },
+        "departmentId": {
+          "required": "Phòng ban là bắt buộc"
+        },
+        "positionId": {
+          "required": "Vị trí là bắt buộc"
+        },
+        "numberOfOpenings": {
+          "invalid": "Số lượng tuyển phải lớn hơn 0"
+        },
+        "minSalary": {
+          "invalid": "Lương tối thiểu không hợp lệ"
+        },
+        "maxSalary": {
+          "invalid": "Lương tối đa không hợp lệ"
+        }
+      },
+      "errors": {
+        "failedToCreateJobRequisition": "Không thể tạo yêu cầu tuyển dụng",
+        "failedToLoadJobRequisition": "Không thể tải thông tin yêu cầu tuyển dụng",
+        "failedToUpdateJobRequisition": "Không thể cập nhật yêu cầu tuyển dụng"
+      }
+    },
+    "payroll": {
+      "title": "Bảng lương",
+      "create": "Thêm bảng lương",
+      "generalInfo": "Thông tin bảng lương",
+      "labels": {
+        "payrollPeriod": "Kỳ lương",
+        "employee": "Nhân viên",
+        "baseSalary": "Lương cơ bản",
+        "overtimePay": "Lương làm thêm",
+        "bonuses": "Thưởng",
+        "otherEarnings": "Thu nhập khác",
+        "grossSalary": "Tổng lương",
+        "socialInsurance": "BHXH",
+        "healthInsurance": "BHYT",
+        "unemploymentInsurance": "BHTN",
+        "personalIncomeTax": "Thuế TNCN",
+        "totalDeductions": "Tổng khấu trừ",
+        "netSalary": "Lương thực lãnh",
+        "workingDays": "Số ngày làm việc",
+        "workingHours": "Số giờ làm việc",
+        "overtimeHours": "Số giờ làm thêm",
+        "status": "Trạng thái",
+        "notes": "Ghi chú"
+      },
+      "validation": {
+        "payrollPeriodId": {
+          "required": "Kỳ lương là bắt buộc"
+        },
+        "employeeId": {
+          "required": "Nhân viên là bắt buộc"
+        },
+        "baseSalary": {
+          "invalid": "Lương cơ bản không hợp lệ"
+        },
+        "overtimePay": {
+          "invalid": "Lương làm thêm không hợp lệ"
+        },
+        "bonuses": {
+          "invalid": "Thưởng không hợp lệ"
+        },
+        "otherEarnings": {
+          "invalid": "Thu nhập khác không hợp lệ"
+        },
+        "socialInsurance": {
+          "invalid": "BHXH không hợp lệ"
+        },
+        "healthInsurance": {
+          "invalid": "BHYT không hợp lệ"
+        },
+        "unemploymentInsurance": {
+          "invalid": "BHTN không hợp lệ"
+        },
+        "personalIncomeTax": {
+          "invalid": "Thuế TNCN không hợp lệ"
+        },
+        "workingDays": {
+          "invalid": "Số ngày làm việc không hợp lệ"
+        },
+        "workingHours": {
+          "invalid": "Số giờ làm việc không hợp lệ"
+        },
+        "overtimeHours": {
+          "invalid": "Số giờ làm thêm không hợp lệ"
+        }
+      },
+      "errors": {
+        "failedToCreatePayroll": "Không thể tạo bảng lương",
+        "failedToLoadPayroll": "Không thể tải thông tin bảng lương",
+        "failedToUpdatePayroll": "Không thể cập nhật bảng lương"
+      }
     }
   }
 }
