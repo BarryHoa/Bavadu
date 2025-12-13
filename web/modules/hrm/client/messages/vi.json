@@ -593,6 +593,40 @@
         "failedToLoadCourse": "Không thể tải thông tin khóa học",
         "failedToUpdateCourse": "Không thể cập nhật khóa học"
       }
+    },
+    "certificates": {
+      "title": "Chứng chỉ",
+      "create": "Thêm chứng chỉ",
+      "generalInfo": "Thông tin chứng chỉ",
+      "labels": {
+        "employee": "Nhân viên",
+        "name": "Tên chứng chỉ",
+        "issuer": "Tổ chức cấp",
+        "certificateNumber": "Số chứng chỉ",
+        "issueDate": "Ngày cấp",
+        "expiryDate": "Ngày hết hạn",
+        "documentUrl": "Link tài liệu",
+        "isActive": "Đang hoạt động"
+      },
+      "validation": {
+        "employeeId": {
+          "required": "Nhân viên là bắt buộc"
+        },
+        "name": {
+          "required": "Tên chứng chỉ là bắt buộc"
+        },
+        "issuer": {
+          "required": "Tổ chức cấp là bắt buộc"
+        },
+        "issueDate": {
+          "required": "Ngày cấp là bắt buộc"
+        }
+      },
+      "errors": {
+        "failedToCreateCertificate": "Không thể tạo chứng chỉ",
+        "failedToLoadCertificate": "Không thể tải thông tin chứng chỉ",
+        "failedToUpdateCertificate": "Không thể cập nhật chứng chỉ"
+      }
     }
   }
 }

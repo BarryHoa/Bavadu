@@ -41,6 +41,7 @@
     "payroll-rule.curd": "PayrollRule/PayrollRuleModel",
     "goal.curd": "Goal/GoalModel",
     "performance-review.curd": "PerformanceReview/PerformanceReviewModel",
+    "performance-review.list": "PerformanceReview/PerformanceReviewViewListModel",
     "course.curd": "Course/CourseModel",
     "course.list": "Course/CourseViewListModel",
     "certificate.curd": "Certificate/CertificateModel",

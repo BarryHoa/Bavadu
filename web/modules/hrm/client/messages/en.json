@@ -563,6 +563,40 @@
         "failedToLoadCourse": "Failed to load course",
         "failedToUpdateCourse": "Failed to update course"
       }
+    },
+    "certificates": {
+      "title": "Certificates",
+      "create": "New Certificate",
+      "generalInfo": "Certificate Information",
+      "labels": {
+        "employee": "Employee",
+        "name": "Certificate Name",
+        "issuer": "Issuer",
+        "certificateNumber": "Certificate Number",
+        "issueDate": "Issue Date",
+        "expiryDate": "Expiry Date",
+        "documentUrl": "Document URL",
+        "isActive": "Is Active"
+      },
+      "validation": {
+        "employeeId": {
+          "required": "Employee is required"
+        },
+        "name": {
+          "required": "Certificate name is required"
+        },
+        "issuer": {
+          "required": "Issuer is required"
+        },
+        "issueDate": {
+          "required": "Issue date is required"
+        }
+      },
+      "errors": {
+        "failedToCreateCertificate": "Failed to create certificate",
+        "failedToLoadCertificate": "Failed to load certificate",
+        "failedToUpdateCertificate": "Failed to update certificate"
+      }
     }
   }
 }
