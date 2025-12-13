@@ -1,31 +1,36 @@
 {
-  "items": [
+  "key": "hrm-main",
+  "name": "HRM",
+  "icon": "Users",
+  "order": 1,
+  "children": [
     {
-      "id": "hrm",
-      "label": "HRM",
-      "icon": "Users",
-      "children": [
-        {
-          "id": "hrm-employees",
-          "label": "Employees",
-          "path": "/workspace/modules/hrm/employees"
-        },
-        {
-          "id": "hrm-departments",
-          "label": "Departments",
-          "path": "/workspace/modules/hrm/departments"
-        },
-        {
-          "id": "hrm-positions",
-          "label": "Positions",
-          "path": "/workspace/modules/hrm/positions"
-        },
-        {
-          "id": "hrm-contracts",
-          "label": "Contracts",
-          "path": "/workspace/modules/hrm/contracts"
-        }
-      ]
+      "key": "hrm-employees",
+      "name": "Employees",
+      "path": "/employees",
+      "as": "/employees",
+      "order": 1
+    },
+    {
+      "key": "hrm-departments",
+      "name": "Departments",
+      "path": "/departments",
+      "as": "/departments",
+      "order": 2
+    },
+    {
+      "key": "hrm-positions",
+      "name": "Positions",
+      "path": "/positions",
+      "as": "/positions",
+      "order": 3
+    },
+    {
+      "key": "hrm-contracts",
+      "name": "Contracts",
+      "path": "/contracts",
+      "as": "/contracts",
+      "order": 4
     }
   ]
 }

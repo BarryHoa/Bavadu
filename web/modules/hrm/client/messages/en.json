@@ -1,30 +1,281 @@
 {
   "hrm": {
     "title": "Human Resource Management",
-    "employees": {
+    "employee": {
       "title": "Employees",
-      "list": "Employee List",
-      "create": "Create Employee",
-      "edit": "Edit Employee",
-      "view": "Employee Details"
+      "list": {
+        "employeeCode": "Employee Code",
+        "fullName": "Full Name",
+        "email": "Email",
+        "phone": "Phone",
+        "status": "Status",
+        "hireDate": "Hire Date",
+        "view": "View",
+        "edit": "Edit",
+        "newEmployee": "New Employee"
+      },
+      "create": {
+        "labels": {
+          "basicInfo": "Basic Information",
+          "employmentInfo": "Employment Information",
+          "additionalInfo": "Additional Information",
+          "employeeCode": "Employee Code",
+          "fullName": "Full Name",
+          "firstName": "First Name",
+          "lastName": "Last Name",
+          "email": "Email",
+          "phone": "Phone",
+          "department": "Department",
+          "position": "Position",
+          "manager": "Manager",
+          "hireDate": "Hire Date",
+          "employmentStatus": "Employment Status",
+          "baseSalary": "Base Salary",
+          "dateOfBirth": "Date of Birth",
+          "gender": "Gender",
+          "cancel": "Cancel",
+          "save": "Save",
+          "errors": {
+            "failedToCreate": "Failed to create employee",
+            "failedToUpdate": "Failed to update employee"
+          }
+        },
+        "validation": {
+          "employeeCode": {
+            "required": "Employee code is required"
+          },
+          "fullName": {
+            "required": "Full name is required"
+          },
+          "email": {
+            "invalid": "Invalid email format"
+          },
+          "positionId": {
+            "required": "Position is required"
+          },
+          "departmentId": {
+            "required": "Department is required"
+          },
+          "hireDate": {
+            "required": "Hire date is required"
+          },
+          "baseSalary": {
+            "invalid": "Invalid base salary"
+          }
+        }
+      },
+      "view": {
+        "labels": {
+          "title": "Employee Details",
+          "basicInfo": "Basic Information",
+          "employmentInfo": "Employment Information",
+          "employeeCode": "Employee Code",
+          "fullName": "Full Name",
+          "email": "Email",
+          "phone": "Phone",
+          "department": "Department",
+          "position": "Position",
+          "hireDate": "Hire Date",
+          "employmentStatus": "Employment Status",
+          "backToList": "Back to List",
+          "edit": "Edit"
+        }
+      }
     },
-    "departments": {
+    "department": {
       "title": "Departments",
-      "list": "Department List",
-      "create": "Create Department",
-      "edit": "Edit Department"
+      "list": {
+        "code": "Code",
+        "name": "Name",
+        "level": "Level",
+        "status": "Status",
+        "view": "View",
+        "edit": "Edit",
+        "newDepartment": "New Department"
+      },
+      "create": {
+        "labels": {
+          "basicInfo": "Basic Information",
+          "code": "Code",
+          "name": "Name",
+          "parentDepartment": "Parent Department",
+          "level": "Level",
+          "manager": "Manager",
+          "cancel": "Cancel",
+          "save": "Save",
+          "errors": {
+            "failedToCreate": "Failed to create department",
+            "failedToUpdate": "Failed to update department"
+          }
+        },
+        "validation": {
+          "code": {
+            "required": "Code is required"
+          },
+          "name": {
+            "required": "Name is required"
+          },
+          "description": {
+            "invalid": "Invalid description"
+          },
+          "level": {
+            "invalid": "Invalid level"
+          }
+        }
+      },
+      "view": {
+        "labels": {
+          "title": "Department Details",
+          "basicInfo": "Basic Information",
+          "code": "Code",
+          "name": "Name",
+          "parentDepartment": "Parent Department",
+          "level": "Level",
+          "backToList": "Back to List",
+          "edit": "Edit"
+        }
+      }
     },
-    "positions": {
+    "position": {
       "title": "Positions",
-      "list": "Position List",
-      "create": "Create Position",
-      "edit": "Edit Position"
+      "list": {
+        "code": "Code",
+        "name": "Name",
+        "department": "Department",
+        "status": "Status",
+        "view": "View",
+        "edit": "Edit",
+        "newPosition": "New Position"
+      },
+      "create": {
+        "labels": {
+          "basicInfo": "Basic Information",
+          "code": "Code",
+          "name": "Name",
+          "department": "Department",
+          "reportsTo": "Reports To",
+          "jobFamily": "Job Family",
+          "jobGrade": "Job Grade",
+          "minSalary": "Min Salary",
+          "maxSalary": "Max Salary",
+          "cancel": "Cancel",
+          "save": "Save",
+          "errors": {
+            "failedToCreate": "Failed to create position",
+            "failedToUpdate": "Failed to update position"
+          }
+        },
+        "validation": {
+          "code": {
+            "required": "Code is required"
+          },
+          "name": {
+            "required": "Name is required"
+          },
+          "departmentId": {
+            "required": "Department is required"
+          },
+          "description": {
+            "invalid": "Invalid description"
+          },
+          "minSalary": {
+            "invalid": "Invalid minimum salary"
+          },
+          "maxSalary": {
+            "invalid": "Invalid maximum salary"
+          }
+        }
+      },
+      "view": {
+        "labels": {
+          "title": "Position Details",
+          "basicInfo": "Basic Information",
+          "code": "Code",
+          "name": "Name",
+          "department": "Department",
+          "jobFamily": "Job Family",
+          "backToList": "Back to List",
+          "edit": "Edit"
+        }
+      }
     },
-    "contracts": {
+    "contract": {
       "title": "Contracts",
-      "list": "Contract List",
-      "create": "Create Contract",
-      "edit": "Edit Contract"
+      "list": {
+        "contractNumber": "Contract Number",
+        "employee": "Employee",
+        "contractType": "Contract Type",
+        "status": "Status",
+        "startDate": "Start Date",
+        "baseSalary": "Base Salary",
+        "view": "View",
+        "edit": "Edit",
+        "newContract": "New Contract"
+      },
+      "create": {
+        "labels": {
+          "basicInfo": "Basic Information",
+          "additionalInfo": "Additional Information",
+          "contractNumber": "Contract Number",
+          "employee": "Employee",
+          "contractType": "Contract Type",
+          "status": "Status",
+          "startDate": "Start Date",
+          "endDate": "End Date",
+          "baseSalary": "Base Salary",
+          "currency": "Currency",
+          "workingHours": "Working Hours",
+          "probationPeriod": "Probation Period",
+          "probationEndDate": "Probation End Date",
+          "signedDate": "Signed Date",
+          "notes": "Notes",
+          "cancel": "Cancel",
+          "save": "Save",
+          "errors": {
+            "failedToCreate": "Failed to create contract",
+            "failedToUpdate": "Failed to update contract"
+          }
+        },
+        "validation": {
+          "contractNumber": {
+            "required": "Contract number is required"
+          },
+          "employeeId": {
+            "required": "Employee is required"
+          },
+          "contractType": {
+            "required": "Contract type is required"
+          },
+          "startDate": {
+            "required": "Start date is required"
+          },
+          "baseSalary": {
+            "required": "Base salary is required",
+            "invalid": "Invalid base salary"
+          },
+          "workingHours": {
+            "invalid": "Invalid working hours"
+          },
+          "probationPeriod": {
+            "invalid": "Invalid probation period"
+          }
+        }
+      },
+      "view": {
+        "labels": {
+          "title": "Contract Details",
+          "basicInfo": "Basic Information",
+          "contractNumber": "Contract Number",
+          "employee": "Employee",
+          "contractType": "Contract Type",
+          "status": "Status",
+          "startDate": "Start Date",
+          "endDate": "End Date",
+          "baseSalary": "Base Salary",
+          "backToList": "Back to List",
+          "edit": "Edit"
+        }
+      }
     }
   }
 }

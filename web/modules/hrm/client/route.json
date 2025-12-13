@@ -1,1 +1,38 @@
-[]
+[
+  {
+    "path": "/employees",
+    "routes": [
+      { "path": "/", "page": "/Employees/EmployeesListPage" },
+      { "path": "/create", "page": "/Employees/EmployeeCreatePage" },
+      { "path": "/edit/[id]", "page": "/Employees/EmployeeEditPage" },
+      { "path": "/view/[id]", "page": "/Employees/EmployeeViewPage" }
+    ]
+  },
+  {
+    "path": "/departments",
+    "routes": [
+      { "path": "/", "page": "/Departments/DepartmentsListPage" },
+      { "path": "/create", "page": "/Departments/DepartmentCreatePage" },
+      { "path": "/edit/[id]", "page": "/Departments/DepartmentEditPage" },
+      { "path": "/view/[id]", "page": "/Departments/DepartmentViewPage" }
+    ]
+  },
+  {
+    "path": "/positions",
+    "routes": [
+      { "path": "/", "page": "/Positions/PositionsListPage" },
+      { "path": "/create", "page": "/Positions/PositionCreatePage" },
+      { "path": "/edit/[id]", "page": "/Positions/PositionEditPage" },
+      { "path": "/view/[id]", "page": "/Positions/PositionViewPage" }
+    ]
+  },
+  {
+    "path": "/contracts",
+    "routes": [
+      { "path": "/", "page": "/Contracts/ContractsListPage" },
+      { "path": "/create", "page": "/Contracts/ContractCreatePage" },
+      { "path": "/edit/[id]", "page": "/Contracts/ContractEditPage" },
+      { "path": "/view/[id]", "page": "/Contracts/ContractViewPage" }
+    ]
+  }
+]

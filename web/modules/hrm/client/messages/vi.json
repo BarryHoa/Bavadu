@@ -1,30 +1,281 @@
 {
   "hrm": {
     "title": "Quản lý Nhân sự",
-    "employees": {
+    "employee": {
       "title": "Nhân viên",
-      "list": "Danh sách nhân viên",
-      "create": "Thêm nhân viên",
-      "edit": "Sửa nhân viên",
-      "view": "Chi tiết nhân viên"
+      "list": {
+        "employeeCode": "Mã nhân viên",
+        "fullName": "Họ tên",
+        "email": "Email",
+        "phone": "Số điện thoại",
+        "status": "Trạng thái",
+        "hireDate": "Ngày vào làm",
+        "view": "Xem",
+        "edit": "Sửa",
+        "newEmployee": "Thêm nhân viên"
+      },
+      "create": {
+        "labels": {
+          "basicInfo": "Thông tin cơ bản",
+          "employmentInfo": "Thông tin công việc",
+          "additionalInfo": "Thông tin bổ sung",
+          "employeeCode": "Mã nhân viên",
+          "fullName": "Họ tên",
+          "firstName": "Tên",
+          "lastName": "Họ",
+          "email": "Email",
+          "phone": "Số điện thoại",
+          "department": "Phòng ban",
+          "position": "Vị trí",
+          "manager": "Quản lý",
+          "hireDate": "Ngày vào làm",
+          "employmentStatus": "Trạng thái làm việc",
+          "baseSalary": "Lương cơ bản",
+          "dateOfBirth": "Ngày sinh",
+          "gender": "Giới tính",
+          "cancel": "Hủy",
+          "save": "Lưu",
+          "errors": {
+            "failedToCreate": "Không thể tạo nhân viên",
+            "failedToUpdate": "Không thể cập nhật nhân viên"
+          }
+        },
+        "validation": {
+          "employeeCode": {
+            "required": "Mã nhân viên là bắt buộc"
+          },
+          "fullName": {
+            "required": "Họ tên là bắt buộc"
+          },
+          "email": {
+            "invalid": "Email không hợp lệ"
+          },
+          "positionId": {
+            "required": "Vị trí là bắt buộc"
+          },
+          "departmentId": {
+            "required": "Phòng ban là bắt buộc"
+          },
+          "hireDate": {
+            "required": "Ngày vào làm là bắt buộc"
+          },
+          "baseSalary": {
+            "invalid": "Lương cơ bản không hợp lệ"
+          }
+        }
+      },
+      "view": {
+        "labels": {
+          "title": "Chi tiết nhân viên",
+          "basicInfo": "Thông tin cơ bản",
+          "employmentInfo": "Thông tin công việc",
+          "employeeCode": "Mã nhân viên",
+          "fullName": "Họ tên",
+          "email": "Email",
+          "phone": "Số điện thoại",
+          "department": "Phòng ban",
+          "position": "Vị trí",
+          "hireDate": "Ngày vào làm",
+          "employmentStatus": "Trạng thái làm việc",
+          "backToList": "Quay lại danh sách",
+          "edit": "Sửa"
+        }
+      }
     },
-    "departments": {
+    "department": {
       "title": "Phòng ban",
-      "list": "Danh sách phòng ban",
-      "create": "Thêm phòng ban",
-      "edit": "Sửa phòng ban"
+      "list": {
+        "code": "Mã",
+        "name": "Tên",
+        "level": "Cấp",
+        "status": "Trạng thái",
+        "view": "Xem",
+        "edit": "Sửa",
+        "newDepartment": "Thêm phòng ban"
+      },
+      "create": {
+        "labels": {
+          "basicInfo": "Thông tin cơ bản",
+          "code": "Mã",
+          "name": "Tên",
+          "parentDepartment": "Phòng ban cha",
+          "level": "Cấp",
+          "manager": "Quản lý",
+          "cancel": "Hủy",
+          "save": "Lưu",
+          "errors": {
+            "failedToCreate": "Không thể tạo phòng ban",
+            "failedToUpdate": "Không thể cập nhật phòng ban"
+          }
+        },
+        "validation": {
+          "code": {
+            "required": "Mã là bắt buộc"
+          },
+          "name": {
+            "required": "Tên là bắt buộc"
+          },
+          "description": {
+            "invalid": "Mô tả không hợp lệ"
+          },
+          "level": {
+            "invalid": "Cấp không hợp lệ"
+          }
+        }
+      },
+      "view": {
+        "labels": {
+          "title": "Chi tiết phòng ban",
+          "basicInfo": "Thông tin cơ bản",
+          "code": "Mã",
+          "name": "Tên",
+          "parentDepartment": "Phòng ban cha",
+          "level": "Cấp",
+          "backToList": "Quay lại danh sách",
+          "edit": "Sửa"
+        }
+      }
     },
-    "positions": {
+    "position": {
       "title": "Vị trí",
-      "list": "Danh sách vị trí",
-      "create": "Thêm vị trí",
-      "edit": "Sửa vị trí"
+      "list": {
+        "code": "Mã",
+        "name": "Tên",
+        "department": "Phòng ban",
+        "status": "Trạng thái",
+        "view": "Xem",
+        "edit": "Sửa",
+        "newPosition": "Thêm vị trí"
+      },
+      "create": {
+        "labels": {
+          "basicInfo": "Thông tin cơ bản",
+          "code": "Mã",
+          "name": "Tên",
+          "department": "Phòng ban",
+          "reportsTo": "Báo cáo cho",
+          "jobFamily": "Nhóm công việc",
+          "jobGrade": "Cấp bậc",
+          "minSalary": "Lương tối thiểu",
+          "maxSalary": "Lương tối đa",
+          "cancel": "Hủy",
+          "save": "Lưu",
+          "errors": {
+            "failedToCreate": "Không thể tạo vị trí",
+            "failedToUpdate": "Không thể cập nhật vị trí"
+          }
+        },
+        "validation": {
+          "code": {
+            "required": "Mã là bắt buộc"
+          },
+          "name": {
+            "required": "Tên là bắt buộc"
+          },
+          "departmentId": {
+            "required": "Phòng ban là bắt buộc"
+          },
+          "description": {
+            "invalid": "Mô tả không hợp lệ"
+          },
+          "minSalary": {
+            "invalid": "Lương tối thiểu không hợp lệ"
+          },
+          "maxSalary": {
+            "invalid": "Lương tối đa không hợp lệ"
+          }
+        }
+      },
+      "view": {
+        "labels": {
+          "title": "Chi tiết vị trí",
+          "basicInfo": "Thông tin cơ bản",
+          "code": "Mã",
+          "name": "Tên",
+          "department": "Phòng ban",
+          "jobFamily": "Nhóm công việc",
+          "backToList": "Quay lại danh sách",
+          "edit": "Sửa"
+        }
+      }
     },
-    "contracts": {
+    "contract": {
       "title": "Hợp đồng",
-      "list": "Danh sách hợp đồng",
-      "create": "Thêm hợp đồng",
-      "edit": "Sửa hợp đồng"
+      "list": {
+        "contractNumber": "Số hợp đồng",
+        "employee": "Nhân viên",
+        "contractType": "Loại hợp đồng",
+        "status": "Trạng thái",
+        "startDate": "Ngày bắt đầu",
+        "baseSalary": "Lương cơ bản",
+        "view": "Xem",
+        "edit": "Sửa",
+        "newContract": "Thêm hợp đồng"
+      },
+      "create": {
+        "labels": {
+          "basicInfo": "Thông tin cơ bản",
+          "additionalInfo": "Thông tin bổ sung",
+          "contractNumber": "Số hợp đồng",
+          "employee": "Nhân viên",
+          "contractType": "Loại hợp đồng",
+          "status": "Trạng thái",
+          "startDate": "Ngày bắt đầu",
+          "endDate": "Ngày kết thúc",
+          "baseSalary": "Lương cơ bản",
+          "currency": "Tiền tệ",
+          "workingHours": "Số giờ làm việc",
+          "probationPeriod": "Thời gian thử việc",
+          "probationEndDate": "Ngày kết thúc thử việc",
+          "signedDate": "Ngày ký",
+          "notes": "Ghi chú",
+          "cancel": "Hủy",
+          "save": "Lưu",
+          "errors": {
+            "failedToCreate": "Không thể tạo hợp đồng",
+            "failedToUpdate": "Không thể cập nhật hợp đồng"
+          }
+        },
+        "validation": {
+          "contractNumber": {
+            "required": "Số hợp đồng là bắt buộc"
+          },
+          "employeeId": {
+            "required": "Nhân viên là bắt buộc"
+          },
+          "contractType": {
+            "required": "Loại hợp đồng là bắt buộc"
+          },
+          "startDate": {
+            "required": "Ngày bắt đầu là bắt buộc"
+          },
+          "baseSalary": {
+            "required": "Lương cơ bản là bắt buộc",
+            "invalid": "Lương cơ bản không hợp lệ"
+          },
+          "workingHours": {
+            "invalid": "Số giờ làm việc không hợp lệ"
+          },
+          "probationPeriod": {
+            "invalid": "Thời gian thử việc không hợp lệ"
+          }
+        }
+      },
+      "view": {
+        "labels": {
+          "title": "Chi tiết hợp đồng",
+          "basicInfo": "Thông tin cơ bản",
+          "contractNumber": "Số hợp đồng",
+          "employee": "Nhân viên",
+          "contractType": "Loại hợp đồng",
+          "status": "Trạng thái",
+          "startDate": "Ngày bắt đầu",
+          "endDate": "Ngày kết thúc",
+          "baseSalary": "Lương cơ bản",
+          "backToList": "Quay lại danh sách",
+          "edit": "Sửa"
+        }
+      }
     }
   }
 }
