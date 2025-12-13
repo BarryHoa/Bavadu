@@ -597,6 +597,47 @@
         "failedToLoadCertificate": "Failed to load certificate",
         "failedToUpdateCertificate": "Failed to update certificate"
       }
+    },
+    "performanceReviews": {
+      "title": "Performance Reviews",
+      "create": "New Performance Review",
+      "generalInfo": "Performance Review Information",
+      "labels": {
+        "employee": "Employee",
+        "reviewType": "Review Type",
+        "reviewPeriod": "Review Period",
+        "reviewDate": "Review Date",
+        "reviewer": "Reviewer",
+        "overallRating": "Overall Rating",
+        "strengths": "Strengths",
+        "areasForImprovement": "Areas for Improvement",
+        "feedback": "Feedback",
+        "employeeComments": "Employee Comments",
+        "status": "Status",
+        "completedDate": "Completed Date"
+      },
+      "validation": {
+        "employeeId": {
+          "required": "Employee is required"
+        },
+        "reviewType": {
+          "required": "Review type is required"
+        },
+        "reviewDate": {
+          "required": "Review date is required"
+        },
+        "reviewerId": {
+          "required": "Reviewer is required"
+        },
+        "overallRating": {
+          "invalid": "Overall rating must be between 1 and 5"
+        }
+      },
+      "errors": {
+        "failedToCreatePerformanceReview": "Failed to create performance review",
+        "failedToLoadPerformanceReview": "Failed to load performance review",
+        "failedToUpdatePerformanceReview": "Failed to update performance review"
+      }
     }
   }
 }
