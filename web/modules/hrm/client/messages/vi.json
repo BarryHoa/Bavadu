@@ -314,6 +314,48 @@
         "failedToLoadTimesheet": "Không thể tải thông tin chấm công",
         "failedToUpdateTimesheet": "Không thể cập nhật chấm công"
       }
+    },
+    "candidates": {
+      "title": "Ứng viên",
+      "create": "Thêm ứng viên",
+      "generalInfo": "Thông tin ứng viên",
+      "labels": {
+        "requisition": "Yêu cầu tuyển dụng",
+        "fullName": "Họ và tên",
+        "firstName": "Tên",
+        "lastName": "Họ",
+        "email": "Email",
+        "phone": "Điện thoại",
+        "dateOfBirth": "Ngày sinh",
+        "gender": "Giới tính",
+        "cvUrl": "Link CV",
+        "coverLetter": "Thư xin việc",
+        "source": "Nguồn ứng viên",
+        "status": "Trạng thái",
+        "stage": "Giai đoạn",
+        "rating": "Đánh giá",
+        "notes": "Ghi chú",
+        "appliedDate": "Ngày ứng tuyển"
+      },
+      "validation": {
+        "requisitionId": {
+          "required": "Yêu cầu tuyển dụng là bắt buộc"
+        },
+        "fullName": {
+          "required": "Họ và tên là bắt buộc"
+        },
+        "email": {
+          "invalid": "Email không hợp lệ"
+        },
+        "rating": {
+          "invalid": "Đánh giá phải từ 0 đến 5"
+        }
+      },
+      "errors": {
+        "failedToCreateCandidate": "Không thể tạo ứng viên",
+        "failedToLoadCandidate": "Không thể tải thông tin ứng viên",
+        "failedToUpdateCandidate": "Không thể cập nhật ứng viên"
+      }
     }
   }
 }

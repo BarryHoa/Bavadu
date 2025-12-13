@@ -29,6 +29,7 @@
     "payroll.curd": "Payroll/PayrollModel",
     "job-requisition.curd": "JobRequisition/JobRequisitionModel",
     "candidate.curd": "Candidate/CandidateModel",
+    "candidate.list": "Candidate/CandidateViewListModel",
     "offer.curd": "Offer/OfferModel",
     "onboarding-checklist.curd": "OnboardingChecklist/OnboardingChecklistModel",
     "offboarding.curd": "Offboarding/OffboardingModel",

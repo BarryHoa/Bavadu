@@ -314,6 +314,48 @@
         "failedToLoadTimesheet": "Failed to load timesheet",
         "failedToUpdateTimesheet": "Failed to update timesheet"
       }
+    },
+    "candidates": {
+      "title": "Candidates",
+      "create": "New Candidate",
+      "generalInfo": "Candidate Information",
+      "labels": {
+        "requisition": "Job Requisition",
+        "fullName": "Full Name",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "email": "Email",
+        "phone": "Phone",
+        "dateOfBirth": "Date of Birth",
+        "gender": "Gender",
+        "cvUrl": "CV URL",
+        "coverLetter": "Cover Letter",
+        "source": "Source",
+        "status": "Status",
+        "stage": "Stage",
+        "rating": "Rating",
+        "notes": "Notes",
+        "appliedDate": "Applied Date"
+      },
+      "validation": {
+        "requisitionId": {
+          "required": "Job requisition is required"
+        },
+        "fullName": {
+          "required": "Full name is required"
+        },
+        "email": {
+          "invalid": "Invalid email format"
+        },
+        "rating": {
+          "invalid": "Rating must be between 0 and 5"
+        }
+      },
+      "errors": {
+        "failedToCreateCandidate": "Failed to create candidate",
+        "failedToLoadCandidate": "Failed to load candidate",
+        "failedToUpdateCandidate": "Failed to update candidate"
+      }
     }
   }
 }

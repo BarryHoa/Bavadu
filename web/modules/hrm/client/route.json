@@ -89,6 +89,15 @@
     ]
   },
   {
+    "path": "/candidates",
+    "routes": [
+      { "path": "/", "page": "/Candidates/CandidatesListPage" },
+      { "path": "/create", "page": "/Candidates/CandidateCreatePage" },
+      { "path": "/edit/[id]", "page": "/Candidates/CandidateEditPage" },
+      { "path": "/view/[id]", "page": "/Candidates/CandidateViewPage" }
+    ]
+  },
+  {
     "path": "/courses",
     "routes": [
       { "path": "/", "page": "/Courses/CoursesListPage" },
