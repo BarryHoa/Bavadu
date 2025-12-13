@@ -3,19 +3,19 @@ import { eq } from "drizzle-orm";
 import { getEnv } from "@base/server";
 import { BaseModel } from "@base/server/models/BaseModel";
 import {
-  sale_b2c_tb_orders,
   sale_b2c_tb_order_lines,
+  sale_b2c_tb_orders,
 } from "@mdl/b2c-sales/server/schemas";
 import type StockModel from "@mdl/stock/server/models/Stock/StockModel";
 import type {
-  NewSaleB2cTbDelivery,
-  NewSaleB2cTbDeliveryLine,
+  NewSaleB2bTbDelivery,
+  NewSaleB2bTbDeliveryLine,
 } from "../../schemas";
 import {
-  sale_b2b_tb_orders,
-  sale_b2c_tb_deliveries,
-  sale_b2c_tb_deliveries_line,
+  sale_b2b_tb_deliveries,
+  sale_b2b_tb_delivery_lines,
   sale_b2b_tb_order_lines,
+  sale_b2b_tb_orders,
 } from "../../schemas";
 
 export interface CreateDeliveryInput {
@@ -33,10 +33,10 @@ export interface CreateDeliveryInput {
 }
 
 export default class DeliveryModel extends BaseModel<
-  typeof sale_b2c_tb_deliveries
+  typeof sale_b2b_tb_deliveries
 > {
   constructor() {
-    super(sale_b2c_tb_deliveries);
+    super(sale_b2b_tb_deliveries);
   }
 
   create = async (input: CreateDeliveryInput) => {
@@ -94,7 +94,7 @@ export default class DeliveryModel extends BaseModel<
 
     return this.db.transaction(async (tx) => {
       // Create delivery record
-      const deliveryPayload: NewSaleB2cTbDelivery = {
+      const deliveryPayload: NewSaleB2bTbDelivery = {
         orderType: input.orderType,
         orderId: input.orderId,
         warehouseId: input.warehouseId,
@@ -106,7 +106,7 @@ export default class DeliveryModel extends BaseModel<
       };
 
       const [delivery] = await tx
-        .insert(sale_b2c_tb_deliveries)
+        .insert(sale_b2b_tb_deliveries)
         .values(deliveryPayload)
         .returning();
 
@@ -131,16 +131,14 @@ export default class DeliveryModel extends BaseModel<
         }
 
         // Create delivery line
-        const deliveryLinePayload: NewSaleB2cTbDeliveryLine = {
+        const deliveryLinePayload: NewSaleB2bTbDeliveryLine = {
           deliveryId: delivery.id,
           orderType: input.orderType,
           orderLineId: deliveryLine.lineId,
           quantity: quantity.toString(),
         };
 
-        await tx
-          .insert(sale_b2c_tb_deliveries_line)
-          .values(deliveryLinePayload);
+        await tx.insert(sale_b2b_tb_delivery_lines).values(deliveryLinePayload);
 
         // Update order line delivered quantity
         await tx
@@ -164,12 +162,12 @@ export default class DeliveryModel extends BaseModel<
 
       // Update delivery status to completed
       await tx
-        .update(sale_b2c_tb_deliveries)
+        .update(sale_b2b_tb_deliveries)
         .set({
           status: "completed",
           updatedAt: now,
         })
-        .where(eq(sale_b2c_tb_deliveries.id, delivery.id));
+        .where(eq(sale_b2b_tb_deliveries.id, delivery.id));
 
       return delivery;
     });

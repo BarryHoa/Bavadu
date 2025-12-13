@@ -10,7 +10,7 @@ import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { Position } from "../../../interface/Position";
+import { Position } from "@mdl/hrm/client/interface/Position";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
 type PositionRow = Position & {

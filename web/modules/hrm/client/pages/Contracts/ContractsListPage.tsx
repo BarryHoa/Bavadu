@@ -10,7 +10,7 @@ import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { Contract } from "../../../interface/Contract";
+import { Contract } from "@mdl/hrm/client/interface/Contract";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
 type ContractRow = Contract & {

@@ -5,20 +5,20 @@ import {
   BaseViewListModel,
   type FilterConditionMap,
 } from "@base/server/models/BaseViewListModel";
+import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
-import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
-import { sale_b2c_tb_deliveries } from "../../schemas";
+import { sale_b2b_tb_deliveries } from "../../schemas";
 
 class DeliveryViewListModel extends BaseViewListModel<
-  typeof sale_b2c_tb_deliveries,
+  typeof sale_b2b_tb_deliveries,
   any
 > {
   constructor() {
     super({
-      table: sale_b2c_tb_deliveries,
+      table: sale_b2b_tb_deliveries,
       sortDefault: [
         {
           column: "createdAt",
@@ -36,40 +36,28 @@ class DeliveryViewListModel extends BaseViewListModel<
         sort?: boolean;
       }
     >([
-      ["id", { column: sale_b2c_tb_deliveries.id, sort: true }],
-      [
-        "orderType",
-        { column: sale_b2c_tb_deliveries.orderType, sort: true },
-      ],
-      ["orderId", { column: sale_b2c_tb_deliveries.orderId, sort: true }],
+      ["id", { column: sale_b2b_tb_deliveries.id, sort: true }],
+      ["orderType", { column: sale_b2b_tb_deliveries.orderType, sort: true }],
+      ["orderId", { column: sale_b2b_tb_deliveries.orderId, sort: true }],
       [
         "warehouseId",
-        { column: sale_b2c_tb_deliveries.warehouseId, sort: true },
+        { column: sale_b2b_tb_deliveries.warehouseId, sort: true },
       ],
       [
         "deliveryDate",
-        { column: sale_b2c_tb_deliveries.deliveryDate, sort: true },
+        { column: sale_b2b_tb_deliveries.deliveryDate, sort: true },
       ],
-      [
-        "reference",
-        { column: sale_b2c_tb_deliveries.reference, sort: true },
-      ],
-      ["status", { column: sale_b2c_tb_deliveries.status, sort: true }],
-      [
-        "createdAt",
-        { column: sale_b2c_tb_deliveries.createdAt, sort: true },
-      ],
-      [
-        "updatedAt",
-        { column: sale_b2c_tb_deliveries.updatedAt, sort: true },
-      ],
+      ["reference", { column: sale_b2b_tb_deliveries.reference, sort: true }],
+      ["status", { column: sale_b2b_tb_deliveries.status, sort: true }],
+      ["createdAt", { column: sale_b2b_tb_deliveries.createdAt, sort: true }],
+      ["updatedAt", { column: sale_b2b_tb_deliveries.updatedAt, sort: true }],
     ]);
 
   protected declarationSearch = () =>
     new Map([
       [
         "reference",
-        (text: string) => ilike(sale_b2c_tb_deliveries.reference, text),
+        (text: string) => ilike(sale_b2b_tb_deliveries.reference, text),
       ],
     ]);
 

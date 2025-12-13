@@ -4,7 +4,7 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import {
   base_tb_currencies,
   base_tb_currencies_exchange_rate,
-} from "@base/server/schemas/currency";
+} from "@base/server/schemas";
 import type {
   CreateSalesOrderB2CInput,
   UpdateSalesOrderB2CInput,

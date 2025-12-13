@@ -4,7 +4,7 @@ import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { timesheetService } from "../../../services/TimesheetService";
+import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
 import TimesheetForm, {
   type TimesheetFormValues,
 } from "./components/TimesheetForm/TimesheetForm";

@@ -14,7 +14,7 @@ import type {
 import {
   sale_b2c_tb_orders,
   sale_b2c_tb_deliveries,
-  sale_b2c_tb_deliveries_line,
+  sale_b2c_tb_delivery_lines,
   sale_b2c_tb_order_lines,
 } from "../../schemas";
 
@@ -139,7 +139,7 @@ export default class DeliveryModel extends BaseModel<
         };
 
         await tx
-          .insert(sale_b2c_tb_deliveries_line)
+          .insert(sale_b2c_tb_delivery_lines)
           .values(deliveryLinePayload);
 
         // Update order line delivered quantity

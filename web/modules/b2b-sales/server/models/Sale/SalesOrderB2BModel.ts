@@ -5,7 +5,7 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import {
   base_tb_currencies,
   base_tb_currencies_exchange_rate,
-} from "@base/server/schemas/currency";
+} from "@base/server/schemas";
 import type StockModel from "@mdl/stock/server/models/Stock/StockModel";
 import type {
   CreateSalesOrderB2BInput,

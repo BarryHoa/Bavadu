@@ -1,10 +1,10 @@
 "use client";
 
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { contractService } from "@mdl/hrm/client/services/ContractService";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { contractService } from "../../../services/ContractService";
 import ContractForm, {
   type ContractFormValues,
 } from "./components/ContractForm/ContractForm";
@@ -58,7 +58,9 @@ export default function ContractEditPage(): React.ReactNode {
       baseSalary: Number(values.baseSalary),
       currency: values.currency?.trim() || "VND",
       workingHours: values.workingHours ? Number(values.workingHours) : null,
-      probationPeriod: values.probationPeriod ? Number(values.probationPeriod) : null,
+      probationPeriod: values.probationPeriod
+        ? Number(values.probationPeriod)
+        : null,
       probationEndDate: values.probationEndDate?.trim() || null,
       status: values.status || "draft",
       documentUrl: values.documentUrl?.trim() || null,
@@ -82,7 +84,9 @@ export default function ContractEditPage(): React.ReactNode {
   return (
     <ContractForm
       onSubmit={handleSubmit}
-      onCancel={() => router.push(`/workspace/modules/hrm/contracts/view/${id}`)}
+      onCancel={() =>
+        router.push(`/workspace/modules/hrm/contracts/view/${id}`)
+      }
       submitError={submitError}
       isSubmitting={isPending}
       defaultValues={{
@@ -106,4 +110,3 @@ export default function ContractEditPage(): React.ReactNode {
     />
   );
 }
-

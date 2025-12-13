@@ -4,7 +4,7 @@ import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { positionService } from "../../../services/PositionService";
+import { positionService } from "@mdl/hrm/client/services/PositionService";
 import PositionForm, {
   type PositionFormValues,
 } from "./components/PositionForm/PositionForm";

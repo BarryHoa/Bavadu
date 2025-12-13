@@ -5,7 +5,7 @@ import { Card, CardBody } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { employeeService } from "../../../services/EmployeeService";
+import { employeeService } from "@mdl/hrm/client/services/EmployeeService";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
 export default function EmployeeViewPage(): React.ReactNode {

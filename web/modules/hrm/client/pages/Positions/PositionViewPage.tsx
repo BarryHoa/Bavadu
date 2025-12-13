@@ -5,7 +5,7 @@ import { Card, CardBody } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { positionService } from "../../../services/PositionService";
+import { positionService } from "@mdl/hrm/client/services/PositionService";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
 export default function PositionViewPage(): React.ReactNode {

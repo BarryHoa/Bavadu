@@ -11,7 +11,7 @@ import { formatDate } from "@base/client/utils/date/formatDate";
 import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { TimesheetDto } from "../../../interface/Timesheet";
+import { TimesheetDto } from "@mdl/hrm/client/interface/Timesheet";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
 type TimesheetRow = TimesheetDto & {

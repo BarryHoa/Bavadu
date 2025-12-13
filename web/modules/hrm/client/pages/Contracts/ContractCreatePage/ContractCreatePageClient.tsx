@@ -1,9 +1,9 @@
 "use client";
 
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { contractService } from "@mdl/hrm/client/services/ContractService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { contractService } from "../../../../services/ContractService";
 import ContractForm, {
   type ContractFormValues,
 } from "../components/ContractForm/ContractForm";
@@ -43,7 +43,9 @@ export default function ContractCreatePageClient(): React.ReactNode {
       baseSalary: Number(values.baseSalary),
       currency: values.currency?.trim() || "VND",
       workingHours: values.workingHours ? Number(values.workingHours) : null,
-      probationPeriod: values.probationPeriod ? Number(values.probationPeriod) : null,
+      probationPeriod: values.probationPeriod
+        ? Number(values.probationPeriod)
+        : null,
       probationEndDate: values.probationEndDate?.trim() || null,
       status: values.status || "draft",
       documentUrl: values.documentUrl?.trim() || null,
@@ -65,4 +67,3 @@ export default function ContractCreatePageClient(): React.ReactNode {
     />
   );
 }
-

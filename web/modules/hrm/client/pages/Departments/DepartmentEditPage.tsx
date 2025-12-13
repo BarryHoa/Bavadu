@@ -4,7 +4,7 @@ import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { departmentService } from "../../../services/DepartmentService";
+import { departmentService } from "@mdl/hrm/client/services/DepartmentService";
 import DepartmentForm, {
   type DepartmentFormValues,
 } from "./components/DepartmentForm/DepartmentForm";

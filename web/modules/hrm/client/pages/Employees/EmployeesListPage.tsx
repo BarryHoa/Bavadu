@@ -11,7 +11,7 @@ import { formatDate } from "@base/client/utils/date/formatDate";
 import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { Employee } from "../../../interface/Employee";
+import { Employee } from "@mdl/hrm/client/interface/Employee";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
 type EmployeeRow = Employee & {

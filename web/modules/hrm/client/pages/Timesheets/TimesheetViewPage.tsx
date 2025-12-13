@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { timesheetService } from "../../../services/TimesheetService";
+import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/react";
 import { LoadingOverlay, IBaseDigitViewer } from "@base/client/components";

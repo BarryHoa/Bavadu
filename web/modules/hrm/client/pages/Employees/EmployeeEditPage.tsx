@@ -4,7 +4,7 @@ import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { employeeService } from "../../../services/EmployeeService";
+import { employeeService } from "@mdl/hrm/client/services/EmployeeService";
 import EmployeeForm, {
   type EmployeeFormValues,
 } from "./components/EmployeeForm/EmployeeForm";

@@ -5,7 +5,7 @@ import { Card, CardBody } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { departmentService } from "../../../services/DepartmentService";
+import { departmentService } from "@mdl/hrm/client/services/DepartmentService";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
 export default function DepartmentViewPage(): React.ReactNode {

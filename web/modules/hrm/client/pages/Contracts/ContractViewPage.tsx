@@ -1,12 +1,12 @@
 "use client";
 
+import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/react";
+import { contractService } from "@mdl/hrm/client/services/ContractService";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { contractService } from "../../../services/ContractService";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
 export default function ContractViewPage(): React.ReactNode {
   const router = useRouter();
@@ -50,7 +50,9 @@ export default function ContractViewPage(): React.ReactNode {
           <Button
             size="sm"
             color="primary"
-            onPress={() => router.push(`/workspace/modules/hrm/contracts/edit/${id}`)}
+            onPress={() =>
+              router.push(`/workspace/modules/hrm/contracts/edit/${id}`)
+            }
           >
             {t("edit")}
           </Button>
@@ -62,15 +64,23 @@ export default function ContractViewPage(): React.ReactNode {
           <h2 className="text-base font-semibold mb-4">{t("basicInfo")}</h2>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <div className="text-sm text-default-500">{t("contractNumber")}</div>
+              <div className="text-sm text-default-500">
+                {t("contractNumber")}
+              </div>
               <div className="text-base">{contract.contractNumber}</div>
             </div>
             <div>
               <div className="text-sm text-default-500">{t("employee")}</div>
-              <div className="text-base">{getLocalizedText(contract.employee?.fullName as any) || contract.employee?.employeeCode || "—"}</div>
+              <div className="text-base">
+                {getLocalizedText(contract.employee?.fullName as any) ||
+                  contract.employee?.employeeCode ||
+                  "—"}
+              </div>
             </div>
             <div>
-              <div className="text-sm text-default-500">{t("contractType")}</div>
+              <div className="text-sm text-default-500">
+                {t("contractType")}
+              </div>
               <div className="text-base">{contract.contractType}</div>
             </div>
             <div>
@@ -100,4 +110,3 @@ export default function ContractViewPage(): React.ReactNode {
     </div>
   );
 }
-

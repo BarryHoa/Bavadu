@@ -3,7 +3,7 @@
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { timesheetService } from "../../../../services/TimesheetService";
+import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
 import TimesheetForm, {
   type TimesheetFormValues,
 } from "../components/TimesheetForm/TimesheetForm";

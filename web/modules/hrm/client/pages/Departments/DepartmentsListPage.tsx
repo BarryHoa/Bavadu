@@ -10,7 +10,7 @@ import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { Department } from "../../../interface/Department";
+import { Department } from "@mdl/hrm/client/interface/Department";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
 type DepartmentRow = Department & {
