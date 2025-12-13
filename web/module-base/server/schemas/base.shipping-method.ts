@@ -4,6 +4,7 @@ import {
   index,
   jsonb,
   numeric,
+  text,
   timestamp,
   uniqueIndex,
   uuid,
@@ -20,7 +21,7 @@ export const base_tb_shipping_methods = mdBaseSchema.table(
       .default(sql`uuid_generate_v7()`),
     code: varchar("code", { length: 50 }).notNull(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // Text description
     type: varchar("type", { length: 50 }).notNull(), // 'b2c', 'b2b', 'all' , b2b-internal, b2b-external
     baseFee: numeric("base_fee", { precision: 14, scale: 2 }), // Base shipping fee
     isActive: boolean("is_active").default(true).notNull(),
@@ -37,4 +38,5 @@ export const base_tb_shipping_methods = mdBaseSchema.table(
 );
 
 export type BaseTbShippingMethod = typeof base_tb_shipping_methods.$inferSelect;
-export type NewBaseTbShippingMethod = typeof base_tb_shipping_methods.$inferInsert;
+export type NewBaseTbShippingMethod =
+  typeof base_tb_shipping_methods.$inferInsert;

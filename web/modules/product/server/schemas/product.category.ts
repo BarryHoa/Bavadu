@@ -5,6 +5,7 @@ import {
   index,
   integer,
   jsonb,
+  text,
   timestamp,
   uuid,
   varchar,
@@ -20,7 +21,7 @@ export const product_tb_product_categories = mdlProductSchema.table(
       .default(sql`uuid_generate_v7()`),
     code: varchar("code", { length: 100 }).notNull().unique(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // Text description
     parentId: uuid("parent_id"),
     level: integer("level").default(1).notNull(),
     isActive: boolean("is_active").default(true).notNull(),

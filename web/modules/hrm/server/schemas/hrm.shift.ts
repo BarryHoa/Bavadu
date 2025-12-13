@@ -4,6 +4,7 @@ import {
   index,
   integer,
   jsonb,
+  text,
   time,
   timestamp,
   uuid,
@@ -20,7 +21,7 @@ export const hrm_tb_shifts = mdlHrmSchema.table(
       .default(sql`uuid_generate_v7()`),
     code: varchar("code", { length: 100 }).notNull().unique(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // Text description
     startTime: time("start_time").notNull(), // HH:mm format
     endTime: time("end_time").notNull(), // HH:mm format
     breakDuration: integer("break_duration").default(0), // Minutes

@@ -6,6 +6,10 @@
   "icon": "Package",
   "models": {
     "user.curd": "Users/UserModel",
+    "role.curd": "Role/RoleModel",
+    "role-permission.curd": "RolePermission/RolePermissionModel",
+    "user-role.curd": "UserRole/UserRoleModel",
+    "user-permission.curd": "UserPermission/UserPermissionModel",
     "location.curd": "Locations/LocationModel",
     "guideline.curd": "Guidelines/GuidelineModel",
     "payment-method.dropdown": "PaymentMethod/PaymentMethodDropdownListModel",

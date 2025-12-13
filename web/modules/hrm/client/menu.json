@@ -5,39 +5,119 @@
   "order": 1,
   "children": [
     {
-      "key": "hrm-employees",
-      "name": "Employees",
-      "path": "/employees",
-      "as": "/employees",
-      "order": 1
+      "key": "hrm-org",
+      "name": "Org - Tổ chức",
+      "icon": "Building",
+      "order": 1,
+      "children": [
+        {
+          "key": "hrm-org-chart",
+          "name": "Org Chart",
+          "path": "/org-chart",
+          "as": "/org-chart",
+          "order": 1
+        },
+        {
+          "key": "hrm-departments",
+          "name": "Departments",
+          "path": "/departments",
+          "as": "/departments",
+          "order": 2
+        },
+        {
+          "key": "hrm-positions",
+          "name": "Positions",
+          "path": "/positions",
+          "as": "/positions",
+          "order": 3
+        },
+        {
+          "key": "hrm-roles",
+          "name": "Roles",
+          "path": "/roles",
+          "as": "/roles",
+          "order": 4
+        },
+        {
+          "key": "hrm-permissions",
+          "name": "Permissions",
+          "path": "/permissions",
+          "as": "/permissions",
+          "order": 5
+        }
+      ]
     },
     {
-      "key": "hrm-departments",
-      "name": "Departments",
-      "path": "/departments",
-      "as": "/departments",
+      "key": "hrm-employees",
+      "name": "Employees - Quản lý nhân viên",
+      "path": "/employees",
+      "as": "/employees",
       "order": 2
     },
     {
-      "key": "hrm-positions",
-      "name": "Positions",
-      "path": "/positions",
-      "as": "/positions",
-      "order": 3
+      "key": "hrm-timesheets-leave",
+      "name": "Timesheets & Leave Request",
+      "icon": "Calendar",
+      "order": 3,
+      "children": [
+        {
+          "key": "hrm-timesheets",
+          "name": "Timesheets",
+          "path": "/timesheets",
+          "as": "/timesheets",
+          "order": 1
+        },
+        {
+          "key": "hrm-leave-requests",
+          "name": "Leave Requests",
+          "path": "/leave-requests",
+          "as": "/leave-requests",
+          "order": 2
+        }
+      ]
     },
     {
-      "key": "hrm-contracts",
-      "name": "Contracts",
-      "path": "/contracts",
-      "as": "/contracts",
+      "key": "hrm-payroll",
+      "name": "Payroll - Bảng lương",
+      "path": "/payroll",
+      "as": "/payroll",
       "order": 4
     },
     {
-      "key": "hrm-timesheets",
-      "name": "Timesheets",
-      "path": "/timesheets",
-      "as": "/timesheets",
+      "key": "hrm-recruitment",
+      "name": "Recruitment - Tuyển dụng",
+      "path": "/job-requisitions",
+      "as": "/job-requisitions",
       "order": 5
+    },
+    {
+      "key": "hrm-training",
+      "name": "Học Tập",
+      "icon": "GraduationCap",
+      "order": 6,
+      "children": [
+        {
+          "key": "hrm-courses",
+          "name": "Courses",
+          "path": "/courses",
+          "as": "/courses",
+          "order": 1
+        },
+        {
+          "key": "hrm-certificates",
+          "name": "Certificates",
+          "path": "/certificates",
+          "as": "/certificates",
+          "order": 2
+        }
+      ]
+    },
+    {
+      "key": "hrm-performance",
+      "name": "Performance - Đánh giá hiệu suất",
+      "path": "/performance-reviews",
+      "as": "/performance-reviews",
+      "order": 7
     }
   ]
 }

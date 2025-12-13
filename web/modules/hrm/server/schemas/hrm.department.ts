@@ -5,6 +5,7 @@ import {
   index,
   integer,
   jsonb,
+  text,
   timestamp,
   uuid,
   varchar,
@@ -20,7 +21,7 @@ export const hrm_tb_departments = mdlHrmSchema.table(
       .default(sql`uuid_generate_v7()`),
     code: varchar("code", { length: 100 }).notNull().unique(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // Text description
     parentId: uuid("parent_id"), // Self-referencing for hierarchy
     level: integer("level").default(1).notNull(),
     managerId: uuid("manager_id"), // Employee ID who manages this department

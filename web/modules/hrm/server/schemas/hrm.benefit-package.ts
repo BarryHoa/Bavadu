@@ -4,6 +4,7 @@ import {
   index,
   integer,
   jsonb,
+  text,
   timestamp,
   uuid,
   varchar,
@@ -19,7 +20,7 @@ export const hrm_tb_benefit_packages = mdlHrmSchema.table(
       .default(sql`uuid_generate_v7()`),
     code: varchar("code", { length: 100 }).notNull().unique(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // Text description
     benefitType: varchar("benefit_type", { length: 50 }).notNull(), // insurance, allowance, bonus, etc.
     coverage: jsonb("coverage"), // Details of what's covered
     cost: integer("cost"), // Monthly/annual cost

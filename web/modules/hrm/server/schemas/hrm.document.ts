@@ -3,6 +3,7 @@ import {
   boolean,
   integer,
   jsonb,
+  text,
   timestamp,
   uuid,
   varchar,
@@ -20,7 +21,7 @@ export const hrm_tb_documents = mdlHrmSchema.table(
     documentNumber: varchar("document_number", { length: 100 }).unique(),
     documentType: varchar("document_type", { length: 50 }).notNull(), // contract, amendment, certificate, id_card, etc.
     title: jsonb("title").notNull(), // LocaleDataType<string>
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // Text description
     employeeId: uuid("employee_id").references(() => hrm_tb_employees.id, {
       onDelete: "cascade",
     }),

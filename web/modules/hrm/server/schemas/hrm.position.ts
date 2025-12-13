@@ -5,12 +5,13 @@ import {
   index,
   integer,
   jsonb,
+  text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { mdlHrmSchema } from "./schema";
 import { hrm_tb_departments } from "./hrm.department";
+import { mdlHrmSchema } from "./schema";
 
 // Positions - Vị trí công việc
 export const hrm_tb_positions = mdlHrmSchema.table(
@@ -21,7 +22,7 @@ export const hrm_tb_positions = mdlHrmSchema.table(
       .default(sql`uuid_generate_v7()`),
     code: varchar("code", { length: 100 }).notNull().unique(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // Text description
     departmentId: uuid("department_id")
       .references(() => hrm_tb_departments.id, { onDelete: "restrict" })
       .notNull(),

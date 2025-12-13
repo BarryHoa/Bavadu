@@ -27,7 +27,6 @@ export * from "./hrm.payroll-period";
 export * from "./hrm.payroll-rule";
 export * from "./hrm.performance-review";
 export * from "./hrm.position";
-export * from "./hrm.role";
 export * from "./hrm.roster";
 export * from "./hrm.shift";
 export * from "./hrm.timesheet";

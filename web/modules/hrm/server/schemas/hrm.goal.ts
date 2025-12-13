@@ -25,7 +25,7 @@ export const hrm_tb_goals = mdlHrmSchema.table(
       .notNull(),
     goalType: varchar("goal_type", { length: 50 }).notNull(), // kpi, okr
     title: jsonb("title").notNull(), // LocaleDataType<string>
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // Text description
     targetValue: integer("target_value"),
     currentValue: integer("current_value").default(0),
     unit: varchar("unit", { length: 50 }), // percentage, number, currency, etc.

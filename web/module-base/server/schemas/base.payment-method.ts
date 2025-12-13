@@ -4,6 +4,7 @@ import {
   index,
   jsonb,
   numeric,
+  text,
   timestamp,
   uniqueIndex,
   uuid,
@@ -21,7 +22,7 @@ export const base_tb_payment_methods = mdBaseSchema.table(
     code: varchar("code", { length: 50 }).notNull(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
     type: varchar("type", { length: 50 }).notNull().default("all"), // 'b2c', 'b2b', 'all'
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // Text description
     isActive: boolean("is_active").default(true).notNull(),
     order: numeric("order", { precision: 5, scale: 0 }).default("0").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
@@ -38,4 +39,5 @@ export const base_tb_payment_methods = mdBaseSchema.table(
 );
 
 export type BaseTbPaymentMethod = typeof base_tb_payment_methods.$inferSelect;
-export type NewBaseTbPaymentMethod = typeof base_tb_payment_methods.$inferInsert;
+export type NewBaseTbPaymentMethod =
+  typeof base_tb_payment_methods.$inferInsert;

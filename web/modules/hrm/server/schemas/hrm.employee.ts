@@ -1,3 +1,4 @@
+import { base_tb_users } from "@base/server/schemas/base.user";
 import { sql } from "drizzle-orm";
 import {
   boolean,
@@ -21,6 +22,12 @@ export const hrm_tb_employees = mdlHrmSchema.table(
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
+
+    // Link to base user (optional - not all employees have user accounts)
+    userId: uuid("user_id").references(() => base_tb_users.id, {
+      onDelete: "set null",
+    }), // Optional: link to user account for authentication
+
     employeeCode: varchar("employee_code", { length: 100 }).notNull().unique(), // Mã nhân viên
     firstName: varchar("first_name", { length: 255 }),
     lastName: varchar("last_name", { length: 255 }),
@@ -59,6 +66,7 @@ export const hrm_tb_employees = mdlHrmSchema.table(
       columns: [table.managerId],
       foreignColumns: [table.id],
     }),
+    index("employees_user_idx").on(table.userId),
     index("employees_code_idx").on(table.employeeCode),
     index("employees_email_idx").on(table.email),
     index("employees_position_idx").on(table.positionId),

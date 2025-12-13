@@ -3,6 +3,7 @@ import {
   boolean,
   integer,
   jsonb,
+  text,
   timestamp,
   uuid,
   varchar,
@@ -18,7 +19,7 @@ export const hrm_tb_leave_types = mdlHrmSchema.table(
       .default(sql`uuid_generate_v7()`),
     code: varchar("code", { length: 100 }).notNull().unique(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // Text description
     accrualType: varchar("accrual_type", { length: 50 }).notNull(), // monthly, yearly, none
     accrualRate: integer("accrual_rate"), // Days per period (e.g., 1.25 days/month)
     maxAccrual: integer("max_accrual"), // Maximum days that can be accrued (null = unlimited)

@@ -4,6 +4,7 @@ import {
   index,
   jsonb,
   numeric,
+  text,
   timestamp,
   uniqueIndex,
   uuid,
@@ -21,7 +22,7 @@ export const base_tb_payment_terms = mdBaseSchema.table(
     code: varchar("code", { length: 50 }).notNull(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
     type: varchar("type", { length: 50 }).notNull().default("all"), // 'b2c', 'b2b', 'all'
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // Text description
     days: numeric("days", { precision: 5, scale: 0 }), // Number of days (e.g., 30 for Net 30)
     isActive: boolean("is_active").default(true).notNull(),
     order: numeric("order", { precision: 5, scale: 0 }).default("0").notNull(),

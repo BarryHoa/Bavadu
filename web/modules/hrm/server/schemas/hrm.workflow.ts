@@ -3,6 +3,7 @@ import {
   boolean,
   integer,
   jsonb,
+  text,
   timestamp,
   uuid,
   varchar,
@@ -18,7 +19,7 @@ export const hrm_tb_workflows = mdlHrmSchema.table(
       .default(sql`uuid_generate_v7()`),
     code: varchar("code", { length: 100 }).notNull().unique(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // Text description
     workflowType: varchar("workflow_type", { length: 50 }).notNull(), // leave_request, overtime, salary_change, contract_approval, etc.
     steps: jsonb("steps").notNull(), // Array of workflow steps with approvers
     isActive: boolean("is_active").default(true).notNull(),

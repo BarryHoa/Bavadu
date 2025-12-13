@@ -7,7 +7,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_employees } from "./hrm.employee";
-import { hrm_tb_roles } from "./hrm.role";
+import { base_tb_roles } from "@base/server/schemas/base.role";
 
 // Employee Role Assignments - Phân quyền cho nhân viên
 export const hrm_tb_employees_role = mdlHrmSchema.table(
@@ -20,7 +20,7 @@ export const hrm_tb_employees_role = mdlHrmSchema.table(
       .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
       .notNull(),
     roleId: uuid("role_id")
-      .references(() => hrm_tb_roles.id, { onDelete: "restrict" })
+      .references(() => base_tb_roles.id, { onDelete: "restrict" })
       .notNull(),
     departmentId: uuid("department_id"), // Scope: chỉ áp dụng cho phòng ban này (null = toàn công ty)
     locationId: uuid("location_id"), // Scope: chỉ áp dụng cho địa điểm này (null = tất cả)

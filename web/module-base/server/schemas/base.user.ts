@@ -25,10 +25,6 @@ export const base_tb_users = mdBaseSchema.table(
     phones: varchar("phones", { length: 20 }).array(),
     addresses: varchar("addresses", { length: 225 }).array(),
     emails: varchar("emails", { length: 255 }).array(),
-    position: varchar("position", { length: 100 }),
-    department: varchar("department", { length: 100 }),
-    joinedAt: timestamp("joined_at", { withTimezone: true }),
-    salary: varchar("salary", { length: 50 }),
     address: jsonb("address"),
     notes: varchar("notes", { length: 255 }),
     status: varchar("status", { length: 20 }).default("active").notNull(), // 'active', 'inactive', 'block'
@@ -40,8 +36,6 @@ export const base_tb_users = mdBaseSchema.table(
   },
   (table) => [
     index("users_status_idx").on(table.status),
-    index("users_department_idx").on(table.department),
-    index("users_joined_idx").on(table.joinedAt),
     index("users_lastname_idx").on(table.lastName),
   ]
 );

@@ -1,8 +1,7 @@
 import { LocaleDataType } from "@base/server/interfaces/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
-import { base_tb_roles } from "@base/server/schemas/base.role";
-import type { NewBaseTbRole } from "@base/server/schemas/base.role";
-import { eq, and } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { base_tb_roles } from "../../schemas";
 
 export interface RoleRow {
   id: string;
@@ -19,7 +18,7 @@ export interface RoleRow {
 export interface RoleInput {
   code: string;
   name: LocaleDataType<string>;
-  description?: LocaleDataType<string> | null;
+  description?: string | null;
   permissions: string[];
   isSystem?: boolean;
   isActive?: boolean;
@@ -72,7 +71,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
 
   createRole = async (payload: RoleInput): Promise<RoleRow> => {
     const now = new Date();
-    const insertData: NewBaseTbRole = {
+    const insertData = {
       code: payload.code,
       name: payload.name,
       description: payload.description ?? null,
@@ -140,9 +139,10 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
       };
     }
     if (payload.description !== undefined) {
-      normalizedPayload.description = this.normalizeLocaleInput(
-        payload.description
-      );
+      normalizedPayload.description =
+        payload.description !== null && payload.description !== undefined
+          ? String(payload.description)
+          : null;
     }
     if (payload.permissions !== undefined) {
       normalizedPayload.permissions = Array.isArray(payload.permissions)

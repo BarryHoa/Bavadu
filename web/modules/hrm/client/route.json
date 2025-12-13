@@ -1,12 +1,7 @@
 [
   {
-    "path": "/employees",
-    "routes": [
-      { "path": "/", "page": "/Employees/EmployeesListPage" },
-      { "path": "/create", "page": "/Employees/EmployeeCreatePage" },
-      { "path": "/edit/[id]", "page": "/Employees/EmployeeEditPage" },
-      { "path": "/view/[id]", "page": "/Employees/EmployeeViewPage" }
-    ]
+    "path": "/org-chart",
+    "routes": [{ "path": "/", "page": "/OrgChart/OrgChartPage" }]
   },
   {
     "path": "/departments",
@@ -27,12 +22,25 @@
     ]
   },
   {
-    "path": "/contracts",
+    "path": "/roles",
     "routes": [
-      { "path": "/", "page": "/Contracts/ContractsListPage" },
-      { "path": "/create", "page": "/Contracts/ContractCreatePage" },
-      { "path": "/edit/[id]", "page": "/Contracts/ContractEditPage" },
-      { "path": "/view/[id]", "page": "/Contracts/ContractViewPage" }
+      { "path": "/", "page": "/Roles/RolesListPage" },
+      { "path": "/create", "page": "/Roles/RoleCreatePage" },
+      { "path": "/edit/[id]", "page": "/Roles/RoleEditPage" },
+      { "path": "/view/[id]", "page": "/Roles/RoleViewPage" }
+    ]
+  },
+  {
+    "path": "/permissions",
+    "routes": [{ "path": "/", "page": "/Permissions/PermissionsPage" }]
+  },
+  {
+    "path": "/employees",
+    "routes": [
+      { "path": "/", "page": "/Employees/EmployeesListPage" },
+      { "path": "/create", "page": "/Employees/EmployeeCreatePage" },
+      { "path": "/edit/[id]", "page": "/Employees/EmployeeEditPage" },
+      { "path": "/view/[id]", "page": "/Employees/EmployeeViewPage" }
     ]
   },
   {
@@ -42,6 +50,78 @@
       { "path": "/create", "page": "/Timesheets/TimesheetCreatePage" },
       { "path": "/edit/[id]", "page": "/Timesheets/TimesheetEditPage" },
       { "path": "/view/[id]", "page": "/Timesheets/TimesheetViewPage" }
+    ]
+  },
+  {
+    "path": "/leave-requests",
+    "routes": [
+      { "path": "/", "page": "/LeaveRequests/LeaveRequestsListPage" },
+      { "path": "/create", "page": "/LeaveRequests/LeaveRequestCreatePage" },
+      { "path": "/edit/[id]", "page": "/LeaveRequests/LeaveRequestEditPage" },
+      { "path": "/view/[id]", "page": "/LeaveRequests/LeaveRequestViewPage" }
+    ]
+  },
+  {
+    "path": "/payroll",
+    "routes": [
+      { "path": "/", "page": "/Payroll/PayrollListPage" },
+      { "path": "/create", "page": "/Payroll/PayrollCreatePage" },
+      { "path": "/edit/[id]", "page": "/Payroll/PayrollEditPage" },
+      { "path": "/view/[id]", "page": "/Payroll/PayrollViewPage" }
+    ]
+  },
+  {
+    "path": "/job-requisitions",
+    "routes": [
+      { "path": "/", "page": "/JobRequisitions/JobRequisitionsListPage" },
+      {
+        "path": "/create",
+        "page": "/JobRequisitions/JobRequisitionCreatePage"
+      },
+      {
+        "path": "/edit/[id]",
+        "page": "/JobRequisitions/JobRequisitionEditPage"
+      },
+      {
+        "path": "/view/[id]",
+        "page": "/JobRequisitions/JobRequisitionViewPage"
+      }
+    ]
+  },
+  {
+    "path": "/courses",
+    "routes": [
+      { "path": "/", "page": "/Courses/CoursesListPage" },
+      { "path": "/create", "page": "/Courses/CourseCreatePage" },
+      { "path": "/edit/[id]", "page": "/Courses/CourseEditPage" },
+      { "path": "/view/[id]", "page": "/Courses/CourseViewPage" }
+    ]
+  },
+  {
+    "path": "/certificates",
+    "routes": [
+      { "path": "/", "page": "/Certificates/CertificatesListPage" },
+      { "path": "/create", "page": "/Certificates/CertificateCreatePage" },
+      { "path": "/edit/[id]", "page": "/Certificates/CertificateEditPage" },
+      { "path": "/view/[id]", "page": "/Certificates/CertificateViewPage" }
+    ]
+  },
+  {
+    "path": "/performance-reviews",
+    "routes": [
+      { "path": "/", "page": "/PerformanceReviews/PerformanceReviewsListPage" },
+      {
+        "path": "/create",
+        "page": "/PerformanceReviews/PerformanceReviewCreatePage"
+      },
+      {
+        "path": "/edit/[id]",
+        "page": "/PerformanceReviews/PerformanceReviewEditPage"
+      },
+      {
+        "path": "/view/[id]",
+        "page": "/PerformanceReviews/PerformanceReviewViewPage"
+      }
     ]
   }
 ]

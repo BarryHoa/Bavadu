@@ -15,10 +15,6 @@ CREATE TABLE IF NOT EXISTS "md_base"."users" (
 	"phones" varchar(20)[],
 	"addresses" varchar(225)[],
 	"emails" varchar(255)[],
-	"position" varchar(100),
-	"department" varchar(100),
-	"joined_at" timestamp with time zone,
-	"salary" varchar(50),
 	"address" jsonb,
 	"notes" varchar(255),
 	"status" varchar(20) DEFAULT 'active' NOT NULL,
@@ -33,7 +29,5 @@ CREATE TABLE IF NOT EXISTS "md_base"."users" (
 -- Indexes
 -- ============================================
 CREATE INDEX IF NOT EXISTS "users_status_idx" ON "md_base"."users" USING btree ("status");
-CREATE INDEX IF NOT EXISTS "users_department_idx" ON "md_base"."users" USING btree ("department");
-CREATE INDEX IF NOT EXISTS "users_joined_idx" ON "md_base"."users" USING btree ("joined_at");
 CREATE INDEX IF NOT EXISTS "users_lastname_idx" ON "md_base"."users" USING btree ("last_name");
 

@@ -23,7 +23,7 @@ export const hrm_tb_onboarding_checklists = mdlHrmSchema.table(
       .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
       .notNull(),
     taskName: jsonb("task_name").notNull(), // LocaleDataType<string>
-    taskDescription: jsonb("task_description"), // LocaleDataType<string>
+    taskDescription: text("task_description"), // Text description
     category: varchar("category", { length: 50 }), // hr, it, facilities, training, etc.
     assignedTo: uuid("assigned_to"), // Employee ID responsible for this task
     dueDate: date("due_date"),

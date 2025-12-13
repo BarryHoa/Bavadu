@@ -5,6 +5,7 @@ import {
   index,
   integer,
   jsonb,
+  text,
   timestamp,
   uuid,
   varchar,
@@ -15,10 +16,12 @@ import { mdBaseSchema } from "./schema";
 export const base_tb_dynamic_entities = mdBaseSchema.table(
   "dynamic_entities",
   {
-    id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuid_generate_v7()`),
     code: varchar("code", { length: 20 }).notNull(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // Text description
     model: varchar("model", { length: 30 }).notNull(), // e.g. "product", "customer", "supplier", etc.
     dataType: varchar("data_type", { length: 20 }).notNull(), // string | number | boolean | date | select | multi-select
     options: jsonb("options"), // [{ label: LocaleDataType<string>, value: any }]
@@ -46,4 +49,5 @@ export const base_tb_dynamic_entities = mdBaseSchema.table(
 );
 
 export type BaseTbDynamicEntity = typeof base_tb_dynamic_entities.$inferSelect;
-export type NewBaseTbDynamicEntity = typeof base_tb_dynamic_entities.$inferInsert;
+export type NewBaseTbDynamicEntity =
+  typeof base_tb_dynamic_entities.$inferInsert;

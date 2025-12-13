@@ -24,7 +24,7 @@ export const hrm_tb_job_requisitions = mdlHrmSchema.table(
       .default(sql`uuid_generate_v7()`),
     requisitionNumber: varchar("requisition_number", { length: 100 }).notNull().unique(),
     title: jsonb("title").notNull(), // LocaleDataType<string>
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // Text description
     departmentId: uuid("department_id")
       .references(() => hrm_tb_departments.id, { onDelete: "restrict" })
       .notNull(),

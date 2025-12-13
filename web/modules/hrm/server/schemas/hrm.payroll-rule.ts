@@ -5,6 +5,7 @@ import {
   index,
   integer,
   jsonb,
+  text,
   timestamp,
   uuid,
   varchar,
@@ -20,7 +21,7 @@ export const hrm_tb_payrolls_rule = mdlHrmSchema.table(
       .default(sql`uuid_generate_v7()`),
     code: varchar("code", { length: 100 }).notNull().unique(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
-    description: jsonb("description"), // LocaleDataType<string>
+    description: text("description"), // Text description
     ruleType: varchar("rule_type", { length: 50 }).notNull(), // min_wage, ot_limit, tax_bracket, insurance_rate, etc.
     ruleConfig: jsonb("rule_config").notNull(), // Rule configuration (e.g., { minWage: 5000000, region: "region_1" })
     effectiveDate: date("effective_date").notNull(),
