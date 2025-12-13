@@ -396,6 +396,49 @@
         "failedToLoadLeaveRequest": "Không thể tải thông tin đơn xin nghỉ phép",
         "failedToUpdateLeaveRequest": "Không thể cập nhật đơn xin nghỉ phép"
       }
+    },
+    "leaveTypes": {
+      "title": "Loại nghỉ phép",
+      "create": "Thêm loại nghỉ phép",
+      "generalInfo": "Thông tin loại nghỉ phép",
+      "labels": {
+        "code": "Mã",
+        "name": "Tên",
+        "description": "Mô tả",
+        "accrualType": "Loại tích lũy",
+        "accrualRate": "Tỷ lệ tích lũy",
+        "maxAccrual": "Tích lũy tối đa",
+        "carryForward": "Chuyển sang năm sau",
+        "maxCarryForward": "Chuyển tối đa",
+        "requiresApproval": "Cần duyệt",
+        "isPaid": "Có lương",
+        "isActive": "Đang hoạt động"
+      },
+      "validation": {
+        "code": {
+          "required": "Mã là bắt buộc"
+        },
+        "name": {
+          "required": "Tên là bắt buộc"
+        },
+        "accrualType": {
+          "required": "Loại tích lũy là bắt buộc"
+        },
+        "accrualRate": {
+          "invalid": "Tỷ lệ tích lũy không hợp lệ"
+        },
+        "maxAccrual": {
+          "invalid": "Tích lũy tối đa không hợp lệ"
+        },
+        "maxCarryForward": {
+          "invalid": "Chuyển tối đa không hợp lệ"
+        }
+      },
+      "errors": {
+        "failedToCreateLeaveType": "Không thể tạo loại nghỉ phép",
+        "failedToLoadLeaveType": "Không thể tải thông tin loại nghỉ phép",
+        "failedToUpdateLeaveType": "Không thể cập nhật loại nghỉ phép"
+      }
     }
   }
 }

@@ -396,6 +396,49 @@
         "failedToLoadLeaveRequest": "Failed to load leave request",
         "failedToUpdateLeaveRequest": "Failed to update leave request"
       }
+    },
+    "leaveTypes": {
+      "title": "Leave Types",
+      "create": "New Leave Type",
+      "generalInfo": "Leave Type Information",
+      "labels": {
+        "code": "Code",
+        "name": "Name",
+        "description": "Description",
+        "accrualType": "Accrual Type",
+        "accrualRate": "Accrual Rate",
+        "maxAccrual": "Max Accrual",
+        "carryForward": "Carry Forward",
+        "maxCarryForward": "Max Carry Forward",
+        "requiresApproval": "Requires Approval",
+        "isPaid": "Is Paid",
+        "isActive": "Is Active"
+      },
+      "validation": {
+        "code": {
+          "required": "Code is required"
+        },
+        "name": {
+          "required": "Name is required"
+        },
+        "accrualType": {
+          "required": "Accrual type is required"
+        },
+        "accrualRate": {
+          "invalid": "Invalid accrual rate"
+        },
+        "maxAccrual": {
+          "invalid": "Invalid max accrual"
+        },
+        "maxCarryForward": {
+          "invalid": "Invalid max carry forward"
+        }
+      },
+      "errors": {
+        "failedToCreateLeaveType": "Failed to create leave type",
+        "failedToLoadLeaveType": "Failed to load leave type",
+        "failedToUpdateLeaveType": "Failed to update leave type"
+      }
     }
   }
 }

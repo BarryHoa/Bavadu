@@ -62,6 +62,15 @@
     ]
   },
   {
+    "path": "/leave-types",
+    "routes": [
+      { "path": "/", "page": "/LeaveTypes/LeaveTypesListPage" },
+      { "path": "/create", "page": "/LeaveTypes/LeaveTypeCreatePage" },
+      { "path": "/edit/[id]", "page": "/LeaveTypes/LeaveTypeEditPage" },
+      { "path": "/view/[id]", "page": "/LeaveTypes/LeaveTypeViewPage" }
+    ]
+  },
+  {
     "path": "/payroll",
     "routes": [
       { "path": "/", "page": "/Payroll/PayrollListPage" },
