@@ -1,7 +1,11 @@
 import { LocaleDataType } from "@base/server/interfaces/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
 import { and, eq } from "drizzle-orm";
-import { base_tb_roles } from "../../schemas";
+import {
+  base_tb_permissions,
+  base_tb_role_permissions_default,
+  base_tb_roles,
+} from "../../schemas";
 
 export interface RoleRow {
   id: string;
@@ -46,7 +50,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
       .where(eq(this.table.isActive, true))
       .orderBy(this.table.code);
 
-    return results.map((row) => this.mapToRoleRow(row));
+    return Promise.all(results.map((row) => this.mapToRoleRow(row)));
   }
 
   getRoleById = async (id: string): Promise<RoleRow | null> => {
@@ -75,7 +79,6 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
       code: payload.code,
       name: payload.name,
       description: payload.description ?? null,
-      permissions: payload.permissions,
       isSystem: payload.isSystem ?? false,
       isActive:
         payload.isActive === undefined || payload.isActive === null
@@ -92,6 +95,39 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
 
     if (!created) {
       throw new Error("Failed to create role");
+    }
+
+    // Add permissions to role_permissions_default if provided
+    if (payload.permissions && payload.permissions.length > 0) {
+      // Get permission IDs from keys
+      const permissions = await this.db
+        .select({ id: base_tb_permissions.id })
+        .from(base_tb_permissions)
+        .where(
+          and(
+            eq(base_tb_permissions.isActive, true)
+            // Note: We'd need to filter by keys, but for now we'll handle this differently
+          )
+        );
+
+      // For now, we'll need to match permission keys to IDs
+      // This is a simplified version - you may want to improve this
+      for (const permKey of payload.permissions) {
+        const perm = await this.db
+          .select({ id: base_tb_permissions.id })
+          .from(base_tb_permissions)
+          .where(eq(base_tb_permissions.key, permKey))
+          .limit(1);
+
+        if (perm[0]) {
+          await this.db.insert(base_tb_role_permissions_default).values({
+            roleId: created.id,
+            permissionId: perm[0].id,
+            isActive: true,
+            createdAt: now,
+          });
+        }
+      }
     }
 
     const role = await this.getRoleById(created.id);
@@ -113,14 +149,67 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.description !== undefined)
       updateData.description = payload.description ?? null;
-    if (payload.permissions !== undefined)
-      updateData.permissions = payload.permissions;
     if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
 
     await this.db
       .update(this.table)
       .set(updateData)
       .where(eq(this.table.id, id));
+
+    // Update permissions if provided
+    if (payload.permissions !== undefined) {
+      // Get permission IDs from keys
+      const permissionIds: string[] = [];
+      for (const permKey of payload.permissions) {
+        const perm = await this.db
+          .select({ id: base_tb_permissions.id })
+          .from(base_tb_permissions)
+          .where(eq(base_tb_permissions.key, permKey))
+          .limit(1);
+
+        if (perm[0]) {
+          permissionIds.push(perm[0].id);
+        }
+      }
+
+      // Remove all current permissions
+      await this.db
+        .update(base_tb_role_permissions_default)
+        .set({ isActive: false })
+        .where(eq(base_tb_role_permissions_default.roleId, id));
+
+      // Add new permissions
+      const now = new Date();
+      for (const permissionId of permissionIds) {
+        // Check if exists
+        const existing = await this.db
+          .select()
+          .from(base_tb_role_permissions_default)
+          .where(
+            and(
+              eq(base_tb_role_permissions_default.roleId, id),
+              eq(base_tb_role_permissions_default.permissionId, permissionId)
+            )
+          )
+          .limit(1);
+
+        if (existing[0]) {
+          // Reactivate if inactive
+          await this.db
+            .update(base_tb_role_permissions_default)
+            .set({ isActive: true })
+            .where(eq(base_tb_role_permissions_default.id, existing[0].id));
+        } else {
+          // Insert new
+          await this.db.insert(base_tb_role_permissions_default).values({
+            roleId: id,
+            permissionId,
+            isActive: true,
+            createdAt: now,
+          });
+        }
+      }
+    }
 
     return this.getRoleById(id);
   };
@@ -156,13 +245,36 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
     return this.updateRole(id, normalizedPayload);
   };
 
-  private mapToRoleRow(row: typeof base_tb_roles.$inferSelect): RoleRow {
+  private async mapToRoleRow(
+    row: typeof base_tb_roles.$inferSelect
+  ): Promise<RoleRow> {
+    // Get permissions for this role
+    const permissions = await this.db
+      .select({
+        permissionKey: base_tb_permissions.key,
+      })
+      .from(base_tb_role_permissions_default)
+      .innerJoin(
+        base_tb_permissions,
+        eq(
+          base_tb_role_permissions_default.permissionId,
+          base_tb_permissions.id
+        )
+      )
+      .where(
+        and(
+          eq(base_tb_role_permissions_default.roleId, row.id),
+          eq(base_tb_role_permissions_default.isActive, true),
+          eq(base_tb_permissions.isActive, true)
+        )
+      );
+
     return {
       id: row.id,
       code: row.code,
       name: row.name,
       description: row.description ?? undefined,
-      permissions: (row.permissions as string[]) ?? [],
+      permissions: permissions.map((p) => p.permissionKey),
       isSystem: row.isSystem ?? undefined,
       isActive: row.isActive ?? undefined,
       createdAt: row.createdAt?.getTime(),

@@ -1,22 +1,25 @@
 import { BaseModel } from "@base/server/models/BaseModel";
-import { and, eq } from "drizzle-orm";
-import { base_tb_role_permissions } from "../../schemas";
+import { and, eq, inArray } from "drizzle-orm";
+import {
+  base_tb_permissions,
+  base_tb_role_permissions_default,
+} from "../../schemas";
 
 export interface RolePermissionRow {
   id: string;
   roleId: string;
+  permissionId: string;
   permissionKey: string;
-  permissionId?: string | null;
   isActive: boolean;
   createdAt?: number;
   createdBy?: string;
 }
 
 export default class RolePermissionModel extends BaseModel<
-  typeof base_tb_role_permissions
+  typeof base_tb_role_permissions_default
 > {
   constructor() {
-    super(base_tb_role_permissions);
+    super(base_tb_role_permissions_default);
   }
 
   /**
@@ -25,10 +28,20 @@ export default class RolePermissionModel extends BaseModel<
   async getPermissionsByRole(roleId: string): Promise<string[]> {
     const results = await this.db
       .select({
-        permissionKey: this.table.permissionKey,
+        permissionKey: base_tb_permissions.key,
       })
       .from(this.table)
-      .where(and(eq(this.table.roleId, roleId), eq(this.table.isActive, true)));
+      .innerJoin(
+        base_tb_permissions,
+        eq(this.table.permissionId, base_tb_permissions.id)
+      )
+      .where(
+        and(
+          eq(this.table.roleId, roleId),
+          eq(this.table.isActive, true),
+          eq(base_tb_permissions.isActive, true)
+        )
+      );
 
     return results.map((r) => r.permissionKey);
   }
@@ -46,10 +59,20 @@ export default class RolePermissionModel extends BaseModel<
     const results = await this.db
       .select({
         roleId: this.table.roleId,
-        permissionKey: this.table.permissionKey,
+        permissionKey: base_tb_permissions.key,
       })
       .from(this.table)
-      .where(and(eq(this.table.isActive, true)));
+      .innerJoin(
+        base_tb_permissions,
+        eq(this.table.permissionId, base_tb_permissions.id)
+      )
+      .where(
+        and(
+          inArray(this.table.roleId, roleIds),
+          eq(this.table.isActive, true),
+          eq(base_tb_permissions.isActive, true)
+        )
+      );
 
     const permissionsMap = new Map<string, string[]>();
 
@@ -58,11 +81,9 @@ export default class RolePermissionModel extends BaseModel<
     }
 
     for (const result of results) {
-      if (roleIds.includes(result.roleId)) {
-        const existing = permissionsMap.get(result.roleId) || [];
-        existing.push(result.permissionKey);
-        permissionsMap.set(result.roleId, existing);
-      }
+      const existing = permissionsMap.get(result.roleId) || [];
+      existing.push(result.permissionKey);
+      permissionsMap.set(result.roleId, existing);
     }
 
     return permissionsMap;
@@ -73,11 +94,21 @@ export default class RolePermissionModel extends BaseModel<
    */
   async addPermissionToRole(
     roleId: string,
-    permissionKey: string,
-    permissionId?: string | null,
+    permissionId: string,
     createdBy?: string
   ): Promise<RolePermissionRow> {
     const now = new Date();
+
+    // Get permission key for return value
+    const permission = await this.db
+      .select({ key: base_tb_permissions.key })
+      .from(base_tb_permissions)
+      .where(eq(base_tb_permissions.id, permissionId))
+      .limit(1);
+
+    if (!permission[0]) {
+      throw new Error("Permission not found");
+    }
 
     // Check if already exists
     const existing = await this.db
@@ -86,7 +117,7 @@ export default class RolePermissionModel extends BaseModel<
       .where(
         and(
           eq(this.table.roleId, roleId),
-          eq(this.table.permissionKey, permissionKey)
+          eq(this.table.permissionId, permissionId)
         )
       )
       .limit(1);
@@ -98,7 +129,6 @@ export default class RolePermissionModel extends BaseModel<
           .update(this.table)
           .set({
             isActive: true,
-            permissionId: permissionId ?? null,
           })
           .where(eq(this.table.id, existing[0].id));
       }
@@ -106,8 +136,8 @@ export default class RolePermissionModel extends BaseModel<
       return {
         id: existing[0].id,
         roleId: existing[0].roleId,
-        permissionKey: existing[0].permissionKey,
-        permissionId: permissionId ?? existing[0].permissionId ?? undefined,
+        permissionId: existing[0].permissionId,
+        permissionKey: permission[0].key,
         isActive: true,
         createdAt: existing[0].createdAt?.getTime(),
         createdBy: existing[0].createdBy ?? undefined,
@@ -118,8 +148,7 @@ export default class RolePermissionModel extends BaseModel<
       .insert(this.table)
       .values({
         roleId,
-        permissionKey,
-        permissionId: permissionId ?? null,
+        permissionId,
         isActive: true,
         createdAt: now,
         createdBy: createdBy ?? null,
@@ -133,8 +162,8 @@ export default class RolePermissionModel extends BaseModel<
     return {
       id: created.id,
       roleId: created.roleId,
-      permissionKey: created.permissionKey,
-      permissionId: created.permissionId ?? undefined,
+      permissionId: created.permissionId,
+      permissionKey: permission[0].key,
       isActive: created.isActive,
       createdAt: created.createdAt?.getTime(),
       createdBy: created.createdBy ?? undefined,
@@ -146,7 +175,7 @@ export default class RolePermissionModel extends BaseModel<
    */
   async removePermissionFromRole(
     roleId: string,
-    permissionKey: string
+    permissionId: string
   ): Promise<boolean> {
     const result = await this.db
       .update(this.table)
@@ -156,7 +185,7 @@ export default class RolePermissionModel extends BaseModel<
       .where(
         and(
           eq(this.table.roleId, roleId),
-          eq(this.table.permissionKey, permissionKey),
+          eq(this.table.permissionId, permissionId),
           eq(this.table.isActive, true)
         )
       )
@@ -170,24 +199,31 @@ export default class RolePermissionModel extends BaseModel<
    */
   async setPermissionsForRole(
     roleId: string,
-    permissionKeys: string[],
+    permissionIds: string[],
     createdBy?: string
   ): Promise<void> {
     // Get current permissions
-    const current = await this.getPermissionsByRole(roleId);
-    const currentSet = new Set(current);
+    const current = await this.db
+      .select({
+        permissionId: this.table.permissionId,
+      })
+      .from(this.table)
+      .where(and(eq(this.table.roleId, roleId), eq(this.table.isActive, true)));
+
+    const currentSet = new Set(current.map((c) => c.permissionId));
+    const newSet = new Set(permissionIds);
 
     // Deactivate permissions not in new list
-    for (const key of current) {
-      if (!permissionKeys.includes(key)) {
-        await this.removePermissionFromRole(roleId, key);
+    for (const perm of current) {
+      if (!newSet.has(perm.permissionId)) {
+        await this.removePermissionFromRole(roleId, perm.permissionId);
       }
     }
 
     // Add new permissions
-    for (const key of permissionKeys) {
-      if (!currentSet.has(key)) {
-        await this.addPermissionToRole(roleId, key, null, createdBy);
+    for (const permissionId of permissionIds) {
+      if (!currentSet.has(permissionId)) {
+        await this.addPermissionToRole(roleId, permissionId, createdBy);
       }
     }
   }

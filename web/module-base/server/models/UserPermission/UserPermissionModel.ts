@@ -1,9 +1,10 @@
 import { BaseModel } from "@base/server/models/BaseModel";
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import {
-  base_tb_role_permissions,
+  base_tb_permissions,
+  base_tb_role_permissions_default,
   base_tb_roles,
-  base_tb_user_permission_overrides,
+  base_tb_user_permissions,
   base_tb_user_roles,
 } from "../../schemas";
 
@@ -17,10 +18,10 @@ export interface UserPermissionResult {
 }
 
 export default class UserPermissionModel extends BaseModel<
-  typeof base_tb_user_permission_overrides
+  typeof base_tb_user_permissions
 > {
   constructor() {
-    super(base_tb_user_permission_overrides);
+    super(base_tb_user_permissions);
   }
 
   /**
@@ -68,74 +69,58 @@ export default class UserPermissionModel extends BaseModel<
       name: r.role.name,
     }));
 
-    // 2. Get permissions from role_permissions table for all user's roles
+    // 2. Get permissions from role_permissions_default table for all user's roles
     const rolePermissions = new Set<string>();
     const roleIds = roles.map((r) => r.id);
 
     if (roleIds.length > 0) {
       const rolePerms = await this.db
         .select({
-          permissionKey: base_tb_role_permissions.permissionKey,
+          permissionKey: base_tb_permissions.key,
         })
-        .from(base_tb_role_permissions)
+        .from(base_tb_role_permissions_default)
+        .innerJoin(
+          base_tb_permissions,
+          eq(
+            base_tb_role_permissions_default.permissionId,
+            base_tb_permissions.id
+          )
+        )
         .where(
           and(
-            inArray(base_tb_role_permissions.roleId, roleIds),
-            eq(base_tb_role_permissions.isActive, true)
+            inArray(base_tb_role_permissions_default.roleId, roleIds),
+            eq(base_tb_role_permissions_default.isActive, true),
+            eq(base_tb_permissions.isActive, true)
           )
         );
 
       for (const rp of rolePerms) {
         rolePermissions.add(rp.permissionKey);
       }
-
-      // Fallback: Also check roles.permissions (jsonb) for backward compatibility
-      // This can be removed after full migration to role_permissions table
-      const rolesWithJsonbPerms = await this.db
-        .select({
-          permissions: base_tb_roles.permissions,
-        })
-        .from(base_tb_roles)
-        .where(inArray(base_tb_roles.id, roleIds));
-
-      for (const role of rolesWithJsonbPerms) {
-        if (role.permissions && Array.isArray(role.permissions)) {
-          (role.permissions as string[]).forEach((perm) => {
-            rolePermissions.add(perm);
-          });
-        }
-      }
     }
 
-    // 3. Get permission overrides for this user
-    const overrides = await this.db
-      .select()
-      .from(this.table)
-      .where(and(eq(this.table.userId, userId), eq(this.table.isActive, true)));
+    // 3. Get additional user permissions (from user_permissions table)
+    const userPerms = await this.db
+      .select({
+        permissionKey: base_tb_permissions.key,
+      })
+      .from(base_tb_user_permissions)
+      .innerJoin(
+        base_tb_permissions,
+        eq(base_tb_user_permissions.permissionId, base_tb_permissions.id)
+      )
+      .where(
+        and(
+          eq(base_tb_user_permissions.userId, userId),
+          eq(base_tb_user_permissions.isActive, true),
+          eq(base_tb_permissions.isActive, true)
+        )
+      );
 
-    // 4. Apply overrides: add granted, remove revoked
+    // 4. Combine role permissions and user permissions
     const finalPermissions = new Set(rolePermissions);
-
-    for (const override of overrides) {
-      // Add granted permissions
-      if (
-        override.grantedPermissions &&
-        Array.isArray(override.grantedPermissions)
-      ) {
-        (override.grantedPermissions as string[]).forEach((perm) => {
-          finalPermissions.add(perm);
-        });
-      }
-
-      // Remove revoked permissions (takes precedence)
-      if (
-        override.revokedPermissions &&
-        Array.isArray(override.revokedPermissions)
-      ) {
-        (override.revokedPermissions as string[]).forEach((perm) => {
-          finalPermissions.delete(perm);
-        });
-      }
+    for (const up of userPerms) {
+      finalPermissions.add(up.permissionKey);
     }
 
     return {
@@ -183,57 +168,73 @@ export default class UserPermissionModel extends BaseModel<
   }
 
   /**
-   * Set permission override for user
+   * Add permission to user
    */
-  async setPermissionOverride(
+  async addPermissionToUser(
     userId: string,
-    payload: {
-      grantedPermissions?: string[];
-      revokedPermissions?: string[];
-      module?: string | null;
-    }
+    permissionId: string,
+    createdBy?: string
   ) {
     const now = new Date();
 
-    // Check if override exists
-    const conditions = [eq(this.table.userId, userId)];
-    if (payload.module !== undefined) {
-      if (payload.module === null) {
-        conditions.push(isNull(this.table.module));
-      } else {
-        conditions.push(eq(this.table.module, payload.module));
-      }
-    } else {
-      conditions.push(isNull(this.table.module));
-    }
-
+    // Check if already exists
     const existing = await this.db
       .select()
       .from(this.table)
-      .where(and(...conditions))
+      .where(
+        and(
+          eq(this.table.userId, userId),
+          eq(this.table.permissionId, permissionId)
+        )
+      )
       .limit(1);
 
     if (existing[0]) {
-      // Update existing override
-      await this.db
-        .update(this.table)
-        .set({
-          grantedPermissions: payload.grantedPermissions ?? null,
-          revokedPermissions: payload.revokedPermissions ?? null,
-          updatedAt: now,
-        })
-        .where(eq(this.table.id, existing[0].id));
-    } else {
-      // Create new override
-      await this.db.insert(this.table).values({
+      // Reactivate if inactive
+      if (!existing[0].isActive) {
+        await this.db
+          .update(this.table)
+          .set({
+            isActive: true,
+          })
+          .where(eq(this.table.id, existing[0].id));
+      }
+      return existing[0];
+    }
+
+    // Create new user permission
+    const [created] = await this.db
+      .insert(this.table)
+      .values({
         userId,
-        grantedPermissions: payload.grantedPermissions ?? null,
-        revokedPermissions: payload.revokedPermissions ?? null,
-        module: payload.module ?? null,
+        permissionId,
         isActive: true,
         createdAt: now,
-        updatedAt: now,
-      });
-    }
+        createdBy: createdBy ?? null,
+      })
+      .returning();
+
+    return created;
+  }
+
+  /**
+   * Remove permission from user (soft delete)
+   */
+  async removePermissionFromUser(userId: string, permissionId: string) {
+    const result = await this.db
+      .update(this.table)
+      .set({
+        isActive: false,
+      })
+      .where(
+        and(
+          eq(this.table.userId, userId),
+          eq(this.table.permissionId, permissionId),
+          eq(this.table.isActive, true)
+        )
+      )
+      .returning();
+
+    return result.length > 0;
   }
 }

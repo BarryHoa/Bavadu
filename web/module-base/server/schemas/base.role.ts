@@ -11,7 +11,7 @@ import {
 import { mdBaseSchema } from "./schema";
 
 // Base Roles - Core role system for entire application
-// module: null = global role, 'hrm' = HRM specific role, etc.
+// Roles định nghĩa các vai trò trong hệ thống (Guest, admin, system, etc.)
 export const base_tb_roles = mdBaseSchema.table(
   "roles",
   {
@@ -23,9 +23,6 @@ export const base_tb_roles = mdBaseSchema.table(
     name: jsonb("name").notNull(), // LocaleDataType<string>
     description: text("description"), // Text description
 
-    // Permissions - Array of permission strings
-    permissions: jsonb("permissions").notNull(), // ['hrm.employee.view', 'hrm.employee.create', ...]
-
     // System roles cannot be deleted
     isSystem: boolean("is_system").default(false).notNull(),
     isActive: boolean("is_active").default(true).notNull(),
@@ -36,7 +33,10 @@ export const base_tb_roles = mdBaseSchema.table(
     createdBy: varchar("created_by", { length: 36 }),
     updatedBy: varchar("updated_by", { length: 36 }),
   },
-  (table) => [index("roles_active_idx").on(table.isActive)]
+  (table) => [
+    index("roles_active_idx").on(table.isActive),
+    index("roles_code_idx").on(table.code),
+  ]
 );
 
 export type BaseTbRole = typeof base_tb_roles.$inferSelect;

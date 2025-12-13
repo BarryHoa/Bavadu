@@ -1,17 +1,19 @@
 import { BaseModel } from "@base/server/models/BaseModel";
-import { and, eq } from "drizzle-orm";
-import { base_tb_user_roles, base_tb_roles } from "../../schemas";
+import { and, eq, inArray } from "drizzle-orm";
+import {
+  base_tb_permissions,
+  base_tb_role_permissions_default,
+  base_tb_user_roles,
+  base_tb_roles,
+} from "../../schemas";
 
 export interface UserRoleRow {
   id: string;
   userId: string;
   roleId: string;
-  scope?: unknown;
   isActive: boolean;
-  assignedAt?: number;
-  assignedBy?: string;
-  revokedAt?: number;
-  revokedBy?: string;
+  createdAt?: number;
+  createdBy?: string;
 }
 
 export default class UserRoleModel extends BaseModel<typeof base_tb_user_roles> {
@@ -23,9 +25,10 @@ export default class UserRoleModel extends BaseModel<typeof base_tb_user_roles> 
    * Get user's permissions (aggregate từ tất cả roles)
    */
   async getUserPermissions(userId: string): Promise<Set<string>> {
+    // Get user's roles
     const userRoles = await this.db
       .select({
-        permissions: base_tb_roles.permissions,
+        roleId: base_tb_roles.id,
       })
       .from(this.table)
       .innerJoin(base_tb_roles, eq(this.table.roleId, base_tb_roles.id))
@@ -37,13 +40,33 @@ export default class UserRoleModel extends BaseModel<typeof base_tb_user_roles> 
         )
       );
 
+    const roleIds = userRoles.map((r) => r.roleId);
     const permissionsSet = new Set<string>();
 
-    for (const role of userRoles) {
-      if (role.permissions && Array.isArray(role.permissions)) {
-        (role.permissions as string[]).forEach((perm) => {
-          permissionsSet.add(perm);
-        });
+    if (roleIds.length > 0) {
+      // Get permissions from role_permissions_default
+      const rolePerms = await this.db
+        .select({
+          permissionKey: base_tb_permissions.key,
+        })
+        .from(base_tb_role_permissions_default)
+        .innerJoin(
+          base_tb_permissions,
+          eq(
+            base_tb_role_permissions_default.permissionId,
+            base_tb_permissions.id
+          )
+        )
+        .where(
+          and(
+            inArray(base_tb_role_permissions_default.roleId, roleIds),
+            eq(base_tb_role_permissions_default.isActive, true),
+            eq(base_tb_permissions.isActive, true)
+          )
+        );
+
+      for (const rp of rolePerms) {
+        permissionsSet.add(rp.permissionKey);
       }
     }
 
@@ -72,12 +95,9 @@ export default class UserRoleModel extends BaseModel<typeof base_tb_user_roles> 
       id: r.userRole.id,
       userId: r.userRole.userId,
       roleId: r.userRole.roleId,
-      scope: r.userRole.scope ?? undefined,
       isActive: r.userRole.isActive,
-      assignedAt: r.userRole.assignedAt?.getTime(),
-      assignedBy: r.userRole.assignedBy ?? undefined,
-      revokedAt: r.userRole.revokedAt?.getTime(),
-      revokedBy: r.userRole.revokedBy ?? undefined,
+      createdAt: r.userRole.createdAt?.getTime(),
+      createdBy: r.userRole.createdBy ?? undefined,
     }));
   }
 
@@ -87,8 +107,7 @@ export default class UserRoleModel extends BaseModel<typeof base_tb_user_roles> 
   async assignRole(
     userId: string,
     roleId: string,
-    assignedBy?: string,
-    scope?: unknown
+    createdBy?: string
   ): Promise<UserRoleRow> {
     const now = new Date();
 
@@ -105,16 +124,12 @@ export default class UserRoleModel extends BaseModel<typeof base_tb_user_roles> 
       .limit(1);
 
     if (existing[0]) {
-      // Reactivate if revoked
+      // Reactivate if inactive
       await this.db
         .update(this.table)
         .set({
           isActive: true,
-          assignedAt: now,
-          assignedBy: assignedBy ?? null,
-          revokedAt: null,
-          revokedBy: null,
-          scope: scope ?? null,
+          createdBy: createdBy ?? null,
         })
         .where(eq(this.table.id, existing[0].id));
 
@@ -122,10 +137,9 @@ export default class UserRoleModel extends BaseModel<typeof base_tb_user_roles> 
         id: existing[0].id,
         userId: existing[0].userId,
         roleId: existing[0].roleId,
-        scope: scope ?? undefined,
         isActive: true,
-        assignedAt: now.getTime(),
-        assignedBy: assignedBy ?? undefined,
+        createdAt: now.getTime(),
+        createdBy: createdBy ?? undefined,
       };
     }
 
@@ -134,10 +148,9 @@ export default class UserRoleModel extends BaseModel<typeof base_tb_user_roles> 
       .values({
         userId,
         roleId,
-        scope: scope ?? null,
         isActive: true,
-        assignedAt: now,
-        assignedBy: assignedBy ?? null,
+        createdAt: now,
+        createdBy: createdBy ?? null,
       })
       .returning();
 
@@ -149,25 +162,20 @@ export default class UserRoleModel extends BaseModel<typeof base_tb_user_roles> 
       id: created.id,
       userId: created.userId,
       roleId: created.roleId,
-      scope: created.scope ?? undefined,
       isActive: created.isActive,
-      assignedAt: created.assignedAt?.getTime(),
-      assignedBy: created.assignedBy ?? undefined,
+      createdAt: created.createdAt?.getTime(),
+      createdBy: created.createdBy ?? undefined,
     };
   }
 
   /**
-   * Revoke role from user
+   * Revoke role from user (soft delete)
    */
-  async revokeRole(userId: string, roleId: string, revokedBy?: string): Promise<boolean> {
-    const now = new Date();
-
+  async revokeRole(userId: string, roleId: string): Promise<boolean> {
     const result = await this.db
       .update(this.table)
       .set({
         isActive: false,
-        revokedAt: now,
-        revokedBy: revokedBy ?? null,
       })
       .where(
         and(
