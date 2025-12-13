@@ -24,6 +24,7 @@
     "leave-type.curd": "LeaveType/LeaveTypeModel",
     "leave-request.curd": "LeaveRequest/LeaveRequestModel",
     "timesheet.curd": "Timesheet/TimesheetModel",
+    "timesheet.list": "Timesheet/TimesheetViewListModel",
     "payroll-period.curd": "PayrollPeriod/PayrollPeriodModel",
     "payroll.curd": "Payroll/PayrollModel",
     "job-requisition.curd": "JobRequisition/JobRequisitionModel",

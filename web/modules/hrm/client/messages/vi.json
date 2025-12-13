@@ -276,6 +276,44 @@
           "edit": "Sửa"
         }
       }
+    },
+    "timesheets": {
+      "title": "Chấm công",
+      "create": "Thêm chấm công",
+      "generalInfo": "Thông tin chấm công",
+      "labels": {
+        "employee": "Nhân viên",
+        "workDate": "Ngày làm việc",
+        "shift": "Ca làm việc",
+        "checkInTime": "Giờ vào",
+        "checkOutTime": "Giờ ra",
+        "actualHours": "Số giờ thực tế",
+        "regularHours": "Số giờ chính thức",
+        "overtimeHours": "Số giờ làm thêm",
+        "breakDuration": "Thời gian nghỉ (phút)",
+        "status": "Trạng thái",
+        "checkInMethod": "Phương thức vào",
+        "checkOutMethod": "Phương thức ra",
+        "checkInLocation": "Địa điểm vào",
+        "checkOutLocation": "Địa điểm ra",
+        "notes": "Ghi chú"
+      },
+      "validation": {
+        "employeeId": {
+          "required": "Nhân viên là bắt buộc"
+        },
+        "workDate": {
+          "required": "Ngày làm việc là bắt buộc"
+        },
+        "breakDuration": {
+          "invalid": "Thời gian nghỉ không hợp lệ"
+        }
+      },
+      "errors": {
+        "failedToCreateTimesheet": "Không thể tạo chấm công",
+        "failedToLoadTimesheet": "Không thể tải thông tin chấm công",
+        "failedToUpdateTimesheet": "Không thể cập nhật chấm công"
+      }
     }
   }
 }

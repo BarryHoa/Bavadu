@@ -34,5 +34,14 @@
       { "path": "/edit/[id]", "page": "/Contracts/ContractEditPage" },
       { "path": "/view/[id]", "page": "/Contracts/ContractViewPage" }
     ]
+  },
+  {
+    "path": "/timesheets",
+    "routes": [
+      { "path": "/", "page": "/Timesheets/TimesheetsListPage" },
+      { "path": "/create", "page": "/Timesheets/TimesheetCreatePage" },
+      { "path": "/edit/[id]", "page": "/Timesheets/TimesheetEditPage" },
+      { "path": "/view/[id]", "page": "/Timesheets/TimesheetViewPage" }
+    ]
   }
 ]

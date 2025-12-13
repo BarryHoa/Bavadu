@@ -276,6 +276,44 @@
           "edit": "Edit"
         }
       }
+    },
+    "timesheets": {
+      "title": "Timesheets",
+      "create": "New Timesheet",
+      "generalInfo": "Timesheet Information",
+      "labels": {
+        "employee": "Employee",
+        "workDate": "Work Date",
+        "shift": "Shift",
+        "checkInTime": "Check In Time",
+        "checkOutTime": "Check Out Time",
+        "actualHours": "Actual Hours",
+        "regularHours": "Regular Hours",
+        "overtimeHours": "Overtime Hours",
+        "breakDuration": "Break Duration (minutes)",
+        "status": "Status",
+        "checkInMethod": "Check In Method",
+        "checkOutMethod": "Check Out Method",
+        "checkInLocation": "Check In Location",
+        "checkOutLocation": "Check Out Location",
+        "notes": "Notes"
+      },
+      "validation": {
+        "employeeId": {
+          "required": "Employee is required"
+        },
+        "workDate": {
+          "required": "Work date is required"
+        },
+        "breakDuration": {
+          "invalid": "Invalid break duration"
+        }
+      },
+      "errors": {
+        "failedToCreateTimesheet": "Failed to create timesheet",
+        "failedToLoadTimesheet": "Failed to load timesheet",
+        "failedToUpdateTimesheet": "Failed to update timesheet"
+      }
     }
   }
 }
