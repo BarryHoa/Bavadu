@@ -44,6 +44,7 @@
     "course.curd": "Course/CourseModel",
     "course.list": "Course/CourseViewListModel",
     "certificate.curd": "Certificate/CertificateModel",
+    "certificate.list": "Certificate/CertificateViewListModel",
     "compliance-report.curd": "ComplianceReport/ComplianceReportModel",
     "notification.curd": "Notification/NotificationModel"
   }

@@ -1,0 +1,119 @@
+"use client";
+
+import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
+import {
+  DATA_TABLE_COLUMN_KEY_ACTION,
+  DataTableColumn,
+  ViewListDataTable,
+} from "@base/client/components";
+import LinkAs from "@base/client/components/LinkAs";
+import { formatDate } from "@base/client/utils/date/formatDate";
+import { Chip } from "@heroui/react";
+import { useTranslations } from "next-intl";
+import { useMemo } from "react";
+import { CertificateDto } from "@mdl/hrm/client/interface/Certificate";
+import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+
+type CertificateRow = CertificateDto & {
+  createdAt?: number | string | null;
+  updatedAt?: number | string | null;
+};
+
+export default function CertificatesListPage(): React.ReactNode {
+  const tDataTable = useTranslations("dataTable");
+  const t = useTranslations("hrm.certificates");
+  const getLocalizedText = useLocalizedText();
+
+  const columns = useMemo<DataTableColumn<CertificateRow>[]>(
+    () => [
+      {
+        key: "employee",
+        label: t("labels.employee"),
+        render: (value, row) => {
+          if (!row?.id) return null;
+          return (
+            <LinkAs href={`/workspace/modules/hrm/certificates/view/${row.id}`}>
+              {getLocalizedText(row.employee?.fullName) || row.employee?.employeeCode || "—"}
+            </LinkAs>
+          );
+        },
+      },
+      {
+        key: "name",
+        label: t("labels.name"),
+        render: (value) => getLocalizedText(value),
+      },
+      {
+        key: "issuer",
+        label: t("labels.issuer"),
+      },
+      {
+        key: "certificateNumber",
+        label: t("labels.certificateNumber"),
+        render: (value) => value || "—",
+      },
+      {
+        key: "issueDate",
+        label: t("labels.issueDate"),
+        render: (value) => formatDate(value),
+      },
+      {
+        key: "expiryDate",
+        label: t("labels.expiryDate"),
+        render: (value) => formatDate(value),
+      },
+      {
+        key: "isActive",
+        label: t("labels.isActive"),
+        render: (value) => (
+          <Chip size="sm" variant="flat" color={value ? "success" : "default"}>
+            {value ? "Active" : "Inactive"}
+          </Chip>
+        ),
+      },
+      {
+        key: DATA_TABLE_COLUMN_KEY_ACTION,
+        label: tDataTable("columns.action"),
+        align: "end",
+        render: (_, row) => {
+          if (!row?.id) return null;
+          const viewLink = `/workspace/modules/hrm/certificates/view/${row.id}`;
+          return (
+            <ActionMenu
+              actions={[
+                {
+                  key: "view",
+                  label: tDataTable("columns.view"),
+                  href: viewLink,
+                },
+              ]}
+            />
+          );
+        },
+      },
+    ],
+    [tDataTable, t, getLocalizedText]
+  );
+
+  return (
+    <div className="space-y-4">
+      <ViewListDataTable<CertificateRow>
+        model="hrm.certificate"
+        columns={columns}
+        isDummyData={false}
+        actionsRight={[
+          {
+            key: "new",
+            title: t("create"),
+            type: "link",
+            color: "primary",
+            props: {
+              href: "/workspace/modules/hrm/certificates/create",
+            },
+          },
+        ]}
+      />
+    </div>
+  );
+}
+
