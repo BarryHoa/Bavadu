@@ -19,7 +19,12 @@
     "routes": [
       {
         "path": "/roles",
-        "page": "/Settings/Roles/RolesListPage"
+        "routes": [
+          { "path": "/", "page": "/Settings/Roles/RolesListPage" },
+          { "path": "/create", "page": "/Settings/Roles/RoleCreatePage" },
+          { "path": "/view/[id]", "page": "/Settings/Roles/RoleViewPage" },
+          { "path": "/edit/[id]", "page": "/Settings/Roles/RoleEditPage" }
+        ]
       }
     ]
   }

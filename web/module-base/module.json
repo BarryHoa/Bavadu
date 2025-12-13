@@ -7,6 +7,7 @@
   "models": {
     "user.curd": "Users/UserModel",
     "role.curd": "Role/RoleModel",
+    "role.list": "Role/RoleViewListModel",
     "role-permission.curd": "RolePermission/RolePermissionModel",
     "user-role.curd": "UserRole/UserRoleModel",
     "user-permission.curd": "UserPermission/UserPermissionModel",

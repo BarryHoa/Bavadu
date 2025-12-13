@@ -1,9 +1,9 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
-import getDbConnect from "../../../utils/getDbConnect";
 import { base_tb_roles } from "../../../schemas/base.role";
 import { base_tb_role_permissions_default } from "../../../schemas/base.role-permissions-default";
+import getDbConnect from "../../../utils/getDbConnect";
 
 export async function PUT(request: NextRequest) {
   try {
@@ -66,7 +66,11 @@ export async function PUT(request: NextRequest) {
       .where(eq(base_tb_role_permissions_default.roleId, id));
 
     // Then, insert new permissions if provided
-    if (permissionIds && Array.isArray(permissionIds) && permissionIds.length > 0) {
+    if (
+      permissionIds &&
+      Array.isArray(permissionIds) &&
+      permissionIds.length > 0
+    ) {
       await db.insert(base_tb_role_permissions_default).values(
         permissionIds.map((permissionId: string) => ({
           roleId: id,
@@ -90,4 +94,3 @@ export async function PUT(request: NextRequest) {
     });
   }
 }
-

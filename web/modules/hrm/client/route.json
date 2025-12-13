@@ -22,15 +22,6 @@
     ]
   },
   {
-    "path": "/roles",
-    "routes": [
-      { "path": "/", "page": "/Roles/RolesListPage" },
-      { "path": "/create", "page": "/Roles/RoleCreatePage" },
-      { "path": "/edit/[id]", "page": "/Roles/RoleEditPage" },
-      { "path": "/view/[id]", "page": "/Roles/RoleViewPage" }
-    ]
-  },
-  {
     "path": "/permissions",
     "routes": [{ "path": "/", "page": "/Permissions/PermissionsPage" }]
   },

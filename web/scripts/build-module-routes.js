@@ -490,6 +490,43 @@ const buildClientPagesForResource = (resourceType, routeData) => {
       // Other routes
       routes.forEach((r) => {
         if (r.path === "/") return;
+        
+        // Handle nested routes (routes with routes array)
+        if (r.routes && Array.isArray(r.routes) && r.routes.length > 0) {
+          const routePath = normalizeRoutePath(r.path);
+          const nestedDir = path.join(groupDir, routePath);
+          fs.mkdirSync(nestedDir, { recursive: true });
+          
+          // Route-level layout for nested route group
+          if (r.layout && layoutExists(resourceType, moduleName, r.layout)) {
+            const layoutContent = genClientLayoutContent(
+              resourceType,
+              moduleName,
+              r.layout
+            );
+            createFile(
+              path.join(nestedDir, EXTENSIONS.LAYOUT),
+              layoutContent,
+              "layout"
+            );
+          }
+          
+          // Process nested routes - create a temporary group object
+          const nestedGroup = {
+            path: "/",
+            routes: r.routes,
+            layout: undefined, // Layout already handled above
+          };
+          processRoutes([nestedGroup], moduleName, nestedDir);
+          return;
+        }
+        
+        // Handle regular route with page
+        if (!r.page) {
+          skipped++;
+          return;
+        }
+        
         if (!pageExists(resourceType, moduleName, r.page)) {
           console.warn(
             `  ⚠️  Skipping "${r.path}" - page not found: ${r.page}.tsx`

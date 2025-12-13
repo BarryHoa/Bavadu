@@ -20,7 +20,13 @@
     "name": "Settings",
     "icon": "Settings",
     "order": 3,
-    "path": "/settings",
-    "as": "/settings"
+    "children": [
+      {
+        "key": "settings.roles",
+        "name": "Roles and Permission",
+        "path": "/settings/roles",
+        "as": "/settings/roles"
+      }
+    ]
   }
 ]

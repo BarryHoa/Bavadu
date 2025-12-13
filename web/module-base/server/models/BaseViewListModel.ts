@@ -42,7 +42,6 @@ export abstract class BaseViewListModel<
   private _search?: SearchConditionMap;
   private _filter?: FilterConditionMap<TFilter>;
   private _sortDefault?: ParamSortMultiple;
-  private readonly _searchOverride?: SearchConditionMap;
   private readonly _sortDefaultOverride?: ParamSortMultiple;
 
   constructor({

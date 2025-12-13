@@ -32,18 +32,11 @@
           "order": 3
         },
         {
-          "key": "hrm-roles",
-          "name": "Roles",
-          "path": "/roles",
-          "as": "/roles",
-          "order": 4
-        },
-        {
           "key": "hrm-permissions",
           "name": "Permissions",
           "path": "/permissions",
           "as": "/permissions",
-          "order": 5
+          "order": 4
         }
       ]
     },
