@@ -356,6 +356,46 @@
         "failedToLoadCandidate": "Không thể tải thông tin ứng viên",
         "failedToUpdateCandidate": "Không thể cập nhật ứng viên"
       }
+    },
+    "leaveRequests": {
+      "title": "Đơn xin nghỉ phép",
+      "create": "Thêm đơn xin nghỉ phép",
+      "generalInfo": "Thông tin đơn xin nghỉ phép",
+      "labels": {
+        "employee": "Nhân viên",
+        "leaveType": "Loại nghỉ phép",
+        "startDate": "Ngày bắt đầu",
+        "endDate": "Ngày kết thúc",
+        "days": "Số ngày",
+        "day": "ngày",
+        "reason": "Lý do",
+        "status": "Trạng thái",
+        "approvedAt": "Ngày duyệt",
+        "rejectedAt": "Ngày từ chối",
+        "rejectionReason": "Lý do từ chối"
+      },
+      "validation": {
+        "employeeId": {
+          "required": "Nhân viên là bắt buộc"
+        },
+        "leaveTypeId": {
+          "required": "Loại nghỉ phép là bắt buộc"
+        },
+        "startDate": {
+          "required": "Ngày bắt đầu là bắt buộc"
+        },
+        "endDate": {
+          "required": "Ngày kết thúc là bắt buộc"
+        },
+        "days": {
+          "invalid": "Số ngày phải lớn hơn 0"
+        }
+      },
+      "errors": {
+        "failedToCreateLeaveRequest": "Không thể tạo đơn xin nghỉ phép",
+        "failedToLoadLeaveRequest": "Không thể tải thông tin đơn xin nghỉ phép",
+        "failedToUpdateLeaveRequest": "Không thể cập nhật đơn xin nghỉ phép"
+      }
     }
   }
 }

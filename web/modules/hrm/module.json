@@ -23,6 +23,7 @@
     "shift.curd": "Shift/ShiftModel",
     "leave-type.curd": "LeaveType/LeaveTypeModel",
     "leave-request.curd": "LeaveRequest/LeaveRequestModel",
+    "leave-request.list": "LeaveRequest/LeaveRequestViewListModel",
     "timesheet.curd": "Timesheet/TimesheetModel",
     "timesheet.list": "Timesheet/TimesheetViewListModel",
     "payroll-period.curd": "PayrollPeriod/PayrollPeriodModel",

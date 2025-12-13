@@ -356,6 +356,46 @@
         "failedToLoadCandidate": "Failed to load candidate",
         "failedToUpdateCandidate": "Failed to update candidate"
       }
+    },
+    "leaveRequests": {
+      "title": "Leave Requests",
+      "create": "New Leave Request",
+      "generalInfo": "Leave Request Information",
+      "labels": {
+        "employee": "Employee",
+        "leaveType": "Leave Type",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "days": "Days",
+        "day": "day(s)",
+        "reason": "Reason",
+        "status": "Status",
+        "approvedAt": "Approved At",
+        "rejectedAt": "Rejected At",
+        "rejectionReason": "Rejection Reason"
+      },
+      "validation": {
+        "employeeId": {
+          "required": "Employee is required"
+        },
+        "leaveTypeId": {
+          "required": "Leave type is required"
+        },
+        "startDate": {
+          "required": "Start date is required"
+        },
+        "endDate": {
+          "required": "End date is required"
+        },
+        "days": {
+          "invalid": "Days must be greater than 0"
+        }
+      },
+      "errors": {
+        "failedToCreateLeaveRequest": "Failed to create leave request",
+        "failedToLoadLeaveRequest": "Failed to load leave request",
+        "failedToUpdateLeaveRequest": "Failed to update leave request"
+      }
     }
   }
 }
