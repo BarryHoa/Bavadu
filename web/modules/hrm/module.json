@@ -30,6 +30,7 @@
     "payroll-period.curd": "PayrollPeriod/PayrollPeriodModel",
     "payroll.curd": "Payroll/PayrollModel",
     "job-requisition.curd": "JobRequisition/JobRequisitionModel",
+    "job-requisition.list": "JobRequisition/JobRequisitionViewListModel",
     "candidate.curd": "Candidate/CandidateModel",
     "candidate.list": "Candidate/CandidateViewListModel",
     "offer.curd": "Offer/OfferModel",

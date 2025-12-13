@@ -439,6 +439,58 @@
         "failedToLoadLeaveType": "Failed to load leave type",
         "failedToUpdateLeaveType": "Failed to update leave type"
       }
+    },
+    "jobRequisitions": {
+      "title": "Job Requisitions",
+      "create": "New Job Requisition",
+      "generalInfo": "Job Requisition Information",
+      "labels": {
+        "requisitionNumber": "Requisition Number",
+        "title": "Title",
+        "department": "Department",
+        "position": "Position",
+        "numberOfOpenings": "Number of Openings",
+        "priority": "Priority",
+        "employmentType": "Employment Type",
+        "minSalary": "Min Salary",
+        "maxSalary": "Max Salary",
+        "currency": "Currency",
+        "requirements": "Requirements",
+        "status": "Status",
+        "openedDate": "Opened Date",
+        "closedDate": "Closed Date",
+        "hiringManager": "Hiring Manager",
+        "recruiter": "Recruiter",
+        "notes": "Notes"
+      },
+      "validation": {
+        "requisitionNumber": {
+          "required": "Requisition number is required"
+        },
+        "title": {
+          "required": "Title is required"
+        },
+        "departmentId": {
+          "required": "Department is required"
+        },
+        "positionId": {
+          "required": "Position is required"
+        },
+        "numberOfOpenings": {
+          "invalid": "Number of openings must be greater than 0"
+        },
+        "minSalary": {
+          "invalid": "Invalid minimum salary"
+        },
+        "maxSalary": {
+          "invalid": "Invalid maximum salary"
+        }
+      },
+      "errors": {
+        "failedToCreateJobRequisition": "Failed to create job requisition",
+        "failedToLoadJobRequisition": "Failed to load job requisition",
+        "failedToUpdateJobRequisition": "Failed to update job requisition"
+      }
     }
   }
 }
