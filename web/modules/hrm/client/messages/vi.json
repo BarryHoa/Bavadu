@@ -627,6 +627,47 @@
         "failedToLoadCertificate": "Không thể tải thông tin chứng chỉ",
         "failedToUpdateCertificate": "Không thể cập nhật chứng chỉ"
       }
+    },
+    "performanceReviews": {
+      "title": "Đánh giá hiệu suất",
+      "create": "Thêm đánh giá hiệu suất",
+      "generalInfo": "Thông tin đánh giá hiệu suất",
+      "labels": {
+        "employee": "Nhân viên",
+        "reviewType": "Loại đánh giá",
+        "reviewPeriod": "Kỳ đánh giá",
+        "reviewDate": "Ngày đánh giá",
+        "reviewer": "Người đánh giá",
+        "overallRating": "Điểm tổng thể",
+        "strengths": "Điểm mạnh",
+        "areasForImprovement": "Điểm cần cải thiện",
+        "feedback": "Phản hồi",
+        "employeeComments": "Ý kiến nhân viên",
+        "status": "Trạng thái",
+        "completedDate": "Ngày hoàn thành"
+      },
+      "validation": {
+        "employeeId": {
+          "required": "Nhân viên là bắt buộc"
+        },
+        "reviewType": {
+          "required": "Loại đánh giá là bắt buộc"
+        },
+        "reviewDate": {
+          "required": "Ngày đánh giá là bắt buộc"
+        },
+        "reviewerId": {
+          "required": "Người đánh giá là bắt buộc"
+        },
+        "overallRating": {
+          "invalid": "Điểm tổng thể phải từ 1 đến 5"
+        }
+      },
+      "errors": {
+        "failedToCreatePerformanceReview": "Không thể tạo đánh giá hiệu suất",
+        "failedToLoadPerformanceReview": "Không thể tải thông tin đánh giá hiệu suất",
+        "failedToUpdatePerformanceReview": "Không thể cập nhật đánh giá hiệu suất"
+      }
     }
   }
 }
