@@ -491,6 +491,78 @@
         "failedToLoadJobRequisition": "Failed to load job requisition",
         "failedToUpdateJobRequisition": "Failed to update job requisition"
       }
+    },
+    "payroll": {
+      "title": "Payroll",
+      "create": "New Payroll",
+      "generalInfo": "Payroll Information",
+      "labels": {
+        "payrollPeriod": "Payroll Period",
+        "employee": "Employee",
+        "baseSalary": "Base Salary",
+        "overtimePay": "Overtime Pay",
+        "bonuses": "Bonuses",
+        "otherEarnings": "Other Earnings",
+        "grossSalary": "Gross Salary",
+        "socialInsurance": "Social Insurance",
+        "healthInsurance": "Health Insurance",
+        "unemploymentInsurance": "Unemployment Insurance",
+        "personalIncomeTax": "Personal Income Tax",
+        "totalDeductions": "Total Deductions",
+        "netSalary": "Net Salary",
+        "workingDays": "Working Days",
+        "workingHours": "Working Hours",
+        "overtimeHours": "Overtime Hours",
+        "status": "Status",
+        "notes": "Notes"
+      },
+      "validation": {
+        "payrollPeriodId": {
+          "required": "Payroll period is required"
+        },
+        "employeeId": {
+          "required": "Employee is required"
+        },
+        "baseSalary": {
+          "invalid": "Invalid base salary"
+        }
+      },
+      "errors": {
+        "failedToCreatePayroll": "Failed to create payroll",
+        "failedToLoadPayroll": "Failed to load payroll",
+        "failedToUpdatePayroll": "Failed to update payroll"
+      }
+    },
+    "courses": {
+      "title": "Courses",
+      "create": "New Course",
+      "generalInfo": "Course Information",
+      "labels": {
+        "code": "Code",
+        "name": "Name",
+        "description": "Description",
+        "category": "Category",
+        "duration": "Duration (hours)",
+        "format": "Format",
+        "instructor": "Instructor",
+        "isActive": "Is Active"
+      },
+      "validation": {
+        "code": {
+          "required": "Code is required"
+        },
+        "name": {
+          "required": "Name is required"
+        },
+        "duration": {
+          "invalid": "Invalid duration"
+        }
+      },
+      "errors": {
+        "failedToCreateCourse": "Failed to create course",
+        "failedToLoadCourse": "Failed to load course",
+        "failedToUpdateCourse": "Failed to update course"
+      }
     }
   }
 }

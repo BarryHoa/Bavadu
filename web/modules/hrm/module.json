@@ -42,6 +42,7 @@
     "goal.curd": "Goal/GoalModel",
     "performance-review.curd": "PerformanceReview/PerformanceReviewModel",
     "course.curd": "Course/CourseModel",
+    "course.list": "Course/CourseViewListModel",
     "certificate.curd": "Certificate/CertificateModel",
     "compliance-report.curd": "ComplianceReport/ComplianceReportModel",
     "notification.curd": "Notification/NotificationModel"

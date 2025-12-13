@@ -562,6 +562,37 @@
         "failedToLoadPayroll": "Không thể tải thông tin bảng lương",
         "failedToUpdatePayroll": "Không thể cập nhật bảng lương"
       }
+    },
+    "courses": {
+      "title": "Khóa học",
+      "create": "Thêm khóa học",
+      "generalInfo": "Thông tin khóa học",
+      "labels": {
+        "code": "Mã",
+        "name": "Tên",
+        "description": "Mô tả",
+        "category": "Danh mục",
+        "duration": "Thời lượng (giờ)",
+        "format": "Hình thức",
+        "instructor": "Giảng viên",
+        "isActive": "Đang hoạt động"
+      },
+      "validation": {
+        "code": {
+          "required": "Mã là bắt buộc"
+        },
+        "name": {
+          "required": "Tên là bắt buộc"
+        },
+        "duration": {
+          "invalid": "Thời lượng không hợp lệ"
+        }
+      },
+      "errors": {
+        "failedToCreateCourse": "Không thể tạo khóa học",
+        "failedToLoadCourse": "Không thể tải thông tin khóa học",
+        "failedToUpdateCourse": "Không thể cập nhật khóa học"
+      }
     }
   }
 }
