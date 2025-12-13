@@ -81,5 +81,34 @@
         "handler": "/media/get"
       }
     ]
+  },
+  {
+    "path": "/settings",
+    "routes": [
+      {
+        "path": "/roles/list",
+        "handler": "/settings/roles/list"
+      },
+      {
+        "path": "/roles/get",
+        "handler": "/settings/roles/get"
+      },
+      {
+        "path": "/roles/create",
+        "handler": "/settings/roles/create"
+      },
+      {
+        "path": "/roles/update",
+        "handler": "/settings/roles/update"
+      },
+      {
+        "path": "/roles/delete",
+        "handler": "/settings/roles/delete"
+      },
+      {
+        "path": "/permissions/list",
+        "handler": "/settings/permissions/list"
+      }
+    ]
   }
 ]

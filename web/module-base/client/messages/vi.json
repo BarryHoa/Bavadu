@@ -38,6 +38,7 @@
       "remove": "Xóa",
       "delete": "Xóa",
       "edit": "Sửa",
+      "view": "Xem",
       "saveChanges": "Lưu thay đổi",
       "close": "Đóng",
       "regenerate": "Tạo lại",
@@ -162,6 +163,73 @@
       "uploading": "Đang tải lên...",
       "uploadImages": "Tải lên hình ảnh",
       "removeImage": "Xóa hình ảnh"
+    }
+  },
+  "settings": {
+    "roles": {
+      "loading": "Đang tải role...",
+      "notFound": "Không tìm thấy role",
+      "cannotEditSystemRole": "Không thể chỉnh sửa role hệ thống",
+      "create": {
+        "title": "Tạo Role Mới"
+      },
+      "edit": {
+        "title": "Chỉnh Sửa Role"
+      },
+      "actions": {
+        "addRole": "Thêm Role"
+      },
+      "filters": {
+        "searchPlaceholder": "Tìm kiếm role theo mã..."
+      },
+      "table": {
+        "columns": {
+          "code": "Mã",
+          "name": "Tên",
+          "description": "Mô tả",
+          "type": "Loại",
+          "status": "Trạng thái",
+          "systemRole": "Hệ thống",
+          "customRole": "Tùy chỉnh",
+          "active": "Hoạt động",
+          "inactive": "Không hoạt động"
+        },
+        "empty": {
+          "search": "Không có role nào khớp với tìm kiếm hiện tại.",
+          "default": "Chưa có role nào."
+        }
+      },
+      "form": {
+        "code": "Mã",
+        "name": "Tên",
+        "description": "Mô tả",
+        "type": "Loại",
+        "status": "Trạng thái",
+        "defaultPermissions": "Quyền Mặc Định",
+        "codeDescription": "Mã role (chỉ chữ thường, số và dấu gạch dưới)",
+        "codeInvalid": "Mã chỉ được chứa chữ thường, số và dấu gạch dưới",
+        "descriptionDescription": "Mô tả tùy chọn cho role này",
+        "permissionsDescription": "Chọn quyền mặc định cho role này",
+        "selectPermissions": "Chọn quyền...",
+        "systemRole": "Role Hệ Thống",
+        "customRole": "Role Tùy Chỉnh",
+        "active": "Hoạt động",
+        "inactive": "Không hoạt động",
+        "noPermissions": "Chưa có quyền nào được gán"
+      },
+      "deleteConfirm": {
+        "title": "Xóa Role",
+        "message": "Những user đã gắng role này sẽ được xóa role"
+      },
+      "toast": {
+        "createSuccess": "Tạo role thành công",
+        "createError": "Không thể tạo role",
+        "updateSuccess": "Cập nhật role thành công",
+        "updateError": "Không thể cập nhật role",
+        "deleteSuccess": "Xóa role thành công",
+        "deleteError": "Không thể xóa role",
+        "loadError": "Không thể tải danh sách role"
+      }
     }
   }
 }

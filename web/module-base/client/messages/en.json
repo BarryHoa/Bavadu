@@ -38,6 +38,7 @@
       "remove": "Remove",
       "delete": "Delete",
       "edit": "Edit",
+      "view": "View",
       "saveChanges": "Save changes",
       "close": "Close",
       "regenerate": "Regenerate",
@@ -163,6 +164,73 @@
       "uploading": "Uploading...",
       "uploadImages": "Upload images",
       "removeImage": "Remove image"
+    }
+  },
+  "settings": {
+    "roles": {
+      "loading": "Loading role...",
+      "notFound": "Role not found",
+      "cannotEditSystemRole": "System roles cannot be edited",
+      "create": {
+        "title": "Create New Role"
+      },
+      "edit": {
+        "title": "Edit Role"
+      },
+      "actions": {
+        "addRole": "Add Role"
+      },
+      "filters": {
+        "searchPlaceholder": "Search roles by code..."
+      },
+      "table": {
+        "columns": {
+          "code": "Code",
+          "name": "Name",
+          "description": "Description",
+          "type": "Type",
+          "status": "Status",
+          "systemRole": "System",
+          "customRole": "Custom",
+          "active": "Active",
+          "inactive": "Inactive"
+        },
+        "empty": {
+          "search": "No roles match the current search.",
+          "default": "No roles found."
+        }
+      },
+      "form": {
+        "code": "Code",
+        "name": "Name",
+        "description": "Description",
+        "type": "Type",
+        "status": "Status",
+        "defaultPermissions": "Default Permissions",
+        "codeDescription": "Role code (lowercase letters, numbers, and underscores only)",
+        "codeInvalid": "Code must contain only lowercase letters, numbers, and underscores",
+        "descriptionDescription": "Optional description for this role",
+        "permissionsDescription": "Select default permissions for this role",
+        "selectPermissions": "Select permissions...",
+        "systemRole": "System Role",
+        "customRole": "Custom Role",
+        "active": "Active",
+        "inactive": "Inactive",
+        "noPermissions": "No permissions assigned"
+      },
+      "deleteConfirm": {
+        "title": "Delete Role",
+        "message": "Những user đã gắng role này sẽ được xóa role"
+      },
+      "toast": {
+        "createSuccess": "Role created successfully",
+        "createError": "Failed to create role",
+        "updateSuccess": "Role updated successfully",
+        "updateError": "Failed to update role",
+        "deleteSuccess": "Role deleted successfully",
+        "deleteError": "Failed to delete role",
+        "loadError": "Failed to load roles"
+      }
     }
   }
 }

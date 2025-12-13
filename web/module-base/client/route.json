@@ -13,5 +13,14 @@
     "routes": [
       { "path": "/models", "page": "/Admin/ModelsViewList/ModelsListPage" }
     ]
+  },
+  {
+    "path": "/settings",
+    "routes": [
+      {
+        "path": "/roles",
+        "page": "/Settings/Roles/RolesListPage"
+      }
+    ]
   }
 ]
