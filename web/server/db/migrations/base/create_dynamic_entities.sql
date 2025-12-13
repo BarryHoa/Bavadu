@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS "md_base"."dynamic_entities" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(20) NOT NULL,
 	"name" jsonb NOT NULL,
-	"description" jsonb,
+	"description" text,
 	"model" varchar(30) NOT NULL,
 	"data_type" varchar(20) NOT NULL,
 	"options" jsonb,

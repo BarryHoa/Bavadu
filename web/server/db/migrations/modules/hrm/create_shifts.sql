@@ -5,7 +5,7 @@ CREATE TABLE "mdl_hrm"."shifts" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(100) NOT NULL,
 	"name" jsonb NOT NULL,
-	"description" jsonb,
+	"description" text,
 	"start_time" time NOT NULL,
 	"end_time" time NOT NULL,
 	"break_duration" integer DEFAULT 0,

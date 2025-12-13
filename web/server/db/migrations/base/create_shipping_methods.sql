@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS "md_base"."shipping_methods" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(50) NOT NULL,
 	"name" jsonb NOT NULL,
-	"description" jsonb,
+	"description" text,
 	"type" varchar(50) NOT NULL DEFAULT 'all',
 	"base_fee" numeric(14, 2),
 	"is_active" boolean DEFAULT true NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS "md_base"."shipping_methods" (
 	"updated_at" timestamp with time zone DEFAULT now()
 );
 
-COMMENT ON COLUMN "shipping_methods"."type" IS 
+COMMENT ON COLUMN "md_base"."shipping_methods"."type" IS 
 'Loại shipping method: b2c (chỉ dùng cho B2C), b2b (chỉ dùng cho B2B), all (dùng chung cho cả B2B và B2C), b2b-internal (B2B nội bộ), b2b-external (B2B bên ngoài)';
 
 -- ============================================
@@ -32,7 +32,7 @@ CREATE INDEX IF NOT EXISTS "shipping_methods_type_active_idx" ON "md_base"."ship
 -- Unique Constraint
 -- ============================================
 CREATE UNIQUE INDEX IF NOT EXISTS "shipping_methods_code_type_unique" 
-ON "shipping_methods" USING btree ("code", "type");
+ON "md_base"."shipping_methods" USING btree ("code", "type");
 
 COMMENT ON INDEX "shipping_methods_code_type_unique" IS 
 'Unique constraint: không được trùng code và type. Một code có thể tồn tại nhiều lần nhưng với các type khác nhau.';

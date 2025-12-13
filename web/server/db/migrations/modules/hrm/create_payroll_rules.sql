@@ -5,7 +5,7 @@ CREATE TABLE "mdl_hrm"."payroll_rules" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(100) NOT NULL,
 	"name" jsonb NOT NULL,
-	"description" jsonb,
+	"description" text,
 	"rule_type" varchar(50) NOT NULL,
 	"rule_config" jsonb NOT NULL,
 	"effective_date" date NOT NULL,

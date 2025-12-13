@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS "md_base"."payment_terms" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(50) NOT NULL,
 	"name" jsonb NOT NULL,
-	"description" jsonb,
+	"description" text,
 	"type" varchar(50) NOT NULL DEFAULT 'all',
 	"days" numeric(5, 0),
 	"is_active" boolean DEFAULT true NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS "md_base"."payment_terms" (
 	"updated_at" timestamp with time zone DEFAULT now()
 );
 
-COMMENT ON COLUMN "payment_terms"."type" IS 
+COMMENT ON COLUMN "md_base"."payment_terms"."type" IS 
 'Loại payment term: b2c (chỉ dùng cho B2C), b2b (chỉ dùng cho B2B), all (dùng chung cho cả B2B và B2C)';
 
 -- ============================================

@@ -5,7 +5,7 @@ CREATE TABLE "mdl_hrm"."courses" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(100) NOT NULL,
 	"name" jsonb NOT NULL,
-	"description" jsonb,
+	"description" text,
 	"category" varchar(100),
 	"duration" integer,
 	"format" varchar(50),

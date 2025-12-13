@@ -5,7 +5,7 @@ CREATE TABLE "mdl_hrm"."benefit_packages" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(100) NOT NULL,
 	"name" jsonb NOT NULL,
-	"description" jsonb,
+	"description" text,
 	"benefit_type" varchar(50) NOT NULL,
 	"coverage" jsonb,
 	"cost" integer,

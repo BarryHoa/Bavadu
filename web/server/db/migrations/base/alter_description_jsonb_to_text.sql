@@ -105,96 +105,96 @@ END $$;
 -- HRM module tables
 DO $$ 
 BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'md_hrm' AND table_name = 'departments') THEN
-    ALTER TABLE "md_hrm"."departments" 
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'mdl_hrm' AND table_name = 'departments') THEN
+    ALTER TABLE "mdl_hrm"."departments" 
       ALTER COLUMN "description" TYPE text USING extract_text_from_jsonb("description");
   END IF;
 END $$;
 
 DO $$ 
 BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'md_hrm' AND table_name = 'positions') THEN
-    ALTER TABLE "md_hrm"."positions" 
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'mdl_hrm' AND table_name = 'positions') THEN
+    ALTER TABLE "mdl_hrm"."positions" 
       ALTER COLUMN "description" TYPE text USING extract_text_from_jsonb("description");
   END IF;
 END $$;
 
 DO $$ 
 BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'md_hrm' AND table_name = 'leave_types') THEN
-    ALTER TABLE "md_hrm"."leave_types" 
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'mdl_hrm' AND table_name = 'leave_types') THEN
+    ALTER TABLE "mdl_hrm"."leave_types" 
       ALTER COLUMN "description" TYPE text USING extract_text_from_jsonb("description");
   END IF;
 END $$;
 
 DO $$ 
 BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'md_hrm' AND table_name = 'workflows') THEN
-    ALTER TABLE "md_hrm"."workflows" 
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'mdl_hrm' AND table_name = 'workflows') THEN
+    ALTER TABLE "mdl_hrm"."workflows" 
       ALTER COLUMN "description" TYPE text USING extract_text_from_jsonb("description");
   END IF;
 END $$;
 
 DO $$ 
 BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'md_hrm' AND table_name = 'shifts') THEN
-    ALTER TABLE "md_hrm"."shifts" 
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'mdl_hrm' AND table_name = 'shifts') THEN
+    ALTER TABLE "mdl_hrm"."shifts" 
       ALTER COLUMN "description" TYPE text USING extract_text_from_jsonb("description");
   END IF;
 END $$;
 
 DO $$ 
 BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'md_hrm' AND table_name = 'payroll_rules') THEN
-    ALTER TABLE "md_hrm"."payroll_rules" 
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'mdl_hrm' AND table_name = 'payroll_rules') THEN
+    ALTER TABLE "mdl_hrm"."payroll_rules" 
       ALTER COLUMN "description" TYPE text USING extract_text_from_jsonb("description");
   END IF;
 END $$;
 
 DO $$ 
 BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'md_hrm' AND table_name = 'job_requisitions') THEN
-    ALTER TABLE "md_hrm"."job_requisitions" 
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'mdl_hrm' AND table_name = 'job_requisitions') THEN
+    ALTER TABLE "mdl_hrm"."job_requisitions" 
       ALTER COLUMN "description" TYPE text USING extract_text_from_jsonb("description");
   END IF;
 END $$;
 
 DO $$ 
 BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'md_hrm' AND table_name = 'documents') THEN
-    ALTER TABLE "md_hrm"."documents" 
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'mdl_hrm' AND table_name = 'documents') THEN
+    ALTER TABLE "mdl_hrm"."documents" 
       ALTER COLUMN "description" TYPE text USING extract_text_from_jsonb("description");
   END IF;
 END $$;
 
 DO $$ 
 BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'md_hrm' AND table_name = 'goals') THEN
-    ALTER TABLE "md_hrm"."goals" 
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'mdl_hrm' AND table_name = 'goals') THEN
+    ALTER TABLE "mdl_hrm"."goals" 
       ALTER COLUMN "description" TYPE text USING extract_text_from_jsonb("description");
   END IF;
 END $$;
 
 DO $$ 
 BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'md_hrm' AND table_name = 'benefit_packages') THEN
-    ALTER TABLE "md_hrm"."benefit_packages" 
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'mdl_hrm' AND table_name = 'benefit_packages') THEN
+    ALTER TABLE "mdl_hrm"."benefit_packages" 
       ALTER COLUMN "description" TYPE text USING extract_text_from_jsonb("description");
   END IF;
 END $$;
 
 DO $$ 
 BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'md_hrm' AND table_name = 'courses') THEN
-    ALTER TABLE "md_hrm"."courses" 
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'mdl_hrm' AND table_name = 'courses') THEN
+    ALTER TABLE "mdl_hrm"."courses" 
       ALTER COLUMN "description" TYPE text USING extract_text_from_jsonb("description");
   END IF;
 END $$;
 
 DO $$ 
 BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'md_hrm' AND table_name = 'onboarding_checklists') THEN
-    ALTER TABLE "md_hrm"."onboarding_checklists" 
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'mdl_hrm' AND table_name = 'onboarding_checklists') THEN
+    ALTER TABLE "mdl_hrm"."onboarding_checklists" 
       ALTER COLUMN "task_description" TYPE text USING extract_text_from_jsonb("task_description");
   END IF;
 END $$;
@@ -202,8 +202,8 @@ END $$;
 -- Product module tables
 DO $$ 
 BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'md_product' AND table_name = 'categories') THEN
-    ALTER TABLE "md_product"."categories" 
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'mdl_product' AND table_name = 'categories') THEN
+    ALTER TABLE "mdl_product"."categories" 
       ALTER COLUMN "description" TYPE text USING extract_text_from_jsonb("description");
   END IF;
 END $$;

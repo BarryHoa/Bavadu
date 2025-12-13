@@ -5,7 +5,7 @@ CREATE TABLE "mdl_hrm"."leave_types" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(100) NOT NULL,
 	"name" jsonb NOT NULL,
-	"description" jsonb,
+	"description" text,
 	"accrual_type" varchar(50) NOT NULL,
 	"accrual_rate" integer,
 	"max_accrual" integer,

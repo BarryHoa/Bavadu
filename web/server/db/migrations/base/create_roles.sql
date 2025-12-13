@@ -5,7 +5,7 @@ CREATE TABLE "md_base"."roles" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"code" varchar(100) NOT NULL UNIQUE,
 	"name" jsonb NOT NULL,
-	"description" jsonb,
+	"description" text,
 	"permissions" jsonb NOT NULL,
 	"is_system" boolean DEFAULT false NOT NULL,
 	"is_active" boolean DEFAULT true NOT NULL,
