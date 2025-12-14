@@ -4,8 +4,6 @@
  * Used to initialize database and environment for Vercel/serverless deployments
  */
 
-import type { SystemRuntimeVariables } from "@base/server/types/global";
-
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
     // Skip instrumentation if running custom server (server.ts)
@@ -18,7 +16,12 @@ export async function register() {
     // Only run instrumentation in serverless environments (Vercel, etc.)
     // Skip in local development when using custom server
     // If VERCEL env is not set and not in production, assume custom server will handle it
-    if (!process.env.VERCEL && process.env.NODE_ENV !== "production") {
+    // But allow explicit VERCEL=1 to force instrumentation even in development
+    if (
+      !process.env.VERCEL &&
+      process.env.NODE_ENV !== "production" &&
+      !process.env.FORCE_INSTRUMENTATION
+    ) {
       console.log(
         "> ⏭️  Skipping instrumentation (local development with custom server)"
       );
@@ -28,43 +31,18 @@ export async function register() {
     try {
       // Initialize in serverless environments (Vercel, etc.)
       // This runs when the serverless function starts
-      const { Database } = await import("@base/server/stores/database");
-      const Environment = (await import("@base/server/env")).default;
-      const { getLogModel } = await import("@base/server/models/Logs/LogModel");
-      const dayjs = (await import("dayjs")).default;
-      const { ScheduledTask } = await import("./cron");
-
       console.log("> 🔧 Initializing server runtime...");
 
-      // Initialize logging system FIRST
-      getLogModel();
-      console.log("> 📝 Logging system initialized");
-
-      // Initialize database
-      const database = new Database(process.cwd());
-      await database.initialize();
-      console.log("> 🗄️  Database initialized");
-
-      // Set database to globalThis BEFORE initializing environment
-      // Initialize with database first, then add env later
-      globalThis.systemRuntimeVariables = {
-        database: database,
-      } as SystemRuntimeVariables;
-
-      // Initialize environment
-      const envProcess = await Environment.create();
-      console.log("> ⚙️  Environment initialized");
-
-      // Set globalThis with env, database, and initial timestamp
-      globalThis.systemRuntimeVariables = {
-        env: envProcess,
-        database: database,
-        timestamp: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-      };
+      // Use shared initialization utility
+      const { initializeRuntime } =
+        await import("@base/server/utils/initializeRuntime");
+      await initializeRuntime();
+      console.log("> ✅ Runtime initialized (database, environment)");
 
       // Initialize and start cron scheduler (only if not in serverless)
       // Note: Cron jobs may not work in serverless environments
       if (!process.env.VERCEL) {
+        const { ScheduledTask } = await import("./cron");
         const scheduler = new ScheduledTask();
         scheduler.start();
         console.log("> ⏰ Cron scheduler started");

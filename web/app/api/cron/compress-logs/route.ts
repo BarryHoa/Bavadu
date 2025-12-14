@@ -8,7 +8,7 @@
  */
 
 import { getLogCompressionModel } from "@base/server/models/Logs/LogCompressionModel";
-import type { SystemRuntimeVariables } from "@base/server/types/global";
+import { initializeRuntime } from "@base/server/utils/initializeRuntime";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -36,16 +36,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Initialize database if not already initialized
-    if (!globalThis.systemRuntimeVariables?.database) {
-      const { Database } = await import("@base/server/stores/database");
-      const database = new Database(process.cwd());
-      await database.initialize();
-
-      globalThis.systemRuntimeVariables = {
-        database: database,
-      } as SystemRuntimeVariables;
-    }
+    // Initialize runtime (database and environment) if not already initialized
+    await initializeRuntime();
 
     console.log("[Cron] Starting log compression...");
     const compressionModel = getLogCompressionModel();

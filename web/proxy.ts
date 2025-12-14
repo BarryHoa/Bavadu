@@ -186,6 +186,8 @@ export async function proxy(req: NextRequest) {
   // Add security headers to all responses
   return addSecurityHeaders(response);
 }
+// Next.js 16 uses proxy.ts instead of middleware.ts
+// Export config for Next.js to recognize this as the proxy middleware
 export const config = {
   matcher: [
     /*
