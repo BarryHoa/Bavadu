@@ -79,32 +79,49 @@ class Environment {
       return false;
     }
 
-    const rootPath = [
-      factoryElm.module === "base" ? "base" : "mdl",
-      factoryElm.module === "base" ? undefined : factoryElm.module,
-      "server",
-      "models",
-      factoryElm.path,
-    ]
-      .filter(Boolean)
-      .join("/");
+    // Find the module.json file to get the full path
+    const moduleJsonPaths = this.collectModuleJsonPaths();
+    let modelPath: string | null = null;
+    let folderName: string = factoryElm.module;
+
+    // Find the model file path
+    for (const moduleJsonPath of moduleJsonPaths) {
+      const folderMdlRoot = this.resolveModuleName(moduleJsonPath);
+      const currentFolderName =
+        folderMdlRoot === "module-base"
+          ? "base"
+          : (folderMdlRoot ?? "unknown-module");
+
+      if (currentFolderName === factoryElm.module) {
+        const pathToModelFile = join("server", "models", factoryElm.path);
+        const fullModelPath = join(dirname(moduleJsonPath), pathToModelFile);
+
+        // Check if file exists
+        if (existsSync(fullModelPath)) {
+          modelPath = fullModelPath;
+          folderName = currentFolderName;
+          break;
+        }
+      }
+    }
+
+    if (!modelPath) {
+      console.error(
+        `Failed to find model file for "${modelId}" in module "${factoryElm.module}"`
+      );
+      return false;
+    }
 
     try {
-      const moduleSpecifier = `@${rootPath}`;
-      const cacheBustedSpecifier = `${moduleSpecifier}?update=${Date.now()}`;
-      const mod = await import(cacheBustedSpecifier);
+      // Use toImportPath like registerModels does - this works in serverless
+      const mod = await import(this.toImportPath(modelPath));
       const ModelClass = mod?.default;
       if (!ModelClass) {
         throw new Error("Missing default export");
       }
 
       const factory = () => new ModelClass();
-      this.registerOneModel(
-        modelId,
-        factoryElm.module,
-        factory,
-        factoryElm.path
-      );
+      this.registerOneModel(modelId, folderName, factory, factoryElm.path);
 
       return true;
     } catch (error) {

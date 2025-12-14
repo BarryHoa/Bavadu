@@ -63,8 +63,8 @@ const nextConfig = {
   experimental: {
     // Allow importing from modules directory
     externalDir: true,
-    // Enable instrumentation hook for server initialization
-    instrumentationHook: true,
+    // Note: instrumentationHook is available by default in Next.js 16+
+    // No need to explicitly enable it
   },
 };
 
