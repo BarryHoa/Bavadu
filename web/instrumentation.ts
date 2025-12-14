@@ -4,9 +4,12 @@
  * Used to initialize database and environment for Vercel/serverless deployments
  */
 
+// Log immediately when file is loaded (before register is called)
+console.log("> 📦 instrumentation.ts file loaded");
+
 export async function register() {
   // Log environment variables for debugging
-  console.log("> 🔍 Instrumentation hook called");
+  console.log("> 🔍 Instrumentation hook called (register function)");
   console.log("> 🔍 NEXT_RUNTIME:", process.env.NEXT_RUNTIME);
   console.log("> 🔍 VERCEL:", process.env.VERCEL);
   console.log("> 🔍 NODE_ENV:", process.env.NODE_ENV);
