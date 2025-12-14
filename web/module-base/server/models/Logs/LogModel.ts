@@ -230,6 +230,12 @@ class LogModel {
       return;
     }
 
+    // On Vercel, only use console
+    if (process.env.VERCEL === "1") {
+      console.error(this.formatLogEntry(entry).trim());
+      return;
+    }
+
     if (this.destination === "file") {
       await this.writeToFile(entry);
     } else if (this.destination === "webhook") {
