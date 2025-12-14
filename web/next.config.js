@@ -12,8 +12,7 @@ const securityHeaders = {
   "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
   "X-XSS-Protection": "1; mode=block",
   ...(isProduction && {
-    "Strict-Transport-Security":
-      "max-age=31536000; includeSubDomains; preload",
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
   }),
 };
 
@@ -64,6 +63,8 @@ const nextConfig = {
   experimental: {
     // Allow importing from modules directory
     externalDir: true,
+    // Enable instrumentation hook for server initialization
+    instrumentationHook: true,
   },
 };
 

@@ -13,6 +13,9 @@ import http from "http";
 import next from "next";
 import { ScheduledTask } from "./cron";
 
+// Mark that we're running custom server to skip instrumentation
+process.env.RUNNING_CUSTOM_SERVER = "true";
+
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.HOSTNAME || "localhost";
 const port = parseInt(process.env.PORT || "3000", 10);

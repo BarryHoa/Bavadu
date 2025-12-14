@@ -1,0 +1,21 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "outputDirectory": ".next",
+  "regions": ["sin1"],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "crons": [
+    {
+      "path": "/api/cron/compress-logs",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/cleanup-expired-sessions",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}
