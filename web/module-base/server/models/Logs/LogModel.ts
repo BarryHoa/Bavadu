@@ -38,7 +38,11 @@ class LogModel {
     this.baseDirectory = LOG_CONFIG.file.directory;
     this.maxSizeBytes = LOG_CONFIG.file.maxSizeBytes;
 
-    if (this.enabled && this.destination === "file") {
+    if (
+      this.enabled &&
+      this.destination === "file" &&
+      process.env.VERCEL !== "1"
+    ) {
       this.ensureDirectoryExists();
     }
   }
