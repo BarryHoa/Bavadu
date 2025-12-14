@@ -5,6 +5,7 @@ import {
   IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
+import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { Button } from "@heroui/button";
 import {
   Modal,
@@ -15,11 +16,7 @@ import {
 } from "@heroui/react";
 import { AlertCircle } from "lucide-react";
 import { useMemo } from "react";
-import {
-  Control,
-  Controller,
-  UseFormSetValue,
-} from "react-hook-form";
+import { Control, Controller, UseFormSetValue } from "react-hook-form";
 
 interface PriceItemEditModalProps {
   isOpen: boolean;
@@ -29,7 +26,9 @@ interface PriceItemEditModalProps {
   setValue: UseFormSetValue<any>;
   variantOptions: SelectItemOption[];
   uomOptions: SelectItemOption[];
-  getAvailableUomsForVariant: (variantId: string | undefined) => SelectItemOption[];
+  getAvailableUomsForVariant: (
+    variantId: string | undefined
+  ) => SelectItemOption[];
   watchedPriceItems: any[];
   isLoading?: boolean;
 }
@@ -46,6 +45,7 @@ export default function PriceItemEditModal({
   watchedPriceItems,
   isLoading = false,
 }: PriceItemEditModalProps) {
+  const getLocalizedText = useLocalizedText();
   const currentItem = watchedPriceItems?.[index];
   const variantId = currentItem?.variantId;
   const minimumQuantity = currentItem?.minimumQuantity;
@@ -66,8 +66,11 @@ export default function PriceItemEditModal({
   const variantName = useMemo(() => {
     if (!variantId) return "";
     const variant = variantOptions.find((v) => v.value === variantId);
-    return variant?.label || "";
-  }, [variantId, variantOptions]);
+    if (!variant) return "";
+    return typeof variant.label === "string"
+      ? variant.label
+      : getLocalizedText(variant.label);
+  }, [variantId, variantOptions, getLocalizedText]);
 
   // Get all tiers for this variant
   const variantTiers = useMemo(() => {
@@ -75,9 +78,7 @@ export default function PriceItemEditModal({
     return watchedPriceItems
       .filter(
         (item: any, idx: number) =>
-          idx !== index &&
-          item.variantId === variantId &&
-          item.minimumQuantity
+          idx !== index && item.variantId === variantId && item.minimumQuantity
       )
       .map((item: any) => ({
         minQty: Number(item.minimumQuantity) || 0,
@@ -91,13 +92,9 @@ export default function PriceItemEditModal({
       const variant = variantOptions.find((v) => v.value === key);
       if (variant) {
         const saleUomId =
-          typeof variant.saleUomId === "string"
-            ? variant.saleUomId
-            : undefined;
+          typeof variant.saleUomId === "string" ? variant.saleUomId : undefined;
         const baseUomId =
-          typeof variant.baseUomId === "string"
-            ? variant.baseUomId
-            : undefined;
+          typeof variant.baseUomId === "string" ? variant.baseUomId : undefined;
         const uomId = saleUomId || baseUomId;
         if (uomId) {
           setValue(`priceItems.${index}.uomId`, uomId, {
@@ -153,8 +150,8 @@ export default function PriceItemEditModal({
                   {minimumQuantity && (
                     <span className="px-2 py-1 bg-primary-100 text-primary-700 rounded font-semibold text-xs">
                       {minimumQuantity}+:{" "}
-                      {Number(currentItem?.unitPrice || 0).toLocaleString()}{" "}
-                      VND (current)
+                      {Number(currentItem?.unitPrice || 0).toLocaleString()} VND
+                      (current)
                     </span>
                   )}
                 </div>
@@ -287,4 +284,3 @@ export default function PriceItemEditModal({
     </Modal>
   );
 }
-

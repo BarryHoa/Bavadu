@@ -1,6 +1,8 @@
 import {
   custom,
+  maxValue,
   minLength,
+  minValue,
   number,
   object,
   optional,
@@ -13,25 +15,26 @@ import {
 type TranslateFn = (key: string, values?: Record<string, any>) => string;
 
 export function createCandidateValidation(t: TranslateFn) {
-  const fullNameSchema = custom<{ vi?: string; en?: string }>(
-    (value) => {
-      if (!value || typeof value !== "object") return false;
-      const obj = value as any;
-      return (
-        (obj.vi !== undefined && typeof obj.vi === "string" && obj.vi.trim() !== "") ||
-        (obj.en !== undefined && typeof obj.en === "string" && obj.en.trim() !== "")
-      );
-    },
-    t("validation.fullName.required")
-  );
+  const fullNameSchema = custom<{ vi?: string; en?: string }>((value) => {
+    if (!value || typeof value !== "object") return false;
+    const obj = value as any;
+    return (
+      (obj.vi !== undefined &&
+        typeof obj.vi === "string" &&
+        obj.vi.trim() !== "") ||
+      (obj.en !== undefined &&
+        typeof obj.en === "string" &&
+        obj.en.trim() !== "")
+    );
+  }, t("validation.fullName.required"));
 
   const emailSchema = pipe(
     string(),
     trim(),
-    custom(
-      (value) => value === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
-      t("validation.email.invalid")
-    )
+    custom((value) => {
+      const str = value as string;
+      return str === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
+    }, t("validation.email.invalid"))
   );
 
   const candidateFormSchema = object({
@@ -56,7 +59,8 @@ export function createCandidateValidation(t: TranslateFn) {
     rating: optional(
       pipe(
         number(),
-        custom((value) => value >= 0 && value <= 5, t("validation.rating.invalid"))
+        minValue(0, t("validation.rating.min")),
+        maxValue(5, t("validation.rating.max"))
       )
     ),
     notes: optional(pipe(string(), trim())),
@@ -70,4 +74,3 @@ export function createCandidateValidation(t: TranslateFn) {
 export type CandidateFormValues = InferOutput<
   ReturnType<typeof createCandidateValidation>["candidateFormSchema"]
 >;
-

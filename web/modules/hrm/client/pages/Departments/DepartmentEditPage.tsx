@@ -36,11 +36,11 @@ export default function DepartmentEditPage(): React.ReactNode {
     { id: string }
   >({
     mutationFn: async (payload) => {
-      const response = await departmentService.update({ ...payload, id });
+      const response = await departmentService.update(payload);
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToUpdate"));
       }
-      return response.data;
+      return { id: response.data.id };
     },
     invalidateQueries: [["hrm-departments"], ["hrm-department", id]],
     onSuccess: (data) => {
@@ -50,6 +50,7 @@ export default function DepartmentEditPage(): React.ReactNode {
 
   const handleSubmit = async (values: DepartmentFormValues) => {
     const payload = {
+      id,
       code: values.code.trim(),
       name: values.name || { vi: "", en: "" },
       description: values.description || null,

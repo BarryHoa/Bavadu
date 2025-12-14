@@ -33,18 +33,18 @@ export default function PositionEditPage(): React.ReactNode {
     isPending,
   } = useCreateUpdate<
     Parameters<typeof positionService.update>[0],
-    { id: string }
+    { data: { id: string } }
   >({
     mutationFn: async (payload) => {
       const response = await positionService.update({ ...payload, id });
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToUpdate"));
       }
-      return response.data;
+      return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-positions"], ["hrm-position", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/positions/view/${data.id}`);
+      router.push(`/workspace/modules/hrm/positions/view/${data.data.id}`);
     },
   });
 
@@ -62,7 +62,7 @@ export default function PositionEditPage(): React.ReactNode {
       isActive: values.isActive ?? true,
     };
 
-    await updatePosition(payload);
+    await updatePosition({ ...payload, id });
   };
 
   if (isLoading) {

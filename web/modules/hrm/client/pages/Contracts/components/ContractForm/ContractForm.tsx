@@ -1,14 +1,16 @@
 "use client";
 
 import { IBaseInput, IBaseSingleSelectAsync } from "@base/client/components";
+import { Button } from "@heroui/button";
+import { Card, CardBody, Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
-import { Button } from "@heroui/button";
-import { Card, CardBody, Textarea } from "@heroui/react";
 import type { ContractFormValues } from "../../validation/contractValidation";
 import { createContractValidation } from "../../validation/contractValidation";
+
+export type { ContractFormValues };
 
 interface ContractFormProps {
   onSubmit: (values: ContractFormValues) => Promise<void>;
@@ -75,7 +77,9 @@ export default function ContractForm({
 
       <Card>
         <CardBody className="p-4">
-          <h2 className="text-base font-semibold mb-4">{tLabels("basicInfo")}</h2>
+          <h2 className="text-base font-semibold mb-4">
+            {tLabels("basicInfo")}
+          </h2>
           <div className="grid gap-4 md:grid-cols-2">
             <Controller
               name="contractNumber"
@@ -207,7 +211,9 @@ export default function ContractForm({
 
       <Card>
         <CardBody className="p-4">
-          <h2 className="text-base font-semibold mb-4">{tLabels("additionalInfo")}</h2>
+          <h2 className="text-base font-semibold mb-4">
+            {tLabels("additionalInfo")}
+          </h2>
           <div className="grid gap-4 md:grid-cols-2">
             <Controller
               name="workingHours"
@@ -293,4 +299,3 @@ export default function ContractForm({
     </form>
   );
 }
-

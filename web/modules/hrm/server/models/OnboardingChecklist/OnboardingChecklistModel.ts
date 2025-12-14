@@ -133,7 +133,7 @@ export default class OnboardingChecklistModel extends BaseModel<
     const insertData: NewHrmTbOnboardingChecklist = {
       employeeId: payload.employeeId,
       taskName: payload.taskName,
-      taskDescription: payload.taskDescription ?? null,
+      taskDescription: payload.taskDescription ? (typeof payload.taskDescription === "string" ? payload.taskDescription : JSON.stringify(payload.taskDescription)) : null,
       category: payload.category ?? null,
       assignedTo: payload.assignedTo ?? null,
       dueDate: payload.dueDate ?? null,
@@ -168,7 +168,7 @@ export default class OnboardingChecklistModel extends BaseModel<
       updateData.employeeId = payload.employeeId;
     if (payload.taskName !== undefined) updateData.taskName = payload.taskName;
     if (payload.taskDescription !== undefined)
-      updateData.taskDescription = payload.taskDescription ?? null;
+      updateData.taskDescription = payload.taskDescription ? (typeof payload.taskDescription === "string" ? payload.taskDescription : JSON.stringify(payload.taskDescription)) : null;
     if (payload.category !== undefined)
       updateData.category = payload.category ?? null;
     if (payload.assignedTo !== undefined)

@@ -1,6 +1,7 @@
 import {
   custom,
   minLength,
+  minValue,
   number,
   object,
   optional,
@@ -37,10 +38,7 @@ export function createCourseValidation(t: TranslateFn) {
     duration: optional(
       pipe(
         number(),
-        (value) => {
-          if (value >= 0) return true;
-          throw new Error(t("validation.duration.invalid"));
-        }
+        minValue(0, t("validation.duration.invalid"))
       )
     ),
     format: optional(pipe(string(), trim())),

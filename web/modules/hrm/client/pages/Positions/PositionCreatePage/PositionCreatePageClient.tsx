@@ -18,18 +18,18 @@ export default function PositionCreatePageClient(): React.ReactNode {
     isPending,
   } = useCreateUpdate<
     Parameters<typeof positionService.create>[0],
-    { id: string }
+    { data: { id: string } }
   >({
     mutationFn: async (payload) => {
       const response = await positionService.create(payload);
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToCreate"));
       }
-      return response.data;
+      return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-positions"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/positions/view/${data.id}`);
+      router.push(`/workspace/modules/hrm/positions/view/${data.data.id}`);
     },
   });
 

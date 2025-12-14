@@ -130,7 +130,7 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
       documentNumber: payload.documentNumber ?? null,
       documentType: payload.documentType,
       title: payload.title,
-      description: payload.description ?? null,
+      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
       employeeId: payload.employeeId ?? null,
       fileUrl: payload.fileUrl,
       fileSize: payload.fileSize ?? null,
@@ -179,7 +179,7 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
       updateData.documentType = payload.documentType;
     if (payload.title !== undefined) updateData.title = payload.title;
     if (payload.description !== undefined)
-      updateData.description = payload.description ?? null;
+      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
     if (payload.employeeId !== undefined)
       updateData.employeeId = payload.employeeId ?? null;
     if (payload.fileUrl !== undefined) updateData.fileUrl = payload.fileUrl;

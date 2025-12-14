@@ -36,11 +36,11 @@ export default function EmployeeEditPage(): React.ReactNode {
     { id: string }
   >({
     mutationFn: async (payload) => {
-      const response = await employeeService.update({ ...payload, id });
+      const response = await employeeService.update(payload);
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToUpdate"));
       }
-      return response.data;
+      return { id: response.data.id };
     },
     invalidateQueries: [["hrm-employees"], ["hrm-employee", id]],
     onSuccess: (data) => {
@@ -50,6 +50,7 @@ export default function EmployeeEditPage(): React.ReactNode {
 
   const handleSubmit = async (values: EmployeeFormValues) => {
     const payload = {
+      id,
       employeeCode: values.employeeCode.trim(),
       firstName: values.firstName?.trim() || null,
       lastName: values.lastName?.trim() || null,

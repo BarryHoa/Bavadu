@@ -7,6 +7,7 @@ import {
   DatePicker,
 } from "@base/client/components";
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { parseDate } from "@internationalized/date";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
@@ -16,6 +17,8 @@ import {
   createPerformanceReviewValidation,
   type PerformanceReviewFormValues,
 } from "../../validation/performanceReviewValidation";
+
+export type { PerformanceReviewFormValues };
 
 interface PerformanceReviewFormProps {
   onSubmit: (values: PerformanceReviewFormValues) => Promise<void>;
@@ -139,8 +142,8 @@ export default function PerformanceReviewForm({
               render={({ field, fieldState }) => (
                 <DatePicker
                   label={t("labels.reviewDate")}
-                  value={field.value}
-                  onChange={field.onChange}
+                  value={field.value ? (typeof field.value === "string" ? parseDate(field.value) : field.value) : null}
+                  onChange={(val) => field.onChange(val ? val.toString() : null)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   isRequired
@@ -173,8 +176,8 @@ export default function PerformanceReviewForm({
                   {...field}
                   label={t("labels.overallRating")}
                   size="sm"
-                  value={field.value?.toString() ?? ""}
-                  onValueChange={(val) => field.onChange(val ? Number(val) : undefined)}
+                  value={typeof field.value === "number" ? field.value : null}
+                  onValueChange={(val) => field.onChange(val ?? null)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={1}

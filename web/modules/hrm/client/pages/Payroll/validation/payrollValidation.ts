@@ -1,5 +1,6 @@
 import {
   minLength,
+  minValue,
   number,
   object,
   optional,
@@ -25,99 +26,66 @@ export function createPayrollValidation(t: TranslateFn) {
     ),
     baseSalary: pipe(
       number(),
-      (value) => {
-        if (value >= 0) return true;
-        throw new Error(t("validation.baseSalary.invalid"));
-      }
+      minValue(0, t("validation.baseSalary.invalid"))
     ),
     overtimePay: optional(
       pipe(
         number(),
-        (value) => {
-          if (value >= 0) return true;
-          throw new Error(t("validation.overtimePay.invalid"));
-        }
+        minValue(0, t("validation.overtimePay.invalid"))
       )
     ),
     bonuses: optional(
       pipe(
         number(),
-        (value) => {
-          if (value >= 0) return true;
-          throw new Error(t("validation.bonuses.invalid"));
-        }
+        minValue(0, t("validation.bonuses.invalid"))
       )
     ),
     otherEarnings: optional(
       pipe(
         number(),
-        (value) => {
-          if (value >= 0) return true;
-          throw new Error(t("validation.otherEarnings.invalid"));
-        }
+        minValue(0, t("validation.otherEarnings.invalid"))
       )
     ),
     socialInsurance: optional(
       pipe(
         number(),
-        (value) => {
-          if (value >= 0) return true;
-          throw new Error(t("validation.socialInsurance.invalid"));
-        }
+        minValue(0, t("validation.socialInsurance.invalid"))
       )
     ),
     healthInsurance: optional(
       pipe(
         number(),
-        (value) => {
-          if (value >= 0) return true;
-          throw new Error(t("validation.healthInsurance.invalid"));
-        }
+        minValue(0, t("validation.healthInsurance.invalid"))
       )
     ),
     unemploymentInsurance: optional(
       pipe(
         number(),
-        (value) => {
-          if (value >= 0) return true;
-          throw new Error(t("validation.unemploymentInsurance.invalid"));
-        }
+        minValue(0, t("validation.unemploymentInsurance.invalid"))
       )
     ),
     personalIncomeTax: optional(
       pipe(
         number(),
-        (value) => {
-          if (value >= 0) return true;
-          throw new Error(t("validation.personalIncomeTax.invalid"));
-        }
+        minValue(0, t("validation.personalIncomeTax.invalid"))
       )
     ),
     workingDays: optional(
       pipe(
         number(),
-        (value) => {
-          if (value >= 0) return true;
-          throw new Error(t("validation.workingDays.invalid"));
-        }
+        minValue(0, t("validation.workingDays.invalid"))
       )
     ),
     workingHours: optional(
       pipe(
         number(),
-        (value) => {
-          if (value >= 0) return true;
-          throw new Error(t("validation.workingHours.invalid"));
-        }
+        minValue(0, t("validation.workingHours.invalid"))
       )
     ),
     overtimeHours: optional(
       pipe(
         number(),
-        (value) => {
-          if (value >= 0) return true;
-          throw new Error(t("validation.overtimeHours.invalid"));
-        }
+        minValue(0, t("validation.overtimeHours.invalid"))
       )
     ),
     status: optional(pipe(string(), trim())),

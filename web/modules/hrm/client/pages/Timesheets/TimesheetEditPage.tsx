@@ -47,11 +47,11 @@ export default function TimesheetEditPage(): React.ReactNode {
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToUpdateTimesheet"));
       }
-      return response.data;
+      return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-timesheets"], ["hrm-timesheets", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/timesheets/view/${data.id}`);
+      router.push(`/workspace/modules/hrm/.../view/${data.data.id}`);
     },
   });
 
@@ -75,7 +75,7 @@ export default function TimesheetEditPage(): React.ReactNode {
   };
 
   if (isLoading) {
-    return <LoadingOverlay />;
+    return <LoadingOverlay isLoading={true} />;
   }
 
   if (isError) {

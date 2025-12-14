@@ -1,14 +1,14 @@
 "use client";
 
+import { LoadingOverlay } from "@base/client/components";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { candidateService } from "@mdl/hrm/client/services/CandidateService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { candidateService } from "@mdl/hrm/client/services/CandidateService";
 import CandidateForm, {
   type CandidateFormValues,
 } from "./components/CandidateForm/CandidateForm";
-import { LoadingOverlay } from "@base/client/components";
 
 export default function CandidateEditPage(): React.ReactNode {
   const router = useRouter();
@@ -45,13 +45,15 @@ export default function CandidateEditPage(): React.ReactNode {
     mutationFn: async (payload) => {
       const response = await candidateService.update(payload);
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToUpdateCandidate"));
+        throw new Error(
+          response.message ?? t("errors.failedToUpdateCandidate")
+        );
       }
-      return response.data;
+      return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-candidates"], ["hrm-candidates", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/candidates/view/${data.id}`);
+      router.push(`/workspace/modules/hrm/candidates/view/${data.data.id}`);
     },
   });
 
@@ -78,7 +80,7 @@ export default function CandidateEditPage(): React.ReactNode {
   };
 
   if (isLoading) {
-    return <LoadingOverlay />;
+    return <LoadingOverlay isLoading={true} />;
   }
 
   if (isError) {
@@ -98,7 +100,9 @@ export default function CandidateEditPage(): React.ReactNode {
   return (
     <CandidateForm
       onSubmit={handleSubmit}
-      onCancel={() => router.push(`/workspace/modules/hrm/candidates/view/${id}`)}
+      onCancel={() =>
+        router.push(`/workspace/modules/hrm/candidates/view/${id}`)
+      }
       submitError={submitError}
       isSubmitting={isPending}
       defaultValues={{
@@ -122,4 +126,3 @@ export default function CandidateEditPage(): React.ReactNode {
     />
   );
 }
-

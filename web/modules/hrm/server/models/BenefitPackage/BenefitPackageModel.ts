@@ -83,7 +83,7 @@ export default class BenefitPackageModel extends BaseModel<
     const insertData: NewHrmTbBenefitPackage = {
       code: payload.code,
       name: payload.name,
-      description: payload.description ?? null,
+      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
       benefitType: payload.benefitType,
       coverage: payload.coverage ?? null,
       cost: payload.cost ?? null,
@@ -117,7 +117,7 @@ export default class BenefitPackageModel extends BaseModel<
     if (payload.code !== undefined) updateData.code = payload.code;
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.description !== undefined)
-      updateData.description = payload.description ?? null;
+      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
     if (payload.benefitType !== undefined)
       updateData.benefitType = payload.benefitType;
     if (payload.coverage !== undefined)

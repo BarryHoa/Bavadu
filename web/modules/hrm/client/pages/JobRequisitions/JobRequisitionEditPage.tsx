@@ -1,14 +1,14 @@
 "use client";
 
+import { LoadingOverlay } from "@base/client/components";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { jobRequisitionService } from "@mdl/hrm/client/services/JobRequisitionService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { jobRequisitionService } from "@mdl/hrm/client/services/JobRequisitionService";
 import JobRequisitionForm, {
   type JobRequisitionFormValues,
 } from "./components/JobRequisitionForm/JobRequisitionForm";
-import { LoadingOverlay } from "@base/client/components";
 
 export default function JobRequisitionEditPage(): React.ReactNode {
   const router = useRouter();
@@ -27,7 +27,9 @@ export default function JobRequisitionEditPage(): React.ReactNode {
     queryFn: async () => {
       const response = await jobRequisitionService.getById(id);
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToLoadJobRequisition"));
+        throw new Error(
+          response.message ?? t("errors.failedToLoadJobRequisition")
+        );
       }
       return response.data;
     },
@@ -45,42 +47,85 @@ export default function JobRequisitionEditPage(): React.ReactNode {
     mutationFn: async (payload) => {
       const response = await jobRequisitionService.update(payload);
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToUpdateJobRequisition"));
+        throw new Error(
+          response.message ?? t("errors.failedToUpdateJobRequisition")
+        );
       }
-      return response.data;
+      return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-job-requisitions"], ["hrm-job-requisitions", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/job-requisitions/view/${data.id}`);
+      router.push(
+        `/workspace/modules/hrm/job-requisitions/view/${data.data.id}`
+      );
     },
   });
 
   const handleSubmit = async (values: JobRequisitionFormValues) => {
     await submitJobRequisition({
       id,
-      requisitionNumber: values.requisitionNumber.trim(),
-      title: values.title || { vi: "", en: "" },
-      description: values.description || null,
-      departmentId: values.departmentId.trim(),
-      positionId: values.positionId.trim(),
-      numberOfOpenings: values.numberOfOpenings || 1,
-      priority: values.priority || "normal",
-      employmentType: values.employmentType || null,
-      minSalary: values.minSalary || null,
-      maxSalary: values.maxSalary || null,
-      currency: values.currency || "VND",
-      requirements: values.requirements?.trim() || null,
-      status: values.status || "draft",
-      openedDate: values.openedDate?.trim() || null,
-      closedDate: values.closedDate?.trim() || null,
-      hiringManagerId: values.hiringManagerId?.trim() || null,
-      recruiterId: values.recruiterId?.trim() || null,
-      notes: values.notes?.trim() || null,
+      requisitionNumber: String(values.requisitionNumber).trim(),
+      title:
+        values.title &&
+        typeof values.title === "object" &&
+        !Array.isArray(values.title) &&
+        ("vi" in values.title || "en" in values.title)
+          ? (values.title as { vi?: string; en?: string })
+          : undefined,
+      description:
+        values.description &&
+        typeof values.description === "object" &&
+        !Array.isArray(values.description) &&
+        (values.description === null ||
+          "vi" in values.description ||
+          "en" in values.description)
+          ? (values.description as { vi?: string; en?: string } | null)
+          : null,
+      departmentId:
+        typeof values.departmentId === "string"
+          ? values.departmentId.trim()
+          : undefined,
+      positionId:
+        typeof values.positionId === "string"
+          ? values.positionId.trim()
+          : undefined,
+      numberOfOpenings:
+        typeof values.numberOfOpenings === "number"
+          ? values.numberOfOpenings
+          : undefined,
+      priority:
+        typeof values.priority === "string" ? values.priority : undefined,
+      employmentType:
+        typeof values.employmentType === "string"
+          ? values.employmentType
+          : null,
+      minSalary: typeof values.minSalary === "number" ? values.minSalary : null,
+      maxSalary: typeof values.maxSalary === "number" ? values.maxSalary : null,
+      currency:
+        typeof values.currency === "string" ? values.currency : undefined,
+      requirements:
+        typeof values.requirements === "string"
+          ? values.requirements.trim()
+          : null,
+      status: typeof values.status === "string" ? values.status : undefined,
+      openedDate:
+        typeof values.openedDate === "string" ? values.openedDate.trim() : null,
+      closedDate:
+        typeof values.closedDate === "string" ? values.closedDate.trim() : null,
+      hiringManagerId:
+        typeof values.hiringManagerId === "string"
+          ? values.hiringManagerId.trim()
+          : null,
+      recruiterId:
+        typeof values.recruiterId === "string"
+          ? values.recruiterId.trim()
+          : null,
+      notes: typeof values.notes === "string" ? values.notes.trim() : null,
     });
   };
 
   if (isLoading) {
-    return <LoadingOverlay />;
+    return <LoadingOverlay isLoading={true} />;
   }
 
   if (isError) {
@@ -100,7 +145,9 @@ export default function JobRequisitionEditPage(): React.ReactNode {
   return (
     <JobRequisitionForm
       onSubmit={handleSubmit}
-      onCancel={() => router.push(`/workspace/modules/hrm/job-requisitions/view/${id}`)}
+      onCancel={() =>
+        router.push(`/workspace/modules/hrm/job-requisitions/view/${id}`)
+      }
       submitError={submitError}
       isSubmitting={isPending}
       defaultValues={{
@@ -126,4 +173,3 @@ export default function JobRequisitionEditPage(): React.ReactNode {
     />
   );
 }
-

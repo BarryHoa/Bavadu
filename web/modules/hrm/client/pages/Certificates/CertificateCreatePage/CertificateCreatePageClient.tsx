@@ -25,11 +25,11 @@ export default function CertificateCreatePageClient(): React.ReactNode {
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToCreateCertificate"));
       }
-      return response.data;
+      return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-certificates"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/certificates/view/${data.id}`);
+      router.push(`/workspace/modules/hrm/certificates/view/${data.data.id}`);
     },
   });
 

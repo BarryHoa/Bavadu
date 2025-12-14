@@ -44,7 +44,7 @@ export function createEmployeeValidation(t: TranslateFn) {
     string(),
     trim(),
     custom(
-      (value) => value === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
+      (value) => value === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value)),
       t("validation.email.invalid")
     )
   );

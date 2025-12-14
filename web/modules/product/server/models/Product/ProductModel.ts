@@ -273,7 +273,7 @@ class ProductModel extends BaseModel<typeof product_tb_product_variants> {
 
       // Handle uomConversions - create units_of_measure records
       const normalizedUomConversions = payload.uomConversions ?? [];
-      if (normalizedUomConversions.length > 0 && variant.baseUomId) {
+      if (normalizedUomConversions.length > 0 && payload.variant.baseUomId) {
         // Insert UOM records first
         const uomInserts = await tx
           .insert(product_tb_units_of_measure)

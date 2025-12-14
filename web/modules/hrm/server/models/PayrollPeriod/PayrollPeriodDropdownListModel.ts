@@ -18,7 +18,7 @@ export interface PayrollPeriodDropdownRow {
   name?: string | null;
   startDate?: string | null;
   endDate?: string | null;
-  isActive?: boolean;
+  isLocked?: boolean;
 }
 
 class PayrollPeriodDropdownListModel extends BaseViewListModel<
@@ -36,7 +36,7 @@ class PayrollPeriodDropdownListModel extends BaseViewListModel<
       ["id", { column: hrm_tb_payrolls_period.id, sort: true }],
       ["code", { column: hrm_tb_payrolls_period.code, sort: true }],
       ["name", { column: hrm_tb_payrolls_period.name, sort: true }],
-      ["isActive", { column: hrm_tb_payrolls_period.isActive, sort: true }],
+      ["isLocked", { column: hrm_tb_payrolls_period.isLocked, sort: true }],
     ]);
 
   constructor() {
@@ -59,7 +59,7 @@ class PayrollPeriodDropdownListModel extends BaseViewListModel<
     name: row.name ?? undefined,
     startDate: row.startDate ?? undefined,
     endDate: row.endDate ?? undefined,
-    isActive: row.isActive ?? undefined,
+    isLocked: row.isLocked ?? undefined,
   });
 
   getData = async (

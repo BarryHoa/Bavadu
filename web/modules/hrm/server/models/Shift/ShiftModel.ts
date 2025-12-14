@@ -78,7 +78,7 @@ export default class ShiftModel extends BaseModel<typeof hrm_tb_shifts> {
     const insertData: NewHrmTbShift = {
       code: payload.code,
       name: payload.name,
-      description: payload.description ?? null,
+      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
       startTime: payload.startTime as any,
       endTime: payload.endTime as any,
       breakDuration: payload.breakDuration ?? 0,
@@ -112,7 +112,7 @@ export default class ShiftModel extends BaseModel<typeof hrm_tb_shifts> {
     if (payload.code !== undefined) updateData.code = payload.code;
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.description !== undefined)
-      updateData.description = payload.description ?? null;
+      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
     if (payload.startTime !== undefined)
       updateData.startTime = payload.startTime as any;
     if (payload.endTime !== undefined)

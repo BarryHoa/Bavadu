@@ -1,14 +1,14 @@
 "use client";
 
+import { LoadingOverlay } from "@base/client/components";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { payrollService } from "@mdl/hrm/client/services/PayrollService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { payrollService } from "@mdl/hrm/client/services/PayrollService";
 import PayrollForm, {
   type PayrollFormValues,
 } from "./components/PayrollForm/PayrollForm";
-import { LoadingOverlay } from "@base/client/components";
 
 export default function PayrollEditPage(): React.ReactNode {
   const router = useRouter();
@@ -47,37 +47,67 @@ export default function PayrollEditPage(): React.ReactNode {
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToUpdatePayroll"));
       }
-      return response.data;
+      return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-payroll"], ["hrm-payroll", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/payroll/view/${data.id}`);
+      router.push(`/workspace/modules/hrm/payroll/view/${data.data.id}`);
     },
   });
 
   const handleSubmit = async (values: PayrollFormValues) => {
     await submitPayroll({
       id,
-      payrollPeriodId: values.payrollPeriodId.trim(),
-      employeeId: values.employeeId.trim(),
-      baseSalary: values.baseSalary || 0,
-      overtimePay: values.overtimePay || 0,
-      bonuses: values.bonuses || 0,
-      otherEarnings: values.otherEarnings || 0,
-      socialInsurance: values.socialInsurance || 0,
-      healthInsurance: values.healthInsurance || 0,
-      unemploymentInsurance: values.unemploymentInsurance || 0,
-      personalIncomeTax: values.personalIncomeTax || 0,
-      workingDays: values.workingDays || 0,
-      workingHours: values.workingHours || 0,
-      overtimeHours: values.overtimeHours || 0,
-      status: values.status || "draft",
+      payrollPeriodId:
+        typeof values.payrollPeriodId === "string"
+          ? values.payrollPeriodId.trim()
+          : undefined,
+      employeeId:
+        typeof values.employeeId === "string"
+          ? values.employeeId.trim()
+          : undefined,
+      baseSalary:
+        typeof values.baseSalary === "number" ? values.baseSalary : undefined,
+      overtimePay:
+        typeof values.overtimePay === "number" ? values.overtimePay : undefined,
+      bonuses: typeof values.bonuses === "number" ? values.bonuses : undefined,
+      otherEarnings:
+        typeof values.otherEarnings === "number"
+          ? values.otherEarnings
+          : undefined,
+      socialInsurance:
+        typeof values.socialInsurance === "number"
+          ? values.socialInsurance
+          : undefined,
+      healthInsurance:
+        typeof values.healthInsurance === "number"
+          ? values.healthInsurance
+          : undefined,
+      unemploymentInsurance:
+        typeof values.unemploymentInsurance === "number"
+          ? values.unemploymentInsurance
+          : undefined,
+      personalIncomeTax:
+        typeof values.personalIncomeTax === "number"
+          ? values.personalIncomeTax
+          : undefined,
+      workingDays:
+        typeof values.workingDays === "number" ? values.workingDays : undefined,
+      workingHours:
+        typeof values.workingHours === "number"
+          ? values.workingHours
+          : undefined,
+      overtimeHours:
+        typeof values.overtimeHours === "number"
+          ? values.overtimeHours
+          : undefined,
+      status: typeof values.status === "string" ? values.status : undefined,
       notes: values.notes?.trim() || null,
     });
   };
 
   if (isLoading) {
-    return <LoadingOverlay />;
+    return <LoadingOverlay isLoading={true} />;
   }
 
   if (isError) {
@@ -120,4 +150,3 @@ export default function PayrollEditPage(): React.ReactNode {
     />
   );
 }
-

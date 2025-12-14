@@ -142,8 +142,9 @@ export const mapDetailToFormValues = (
       brand:
         typeof detail.master.brand === "string" ? detail.master.brand : "",
       categoryId: detail.master.category?.id,
+      images: (detail.master as any).images ?? [],
     },
-    variant: {
+    variants: [{
       name: toLocaleFormValue(detail.variant.name),
       description: detail.variant.description || "",
       sku: detail.variant.sku ?? "",
@@ -155,9 +156,10 @@ export const mapDetailToFormValues = (
       manufacturerCode: detail.variant.manufacturer?.code ?? "",
       baseUomId: detail.variant.baseUom?.id,
       isActive: detail.variant.isActive ?? true,
-    },
-    packings: mapPackings(detail.packings),
-    attributes: mapAttributes(detail.attributes),
+      images: detail.variant.images ?? [],
+      packings: mapPackings(detail.packings),
+      attributes: mapAttributes(detail.attributes),
+    }],
   };
 };
 
@@ -172,12 +174,17 @@ export const mapFormValuesToPayload = (
   const masterDescription = values.master.description.trim() || null;
   const masterBrand = values.master.brand.trim() || null;
 
+  const firstVariant = values.variants[0];
+  if (!firstVariant) {
+    throw new Error("At least one variant is required");
+  }
+
   const variantNameRecord =
-    toLocaleRecord(ensureLocaleValue(values.variant.name), trimmedCode) ?? {
+    toLocaleRecord(ensureLocaleValue(firstVariant.name), trimmedCode) ?? {
       en: trimmedCode,
     };
-  const variantDescription = values.variant.description.trim() || null;
-  const manufacturerName = values.variant.manufacturerName.trim() || null;
+  const variantDescription = firstVariant.description.trim() || null;
+  const manufacturerName = firstVariant.manufacturerName.trim() || null;
 
   return {
     master: {
@@ -194,24 +201,24 @@ export const mapFormValuesToPayload = (
     variant: {
       name: variantNameRecord,
       description: variantDescription,
-      sku: values.variant.sku ? values.variant.sku.trim() : null,
-      barcode: values.variant.barcode ? values.variant.barcode.trim() : null,
+      sku: firstVariant.sku ? firstVariant.sku.trim() : null,
+      barcode: firstVariant.barcode ? firstVariant.barcode.trim() : null,
       manufacturer:
         manufacturerName ||
-        (values.variant.manufacturerCode &&
-          values.variant.manufacturerCode.trim())
+        (firstVariant.manufacturerCode &&
+          firstVariant.manufacturerCode.trim())
           ? {
               name: manufacturerName,
-              code: values.variant.manufacturerCode
-                ? values.variant.manufacturerCode.trim()
+              code: firstVariant.manufacturerCode
+                ? firstVariant.manufacturerCode.trim()
                 : null,
             }
           : null,
-      baseUomId: values.variant.baseUomId || null,
-      isActive: values.variant.isActive,
+      baseUomId: firstVariant.baseUomId || null,
+      isActive: firstVariant.isActive,
       images: undefined,
     },
-    packings: sanitizePackings(values.packings),
-    attributes: sanitizeAttributes(values.attributes),
+    packings: sanitizePackings(firstVariant.packings),
+    attributes: sanitizeAttributes(firstVariant.attributes),
   };
 };

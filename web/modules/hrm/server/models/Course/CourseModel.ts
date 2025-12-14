@@ -75,7 +75,7 @@ export default class CourseModel extends BaseModel<typeof hrm_tb_courses> {
     const insertData: NewHrmTbCourse = {
       code: payload.code,
       name: payload.name,
-      description: payload.description ?? null,
+      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
       category: payload.category ?? null,
       duration: payload.duration ?? null,
       format: payload.format ?? null,
@@ -108,7 +108,7 @@ export default class CourseModel extends BaseModel<typeof hrm_tb_courses> {
     if (payload.code !== undefined) updateData.code = payload.code;
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.description !== undefined)
-      updateData.description = payload.description ?? null;
+      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
     if (payload.category !== undefined)
       updateData.category = payload.category ?? null;
     if (payload.duration !== undefined)

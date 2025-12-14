@@ -112,7 +112,7 @@ export default class DepartmentModel extends BaseModel<
     const insertData: NewHrmTbDepartment = {
       code: payload.code,
       name: payload.name,
-      description: payload.description ?? null,
+      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
       parentId: payload.parentId ?? null,
       managerId: payload.managerId ?? null,
       locationId: payload.locationId ?? null,
@@ -157,7 +157,7 @@ export default class DepartmentModel extends BaseModel<
     if (payload.code !== undefined) updateData.code = payload.code;
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.description !== undefined)
-      updateData.description = payload.description ?? null;
+      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
     if (payload.parentId !== undefined)
       updateData.parentId = payload.parentId ?? null;
     if (payload.level !== undefined) {

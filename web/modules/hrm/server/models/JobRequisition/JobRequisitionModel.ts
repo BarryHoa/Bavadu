@@ -165,7 +165,7 @@ export default class JobRequisitionModel extends BaseModel<
     const insertData: NewHrmTbJobRequisition = {
       requisitionNumber: payload.requisitionNumber,
       title: payload.title,
-      description: payload.description ?? null,
+      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
       departmentId: payload.departmentId,
       positionId: payload.positionId,
       numberOfOpenings: payload.numberOfOpenings ?? 1,
@@ -210,7 +210,7 @@ export default class JobRequisitionModel extends BaseModel<
       updateData.requisitionNumber = payload.requisitionNumber;
     if (payload.title !== undefined) updateData.title = payload.title;
     if (payload.description !== undefined)
-      updateData.description = payload.description ?? null;
+      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
     if (payload.departmentId !== undefined)
       updateData.departmentId = payload.departmentId;
     if (payload.positionId !== undefined)

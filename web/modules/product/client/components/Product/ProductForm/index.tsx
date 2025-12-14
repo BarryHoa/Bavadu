@@ -507,6 +507,7 @@ export default function ProductForm({
                     description: masterDescription ?? "",
                     features: masterFeatures ?? {},
                     isActive: true,
+                    images: [],
                   }}
                   categoryOptions={categoryOptions}
                   featureOptions={featureOptions}
@@ -524,6 +525,7 @@ export default function ProductForm({
                       description: masterDescription ?? "",
                       features: masterFeatures ?? {},
                       isActive: true,
+                      images: [],
                     };
                     const updated = updater(current);
 

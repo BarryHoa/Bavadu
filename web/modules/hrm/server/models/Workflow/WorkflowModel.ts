@@ -81,7 +81,7 @@ export default class WorkflowModel extends BaseModel<typeof hrm_tb_workflows> {
     const insertData: NewHrmTbWorkflow = {
       code: payload.code,
       name: payload.name,
-      description: payload.description ?? null,
+      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
       workflowType: payload.workflowType,
       steps: payload.steps,
       isActive:
@@ -119,7 +119,7 @@ export default class WorkflowModel extends BaseModel<typeof hrm_tb_workflows> {
     if (payload.code !== undefined) updateData.code = payload.code;
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.description !== undefined)
-      updateData.description = payload.description ?? null;
+      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
     if (payload.workflowType !== undefined)
       updateData.workflowType = payload.workflowType;
     if (payload.steps !== undefined) updateData.steps = payload.steps;

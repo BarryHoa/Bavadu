@@ -1,3 +1,2 @@
-export { getMediaServiceModel, MediaServiceModel } from "./MediaServiceModel";
+export { getMediaServiceModel } from "./MediaServiceModel";
 export type { UploadResult } from "./MediaServiceModel";
-

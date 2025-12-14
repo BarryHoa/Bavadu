@@ -1,6 +1,8 @@
 import {
   custom,
+  maxValue,
   minLength,
+  minValue,
   number,
   object,
   optional,
@@ -38,14 +40,13 @@ export function createPerformanceReviewValidation(t: TranslateFn) {
     overallRating: optional(
       pipe(
         number(),
-        (value) => {
-          if (value >= 1 && value <= 5) return true;
-          throw new Error(t("validation.overallRating.invalid"));
-        }
+        minValue(1, t("validation.overallRating.min")),
+        maxValue(5, t("validation.overallRating.max"))
       )
     ),
     strengths: optional(pipe(string(), trim())),
     areasForImprovement: optional(pipe(string(), trim())),
+    goals: optional(string()),
     feedback: optional(pipe(string(), trim())),
     employeeComments: optional(pipe(string(), trim())),
     status: optional(pipe(string(), trim())),

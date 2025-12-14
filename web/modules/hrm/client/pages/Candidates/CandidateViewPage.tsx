@@ -1,14 +1,14 @@
 "use client";
 
+import { IBaseDigitViewer, LoadingOverlay } from "@base/client/components";
+import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { formatDate } from "@base/client/utils/date/formatDate";
+import { Button } from "@heroui/button";
+import { Card, CardBody } from "@heroui/react";
+import { candidateService } from "@mdl/hrm/client/services/CandidateService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { candidateService } from "@mdl/hrm/client/services/CandidateService";
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/react";
-import { LoadingOverlay, IBaseDigitViewer } from "@base/client/components";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { formatDate } from "@base/client/utils/date/formatDate";
 
 export default function CandidateViewPage(): React.ReactNode {
   const router = useRouter();
@@ -36,7 +36,7 @@ export default function CandidateViewPage(): React.ReactNode {
   });
 
   if (isLoading) {
-    return <LoadingOverlay />;
+    return <LoadingOverlay isLoading={true} />;
   }
 
   if (isError) {

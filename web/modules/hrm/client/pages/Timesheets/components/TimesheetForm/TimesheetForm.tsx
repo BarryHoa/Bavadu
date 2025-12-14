@@ -7,6 +7,7 @@ import {
   DatePicker,
 } from "@base/client/components";
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { parseDate } from "@internationalized/date";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
@@ -16,6 +17,8 @@ import {
   createTimesheetValidation,
   type TimesheetFormValues,
 } from "../../validation/timesheetValidation";
+
+export type { TimesheetFormValues };
 
 interface TimesheetFormProps {
   onSubmit: (values: TimesheetFormValues) => Promise<void>;
@@ -107,8 +110,8 @@ export default function TimesheetForm({
               render={({ field, fieldState }) => (
                 <DatePicker
                   label={t("labels.workDate")}
-                  value={field.value}
-                  onChange={field.onChange}
+                  value={field.value ? (typeof field.value === "string" ? parseDate(field.value) : field.value) : null}
+                  onChange={(val) => field.onChange(val ? val.toString() : null)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   isRequired
@@ -172,8 +175,8 @@ export default function TimesheetForm({
                   {...field}
                   label={t("labels.breakDuration")}
                   size="sm"
-                  value={field.value?.toString() ?? "0"}
-                  onValueChange={(val) => field.onChange(Number(val) || 0)}
+                  value={typeof field.value === "number" ? field.value : 0}
+                  onValueChange={(val) => field.onChange(val ?? 0)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}

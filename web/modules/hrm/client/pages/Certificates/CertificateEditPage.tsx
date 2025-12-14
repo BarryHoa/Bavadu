@@ -47,11 +47,11 @@ export default function CertificateEditPage(): React.ReactNode {
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToUpdateCertificate"));
       }
-      return response.data;
+      return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-certificates"], ["hrm-certificates", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/certificates/view/${data.id}`);
+      router.push(`/workspace/modules/hrm/certificates/view/${data.data.id}`);
     },
   });
 
@@ -70,7 +70,7 @@ export default function CertificateEditPage(): React.ReactNode {
   };
 
   if (isLoading) {
-    return <LoadingOverlay />;
+    return <LoadingOverlay isLoading={true} />;
   }
 
   if (isError) {

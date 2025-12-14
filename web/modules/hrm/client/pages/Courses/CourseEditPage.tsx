@@ -1,14 +1,14 @@
 "use client";
 
+import { LoadingOverlay } from "@base/client/components";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { courseService } from "@mdl/hrm/client/services/CourseService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { courseService } from "@mdl/hrm/client/services/CourseService";
 import CourseForm, {
   type CourseFormValues,
 } from "./components/CourseForm/CourseForm";
-import { LoadingOverlay } from "@base/client/components";
 
 export default function CourseEditPage(): React.ReactNode {
   const router = useRouter();
@@ -47,11 +47,11 @@ export default function CourseEditPage(): React.ReactNode {
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToUpdateCourse"));
       }
-      return response.data;
+      return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-courses"], ["hrm-courses", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/courses/view/${data.id}`);
+      router.push(`/workspace/modules/hrm/courses/view/${data.data.id}`);
     },
   });
 
@@ -70,7 +70,7 @@ export default function CourseEditPage(): React.ReactNode {
   };
 
   if (isLoading) {
-    return <LoadingOverlay />;
+    return <LoadingOverlay isLoading={true} />;
   }
 
   if (isError) {
@@ -94,16 +94,15 @@ export default function CourseEditPage(): React.ReactNode {
       submitError={submitError}
       isSubmitting={isPending}
       defaultValues={{
-        code: courseData.code,
-        name: (courseData.name as any) || { vi: "", en: "" },
-        description: courseData.description as any,
-        category: courseData.category || "",
-        duration: courseData.duration || undefined,
-        format: courseData.format || "",
-        instructor: courseData.instructor || "",
-        isActive: courseData.isActive ? "true" : "false",
+        code: courseData?.code || "",
+        name: (courseData?.name as any) || { vi: "", en: "" },
+        description: courseData?.description as any,
+        category: courseData?.category || "",
+        duration: courseData?.duration ?? undefined,
+        format: courseData?.format || "",
+        instructor: courseData?.instructor || "",
+        isActive: courseData?.isActive ? "true" : "false",
       }}
     />
   );
 }
-

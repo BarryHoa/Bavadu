@@ -139,7 +139,7 @@ export default class GoalModel extends BaseModel<typeof hrm_tb_goals> {
       employeeId: payload.employeeId,
       goalType: payload.goalType,
       title: payload.title,
-      description: payload.description ?? null,
+      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
       targetValue: payload.targetValue ?? null,
       currentValue: payload.currentValue ?? 0,
       unit: payload.unit ?? null,
@@ -177,7 +177,7 @@ export default class GoalModel extends BaseModel<typeof hrm_tb_goals> {
     if (payload.goalType !== undefined) updateData.goalType = payload.goalType;
     if (payload.title !== undefined) updateData.title = payload.title;
     if (payload.description !== undefined)
-      updateData.description = payload.description ?? null;
+      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
     if (payload.targetValue !== undefined)
       updateData.targetValue = payload.targetValue ?? null;
     if (payload.currentValue !== undefined)

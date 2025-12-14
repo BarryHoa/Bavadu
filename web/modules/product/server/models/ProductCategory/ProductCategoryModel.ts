@@ -102,8 +102,8 @@ export default class ProductCategoryModel extends BaseModel<
     const now = new Date();
     const insertData: NewProductTbProductCategory = {
       code: payload.code,
-      name: payload.name,
-      description: payload.description ?? null,
+      name: this.normalizeLocaleInput(payload.name) ?? { en: payload.code },
+      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
       parentId: payload.parentId ?? null,
       isActive:
         payload.isActive === undefined || payload.isActive === null
@@ -144,9 +144,9 @@ export default class ProductCategoryModel extends BaseModel<
     };
 
     if (payload.code !== undefined) updateData.code = payload.code;
-    if (payload.name !== undefined) updateData.name = payload.name;
+    if (payload.name !== undefined) updateData.name = this.normalizeLocaleInput(payload.name) ?? undefined;
     if (payload.description !== undefined)
-      updateData.description = payload.description ?? null;
+      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
     if (payload.parentId !== undefined)
       updateData.parentId = payload.parentId ?? null;
     if (payload.level !== undefined) {

@@ -24,10 +24,7 @@ export async function GET(
     );
 
     if (!fileData) {
-      return NextResponse.json(
-        { error: "File not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "File not found" }, { status: 404 });
     }
 
     // Return file with appropriate headers
@@ -45,7 +42,7 @@ export async function GET(
         "default-src 'none'; script-src 'none'; style-src 'unsafe-inline'";
     }
 
-    return new NextResponse(fileData.buffer, { headers });
+    return new NextResponse(fileData.buffer as any, { headers });
   } catch (error) {
     console.error("Get file error:", error);
     return NextResponse.json(
@@ -57,4 +54,3 @@ export async function GET(
     );
   }
 }
-

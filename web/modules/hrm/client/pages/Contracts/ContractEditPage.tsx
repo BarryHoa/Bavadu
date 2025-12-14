@@ -40,7 +40,7 @@ export default function ContractEditPage(): React.ReactNode {
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToUpdate"));
       }
-      return response.data;
+      return { id: response.data.id };
     },
     invalidateQueries: [["hrm-contracts"], ["hrm-contract", id]],
     onSuccess: (data) => {
@@ -50,6 +50,7 @@ export default function ContractEditPage(): React.ReactNode {
 
   const handleSubmit = async (values: ContractFormValues) => {
     const payload = {
+      id,
       contractNumber: values.contractNumber.trim(),
       employeeId: values.employeeId.trim(),
       contractType: values.contractType.trim(),

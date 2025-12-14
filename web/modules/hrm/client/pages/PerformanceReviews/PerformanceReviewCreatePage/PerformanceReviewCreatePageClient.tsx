@@ -25,11 +25,11 @@ export default function PerformanceReviewCreatePageClient(): React.ReactNode {
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToCreatePerformanceReview"));
       }
-      return response.data;
+      return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-performance-reviews"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/performance-reviews/view/${data.id}`);
+      router.push(`/workspace/modules/hrm/performance-reviews/view/${data.data.id}`);
     },
   });
 

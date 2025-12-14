@@ -10,6 +10,8 @@ import { Card, CardBody } from "@heroui/react";
 import type { PositionFormValues } from "../../validation/positionValidation";
 import { createPositionValidation } from "../../validation/positionValidation";
 
+export type { PositionFormValues };
+
 interface PositionFormProps {
   onSubmit: (values: PositionFormValues) => Promise<void>;
   onCancel?: () => void;

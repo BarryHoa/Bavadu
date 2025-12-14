@@ -1,22 +1,23 @@
 import { desc, eq } from "drizzle-orm";
 
 import { BaseModel } from "@base/server/models/BaseModel";
+import getDbConnect from "@base/server/utils/getDbConnect";
+import type {
+  CreateCustomerCompanyInput,
+  CreateCustomerIndividualInput,
+  UpdateCustomerCompanyInput,
+  UpdateCustomerIndividualInput,
+} from "../../models/interfaces/Customer";
+import type {
+  NewSaleB2cTbCustomer,
+  NewSaleB2cTbCustomerCompany,
+  SaleB2cTbCustomer,
+  SaleB2cTbCustomerCompany,
+} from "../../schemas";
 import {
   sale_b2c_tb_customer_companies,
   sale_b2c_tb_customers,
 } from "../../schemas";
-import type {
-  NewSaleB2cTbCustomerCompany,
-  SaleB2cTbCustomerCompany,
-  NewSaleB2cTbCustomer,
-  SaleB2cTbCustomer,
-} from "../../schemas";
-import type {
-  CreateCustomerCompanyInput,
-  UpdateCustomerCompanyInput,
-  CreateCustomerIndividualInput,
-  UpdateCustomerIndividualInput,
-} from "../../models/interfaces/Customer";
 
 export default class CustomerModel {
   private companyModel: BaseModel<typeof sale_b2c_tb_customer_companies>;
@@ -29,14 +30,18 @@ export default class CustomerModel {
 
   // Company methods
   listCompanies = async (): Promise<SaleB2cTbCustomerCompany[]> => {
-    return this.companyModel.db
+    const db = getDbConnect();
+    return db
       .select()
       .from(sale_b2c_tb_customer_companies)
       .orderBy(desc(sale_b2c_tb_customer_companies.createdAt));
   };
 
-  getCompanyById = async (id: string): Promise<SaleB2cTbCustomerCompany | null> => {
-    const [company] = await this.companyModel.db
+  getCompanyById = async (
+    id: string
+  ): Promise<SaleB2cTbCustomerCompany | null> => {
+    const db = getDbConnect();
+    const [company] = await db
       .select()
       .from(sale_b2c_tb_customer_companies)
       .where(eq(sale_b2c_tb_customer_companies.id, id))
@@ -53,7 +58,10 @@ export default class CustomerModel {
         .padStart(2, "0")}${now
         .getDate()
         .toString()
-        .padStart(2, "0")}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+        .padStart(
+          2,
+          "0"
+        )}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
     const payload: NewSaleB2cTbCustomerCompany = {
       code: generatedCode,
@@ -71,7 +79,8 @@ export default class CustomerModel {
       createdBy: input.userId,
     };
 
-    const [company] = await this.companyModel.db
+    const db = getDbConnect();
+    const [company] = await db
       .insert(sale_b2c_tb_customer_companies)
       .values(payload)
       .returning();
@@ -97,7 +106,8 @@ export default class CustomerModel {
       updatedBy: input.userId,
     };
 
-    const [updated] = await this.companyModel.db
+    const db = getDbConnect();
+    const [updated] = await db
       .update(sale_b2c_tb_customer_companies)
       .set(updatePayload)
       .where(eq(sale_b2c_tb_customer_companies.id, input.id))
@@ -112,14 +122,16 @@ export default class CustomerModel {
 
   // Individual methods
   listIndividuals = async (): Promise<SaleB2cTbCustomer[]> => {
-    return this.individualModel.db
+    const db = getDbConnect();
+    return db
       .select()
       .from(sale_b2c_tb_customers)
       .orderBy(desc(sale_b2c_tb_customers.createdAt));
   };
 
   getIndividualById = async (id: string): Promise<SaleB2cTbCustomer | null> => {
-    const [individual] = await this.individualModel.db
+    const db = getDbConnect();
+    const [individual] = await db
       .select()
       .from(sale_b2c_tb_customers)
       .where(eq(sale_b2c_tb_customers.id, id))
@@ -136,7 +148,10 @@ export default class CustomerModel {
         .padStart(2, "0")}${now
         .getDate()
         .toString()
-        .padStart(2, "0")}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+        .padStart(
+          2,
+          "0"
+        )}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
     const payload: NewSaleB2cTbCustomer = {
       code: generatedCode,
@@ -152,7 +167,8 @@ export default class CustomerModel {
       createdBy: input.userId,
     };
 
-    const [individual] = await this.individualModel.db
+    const db = getDbConnect();
+    const [individual] = await db
       .insert(sale_b2c_tb_customers)
       .values(payload)
       .returning();
@@ -176,7 +192,8 @@ export default class CustomerModel {
       updatedBy: input.userId,
     };
 
-    const [updated] = await this.individualModel.db
+    const db = getDbConnect();
+    const [updated] = await db
       .update(sale_b2c_tb_customers)
       .set(updatePayload)
       .where(eq(sale_b2c_tb_customers.id, input.id))
@@ -189,4 +206,3 @@ export default class CustomerModel {
     return updated;
   };
 }
-

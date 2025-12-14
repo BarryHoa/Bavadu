@@ -35,7 +35,7 @@ export default function CourseViewPage(): React.ReactNode {
   });
 
   if (isLoading) {
-    return <LoadingOverlay />;
+    return <LoadingOverlay isLoading={true} />;
   }
 
   if (isError) {

@@ -1,22 +1,25 @@
 "use client";
 
 import {
+  DatePicker,
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseInputNumber,
   IBaseSingleSelectAsync,
-  DatePicker,
 } from "@base/client/components";
+import { Button } from "@heroui/button";
+import { Card, CardBody, Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { parseDate } from "@internationalized/date";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
-import { Button } from "@heroui/button";
-import { Card, CardBody, Textarea } from "@heroui/react";
 import {
   createJobRequisitionValidation,
   type JobRequisitionFormValues,
 } from "../../validation/jobRequisitionValidation";
+
+export type { JobRequisitionFormValues };
 
 interface JobRequisitionFormProps {
   onSubmit: (values: JobRequisitionFormValues) => Promise<void>;
@@ -53,7 +56,9 @@ export default function JobRequisitionForm({
     },
   });
 
-  const onSubmitForm: SubmitHandler<JobRequisitionFormValues> = async (values) => {
+  const onSubmitForm: SubmitHandler<JobRequisitionFormValues> = async (
+    values
+  ) => {
     await onSubmit(values);
   };
 
@@ -161,8 +166,8 @@ export default function JobRequisitionForm({
                   {...field}
                   label={t("labels.numberOfOpenings")}
                   size="sm"
-                  value={field.value?.toString() ?? "1"}
-                  onValueChange={(val) => field.onChange(Number(val) || 1)}
+                  value={field.value ?? 1}
+                  onValueChange={(val) => field.onChange(val ?? 1)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={1}
@@ -228,8 +233,8 @@ export default function JobRequisitionForm({
                   {...field}
                   label={t("labels.minSalary")}
                   size="sm"
-                  value={field.value?.toString() ?? ""}
-                  onValueChange={(val) => field.onChange(val ? Number(val) : undefined)}
+                  value={field.value ?? null}
+                  onValueChange={(val) => field.onChange(val ?? undefined)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}
@@ -244,8 +249,8 @@ export default function JobRequisitionForm({
                   {...field}
                   label={t("labels.maxSalary")}
                   size="sm"
-                  value={field.value?.toString() ?? ""}
-                  onValueChange={(val) => field.onChange(val ? Number(val) : undefined)}
+                  value={field.value ?? null}
+                  onValueChange={(val) => field.onChange(val ?? undefined)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}
@@ -275,8 +280,16 @@ export default function JobRequisitionForm({
               render={({ field, fieldState }) => (
                 <DatePicker
                   label={t("labels.openedDate")}
-                  value={field.value}
-                  onChange={field.onChange}
+                  value={
+                    field.value
+                      ? typeof field.value === "string"
+                        ? parseDate(field.value)
+                        : field.value
+                      : null
+                  }
+                  onChange={(val) =>
+                    field.onChange(val ? val.toString() : null)
+                  }
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                 />
@@ -288,8 +301,16 @@ export default function JobRequisitionForm({
               render={({ field, fieldState }) => (
                 <DatePicker
                   label={t("labels.closedDate")}
-                  value={field.value}
-                  onChange={field.onChange}
+                  value={
+                    field.value
+                      ? typeof field.value === "string"
+                        ? parseDate(field.value)
+                        : field.value
+                      : null
+                  }
+                  onChange={(val) =>
+                    field.onChange(val ? val.toString() : null)
+                  }
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                 />
@@ -369,4 +390,3 @@ export default function JobRequisitionForm({
     </form>
   );
 }
-

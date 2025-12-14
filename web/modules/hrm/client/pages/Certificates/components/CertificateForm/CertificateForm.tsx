@@ -1,21 +1,24 @@
 "use client";
 
 import {
+  DatePicker,
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseSingleSelectAsync,
-  DatePicker,
 } from "@base/client/components";
+import { Button } from "@heroui/button";
+import { Card, CardBody, Checkbox } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { parseDate } from "@internationalized/date";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
-import { Button } from "@heroui/button";
-import { Card, CardBody, Checkbox } from "@heroui/react";
 import {
   createCertificateValidation,
   type CertificateFormValues,
 } from "../../validation/certificateValidation";
+
+export type { CertificateFormValues };
 
 interface CertificateFormProps {
   onSubmit: (values: CertificateFormValues) => Promise<void>;
@@ -152,8 +155,16 @@ export default function CertificateForm({
               render={({ field, fieldState }) => (
                 <DatePicker
                   label={t("labels.issueDate")}
-                  value={field.value}
-                  onChange={field.onChange}
+                  value={
+                    field.value
+                      ? typeof field.value === "string"
+                        ? parseDate(field.value)
+                        : field.value
+                      : null
+                  }
+                  onChange={(val) =>
+                    field.onChange(val ? val.toString() : null)
+                  }
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   isRequired
@@ -166,8 +177,16 @@ export default function CertificateForm({
               render={({ field, fieldState }) => (
                 <DatePicker
                   label={t("labels.expiryDate")}
-                  value={field.value}
-                  onChange={field.onChange}
+                  value={
+                    field.value
+                      ? typeof field.value === "string"
+                        ? parseDate(field.value)
+                        : field.value
+                      : null
+                  }
+                  onChange={(val) =>
+                    field.onChange(val ? val.toString() : null)
+                  }
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                 />
@@ -194,7 +213,9 @@ export default function CertificateForm({
               render={({ field }) => (
                 <Checkbox
                   isSelected={field.value === "true"}
-                  onValueChange={(val) => field.onChange(val ? "true" : "false")}
+                  onValueChange={(val) =>
+                    field.onChange(val ? "true" : "false")
+                  }
                 >
                   {t("labels.isActive")}
                 </Checkbox>
@@ -206,4 +227,3 @@ export default function CertificateForm({
     </form>
   );
 }
-

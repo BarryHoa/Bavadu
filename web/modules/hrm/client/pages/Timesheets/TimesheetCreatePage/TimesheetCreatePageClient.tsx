@@ -25,11 +25,11 @@ export default function TimesheetCreatePageClient(): React.ReactNode {
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToCreateTimesheet"));
       }
-      return response.data;
+      return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-timesheets"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/timesheets/view/${data.id}`);
+      router.push(`/workspace/modules/hrm/timesheets/view/${data.data.id}`);
     },
   });
 

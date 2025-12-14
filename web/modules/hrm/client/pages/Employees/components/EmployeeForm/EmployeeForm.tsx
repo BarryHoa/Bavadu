@@ -1,19 +1,21 @@
 "use client";
 
-import { IBaseInput, IBaseInputMultipleLang, IBaseSingleSelectAsync } from "@base/client/components";
+import {
+  IBaseInput,
+  IBaseInputMultipleLang,
+  IBaseSingleSelectAsync,
+} from "@base/client/components";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-import {
-  Controller,
-  useForm,
-  type SubmitHandler,
-} from "react-hook-form";
+import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 
 import { Button } from "@heroui/button";
-import { Card, CardBody, Textarea } from "@heroui/react";
+import { Card, CardBody } from "@heroui/react";
 import type { EmployeeFormValues } from "../../validation/employeeValidation";
 import { createEmployeeValidation } from "../../validation/employeeValidation";
+
+export type { EmployeeFormValues };
 
 interface EmployeeFormProps {
   onSubmit: (values: EmployeeFormValues) => Promise<void>;
@@ -83,7 +85,9 @@ export default function EmployeeForm({
       {/* Basic Information */}
       <Card>
         <CardBody className="p-4">
-          <h2 className="text-base font-semibold mb-4">{tLabels("basicInfo")}</h2>
+          <h2 className="text-base font-semibold mb-4">
+            {tLabels("basicInfo")}
+          </h2>
           <div className="grid gap-4 md:grid-cols-2">
             <Controller
               name="employeeCode"
@@ -179,7 +183,9 @@ export default function EmployeeForm({
       {/* Employment Information */}
       <Card>
         <CardBody className="p-4">
-          <h2 className="text-base font-semibold mb-4">{tLabels("employmentInfo")}</h2>
+          <h2 className="text-base font-semibold mb-4">
+            {tLabels("employmentInfo")}
+          </h2>
           <div className="grid gap-4 md:grid-cols-2">
             <Controller
               name="departmentId"
@@ -290,7 +296,9 @@ export default function EmployeeForm({
       {/* Additional Information */}
       <Card>
         <CardBody className="p-4">
-          <h2 className="text-base font-semibold mb-4">{tLabels("additionalInfo")}</h2>
+          <h2 className="text-base font-semibold mb-4">
+            {tLabels("additionalInfo")}
+          </h2>
           <div className="grid gap-4 md:grid-cols-2">
             <Controller
               name="dateOfBirth"
@@ -326,4 +334,3 @@ export default function EmployeeForm({
     </form>
   );
 }
-

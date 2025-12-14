@@ -36,7 +36,7 @@ export default function LeaveRequestViewPage(): React.ReactNode {
   });
 
   if (isLoading) {
-    return <LoadingOverlay />;
+    return <LoadingOverlay isLoading={true} />;
   }
 
   if (isError) {

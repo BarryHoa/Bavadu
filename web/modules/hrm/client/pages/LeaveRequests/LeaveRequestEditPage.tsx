@@ -1,14 +1,14 @@
 "use client";
 
+import { LoadingOverlay } from "@base/client/components";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { leaveRequestService } from "@mdl/hrm/client/services/LeaveRequestService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { leaveRequestService } from "@mdl/hrm/client/services/LeaveRequestService";
 import LeaveRequestForm, {
   type LeaveRequestFormValues,
 } from "./components/LeaveRequestForm/LeaveRequestForm";
-import { LoadingOverlay } from "@base/client/components";
 
 export default function LeaveRequestEditPage(): React.ReactNode {
   const router = useRouter();
@@ -27,7 +27,9 @@ export default function LeaveRequestEditPage(): React.ReactNode {
     queryFn: async () => {
       const response = await leaveRequestService.getById(id);
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToLoadLeaveRequest"));
+        throw new Error(
+          response.message ?? t("errors.failedToLoadLeaveRequest")
+        );
       }
       return response.data;
     },
@@ -45,13 +47,15 @@ export default function LeaveRequestEditPage(): React.ReactNode {
     mutationFn: async (payload) => {
       const response = await leaveRequestService.update(payload);
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToUpdateLeaveRequest"));
+        throw new Error(
+          response.message ?? t("errors.failedToUpdateLeaveRequest")
+        );
       }
-      return response.data;
+      return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-leave-requests"], ["hrm-leave-requests", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/leave-requests/view/${data.id}`);
+      router.push(`/workspace/modules/hrm/leave-requests/view/${data.data.id}`);
     },
   });
 
@@ -62,14 +66,14 @@ export default function LeaveRequestEditPage(): React.ReactNode {
       leaveTypeId: values.leaveTypeId.trim(),
       startDate: values.startDate.trim(),
       endDate: values.endDate.trim(),
-      days: values.days || 1,
+      days: values.days,
       reason: values.reason?.trim() || null,
       status: values.status || "pending",
     });
   };
 
   if (isLoading) {
-    return <LoadingOverlay />;
+    return <LoadingOverlay isLoading={true} />;
   }
 
   if (isError) {
@@ -89,7 +93,9 @@ export default function LeaveRequestEditPage(): React.ReactNode {
   return (
     <LeaveRequestForm
       onSubmit={handleSubmit}
-      onCancel={() => router.push(`/workspace/modules/hrm/leave-requests/view/${id}`)}
+      onCancel={() =>
+        router.push(`/workspace/modules/hrm/leave-requests/view/${id}`)
+      }
       submitError={submitError}
       isSubmitting={isPending}
       defaultValues={{
@@ -104,4 +110,3 @@ export default function LeaveRequestEditPage(): React.ReactNode {
     />
   );
 }
-

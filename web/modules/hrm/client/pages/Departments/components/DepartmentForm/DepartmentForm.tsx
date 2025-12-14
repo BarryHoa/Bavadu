@@ -1,14 +1,20 @@
 "use client";
 
-import { IBaseInput, IBaseInputMultipleLang, IBaseSingleSelectAsync } from "@base/client/components";
+import {
+  IBaseInput,
+  IBaseInputMultipleLang,
+  IBaseSingleSelectAsync,
+} from "@base/client/components";
+import { Button } from "@heroui/button";
+import { Card, CardBody } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/react";
 import type { DepartmentFormValues } from "../../validation/departmentValidation";
 import { createDepartmentValidation } from "../../validation/departmentValidation";
+
+export type { DepartmentFormValues };
 
 interface DepartmentFormProps {
   onSubmit: (values: DepartmentFormValues) => Promise<void>;
@@ -73,7 +79,9 @@ export default function DepartmentForm({
 
       <Card>
         <CardBody className="p-4">
-          <h2 className="text-base font-semibold mb-4">{tLabels("basicInfo")}</h2>
+          <h2 className="text-base font-semibold mb-4">
+            {tLabels("basicInfo")}
+          </h2>
           <div className="grid gap-4 md:grid-cols-2">
             <Controller
               name="code"
@@ -162,4 +170,3 @@ export default function DepartmentForm({
     </form>
   );
 }
-

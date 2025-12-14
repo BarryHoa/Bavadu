@@ -25,11 +25,11 @@ export default function LeaveRequestCreatePageClient(): React.ReactNode {
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToCreateLeaveRequest"));
       }
-      return response.data;
+      return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-leave-requests"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/leave-requests/view/${data.id}`);
+      router.push(`/workspace/modules/hrm/leave-requests/view/${data.data.id}`);
     },
   });
 
@@ -39,7 +39,7 @@ export default function LeaveRequestCreatePageClient(): React.ReactNode {
       leaveTypeId: values.leaveTypeId.trim(),
       startDate: values.startDate.trim(),
       endDate: values.endDate.trim(),
-      days: values.days || 1,
+      days: values.days,
       reason: values.reason?.trim() || null,
       status: values.status || "pending",
     });

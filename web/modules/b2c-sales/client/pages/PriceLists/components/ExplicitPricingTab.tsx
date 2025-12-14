@@ -1,12 +1,12 @@
 "use client";
 
+import type { DataTableColumnDefinition } from "@base/client/components";
 import {
+  DATA_TABLE_COLUMN_KEY_ACTION,
   DataTable,
   IBaseInputSearch,
   SelectItemOption,
 } from "@base/client/components";
-import type { DataTableColumnDefinition } from "@base/client/components";
-import { DATA_TABLE_COLUMN_KEY_ACTION } from "@base/client/components";
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/react";
 import ProductService from "@mdl/product/client/services/ProductService";
@@ -172,7 +172,10 @@ export default function ExplicitPricingTab({
       const uom = uomOptions.find((u) => u.value === item.uomId);
 
       const variantName = variant?.label || "";
-      const variantSku = variant?.label?.match(/\(([^)]+)\)/)?.[1] || "";
+      const variantLabel =
+        typeof variant?.label === "string" ? variant.label : "";
+      const matchResult = variantLabel.match(/\(([^)]+)\)/);
+      const variantSku = matchResult?.[1] ?? "";
       const uomName = uom?.label || "";
 
       // Check for duplicate
@@ -238,7 +241,9 @@ export default function ExplicitPricingTab({
         availableUomIds.push(baseUomId);
       }
 
-      return uomOptions.filter((uom) => availableUomIds.includes(uom.value));
+      return uomOptions.filter((uom) =>
+        availableUomIds.includes(String(uom.value))
+      );
     },
     [variantOptions, uomOptions]
   );
@@ -258,7 +263,12 @@ export default function ExplicitPricingTab({
           minQty: Number(item.minimumQuantity) || 0,
           price: Number(item.unitPrice) || 0,
         }))
-        .sort((a: { minQty: number; price: number }, b: { minQty: number; price: number }) => a.minQty - b.minQty);
+        .sort(
+          (
+            a: { minQty: number; price: number },
+            b: { minQty: number; price: number }
+          ) => a.minQty - b.minQty
+        );
     },
     [watchedPriceItems]
   );

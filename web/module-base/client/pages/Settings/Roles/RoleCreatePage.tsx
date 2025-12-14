@@ -1,14 +1,19 @@
 "use client";
 
-import { IBaseInput, IBaseInputMultipleLang, IBaseSelect, SelectItem } from "@base/client/components";
+import {
+  IBaseInput,
+  IBaseInputMultipleLang,
+  IBaseSelect,
+  SelectItem,
+} from "@base/client/components";
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
+import roleService from "@base/client/services/RoleService";
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
-import roleService, { type Permission } from "@base/client/services/RoleService";
-import type { LocalizeText } from "@base/client/interface/LocalizeText";
 
 const PERMISSIONS_QUERY_KEY = ["settings", "permissions", "list"] as const;
 const ROLES_LIST_QUERY_KEY = ["settings", "roles", "list"] as const;
@@ -21,9 +26,14 @@ export default function RoleCreatePage() {
   const router = useRouter();
 
   const [code, setCode] = useState("");
-  const [name, setName] = useState<LocalizeText>({});
+  const [name, setName] = useState<LocalizeText>({
+    en: undefined,
+    vi: undefined,
+  });
   const [description, setDescription] = useState("");
-  const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>([]);
+  const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>(
+    []
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{
     message: string;
@@ -85,9 +95,17 @@ export default function RoleCreatePage() {
       code: code.trim(),
       name,
       description: description.trim() || undefined,
-      permissionIds: selectedPermissionIds.length > 0 ? selectedPermissionIds : undefined,
+      permissionIds:
+        selectedPermissionIds.length > 0 ? selectedPermissionIds : undefined,
     });
-  }, [code, name, description, selectedPermissionIds, validate, createRoleMutation]);
+  }, [
+    code,
+    name,
+    description,
+    selectedPermissionIds,
+    validate,
+    createRoleMutation,
+  ]);
 
   const permissions = permissionsQuery.data ?? [];
 
@@ -126,7 +144,7 @@ export default function RoleCreatePage() {
             <IBaseInputMultipleLang
               label={t("form.name")}
               value={name}
-              onValueChange={setName}
+              onValueChange={setName as (value: LocalizeText) => void}
               errorMessage={errors.name}
               isInvalid={!!errors.name}
               isRequired
@@ -153,7 +171,8 @@ export default function RoleCreatePage() {
               >
                 {permissions.map((permission) => (
                   <SelectItem key={permission.id} textValue={permission.key}>
-                    {permission.key} - {permission.module}.{permission.resource}.{permission.action}
+                    {permission.key} - {permission.module}.{permission.resource}
+                    .{permission.action}
                   </SelectItem>
                 ))}
               </IBaseSelect>
@@ -177,4 +196,3 @@ export default function RoleCreatePage() {
     </div>
   );
 }
-

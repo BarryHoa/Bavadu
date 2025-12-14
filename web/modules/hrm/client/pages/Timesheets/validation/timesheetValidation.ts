@@ -1,6 +1,7 @@
 import {
   custom,
   minLength,
+  minValue,
   number,
   object,
   optional,
@@ -31,7 +32,7 @@ export function createTimesheetValidation(t: TranslateFn) {
     breakDuration: optional(
       pipe(
         number(),
-        custom((value) => value >= 0, t("validation.breakDuration.invalid"))
+        minValue(0, t("validation.breakDuration.invalid"))
       )
     ),
     status: optional(pipe(string(), trim())),

@@ -47,11 +47,11 @@ export default function PerformanceReviewEditPage(): React.ReactNode {
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToUpdatePerformanceReview"));
       }
-      return response.data;
+      return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-performance-reviews"], ["hrm-performance-reviews", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/performance-reviews/view/${data.id}`);
+      router.push(`/workspace/modules/hrm/.../view/${data.data.id}`);
     },
   });
 
@@ -74,7 +74,7 @@ export default function PerformanceReviewEditPage(): React.ReactNode {
   };
 
   if (isLoading) {
-    return <LoadingOverlay />;
+    return <LoadingOverlay isLoading={true} />;
   }
 
   if (isError) {

@@ -1,20 +1,21 @@
 "use client";
 
 import {
-  IBaseInput,
   IBaseInputNumber,
   IBaseSingleSelectAsync,
 } from "@base/client/components";
+import { Button } from "@heroui/button";
+import { Card, CardBody, Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
-import { Button } from "@heroui/button";
-import { Card, CardBody, Textarea } from "@heroui/react";
 import {
   createPayrollValidation,
   type PayrollFormValues,
 } from "../../validation/payrollValidation";
+
+export type { PayrollFormValues };
 
 interface PayrollFormProps {
   onSubmit: (values: PayrollFormValues) => Promise<void>;
@@ -135,8 +136,8 @@ export default function PayrollForm({
                   {...field}
                   label={t("labels.baseSalary")}
                   size="sm"
-                  value={field.value?.toString() ?? "0"}
-                  onValueChange={(val) => field.onChange(Number(val) || 0)}
+                  value={typeof field.value === "number" ? field.value : 0}
+                  onValueChange={(val) => field.onChange(val ?? 0)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}
@@ -152,8 +153,8 @@ export default function PayrollForm({
                   {...field}
                   label={t("labels.overtimePay")}
                   size="sm"
-                  value={field.value?.toString() ?? "0"}
-                  onValueChange={(val) => field.onChange(Number(val) || 0)}
+                  value={typeof field.value === "number" ? field.value : 0}
+                  onValueChange={(val) => field.onChange(val ?? 0)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}
@@ -168,8 +169,8 @@ export default function PayrollForm({
                   {...field}
                   label={t("labels.bonuses")}
                   size="sm"
-                  value={field.value?.toString() ?? "0"}
-                  onValueChange={(val) => field.onChange(Number(val) || 0)}
+                  value={typeof field.value === "number" ? field.value : 0}
+                  onValueChange={(val) => field.onChange(val ?? 0)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}
@@ -184,8 +185,8 @@ export default function PayrollForm({
                   {...field}
                   label={t("labels.otherEarnings")}
                   size="sm"
-                  value={field.value?.toString() ?? "0"}
-                  onValueChange={(val) => field.onChange(Number(val) || 0)}
+                  value={typeof field.value === "number" ? field.value : 0}
+                  onValueChange={(val) => field.onChange(val ?? 0)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}
@@ -200,8 +201,8 @@ export default function PayrollForm({
                   {...field}
                   label={t("labels.socialInsurance")}
                   size="sm"
-                  value={field.value?.toString() ?? "0"}
-                  onValueChange={(val) => field.onChange(Number(val) || 0)}
+                  value={typeof field.value === "number" ? field.value : 0}
+                  onValueChange={(val) => field.onChange(val ?? 0)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}
@@ -216,8 +217,8 @@ export default function PayrollForm({
                   {...field}
                   label={t("labels.healthInsurance")}
                   size="sm"
-                  value={field.value?.toString() ?? "0"}
-                  onValueChange={(val) => field.onChange(Number(val) || 0)}
+                  value={typeof field.value === "number" ? field.value : 0}
+                  onValueChange={(val) => field.onChange(val ?? 0)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}
@@ -232,8 +233,8 @@ export default function PayrollForm({
                   {...field}
                   label={t("labels.unemploymentInsurance")}
                   size="sm"
-                  value={field.value?.toString() ?? "0"}
-                  onValueChange={(val) => field.onChange(Number(val) || 0)}
+                  value={typeof field.value === "number" ? field.value : 0}
+                  onValueChange={(val) => field.onChange(val ?? 0)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}
@@ -248,8 +249,8 @@ export default function PayrollForm({
                   {...field}
                   label={t("labels.personalIncomeTax")}
                   size="sm"
-                  value={field.value?.toString() ?? "0"}
-                  onValueChange={(val) => field.onChange(Number(val) || 0)}
+                  value={typeof field.value === "number" ? field.value : 0}
+                  onValueChange={(val) => field.onChange(val ?? 0)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}
@@ -264,8 +265,8 @@ export default function PayrollForm({
                   {...field}
                   label={t("labels.workingDays")}
                   size="sm"
-                  value={field.value?.toString() ?? "0"}
-                  onValueChange={(val) => field.onChange(Number(val) || 0)}
+                  value={typeof field.value === "number" ? field.value : 0}
+                  onValueChange={(val) => field.onChange(val ?? 0)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}
@@ -280,8 +281,8 @@ export default function PayrollForm({
                   {...field}
                   label={t("labels.workingHours")}
                   size="sm"
-                  value={field.value?.toString() ?? "0"}
-                  onValueChange={(val) => field.onChange(Number(val) || 0)}
+                  value={typeof field.value === "number" ? field.value : 0}
+                  onValueChange={(val) => field.onChange(val ?? 0)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}
@@ -296,8 +297,8 @@ export default function PayrollForm({
                   {...field}
                   label={t("labels.overtimeHours")}
                   size="sm"
-                  value={field.value?.toString() ?? "0"}
-                  onValueChange={(val) => field.onChange(Number(val) || 0)}
+                  value={typeof field.value === "number" ? field.value : 0}
+                  onValueChange={(val) => field.onChange(val ?? 0)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}
@@ -344,4 +345,3 @@ export default function PayrollForm({
     </form>
   );
 }
-

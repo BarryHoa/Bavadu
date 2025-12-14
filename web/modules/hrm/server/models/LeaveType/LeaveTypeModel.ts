@@ -84,7 +84,7 @@ export default class LeaveTypeModel extends BaseModel<typeof hrm_tb_leave_types>
     const insertData: NewHrmTbLeaveType = {
       code: payload.code,
       name: payload.name,
-      description: payload.description ?? null,
+      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
       accrualType: payload.accrualType,
       accrualRate: payload.accrualRate ?? null,
       maxAccrual: payload.maxAccrual ?? null,
@@ -120,7 +120,7 @@ export default class LeaveTypeModel extends BaseModel<typeof hrm_tb_leave_types>
     if (payload.code !== undefined) updateData.code = payload.code;
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.description !== undefined)
-      updateData.description = payload.description ?? null;
+      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
     if (payload.accrualType !== undefined)
       updateData.accrualType = payload.accrualType;
     if (payload.accrualRate !== undefined)

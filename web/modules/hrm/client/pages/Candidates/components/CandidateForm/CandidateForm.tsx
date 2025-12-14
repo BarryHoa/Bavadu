@@ -1,22 +1,25 @@
 "use client";
 
 import {
+  DatePicker,
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseInputNumber,
   IBaseSingleSelectAsync,
-  DatePicker,
 } from "@base/client/components";
+import { Button } from "@heroui/button";
+import { Card, CardBody, Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { parseDate } from "@internationalized/date";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
-import { Button } from "@heroui/button";
-import { Card, CardBody, Textarea } from "@heroui/react";
 import {
   createCandidateValidation,
   type CandidateFormValues,
 } from "../../validation/candidateValidation";
+
+export type { CandidateFormValues };
 
 interface CandidateFormProps {
   onSubmit: (values: CandidateFormValues) => Promise<void>;
@@ -184,8 +187,16 @@ export default function CandidateForm({
               render={({ field, fieldState }) => (
                 <DatePicker
                   label={t("labels.dateOfBirth")}
-                  value={field.value}
-                  onChange={field.onChange}
+                  value={
+                    field.value
+                      ? typeof field.value === "string"
+                        ? parseDate(field.value)
+                        : field.value
+                      : null
+                  }
+                  onChange={(val) =>
+                    field.onChange(val ? val.toString() : null)
+                  }
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                 />
@@ -282,8 +293,8 @@ export default function CandidateForm({
                   {...field}
                   label={t("labels.rating")}
                   size="sm"
-                  value={field.value?.toString() ?? ""}
-                  onValueChange={(val) => field.onChange(val ? Number(val) : undefined)}
+                  value={field.value ?? null}
+                  onValueChange={(val) => field.onChange(val ?? undefined)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}
@@ -331,4 +342,3 @@ export default function CandidateForm({
     </form>
   );
 }
-

@@ -13,6 +13,7 @@
     "server:start": "NODE_ENV=production tsx server.ts",
     "start": "npm run server:start",
     "lint": "eslint --fix",
+    "type-check": "tsc --noEmit",
     "routes:generate": "node scripts/build-module-routes.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

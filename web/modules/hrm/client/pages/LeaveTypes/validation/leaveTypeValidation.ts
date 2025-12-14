@@ -1,6 +1,7 @@
 import {
   custom,
   minLength,
+  minValue,
   number,
   object,
   optional,
@@ -13,10 +14,10 @@ import {
 type TranslateFn = (key: string, values?: Record<string, any>) => string;
 
 export function createLeaveTypeValidation(t: TranslateFn) {
-  const fullNameSchema = custom<{ vi?: string; en?: string }>(
+  const fullNameSchema = custom(
     (value) => {
-      if (!value || typeof value !== "object") return false;
-      const obj = value as any;
+      const obj = value as { vi?: string; en?: string };
+      if (!obj || typeof obj !== "object") return false;
       return (
         (obj.vi !== undefined && typeof obj.vi === "string" && obj.vi.trim() !== "") ||
         (obj.en !== undefined && typeof obj.en === "string" && obj.en.trim() !== "")
@@ -41,20 +42,20 @@ export function createLeaveTypeValidation(t: TranslateFn) {
     accrualRate: optional(
       pipe(
         number(),
-        custom((value) => value >= 0, t("validation.accrualRate.invalid"))
+        minValue(0, t("validation.accrualRate.invalid"))
       )
     ),
     maxAccrual: optional(
       pipe(
         number(),
-        custom((value) => value >= 0, t("validation.maxAccrual.invalid"))
+        minValue(0, t("validation.maxAccrual.invalid"))
       )
     ),
     carryForward: optional(pipe(string(), trim())),
     maxCarryForward: optional(
       pipe(
         number(),
-        custom((value) => value >= 0, t("validation.maxCarryForward.invalid"))
+        minValue(0, t("validation.maxCarryForward.invalid"))
       )
     ),
     requiresApproval: optional(pipe(string(), trim())),

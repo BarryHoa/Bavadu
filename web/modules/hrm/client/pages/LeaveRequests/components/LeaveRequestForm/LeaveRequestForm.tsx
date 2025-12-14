@@ -1,22 +1,23 @@
 "use client";
 
 import {
-  IBaseInput,
+  DatePicker,
   IBaseInputNumber,
   IBaseSingleSelectAsync,
-  DatePicker,
 } from "@base/client/components";
-import { valibotResolver } from "@hookform/resolvers/valibot";
-import { useTranslations } from "next-intl";
-import { useMemo } from "react";
-import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Textarea } from "@heroui/react";
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { parseDate } from "@internationalized/date";
+import { useTranslations } from "next-intl";
+import { useCallback, useMemo } from "react";
+import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import {
   createLeaveRequestValidation,
   type LeaveRequestFormValues,
 } from "../../validation/leaveRequestValidation";
-import { useCallback } from "react";
+
+export type { LeaveRequestFormValues };
 
 interface LeaveRequestFormProps {
   onSubmit: (values: LeaveRequestFormValues) => Promise<void>;
@@ -68,7 +69,9 @@ export default function LeaveRequestForm({
     }
   }, [startDate, endDate, setValue]);
 
-  const onSubmitForm: SubmitHandler<LeaveRequestFormValues> = async (values) => {
+  const onSubmitForm: SubmitHandler<LeaveRequestFormValues> = async (
+    values
+  ) => {
     await onSubmit(values);
   };
 
@@ -143,9 +146,9 @@ export default function LeaveRequestForm({
               render={({ field, fieldState }) => (
                 <DatePicker
                   label={t("labels.startDate")}
-                  value={field.value}
+                  value={field.value ? (typeof field.value === "string" ? parseDate(field.value) : field.value) : null}
                   onChange={(val) => {
-                    field.onChange(val);
+                    field.onChange(val ? val.toString() : null);
                     calculateDays();
                   }}
                   isInvalid={fieldState.invalid}
@@ -160,9 +163,9 @@ export default function LeaveRequestForm({
               render={({ field, fieldState }) => (
                 <DatePicker
                   label={t("labels.endDate")}
-                  value={field.value}
+                  value={field.value ? (typeof field.value === "string" ? parseDate(field.value) : field.value) : null}
                   onChange={(val) => {
-                    field.onChange(val);
+                    field.onChange(val ? val.toString() : null);
                     calculateDays();
                   }}
                   isInvalid={fieldState.invalid}
@@ -179,8 +182,8 @@ export default function LeaveRequestForm({
                   {...field}
                   label={t("labels.days")}
                   size="sm"
-                  value={field.value?.toString() ?? "1"}
-                  onValueChange={(val) => field.onChange(Number(val) || 1)}
+                  value={field.value}
+                  onValueChange={(val) => field.onChange(val ?? 1)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={1}
@@ -228,4 +231,3 @@ export default function LeaveRequestForm({
     </form>
   );
 }
-

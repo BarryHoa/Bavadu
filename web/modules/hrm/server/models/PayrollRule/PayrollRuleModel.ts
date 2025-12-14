@@ -75,7 +75,7 @@ export default class PayrollRuleModel extends BaseModel<typeof hrm_tb_payrolls_r
     const insertData: NewHrmTbPayrollRule = {
       code: payload.code,
       name: payload.name,
-      description: payload.description ?? null,
+      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
       ruleType: payload.ruleType,
       ruleConfig: payload.ruleConfig,
       effectiveDate: payload.effectiveDate,
@@ -108,7 +108,7 @@ export default class PayrollRuleModel extends BaseModel<typeof hrm_tb_payrolls_r
     if (payload.code !== undefined) updateData.code = payload.code;
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.description !== undefined)
-      updateData.description = payload.description ?? null;
+      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
     if (payload.ruleType !== undefined) updateData.ruleType = payload.ruleType;
     if (payload.ruleConfig !== undefined)
       updateData.ruleConfig = payload.ruleConfig;

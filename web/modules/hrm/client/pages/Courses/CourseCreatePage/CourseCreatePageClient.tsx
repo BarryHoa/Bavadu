@@ -25,11 +25,11 @@ export default function CourseCreatePageClient(): React.ReactNode {
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToCreateCourse"));
       }
-      return response.data;
+      return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-courses"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/courses/view/${data.id}`);
+      router.push(`/workspace/modules/hrm/courses/view/${data.data.id}`);
     },
   });
 
@@ -39,7 +39,7 @@ export default function CourseCreatePageClient(): React.ReactNode {
       name: values.name || { vi: "", en: "" },
       description: values.description || null,
       category: values.category?.trim() || null,
-      duration: values.duration || null,
+      duration: values.duration ?? null,
       format: values.format?.trim() || null,
       instructor: values.instructor?.trim() || null,
       isActive: values.isActive === "true",

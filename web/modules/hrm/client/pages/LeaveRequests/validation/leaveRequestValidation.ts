@@ -1,5 +1,6 @@
 import {
   minLength,
+  minValue,
   number,
   object,
   optional,
@@ -35,10 +36,7 @@ export function createLeaveRequestValidation(t: TranslateFn) {
     ),
     days: pipe(
       number(),
-      (value) => {
-        if (value > 0) return true;
-        throw new Error(t("validation.days.invalid"));
-      }
+      minValue(1, t("validation.days.invalid"))
     ),
     reason: optional(pipe(string(), trim())),
     status: optional(pipe(string(), trim())),

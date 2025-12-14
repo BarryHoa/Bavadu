@@ -13,7 +13,10 @@ import {
 } from "../../interface/LocalizeText";
 import TranslateModal from "./TranslateModal";
 
-type IBaseInputMultipleLangProps = Omit<InputProps, "endContent" | "value"> & {
+type IBaseInputMultipleLangProps = Omit<
+  InputProps,
+  "endContent" | "value" | "onValueChange"
+> & {
   value?: LocalizeText | string;
   onValueChange?: (value: LocalizeText) => void;
   defaultLangs?: LocalizeText;

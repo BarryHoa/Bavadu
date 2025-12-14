@@ -1,6 +1,7 @@
 import {
   custom,
   minLength,
+  minValue,
   number,
   object,
   optional,
@@ -13,17 +14,28 @@ import {
 type TranslateFn = (key: string, values?: Record<string, any>) => string;
 
 export function createJobRequisitionValidation(t: TranslateFn) {
-  const fullNameSchema = custom<{ vi?: string; en?: string }>(
-    (value) => {
-      if (!value || typeof value !== "object") return false;
-      const obj = value as any;
-      return (
-        (obj.vi !== undefined && typeof obj.vi === "string" && obj.vi.trim() !== "") ||
-        (obj.en !== undefined && typeof obj.en === "string" && obj.en.trim() !== "")
-      );
-    },
-    t("validation.title.required")
-  );
+  const fullNameSchema = custom((value) => {
+    const obj = value as { vi?: string; en?: string };
+    if (!obj || typeof obj !== "object") return false;
+    return (
+      (obj.vi !== undefined &&
+        typeof obj.vi === "string" &&
+        obj.vi.trim() !== "") ||
+      (obj.en !== undefined &&
+        typeof obj.en === "string" &&
+        obj.en.trim() !== "")
+    );
+  }, t("validation.title.required"));
+
+  const descriptionSchema = custom((value) => {
+    const obj = value as { vi?: string; en?: string } | null;
+    if (obj === null || obj === undefined) return true;
+    if (typeof obj !== "object") return false;
+    return (
+      (obj.vi !== undefined && typeof obj.vi === "string") ||
+      (obj.en !== undefined && typeof obj.en === "string")
+    );
+  }, t("validation.description.invalid"));
 
   const jobRequisitionFormSchema = object({
     requisitionNumber: pipe(
@@ -32,7 +44,7 @@ export function createJobRequisitionValidation(t: TranslateFn) {
       minLength(1, t("validation.requisitionNumber.required"))
     ),
     title: fullNameSchema,
-    description: optional(object({})),
+    description: optional(descriptionSchema),
     departmentId: pipe(
       string(),
       trim(),
@@ -44,24 +56,15 @@ export function createJobRequisitionValidation(t: TranslateFn) {
       minLength(1, t("validation.positionId.required"))
     ),
     numberOfOpenings: optional(
-      pipe(
-        number(),
-        custom((value) => value > 0, t("validation.numberOfOpenings.invalid"))
-      )
+      pipe(number(), minValue(1, t("validation.numberOfOpenings.invalid")))
     ),
     priority: optional(pipe(string(), trim())),
     employmentType: optional(pipe(string(), trim())),
     minSalary: optional(
-      pipe(
-        number(),
-        custom((value) => value >= 0, t("validation.minSalary.invalid"))
-      )
+      pipe(number(), minValue(0, t("validation.minSalary.invalid")))
     ),
     maxSalary: optional(
-      pipe(
-        number(),
-        custom((value) => value >= 0, t("validation.maxSalary.invalid"))
-      )
+      pipe(number(), minValue(0, t("validation.maxSalary.invalid")))
     ),
     currency: optional(pipe(string(), trim())),
     requirements: optional(pipe(string(), trim())),
@@ -81,4 +84,3 @@ export function createJobRequisitionValidation(t: TranslateFn) {
 export type JobRequisitionFormValues = InferOutput<
   ReturnType<typeof createJobRequisitionValidation>["jobRequisitionFormSchema"]
 >;
-

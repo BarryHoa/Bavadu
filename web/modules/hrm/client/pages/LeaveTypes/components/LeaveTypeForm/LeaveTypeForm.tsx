@@ -6,16 +6,18 @@ import {
   IBaseInputNumber,
   IBaseSingleSelectAsync,
 } from "@base/client/components";
+import { Button } from "@heroui/button";
+import { Card, CardBody, Checkbox, Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
-import { Button } from "@heroui/button";
-import { Card, CardBody, Checkbox, Textarea } from "@heroui/react";
 import {
   createLeaveTypeValidation,
   type LeaveTypeFormValues,
 } from "../../validation/leaveTypeValidation";
+
+export type { LeaveTypeFormValues };
 
 interface LeaveTypeFormProps {
   onSubmit: (values: LeaveTypeFormValues) => Promise<void>;
@@ -143,8 +145,8 @@ export default function LeaveTypeForm({
                   {...field}
                   label={t("labels.accrualRate")}
                   size="sm"
-                  value={field.value?.toString() ?? ""}
-                  onValueChange={(val) => field.onChange(val ? Number(val) : undefined)}
+                  value={typeof field.value === "number" ? field.value : null}
+                  onValueChange={(val) => field.onChange(val ?? null)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}
@@ -159,8 +161,8 @@ export default function LeaveTypeForm({
                   {...field}
                   label={t("labels.maxAccrual")}
                   size="sm"
-                  value={field.value?.toString() ?? ""}
-                  onValueChange={(val) => field.onChange(val ? Number(val) : undefined)}
+                  value={typeof field.value === "number" ? field.value : null}
+                  onValueChange={(val) => field.onChange(val ?? null)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}
@@ -175,8 +177,8 @@ export default function LeaveTypeForm({
                   {...field}
                   label={t("labels.maxCarryForward")}
                   size="sm"
-                  value={field.value?.toString() ?? ""}
-                  onValueChange={(val) => field.onChange(val ? Number(val) : undefined)}
+                  value={typeof field.value === "number" ? field.value : null}
+                  onValueChange={(val) => field.onChange(val ?? null)}
                   isInvalid={fieldState.invalid}
                   errorMessage={fieldState.error?.message}
                   min={0}
@@ -189,7 +191,9 @@ export default function LeaveTypeForm({
               render={({ field }) => (
                 <Checkbox
                   isSelected={field.value === "true"}
-                  onValueChange={(val) => field.onChange(val ? "true" : "false")}
+                  onValueChange={(val) =>
+                    field.onChange(val ? "true" : "false")
+                  }
                 >
                   {t("labels.carryForward")}
                 </Checkbox>
@@ -201,7 +205,9 @@ export default function LeaveTypeForm({
               render={({ field }) => (
                 <Checkbox
                   isSelected={field.value === "true"}
-                  onValueChange={(val) => field.onChange(val ? "true" : "false")}
+                  onValueChange={(val) =>
+                    field.onChange(val ? "true" : "false")
+                  }
                 >
                   {t("labels.requiresApproval")}
                 </Checkbox>
@@ -213,7 +219,9 @@ export default function LeaveTypeForm({
               render={({ field }) => (
                 <Checkbox
                   isSelected={field.value === "true"}
-                  onValueChange={(val) => field.onChange(val ? "true" : "false")}
+                  onValueChange={(val) =>
+                    field.onChange(val ? "true" : "false")
+                  }
                 >
                   {t("labels.isPaid")}
                 </Checkbox>
@@ -225,7 +233,9 @@ export default function LeaveTypeForm({
               render={({ field }) => (
                 <Checkbox
                   isSelected={field.value === "true"}
-                  onValueChange={(val) => field.onChange(val ? "true" : "false")}
+                  onValueChange={(val) =>
+                    field.onChange(val ? "true" : "false")
+                  }
                 >
                   {t("labels.isActive")}
                 </Checkbox>
@@ -241,7 +251,9 @@ export default function LeaveTypeForm({
                     label={t("labels.description")}
                     size="sm"
                     value={field.value ? JSON.stringify(field.value) : ""}
-                    onValueChange={(val) => field.onChange(val ? {} : undefined)}
+                    onValueChange={(val) =>
+                      field.onChange(val ? {} : undefined)
+                    }
                     isInvalid={fieldState.invalid}
                     errorMessage={fieldState.error?.message}
                   />
@@ -254,4 +266,3 @@ export default function LeaveTypeForm({
     </form>
   );
 }
-
