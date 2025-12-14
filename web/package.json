@@ -59,13 +59,13 @@
     "react-hook-form": "^7.68.0",
     "uuidv7": "^1.1.0",
     "valibot": "^1.2.0",
-    "zustand": "^5.0.9"
+    "zustand": "^5.0.9",
+    "@tailwindcss/postcss": "4.1.17"
   },
   "devDependencies": {
     "@eslint/compat": "^2.0.0",
     "@next/eslint-plugin-next": "16.0.7",
     "@react-types/shared": "3.32.1",
-    "@tailwindcss/postcss": "4.1.17",
     "@types/lodash": "^4.17.21",
     "@types/node": "24.10.1",
     "@types/react": "19.2.7",
