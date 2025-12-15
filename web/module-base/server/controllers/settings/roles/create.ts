@@ -1,9 +1,6 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
-import { eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
-import getDbConnect from "../../../utils/getDbConnect";
-import { base_tb_roles } from "../../../schemas/base.role";
-import { base_tb_role_permissions_default } from "../../../schemas/base.role-permissions-default";
+import RoleModel, { type RoleInput } from "../../../models/Role/RoleModel";
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,14 +14,10 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const db = getDbConnect();
+    const roleModel = new RoleModel();
 
     // Check if role with same code already exists
-    const [existingRole] = await db
-      .select()
-      .from(base_tb_roles)
-      .where(eq(base_tb_roles.code, code))
-      .limit(1);
+    const existingRole = await roleModel.getRoleByCode(code);
 
     if (existingRole) {
       return JSONResponse({
@@ -33,28 +26,18 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Create role (always set isSystem to false)
-    const [newRole] = await db
-      .insert(base_tb_roles)
-      .values({
-        code,
-        name,
-        description: description || null,
-        isSystem: false, // Always false for new roles
-        isActive: true,
-      })
-      .returning();
+    const permissions = Array.isArray(permissionIds) ? permissionIds : [];
 
-    // Add default permissions if provided
-    if (permissionIds && Array.isArray(permissionIds) && permissionIds.length > 0) {
-      await db.insert(base_tb_role_permissions_default).values(
-        permissionIds.map((permissionId: string) => ({
-          roleId: newRole.id,
-          permissionId,
-          isActive: true,
-        }))
-      );
-    }
+    const roleInput: RoleInput = {
+      code,
+      name,
+      description: description || null,
+      permissions,
+      isSystem: false,
+      isActive: true,
+    };
+
+    const newRole = await roleModel.createRole(roleInput);
 
     return JSONResponse({
       data: newRole,
@@ -70,4 +53,3 @@ export async function POST(request: NextRequest) {
     });
   }
 }
-

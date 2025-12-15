@@ -4,8 +4,8 @@ import { NextRequest } from "next/server";
 import { SESSION_CONFIG } from "../../config";
 import { setCsrfTokenCookie } from "../../middleware/csrf";
 import SessionModel from "../../models/Sessions/SessionModel";
+import { RuntimeContext } from "../../runtime/RuntimeContext";
 import { base_tb_users, base_tb_users_login } from "../../schemas/base.user";
-import getDbConnect from "../../utils/getDbConnect";
 import { JSONResponse } from "../../utils/JSONResponse";
 import {
   getClientIp,
@@ -21,7 +21,6 @@ interface LoginRequest {
   password: string;
   rememberMe?: boolean;
 }
-
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,7 +42,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const db = getDbConnect();
+    const db = await RuntimeContext.getDbConnect();
 
     // Find user login by username, email, or phone in parallel
     const queries = [];

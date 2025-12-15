@@ -1,9 +1,9 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
-import getEnv from "../../../utils/getEnv";
+import { RuntimeContext } from "../../../runtime/RuntimeContext";
 
 const getModelList = async () => {
-  const env = getEnv();
-  const modelKeys = env?.getAllModels() ?? [];
+  const modelInstance = await RuntimeContext.getModelInstance();
+  const modelKeys = modelInstance?.getAllModels() ?? [];
   // sort by module name
   const sortedModelKeys = modelKeys
     .sort((a, b) => a.module.localeCompare(b.module))

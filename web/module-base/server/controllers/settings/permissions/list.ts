@@ -1,17 +1,10 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
-import { eq } from "drizzle-orm";
-import getDbConnect from "../../../utils/getDbConnect";
-import { base_tb_permissions } from "../../../schemas/base.permission";
+import PermissionModel from "../../../models/Permission/PermissionModel";
 
 export async function GET() {
   try {
-    const db = getDbConnect();
-    
-    const permissions = await db
-      .select()
-      .from(base_tb_permissions)
-      .where(eq(base_tb_permissions.isActive, true))
-      .orderBy(base_tb_permissions.module, base_tb_permissions.resource, base_tb_permissions.action);
+    const permissionModel = new PermissionModel();
+    const permissions = await permissionModel.getPermissions();
 
     return JSONResponse({
       data: permissions,
@@ -29,4 +22,3 @@ export async function GET() {
     });
   }
 }
-

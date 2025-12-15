@@ -1,6 +1,6 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { escapeHtml } from "@base/server/utils/xss-protection";
-import getEnv from "../../../utils/getEnv";
+import { RuntimeContext } from "../../../runtime/RuntimeContext";
 
 type ReloadModelRequest = {
   key?: unknown;
@@ -18,15 +18,15 @@ export async function POST(request: Request) {
       });
     }
 
-    const env = getEnv();
-    if (!env) {
+    const modelInstance = await RuntimeContext.getModelInstance();
+    if (!modelInstance) {
       return JSONResponse({
-        message: "Environment is not available.",
+        message: "Model instance is not available.",
         status: 500,
       });
     }
 
-    const reloaded = await env.reloadModel(modelKey);
+    const reloaded = await modelInstance.reloadModel(modelKey);
     if (!reloaded) {
       // Sanitize modelKey to prevent XSS in error message
       const safeModelKey = escapeHtml(modelKey);
@@ -50,4 +50,3 @@ export async function POST(request: Request) {
     });
   }
 }
-

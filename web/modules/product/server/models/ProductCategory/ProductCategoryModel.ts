@@ -1,10 +1,12 @@
-import { getEnv } from "@base/server";
 import { LocaleDataType } from "@base/server/interfaces/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewProductTbProductCategory, product_tb_product_categories } from "../../schemas";
+import {
+  NewProductTbProductCategory,
+  product_tb_product_categories,
+} from "../../schemas";
 
 const parentCategory = alias(product_tb_product_categories, "parent_category");
 
@@ -103,7 +105,11 @@ export default class ProductCategoryModel extends BaseModel<
     const insertData: NewProductTbProductCategory = {
       code: payload.code,
       name: this.normalizeLocaleInput(payload.name) ?? { en: payload.code },
-      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
+      description: payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null,
       parentId: payload.parentId ?? null,
       isActive:
         payload.isActive === undefined || payload.isActive === null
@@ -144,9 +150,14 @@ export default class ProductCategoryModel extends BaseModel<
     };
 
     if (payload.code !== undefined) updateData.code = payload.code;
-    if (payload.name !== undefined) updateData.name = this.normalizeLocaleInput(payload.name) ?? undefined;
+    if (payload.name !== undefined)
+      updateData.name = this.normalizeLocaleInput(payload.name) ?? undefined;
     if (payload.description !== undefined)
-      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
+      updateData.description = payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null;
     if (payload.parentId !== undefined)
       updateData.parentId = payload.parentId ?? null;
     if (payload.level !== undefined) {
@@ -156,7 +167,10 @@ export default class ProductCategoryModel extends BaseModel<
     }
     if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
 
-    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db
+      .update(this.table)
+      .set(updateData)
+      .where(eq(this.table.id, id));
 
     return this.getCategoryById(id);
   };

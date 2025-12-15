@@ -50,28 +50,13 @@ export async function register() {
     // Initialize in serverless environments (Vercel, etc.)
     // This runs when the serverless function starts
     console.log("> 🔧 Initializing server runtime...");
-    console.log("> 🔧 globalThis.systemRuntimeVariables before:", {
-      exists: !!globalThis.systemRuntimeVariables,
-      hasDatabase: !!globalThis.systemRuntimeVariables?.database,
-      hasEnv: !!globalThis.systemRuntimeVariables?.env,
-    });
 
     // Use shared initialization utility
     const { initializeRuntime } =
       await import("@base/server/utils/initializeRuntime");
     await initializeRuntime();
 
-    console.log("> 🔧 globalThis.systemRuntimeVariables after:", {
-      exists: !!globalThis.systemRuntimeVariables,
-      hasDatabase: !!globalThis.systemRuntimeVariables?.database,
-      hasEnv: !!globalThis.systemRuntimeVariables?.env,
-    });
-
-    if (!globalThis.systemRuntimeVariables?.database) {
-      throw new Error(
-        "Database initialization failed - database not found in globalThis after initialization"
-      );
-    }
+    console.log("> 🔧 Runtime initialization completed");
 
     console.log("> ✅ Runtime initialized (database, environment)");
 

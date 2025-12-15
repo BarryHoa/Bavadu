@@ -5,6 +5,7 @@ import {
   base_tb_permissions,
   base_tb_role_permissions_default,
   base_tb_roles,
+  base_tb_user_roles,
 } from "../../schemas";
 
 export interface RoleRow {
@@ -44,7 +45,8 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
    * Get all active roles
    */
   async getRoles(): Promise<RoleRow[]> {
-    const results = await this.db
+    const db = await this.getDb();
+    const results = await db
       .select()
       .from(this.table)
       .where(eq(this.table.isActive, true))
@@ -53,8 +55,22 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
     return Promise.all(results.map((row) => this.mapToRoleRow(row)));
   }
 
+  /**
+   * Get all roles (including inactive)
+   */
+  async getAllRoles(): Promise<RoleRow[]> {
+    const db = await this.getDb();
+    const results = await db
+      .select()
+      .from(this.table)
+      .orderBy(this.table.createdAt);
+
+    return Promise.all(results.map((row) => this.mapToRoleRow(row)));
+  }
+
   getRoleById = async (id: string): Promise<RoleRow | null> => {
-    const result = await this.db
+    const db = await this.getDb();
+    const result = await db
       .select()
       .from(this.table)
       .where(eq(this.table.id, id))
@@ -68,6 +84,71 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
 
     return this.mapToRoleRow(row);
   };
+
+  /**
+   * Get role by code
+   */
+  async getRoleByCode(code: string): Promise<RoleRow | null> {
+    const db = await this.getDb();
+    const [result] = await db
+      .select()
+      .from(this.table)
+      .where(eq(this.table.code, code))
+      .limit(1);
+
+    if (!result) {
+      return null;
+    }
+
+    return this.mapToRoleRow(result);
+  }
+
+  /**
+   * Get role by ID with permissions details
+   */
+  async getRoleWithPermissions(id: string): Promise<{
+    role: RoleRow;
+    permissions: Array<{
+      id: string;
+      key: string;
+      module: string;
+      resource: string;
+      action: string;
+      name?: unknown;
+      description?: unknown;
+    }>;
+  } | null> {
+    const role = await this.getRoleById(id);
+    if (!role) {
+      return null;
+    }
+
+    const db = await this.getDb();
+    const rolePermissions = await db
+      .select({
+        id: base_tb_permissions.id,
+        key: base_tb_permissions.key,
+        module: base_tb_permissions.module,
+        resource: base_tb_permissions.resource,
+        action: base_tb_permissions.action,
+        name: base_tb_permissions.name,
+        description: base_tb_permissions.description,
+      })
+      .from(base_tb_role_permissions_default)
+      .innerJoin(
+        base_tb_permissions,
+        eq(
+          base_tb_role_permissions_default.permissionId,
+          base_tb_permissions.id
+        )
+      )
+      .where(eq(base_tb_role_permissions_default.roleId, id));
+
+    return {
+      role,
+      permissions: rolePermissions,
+    };
+  }
 
   getDataById = async (params: { id: string }): Promise<RoleRow | null> => {
     return this.getRoleById(params.id);
@@ -88,7 +169,8 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
       updatedAt: now,
     };
 
-    const [created] = await this.db
+    const db = await this.getDb();
+    const [created] = await db
       .insert(this.table)
       .values(insertData)
       .returning({ id: this.table.id });
@@ -100,7 +182,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
     // Add permissions to role_permissions_default if provided
     if (payload.permissions && payload.permissions.length > 0) {
       // Get permission IDs from keys
-      const permissions = await this.db
+      const permissions = await db
         .select({ id: base_tb_permissions.id })
         .from(base_tb_permissions)
         .where(
@@ -113,14 +195,14 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
       // For now, we'll need to match permission keys to IDs
       // This is a simplified version - you may want to improve this
       for (const permKey of payload.permissions) {
-        const perm = await this.db
+        const perm = await db
           .select({ id: base_tb_permissions.id })
           .from(base_tb_permissions)
           .where(eq(base_tb_permissions.key, permKey))
           .limit(1);
 
         if (perm[0]) {
-          await this.db.insert(base_tb_role_permissions_default).values({
+          await db.insert(base_tb_role_permissions_default).values({
             roleId: created.id,
             permissionId: perm[0].id,
             isActive: true,
@@ -151,17 +233,15 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
       updateData.description = payload.description ?? null;
     if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
 
-    await this.db
-      .update(this.table)
-      .set(updateData)
-      .where(eq(this.table.id, id));
+    const db = await this.getDb();
+    await db.update(this.table).set(updateData).where(eq(this.table.id, id));
 
     // Update permissions if provided
     if (payload.permissions !== undefined) {
       // Get permission IDs from keys
       const permissionIds: string[] = [];
       for (const permKey of payload.permissions) {
-        const perm = await this.db
+        const perm = await db
           .select({ id: base_tb_permissions.id })
           .from(base_tb_permissions)
           .where(eq(base_tb_permissions.key, permKey))
@@ -173,7 +253,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
       }
 
       // Remove all current permissions
-      await this.db
+      await db
         .update(base_tb_role_permissions_default)
         .set({ isActive: false })
         .where(eq(base_tb_role_permissions_default.roleId, id));
@@ -182,7 +262,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
       const now = new Date();
       for (const permissionId of permissionIds) {
         // Check if exists
-        const existing = await this.db
+        const existing = await db
           .select()
           .from(base_tb_role_permissions_default)
           .where(
@@ -195,13 +275,13 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
 
         if (existing[0]) {
           // Reactivate if inactive
-          await this.db
+          await db
             .update(base_tb_role_permissions_default)
             .set({ isActive: true })
             .where(eq(base_tb_role_permissions_default.id, existing[0].id));
         } else {
           // Insert new
-          await this.db.insert(base_tb_role_permissions_default).values({
+          await db.insert(base_tb_role_permissions_default).values({
             roleId: id,
             permissionId,
             isActive: true,
@@ -245,11 +325,59 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
     return this.updateRole(id, normalizedPayload);
   };
 
+  /**
+   * Delete role
+   */
+  async deleteRole(id: string): Promise<{ success: boolean; message: string }> {
+    const db = await this.getDb();
+
+    // Check if role exists
+    const [role] = await db
+      .select()
+      .from(this.table)
+      .where(eq(this.table.id, id))
+      .limit(1);
+
+    if (!role) {
+      return {
+        success: false,
+        message: "Role not found",
+      };
+    }
+
+    // Check if role is system role (cannot be deleted)
+    if (role.isSystem) {
+      return {
+        success: false,
+        message: "System roles cannot be deleted",
+      };
+    }
+
+    // Check if role is assigned to any users
+    const userRoles = await db
+      .select()
+      .from(base_tb_user_roles)
+      .where(eq(base_tb_user_roles.roleId, id))
+      .limit(1);
+
+    // Delete role (cascade will handle related records)
+    await db.delete(this.table).where(eq(this.table.id, id));
+
+    return {
+      success: true,
+      message:
+        userRoles.length > 0
+          ? "Role deleted. Users with this role have been unassigned."
+          : "Role deleted successfully",
+    };
+  }
+
   private async mapToRoleRow(
     row: typeof base_tb_roles.$inferSelect
   ): Promise<RoleRow> {
     // Get permissions for this role
-    const permissions = await this.db
+    const db = await this.getDb();
+    const permissions = await db
       .select({
         permissionKey: base_tb_permissions.key,
       })

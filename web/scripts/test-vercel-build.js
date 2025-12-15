@@ -142,10 +142,7 @@ buildProcess.on("close", (code) => {
   console.log("🔄 Test 6: Checking initializeRuntime.ts...");
   try {
     const initContent = fs.readFileSync(
-      path.join(
-        process.cwd(),
-        "module-base/server/utils/initializeRuntime.ts"
-      ),
+      path.join(process.cwd(), "module-base/server/utils/initializeRuntime.ts"),
       "utf8"
     );
 
@@ -156,16 +153,9 @@ buildProcess.on("close", (code) => {
       process.exit(1);
     }
 
-    if (initContent.includes("globalThis.systemRuntimeVariables")) {
-      console.log("  ✅ Sets globalThis.systemRuntimeVariables");
-    }
-
     console.log("\n✅ initializeRuntime.ts is correct!\n");
   } catch (error) {
-    console.error(
-      "  ❌ Error reading initializeRuntime.ts:",
-      error.message
-    );
+    console.error("  ❌ Error reading initializeRuntime.ts:", error.message);
     process.exit(1);
   }
 
@@ -182,4 +172,3 @@ buildProcess.on("close", (code) => {
   console.log("  ✅ initializeRuntime.ts helper available");
   console.log("\n🚀 Ready for Vercel deployment!\n");
 });
-

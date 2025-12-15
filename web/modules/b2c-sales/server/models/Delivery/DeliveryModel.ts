@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 
-import { getEnv } from "@base/server";
+import { RuntimeContext } from "@base/server/runtime/RuntimeContext";
 import { BaseModel } from "@base/server/models/BaseModel";
 import {
   sale_b2b_tb_orders,
@@ -40,8 +40,7 @@ export default class DeliveryModel extends BaseModel<
   }
 
   create = async (input: CreateDeliveryInput) => {
-    const env = getEnv();
-    const stockModel = env.getModel("stock") as StockModel | undefined;
+    const stockModel = await RuntimeContext.getModelInstanceBy<StockModel>("stock");
 
     if (!stockModel) {
       throw new Error("Stock model is not registered");

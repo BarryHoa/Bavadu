@@ -1,5 +1,5 @@
+import { RuntimeContext } from "../runtime/RuntimeContext";
 import { JSONResponse } from "./JSONResponse";
-import getEnv from "./getEnv";
 
 type GetModuleQueryByModelProps = {
   model: string;
@@ -17,14 +17,8 @@ const getModuleQueryByModel = async (props: GetModuleQueryByModelProps) => {
   if (!modelMethod) {
     return JSONResponse({ status: 400, message: "METHOD ARE REQUIRED" });
   }
-  // get env
-  const env = getEnv();
-  // validate env
-  if (!env) {
-    return JSONResponse({ status: 500, message: "ENVIRONMENT NOT FOUND" });
-  }
-  // get model
-  const modelInstance = env.getModel(modelKey);
+  // get model instance
+  const modelInstance = await RuntimeContext.getModelInstanceBy(modelKey);
   // validate model
   if (!modelInstance) {
     return JSONResponse({ status: 500, message: "MODEL NOT FOUND" });

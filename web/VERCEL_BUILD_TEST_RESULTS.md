@@ -50,7 +50,6 @@ Tất cả tests đã **PASS** - Code sẵn sàng cho Vercel deployment!
 - **Status**: PASS
 - **Details**:
   - ✅ `initializeRuntime()` function exported
-  - ✅ Sets `globalThis.systemRuntimeVariables`
 
 ## Build Output
 
@@ -93,7 +92,6 @@ Tất cả tests đã **PASS** - Code sẵn sàng cho Vercel deployment!
 ### 3. Initialize Runtime
 - ✅ Idempotent (checks if already initialized)
 - ✅ Initializes: logging → database → environment
-- ✅ Sets `globalThis.systemRuntimeVariables`
 
 ### 4. Cron Jobs
 - ✅ API routes created

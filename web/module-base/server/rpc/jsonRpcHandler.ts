@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import getEnv from "../utils/getEnv";
+import { RuntimeContext } from "../runtime/RuntimeContext";
 import {
   sanitizeJsonRpcParams,
   validateJsonRpcMethod,
@@ -110,20 +110,11 @@ export class JsonRpcHandler {
       );
     }
 
-    // Get environment
-    const env = getEnv();
-    if (!env) {
-      throw new JsonRpcError(
-        JSON_RPC_ERROR_CODES.INTERNAL_ERROR,
-        "ENVIRONMENT NOT FOUND"
-      );
-    }
-
     // Build model key
     const modelKey = `${modelId}.${subType}`;
 
     // Get model instance
-    const modelInstance = env.getModel(modelKey);
+    const modelInstance = await RuntimeContext.getModelInstanceBy(modelKey);
     if (!modelInstance) {
       throw new JsonRpcError(
         JSON_RPC_ERROR_CODES.MODEL_NOT_FOUND,

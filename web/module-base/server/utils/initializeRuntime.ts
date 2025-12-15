@@ -1,78 +1,44 @@
 /**
  * Utility function to initialize runtime (database, environment) for serverless environments
  * This is used by API routes and cron jobs to ensure proper initialization
+ *
+ * This function delegates to RuntimeContext which provides:
+ * - Thread-safe initialization (Promise-based lock)
+ * - Idempotent initialization (safe to call multiple times)
  */
 
-import type { SystemRuntimeVariables } from "../types/global";
+import { RuntimeContext } from "../runtime/RuntimeContext";
 
 /**
  * Initialize runtime if not already initialized
  * This ensures database and environment are ready for use
+ * Thread-safe: concurrent calls will wait for the same initialization promise
+ *
+ * @param projectRoot - Optional project root path (defaults to process.cwd())
  */
-export async function initializeRuntime(): Promise<void> {
+export async function initializeRuntime(projectRoot?: string): Promise<void> {
   console.log("[initializeRuntime] Starting initialization...");
+  const context = RuntimeContext.getInstance(projectRoot);
   console.log("[initializeRuntime] Current state:", {
-    hasSystemRuntime: !!globalThis.systemRuntimeVariables,
-    hasDatabase: !!globalThis.systemRuntimeVariables?.database,
-    hasEnv: !!globalThis.systemRuntimeVariables?.env,
+    initialized: context.getInitializationState(),
+    hasState: !!context.getState(),
   });
 
-  // Check if already initialized
-  if (
-    globalThis.systemRuntimeVariables?.database &&
-    globalThis.systemRuntimeVariables?.env
-  ) {
-    console.log("[initializeRuntime] Already initialized, skipping");
-    return;
-  }
-
   try {
-    const { Database } = await import("../stores/database");
-    const Environment = (await import("../env")).default;
-    const { getLogModel } = await import("../models/Logs/LogModel");
-    const dayjs = (await import("dayjs")).default;
+    // Delegate to RuntimeContext for thread-safe initialization
+    await context.ensureInitialized();
 
-    console.log("[initializeRuntime] Imports loaded");
-
-    // Initialize logging system FIRST
-    getLogModel();
-    console.log("[initializeRuntime] Logging system initialized");
-
-    // Initialize database
-    console.log("[initializeRuntime] Creating database instance...");
-    const database = new Database(process.cwd());
-    console.log("[initializeRuntime] Database instance created, initializing...");
-    await database.initialize();
-    console.log("[initializeRuntime] Database initialized successfully");
-
-    // Set database to globalThis BEFORE initializing environment
-    // because models need database during initialization
-    if (!globalThis.systemRuntimeVariables) {
-      globalThis.systemRuntimeVariables = {} as SystemRuntimeVariables;
-    }
-    globalThis.systemRuntimeVariables.database = database;
-    console.log("[initializeRuntime] Database set to globalThis");
-
-    // Initialize environment (needed for models)
-    console.log("[initializeRuntime] Creating environment...");
-    const envProcess = await Environment.create();
-    console.log("[initializeRuntime] Environment created");
-
-    // Set globalThis with env, database, and initial timestamp
-    globalThis.systemRuntimeVariables = {
-      env: envProcess,
-      database: database,
-      timestamp: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-    };
-    console.log("[initializeRuntime] Final state:", {
-      hasSystemRuntime: !!globalThis.systemRuntimeVariables,
-      hasDatabase: !!globalThis.systemRuntimeVariables?.database,
-      hasEnv: !!globalThis.systemRuntimeVariables?.env,
-    });
     console.log("[initializeRuntime] Initialization completed successfully");
+    console.log("[initializeRuntime] Final state:", {
+      initialized: context.getInitializationState(),
+      hasState: !!context.getState(),
+    });
   } catch (error) {
     console.error("[initializeRuntime] Error during initialization:", error);
-    console.error("[initializeRuntime] Error stack:", error instanceof Error ? error.stack : "No stack");
+    console.error(
+      "[initializeRuntime] Error stack:",
+      error instanceof Error ? error.stack : "No stack"
+    );
     throw error;
   }
 }

@@ -1,16 +1,10 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
-import { eq } from "drizzle-orm";
-import getDbConnect from "../../../utils/getDbConnect";
-import { base_tb_roles } from "../../../schemas/base.role";
+import RoleModel from "../../../models/Role/RoleModel";
 
 export async function GET() {
   try {
-    const db = getDbConnect();
-    
-    const roles = await db
-      .select()
-      .from(base_tb_roles)
-      .orderBy(base_tb_roles.createdAt);
+    const roleModel = new RoleModel();
+    const roles = await roleModel.getAllRoles();
 
     return JSONResponse({
       data: roles,

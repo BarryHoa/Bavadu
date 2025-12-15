@@ -3,8 +3,9 @@ import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { dirname, join, relative } from "path";
-import { MenuFactoryElm } from "./interfaces/Menu";
-import { loadAllMenus } from "./loaders/menu-loader";
+import { MenuFactoryElm } from "../interfaces/Menu";
+import { loadAllMenus } from "../loaders/menu-loader";
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Ho_Chi_Minh");
@@ -17,11 +18,16 @@ type ModelFactoryElm = {
   timestamp: string;
 };
 
-interface EnvironmentOptions {
+interface ModelInstanceOptions {
   projectRoot?: string;
 }
 
-class Environment {
+/**
+ * Model Instance Manager
+ * - Loads model factories defined in module.json files
+ * - Exposes menu factories
+ */
+export class ModelInstance {
   private readonly projectRoot: string;
   private readonly modelFactories = new Map<string, ModelFactoryElm>();
   private readonly menuFactories: MenuFactoryElm[] = [];
@@ -30,10 +36,12 @@ class Environment {
     this.projectRoot = projectRoot;
   }
 
-  static async create(options: EnvironmentOptions = {}): Promise<Environment> {
-    const env = new Environment(options.projectRoot ?? process.cwd());
-    await env.init();
-    return env;
+  static async create(
+    options: ModelInstanceOptions = {}
+  ): Promise<ModelInstance> {
+    const instance = new ModelInstance(options.projectRoot ?? process.cwd());
+    await instance.init();
+    return instance;
   }
 
   getModel<T extends object>(modelId: string): T | undefined {
@@ -64,6 +72,7 @@ class Environment {
 
     return undefined;
   }
+
   getAllModels(): ModelFactoryElm[] {
     return Array.from(this.modelFactories.values());
   }
@@ -79,12 +88,10 @@ class Environment {
       return false;
     }
 
-    // Find the module.json file to get the full path
     const moduleJsonPaths = this.collectModuleJsonPaths();
     let modelPath: string | null = null;
     let folderName: string = factoryElm.module;
 
-    // Find the model file path
     for (const moduleJsonPath of moduleJsonPaths) {
       const folderMdlRoot = this.resolveModuleName(moduleJsonPath);
       const currentFolderName =
@@ -96,7 +103,6 @@ class Environment {
         const pathToModelFile = join("server", "models", factoryElm.path);
         const fullModelPath = join(dirname(moduleJsonPath), pathToModelFile);
 
-        // Check if file exists
         if (existsSync(fullModelPath)) {
           modelPath = fullModelPath;
           folderName = currentFolderName;
@@ -113,7 +119,6 @@ class Environment {
     }
 
     try {
-      // Use toImportPath like registerModels does - this works in serverless
       const mod = await import(this.toImportPath(modelPath));
       const ModelClass = mod?.default;
       if (!ModelClass) {
@@ -154,7 +159,6 @@ class Environment {
 
       for (const [modelId, fileName] of Object.entries(configuredModels)) {
         const pathToModelFile = join("server", "models", fileName);
-
         const modelPath = join(dirname(moduleJsonPath), pathToModelFile);
         const folderMdlRoot = this.resolveModuleName(moduleJsonPath);
 
@@ -274,6 +278,7 @@ class Environment {
     const segments = relativeModuleDir.split("/").filter(Boolean);
     return segments.pop() ?? relativeModuleDir;
   }
+
   private registerMenuStatic(): void {
     console.log("Registering menus...");
     const menus = loadAllMenus();
@@ -282,5 +287,3 @@ class Environment {
     }
   }
 }
-
-export default Environment;

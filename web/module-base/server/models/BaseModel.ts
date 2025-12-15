@@ -3,15 +3,55 @@ import { and, eq } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { isEmpty } from "lodash";
-import getDbConnect from "../utils/getDbConnect";
+import { RuntimeContext } from "../runtime/RuntimeContext";
 
 export class BaseModel<TTable extends PgTable = PgTable> {
   /**Main table of the model */
   protected readonly table: TTable;
-  protected readonly db: PostgresJsDatabase<Record<string, never>>;
+  private _db: PostgresJsDatabase<Record<string, never>> | null = null;
+  private _dbPromise: Promise<
+    PostgresJsDatabase<Record<string, never>>
+  > | null = null;
+
   constructor(table: TTable) {
     this.table = table;
-    this.db = getDbConnect() as PostgresJsDatabase<Record<string, never>>;
+  }
+
+  /**
+   * Get database connection (lazy initialization)
+   * Thread-safe: ensures runtime is initialized before returning connection
+   */
+  protected async getDb(): Promise<PostgresJsDatabase<Record<string, never>>> {
+    // If already initialized, return immediately
+    if (this._db) {
+      return this._db;
+    }
+
+    // If initialization is in progress, wait for it
+    if (this._dbPromise) {
+      return this._dbPromise;
+    }
+
+    // Start initialization
+    this._dbPromise = RuntimeContext.getDbConnect().then((db) => {
+      this._db = db;
+      return db;
+    });
+
+    return this._dbPromise;
+  }
+
+  /**
+   * Synchronous getter for backward compatibility
+   * @deprecated Use getDb() instead. This will throw if db is not initialized.
+   */
+  protected get db(): PostgresJsDatabase<Record<string, never>> {
+    if (!this._db) {
+      throw new Error(
+        "Database not initialized. Use await getDb() or ensure runtime is initialized first."
+      );
+    }
+    return this._db;
   }
 
   /**Check if a field and value exists in the model */
@@ -21,9 +61,7 @@ export class BaseModel<TTable extends PgTable = PgTable> {
     ignore?: Record<string, unknown>;
   }) => {
     const { field, value, ignore } = params;
-    if (!this.db) {
-      throw new Error("Database not initialized");
-    }
+    const db = await this.getDb();
     // check if field exists in table schema
     const column = this.table[field as keyof typeof this.table] as
       | Column
@@ -64,7 +102,7 @@ export class BaseModel<TTable extends PgTable = PgTable> {
         )
       : eq(column, value);
 
-    const result = await this.db
+    const result = await db
       .select()
       .from(this.table as any)
       .where(whereClause)

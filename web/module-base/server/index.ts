@@ -3,7 +3,8 @@
 // Export models
 export { BaseModel } from "./models/BaseModel";
 export { BaseViewListModel } from "./models/BaseViewListModel";
-export { default as getEnv } from "./utils/getEnv";
+export { RuntimeContext } from "./runtime/RuntimeContext";
+// Backward compatibility - delegate to RuntimeContext
 
 // Export interfaces
 export * from "./models/interfaces/FilterInterface";

@@ -1,7 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 
 import { BaseModel } from "@base/server/models/BaseModel";
-import getDbConnect from "@base/server/utils/getDbConnect";
+import { RuntimeContext } from "@base/server/runtime/RuntimeContext";
 import type {
   CreateCustomerCompanyInput,
   CreateCustomerIndividualInput,
@@ -30,7 +30,7 @@ export default class CustomerModel {
 
   // Company methods
   listCompanies = async (): Promise<SaleB2cTbCustomerCompany[]> => {
-    const db = getDbConnect();
+    const db = await RuntimeContext.getDbConnect();
     return db
       .select()
       .from(sale_b2c_tb_customer_companies)
@@ -40,7 +40,7 @@ export default class CustomerModel {
   getCompanyById = async (
     id: string
   ): Promise<SaleB2cTbCustomerCompany | null> => {
-    const db = getDbConnect();
+    const db = await RuntimeContext.getDbConnect();
     const [company] = await db
       .select()
       .from(sale_b2c_tb_customer_companies)
@@ -79,7 +79,7 @@ export default class CustomerModel {
       createdBy: input.userId,
     };
 
-    const db = getDbConnect();
+    const db = await RuntimeContext.getDbConnect();
     const [company] = await db
       .insert(sale_b2c_tb_customer_companies)
       .values(payload)
@@ -106,7 +106,7 @@ export default class CustomerModel {
       updatedBy: input.userId,
     };
 
-    const db = getDbConnect();
+    const db = await RuntimeContext.getDbConnect();
     const [updated] = await db
       .update(sale_b2c_tb_customer_companies)
       .set(updatePayload)
@@ -122,7 +122,7 @@ export default class CustomerModel {
 
   // Individual methods
   listIndividuals = async (): Promise<SaleB2cTbCustomer[]> => {
-    const db = getDbConnect();
+    const db = await RuntimeContext.getDbConnect();
     return db
       .select()
       .from(sale_b2c_tb_customers)
@@ -130,7 +130,7 @@ export default class CustomerModel {
   };
 
   getIndividualById = async (id: string): Promise<SaleB2cTbCustomer | null> => {
-    const db = getDbConnect();
+    const db = await RuntimeContext.getDbConnect();
     const [individual] = await db
       .select()
       .from(sale_b2c_tb_customers)
@@ -167,7 +167,7 @@ export default class CustomerModel {
       createdBy: input.userId,
     };
 
-    const db = getDbConnect();
+    const db = await RuntimeContext.getDbConnect();
     const [individual] = await db
       .insert(sale_b2c_tb_customers)
       .values(payload)
@@ -192,7 +192,7 @@ export default class CustomerModel {
       updatedBy: input.userId,
     };
 
-    const db = getDbConnect();
+    const db = await RuntimeContext.getDbConnect();
     const [updated] = await db
       .update(sale_b2c_tb_customers)
       .set(updatePayload)

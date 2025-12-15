@@ -2,12 +2,12 @@ import {
   BaseViewListModel,
   type FilterConditionMap,
 } from "@base/server/models/BaseViewListModel";
-import { desc, eq, ilike, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, sql } from "drizzle-orm";
 import {
+  NewSaleB2cTbPriceList,
   sale_b2c_tb_price_lists,
   SaleB2cTbPriceList,
 } from "../../schemas/b2c-sales.price-list";
-import { PriceListValidationService } from "../../services/PriceListValidationService";
 
 export interface PriceListB2CRow {
   id: string;
@@ -67,6 +67,19 @@ export interface UpdatePriceListB2CParams {
   updatedBy?: string;
 }
 
+export interface ValidationResult {
+  valid: boolean;
+  errors: string[];
+}
+
+export interface ApplicableTo {
+  channels?: string[];
+  stores?: string[];
+  locations?: string[];
+  regions?: string[];
+  customerGroups?: string[];
+}
+
 type PriceListFilter = {
   type?: string;
   status?: string;
@@ -78,8 +91,6 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
   PriceListB2CRow,
   PriceListFilter
 > {
-  private validationService: PriceListValidationService;
-
   constructor() {
     super({
       table: sale_b2c_tb_price_lists,
@@ -90,7 +101,6 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
         },
       ],
     });
-    this.validationService = new PriceListValidationService();
   }
 
   protected declarationColumns = () => {
@@ -100,7 +110,10 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
     map.set("name", { column: sale_b2c_tb_price_lists.name, sort: false });
     map.set("type", { column: sale_b2c_tb_price_lists.type, sort: true });
     map.set("status", { column: sale_b2c_tb_price_lists.status, sort: true });
-    map.set("priority", { column: sale_b2c_tb_price_lists.priority, sort: true });
+    map.set("priority", {
+      column: sale_b2c_tb_price_lists.priority,
+      sort: true,
+    });
     map.set("validFrom", {
       column: sale_b2c_tb_price_lists.validFrom,
       sort: true,
@@ -185,7 +198,8 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
    * Get list of price lists (simple list, not for view list data table)
    */
   async getList(): Promise<SaleB2cTbPriceList[]> {
-    return this.db
+    const db = await this.getDb();
+    return db
       .select()
       .from(sale_b2c_tb_price_lists)
       .orderBy(
@@ -210,11 +224,9 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
   /**
    * Create a new price list
    */
-  async create(
-    params: CreatePriceListB2CParams
-  ): Promise<SaleB2cTbPriceList> {
+  async create(params: CreatePriceListB2CParams): Promise<SaleB2cTbPriceList> {
     // Validate
-    const validation = await this.validationService.validatePriceList(params);
+    const validation = await this.validatePriceList(params);
     if (!validation.valid) {
       throw new Error(validation.errors.join("; "));
     }
@@ -229,8 +241,9 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
     }
 
     const now = new Date();
+    const db = await this.getDb();
 
-    const [priceList] = await this.db
+    const [priceList] = await db
       .insert(sale_b2c_tb_price_lists)
       .values({
         code: params.code,
@@ -280,17 +293,15 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
     };
 
     // Validate
-    const validation = await this.validationService.validatePriceList(
-      mergedData,
-      id
-    );
+    const validation = await this.validatePriceList(mergedData, id);
     if (!validation.valid) {
       throw new Error(validation.errors.join("; "));
     }
 
     const now = new Date();
+    const db = await this.getDb();
 
-    const [priceList] = await this.db
+    const [priceList] = await db
       .update(sale_b2c_tb_price_lists)
       .set({
         name: params.name,
@@ -332,19 +343,210 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
       ...existing,
       status: "inactive" as const,
     };
-    const validation = await this.validationService.validatePriceList(
-      simulatedData,
-      id
-    );
+    const validation = await this.validatePriceList(simulatedData, id);
     if (!validation.valid) {
       throw new Error(validation.errors.join("; "));
     }
 
-    const result = await this.db
+    const db = await this.getDb();
+    const result = await db
       .delete(sale_b2c_tb_price_lists)
       .where(eq(sale_b2c_tb_price_lists.id, id))
       .returning();
 
     return result.length > 0;
+  }
+
+  /**
+   * Validate price list data
+   */
+  private async validatePriceList(
+    data: NewSaleB2cTbPriceList | SaleB2cTbPriceList,
+    existingId?: string
+  ): Promise<ValidationResult> {
+    const errors: string[] = [];
+
+    // 1. Validate validFrom và validTo
+    if (!data.validFrom) {
+      errors.push("validFrom là bắt buộc");
+    }
+
+    if (data.validTo && data.validFrom && data.validTo < data.validFrom) {
+      errors.push("validTo phải >= validFrom");
+    }
+
+    if (data.type !== "standard" && !data.validTo) {
+      errors.push(
+        "Nếu type != 'standard' thì validTo là bắt buộc (không được NULL)"
+      );
+    }
+
+    // 2. Validate applicableTo
+    if (!data.applicableTo) {
+      errors.push("applicableTo là bắt buộc");
+    } else {
+      const applicableTo = data.applicableTo as ApplicableTo;
+      if (
+        !applicableTo.channels &&
+        !applicableTo.stores &&
+        !applicableTo.locations &&
+        !applicableTo.regions &&
+        !applicableTo.customerGroups
+      ) {
+        errors.push(
+          "applicableTo phải có ít nhất một trong: channels, stores, locations, regions, customerGroups"
+        );
+      }
+    }
+
+    // 3. Validate không trùng valid dates cho standard price lists
+    if (data.type === "standard" && data.status === "active") {
+      const overlapError = await this.checkStandardPriceListOverlap(
+        data,
+        existingId
+      );
+      if (overlapError) {
+        errors.push(overlapError);
+      }
+    }
+
+    // 4. Validate ít nhất 1 standard price list active (chỉ khi update/delete)
+    if (existingId) {
+      const activeStandardError = await this.checkAtLeastOneActiveStandard(
+        data,
+        existingId
+      );
+      if (activeStandardError) {
+        errors.push(activeStandardError);
+      }
+    }
+
+    return {
+      valid: errors.length === 0,
+      errors,
+    };
+  }
+
+  /**
+   * Kiểm tra không trùng valid dates cho standard price lists với cùng applicableTo
+   */
+  private async checkStandardPriceListOverlap(
+    data: NewSaleB2cTbPriceList | SaleB2cTbPriceList,
+    existingId?: string
+  ): Promise<string | null> {
+    if (!data.applicableTo || !data.validFrom) {
+      return null;
+    }
+
+    const applicableTo = data.applicableTo as ApplicableTo;
+    const db = await this.getDb();
+
+    const existing = await db
+      .select()
+      .from(sale_b2c_tb_price_lists)
+      .where(
+        and(
+          eq(sale_b2c_tb_price_lists.type, "standard"),
+          eq(sale_b2c_tb_price_lists.status, "active"),
+          sql`${sale_b2c_tb_price_lists.applicableTo} = ${JSON.stringify(applicableTo)}::jsonb`,
+          existingId
+            ? sql`${sale_b2c_tb_price_lists.id} != ${existingId}::uuid`
+            : sql`1=1`
+        )
+      );
+
+    for (const existingList of existing) {
+      const existingValidFrom = existingList.validFrom;
+      const existingValidTo = existingList.validTo;
+      const newValidFrom = data.validFrom;
+      const newValidTo = data.validTo;
+
+      if (!newValidTo) {
+        return `Không được phép tạo bảng giá standard mãi mãi khi đã có bảng giá standard khác với cùng applicableTo`;
+      }
+
+      if (!existingValidTo) {
+        return `Không được phép tạo bảng giá standard khi đã có bảng giá standard mãi mãi với cùng applicableTo`;
+      }
+
+      const hasOverlap =
+        (newValidFrom >= existingValidFrom &&
+          newValidFrom <= existingValidTo) ||
+        (newValidTo >= existingValidFrom && newValidTo <= existingValidTo) ||
+        (existingValidFrom >= newValidFrom && existingValidTo <= newValidTo);
+
+      if (hasOverlap) {
+        return `Không được phép tạo bảng giá standard với cùng applicableTo và trùng thời gian áp dụng. Vui lòng kiểm tra valid_from và valid_to.`;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Kiểm tra ít nhất 1 standard price list đang active
+   */
+  private async checkAtLeastOneActiveStandard(
+    data: NewSaleB2cTbPriceList | SaleB2cTbPriceList,
+    existingId: string
+  ): Promise<string | null> {
+    const db = await this.getDb();
+    const existing = await db
+      .select()
+      .from(sale_b2c_tb_price_lists)
+      .where(eq(sale_b2c_tb_price_lists.id, existingId))
+      .limit(1);
+
+    if (existing.length === 0) {
+      return null;
+    }
+
+    const existingRecord = existing[0];
+    const isDeactivatingStandard =
+      existingRecord.type === "standard" &&
+      existingRecord.status === "active" &&
+      (data.status !== "active" || data.type !== "standard");
+
+    if (!isDeactivatingStandard) {
+      return null;
+    }
+
+    const activeStandardCount = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(sale_b2c_tb_price_lists)
+      .where(
+        and(
+          eq(sale_b2c_tb_price_lists.type, "standard"),
+          eq(sale_b2c_tb_price_lists.status, "active"),
+          sql`${sale_b2c_tb_price_lists.id} != ${existingId}::uuid`
+        )
+      );
+
+    const count = Number(activeStandardCount[0]?.count || 0);
+
+    if (count === 0) {
+      return "Hệ thống bắt buộc phải có ít nhất 1 bảng giá standard đang active.";
+    }
+
+    return null;
+  }
+
+  /**
+   * Kiểm tra xem có ít nhất 1 standard price list đang active không
+   */
+  async hasActiveStandardPriceList(): Promise<boolean> {
+    const db = await this.getDb();
+    const result = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(sale_b2c_tb_price_lists)
+      .where(
+        and(
+          eq(sale_b2c_tb_price_lists.type, "standard"),
+          eq(sale_b2c_tb_price_lists.status, "active")
+        )
+      );
+
+    const count = Number(result[0]?.count || 0);
+    return count > 0;
   }
 }

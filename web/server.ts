@@ -4,11 +4,7 @@
  * Loads all models at server startup before handling requests
  */
 
-import Environment from "@base/server/env";
-import { getLogModel } from "@base/server/models/Logs/LogModel";
-import { Database } from "@base/server/stores/database";
-import type { SystemRuntimeVariables } from "@base/server/types/global";
-import dayjs from "dayjs";
+import { RuntimeContext } from "@base/server/runtime/RuntimeContext";
 import http from "http";
 import next from "next";
 import { ScheduledTask } from "./cron";
@@ -34,27 +30,21 @@ async function startServer(): Promise<void> {
   try {
     await app.prepare();
 
-    // Initialize logging system FIRST
-    getLogModel();
-    console.log("> 📝 Logging system initialized");
+    // Initialize runtime using RuntimeContext
+    // This handles database and environment initialization
+    console.log("> 🔧 Initializing runtime...");
+    const context = RuntimeContext.getInstance(process.cwd());
+    await context.ensureInitialized();
+    console.log("> ✅ Runtime initialized");
 
-    // Initialize database
-    const database = new Database(process.cwd());
-    await database.initialize();
+    // Get instances from context
+    const connectionPool = context.getConnectionPool();
+    const modelInstance = context.getModelInstance();
 
-    // Set database to globalThis BEFORE initializing environment
-    // because models need database during initialization
-    globalThis.systemRuntimeVariables = {
-      database: database,
-    } as SystemRuntimeVariables;
-
-    // Initialize environment
-    const envProcess = await Environment.create();
-
-    // Calculate and log envProcess size in KB
+    // Calculate and log modelInstance size in KB
     try {
       const seen = new Set();
-      const envProcessJson = JSON.stringify(envProcess, (key, value) => {
+      const envProcessJson = JSON.stringify(modelInstance, (key, value) => {
         // Skip functions
         if (typeof value === "function") {
           return "[Function]";
@@ -77,25 +67,13 @@ async function startServer(): Promise<void> {
       console.log(`> ⚠️  Could not calculate environment size:`, error);
     }
 
-    // Set globalThis with env, database, and initial timestamp
-    // This will be available for all requests
-    globalThis.systemRuntimeVariables = {
-      env: envProcess,
-      database: database,
-      timestamp: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-    } as SystemRuntimeVariables;
-
     // Initialize and start cron scheduler
     const scheduler = new ScheduledTask();
     scheduler.start();
 
     const server = http.createServer(async (req, res) => {
       // Update timestamp for each request
-      if (globalThis.systemRuntimeVariables) {
-        globalThis.systemRuntimeVariables.timestamp = dayjs().format(
-          "YYYY-MM-DD HH:mm:ss"
-        );
-      }
+      context.updateTimestamp();
       await handle(req, res);
     });
 
@@ -113,7 +91,7 @@ async function startServer(): Promise<void> {
           scheduler.stop();
         }
         await closeServer();
-        await database.closeAll();
+        await connectionPool.closeAll();
         await app.close();
         console.log("✅ Server closed gracefully");
         process.exit(0);

@@ -82,11 +82,13 @@
 **Vai trò**: Entry point cho tất cả requests trên Vercel
 
 **Chức năng**:
+
 - Import và export `proxy` function từ `proxy.ts`
 - Define `config.matcher` để match routes
 - Chạy trước mọi request (giống custom server HTTP handler)
 
 **Code**:
+
 ```typescript
 import { proxy } from "./proxy";
 export { proxy as middleware };
@@ -99,6 +101,7 @@ export { proxy as middleware };
 **Vai trò**: Centralized security và routing handler
 
 **Chức năng**:
+
 - Rate limiting
 - CSRF protection
 - Authentication
@@ -106,6 +109,7 @@ export { proxy as middleware };
 - Security headers
 
 **Sử dụng bởi**:
+
 - `middleware.ts` (Vercel)
 - Custom server (có thể import nếu cần)
 
@@ -116,6 +120,7 @@ export { proxy as middleware };
 **Vai trò**: Initialize runtime khi serverless function start
 
 **Chức năng**:
+
 - Check nếu đang chạy custom server → skip
 - Initialize database
 - Initialize environment
@@ -123,6 +128,7 @@ export { proxy as middleware };
 - Skip cron scheduler (Vercel dùng Vercel Cron)
 
 **Logic**:
+
 ```typescript
 if (RUNNING_CUSTOM_SERVER) → Skip
 if (VERCEL || NODE_ENV === "production") → Initialize
@@ -135,11 +141,13 @@ if (VERCEL || NODE_ENV === "production") → Initialize
 **Vai trò**: Shared utility để khởi tạo runtime
 
 **Chức năng**:
+
 - Check nếu đã initialized → skip (idempotent)
 - Initialize logging → database → environment
 - Set global state
 
 **Sử dụng bởi**:
+
 - `instrumentation.ts`
 - Cron API routes
 - Bất kỳ API route nào cần database/environment
@@ -151,6 +159,7 @@ if (VERCEL || NODE_ENV === "production") → Initialize
 **Vai trò**: Handle API requests
 
 **Cấu trúc**:
+
 - Generated từ `route.json` files
 - Auto-export controllers
 - Handle requests như custom server
@@ -203,11 +212,8 @@ if (VERCEL || NODE_ENV === "production") → Initialize
 
 ```typescript
 // Initialized once when server starts
-globalThis.systemRuntimeVariables = {
-  database: Database,      // Shared connection
-  env: Environment,        // Shared environment
-  timestamp: string        // Updated per request
-}
+// RuntimeContext maintains singleton per process
+await RuntimeContext.getInstance().ensureInitialized();
 
 // Lifetime: Entire server lifetime
 // Scope: All requests share same state
@@ -217,20 +223,16 @@ globalThis.systemRuntimeVariables = {
 
 ```typescript
 // Initialized per function instance (cached)
-// Each serverless function instance has its own globalThis
-
-// In instrumentation.ts or initializeRuntime()
-if (!globalThis.systemRuntimeVariables) {
-  await initializeRuntime()
-  // Cached in this function instance
-}
+// Each serverless function instance has its own RuntimeContext
+await RuntimeContext.getInstance().ensureInitialized();
 
 // Lifetime: Function instance lifetime
 // Scope: Per function instance (not shared between instances)
 ```
 
 **Lưu ý quan trọng**:
-- Mỗi serverless function instance có `globalThis` riêng
+
+- Mỗi serverless function instance có context riêng
 - State không share giữa các instances (by design)
 - Initialization được cache trong instance để tránh re-initialize
 
@@ -241,6 +243,7 @@ if (!globalThis.systemRuntimeVariables) {
 **Timing**: Một lần khi server start
 
 **Process**:
+
 1. Start HTTP server
 2. Initialize logging
 3. Initialize database
@@ -255,6 +258,7 @@ if (!globalThis.systemRuntimeVariables) {
 **Timing**: Per function instance (cached)
 
 **Process**:
+
 1. Function instance starts (cold start)
 2. Instrumentation hook runs
 3. Initialize runtime (if not cached)
@@ -296,7 +300,8 @@ scheduler.start();
 
 **Custom Server**: Không có (server chạy liên tục)
 
-**Vercel**: 
+**Vercel**:
+
 - First request: ~1-3s (initialization)
 - Subsequent requests: Fast (cached)
 
@@ -361,22 +366,26 @@ npm run dev
 ### Middleware không chạy
 
 **Check**:
+
 - `middleware.ts` có export đúng không
 - `config.matcher` match đúng routes
 - Next.js version support middleware
 
 **Fix**:
+
 - Verify middleware.ts ở root directory
 - Check Next.js version >= 12
 
 ### Initialization không chạy
 
 **Check**:
+
 - `NEXT_RUNTIME === "nodejs"`
 - Không có `RUNNING_CUSTOM_SERVER`
 - `VERCEL` hoặc `NODE_ENV === "production"`
 
 **Fix**:
+
 - Set environment variables đúng
 - Check instrumentation.ts logic
 
@@ -385,11 +394,13 @@ npm run dev
 **Expected**: Đây là expected behavior trong serverless
 
 **Explanation**:
+
 - Mỗi function instance có state riêng
 - State chỉ persist trong lifetime của instance
 - Không share state giữa instances
 
 **Solution**:
+
 - Sử dụng external storage (database, cache) nếu cần share state
 - Design stateless APIs
 
@@ -404,6 +415,7 @@ npm run dev
 ## Kết luận
 
 Code đã được tinh chỉnh để:
+
 - ✅ Chạy trên custom server (server.ts)
 - ✅ Chạy trên Vercel (serverless)
 - ✅ Same routing logic (middleware)
@@ -412,9 +424,9 @@ Code đã được tinh chỉnh để:
 - ✅ Same API structure (generated routes)
 
 **Khác biệt chính**:
+
 - State management (per instance vs shared)
 - Cron jobs (Vercel Cron vs node-cron)
 - Initialization timing (per instance vs once)
 
 Code sẵn sàng cho cả hai environments!
-
