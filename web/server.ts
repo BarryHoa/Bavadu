@@ -72,8 +72,6 @@ async function startServer(): Promise<void> {
     scheduler.start();
 
     const server = http.createServer(async (req, res) => {
-      // Update timestamp for each request
-      context.updateTimestamp();
       await handle(req, res);
     });
 

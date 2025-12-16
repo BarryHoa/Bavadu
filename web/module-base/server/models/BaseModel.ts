@@ -9,47 +9,21 @@ export class BaseModel<TTable extends PgTable = PgTable> {
   /**Main table of the model */
   protected readonly table: TTable;
   private _db: PostgresJsDatabase<Record<string, never>> | null = null;
-  private _dbPromise: Promise<
-    PostgresJsDatabase<Record<string, never>>
-  > | null = null;
 
   constructor(table: TTable) {
+    RuntimeContext.getDbConnect()
+      .then((db) => {
+        this._db = db;
+      })
+      .catch((error) => {
+        console.error("Error getting database connection:", error);
+        throw error;
+      });
     this.table = table;
   }
-
-  /**
-   * Get database connection (lazy initialization)
-   * Thread-safe: ensures runtime is initialized before returning connection
-   */
-  protected async getDb(): Promise<PostgresJsDatabase<Record<string, never>>> {
-    // If already initialized, return immediately
-    if (this._db) {
-      return this._db;
-    }
-
-    // If initialization is in progress, wait for it
-    if (this._dbPromise) {
-      return this._dbPromise;
-    }
-
-    // Start initialization
-    this._dbPromise = RuntimeContext.getDbConnect().then((db) => {
-      this._db = db;
-      return db;
-    });
-
-    return this._dbPromise;
-  }
-
-  /**
-   * Synchronous getter for backward compatibility
-   * @deprecated Use getDb() instead. This will throw if db is not initialized.
-   */
-  protected get db(): PostgresJsDatabase<Record<string, never>> {
+  public get db(): PostgresJsDatabase<Record<string, never>> {
     if (!this._db) {
-      throw new Error(
-        "Database not initialized. Use await getDb() or ensure runtime is initialized first."
-      );
+      throw new Error("Database connection not initialized");
     }
     return this._db;
   }
@@ -61,7 +35,7 @@ export class BaseModel<TTable extends PgTable = PgTable> {
     ignore?: Record<string, unknown>;
   }) => {
     const { field, value, ignore } = params;
-    const db = await this.getDb();
+
     // check if field exists in table schema
     const column = this.table[field as keyof typeof this.table] as
       | Column
@@ -102,13 +76,13 @@ export class BaseModel<TTable extends PgTable = PgTable> {
         )
       : eq(column, value);
 
-    const result = await db
-      .select()
+    const result = await this.db
+      ?.select()
       .from(this.table as any)
       .where(whereClause)
       .limit(1);
 
-    return result?.length > 0
+    return result?.length && result.length > 0
       ? { isExist: true, data: result[0] }
       : { isExist: false, data: null };
   };

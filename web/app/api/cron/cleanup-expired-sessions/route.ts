@@ -1,11 +1,3 @@
-/**
- * Vercel Cron Job: Cleanup Expired Sessions
- * Runs daily at 3:00 AM
- *
- * This endpoint is called by Vercel Cron Jobs
- * Make sure to set CRON_SECRET in Vercel environment variables
- */
-
 import SessionModel from "@base/server/models/Sessions/SessionModel";
 import { initializeRuntime } from "@base/server/utils/initializeRuntime";
 import { NextRequest, NextResponse } from "next/server";
@@ -15,10 +7,6 @@ export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   try {
-    // Verify this is a legitimate Vercel Cron request
-    // Vercel sends a special header: x-vercel-signature
-    // For additional security, you can also check CRON_SECRET
-    const vercelSignature = request.headers.get("x-vercel-signature");
     const cronSecret = process.env.CRON_SECRET;
 
     // If CRON_SECRET is set, require it in Authorization header
@@ -27,12 +15,6 @@ export async function GET(request: NextRequest) {
       if (authHeader !== `Bearer ${cronSecret}`) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
-    } else if (!vercelSignature) {
-      // If no CRON_SECRET is set, at least verify it's from Vercel
-      // Note: In production, you should set CRON_SECRET for better security
-      console.warn(
-        "[Cron] Warning: No CRON_SECRET set and no Vercel signature found"
-      );
     }
 
     // Initialize runtime (database and environment) if not already initialized

@@ -38,11 +38,7 @@ class LogModel {
     this.baseDirectory = LOG_CONFIG.file.directory;
     this.maxSizeBytes = LOG_CONFIG.file.maxSizeBytes;
 
-    if (
-      this.enabled &&
-      this.destination === "file" &&
-      process.env.VERCEL !== "1"
-    ) {
+    if (this.enabled && this.destination === "file") {
       this.ensureDirectoryExists();
     }
   }
@@ -231,12 +227,6 @@ class LogModel {
    */
   async write(entry: LogEntry): Promise<void> {
     if (!this.enabled) {
-      return;
-    }
-
-    // On Vercel, only use console
-    if (process.env.VERCEL === "1") {
-      console.error(this.formatLogEntry(entry).trim());
       return;
     }
 
