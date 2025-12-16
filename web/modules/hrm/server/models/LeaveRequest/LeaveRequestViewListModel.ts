@@ -1,13 +1,14 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
@@ -53,7 +54,10 @@ class LeaveRequestViewListModel extends BaseViewListModel<
     >([
       ["id", { column: hrm_tb_leave_requests.id, sort: true }],
       ["employeeId", { column: hrm_tb_leave_requests.employeeId, sort: true }],
-      ["leaveTypeId", { column: hrm_tb_leave_requests.leaveTypeId, sort: true }],
+      [
+        "leaveTypeId",
+        { column: hrm_tb_leave_requests.leaveTypeId, sort: true },
+      ],
       ["startDate", { column: hrm_tb_leave_requests.startDate, sort: true }],
       ["endDate", { column: hrm_tb_leave_requests.endDate, sort: true }],
       ["days", { column: hrm_tb_leave_requests.days, sort: true }],
@@ -75,7 +79,6 @@ class LeaveRequestViewListModel extends BaseViewListModel<
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): LeaveRequestRow => ({
     id: row.id,
     employeeId: row.employeeId,
@@ -102,15 +105,14 @@ class LeaveRequestViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<LeaveRequestRow>> => {
     return this.buildQueryDataList(params, (query) =>
       query
         .leftJoin(employee, eq(this.table.employeeId, employee.id))
-        .leftJoin(leaveType, eq(this.table.leaveTypeId, leaveType.id))
+        .leftJoin(leaveType, eq(this.table.leaveTypeId, leaveType.id)),
     );
   };
 }
 
 export default LeaveRequestViewListModel;
-

@@ -1,4 +1,5 @@
 import type { ImageUploadItem } from "../interface/ImageUpdload";
+
 import ClientHttpService from "./ClientHttpService";
 
 export interface UploadResponse {
@@ -26,6 +27,7 @@ class MediaService extends ClientHttpService {
    */
   async uploadFile(file: File): Promise<UploadResponse> {
     const formData = new FormData();
+
     formData.append("file", file);
 
     // Get CSRF token for POST request
@@ -40,18 +42,19 @@ class MediaService extends ClientHttpService {
         // Don't set Content-Type for FormData, browser will set it with boundary
         ...Object.fromEntries(
           Object.entries(headers).filter(
-            ([key]) => key.toLowerCase() !== "content-type"
-          )
+            ([key]) => key.toLowerCase() !== "content-type",
+          ),
         ),
       },
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
+
       throw new Error(
         errorData.message ||
           errorData.error ||
-          `Upload failed: ${response.status} ${response.statusText}`
+          `Upload failed: ${response.status} ${response.statusText}`,
       );
     }
 
@@ -70,7 +73,7 @@ class MediaService extends ClientHttpService {
    */
   async uploadImageItems(items: ImageUploadItem[]): Promise<ImageUploadItem[]> {
     const itemsToUpload = items.filter(
-      (item) => item.blob && item.status !== "done"
+      (item) => item.blob && item.status !== "done",
     );
 
     if (itemsToUpload.length === 0) {
@@ -95,6 +98,7 @@ class MediaService extends ClientHttpService {
         };
       } catch (error) {
         console.error("Error uploading image:", error);
+
         return {
           ...item,
           status: "error" as const,
@@ -107,6 +111,7 @@ class MediaService extends ClientHttpService {
     // Replace items in original array
     return items.map((item) => {
       const uploaded = uploadedItems.find((u) => u.uid === item.uid);
+
       return uploaded || item;
     });
   }

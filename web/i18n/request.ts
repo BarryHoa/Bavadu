@@ -1,9 +1,9 @@
-import { SYSTEM_TIMEZONE } from "@base/shared/constants";
 import { existsSync, readdirSync, readFileSync } from "fs";
+import { join } from "path";
+
+import { SYSTEM_TIMEZONE } from "@base/shared/constants";
 import { getRequestConfig, GetRequestConfigParams } from "next-intl/server";
 import { notFound } from "next/navigation";
-
-import { join } from "path";
 
 // Can be imported from a shared config
 const locales = ["en", "vi"] as const;
@@ -35,7 +35,7 @@ const moduleBaseMessageLoaders: Record<SupportedLocale, Loader> = {
  * Dynamically load messages from all modules
  */
 const loadModuleMessages = async (
-  locale: SupportedLocale
+  locale: SupportedLocale,
 ): Promise<Record<string, unknown>> => {
   const modulesDir = join(process.cwd(), "modules");
 
@@ -55,7 +55,7 @@ const loadModuleMessages = async (
       moduleDir,
       "client",
       "messages",
-      `${locale}.json`
+      `${locale}.json`,
     );
 
     let fileToRead = messageFile;
@@ -67,8 +67,9 @@ const loadModuleMessages = async (
         moduleDir,
         "client",
         "messages",
-        `${FALLBACK_LOCALE}.json`
+        `${FALLBACK_LOCALE}.json`,
       );
+
       if (existsSync(fallbackFile)) {
         fileToRead = fallbackFile;
       } else {
@@ -79,11 +80,12 @@ const loadModuleMessages = async (
     try {
       const fileContent = readFileSync(fileToRead, "utf-8");
       const messages = JSON.parse(fileContent) as Record<string, unknown>;
+
       Object.assign(moduleMessages, messages);
     } catch (error) {
       console.error(
         `Error loading messages from ${fileToRead}:`,
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error ? error.message : String(error),
       );
     }
   }

@@ -4,6 +4,8 @@ import type {
   DropdownOptionsParams,
   DropdownOptionsResponse,
 } from "@base/client/services/DropdownOptionsService";
+import type { SelectItemOption } from "./IBaseSingleSelect";
+
 import { dropdownOptionsService } from "@base/client/services/DropdownOptionsService";
 import { SelectItem } from "@heroui/select";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -16,10 +18,11 @@ import React, {
   useRef,
   useState,
 } from "react";
+
 import { useLocalizedText } from "../../hooks/useLocalizedText";
 import IBaseInputSearch from "../IBaseInputSearch";
+
 import IBaseSelect, { IBaseSelectProps } from "./IBaseSelect";
-import type { SelectItemOption } from "./IBaseSingleSelect";
 
 export interface FetchOptionsParams extends DropdownOptionsParams {}
 
@@ -92,15 +95,12 @@ const IBaseSingleSelectAsync = React.forwardRef<
         return dropdownOptionsService.getOptionsDropdown(model, params);
       };
     }
+
     return null;
   }, [serviceFn, model]);
 
   // Memoize defaultParams to prevent unnecessary query key changes
-  const stableDefaultParams = useMemo(
-    () => defaultParams,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(defaultParams)]
-  );
+  const stableDefaultParams = useMemo(() => defaultParams, [defaultParams]);
 
   // Debounce search term to avoid excessive API calls
   useEffect(() => {
@@ -139,10 +139,12 @@ const IBaseSingleSelectAsync = React.forwardRef<
             isFirstFetchRef.current = false;
           }
           onFinishFetch?.(data);
+
           return data;
         })
         .catch((error) => {
           onErrorFetch?.(error);
+
           return {
             data: [],
             total: 0,
@@ -151,6 +153,7 @@ const IBaseSingleSelectAsync = React.forwardRef<
         .finally(() => {
           onFetching?.(false);
         });
+
       return data;
     },
     [
@@ -176,10 +179,12 @@ const IBaseSingleSelectAsync = React.forwardRef<
         (sum, page) => sum + (page.data?.length || 0),
         0
       );
+
       // If current offset is less than total, return next offset
       if (currentOffset < currentTotal) {
         return currentOffset;
       }
+
       // No more pages
       return undefined;
     },
@@ -219,6 +224,7 @@ const IBaseSingleSelectAsync = React.forwardRef<
   // Flatten all pages into a single array of items
   const allItems = useMemo(() => {
     if (!data?.pages) return [];
+
     return data.pages.flatMap((page) =>
       page.data.map((item) => ({
         ...item,
@@ -272,6 +278,7 @@ const IBaseSingleSelectAsync = React.forwardRef<
     (open: boolean) => {
       if (rest.isDisabled) {
         setIsOpen(false);
+
         return;
       }
 
@@ -301,12 +308,15 @@ const IBaseSingleSelectAsync = React.forwardRef<
       // Handle clearing selection
       if (!selected || keySet.size === 0) {
         const emptyItem: SelectItemOption = { value: "", label: "" };
+
         onSelectionChange("", emptyItem);
+
         return;
       }
 
       // Find the selected item
       const selectedItem = allItems.find((item) => item.value === selected);
+
       if (selectedItem) {
         onSelectionChange(selected, selectedItem);
       }
@@ -362,34 +372,34 @@ const IBaseSingleSelectAsync = React.forwardRef<
     <IBaseSelect
       {...rest}
       ref={ref}
-      selectionMode="single"
-      selectedKeys={selectedKeysSet}
-      onSelectionChange={handleSelectionChange}
-      onOpenChange={handleOpenChange}
       classNames={rest.classNames}
-      items={allItems}
       isOpen={isOpen}
+      items={allItems}
       listboxProps={listboxPropsMemo}
+      selectedKeys={selectedKeysSet}
+      selectionMode="single"
+      onOpenChange={handleOpenChange}
+      onSelectionChange={handleSelectionChange}
     >
       <>
         {isShowSearch && (
           <SelectItem
             key="__search__"
-            textValue={tSelectAsync("searchLabel")}
-            className="sticky top-0 z-100 pointer-events-auto data-[hover=true]:bg-content1 bg-content1 border-default-200 p-0 py-1"
-            isReadOnly
             hideSelectedIcon
+            isReadOnly
+            className="sticky top-0 z-100 pointer-events-auto data-[hover=true]:bg-content1 bg-content1 border-default-200 p-0 py-1"
+            textValue={tSelectAsync("searchLabel")}
           >
             <IBaseInputSearch
               ref={searchInputRef}
-              value={searchTerm}
-              onValueChange={setSearchTerm}
-              size="sm"
-              placeholder={searchPlaceholder}
-              autoFocus={isOpen}
+              // Avoid autoFocus for better accessibility; focus is handled via effect
               classNames={searchInputClassNames}
-              onKeyDown={handleSearchKeyDown}
+              placeholder={searchPlaceholder}
               showClearButton={false}
+              size="sm"
+              value={searchTerm}
+              onKeyDown={handleSearchKeyDown}
+              onValueChange={setSearchTerm}
             />
           </SelectItem>
         )}
@@ -397,10 +407,10 @@ const IBaseSingleSelectAsync = React.forwardRef<
         {error && (
           <SelectItem
             key="__error__"
-            textValue={tSelectAsync("error")}
-            isReadOnly
             hideSelectedIcon
+            isReadOnly
             className="text-danger"
+            textValue={tSelectAsync("error")}
           >
             {tSelectAsync("error")}
           </SelectItem>
@@ -409,9 +419,9 @@ const IBaseSingleSelectAsync = React.forwardRef<
         {isLoadingData && allItems.length === 0 && (
           <SelectItem
             key="__loading__"
-            textValue={tSelectAsync("loading")}
-            isReadOnly
             hideSelectedIcon
+            isReadOnly
+            textValue={tSelectAsync("loading")}
           >
             {tSelectAsync("loading")}
           </SelectItem>
@@ -420,9 +430,9 @@ const IBaseSingleSelectAsync = React.forwardRef<
         {allItems.length === 0 && !isLoadingData && !error && (
           <SelectItem
             key="__empty__"
-            textValue={tSelectAsync("noResults")}
-            isReadOnly
             hideSelectedIcon
+            isReadOnly
+            textValue={tSelectAsync("noResults")}
           >
             {tSelectAsync("noResults")}
           </SelectItem>
@@ -430,6 +440,7 @@ const IBaseSingleSelectAsync = React.forwardRef<
 
         {allItems.map((item) => {
           const localizedLabel = localizedText(item.label);
+
           return (
             <SelectItem key={item.value} textValue={localizedLabel}>
               {onRenderOption
@@ -445,9 +456,9 @@ const IBaseSingleSelectAsync = React.forwardRef<
         {isFetchingNextPage && (
           <SelectItem
             key="__loading_more__"
-            textValue={tSelectAsync("loadingMore")}
-            isReadOnly
             hideSelectedIcon
+            isReadOnly
+            textValue={tSelectAsync("loadingMore")}
           >
             {tSelectAsync("loadingMore")}
           </SelectItem>

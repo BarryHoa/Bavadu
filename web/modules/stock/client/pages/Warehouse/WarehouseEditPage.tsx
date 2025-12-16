@@ -1,5 +1,10 @@
 "use client";
 
+import type {
+  WarehouseDto,
+  WarehousePayload,
+} from "../../services/StockService";
+
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Spinner } from "@heroui/react";
@@ -7,11 +12,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 
-import type {
-  WarehouseDto,
-  WarehousePayload,
-} from "../../services/StockService";
 import StockService from "../../services/StockService";
+
 import WarehouseForm from "./components/WarehouseForm";
 
 export default function WarehouseEditPage(): React.ReactNode {
@@ -20,7 +22,9 @@ export default function WarehouseEditPage(): React.ReactNode {
 
   const warehouseId = useMemo(() => {
     const value = params?.id;
+
     if (!value) return undefined;
+
     return Array.isArray(value) ? value[0] : value;
   }, [params]);
 
@@ -33,6 +37,7 @@ export default function WarehouseEditPage(): React.ReactNode {
       }
 
       const response = await StockService.getWarehouseById(warehouseId);
+
       if (!response.data) {
         throw new Error(response.message ?? "Unable to load warehouse.");
       }
@@ -47,6 +52,7 @@ export default function WarehouseEditPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await StockService.updateWarehouse(payload);
+
       if (!response.data) {
         throw new Error(response.message ?? "Failed to update warehouse.");
       }
@@ -67,7 +73,7 @@ export default function WarehouseEditPage(): React.ReactNode {
 
       await handleSubmit({ ...payload, id: warehouseId });
     },
-    [handleSubmit, warehouseId]
+    [handleSubmit, warehouseId],
   );
 
   return (
@@ -107,9 +113,6 @@ export default function WarehouseEditPage(): React.ReactNode {
       ) : warehouseQuery.data ? (
         <WarehouseForm
           initialData={warehouseQuery.data}
-          submitLabel="Save changes"
-          onSubmit={handleFormSubmit}
-          submitError={error}
           secondaryAction={
             <Button
               size="sm"
@@ -119,6 +122,9 @@ export default function WarehouseEditPage(): React.ReactNode {
               Cancel
             </Button>
           }
+          submitError={error}
+          submitLabel="Save changes"
+          onSubmit={handleFormSubmit}
         />
       ) : null}
     </div>

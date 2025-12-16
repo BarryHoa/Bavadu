@@ -9,6 +9,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlProductSchema } from "./schema";
 import { product_tb_product_masters } from "./product.master";
 import { product_tb_units_of_measure } from "./product.uom";
@@ -29,23 +30,27 @@ export const product_tb_product_variants = mdlProductSchema.table(
     sku: varchar("sku", { length: 100 }),
     barcode: varchar("barcode", { length: 100 }),
     manufacturer: jsonb("manufacturer"), // { name?: string, code?: string }
-    baseUomId: uuid("base_uom_id").references(() => product_tb_units_of_measure.id),
-    saleUomId: uuid("sale_uom_id").references(() => product_tb_units_of_measure.id),
+    baseUomId: uuid("base_uom_id").references(
+      () => product_tb_units_of_measure.id,
+    ),
+    saleUomId: uuid("sale_uom_id").references(
+      () => product_tb_units_of_measure.id,
+    ),
     purchaseUomId: uuid("purchase_uom_id").references(
-      () => product_tb_units_of_measure.id
+      () => product_tb_units_of_measure.id,
     ),
     manufacturingUomId: uuid("manufacturing_uom_id").references(
-      () => product_tb_units_of_measure.id
+      () => product_tb_units_of_measure.id,
     ),
-    
+
     // Cost calculation method
     costMethod: varchar("cost_method", { length: 20 })
       .notNull()
       .default("average"), // "average" | "fifo" | "lifo" | "standard"
-    
+
     // Standard cost (only used when costMethod = "standard")
     standardCost: numeric("standard_cost", { precision: 18, scale: 4 }),
-    
+
     isActive: boolean("is_active").default(true).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }),
     updatedAt: timestamp("updated_at", { withTimezone: true }),
@@ -60,18 +65,18 @@ export const product_tb_product_variants = mdlProductSchema.table(
     index("variants_base_uom_idx").on(table.baseUomId),
     index("variants_sale_uom_idx").on(table.saleUomId),
     index("variants_purchase_uom_idx").on(table.purchaseUomId),
-    index("variants_manufacturing_uom_idx").on(
-      table.manufacturingUomId
-    ),
+    index("variants_manufacturing_uom_idx").on(table.manufacturingUomId),
     // Composite index for common query: get active variants by master
     index("variants_master_active_idx").on(
       table.productMasterId,
-      table.isActive
+      table.isActive,
     ),
     // Index for cost method filtering
     index("variants_cost_method_idx").on(table.costMethod),
-  ]
+  ],
 );
 
-export type ProductTbProductVariant = typeof product_tb_product_variants.$inferSelect;
-export type NewProductTbProductVariant = typeof product_tb_product_variants.$inferInsert;
+export type ProductTbProductVariant =
+  typeof product_tb_product_variants.$inferSelect;
+export type NewProductTbProductVariant =
+  typeof product_tb_product_variants.$inferInsert;

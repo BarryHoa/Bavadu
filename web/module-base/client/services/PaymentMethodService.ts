@@ -1,5 +1,6 @@
-import { dropdownOptionsService } from "@base/client/services/DropdownOptionsService";
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
+
+import { dropdownOptionsService } from "@base/client/services/DropdownOptionsService";
 
 export interface PaymentMethodDto {
   id: string;
@@ -14,9 +15,7 @@ export interface PaymentMethodDto {
 
 export default class PaymentMethodService {
   getOptionsDropdown() {
-    return dropdownOptionsService.getOptionsDropdown(
-      "payment-method.dropdown"
-    );
+    return dropdownOptionsService.getOptionsDropdown("payment-method.dropdown");
   }
 }
 

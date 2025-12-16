@@ -3,9 +3,11 @@
 import { SelectItem } from "@heroui/select";
 import MiniSearch from "minisearch";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+
 import { useLocalizedText } from "../../hooks/useLocalizedText";
 import { LocalizeText } from "../../interface/LocalizeText";
 import IBaseInputSearch from "../IBaseInputSearch";
+
 import IBaseSelect, { IBaseSelectProps } from "./IBaseSelect";
 
 export interface SelectItemOption extends Record<string, unknown> {
@@ -60,7 +62,7 @@ const IBaseSingleSelect = React.forwardRef<
     // Filter out items with invalid values and ensure value is a string
     const validItems = items.filter(
       (item) =>
-        item.value !== undefined && item.value !== null && item.value !== ""
+        item.value !== undefined && item.value !== null && item.value !== "",
     );
 
     if (validItems.length === 0) {
@@ -97,6 +99,7 @@ const IBaseSingleSelect = React.forwardRef<
     if (!items || items.length === 0) return [];
 
     const term = searchTerm.trim();
+
     if (!term || !miniSearch) return items;
 
     // Check if search term contains quotes (exact phrase)
@@ -104,6 +107,7 @@ const IBaseSingleSelect = React.forwardRef<
     const cleanTerm = term.replace(/"/g, "").trim().toLowerCase();
 
     let results;
+
     if (isPhraseSearch && cleanTerm) {
       // Exact phrase search - search for the entire phrase
       // First try exact match on fullPhrase field
@@ -116,7 +120,7 @@ const IBaseSingleSelect = React.forwardRef<
       // Also filter by exact phrase match in fullPhrase
       if (results.length > 0) {
         results = results.filter((result) =>
-          result.fullPhrase?.includes(cleanTerm)
+          result.fullPhrase?.includes(cleanTerm),
         );
       }
     } else {
@@ -133,13 +137,14 @@ const IBaseSingleSelect = React.forwardRef<
 
         // Boost results that contain the full phrase
         const phraseResults = results.filter((result) =>
-          result.fullPhrase?.includes(cleanTerm)
+          result.fullPhrase?.includes(cleanTerm),
         );
 
         // Combine: phrase matches first, then word matches
         const otherResults = results.filter(
-          (result) => !phraseResults.some((pr) => pr.id === result.id)
+          (result) => !phraseResults.some((pr) => pr.id === result.id),
         );
+
         results = [...phraseResults, ...otherResults];
       } else {
         // Single word - use prefix matching
@@ -176,6 +181,7 @@ const IBaseSingleSelect = React.forwardRef<
 
     if (rest.isDisabled) {
       setIsOpen(false);
+
       return;
     }
 
@@ -186,7 +192,7 @@ const IBaseSingleSelect = React.forwardRef<
   };
 
   const handleSelectionChange = (
-    keys: Parameters<NonNullable<IBaseSelectProps["onSelectionChange"]>>[0]
+    keys: Parameters<NonNullable<IBaseSelectProps["onSelectionChange"]>>[0],
   ) => {
     // Prevent selection of the search input item
     if (typeof keys === "string") return;
@@ -204,12 +210,15 @@ const IBaseSingleSelect = React.forwardRef<
       // Find a placeholder item or use empty string
       // For clearing, we'll pass empty string and a minimal item
       const emptyItem: SelectItemOption = { value: "", label: "" };
+
       onSelectionChange("", emptyItem);
+
       return;
     }
 
     // Find the selected item
     const selectedItem = items?.find((item) => item.value === selected);
+
     if (selectedItem) {
       onSelectionChange(selected, selectedItem);
     }
@@ -219,34 +228,34 @@ const IBaseSingleSelect = React.forwardRef<
     <IBaseSelect
       {...rest}
       ref={ref}
-      selectionMode="single"
-      selectedKeys={selectedKey ? new Set([selectedKey]) : undefined}
-      onSelectionChange={handleSelectionChange}
-      onOpenChange={handleOpenChange}
       classNames={rest.classNames}
-      items={filteredItems}
       isOpen={isOpen}
+      items={filteredItems}
+      selectedKeys={selectedKey ? new Set([selectedKey]) : undefined}
+      selectionMode="single"
+      onOpenChange={handleOpenChange}
+      onSelectionChange={handleSelectionChange}
     >
       <>
         {items && items.length > searchShowMaxResults && (
           <SelectItem
             key="__search__"
-            textValue="Search"
-            className="sticky top-0 z-100 pointer-events-auto data-[hover=true]:bg-content1 bg-content1  border-default-200 p-0 py-1"
-            isReadOnly
             hideSelectedIcon
+            isReadOnly
+            className="sticky top-0 z-100 pointer-events-auto data-[hover=true]:bg-content1 bg-content1  border-default-200 p-0 py-1"
+            textValue="Search"
           >
             <IBaseInputSearch
               ref={searchInputRef}
-              value={searchTerm}
-              onValueChange={setSearchTerm}
-              size="sm"
-              placeholder={searchPlaceholder}
-              autoFocus={isOpen}
+              // Avoid autoFocus for better accessibility; focus is managed via effect
               classNames={{
                 base: "w-full",
                 input: "text-sm",
               }}
+              placeholder={searchPlaceholder}
+              showClearButton={false}
+              size="sm"
+              value={searchTerm}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
@@ -256,13 +265,14 @@ const IBaseSingleSelect = React.forwardRef<
                   setSearchTerm("");
                 }
               }}
-              showClearButton={false}
+              onValueChange={setSearchTerm}
             />
           </SelectItem>
         )}
 
         {filteredItems.map((item) => {
           const localizedLabel = localizedText(item.label);
+
           return (
             <SelectItem key={item.value} textValue={localizedLabel}>
               {onRenderOption

@@ -4,7 +4,6 @@
  * Handles logging to files with rotation and compression support
  */
 
-import dayjs from "dayjs";
 import {
   appendFileSync,
   existsSync,
@@ -13,7 +12,11 @@ import {
   writeFileSync,
 } from "fs";
 import { dirname, join } from "path";
+
+import dayjs from "dayjs";
+
 import { LOG_CONFIG } from "../../config";
+
 import { LogGroup, LogSeverity, LogType, LogTypesToGroups } from "./LogTypes";
 
 export interface LogEntry {
@@ -62,10 +65,12 @@ class LogModel {
    */
   private getLogGroup(logType: LogType): LogGroup {
     const group = LogTypesToGroups.get(logType);
+
     if (!group) {
       // Fallback to application if not found
       return LogGroup.APPLICATION;
     }
+
     return group;
   }
 
@@ -75,10 +80,12 @@ class LogModel {
   private ensureGroupDirectory(logType: LogType): string {
     const group = this.getLogGroup(logType);
     const groupDir = join(this.baseDirectory, group);
+
     if (!this.groupDirsCache.has(groupDir) && !existsSync(groupDir)) {
       mkdirSync(groupDir, { recursive: true });
       this.groupDirsCache.add(groupDir);
     }
+
     return groupDir;
   }
 
@@ -89,7 +96,7 @@ class LogModel {
   private getLogFilePath(
     logType: LogType,
     date: dayjs.Dayjs,
-    chunkNumber: number = 0
+    chunkNumber: number = 0,
   ): string {
     const dateStr = date.format("DD_MM_YYYY");
     const groupDir = this.ensureGroupDirectory(logType);
@@ -112,9 +119,11 @@ class LogModel {
 
     // Check if we have a cached file for today
     const cached = this.currentFiles.get(cacheKey);
+
     if (cached?.path && existsSync(cached.path)) {
       try {
         const stats = statSync(cached.path);
+
         if (stats.size < this.maxSizeBytes) {
           return cached.path;
         }
@@ -130,9 +139,11 @@ class LogModel {
     while (existsSync(filePath)) {
       try {
         const stats = statSync(filePath);
+
         if (stats.size < this.maxSizeBytes) {
           // This file is still under size limit, use it
           this.currentFiles.set(cacheKey, { path: filePath, size: stats.size });
+
           return filePath;
         }
       } catch {
@@ -145,6 +156,7 @@ class LogModel {
 
     // Create new file
     this.currentFiles.set(cacheKey, { path: filePath, size: 0 });
+
     return filePath;
   }
 
@@ -175,6 +187,7 @@ class LogModel {
       } else {
         // Ensure directory exists (should already exist, but double-check)
         const dir = dirname(filePath);
+
         if (!existsSync(dir)) {
           mkdirSync(dir, { recursive: true });
         }
@@ -186,9 +199,11 @@ class LogModel {
       const dateKey = today.format("YYYY-MM-DD");
       const cacheKey = `${entry.type}_${dateKey}`;
       const cached = this.currentFiles.get(cacheKey);
+
       if (cached?.path === filePath) {
         try {
           const stats = statSync(filePath);
+
           cached.size = stats.size;
         } catch {
           // Ignore errors when updating cache
@@ -257,6 +272,7 @@ export function getLogModel(): LogModel {
   if (!logModelInstance) {
     logModelInstance = LogModel.initialize();
   }
+
   return logModelInstance;
 }
 

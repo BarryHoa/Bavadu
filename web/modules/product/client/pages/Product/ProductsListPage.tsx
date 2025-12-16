@@ -1,4 +1,6 @@
 "use client";
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
+
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import {
   DATA_TABLE_COLUMN_KEY_ACTION,
@@ -6,14 +8,13 @@ import {
 } from "@base/client/components";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
-
 import LinkAs from "@base/client/components/LinkAs";
 import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import React, { useMemo } from "react";
+
 import { ProductRow } from "../../interface/Product";
 import { convertProductMasterFeaturesToArrayKey } from "../../utils/getNameProductFeatures";
 import { getNameProductType } from "../../utils/getNameProductType";
@@ -36,8 +37,9 @@ export default function ProductsListPage(): React.ReactNode {
             path: "view/[id]",
             as: `view/${row.id}`,
           });
+
           return (
-            <LinkAs href={path} as={as}>
+            <LinkAs as={as} href={path}>
               {localized(row.name as LocalizeText) || row.id}
             </LinkAs>
           );
@@ -78,10 +80,11 @@ export default function ProductsListPage(): React.ReactNode {
         maxWidth: 250,
         render: (_, row) => {
           const features = convertProductMasterFeaturesToArrayKey(
-            row.productMaster?.features
+            row.productMaster?.features,
           );
+
           return features.map((feature) =>
-            tProduct(`productFeature.${feature}`)
+            tProduct(`productFeature.${feature}`),
           );
         },
       },
@@ -95,8 +98,8 @@ export default function ProductsListPage(): React.ReactNode {
           return (
             <Chip
               color={row.isActive ? "success" : "danger"}
-              variant="flat"
               size="sm"
+              variant="flat"
             >
               {row.isActive ? "Active" : "Inactive"}
             </Chip>
@@ -164,6 +167,7 @@ export default function ProductsListPage(): React.ReactNode {
             path: "edit/[id]",
             as: `edit/${row.id}`,
           });
+
           return (
             <ActionMenu
               actions={[
@@ -195,8 +199,6 @@ export default function ProductsListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable
-        model="product"
-        columns={columns}
         actionsRight={[
           {
             key: "new",
@@ -209,6 +211,8 @@ export default function ProductsListPage(): React.ReactNode {
             },
           },
         ]}
+        columns={columns}
+        model="product"
       />
     </div>
   );

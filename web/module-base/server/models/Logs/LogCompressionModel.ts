@@ -4,7 +4,6 @@
  * Handles compression of log files older than specified days into monthly archives
  */
 
-import dayjs from "dayjs";
 import {
   createReadStream,
   createWriteStream,
@@ -17,6 +16,9 @@ import {
 import { basename, extname, join } from "path";
 import { pipeline } from "stream/promises";
 import { createGzip } from "zlib";
+
+import dayjs from "dayjs";
+
 import { LOG_CONFIG } from "../../config";
 
 export interface CompressionResult {
@@ -41,6 +43,7 @@ class LogCompressionModel {
 
   constructor() {
     const config = LOG_CONFIG.file.compression;
+
     this.baseDir = LOG_CONFIG.file.directory;
     this.compressAfterDays = config.compressAfterDays;
     this.deleteOriginal = config.deleteOriginal;
@@ -55,6 +58,7 @@ class LogCompressionModel {
       const stats = statSync(filePath);
       const fileDate = dayjs(stats.mtime);
       const daysOld = dayjs().diff(fileDate, "day");
+
       return daysOld >= this.compressAfterDays;
     } catch {
       return false;
@@ -66,7 +70,7 @@ class LogCompressionModel {
    */
   private async compressFile(
     filePath: string,
-    outputDir: string
+    outputDir: string,
   ): Promise<{
     success: boolean;
     originalSize: number;
@@ -82,6 +86,7 @@ class LogCompressionModel {
 
       // Create output directory for this month
       const monthDir = join(outputDir, monthStr);
+
       if (!existsSync(monthDir)) {
         mkdirSync(monthDir, { recursive: true });
       }
@@ -123,7 +128,7 @@ class LogCompressionModel {
    * Compress all log files in a directory that are older than specified days
    */
   private async compressLogDirectory(
-    logTypeDir: string
+    logTypeDir: string,
   ): Promise<CompressionResult> {
     const result: CompressionResult = {
       compressed: 0,
@@ -154,7 +159,7 @@ class LogCompressionModel {
       if (this.shouldCompress(filePath)) {
         const compressionResult = await this.compressFile(
           filePath,
-          logTypeDir // Compress into same directory, organized by month
+          logTypeDir, // Compress into same directory, organized by month
         );
 
         if (compressionResult.success) {
@@ -163,7 +168,7 @@ class LogCompressionModel {
           result.compressedSize += compressionResult.compressedSize;
         } else {
           result.errors.push(
-            `${filePath}: ${compressionResult.error || "Unknown error"}`
+            `${filePath}: ${compressionResult.error || "Unknown error"}`,
           );
         }
       }
@@ -259,6 +264,7 @@ class LogCompressionModel {
         for (const filePath of files) {
           try {
             const stats = statSync(filePath);
+
             totalFiles++;
             totalSize += stats.size;
 
@@ -301,6 +307,7 @@ export function getLogCompressionModel(): LogCompressionModel {
   if (!logCompressionModelInstance) {
     logCompressionModelInstance = LogCompressionModel.initialize();
   }
+
   return logCompressionModelInstance;
 }
 

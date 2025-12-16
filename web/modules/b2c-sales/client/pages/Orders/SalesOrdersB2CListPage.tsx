@@ -31,6 +31,7 @@ export default function SalesOrdersB2CListPage(): React.ReactNode {
         label: t("code"),
         render: (value, row) => {
           if (!row?.id) return value;
+
           return (
             <LinkAs href={`/workspace/modules/b2c-sales/view/${row.id}`}>
               {row.code}
@@ -46,7 +47,7 @@ export default function SalesOrdersB2CListPage(): React.ReactNode {
         key: "status",
         label: t("status"),
         render: (value) => (
-          <Chip size="sm" variant="flat" className="capitalize">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value || "draft"}
           </Chip>
         ),
@@ -77,6 +78,7 @@ export default function SalesOrdersB2CListPage(): React.ReactNode {
         render: (_, row) => {
           if (!row?.id) return null;
           const viewLink = `/workspace/modules/b2c-sales/view/${row.id}`;
+
           return (
             <ActionMenu
               actions={[
@@ -91,15 +93,12 @@ export default function SalesOrdersB2CListPage(): React.ReactNode {
         },
       },
     ],
-    [tDataTable]
+    [tDataTable],
   );
 
   return (
     <div className="space-y-4">
       <ViewListDataTable<SalesOrderB2CRow>
-        model="b2c-sales-order"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -111,6 +110,9 @@ export default function SalesOrdersB2CListPage(): React.ReactNode {
             },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="b2c-sales-order"
       />
     </div>
   );

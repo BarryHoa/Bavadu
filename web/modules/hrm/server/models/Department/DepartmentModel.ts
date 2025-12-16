@@ -46,6 +46,7 @@ export default class DepartmentModel extends BaseModel<
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
@@ -66,10 +67,7 @@ export default class DepartmentModel extends BaseModel<
         updatedAt: this.table.updatedAt,
       })
       .from(this.table)
-      .leftJoin(
-        parentDepartment,
-        eq(this.table.parentId, parentDepartment.id)
-      )
+      .leftJoin(parentDepartment, eq(this.table.parentId, parentDepartment.id))
       .where(eq(this.table.id, id))
       .limit(1);
 
@@ -106,13 +104,17 @@ export default class DepartmentModel extends BaseModel<
   };
 
   createDepartment = async (
-    payload: DepartmentInput
+    payload: DepartmentInput,
   ): Promise<DepartmentRow> => {
     const now = new Date();
     const insertData: NewHrmTbDepartment = {
       code: payload.code,
       name: payload.name,
-      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
+      description: payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null,
       parentId: payload.parentId ?? null,
       managerId: payload.managerId ?? null,
       locationId: payload.locationId ?? null,
@@ -148,7 +150,7 @@ export default class DepartmentModel extends BaseModel<
 
   updateDepartment = async (
     id: string,
-    payload: Partial<DepartmentInput>
+    payload: Partial<DepartmentInput>,
   ): Promise<DepartmentRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -157,7 +159,11 @@ export default class DepartmentModel extends BaseModel<
     if (payload.code !== undefined) updateData.code = payload.code;
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.description !== undefined)
-      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
+      updateData.description = payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null;
     if (payload.parentId !== undefined)
       updateData.parentId = payload.parentId ?? null;
     if (payload.level !== undefined) {
@@ -171,7 +177,10 @@ export default class DepartmentModel extends BaseModel<
       updateData.locationId = payload.locationId ?? null;
     if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
 
-    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db
+      .update(this.table)
+      .set(updateData)
+      .where(eq(this.table.id, id));
 
     return this.getDepartmentById(id);
   };
@@ -191,7 +200,7 @@ export default class DepartmentModel extends BaseModel<
     }
     if (payload.description !== undefined) {
       normalizedPayload.description = this.normalizeLocaleInput(
-        payload.description
+        payload.description,
       );
     }
     if (payload.parentId !== undefined) {
@@ -225,4 +234,3 @@ export default class DepartmentModel extends BaseModel<
     return this.updateDepartment(id, normalizedPayload);
   };
 }
-

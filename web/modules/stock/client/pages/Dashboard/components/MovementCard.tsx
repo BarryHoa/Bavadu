@@ -1,5 +1,8 @@
 "use client";
 
+import type { WarehouseDto } from "../../../services/StockService";
+import type { MovementPayload } from "../types";
+
 import {
   IBaseInput,
   IBaseSingleSelect,
@@ -8,8 +11,6 @@ import {
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/react";
 import { useMemo, useState } from "react";
-import type { WarehouseDto } from "../../../services/StockService";
-import type { MovementPayload } from "../types";
 
 interface MovementCardProps {
   title: string;
@@ -45,7 +46,7 @@ export default function MovementCard({
         value: warehouse.id,
         label: `${warehouse.code} — ${warehouse.name}`,
       })),
-    [warehouses]
+    [warehouses],
   );
 
   const handleChange = (field: keyof MovementPayload, value: string) => {
@@ -97,8 +98,8 @@ export default function MovementCard({
           onValueChange={(value) => handleChange("quantity", value)}
         />
         <IBaseSingleSelect
-          label="Warehouse"
           items={warehouseItems}
+          label="Warehouse"
           selectedKey={formValues.primaryWarehouseId}
           onSelectionChange={(key) => {
             handleChange("primaryWarehouseId", key || "");
@@ -106,8 +107,8 @@ export default function MovementCard({
         />
         {requireSecondaryWarehouse ? (
           <IBaseSingleSelect
-            label="Target Warehouse"
             items={warehouseItems}
+            label="Target Warehouse"
             selectedKey={formValues.secondaryWarehouseId}
             onSelectionChange={(key) => {
               handleChange("secondaryWarehouseId", key || "");
@@ -128,8 +129,8 @@ export default function MovementCard({
         />
         <Button
           color="primary"
-          size="sm"
           isLoading={submitting}
+          size="sm"
           onPress={handleSubmit}
         >
           {actionLabel}
@@ -138,4 +139,3 @@ export default function MovementCard({
     </Card>
   );
 }
-

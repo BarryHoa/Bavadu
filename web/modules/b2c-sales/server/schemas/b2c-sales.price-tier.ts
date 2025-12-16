@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { index, integer, numeric, timestamp, uuid } from "drizzle-orm/pg-core";
+
 import { sale_b2c_tb_price_list_items } from "./b2c-sales.price-list-item";
 import { sale_b2c_tb_pricing_rules } from "./b2c-sales.pricing-rule";
 import { mdlSaleB2cSchema } from "./schema";
@@ -15,11 +16,11 @@ export const sale_b2c_tb_price_tiers = mdlSaleB2cSchema.table(
       .default(sql`uuid_generate_v7()`),
     priceListItemId: uuid("price_list_item_id").references(
       () => sale_b2c_tb_price_list_items.id,
-      { onDelete: "cascade" }
+      { onDelete: "cascade" },
     ),
     pricingRuleId: uuid("pricing_rule_id").references(
       () => sale_b2c_tb_pricing_rules.id,
-      { onDelete: "cascade" }
+      { onDelete: "cascade" },
     ),
     minQuantity: numeric("min_quantity", { precision: 14, scale: 2 }).notNull(),
     maxQuantity: numeric("max_quantity", { precision: 14, scale: 2 }),
@@ -36,7 +37,7 @@ export const sale_b2c_tb_price_tiers = mdlSaleB2cSchema.table(
     index("price_tiers_item_idx").on(table.priceListItemId),
     index("price_tiers_rule_idx").on(table.pricingRuleId),
     index("price_tiers_quantity_idx").on(table.minQuantity, table.maxQuantity),
-  ]
+  ],
 );
 
 export type SaleB2cTbPriceTier = typeof sale_b2c_tb_price_tiers.$inferSelect;

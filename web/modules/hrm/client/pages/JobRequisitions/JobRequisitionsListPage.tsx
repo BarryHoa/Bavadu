@@ -31,8 +31,11 @@ export default function JobRequisitionsListPage(): React.ReactNode {
         label: t("labels.requisitionNumber"),
         render: (value, row) => {
           if (!row?.id) return value;
+
           return (
-            <LinkAs href={`/workspace/modules/hrm/job-requisitions/view/${row.id}`}>
+            <LinkAs
+              href={`/workspace/modules/hrm/job-requisitions/view/${row.id}`}
+            >
               {value}
             </LinkAs>
           );
@@ -61,7 +64,7 @@ export default function JobRequisitionsListPage(): React.ReactNode {
         key: "priority",
         label: t("labels.priority"),
         render: (value) => (
-          <Chip size="sm" variant="flat" className="capitalize">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value || "normal"}
           </Chip>
         ),
@@ -70,7 +73,7 @@ export default function JobRequisitionsListPage(): React.ReactNode {
         key: "status",
         label: t("labels.status"),
         render: (value) => (
-          <Chip size="sm" variant="flat" className="capitalize">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value || "draft"}
           </Chip>
         ),
@@ -87,6 +90,7 @@ export default function JobRequisitionsListPage(): React.ReactNode {
         render: (_, row) => {
           if (!row?.id) return null;
           const viewLink = `/workspace/modules/hrm/job-requisitions/view/${row.id}`;
+
           return (
             <ActionMenu
               actions={[
@@ -101,15 +105,12 @@ export default function JobRequisitionsListPage(): React.ReactNode {
         },
       },
     ],
-    [tDataTable, t, getLocalizedText]
+    [tDataTable, t, getLocalizedText],
   );
 
   return (
     <div className="space-y-4">
       <ViewListDataTable<JobRequisitionRow>
-        model="hrm.job-requisition"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -121,8 +122,10 @@ export default function JobRequisitionsListPage(): React.ReactNode {
             },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="hrm.job-requisition"
       />
     </div>
   );
 }
-

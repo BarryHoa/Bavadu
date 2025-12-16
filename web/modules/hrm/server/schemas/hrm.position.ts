@@ -10,6 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { hrm_tb_departments } from "./hrm.department";
 import { mdlHrmSchema } from "./schema";
 
@@ -45,7 +46,7 @@ export const hrm_tb_positions = mdlHrmSchema.table(
     index("positions_department_idx").on(table.departmentId),
     index("positions_reports_to_idx").on(table.reportsTo),
     index("positions_active_idx").on(table.isActive),
-  ]
+  ],
 );
 
 export type HrmTbPosition = typeof hrm_tb_positions.$inferSelect;

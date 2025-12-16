@@ -10,6 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 
 // Departments - Phòng ban
@@ -40,7 +41,7 @@ export const hrm_tb_departments = mdlHrmSchema.table(
     index("departments_parent_idx").on(table.parentId),
     index("departments_manager_idx").on(table.managerId),
     index("departments_active_idx").on(table.isActive),
-  ]
+  ],
 );
 
 export type HrmTbDepartment = typeof hrm_tb_departments.$inferSelect;

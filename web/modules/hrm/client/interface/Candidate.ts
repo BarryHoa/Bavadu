@@ -50,4 +50,3 @@ export interface CreateCandidatePayload {
 export interface UpdateCandidatePayload extends Partial<CreateCandidatePayload> {
   id: string;
 }
-

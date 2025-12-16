@@ -1,9 +1,10 @@
-import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 import type {
   CourseDto,
   CreateCoursePayload,
   UpdateCoursePayload,
 } from "../interface/Course";
+
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export default class CourseService extends JsonRpcClientService {
   list() {
@@ -37,4 +38,3 @@ export default class CourseService extends JsonRpcClientService {
 }
 
 export const courseService = new CourseService();
-

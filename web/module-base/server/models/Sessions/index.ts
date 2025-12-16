@@ -8,4 +8,3 @@ export type {
   CreateSessionParams,
   ValidateSessionResult,
 } from "./SessionInterface";
-

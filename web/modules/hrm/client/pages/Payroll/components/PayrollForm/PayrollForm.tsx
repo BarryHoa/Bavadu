@@ -10,6 +10,7 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+
 import {
   createPayrollValidation,
   type PayrollFormValues,
@@ -79,10 +80,10 @@ export default function PayrollForm({
         )}
         <Button
           color="primary"
-          type="submit"
-          size="sm"
-          isLoading={isSubmitting}
           disabled={isSubmitting}
+          isLoading={isSubmitting}
+          size="sm"
+          type="submit"
         >
           {tCommon("actions.save")}
         </Button>
@@ -93,248 +94,248 @@ export default function PayrollForm({
           <h2 className="text-base font-semibold mb-2">{t("generalInfo")}</h2>
           <div className="grid gap-2 md:grid-cols-2">
             <Controller
-              name="payrollPeriodId"
               control={control}
+              name="payrollPeriodId"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  isRequired
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.payrollPeriod")}
                   model="hrm.payroll-period.dropdown"
                   selectedKey={field.value}
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="employeeId"
               control={control}
+              name="employeeId"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  isRequired
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.employee")}
                   model="hrm.employee.dropdown"
                   selectedKey={field.value}
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
+              control={control}
               name="baseSalary"
-              control={control}
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   {...field}
-                  label={t("labels.baseSalary")}
-                  size="sm"
-                  value={typeof field.value === "number" ? field.value : 0}
-                  onValueChange={(val) => field.onChange(val ?? 0)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  min={0}
                   isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={t("labels.baseSalary")}
+                  min={0}
+                  size="sm"
+                  value={typeof field.value === "number" ? field.value : 0}
+                  onValueChange={(val) => field.onChange(val ?? 0)}
                 />
               )}
             />
             <Controller
+              control={control}
               name="overtimePay"
-              control={control}
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.overtimePay")}
+                  min={0}
                   size="sm"
                   value={typeof field.value === "number" ? field.value : 0}
                   onValueChange={(val) => field.onChange(val ?? 0)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  min={0}
                 />
               )}
             />
             <Controller
+              control={control}
               name="bonuses"
-              control={control}
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.bonuses")}
+                  min={0}
                   size="sm"
                   value={typeof field.value === "number" ? field.value : 0}
                   onValueChange={(val) => field.onChange(val ?? 0)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  min={0}
                 />
               )}
             />
             <Controller
+              control={control}
               name="otherEarnings"
-              control={control}
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.otherEarnings")}
+                  min={0}
                   size="sm"
                   value={typeof field.value === "number" ? field.value : 0}
                   onValueChange={(val) => field.onChange(val ?? 0)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  min={0}
                 />
               )}
             />
             <Controller
+              control={control}
               name="socialInsurance"
-              control={control}
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.socialInsurance")}
+                  min={0}
                   size="sm"
                   value={typeof field.value === "number" ? field.value : 0}
                   onValueChange={(val) => field.onChange(val ?? 0)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  min={0}
                 />
               )}
             />
             <Controller
+              control={control}
               name="healthInsurance"
-              control={control}
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.healthInsurance")}
+                  min={0}
                   size="sm"
                   value={typeof field.value === "number" ? field.value : 0}
                   onValueChange={(val) => field.onChange(val ?? 0)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  min={0}
                 />
               )}
             />
             <Controller
+              control={control}
               name="unemploymentInsurance"
-              control={control}
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.unemploymentInsurance")}
+                  min={0}
                   size="sm"
                   value={typeof field.value === "number" ? field.value : 0}
                   onValueChange={(val) => field.onChange(val ?? 0)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  min={0}
                 />
               )}
             />
             <Controller
+              control={control}
               name="personalIncomeTax"
-              control={control}
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.personalIncomeTax")}
+                  min={0}
                   size="sm"
                   value={typeof field.value === "number" ? field.value : 0}
                   onValueChange={(val) => field.onChange(val ?? 0)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  min={0}
                 />
               )}
             />
             <Controller
+              control={control}
               name="workingDays"
-              control={control}
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.workingDays")}
+                  min={0}
                   size="sm"
                   value={typeof field.value === "number" ? field.value : 0}
                   onValueChange={(val) => field.onChange(val ?? 0)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  min={0}
                 />
               )}
             />
             <Controller
+              control={control}
               name="workingHours"
-              control={control}
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.workingHours")}
+                  min={0}
                   size="sm"
                   value={typeof field.value === "number" ? field.value : 0}
                   onValueChange={(val) => field.onChange(val ?? 0)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  min={0}
                 />
               )}
             />
             <Controller
-              name="overtimeHours"
               control={control}
+              name="overtimeHours"
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.overtimeHours")}
+                  min={0}
                   size="sm"
                   value={typeof field.value === "number" ? field.value : 0}
                   onValueChange={(val) => field.onChange(val ?? 0)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  min={0}
                 />
               )}
             />
             <Controller
-              name="status"
               control={control}
+              name="status"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.status")}
                   model="base-payroll-status"
                   selectedKey={field.value}
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="notes"
               control={control}
+              name="notes"
               render={({ field, fieldState }) => (
                 <div className="md:col-span-2">
                   <Textarea
                     {...field}
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
                     label={t("labels.notes")}
                     size="sm"
                     value={field.value ?? ""}
                     onValueChange={field.onChange}
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
                   />
                 </div>
               )}

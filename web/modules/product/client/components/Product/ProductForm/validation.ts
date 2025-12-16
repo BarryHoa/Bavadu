@@ -16,6 +16,7 @@ import {
   string,
   trim,
 } from "valibot";
+
 import {
   ProductMasterFeatures,
   ProductMasterType,
@@ -31,7 +32,7 @@ export const createLocaleRequiredSchema = (t: (key: string) => string) =>
   object({
     en: pipe(
       fallback(pipe(string(), trim()), ""),
-      minLength(1, t("errors.required"))
+      minLength(1, t("errors.required")),
     ),
     vi: fallback(pipe(string(), trim()), ""),
   });
@@ -53,7 +54,7 @@ const productMasterTypeValues = Object.values(ProductMasterType) as [
 export const createVariantSchema = (
   t: (key: string) => string,
   tProduct: (key: string) => string,
-  tProductForm: (key: string) => string
+  tProductForm: (key: string) => string,
 ) =>
   object({
     name: createLocaleRequiredSchema(t),
@@ -66,23 +67,23 @@ export const createVariantSchema = (
       id: pipe(
         string(),
         trim(),
-        minLength(1, tProductForm("errors.baseUnitOfMeasureRequired"))
+        minLength(1, tProductForm("errors.baseUnitOfMeasureRequired")),
       ),
     }),
     saleUom: optional(
       object({
         id: pipe(string(), trim()),
-      })
+      }),
     ),
     purchaseUom: optional(
       object({
         id: pipe(string(), trim()),
-      })
+      }),
     ),
     manufacturingUom: optional(
       object({
         id: pipe(string(), trim()),
-      })
+      }),
     ),
     uomConversions: array(
       object({
@@ -95,10 +96,10 @@ export const createVariantSchema = (
         conversionRatio: nullable(
           pipe(
             number(),
-            minValue(0.000001, tProductForm("errors.conversionRatioRequired"))
-          )
+            minValue(0.000001, tProductForm("errors.conversionRatioRequired")),
+          ),
         ),
-      })
+      }),
     ),
 
     isActive: boolean(),
@@ -109,7 +110,7 @@ export const createVariantSchema = (
         name: localeSchema,
         description: localeSchema,
         isActive: boolean(),
-      })
+      }),
     ),
     attributes: array(
       object({
@@ -117,7 +118,7 @@ export const createVariantSchema = (
         code: pipe(string(), trim()),
         name: localeSchema,
         value: pipe(string(), trim()),
-      })
+      }),
     ),
   });
 
@@ -127,15 +128,15 @@ export const createProductFormSchema = (
   tProductForm: (key: string) => string,
   formatMessage: (
     key: string,
-    values: Record<string, string | number>
-  ) => string
+    values: Record<string, string | number>,
+  ) => string,
 ) =>
   object({
     master: object({
       code: pipe(
         string(),
         trim(),
-        minLength(1, tProductForm("errors.productCodeRequired"))
+        minLength(1, tProductForm("errors.productCodeRequired")),
       ),
       name: createLocaleRequiredSchema(t),
       description: fallback(pipe(string(), trim()), ""),
@@ -146,12 +147,12 @@ export const createProductFormSchema = (
       categoryId: optional(pipe(string(), trim())),
       images: pipe(
         array(any()),
-        minLength(1, tProductForm("errors.masterImageRequired"))
+        minLength(1, tProductForm("errors.masterImageRequired")),
       ),
     }),
     variants: pipe(
       array(createVariantSchema(t, tProduct, tProductForm)),
       minLength(1, tProductForm("errors.atLeastOneVariantRequired")),
-      maxLength(20, formatMessage("errors.maxVariantsAllowed", { count: 20 }))
+      maxLength(20, formatMessage("errors.maxVariantsAllowed", { count: 20 })),
     ),
   });

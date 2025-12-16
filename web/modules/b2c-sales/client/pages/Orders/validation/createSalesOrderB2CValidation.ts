@@ -25,21 +25,29 @@ export function createSalesOrderB2CValidation(t: TranslateFn) {
     string(),
     trim(),
     minLength(1, t("validation.quantity.required")),
-    custom((value) => {
-      const num = Number(value);
-      return !Number.isNaN(num) && num >= 0 && num <= 5000;
-    }, t("validation.quantity.range", { min: 0, max: 5000 }))
+    custom(
+      (value) => {
+        const num = Number(value);
+
+        return !Number.isNaN(num) && num >= 0 && num <= 5000;
+      },
+      t("validation.quantity.range", { min: 0, max: 5000 }),
+    ),
   );
 
   // Price validation: 0-100,000,000
   const priceSchema = pipe(
     string(),
     trim(),
-    custom((value) => {
-      if (value === "") return true;
-      const num = Number(value);
-      return !Number.isNaN(num) && num >= 0 && num <= 100000000;
-    }, t("validation.price.range", { min: 0, max: 100000000 }))
+    custom(
+      (value) => {
+        if (value === "") return true;
+        const num = Number(value);
+
+        return !Number.isNaN(num) && num >= 0 && num <= 100000000;
+      },
+      t("validation.price.range", { min: 0, max: 100000000 }),
+    ),
   );
 
   // Discount validation: >= 0
@@ -49,8 +57,8 @@ export function createSalesOrderB2CValidation(t: TranslateFn) {
     custom(
       (value) =>
         value === "" || (!Number.isNaN(Number(value)) && Number(value) >= 0),
-      t("validation.discount.min", { min: 0 })
-    )
+      t("validation.discount.min", { min: 0 }),
+    ),
   );
 
   // Tax rate validation: 0-100
@@ -63,8 +71,8 @@ export function createSalesOrderB2CValidation(t: TranslateFn) {
         (!Number.isNaN(Number(value)) &&
           Number(value) >= 0 &&
           Number(value) <= 100),
-      t("validation.taxRate.range", { min: 0, max: 100 })
-    )
+      t("validation.taxRate.range", { min: 0, max: 100 }),
+    ),
   );
 
   // Order line schema
@@ -72,7 +80,7 @@ export function createSalesOrderB2CValidation(t: TranslateFn) {
     productId: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.product.required"))
+      minLength(1, t("validation.product.required")),
     ),
     unitId: optional(pipe(string(), trim())),
     quantity: quantitySchema,
@@ -88,19 +96,19 @@ export function createSalesOrderB2CValidation(t: TranslateFn) {
     priceListId: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.priceListId.required"))
+      minLength(1, t("validation.priceListId.required")),
     ),
     currency: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.currency.required"))
+      minLength(1, t("validation.currency.required")),
     ),
 
     // Customer
     customerName: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.customerName.required"))
+      minLength(1, t("validation.customerName.required")),
     ),
     requireInvoice: optional(boolean()),
 
@@ -119,7 +127,7 @@ export function createSalesOrderB2CValidation(t: TranslateFn) {
     totalTax: optional(discountSchema),
     lines: pipe(
       array(orderLineSchema),
-      minLength(1, t("validation.lines.required"))
+      minLength(1, t("validation.lines.required")),
     ),
   });
 
@@ -151,4 +159,3 @@ export function createSalesOrderB2CValidation(t: TranslateFn) {
 export type SalesOrderB2CFormValues = InferOutput<
   ReturnType<typeof createSalesOrderB2CValidation>["salesOrderB2CFormSchema"]
 >;
-

@@ -8,6 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlSaleB2bSchema } from "./schema";
 
 // Sales Order Delivery - Track deliveries from orders (warehouse receipts)
@@ -35,7 +36,7 @@ export const sale_b2b_tb_deliveries = mdlSaleB2bSchema.table(
     index("deliveries_warehouse_idx").on(table.warehouseId),
     index("deliveries_date_idx").on(table.deliveryDate),
     index("deliveries_status_idx").on(table.status),
-  ]
+  ],
 );
 
 export type SaleB2bTbDelivery = typeof sale_b2b_tb_deliveries.$inferSelect;
@@ -60,9 +61,9 @@ export const sale_b2b_tb_delivery_lines = mdlSaleB2bSchema.table(
     index("delivery_lines_delivery_idx").on(table.deliveryId),
     index("delivery_lines_order_line_idx").on(
       table.orderType,
-      table.orderLineId
+      table.orderLineId,
     ),
-  ]
+  ],
 );
 
 export type SaleB2bTbDeliveryLine =

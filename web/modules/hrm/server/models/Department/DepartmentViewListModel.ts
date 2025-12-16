@@ -1,13 +1,14 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
@@ -47,10 +48,7 @@ class DepartmentViewListModel extends BaseViewListModel<
       ["id", { column: hrm_tb_departments.id, sort: true }],
       ["code", { column: hrm_tb_departments.code, sort: true }],
       ["name", { column: hrm_tb_departments.name, sort: true }],
-      [
-        "description",
-        { column: hrm_tb_departments.description, sort: false },
-      ],
+      ["description", { column: hrm_tb_departments.description, sort: false }],
       ["level", { column: hrm_tb_departments.level, sort: true }],
       ["isActive", { column: hrm_tb_departments.isActive, sort: true }],
       ["parentId", { column: hrm_tb_departments.parentId, sort: true }],
@@ -73,7 +71,6 @@ class DepartmentViewListModel extends BaseViewListModel<
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): DepartmentRow => ({
     id: row.id,
     code: row.code,
@@ -94,16 +91,15 @@ class DepartmentViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<DepartmentRow>> => {
     return this.buildQueryDataList(params, (query) =>
       query.leftJoin(
         parentDepartment,
-        eq(this.table.parentId, parentDepartment.id)
-      )
+        eq(this.table.parentId, parentDepartment.id),
+      ),
     );
   };
 }
 
 export default DepartmentViewListModel;
-

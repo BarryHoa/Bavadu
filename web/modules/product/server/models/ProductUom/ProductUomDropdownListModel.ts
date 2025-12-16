@@ -1,14 +1,16 @@
-import {
-  BaseViewListModel,
-  type FilterCondition,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterCondition,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { asc, eq, ilike, sql } from "drizzle-orm";
+
 import { product_tb_units_of_measure } from "../../schemas";
 
 type UomFilter = {
@@ -49,7 +51,10 @@ class ProductUomDropdownListModel extends BaseViewListModel<
       ["id", { column: product_tb_units_of_measure.id, sort: false }],
       ["name", { column: product_tb_units_of_measure.name, sort: false }],
       ["symbol", { column: product_tb_units_of_measure.symbol, sort: false }],
-      ["isActive", { column: product_tb_units_of_measure.isActive, sort: false }],
+      [
+        "isActive",
+        { column: product_tb_units_of_measure.isActive, sort: false },
+      ],
     ]);
 
   protected declarationSearch = () =>
@@ -62,7 +67,8 @@ class ProductUomDropdownListModel extends BaseViewListModel<
       ],
       [
         "symbol",
-        (text: string) => ilike(product_tb_units_of_measure.symbol, `%${text}%`),
+        (text: string) =>
+          ilike(product_tb_units_of_measure.symbol, `%${text}%`),
       ],
     ]);
 
@@ -80,7 +86,6 @@ class ProductUomDropdownListModel extends BaseViewListModel<
     return new Map(filters);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): ProductUomDropdownOption => {
     return {
       label: row.name,
@@ -90,7 +95,7 @@ class ProductUomDropdownListModel extends BaseViewListModel<
   };
 
   getData = async (
-    params: ListParamsRequest<UomFilter>
+    params: ListParamsRequest<UomFilter>,
   ): Promise<ListParamsResponse<ProductUomDropdownOption>> => {
     return this.buildQueryDataList(params, (query) => {
       return query.orderBy(asc(product_tb_units_of_measure.name));

@@ -6,6 +6,7 @@ import { courseService } from "@mdl/hrm/client/services/CourseService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
+
 import CourseForm, {
   type CourseFormValues,
 } from "./components/CourseForm/CourseForm";
@@ -26,9 +27,11 @@ export default function CourseEditPage(): React.ReactNode {
     queryKey: ["hrm-courses", id],
     queryFn: async () => {
       const response = await courseService.getById(id);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToLoadCourse"));
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -44,9 +47,11 @@ export default function CourseEditPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await courseService.update(payload);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToUpdateCourse"));
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-courses"], ["hrm-courses", id]],
@@ -89,10 +94,6 @@ export default function CourseEditPage(): React.ReactNode {
 
   return (
     <CourseForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push(`/workspace/modules/hrm/courses/view/${id}`)}
-      submitError={submitError}
-      isSubmitting={isPending}
       defaultValues={{
         code: courseData?.code || "",
         name: (courseData?.name as any) || { vi: "", en: "" },
@@ -103,6 +104,10 @@ export default function CourseEditPage(): React.ReactNode {
         instructor: courseData?.instructor || "",
         isActive: courseData?.isActive ? "true" : "false",
       }}
+      isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() => router.push(`/workspace/modules/hrm/courses/view/${id}`)}
+      onSubmit={handleSubmit}
     />
   );
 }

@@ -1,8 +1,10 @@
 "use client";
 
-import { Card, CardBody } from "@heroui/react";
 import type { WarehouseDto } from "../../../services/StockService";
 import type { MovementResult, MovementPayload } from "../types";
+
+import { Card, CardBody } from "@heroui/react";
+
 import MovementCard from "./MovementCard";
 
 interface QuickActionsSectionProps {
@@ -52,39 +54,39 @@ export default function QuickActionsSection({
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <MovementCard
-            title="Adjust Stock"
-            description="Modify the on-hand quantity for a single warehouse."
             actionLabel="Adjust"
-            warehouses={warehouses}
+            description="Modify the on-hand quantity for a single warehouse."
             submitting={adjustMutationPending}
+            title="Adjust Stock"
+            warehouses={warehouses}
             onSubmit={onAdjust}
           />
 
           <MovementCard
-            title="Receive Stock"
-            description="Register incoming inventory for purchase receipts."
             actionLabel="Receive"
-            warehouses={warehouses}
+            description="Register incoming inventory for purchase receipts."
             submitting={receiveMutationPending}
+            title="Receive Stock"
+            warehouses={warehouses}
             onSubmit={onReceive}
           />
 
           <MovementCard
-            title="Issue Stock"
-            description="Deduct inventory for sales or consumption."
             actionLabel="Issue"
-            warehouses={warehouses}
+            description="Deduct inventory for sales or consumption."
             submitting={issueMutationPending}
+            title="Issue Stock"
+            warehouses={warehouses}
             onSubmit={onIssue}
           />
 
           <MovementCard
-            title="Transfer Stock"
-            description="Move inventory between two warehouses."
-            actionLabel="Transfer"
-            warehouses={warehouses}
-            submitting={transferMutationPending}
             requireSecondaryWarehouse
+            actionLabel="Transfer"
+            description="Move inventory between two warehouses."
+            submitting={transferMutationPending}
+            title="Transfer Stock"
+            warehouses={warehouses}
             onSubmit={onTransfer}
           />
         </div>
@@ -92,4 +94,3 @@ export default function QuickActionsSection({
     </Card>
   );
 }
-

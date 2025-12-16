@@ -1,8 +1,4 @@
-export {
-  default as LogModel,
-  getLogModel,
-  type LogEntry,
-} from "./LogModel";
+export { default as LogModel, getLogModel, type LogEntry } from "./LogModel";
 export {
   default as LogCompressionModel,
   getLogCompressionModel,

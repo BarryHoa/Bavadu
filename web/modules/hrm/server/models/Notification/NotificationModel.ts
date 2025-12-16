@@ -43,7 +43,9 @@ export interface NotificationQuery {
   offset?: number;
 }
 
-export default class NotificationModel extends BaseModel<typeof hrm_tb_notifications> {
+export default class NotificationModel extends BaseModel<
+  typeof hrm_tb_notifications
+> {
   constructor() {
     super(hrm_tb_notifications);
   }
@@ -52,6 +54,7 @@ export default class NotificationModel extends BaseModel<typeof hrm_tb_notificat
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
@@ -77,6 +80,7 @@ export default class NotificationModel extends BaseModel<typeof hrm_tb_notificat
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -100,12 +104,14 @@ export default class NotificationModel extends BaseModel<typeof hrm_tb_notificat
     };
   };
 
-  getDataById = async (params: { id: string }): Promise<NotificationRow | null> => {
+  getDataById = async (params: {
+    id: string;
+  }): Promise<NotificationRow | null> => {
     return this.getNotificationById(params.id);
   };
 
   createNotification = async (
-    payload: NotificationInput
+    payload: NotificationInput,
   ): Promise<NotificationRow> => {
     const insertData: NewHrmTbNotification = {
       employeeId: payload.employeeId,
@@ -126,13 +132,15 @@ export default class NotificationModel extends BaseModel<typeof hrm_tb_notificat
     if (!created) throw new Error("Failed to create notification");
 
     const notification = await this.getNotificationById(created.id);
+
     if (!notification)
       throw new Error("Failed to load notification after creation");
+
     return notification;
   };
 
   queryNotifications = async (
-    query: NotificationQuery
+    query: NotificationQuery,
   ): Promise<{ notifications: NotificationRow[]; total: number }> => {
     const conditions = [eq(this.table.employeeId, query.employeeId)];
 
@@ -216,7 +224,11 @@ export default class NotificationModel extends BaseModel<typeof hrm_tb_notificat
         isRead: true,
         readAt: new Date(),
       })
-      .where(and(eq(this.table.employeeId, employeeId), eq(this.table.isRead, false)));
+      .where(
+        and(
+          eq(this.table.employeeId, employeeId),
+          eq(this.table.isRead, false),
+        ),
+      );
   };
 }
-

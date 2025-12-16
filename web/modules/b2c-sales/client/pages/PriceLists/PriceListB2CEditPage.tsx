@@ -14,6 +14,7 @@ import {
   priceListB2CService,
   type UpdatePriceListB2CParams,
 } from "../../services/PriceListB2CService";
+
 import PriceListForm from "./components/PriceListForm";
 
 const priceListFormSchema = object({
@@ -67,6 +68,7 @@ export default function PriceListB2CEditPage(): React.ReactNode {
     queryKey: ["price-list-b2c", id],
     queryFn: async () => {
       const response = await priceListB2CService.getById(id);
+
       return response.data;
     },
     enabled: !!id,
@@ -119,6 +121,7 @@ export default function PriceListB2CEditPage(): React.ReactNode {
   // Reset form when priceList loads
   if (priceList && !isLoading) {
     const applicableTo = priceList.applicableTo || {};
+
     reset({
       code: priceList.code,
       nameEn: name.en || "",
@@ -147,6 +150,7 @@ export default function PriceListB2CEditPage(): React.ReactNode {
 
   const onSubmit = (data: PriceListFormValues) => {
     const applicableTo: any = {};
+
     if (data.applicableTo.channels) {
       applicableTo.channels = data.applicableTo.channels
         .split(",")
@@ -221,27 +225,27 @@ export default function PriceListB2CEditPage(): React.ReactNode {
       <Card>
         <CardBody>
           <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
               <PriceListForm
-              control={control}
-              setValue={setValue}
-              errors={errors}
-              typeOptions={typeOptions}
-              statusOptions={statusOptions}
-              isEdit={true}
-            />
-            <div className="flex gap-2 justify-end">
-              <Button
-                type="button"
-                variant="light"
-                onPress={() => router.back()}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" color="primary" isLoading={isPending}>
-                Update
-              </Button>
-            </div>
+                control={control}
+                errors={errors}
+                isEdit={true}
+                setValue={setValue}
+                statusOptions={statusOptions}
+                typeOptions={typeOptions}
+              />
+              <div className="flex gap-2 justify-end">
+                <Button
+                  type="button"
+                  variant="light"
+                  onPress={() => router.back()}
+                >
+                  Cancel
+                </Button>
+                <Button color="primary" isLoading={isPending} type="submit">
+                  Update
+                </Button>
+              </div>
             </form>
           </FormProvider>
         </CardBody>

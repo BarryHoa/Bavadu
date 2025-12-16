@@ -29,16 +29,19 @@ const storeCreator = (set: any, get: any) => ({
       (state: RootStoreState) => {
         const currentStores = ensureMap(state.stores);
         const newStores = new Map(currentStores);
+
         newStores.set(key, value);
+
         return { stores: newStores };
       },
       false,
-      `setStoreValue:${key}`
+      `setStoreValue:${key}`,
     );
   },
 
   getStoreValue: <T>(key: string) => {
     const stores = ensureMap(get().stores);
+
     return stores.get(key) as T | undefined;
   },
 
@@ -47,16 +50,19 @@ const storeCreator = (set: any, get: any) => ({
       (state: RootStoreState) => {
         const currentStores = ensureMap(state.stores);
         const newStores = new Map(currentStores);
+
         newStores.delete(key);
+
         return { stores: newStores };
       },
       false,
-      `clearStoreValue:${key}`
+      `clearStoreValue:${key}`,
     );
   },
 
   hasStore: (key: string) => {
     const stores = ensureMap(get().stores);
+
     return stores.has(key);
   },
 });
@@ -72,6 +78,7 @@ const ensureMap = (stores: any): Map<string, any> => {
   if (stores && typeof stores === "object") {
     return new Map(Object.entries(stores));
   }
+
   return new Map();
 };
 
@@ -86,8 +93,9 @@ const persistedStore = persist(storeCreator, {
   merge: (persistedState, currentState) => {
     // Convert persisted object back to Map
     const stores = ensureMap(
-      (persistedState as any)?.stores || currentState.stores
+      (persistedState as any)?.stores || currentState.stores,
     );
+
     return {
       ...currentState,
       stores,
@@ -102,7 +110,7 @@ export const rootStore = isDev
       devtools(persistedStore, {
         name: "RootStore",
         enabled: true,
-      })
+      }),
     )
   : create<RootStoreState>()(persistedStore);
 
@@ -117,6 +125,7 @@ if (typeof window !== "undefined") {
 // Direct access (không subscribe, không gây re-render)
 export const getRootStoreValue = <T>(key: string): T | undefined => {
   const stores = ensureMap(rootStore.getState().stores);
+
   return stores.get(key) as T | undefined;
 };
 

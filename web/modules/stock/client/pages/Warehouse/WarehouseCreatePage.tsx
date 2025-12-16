@@ -1,15 +1,17 @@
 "use client";
 
+import type {
+  WarehouseDto,
+  WarehousePayload,
+} from "../../services/StockService";
+
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { Button } from "@heroui/button";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 
-import type {
-  WarehouseDto,
-  WarehousePayload,
-} from "../../services/StockService";
 import StockService from "../../services/StockService";
+
 import WarehouseForm from "./components/WarehouseForm";
 
 export default function WarehouseCreatePage(): React.ReactNode {
@@ -21,9 +23,11 @@ export default function WarehouseCreatePage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await StockService.createWarehouse(payload);
+
       if (!response.data) {
         throw new Error(response.message ?? "Failed to create warehouse.");
       }
+
       return response.data;
     },
     invalidateQueries: [["warehouses"]],
@@ -36,15 +40,12 @@ export default function WarehouseCreatePage(): React.ReactNode {
     async (payload: WarehousePayload) => {
       await handleSubmit(payload);
     },
-    [handleSubmit]
+    [handleSubmit],
   );
 
   return (
     <div className="w-full space-y-6">
       <WarehouseForm
-        submitLabel="Create warehouse"
-        onSubmit={handleFormSubmit}
-        submitError={error}
         secondaryAction={
           <Button
             size="sm"
@@ -54,6 +55,9 @@ export default function WarehouseCreatePage(): React.ReactNode {
             Cancel
           </Button>
         }
+        submitError={error}
+        submitLabel="Create warehouse"
+        onSubmit={handleFormSubmit}
       />
     </div>
   );

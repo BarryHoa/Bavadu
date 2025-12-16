@@ -4,6 +4,7 @@
 
 import { LocaleDataType } from "@base/server/interfaces/Locale";
 import { User } from "@base/server/interfaces/User";
+
 import { ProductAttribute } from "./ProductAttribute";
 import { ProductCategory } from "./ProductCategory";
 

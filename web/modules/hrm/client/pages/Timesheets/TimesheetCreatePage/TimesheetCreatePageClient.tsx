@@ -4,6 +4,7 @@ import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
+
 import TimesheetForm, {
   type TimesheetFormValues,
 } from "../components/TimesheetForm/TimesheetForm";
@@ -22,9 +23,13 @@ export default function TimesheetCreatePageClient(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await timesheetService.create(payload);
+
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToCreateTimesheet"));
+        throw new Error(
+          response.message ?? t("errors.failedToCreateTimesheet"),
+        );
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-timesheets"]],
@@ -53,11 +58,10 @@ export default function TimesheetCreatePageClient(): React.ReactNode {
 
   return (
     <TimesheetForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push("/workspace/modules/hrm/timesheets")}
-      submitError={submitError}
       isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() => router.push("/workspace/modules/hrm/timesheets")}
+      onSubmit={handleSubmit}
     />
   );
 }
-

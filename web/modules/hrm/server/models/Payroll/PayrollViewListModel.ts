@@ -1,13 +1,14 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
@@ -53,10 +54,16 @@ class PayrollViewListModel extends BaseViewListModel<
       }
     >([
       ["id", { column: hrm_tb_payrolls.id, sort: true }],
-      ["payrollPeriodId", { column: hrm_tb_payrolls.payrollPeriodId, sort: true }],
+      [
+        "payrollPeriodId",
+        { column: hrm_tb_payrolls.payrollPeriodId, sort: true },
+      ],
       ["employeeId", { column: hrm_tb_payrolls.employeeId, sort: true }],
       ["grossSalary", { column: hrm_tb_payrolls.grossSalary, sort: true }],
-      ["totalDeductions", { column: hrm_tb_payrolls.totalDeductions, sort: true }],
+      [
+        "totalDeductions",
+        { column: hrm_tb_payrolls.totalDeductions, sort: true },
+      ],
       ["netSalary", { column: hrm_tb_payrolls.netSalary, sort: true }],
       ["status", { column: hrm_tb_payrolls.status, sort: true }],
       ["createdAt", { column: hrm_tb_payrolls.createdAt, sort: true }],
@@ -76,7 +83,6 @@ class PayrollViewListModel extends BaseViewListModel<
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): PayrollRow => ({
     id: row.id,
     payrollPeriodId: row.payrollPeriodId,
@@ -104,15 +110,14 @@ class PayrollViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<PayrollRow>> => {
     return this.buildQueryDataList(params, (query) =>
       query
         .leftJoin(employee, eq(this.table.employeeId, employee.id))
-        .leftJoin(period, eq(this.table.payrollPeriodId, period.id))
+        .leftJoin(period, eq(this.table.payrollPeriodId, period.id)),
     );
   };
 }
 
 export default PayrollViewListModel;
-

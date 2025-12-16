@@ -22,6 +22,7 @@ export default function ModuleI18nProvider({
   // Initialize store with server-fetched messages
   useEffect(() => {
     const { common, ...moduleMessages } = initialMessages;
+
     setCommonMessages(common);
 
     // Set each module's messages
@@ -34,12 +35,13 @@ export default function ModuleI18nProvider({
   const combinedMessages = useMemo(() => {
     const init = Object.values(initialMessages).reduce(
       (acc, msg) => ({ ...acc, ...msg }),
-      {}
+      {},
     );
+
     // Combine all messages: common first, then modules (later modules override earlier ones)
     return Object.values(messages).reduce(
       (acc, moduleMsg) => ({ ...acc, ...moduleMsg }),
-      init
+      init,
     );
   }, [messages, initialMessages]);
 

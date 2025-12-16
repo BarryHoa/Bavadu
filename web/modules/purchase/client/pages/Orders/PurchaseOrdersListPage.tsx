@@ -30,6 +30,7 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
         label: t("columns.code"),
         render: (value, row) => {
           if (!row?.id) return value;
+
           return (
             <LinkAs href={`/workspace/modules/purchase/view/${row.id}`}>
               {row.code}
@@ -45,7 +46,7 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
         key: "status",
         label: t("columns.status"),
         render: (value) => (
-          <Chip size="sm" variant="flat" className="capitalize">
+          <Chip className="capitalize" size="sm" variant="flat">
             {t(`status.${value || "draft"}`)}
           </Chip>
         ),
@@ -71,6 +72,7 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
         render: (_, row) => {
           if (!row?.id) return null;
           const viewLink = `/workspace/modules/purchase/view/${row.id}`;
+
           return (
             <ActionMenu
               actions={[
@@ -85,15 +87,12 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
         },
       },
     ],
-    [t, tDataTable]
+    [t, tDataTable],
   );
 
   return (
     <div className="space-y-4">
       <ViewListDataTable<PurchaseOrderRow>
-        model="purchase-order"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -105,6 +104,9 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
             },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="purchase-order"
       />
     </div>
   );

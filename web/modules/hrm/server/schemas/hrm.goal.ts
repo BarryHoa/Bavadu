@@ -1,6 +1,5 @@
 import { sql } from "drizzle-orm";
 import {
-  boolean,
   date,
   index,
   integer,
@@ -10,6 +9,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_employees } from "./hrm.employee";
 
@@ -44,9 +44,8 @@ export const hrm_tb_goals = mdlHrmSchema.table(
     index("goals_type_idx").on(table.goalType),
     index("goals_status_idx").on(table.status),
     index("goals_dates_idx").on(table.startDate, table.endDate),
-  ]
+  ],
 );
 
 export type HrmTbGoal = typeof hrm_tb_goals.$inferSelect;
 export type NewHrmTbGoal = typeof hrm_tb_goals.$inferInsert;
-

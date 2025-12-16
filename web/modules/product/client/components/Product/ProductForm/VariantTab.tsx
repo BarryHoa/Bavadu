@@ -1,5 +1,7 @@
 "use client";
 
+import type { LocaleFieldValue, VariantFieldValue } from "./types";
+
 import {
   IBaseInput,
   IBaseInputMultipleLang,
@@ -10,8 +12,9 @@ import { Button } from "@heroui/button";
 import { Card, CardBody, Divider } from "@heroui/react";
 import { Plus, Trash } from "lucide-react";
 import { useTranslations } from "next-intl";
+
 import { ProductMasterFeaturesType } from "../../../interface/Product";
-import type { LocaleFieldValue, VariantFieldValue } from "./types";
+
 import { updateLocaleValue } from "./types";
 import UomSection from "./UomSection";
 
@@ -35,7 +38,7 @@ type VariantTabProps = {
   canRemove: boolean;
   onRemove: () => void;
   onUpdate: (
-    updater: (current: VariantFieldValue) => VariantFieldValue
+    updater: (current: VariantFieldValue) => VariantFieldValue,
   ) => void;
 };
 
@@ -59,17 +62,21 @@ export default function VariantTab({
           {t("variant")} {variantIndex + 1}
         </h2>
         <Button
-          size="sm"
-          variant="light"
-          startContent={<Trash size={14} />}
-          onPress={onRemove}
           isDisabled={isBusy || !canRemove}
+          size="sm"
+          startContent={<Trash size={14} />}
+          variant="light"
+          onPress={onRemove}
         >
           {tProductForm("removeVariant")}
         </Button>
       </div>
 
       <IBaseInputMultipleLang
+        isRequired
+        errorMessage={variantErrors?.name?.en?.message}
+        isDisabled={isBusy}
+        isInvalid={Boolean(variantErrors?.name?.en)}
         label={t("name")}
         value={value.name}
         onValueChange={(langs) =>
@@ -78,65 +85,61 @@ export default function VariantTab({
             name: langs as unknown as LocaleFieldValue,
           }))
         }
-        isRequired
-        isInvalid={Boolean(variantErrors?.name?.en)}
-        errorMessage={variantErrors?.name?.en?.message}
-        isDisabled={isBusy}
       />
 
       <div className="grid gap-4 md:grid-cols-2">
         <IBaseInput
+          isRequired
+          errorMessage={variantErrors?.sku?.message}
+          isDisabled={isBusy}
+          isInvalid={Boolean(variantErrors?.sku)}
           label={t("sku")}
           value={value.sku ?? ""}
           onValueChange={(next) =>
             onUpdate((current) => ({ ...current, sku: next }))
           }
-          isRequired
-          isInvalid={Boolean(variantErrors?.sku)}
-          errorMessage={variantErrors?.sku?.message}
-          isDisabled={isBusy}
         />
         <IBaseInput
+          isRequired
+          errorMessage={variantErrors?.barcode?.message}
+          isDisabled={isBusy}
+          isInvalid={Boolean(variantErrors?.barcode)}
           label={t("barcode")}
           value={value.barcode ?? ""}
           onValueChange={(next) =>
             onUpdate((current) => ({ ...current, barcode: next }))
           }
-          isRequired
-          isInvalid={Boolean(variantErrors?.barcode)}
-          errorMessage={variantErrors?.barcode?.message}
-          isDisabled={isBusy}
         />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <IBaseInput
+          errorMessage={variantErrors?.manufacturerName?.message}
+          isDisabled={isBusy}
+          isInvalid={Boolean(variantErrors?.manufacturerName)}
           label={tProductForm("manufacturerName")}
           value={value.manufacturerName ?? ""}
           onValueChange={(next) =>
             onUpdate((current) => ({ ...current, manufacturerName: next }))
           }
-          isInvalid={Boolean(variantErrors?.manufacturerName)}
-          errorMessage={variantErrors?.manufacturerName?.message}
-          isDisabled={isBusy}
         />
         <IBaseInput
+          errorMessage={variantErrors?.manufacturerCode?.message}
+          isDisabled={isBusy}
+          isInvalid={Boolean(variantErrors?.manufacturerCode)}
           label={tProductForm("manufacturerCode")}
           value={value.manufacturerCode ?? ""}
           onValueChange={(next) =>
             onUpdate((current) => ({ ...current, manufacturerCode: next }))
           }
-          isInvalid={Boolean(variantErrors?.manufacturerCode)}
-          errorMessage={variantErrors?.manufacturerCode?.message}
-          isDisabled={isBusy}
         />
       </div>
       <Divider />
       <UomSection
-        variantIndex={variantIndex}
-        masterFeatures={masterFeatures}
-        isBusy={isBusy}
         error={variantErrors?.baseUom}
+        isBusy={isBusy}
+        masterFeatures={masterFeatures}
+        variantIndex={variantIndex}
       />
 
       <Divider />
@@ -152,9 +155,10 @@ export default function VariantTab({
             </p>
           </div>
           <Button
+            isDisabled={isBusy}
             size="sm"
-            variant="bordered"
             startContent={<Plus size={14} />}
+            variant="bordered"
             onPress={() =>
               onUpdate((current) => ({
                 ...current,
@@ -168,7 +172,6 @@ export default function VariantTab({
                 ],
               }))
             }
-            isDisabled={isBusy}
           >
             {tProductForm("addPacking")}
           </Button>
@@ -188,24 +191,25 @@ export default function VariantTab({
                       Packing #{packingIndex + 1}
                     </h5>
                     <Button
+                      isDisabled={isBusy}
                       size="sm"
-                      variant="light"
                       startContent={<Trash size={14} />}
+                      variant="light"
                       onPress={() =>
                         onUpdate((current) => ({
                           ...current,
                           packings: current.packings.filter(
-                            (_, idx) => idx !== packingIndex
+                            (_, idx) => idx !== packingIndex,
                           ),
                         }))
                       }
-                      isDisabled={isBusy}
                     >
                       {t("actions.remove")}
                     </Button>
                   </div>
                   <div className="grid gap-3 md:grid-cols-2">
                     <IBaseInput
+                      isDisabled={isBusy}
                       label={tProductForm("nameEnglish")}
                       value={packing.name.en ?? ""}
                       onValueChange={(next) =>
@@ -217,13 +221,13 @@ export default function VariantTab({
                                   ...p,
                                   name: updateLocaleValue(p.name, "en", next),
                                 }
-                              : p
+                              : p,
                           ),
                         }))
                       }
-                      isDisabled={isBusy}
                     />
                     <IBaseInput
+                      isDisabled={isBusy}
                       label={tProductForm("nameVietnamese")}
                       value={packing.name.vi ?? ""}
                       onValueChange={(next) =>
@@ -235,14 +239,14 @@ export default function VariantTab({
                                   ...p,
                                   name: updateLocaleValue(p.name, "vi", next),
                                 }
-                              : p
+                              : p,
                           ),
                         }))
                       }
-                      isDisabled={isBusy}
                     />
                   </div>
                   <IBaseTextarea
+                    isDisabled={isBusy}
                     label={t("description")}
                     value={packing.description ?? ""}
                     onValueChange={(next) =>
@@ -254,11 +258,10 @@ export default function VariantTab({
                                 ...p,
                                 description: next,
                               }
-                            : p
+                            : p,
                         ),
                       }))
                     }
-                    isDisabled={isBusy}
                   />
                 </CardBody>
               </Card>
@@ -280,9 +283,10 @@ export default function VariantTab({
             </p>
           </div>
           <Button
+            isDisabled={isBusy}
             size="sm"
-            variant="bordered"
             startContent={<Plus size={14} />}
+            variant="bordered"
             onPress={() =>
               onUpdate((current) => ({
                 ...current,
@@ -296,7 +300,6 @@ export default function VariantTab({
                 ],
               }))
             }
-            isDisabled={isBusy}
           >
             {tProductForm("addAttribute")}
           </Button>
@@ -316,43 +319,44 @@ export default function VariantTab({
                       Attribute #{attributeIndex + 1}
                     </h5>
                     <Button
+                      isDisabled={isBusy}
                       size="sm"
-                      variant="light"
                       startContent={<Trash size={14} />}
+                      variant="light"
                       onPress={() =>
                         onUpdate((current) => ({
                           ...current,
                           attributes: current.attributes.filter(
-                            (_, idx) => idx !== attributeIndex
+                            (_, idx) => idx !== attributeIndex,
                           ),
                         }))
                       }
-                      isDisabled={isBusy}
                     >
                       {t("actions.remove")}
                     </Button>
                   </div>
                   <IBaseInput
+                    errorMessage={
+                      variantErrors?.attributes?.[attributeIndex]?.code?.message
+                    }
+                    isDisabled={isBusy}
+                    isInvalid={Boolean(
+                      variantErrors?.attributes?.[attributeIndex]?.code,
+                    )}
                     label={t("code")}
                     value={attribute.code}
                     onValueChange={(next) =>
                       onUpdate((current) => ({
                         ...current,
                         attributes: current.attributes.map((a, idx) =>
-                          idx === attributeIndex ? { ...a, code: next } : a
+                          idx === attributeIndex ? { ...a, code: next } : a,
                         ),
                       }))
                     }
-                    isInvalid={Boolean(
-                      variantErrors?.attributes?.[attributeIndex]?.code
-                    )}
-                    errorMessage={
-                      variantErrors?.attributes?.[attributeIndex]?.code?.message
-                    }
-                    isDisabled={isBusy}
                   />
                   <div className="grid gap-3 md:grid-cols-2">
                     <IBaseInput
+                      isDisabled={isBusy}
                       label={tProductForm("nameEnglish")}
                       value={attribute.name.en ?? ""}
                       onValueChange={(next) =>
@@ -364,13 +368,13 @@ export default function VariantTab({
                                   ...a,
                                   name: updateLocaleValue(a.name, "en", next),
                                 }
-                              : a
+                              : a,
                           ),
                         }))
                       }
-                      isDisabled={isBusy}
                     />
                     <IBaseInput
+                      isDisabled={isBusy}
                       label={tProductForm("nameVietnamese")}
                       value={attribute.name.vi ?? ""}
                       onValueChange={(next) =>
@@ -382,32 +386,31 @@ export default function VariantTab({
                                   ...a,
                                   name: updateLocaleValue(a.name, "vi", next),
                                 }
-                              : a
+                              : a,
                           ),
                         }))
                       }
-                      isDisabled={isBusy}
                     />
                   </div>
                   <IBaseInput
+                    errorMessage={
+                      variantErrors?.attributes?.[attributeIndex]?.value
+                        ?.message
+                    }
+                    isDisabled={isBusy}
+                    isInvalid={Boolean(
+                      variantErrors?.attributes?.[attributeIndex]?.value,
+                    )}
                     label={t("value")}
                     value={attribute.value}
                     onValueChange={(next) =>
                       onUpdate((current) => ({
                         ...current,
                         attributes: current.attributes.map((a, idx) =>
-                          idx === attributeIndex ? { ...a, value: next } : a
+                          idx === attributeIndex ? { ...a, value: next } : a,
                         ),
                       }))
                     }
-                    isInvalid={Boolean(
-                      variantErrors?.attributes?.[attributeIndex]?.value
-                    )}
-                    errorMessage={
-                      variantErrors?.attributes?.[attributeIndex]?.value
-                        ?.message
-                    }
-                    isDisabled={isBusy}
                   />
                 </CardBody>
               </Card>
@@ -417,21 +420,21 @@ export default function VariantTab({
       </div>
 
       <IBaseTextarea
+        isDisabled={isBusy}
         label={t("description")}
         value={value.description ?? ""}
         onValueChange={(next) =>
           onUpdate((current) => ({ ...current, description: next }))
         }
-        isDisabled={isBusy}
       />
 
       <IBaseUploadImageTiny
-        label={tProductForm("images")}
-        values={value.images ?? []}
-        onChange={(images) => onUpdate((current) => ({ ...current, images }))}
         isDisabled={isBusy}
+        label={tProductForm("images")}
         maxCount={10}
         maxSize={5 * 1024 * 1024} // 5MB
+        values={value.images ?? []}
+        onChange={(images) => onUpdate((current) => ({ ...current, images }))}
       />
     </div>
   );

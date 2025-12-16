@@ -1,3 +1,5 @@
+import type { NextRequest } from "next/server";
+
 import {
   addPageHeaders,
   addSecurityHeaders,
@@ -6,7 +8,6 @@ import {
   checkRateLimit,
 } from "@base/server/middleware";
 import { checkSuspiciousRequest } from "@base/server/utils/request-monitor";
-import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 // Public routes that don't require authentication
@@ -32,7 +33,7 @@ const EXCLUDED_PATHS = ["/_next", "/static", "/favicon"];
  */
 function isPublicRoute(pathname: string): boolean {
   return PUBLIC_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(route + "/")
+    (route) => pathname === route || pathname.startsWith(route + "/"),
   );
 }
 
@@ -73,10 +74,11 @@ function isPageRoute(pathname: string): boolean {
 async function handleApiRoute(
   req: NextRequest,
   pathname: string,
-  nextHeaders: Headers
+  nextHeaders: Headers,
 ): Promise<NextResponse | null> {
   // 1. Rate Limiting
   const rateLimitResponse = checkRateLimit(req, pathname);
+
   if (rateLimitResponse) {
     return addSecurityHeaders(rateLimitResponse);
   }
@@ -89,12 +91,14 @@ async function handleApiRoute(
     pathname !== "/api/base/utils/get-csrf-token"
   ) {
     const csrfResponse = checkCsrfProtection(req);
+
     if (csrfResponse) {
       return addSecurityHeaders(csrfResponse);
     }
   } else if (pathname === "/api/base/media/upload") {
     // Upload endpoint requires CSRF protection even though media viewing is public
     const csrfResponse = checkCsrfProtection(req);
+
     if (csrfResponse) {
       return addSecurityHeaders(csrfResponse);
     }
@@ -104,6 +108,7 @@ async function handleApiRoute(
   // Upload endpoint requires authentication even though media viewing is public
   if (!isPublicRoute(pathname) || pathname === "/api/base/media/upload") {
     const authResponse = await authenticateRequest(req, nextHeaders);
+
     if (authResponse) {
       return addSecurityHeaders(authResponse);
     }
@@ -120,20 +125,24 @@ async function handleApiRoute(
 async function handlePageRoute(
   req: NextRequest,
   pathname: string,
-  nextHeaders: Headers
+  nextHeaders: Headers,
 ): Promise<NextResponse | null> {
   // Check authentication for protected routes
   if (isProtectedRoute(pathname) && !isPublicRoute(pathname)) {
     const authResponse = await authenticateRequest(req, nextHeaders);
+
     if (authResponse) {
       // Redirect to login page if not authenticated
       const loginUrl = new URL("/login", req.url);
+
       loginUrl.searchParams.set("redirect", pathname);
+
       return NextResponse.redirect(loginUrl);
     }
   }
 
   addPageHeaders(req, nextHeaders, pathname);
+
   return null;
 }
 
@@ -161,13 +170,16 @@ export async function proxy(req: NextRequest) {
   // Handle API routes
   if (isApiRoute(pathname)) {
     const apiResponse = await handleApiRoute(req, pathname, nextHeaders);
+
     if (apiResponse) {
       // Record error response for monitoring
       if (apiResponse.status >= 400) {
         const { recordErrorResponse } =
           await import("@base/server/utils/request-monitor");
+
         recordErrorResponse(req, pathname, apiResponse.status);
       }
+
       return apiResponse; // Rate limit, CSRF, or auth error
     }
   }
@@ -175,6 +187,7 @@ export async function proxy(req: NextRequest) {
   // Handle page routes
   if (isPageRoute(pathname)) {
     const pageResponse = await handlePageRoute(req, pathname, nextHeaders);
+
     if (pageResponse) {
       return addSecurityHeaders(pageResponse); // Redirect to login
     }

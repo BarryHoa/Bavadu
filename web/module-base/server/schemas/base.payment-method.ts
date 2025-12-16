@@ -10,6 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdBaseSchema } from "./schema";
 
 // Payment Methods
@@ -35,7 +36,7 @@ export const base_tb_payment_methods = mdBaseSchema.table(
     index("payment_methods_active_idx").on(table.isActive),
     index("payment_methods_type_idx").on(table.type),
     index("payment_methods_type_active_idx").on(table.type, table.isActive),
-  ]
+  ],
 );
 
 export type BaseTbPaymentMethod = typeof base_tb_payment_methods.$inferSelect;

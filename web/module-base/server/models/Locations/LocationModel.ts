@@ -14,6 +14,7 @@ class LocationModel extends BaseModel<typeof base_tb_location_countries> {
       .select()
       .from(this.table)
       .where(eq(this.table.id, id));
+
     return location[0];
   };
 
@@ -26,6 +27,7 @@ class LocationModel extends BaseModel<typeof base_tb_location_countries> {
       .from(this.table)
       .where(eq(this.table.isActive, true))
       .orderBy(asc(this.table.code));
+
     return countries;
   };
 
@@ -37,6 +39,7 @@ class LocationModel extends BaseModel<typeof base_tb_location_countries> {
       .select()
       .from(this.table)
       .where(eq(this.table.id, id));
+
     return country[0];
   };
 
@@ -52,7 +55,9 @@ class LocationModel extends BaseModel<typeof base_tb_location_countries> {
     countryId?: string;
     level?: number;
   }) => {
-    const conditions = [eq(base_tb_location_administrative_units.isActive, true)];
+    const conditions = [
+      eq(base_tb_location_administrative_units.isActive, true),
+    ];
 
     // Filter by parentId
     if (params?.parentId !== undefined) {
@@ -61,7 +66,7 @@ class LocationModel extends BaseModel<typeof base_tb_location_countries> {
         conditions.push(isNull(base_tb_location_administrative_units.parentId));
       } else {
         conditions.push(
-          eq(base_tb_location_administrative_units.parentId, params.parentId)
+          eq(base_tb_location_administrative_units.parentId, params.parentId),
         );
       }
     }
@@ -69,14 +74,14 @@ class LocationModel extends BaseModel<typeof base_tb_location_countries> {
     // Filter by countryId
     if (params?.countryId) {
       conditions.push(
-        eq(base_tb_location_administrative_units.countryId, params.countryId)
+        eq(base_tb_location_administrative_units.countryId, params.countryId),
       );
     }
 
     // Filter by level
     if (params?.level) {
       conditions.push(
-        eq(base_tb_location_administrative_units.level, params.level)
+        eq(base_tb_location_administrative_units.level, params.level),
       );
     }
 
@@ -86,7 +91,7 @@ class LocationModel extends BaseModel<typeof base_tb_location_countries> {
       .where(and(...conditions))
       .orderBy(
         asc(base_tb_location_administrative_units.level),
-        asc(base_tb_location_administrative_units.name)
+        asc(base_tb_location_administrative_units.name),
       );
 
     return administrativeUnits;
@@ -99,7 +104,6 @@ class LocationModel extends BaseModel<typeof base_tb_location_countries> {
    * @param params.type - Administrative unit type (province, state, district, ward, commune, etc.)
    */
   getLocationBy = async (params: { parentId: string; type: string }) => {
-
     const conditions = [
       eq(base_tb_location_administrative_units.isActive, true),
       eq(base_tb_location_administrative_units.parentId, params.parentId),
@@ -127,7 +131,7 @@ class LocationModel extends BaseModel<typeof base_tb_location_countries> {
     params?: {
       parentId?: string | null;
       level?: number;
-    }
+    },
   ) => {
     // First, get the country by code
     const country = await this.db
@@ -152,13 +156,14 @@ class LocationModel extends BaseModel<typeof base_tb_location_countries> {
         conditions.push(isNull(base_tb_location_administrative_units.parentId));
       } else {
         conditions.push(
-          eq(base_tb_location_administrative_units.parentId, params.parentId)
+          eq(base_tb_location_administrative_units.parentId, params.parentId),
         );
       }
     }
 
     // Filter by level
     const level = params?.level ?? 1;
+
     conditions.push(eq(base_tb_location_administrative_units.level, level));
 
     const administrativeUnits = await this.db
@@ -167,7 +172,7 @@ class LocationModel extends BaseModel<typeof base_tb_location_countries> {
       .where(and(...conditions))
       .orderBy(
         asc(base_tb_location_administrative_units.level),
-        asc(base_tb_location_administrative_units.name)
+        asc(base_tb_location_administrative_units.name),
       );
 
     return administrativeUnits;

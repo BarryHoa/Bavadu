@@ -1,6 +1,7 @@
 "use client";
 
 import type { DataTableColumnDefinition } from "@base/client/components";
+
 import {
   DATA_TABLE_COLUMN_KEY_ACTION,
   DataTable,
@@ -21,6 +22,7 @@ import {
   UseFormSetValue,
   useWatch,
 } from "react-hook-form";
+
 import PriceItemEditModal from "./PriceItemEditModal";
 
 interface ExplicitPricingTabProps {
@@ -81,6 +83,7 @@ export default function ExplicitPricingTab({
           "variant.isActive": true,
         },
       });
+
       return response.data || [];
     },
   });
@@ -90,6 +93,7 @@ export default function ExplicitPricingTab({
     queryKey: ["uoms"],
     queryFn: async () => {
       const response = await UnitOfMeasureService.getList();
+
       return response.data || [];
     },
   });
@@ -99,6 +103,7 @@ export default function ExplicitPricingTab({
     if (!productsQuery.data) return [];
 
     const variants: ProductVariantOption[] = [];
+
     productsQuery.data.forEach((product: any) => {
       if (product.variant) {
         const variantName =
@@ -134,19 +139,23 @@ export default function ExplicitPricingTab({
   // Build UOM options
   const uomOptions = useMemo<SelectItemOption[]>(() => {
     if (!uomQuery.data) return [];
+
     return uomQuery.data
       .filter((uom) => uom.isActive)
       .map((uom) => {
         let name = "";
+
         if (uom.name) {
           if (typeof uom.name === "object" && uom.name !== null) {
             const nameObj = uom.name as { vi?: string; en?: string };
+
             name = nameObj.vi || nameObj.en || "";
           } else if (typeof uom.name === "string") {
             name = uom.name;
           }
         }
         const label = uom.symbol ? `${name} (${uom.symbol})` : name;
+
         return {
           value: uom.id,
           label,
@@ -166,6 +175,7 @@ export default function ExplicitPricingTab({
 
     const rows: PriceItemRow[] = priceItemFields.map((field, index) => {
       const item = watchedPriceItems[index];
+
       if (!item) return null as any;
 
       const variant = variantOptions.find((v) => v.value === item.variantId);
@@ -183,7 +193,7 @@ export default function ExplicitPricingTab({
         (otherItem: any, otherIndex: number) =>
           otherIndex !== index &&
           otherItem.variantId === item.variantId &&
-          otherItem.minimumQuantity === item.minimumQuantity
+          otherItem.minimumQuantity === item.minimumQuantity,
       );
 
       return {
@@ -203,10 +213,12 @@ export default function ExplicitPricingTab({
     // Filter by search term (name or code/SKU)
     if (searchTerm.trim()) {
       const searchLower = searchTerm.toLowerCase().trim();
+
       return rows.filter((row) => {
         if (!row) return false;
         const nameMatch = row.variantName.toLowerCase().includes(searchLower);
         const skuMatch = row.variantSku?.toLowerCase().includes(searchLower);
+
         return nameMatch || skuMatch;
       });
     }
@@ -226,6 +238,7 @@ export default function ExplicitPricingTab({
       if (!variantId) return [];
 
       const variant = variantOptions.find((v) => v.value === variantId);
+
       if (!variant) return [];
 
       const availableUomIds: string[] = [];
@@ -242,22 +255,23 @@ export default function ExplicitPricingTab({
       }
 
       return uomOptions.filter((uom) =>
-        availableUomIds.includes(String(uom.value))
+        availableUomIds.includes(String(uom.value)),
       );
     },
-    [variantOptions, uomOptions]
+    [variantOptions, uomOptions],
   );
 
   // Get all tiers for a variant
   const getVariantTiers = useCallback(
     (variantId: string, excludeIndex: number) => {
       if (!variantId) return [];
+
       return watchedPriceItems
         .filter(
           (item: any, idx: number) =>
             idx !== excludeIndex &&
             item.variantId === variantId &&
-            item.minimumQuantity
+            item.minimumQuantity,
         )
         .map((item: any) => ({
           minQty: Number(item.minimumQuantity) || 0,
@@ -266,11 +280,11 @@ export default function ExplicitPricingTab({
         .sort(
           (
             a: { minQty: number; price: number },
-            b: { minQty: number; price: number }
-          ) => a.minQty - b.minQty
+            b: { minQty: number; price: number },
+          ) => a.minQty - b.minQty,
         );
     },
-    [watchedPriceItems]
+    [watchedPriceItems],
   );
 
   // Columns definition
@@ -326,6 +340,7 @@ export default function ExplicitPricingTab({
         minWidth: 100,
         render: (_, row) => {
           const tiers = getVariantTiers(row.variantId, row.index);
+
           return (
             <div className="flex items-center justify-end gap-2">
               {tiers.length > 0 && (
@@ -334,18 +349,18 @@ export default function ExplicitPricingTab({
                 </div>
               )}
               <Button
+                isIconOnly
                 size="sm"
                 variant="light"
-                isIconOnly
                 onPress={() => setEditingIndex(row.index)}
               >
                 <Edit2 size={16} />
               </Button>
               <Button
-                size="sm"
-                color="danger"
-                variant="light"
                 isIconOnly
+                color="danger"
+                size="sm"
+                variant="light"
                 onPress={() => removePriceItem(row.index)}
               >
                 <Trash2 size={16} />
@@ -355,7 +370,7 @@ export default function ExplicitPricingTab({
         },
       },
     ],
-    [getVariantTiers, removePriceItem]
+    [getVariantTiers, removePriceItem],
   );
 
   return (
@@ -364,16 +379,16 @@ export default function ExplicitPricingTab({
         <div className="w-[500px]">
           <IBaseInputSearch
             placeholder="Search by product name or code..."
+            size="sm"
             value={searchTerm}
             onValueChange={setSearchTerm}
-            size="sm"
           />
         </div>
         <Button
-          size="sm"
           color="primary"
-          variant="solid"
+          size="sm"
           startContent={<Plus size={16} />}
+          variant="solid"
           onPress={() => {
             prependPriceItem({
               variantId: "",
@@ -399,14 +414,14 @@ export default function ExplicitPricingTab({
             <DataTable<PriceItemRow>
               columns={columns}
               dataSource={tableRows}
-              rowKey="id"
-              pagination={false}
-              loading={productsQuery.isLoading || uomQuery.isLoading}
               emptyContent={
                 searchTerm
                   ? "No products found matching your search"
                   : "No pricing items"
               }
+              loading={productsQuery.isLoading || uomQuery.isLoading}
+              pagination={false}
+              rowKey="id"
             />
           </CardBody>
         </Card>
@@ -415,16 +430,16 @@ export default function ExplicitPricingTab({
       {/* Edit Modal */}
       {editingIndex !== null && (
         <PriceItemEditModal
-          isOpen={editingIndex !== null}
-          onClose={() => setEditingIndex(null)}
-          index={editingIndex}
           control={control}
-          setValue={setValue}
-          variantOptions={variantOptions}
-          uomOptions={uomOptions}
           getAvailableUomsForVariant={getAvailableUomsForVariant}
-          watchedPriceItems={watchedPriceItems}
+          index={editingIndex}
           isLoading={productsQuery.isLoading}
+          isOpen={editingIndex !== null}
+          setValue={setValue}
+          uomOptions={uomOptions}
+          variantOptions={variantOptions}
+          watchedPriceItems={watchedPriceItems}
+          onClose={() => setEditingIndex(null)}
         />
       )}
     </div>

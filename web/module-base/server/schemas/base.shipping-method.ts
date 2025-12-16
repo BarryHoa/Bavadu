@@ -10,6 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdBaseSchema } from "./schema";
 
 // Shipping Methods
@@ -34,7 +35,7 @@ export const base_tb_shipping_methods = mdBaseSchema.table(
     uniqueIndex("shipping_methods_code_type_unique").on(table.code, table.type),
     index("shipping_methods_code_idx").on(table.code),
     index("shipping_methods_active_idx").on(table.isActive),
-  ]
+  ],
 );
 
 export type BaseTbShippingMethod = typeof base_tb_shipping_methods.$inferSelect;

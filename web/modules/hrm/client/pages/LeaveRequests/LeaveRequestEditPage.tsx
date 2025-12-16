@@ -6,6 +6,7 @@ import { leaveRequestService } from "@mdl/hrm/client/services/LeaveRequestServic
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
+
 import LeaveRequestForm, {
   type LeaveRequestFormValues,
 } from "./components/LeaveRequestForm/LeaveRequestForm";
@@ -26,11 +27,13 @@ export default function LeaveRequestEditPage(): React.ReactNode {
     queryKey: ["hrm-leave-requests", id],
     queryFn: async () => {
       const response = await leaveRequestService.getById(id);
+
       if (!response.data) {
         throw new Error(
-          response.message ?? t("errors.failedToLoadLeaveRequest")
+          response.message ?? t("errors.failedToLoadLeaveRequest"),
         );
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -46,11 +49,13 @@ export default function LeaveRequestEditPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await leaveRequestService.update(payload);
+
       if (!response.data) {
         throw new Error(
-          response.message ?? t("errors.failedToUpdateLeaveRequest")
+          response.message ?? t("errors.failedToUpdateLeaveRequest"),
         );
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-leave-requests"], ["hrm-leave-requests", id]],
@@ -92,12 +97,6 @@ export default function LeaveRequestEditPage(): React.ReactNode {
 
   return (
     <LeaveRequestForm
-      onSubmit={handleSubmit}
-      onCancel={() =>
-        router.push(`/workspace/modules/hrm/leave-requests/view/${id}`)
-      }
-      submitError={submitError}
-      isSubmitting={isPending}
       defaultValues={{
         employeeId: leaveRequestData.employeeId,
         leaveTypeId: leaveRequestData.leaveTypeId,
@@ -107,6 +106,12 @@ export default function LeaveRequestEditPage(): React.ReactNode {
         reason: leaveRequestData.reason || "",
         status: leaveRequestData.status,
       }}
+      isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() =>
+        router.push(`/workspace/modules/hrm/leave-requests/view/${id}`)
+      }
+      onSubmit={handleSubmit}
     />
   );
 }

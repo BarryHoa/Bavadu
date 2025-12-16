@@ -1,4 +1,3 @@
-import type { LocaleDataType } from "@base/server/interfaces/Locale";
 import type { User } from "@base/server/interfaces/User";
 import type {
   SaleB2cTbCustomerCompany,
@@ -52,4 +51,3 @@ export interface CreateCustomerIndividualInput {
 export interface UpdateCustomerIndividualInput extends Partial<CreateCustomerIndividualInput> {
   id: string;
 }
-

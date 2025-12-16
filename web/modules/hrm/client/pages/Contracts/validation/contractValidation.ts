@@ -16,7 +16,7 @@ export function createContractValidation(t: TranslateFn) {
   const contractNumberSchema = pipe(
     string(),
     trim(),
-    minLength(1, t("validation.contractNumber.required"))
+    minLength(1, t("validation.contractNumber.required")),
   );
 
   const contractFormSchema = object({
@@ -24,17 +24,17 @@ export function createContractValidation(t: TranslateFn) {
     employeeId: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.employeeId.required"))
+      minLength(1, t("validation.employeeId.required")),
     ),
     contractType: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.contractType.required"))
+      minLength(1, t("validation.contractType.required")),
     ),
     startDate: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.startDate.required"))
+      minLength(1, t("validation.startDate.required")),
     ),
     endDate: optional(pipe(string(), trim())),
     baseSalary: pipe(
@@ -43,20 +43,35 @@ export function createContractValidation(t: TranslateFn) {
       minLength(1, t("validation.baseSalary.required")),
       custom((value) => {
         const num = Number(value);
+
         return !Number.isNaN(num) && num >= 0;
-      }, t("validation.baseSalary.invalid"))
+      }, t("validation.baseSalary.invalid")),
     ),
     currency: optional(pipe(string(), trim())),
-    workingHours: optional(pipe(string(), trim(), custom((value) => {
-      if (value === "") return true;
-      const num = Number(value);
-      return !Number.isNaN(num) && num >= 0;
-    }, t("validation.workingHours.invalid")))),
-    probationPeriod: optional(pipe(string(), trim(), custom((value) => {
-      if (value === "") return true;
-      const num = Number(value);
-      return !Number.isNaN(num) && num >= 0;
-    }, t("validation.probationPeriod.invalid")))),
+    workingHours: optional(
+      pipe(
+        string(),
+        trim(),
+        custom((value) => {
+          if (value === "") return true;
+          const num = Number(value);
+
+          return !Number.isNaN(num) && num >= 0;
+        }, t("validation.workingHours.invalid")),
+      ),
+    ),
+    probationPeriod: optional(
+      pipe(
+        string(),
+        trim(),
+        custom((value) => {
+          if (value === "") return true;
+          const num = Number(value);
+
+          return !Number.isNaN(num) && num >= 0;
+        }, t("validation.probationPeriod.invalid")),
+      ),
+    ),
     probationEndDate: optional(pipe(string(), trim())),
     status: optional(pipe(string(), trim())),
     documentUrl: optional(pipe(string(), trim())),
@@ -74,4 +89,3 @@ export function createContractValidation(t: TranslateFn) {
 export type ContractFormValues = InferOutput<
   ReturnType<typeof createContractValidation>["contractFormSchema"]
 >;
-

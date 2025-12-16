@@ -1,5 +1,6 @@
 import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
+
 import { base_tb_permissions } from "../../schemas";
 
 export interface PermissionRow {
@@ -25,7 +26,7 @@ export default class PermissionModel extends BaseModel<
    * Get all active permissions
    */
   async getPermissions(): Promise<PermissionRow[]> {
-    const db = await this.getDb();
+    const db = await this.db;
     const results = await db
       .select()
       .from(this.table)
@@ -36,7 +37,7 @@ export default class PermissionModel extends BaseModel<
   }
 
   private mapToPermissionRow(
-    row: typeof base_tb_permissions.$inferSelect
+    row: typeof base_tb_permissions.$inferSelect,
   ): PermissionRow {
     return {
       id: row.id,

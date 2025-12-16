@@ -3,6 +3,7 @@
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+
 import { salesOrderB2CService } from "../../../services/SalesOrderB2CService";
 import SalesOrderB2CForm, {
   type SalesOrderB2CFormValues,
@@ -33,9 +34,11 @@ export default function SalesOrderB2CCreatePageClient({
   >({
     mutationFn: async (payload) => {
       const response = await salesOrderB2CService.create(payload);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToCreateOrder"));
       }
+
       return response.data;
     },
     invalidateQueries: [["b2c-sales-orders"]],
@@ -83,14 +86,14 @@ export default function SalesOrderB2CCreatePageClient({
   return (
     <SalesOrderB2BFormProvider page="create">
       <SalesOrderB2CForm
-        onSubmit={handleSubmit}
-        onCancel={() => router.push("/workspace/modules/b2c-sales")}
-        submitError={submitError}
-        isSubmitting={isPending}
         defaultValues={{
           currency,
           customerName,
         }}
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push("/workspace/modules/b2c-sales")}
+        onSubmit={handleSubmit}
       />
     </SalesOrderB2BFormProvider>
   );

@@ -45,6 +45,7 @@ export default class ProductCategoryModel extends BaseModel<
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
@@ -99,7 +100,7 @@ export default class ProductCategoryModel extends BaseModel<
   };
 
   createCategory = async (
-    payload: ProductCategoryInput
+    payload: ProductCategoryInput,
   ): Promise<ProductCategoryRow> => {
     const now = new Date();
     const insertData: NewProductTbProductCategory = {
@@ -143,7 +144,7 @@ export default class ProductCategoryModel extends BaseModel<
 
   updateCategory = async (
     id: string,
-    payload: Partial<ProductCategoryInput>
+    payload: Partial<ProductCategoryInput>,
   ): Promise<ProductCategoryRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -179,7 +180,7 @@ export default class ProductCategoryModel extends BaseModel<
    * Wrapper used by getModuleQueryByModel for update via API
    * Accepts raw payload from controller and applies normalization logic.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   updateData = async (params: { id: string; payload: any }) => {
     const { id, payload } = params;
 
@@ -195,7 +196,7 @@ export default class ProductCategoryModel extends BaseModel<
     }
     if (payload.description !== undefined) {
       normalizedPayload.description = this.normalizeLocaleInput(
-        payload.description
+        payload.description,
       );
     }
     if (payload.parentId !== undefined) {

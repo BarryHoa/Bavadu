@@ -7,6 +7,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 
 // Payroll Periods - Kỳ lương
@@ -32,9 +33,8 @@ export const hrm_tb_payrolls_period = mdlHrmSchema.table(
     index("payroll_periods_code_idx").on(table.code),
     index("payroll_periods_dates_idx").on(table.startDate, table.endDate),
     index("payroll_periods_status_idx").on(table.status),
-  ]
+  ],
 );
 
 export type HrmTbPayrollPeriod = typeof hrm_tb_payrolls_period.$inferSelect;
 export type NewHrmTbPayrollPeriod = typeof hrm_tb_payrolls_period.$inferInsert;
-

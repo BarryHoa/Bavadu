@@ -1,17 +1,18 @@
 "use client";
 
-import {
-  IBaseInput,
-  IBaseSingleSelect,
-  SelectItemOption,
-} from "@base/client/components";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import type {
   Address,
   AdministrativeUnit,
   countryCode,
 } from "@base/client/interface/Address";
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
+
+import {
+  IBaseInput,
+  IBaseSingleSelect,
+  SelectItemOption,
+} from "@base/client/components";
+import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import locationService from "@base/client/services/LocationService";
 import { createAdministrativeUnit } from "@base/client/utils/address/addressUtils";
 import { useQuery } from "@tanstack/react-query";
@@ -43,8 +44,9 @@ const PickerAddressByCountryVN = ({
         {
           parentId: null,
           level: 1,
-        }
+        },
       );
+
       return response.data || [];
     },
   });
@@ -60,8 +62,9 @@ const PickerAddressByCountryVN = ({
       // Get all level 3 units (ward, commune, township) under the selected province
       const response = await locationService.getLocationBy(
         selectedProvinceId,
-        "ward"
+        "ward",
       );
+
       return response.data || [];
     },
     enabled: !!selectedProvinceId,
@@ -74,6 +77,7 @@ const PickerAddressByCountryVN = ({
       const nameObj = province.name as LocalizeText;
       // Include both Vietnamese and English names for better search
       const searchText = `${name} ${nameObj.vi || ""} ${nameObj.en || ""}`;
+
       return {
         value: province.id,
         label: name,
@@ -89,6 +93,7 @@ const PickerAddressByCountryVN = ({
       const nameObj = ward.name as LocalizeText;
       // Include both Vietnamese and English names for better search
       const searchText = `${name} ${nameObj.vi || ""} ${nameObj.en || ""}`;
+
       return {
         value: ward.id,
         label: name,
@@ -104,13 +109,14 @@ const PickerAddressByCountryVN = ({
     // Add Province (level 1)
     if (provinceId) {
       const province = provinces.find((p) => p.id === provinceId);
+
       if (province) {
         units.push(
           createAdministrativeUnit(
             province.id,
             province.name as Record<string, string>,
-            "province"
-          )
+            "province",
+          ),
         );
       }
     }
@@ -118,13 +124,14 @@ const PickerAddressByCountryVN = ({
     // Add Ward/Commune/Township (level 3) - trực thuộc tỉnh/TP
     if (wardId) {
       const ward = wards.find((w) => w.id === wardId);
+
       if (ward) {
         units.push(
           createAdministrativeUnit(
             ward.id,
             ward.name as Record<string, string>,
-            ward.type as "ward" | "commune" | "township"
-          )
+            ward.type as "ward" | "commune" | "township",
+          ),
         );
       }
     }
@@ -141,35 +148,37 @@ const PickerAddressByCountryVN = ({
   return (
     <div className="flex flex-col gap-4">
       <IBaseSingleSelect
+        disallowEmptySelection={false}
+        items={provinceItems}
         label={t("province.label")}
         placeholder={t("province.placeholder")}
-        items={provinceItems}
         selectedKey={selectedProvinceId || undefined}
         onSelectionChange={(key) => {
           const newProvinceId = key || "";
+
           setSelectedProvinceId(newProvinceId);
           // Reset ward khi đổi province
           setSelectedWardId("");
           // Update administrativeUnits
           updateAdministrativeUnits(newProvinceId, "");
         }}
-        disallowEmptySelection={false}
       />
 
       {/* Phường/Xã/Thị trấn - Required (trực thuộc tỉnh/TP) */}
       <IBaseSingleSelect
+        disallowEmptySelection={false}
+        isDisabled={!selectedProvinceId}
+        items={wardItems}
         label={t("ward.label")}
         placeholder={t("ward.placeholder")}
-        items={wardItems}
         selectedKey={selectedWardId || undefined}
         onSelectionChange={(key) => {
           const newWardId = key || "";
+
           setSelectedWardId(newWardId);
           // Update administrativeUnits
           updateAdministrativeUnits(selectedProvinceId, newWardId);
         }}
-        isDisabled={!selectedProvinceId}
-        disallowEmptySelection={false}
       />
 
       {/* Địa chỉ đường */}

@@ -5,10 +5,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
+import { LoadingOverlay } from "@base/client/components";
+
 import TimesheetForm, {
   type TimesheetFormValues,
 } from "./components/TimesheetForm/TimesheetForm";
-import { LoadingOverlay } from "@base/client/components";
 
 export default function TimesheetEditPage(): React.ReactNode {
   const router = useRouter();
@@ -26,9 +27,11 @@ export default function TimesheetEditPage(): React.ReactNode {
     queryKey: ["hrm-timesheets", id],
     queryFn: async () => {
       const response = await timesheetService.getById(id);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToLoadTimesheet"));
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -44,9 +47,13 @@ export default function TimesheetEditPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await timesheetService.update(payload);
+
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToUpdateTimesheet"));
+        throw new Error(
+          response.message ?? t("errors.failedToUpdateTimesheet"),
+        );
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-timesheets"], ["hrm-timesheets", id]],
@@ -94,10 +101,6 @@ export default function TimesheetEditPage(): React.ReactNode {
 
   return (
     <TimesheetForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push(`/workspace/modules/hrm/timesheets/view/${id}`)}
-      submitError={submitError}
-      isSubmitting={isPending}
       defaultValues={{
         employeeId: timesheetData.employeeId,
         rosterId: timesheetData.rosterId || "",
@@ -117,7 +120,12 @@ export default function TimesheetEditPage(): React.ReactNode {
         checkOutLocation: timesheetData.checkOutLocation || "",
         notes: timesheetData.notes || "",
       }}
+      isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() =>
+        router.push(`/workspace/modules/hrm/timesheets/view/${id}`)
+      }
+      onSubmit={handleSubmit}
     />
   );
 }
-

@@ -44,7 +44,7 @@ export default async function RootLayout({
   const locale = "en";
 
   return (
-    <html suppressHydrationWarning lang={locale} className="light">
+    <html suppressHydrationWarning className="light" lang={locale}>
       <head />
       <body>
         <Providers>

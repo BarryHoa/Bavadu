@@ -10,6 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlProductSchema } from "./schema";
 
 // Product Categories
@@ -37,8 +38,10 @@ export const product_tb_product_categories = mdlProductSchema.table(
     }),
     index("categories_parent_idx").on(table.parentId),
     index("categories_active_idx").on(table.isActive),
-  ]
+  ],
 );
 
-export type ProductTbProductCategory = typeof product_tb_product_categories.$inferSelect;
-export type NewProductTbProductCategory = typeof product_tb_product_categories.$inferInsert;
+export type ProductTbProductCategory =
+  typeof product_tb_product_categories.$inferSelect;
+export type NewProductTbProductCategory =
+  typeof product_tb_product_categories.$inferInsert;

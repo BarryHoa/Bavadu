@@ -1,15 +1,16 @@
 import type { Column } from "drizzle-orm";
-import { ilike } from "drizzle-orm";
-
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
+
+import { ilike } from "drizzle-orm";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
+
 import { sale_b2c_tb_orders } from "../../schemas";
 
 class SalesOrderB2CViewListModel extends BaseViewListModel<
@@ -54,13 +55,15 @@ class SalesOrderB2CViewListModel extends BaseViewListModel<
   protected declarationSearch = () =>
     new Map([
       ["code", (text: string) => ilike(sale_b2c_tb_orders.code, text)],
-      ["customerName", (text: string) => ilike(sale_b2c_tb_orders.customerName, text)],
+      [
+        "customerName",
+        (text: string) => ilike(sale_b2c_tb_orders.customerName, text),
+      ],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): any => ({
     id: row.id,
     code: row.code,
@@ -78,11 +81,10 @@ class SalesOrderB2CViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<any>> => {
     return this.buildQueryDataList(params);
   };
 }
 
 export default SalesOrderB2CViewListModel;
-

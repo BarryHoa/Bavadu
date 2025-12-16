@@ -5,7 +5,6 @@ import { usePrefetchModuleMessages } from "@base/client/hooks/usePrefetchModuleM
 import { MenuWorkspaceElement } from "@base/client/interface/WorkspaceMenuInterface";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-
 import Content from "@base/client/layouts/workspace/components/Content";
 import MenuPanel from "@base/client/layouts/workspace/components/Menu";
 import Nav from "@base/client/layouts/workspace/components/Nav";
@@ -40,6 +39,7 @@ export default function WorkspaceLayoutClient({
 
   useEffect(() => {
     const stored = window.localStorage.getItem("workspace_sidebar_pinned");
+
     setSidebarOpen(stored === "false" ? false : true);
   }, []);
 

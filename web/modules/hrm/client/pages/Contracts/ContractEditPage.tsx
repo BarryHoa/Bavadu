@@ -5,6 +5,7 @@ import { contractService } from "@mdl/hrm/client/services/ContractService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
+
 import ContractForm, {
   type ContractFormValues,
 } from "./components/ContractForm/ContractForm";
@@ -19,9 +20,11 @@ export default function ContractEditPage(): React.ReactNode {
     queryKey: ["hrm-contract", id],
     queryFn: async () => {
       const response = await contractService.getById(id);
+
       if (!response.data) {
         throw new Error(response.message ?? "Contract not found");
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -37,9 +40,11 @@ export default function ContractEditPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await contractService.update({ ...payload, id });
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToUpdate"));
       }
+
       return { id: response.data.id };
     },
     invalidateQueries: [["hrm-contracts"], ["hrm-contract", id]],
@@ -84,12 +89,6 @@ export default function ContractEditPage(): React.ReactNode {
 
   return (
     <ContractForm
-      onSubmit={handleSubmit}
-      onCancel={() =>
-        router.push(`/workspace/modules/hrm/contracts/view/${id}`)
-      }
-      submitError={submitError}
-      isSubmitting={isPending}
       defaultValues={{
         contractNumber: contractData.contractNumber,
         employeeId: contractData.employeeId,
@@ -108,6 +107,12 @@ export default function ContractEditPage(): React.ReactNode {
         notes: contractData.notes || "",
         isActive: contractData.isActive ?? true,
       }}
+      isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() =>
+        router.push(`/workspace/modules/hrm/contracts/view/${id}`)
+      }
+      onSubmit={handleSubmit}
     />
   );
 }

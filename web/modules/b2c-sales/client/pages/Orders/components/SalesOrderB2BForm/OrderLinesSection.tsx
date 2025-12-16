@@ -1,6 +1,5 @@
 "use client";
 
-import { ProductMasterFeaturesEnum } from "@/modules/product/server/models/interfaces/ProductMaster";
 import {
   IBaseInputNumber,
   IBaseSingleSelect,
@@ -14,6 +13,8 @@ import { Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo } from "react";
 import { Control, Controller, UseFormSetValue } from "react-hook-form";
+
+import { ProductMasterFeaturesEnum } from "@/modules/product/server/models/interfaces/ProductMaster";
 
 interface OrderLinesSectionProps {
   control: Control<any>;
@@ -84,10 +85,11 @@ export default function OrderLinesSection({
           const priceData = response.data;
           // Only auto-fill if unitPrice is not manually set or is 0
           const currentPrice = Number(line.unitPrice) || 0;
+
           if (currentPrice === 0 || currentPrice === 1) {
             setValue(
               `lines.${index}.unitPrice`,
-              priceData.finalPrice.toString()
+              priceData.finalPrice.toString(),
             );
           }
         }
@@ -150,14 +152,14 @@ export default function OrderLinesSection({
                   {t("line")} {index + 1}
                 </h3>
                 <Button
-                  size="sm"
-                  variant="light"
-                  color="danger"
                   isIconOnly
-                  onPress={() => remove(index)}
-                  isDisabled={fields.length === 1}
                   aria-label={t("removeLine")}
                   className="min-w-6 h-6"
+                  color="danger"
+                  isDisabled={fields.length === 1}
+                  size="sm"
+                  variant="light"
+                  onPress={() => remove(index)}
                 >
                   <Trash2 size={14} />
                 </Button>
@@ -168,26 +170,23 @@ export default function OrderLinesSection({
                 {/* Product - flex-grow on lg, full width on md */}
                 <div className="md:col-span-3 lg:flex-1 lg:min-w-[200px]">
                   <Controller
-                    name={`lines.${index}.productId`}
                     control={control}
+                    name={`lines.${index}.productId`}
                     render={({ field, fieldState }) => (
                       <IBaseSingleSelectAsync
-                        label={t("product")}
-                        size="sm"
-                        model="product.dropdown"
-                        selectedKey={field.value}
-                        onSelectionChange={(key) => {
-                          field.onChange(key || undefined);
-                        }}
                         isRequired
-                        isInvalid={fieldState.invalid}
-                        errorMessage={fieldState.error?.message}
                         defaultParams={{
                           filters: {
                             isActive: true,
                             features: [ProductMasterFeaturesEnum.SALE],
                           },
                         }}
+                        errorMessage={fieldState.error?.message}
+                        isInvalid={fieldState.invalid}
+                        label={t("product")}
+                        model="product.dropdown"
+                        selectedKey={field.value}
+                        size="sm"
                         onRenderOption={(item: any) => {
                           return (
                             <div className="flex flex-col igap-2">
@@ -198,6 +197,9 @@ export default function OrderLinesSection({
                             </div>
                           );
                         }}
+                        onSelectionChange={(key) => {
+                          field.onChange(key || undefined);
+                        }}
                       />
                     )}
                   />
@@ -206,23 +208,23 @@ export default function OrderLinesSection({
                 {/* Quantity - fixed width on lg */}
                 <div className="md:col-span-1 lg:w-[120px] lg:flex-shrink-0">
                   <Controller
-                    name={`lines.${index}.quantity`}
                     control={control}
+                    name={`lines.${index}.quantity`}
                     render={({ field, fieldState }) => (
                       <IBaseInputNumber
+                        isRequired
+                        allowNegative={false}
+                        decimalPlaces={2}
+                        errorMessage={fieldState.error?.message}
+                        isInvalid={fieldState.invalid}
+                        label={t("quantity")}
+                        max={5000}
+                        min={0}
+                        size="sm"
                         value={field.value ? Number(field.value) : null}
                         onValueChange={(val) =>
                           field.onChange(val?.toString() ?? "")
                         }
-                        label={t("quantity")}
-                        size="sm"
-                        min={0}
-                        max={5000}
-                        decimalPlaces={2}
-                        allowNegative={false}
-                        isRequired
-                        isInvalid={fieldState.invalid}
-                        errorMessage={fieldState.error?.message}
                       />
                     )}
                   />
@@ -231,22 +233,22 @@ export default function OrderLinesSection({
                 {/* Unit Price - fixed width on lg */}
                 <div className="md:col-span-1 lg:w-[160px] lg:flex-shrink-0">
                   <Controller
-                    name={`lines.${index}.unitPrice`}
                     control={control}
+                    name={`lines.${index}.unitPrice`}
                     render={({ field, fieldState }) => (
                       <IBaseInputNumber
+                        allowNegative={false}
+                        decimalPlaces={2}
+                        errorMessage={fieldState.error?.message}
+                        isInvalid={fieldState.invalid}
+                        label={t("unitPrice")}
+                        max={100000000}
+                        min={0}
+                        size="sm"
                         value={field.value ? Number(field.value) : null}
                         onValueChange={(val) =>
                           field.onChange(val?.toString() ?? "")
                         }
-                        label={t("unitPrice")}
-                        size="sm"
-                        min={0}
-                        max={100000000}
-                        decimalPlaces={2}
-                        allowNegative={false}
-                        isInvalid={fieldState.invalid}
-                        errorMessage={fieldState.error?.message}
                       />
                     )}
                   />
@@ -255,8 +257,8 @@ export default function OrderLinesSection({
                 {/* Discount - fixed width on lg */}
                 <div className="md:col-span-1 lg:w-[200px] lg:flex-shrink-0">
                   <Controller
-                    name={`lines.${index}.lineDiscount`}
                     control={control}
+                    name={`lines.${index}.lineDiscount`}
                     render={({ field, fieldState }) => {
                       const line = watchedLines[index];
                       const quantity = Number(line?.quantity) || 0;
@@ -267,17 +269,8 @@ export default function OrderLinesSection({
 
                       return (
                         <IBaseInputNumber
-                          value={field.value ? Number(field.value) : null}
-                          onValueChange={(val) =>
-                            field.onChange(val?.toString() ?? "")
-                          }
-                          label={t("discount")}
-                          size="sm"
-                          min={0}
-                          max={maxDiscount}
-                          decimalPlaces={2}
                           allowNegative={false}
-                          isInvalid={fieldState.invalid || isDiscountExceeded}
+                          decimalPlaces={2}
                           errorMessage={
                             fieldState.error?.message ||
                             (isDiscountExceeded
@@ -285,6 +278,15 @@ export default function OrderLinesSection({
                                   max: maxDiscount.toLocaleString(),
                                 })
                               : undefined)
+                          }
+                          isInvalid={fieldState.invalid || isDiscountExceeded}
+                          label={t("discount")}
+                          max={maxDiscount}
+                          min={0}
+                          size="sm"
+                          value={field.value ? Number(field.value) : null}
+                          onValueChange={(val) =>
+                            field.onChange(val?.toString() ?? "")
                           }
                         />
                       );
@@ -295,20 +297,20 @@ export default function OrderLinesSection({
                 {/* Tax Rate - fixed width on lg */}
                 <div className="md:col-span-1 lg:w-[150px] lg:flex-shrink-0">
                   <Controller
-                    name={`lines.${index}.taxRate`}
                     control={control}
+                    name={`lines.${index}.taxRate`}
                     render={({ field, fieldState }) => (
                       <IBaseSingleSelect
-                        label={t("taxRate")}
+                        errorMessage={fieldState.error?.message}
+                        isDisabled={taxRatesQuery.isLoading}
+                        isInvalid={fieldState.invalid}
                         items={taxRateOptions}
+                        label={t("taxRate")}
                         selectedKey={field.value}
+                        size="sm"
                         onSelectionChange={(key) => {
                           field.onChange(key || "0");
                         }}
-                        size="sm"
-                        isInvalid={fieldState.invalid}
-                        errorMessage={fieldState.error?.message}
-                        isDisabled={taxRatesQuery.isLoading}
                       />
                     )}
                   />
@@ -361,10 +363,10 @@ export default function OrderLinesSection({
 
       <div className="flex justify-end">
         <Button
+          color="primary"
           size="sm"
           variant="solid"
           onPress={() => append(defaultLine)}
-          color="primary"
         >
           {t("addLine")}
         </Button>

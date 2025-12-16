@@ -1,4 +1,6 @@
 import type { SortDescriptor } from "@react-types/shared";
+import type { ReactNode } from "react";
+
 import {
   getCoreRowModel,
   getExpandedRowModel,
@@ -19,8 +21,8 @@ import {
   type Table as TanStackTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 
 // Column Definition Type (compatible with DataTableColumnDefinition)
@@ -72,7 +74,7 @@ export interface IBaseTableCoreProps<T = any> {
         selectedRowKeys?: (string | number)[];
         onChange?: (
           selectedRowKeys: (string | number)[],
-          selectedRows: T[]
+          selectedRows: T[],
         ) => void;
       }
     | false;
@@ -92,7 +94,7 @@ export interface IBaseTableCoreProps<T = any> {
 
   onRowSelectionChange?: (
     selectedRowKeys: (string | number)[],
-    selectedRows: T[]
+    selectedRows: T[],
   ) => void;
   onColumnOrderChange?: (columnOrder: string[]) => void;
 
@@ -126,7 +128,7 @@ export interface IBaseTableCoreReturn<T = any> {
   setRowSelection: (
     selection:
       | RowSelectionState
-      | ((prev: RowSelectionState) => RowSelectionState)
+      | ((prev: RowSelectionState) => RowSelectionState),
   ) => void;
   setColumnOrder: (columnOrder: ColumnOrderState) => void;
   setGrouping: (grouping: GroupingState) => void;
@@ -155,7 +157,7 @@ export interface IBaseTableCoreReturn<T = any> {
 
 // Convert column definition to TanStack format
 function convertToTanStackColumn<T>(
-  column: IBaseTableCoreColumn<T>
+  column: IBaseTableCoreColumn<T>,
 ): ColumnDef<T> {
   const accessorKey =
     typeof column.dataIndex === "string" ? column.dataIndex : column.key;
@@ -177,6 +179,7 @@ function convertToTanStackColumn<T>(
       if (column.render) {
         return column.render(getValue(), row.original, row.index);
       }
+
       return getValue() ?? null;
     },
     enableSorting: column.sortable ?? column.enableSorting ?? false,
@@ -211,11 +214,12 @@ function convertToTanStackSorting(sort?: SortDescriptor): SortingState {
 
 // Convert TanStack SortingState to SortDescriptor
 function convertFromTanStackSorting(
-  sorting: SortingState
+  sorting: SortingState,
 ): SortDescriptor | undefined {
   if (sorting.length === 0) return undefined;
 
   const firstSort = sorting[0];
+
   return {
     column: firstSort.id,
     direction: firstSort.desc ? "descending" : "ascending",
@@ -223,7 +227,7 @@ function convertFromTanStackSorting(
 }
 
 export function useIBaseTableCore<T = any>(
-  props: IBaseTableCoreProps<T>
+  props: IBaseTableCoreProps<T>,
 ): IBaseTableCoreReturn<T> {
   const {
     data,
@@ -256,9 +260,10 @@ export function useIBaseTableCore<T = any>(
         return String(rowKey(record, index));
       }
       const key = (record as any)[rowKey];
+
       return key !== undefined && key !== null ? String(key) : String(index);
     },
-    [rowKey]
+    [rowKey],
   );
 
   // Convert columns to TanStack format - memoize with stable reference
@@ -291,16 +296,17 @@ export function useIBaseTableCore<T = any>(
       if (pagination === false) {
         return { pageIndex: 0, pageSize: PAGINATION_DEFAULT_PAGE_SIZE };
       }
+
       return {
         pageIndex: (pagination?.page ?? 1) - 1, // TanStack uses 0-based index
         pageSize: pagination?.pageSize ?? PAGINATION_DEFAULT_PAGE_SIZE,
       };
-    }
+    },
   );
 
   // Sorting state
   const [sortingState, setSortingState] = useState<SortingState>(() =>
-    convertToTanStackSorting(sorting)
+    convertToTanStackSorting(sorting),
   );
 
   // Row selection state
@@ -310,11 +316,13 @@ export function useIBaseTableCore<T = any>(
 
       const selectedKeys = rowSelection.selectedRowKeys || [];
       const selectionMap: RowSelectionState = {};
+
       selectedKeys.forEach((key) => {
         selectionMap[String(key)] = true;
       });
+
       return selectionMap;
-    }
+    },
   );
 
   // Column pinning state (for frozen columns)
@@ -323,7 +331,7 @@ export function useIBaseTableCore<T = any>(
 
   // Column sizing state
   const [columnSizingState, setColumnSizingState] = useState<ColumnSizingState>(
-    {}
+    {},
   );
 
   // Column visibility state
@@ -332,7 +340,7 @@ export function useIBaseTableCore<T = any>(
 
   // Column ordering state (for drag & drop) - sync with column keys changes
   const [columnOrderState, setColumnOrderState] = useState<ColumnOrderState>(
-    () => columnKeys
+    () => columnKeys,
   );
 
   // Sync column order when columns change
@@ -379,18 +387,18 @@ export function useIBaseTableCore<T = any>(
 
   // Grouping state
   const [groupingState, setGroupingState] = useState<GroupingState>(
-    () => grouping || []
+    () => grouping || [],
   );
 
   // Expanded state (for grouped rows)
   const [expandedState, setExpandedState] = useState<ExpandedState>(
-    () => expanded || {}
+    () => expanded || {},
   );
 
   // Sync external sorting changes - memoize conversion
   const externalSortingState = useMemo(
     () => (sorting !== undefined ? convertToTanStackSorting(sorting) : null),
-    [sorting]
+    [sorting],
   );
 
   useEffect(() => {
@@ -406,9 +414,12 @@ export function useIBaseTableCore<T = any>(
           // Also update currentSort to keep it in sync
           const sortDescriptor =
             convertFromTanStackSorting(externalSortingState);
+
           setCurrentSort(sortDescriptor);
+
           return externalSortingState;
         }
+
         return prev;
       });
     } else {
@@ -423,9 +434,11 @@ export function useIBaseTableCore<T = any>(
       setGroupingState((prev) => {
         const prevStr = JSON.stringify(prev);
         const newStr = JSON.stringify(grouping);
+
         if (prevStr !== newStr) {
           return grouping;
         }
+
         return prev;
       });
     }
@@ -437,9 +450,11 @@ export function useIBaseTableCore<T = any>(
       setExpandedState((prev) => {
         const prevStr = JSON.stringify(prev);
         const newStr = JSON.stringify(expanded);
+
         if (prevStr !== newStr) {
           return expanded;
         }
+
         return prev;
       });
     }
@@ -447,7 +462,7 @@ export function useIBaseTableCore<T = any>(
 
   // Track current sort for onChangeTable callback
   const [currentSort, setCurrentSort] = useState<SortDescriptor | undefined>(
-    sorting
+    sorting,
   );
 
   // Memoize handlers to prevent recreation
@@ -455,6 +470,7 @@ export function useIBaseTableCore<T = any>(
     (newPagination: PaginationState) => {
       const page = newPagination.pageIndex + 1;
       const pageSize = newPagination.pageSize;
+
       if (onChangeTable) {
         onChangeTable({
           page: page,
@@ -467,7 +483,7 @@ export function useIBaseTableCore<T = any>(
         pageSize: newPagination.pageSize,
       });
     },
-    [onChangeTable, currentSort]
+    [onChangeTable, currentSort],
   );
 
   const handleSortingChange = useCallback(
@@ -478,6 +494,7 @@ export function useIBaseTableCore<T = any>(
           typeof updater === "function" ? updater(prev) : updater;
 
         const sortDescriptor = convertFromTanStackSorting(newSorting);
+
         setCurrentSort(sortDescriptor);
         if (onChangeTable) {
           onChangeTable({
@@ -490,7 +507,7 @@ export function useIBaseTableCore<T = any>(
         return newSorting;
       });
     },
-    [onChangeTable, pagination]
+    [onChangeTable, pagination],
   );
 
   const handleRowSelectionChange = useCallback(
@@ -501,18 +518,19 @@ export function useIBaseTableCore<T = any>(
 
         if (onRowSelectionChange) {
           const selectedKeys = Object.keys(newSelection).filter(
-            (key) => newSelection[key]
+            (key) => newSelection[key],
           );
           const selectedRows = data.filter((item, index) =>
-            selectedKeys.includes(getRowKey(item, index))
+            selectedKeys.includes(getRowKey(item, index)),
           );
+
           onRowSelectionChange(selectedKeys, selectedRows);
         }
 
         return newSelection;
       });
     },
-    [data, getRowKey, onRowSelectionChange]
+    [data, getRowKey, onRowSelectionChange],
   );
 
   const handleColumnOrderChange = useCallback(
@@ -528,7 +546,7 @@ export function useIBaseTableCore<T = any>(
         return newOrder;
       });
     },
-    [onColumnOrderChange]
+    [onColumnOrderChange],
   );
 
   const handleGroupingChange = useCallback(
@@ -544,7 +562,7 @@ export function useIBaseTableCore<T = any>(
         return newGrouping;
       });
     },
-    [onGroupingChange]
+    [onGroupingChange],
   );
 
   const handleExpandedChange = useCallback(
@@ -560,7 +578,7 @@ export function useIBaseTableCore<T = any>(
         return newExpanded;
       });
     },
-    [onExpandedChange]
+    [onExpandedChange],
   );
 
   // Memoize state object to prevent unnecessary re-renders
@@ -588,7 +606,7 @@ export function useIBaseTableCore<T = any>(
       enableGrouping,
       groupingState,
       expandedState,
-    ]
+    ],
   );
 
   // Memoize pageCount calculation
@@ -596,6 +614,7 @@ export function useIBaseTableCore<T = any>(
     if (pagination && typeof pagination === "object" && pagination.total) {
       return Math.ceil(pagination.total / paginationState.pageSize);
     }
+
     return undefined;
   }, [pagination, paginationState.pageSize]);
 
@@ -655,7 +674,7 @@ export function useIBaseTableCore<T = any>(
 
   const selectedRowKeys = useMemo(() => {
     return Object.keys(rowSelectionState).filter(
-      (key) => rowSelectionState[key]
+      (key) => rowSelectionState[key],
     );
   }, [rowSelectionState]);
 
@@ -694,6 +713,7 @@ export function useIBaseTableCore<T = any>(
         const next = select !== undefined ? select : !allSelected;
 
         const newSelection: RowSelectionState = {};
+
         rows.forEach((row) => {
           newSelection[row.id] = next;
         });
@@ -701,7 +721,7 @@ export function useIBaseTableCore<T = any>(
         return newSelection;
       });
     },
-    [rows]
+    [rows],
   );
 
   const resetRowSelection = useCallback(() => {
@@ -752,7 +772,7 @@ export function useIBaseTableCore<T = any>(
       paginationInfo,
       paginationState.pageSize,
       handlePaginationChange,
-    ]
+    ],
   );
 
   // Handle page size change
@@ -765,7 +785,7 @@ export function useIBaseTableCore<T = any>(
         pageSize: nextPageSize,
       });
     },
-    [pagination, handlePaginationChange]
+    [pagination, handlePaginationChange],
   );
 
   // Handle sort change (for UI components)
@@ -778,7 +798,7 @@ export function useIBaseTableCore<T = any>(
         },
       ]);
     },
-    [handleSortingChange]
+    [handleSortingChange],
   );
 
   return {

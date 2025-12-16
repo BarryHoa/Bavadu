@@ -1,13 +1,14 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { ilike } from "drizzle-orm";
 
 import { hrm_tb_leave_types } from "../../schemas";
@@ -62,7 +63,6 @@ class LeaveTypeViewListModel extends BaseViewListModel<
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): LeaveTypeRow => ({
     id: row.id,
     code: row.code,
@@ -79,11 +79,10 @@ class LeaveTypeViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<LeaveTypeRow>> => {
     return this.buildQueryDataList(params);
   };
 }
 
 export default LeaveTypeViewListModel;
-

@@ -40,6 +40,7 @@ export default class ShiftModel extends BaseModel<typeof hrm_tb_shifts> {
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
@@ -51,6 +52,7 @@ export default class ShiftModel extends BaseModel<typeof hrm_tb_shifts> {
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -78,7 +80,11 @@ export default class ShiftModel extends BaseModel<typeof hrm_tb_shifts> {
     const insertData: NewHrmTbShift = {
       code: payload.code,
       name: payload.name,
-      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
+      description: payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null,
       startTime: payload.startTime as any,
       endTime: payload.endTime as any,
       breakDuration: payload.breakDuration ?? 0,
@@ -97,13 +103,15 @@ export default class ShiftModel extends BaseModel<typeof hrm_tb_shifts> {
     if (!created) throw new Error("Failed to create shift");
 
     const shift = await this.getShiftById(created.id);
+
     if (!shift) throw new Error("Failed to load shift after creation");
+
     return shift;
   };
 
   updateShift = async (
     id: string,
-    payload: Partial<ShiftInput>
+    payload: Partial<ShiftInput>,
   ): Promise<ShiftRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -112,7 +120,11 @@ export default class ShiftModel extends BaseModel<typeof hrm_tb_shifts> {
     if (payload.code !== undefined) updateData.code = payload.code;
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.description !== undefined)
-      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
+      updateData.description = payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null;
     if (payload.startTime !== undefined)
       updateData.startTime = payload.startTime as any;
     if (payload.endTime !== undefined)
@@ -125,7 +137,11 @@ export default class ShiftModel extends BaseModel<typeof hrm_tb_shifts> {
       updateData.isNightShift = payload.isNightShift;
     if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
 
-    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db
+      .update(this.table)
+      .set(updateData)
+      .where(eq(this.table.id, id));
+
     return this.getShiftById(id);
   };
 
@@ -133,12 +149,17 @@ export default class ShiftModel extends BaseModel<typeof hrm_tb_shifts> {
     const { id, payload } = params;
     const normalizedPayload: Partial<ShiftInput> = {};
 
-    if (payload.code !== undefined) normalizedPayload.code = String(payload.code);
+    if (payload.code !== undefined)
+      normalizedPayload.code = String(payload.code);
     if (payload.name !== undefined) {
-      normalizedPayload.name = this.normalizeLocaleInput(payload.name) ?? { en: "" };
+      normalizedPayload.name = this.normalizeLocaleInput(payload.name) ?? {
+        en: "",
+      };
     }
     if (payload.description !== undefined) {
-      normalizedPayload.description = this.normalizeLocaleInput(payload.description);
+      normalizedPayload.description = this.normalizeLocaleInput(
+        payload.description,
+      );
     }
     if (payload.startTime !== undefined) {
       normalizedPayload.startTime = String(payload.startTime);
@@ -162,4 +183,3 @@ export default class ShiftModel extends BaseModel<typeof hrm_tb_shifts> {
     return this.updateShift(id, normalizedPayload);
   };
 }
-

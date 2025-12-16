@@ -31,9 +31,14 @@ export default function LeaveRequestsListPage(): React.ReactNode {
         label: t("labels.employee"),
         render: (value, row) => {
           if (!row?.id) return null;
+
           return (
-            <LinkAs href={`/workspace/modules/hrm/leave-requests/view/${row.id}`}>
-              {getLocalizedText(row.employee?.fullName) || row.employee?.employeeCode || "—"}
+            <LinkAs
+              href={`/workspace/modules/hrm/leave-requests/view/${row.id}`}
+            >
+              {getLocalizedText(row.employee?.fullName) ||
+                row.employee?.employeeCode ||
+                "—"}
             </LinkAs>
           );
         },
@@ -62,7 +67,7 @@ export default function LeaveRequestsListPage(): React.ReactNode {
         key: "status",
         label: t("labels.status"),
         render: (value) => (
-          <Chip size="sm" variant="flat" className="capitalize">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value || "pending"}
           </Chip>
         ),
@@ -74,6 +79,7 @@ export default function LeaveRequestsListPage(): React.ReactNode {
         render: (_, row) => {
           if (!row?.id) return null;
           const viewLink = `/workspace/modules/hrm/leave-requests/view/${row.id}`;
+
           return (
             <ActionMenu
               actions={[
@@ -88,15 +94,12 @@ export default function LeaveRequestsListPage(): React.ReactNode {
         },
       },
     ],
-    [tDataTable, t, getLocalizedText]
+    [tDataTable, t, getLocalizedText],
   );
 
   return (
     <div className="space-y-4">
       <ViewListDataTable<LeaveRequestRow>
-        model="hrm.leave-request"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -108,8 +111,10 @@ export default function LeaveRequestsListPage(): React.ReactNode {
             },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="hrm.leave-request"
       />
     </div>
   );
 }
-

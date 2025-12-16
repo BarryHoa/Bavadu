@@ -8,6 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { product_tb_product_variants } from "./product.variant";
 import { mdlProductSchema } from "./schema";
 
@@ -38,7 +39,7 @@ export const product_tb_product_type_services = mdlProductSchema.table(
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
-  (table) => [index("type_service_variant_idx").on(table.productVariantId)]
+  (table) => [index("type_service_variant_idx").on(table.productVariantId)],
 );
 
 export type ProductTbProductTypeService =

@@ -32,6 +32,7 @@ class RateLimitStore {
     // Check if entry has expired
     if (Date.now() > entry.resetTime) {
       this.store.delete(key);
+
       return 0;
     }
 
@@ -51,11 +52,13 @@ class RateLimitStore {
         count: 1,
         resetTime: now + windowMs,
       });
+
       return 1;
     }
 
     // Increment existing entry
     entry.count++;
+
     return entry.count;
   }
 
@@ -70,6 +73,7 @@ class RateLimitStore {
     }
 
     const remaining = entry.resetTime - Date.now();
+
     return Math.max(0, remaining);
   }
 

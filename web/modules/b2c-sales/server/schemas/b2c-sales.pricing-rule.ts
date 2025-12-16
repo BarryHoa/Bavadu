@@ -10,6 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { sale_b2c_tb_price_lists } from "./b2c-sales.price-list";
 import { mdlSaleB2cSchema } from "./schema";
 
@@ -61,13 +62,11 @@ export const sale_b2c_tb_pricing_rules = mdlSaleB2cSchema.table(
     index("pricing_rules_active_idx")
       .on(table.isActive)
       .where(sql`${table.isActive} = true`),
-    index("pricing_rules_priority_idx").on(
-      table.priceListId,
-      table.priority
-    ),
-  ]
+    index("pricing_rules_priority_idx").on(table.priceListId, table.priority),
+  ],
 );
 
-export type SaleB2cTbPricingRule = typeof sale_b2c_tb_pricing_rules.$inferSelect;
-export type NewSaleB2cTbPricingRule = typeof sale_b2c_tb_pricing_rules.$inferInsert;
-
+export type SaleB2cTbPricingRule =
+  typeof sale_b2c_tb_pricing_rules.$inferSelect;
+export type NewSaleB2cTbPricingRule =
+  typeof sale_b2c_tb_pricing_rules.$inferInsert;

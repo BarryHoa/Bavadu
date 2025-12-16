@@ -11,8 +11,7 @@ declare module "minisearch" {
     addAll(documents: T[]): void;
     search(
       query: string,
-      options?: Record<string, unknown>
+      options?: Record<string, unknown>,
     ): Array<T & { id: string }>;
   }
 }
-

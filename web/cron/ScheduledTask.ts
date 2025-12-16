@@ -5,6 +5,7 @@
 
 import SessionModel from "../module-base/server/models/Sessions/SessionModel";
 import { getLogCompressionModel } from "../module-base/server/models/Logs/LogCompressionModel";
+
 import { Kernel } from "./Kernel";
 
 export class ScheduledTask extends Kernel {
@@ -18,6 +19,7 @@ export class ScheduledTask extends Kernel {
       try {
         const sessionModel = new SessionModel();
         const deletedCount = await sessionModel.cleanupExpiredSessions();
+
         console.log(`[Cron] Cleaned up ${deletedCount} expired session(s)`);
       } catch (error) {
         console.error("[Cron] Error cleaning up expired sessions:", error);
@@ -31,9 +33,10 @@ export class ScheduledTask extends Kernel {
       try {
         const compressionModel = getLogCompressionModel();
         const statsBefore = compressionModel.getStats();
+
         console.log(
           `[Cron] Files to compress: ${statsBefore.filesToCompress}, ` +
-          `Size: ${(statsBefore.sizeToCompress / 1024 / 1024).toFixed(2)} MB`
+            `Size: ${(statsBefore.sizeToCompress / 1024 / 1024).toFixed(2)} MB`,
         );
 
         const result = await compressionModel.compressLogs();
@@ -43,18 +46,21 @@ export class ScheduledTask extends Kernel {
             (1 - result.compressedSize / result.totalSize) *
             100
           ).toFixed(1);
+
           console.log(
             `[Cron] ✅ Compressed ${result.compressed} log files. ` +
-            `Original: ${(result.totalSize / 1024 / 1024).toFixed(2)} MB, ` +
-            `Compressed: ${(result.compressedSize / 1024 / 1024).toFixed(2)} MB ` +
-            `(${compressionRatio}% reduction)`
+              `Original: ${(result.totalSize / 1024 / 1024).toFixed(2)} MB, ` +
+              `Compressed: ${(result.compressedSize / 1024 / 1024).toFixed(2)} MB ` +
+              `(${compressionRatio}% reduction)`,
           );
         } else {
           console.log("[Cron] No log files to compress");
         }
 
         if (result.errors.length > 0) {
-          console.warn(`[Cron] ⚠️  ${result.errors.length} compression errors:`);
+          console.warn(
+            `[Cron] ⚠️  ${result.errors.length} compression errors:`,
+          );
           result.errors.forEach((error) => console.warn(`  - ${error}`));
         }
       } catch (error) {

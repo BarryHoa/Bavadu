@@ -7,8 +7,10 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
-import { mdlStockSchema } from "./schema";
+
 import { product_tb_product_masters } from "../../../product/server/schemas/product.master";
+
+import { mdlStockSchema } from "./schema";
 import { stock_tb_stock_warehouses } from "./stock.warehouse";
 
 // Stock Settings - Cấu hình tồn kho theo từng kho
@@ -39,7 +41,7 @@ export const stock_tb_stock_settings = mdlStockSchema.table(
   (table) => [
     uniqueIndex("settings_product_warehouse_unique").on(
       table.productId,
-      table.warehouseId
+      table.warehouseId,
     ),
     index("settings_product_idx").on(table.productId),
     index("settings_warehouse_idx").on(table.warehouseId),
@@ -47,10 +49,11 @@ export const stock_tb_stock_settings = mdlStockSchema.table(
     // Composite index for warehouse and reorder point (low stock queries)
     index("settings_warehouse_reorder_idx").on(
       table.warehouseId,
-      table.reorderPoint
+      table.reorderPoint,
     ),
-  ]
+  ],
 );
 
 export type StockTbStockSettings = typeof stock_tb_stock_settings.$inferSelect;
-export type NewStockTbStockSettings = typeof stock_tb_stock_settings.$inferInsert;
+export type NewStockTbStockSettings =
+  typeof stock_tb_stock_settings.$inferInsert;

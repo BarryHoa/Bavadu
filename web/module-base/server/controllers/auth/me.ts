@@ -1,5 +1,6 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { NextRequest } from "next/server";
+
 import { getAuthenticatedUser } from "../../utils/auth-helpers";
 
 export async function GET(request: NextRequest) {
@@ -28,6 +29,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Get current user error:", error);
+
     return JSONResponse({
       error: "Failed to get current user",
       message: error instanceof Error ? error.message : "Unknown error",
@@ -35,4 +37,3 @@ export async function GET(request: NextRequest) {
     });
   }
 }
-

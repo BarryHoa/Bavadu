@@ -8,4 +8,3 @@ export default function CustomerIndividualEditPage(): React.ReactNode {
     </div>
   );
 }
-

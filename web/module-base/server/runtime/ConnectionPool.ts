@@ -1,9 +1,11 @@
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { drizzle } from "drizzle-orm/postgres-js";
+import type { IConnectionPool } from "./types";
+
 import { existsSync, readdirSync } from "fs";
 import { join, relative } from "path";
+
+import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import type { IConnectionPool } from "./types";
 
 type SchemaRegistry = Record<string, unknown>;
 
@@ -62,6 +64,7 @@ export class ConnectionPool implements IConnectionPool {
 
   private createPgClient() {
     const config = this.getDefaultConfig();
+
     return postgres({
       host: config.host,
       port: config.port,
@@ -99,6 +102,7 @@ export class ConnectionPool implements IConnectionPool {
     for (const schemaPath of schemaEntryPoints) {
       try {
         const schemaModule = await import(this.toImportPath(schemaPath));
+
         Object.assign(schemas, schemaModule);
       } catch (error) {
         console.error(`Failed to load schema from ${schemaPath}:`, error);
@@ -137,21 +141,24 @@ export class ConnectionPool implements IConnectionPool {
       "module-base",
       "server",
       "schemas",
-      "index.ts"
+      "index.ts",
     );
+
     if (existsSync(baseSchema)) {
       schemaPaths.push(baseSchema);
     }
 
     const modulesRoot = join(this.projectRoot, "modules");
+
     for (const dir of this.safeReadDir(modulesRoot)) {
       const schemaPath = join(
         modulesRoot,
         dir,
         "server",
         "schemas",
-        "index.ts"
+        "index.ts",
       );
+
       if (existsSync(schemaPath)) {
         schemaPaths.push(schemaPath);
       }
@@ -171,21 +178,23 @@ export class ConnectionPool implements IConnectionPool {
   private toImportPath(targetPath: string): string {
     const relativePath = relative(this.projectRoot, targetPath).replace(
       /\\/g,
-      "/"
+      "/",
     );
+
     return `@/${relativePath}`;
   }
 
   getConnection(
-    name: string = "primary"
+    name: string = "primary",
   ): PostgresJsDatabase<Record<string, never>> {
     if (!this.isInitialized) {
       throw new Error(
-        "ConnectionPool not initialized. Call initialize() first."
+        "ConnectionPool not initialized. Call initialize() first.",
       );
     }
 
     const connection = this.connections.get(name);
+
     if (!connection) {
       throw new Error(`Database connection "${name}" not found.`);
     }
@@ -195,7 +204,7 @@ export class ConnectionPool implements IConnectionPool {
 
     if (connection.type !== "postgres") {
       throw new Error(
-        `Database connection "${name}" is not a PostgreSQL connection.`
+        `Database connection "${name}" is not a PostgreSQL connection.`,
       );
     }
 
@@ -205,11 +214,12 @@ export class ConnectionPool implements IConnectionPool {
   getPrimaryConnection(): PostgresJsDatabase<Record<string, never>> {
     if (!this.isInitialized || !this.primaryConnectionName) {
       throw new Error(
-        "ConnectionPool not initialized. Call initialize() first."
+        "ConnectionPool not initialized. Call initialize() first.",
       );
     }
 
     const connection = this.connections.get(this.primaryConnectionName);
+
     if (!connection) {
       throw new Error("Primary database connection not found");
     }
@@ -225,6 +235,7 @@ export class ConnectionPool implements IConnectionPool {
     this.connections.forEach((connection) => {
       if (connection.type === "postgres" && connection.db) {
         const client = (connection.db as any).$client;
+
         if (client && typeof client.end === "function") {
           client.end();
         }
@@ -239,10 +250,11 @@ export class ConnectionPool implements IConnectionPool {
     name: string,
     type: DatabaseType,
     config?: Partial<DbConnectionConfig>,
-    schemas?: SchemaRegistry
+    schemas?: SchemaRegistry,
   ): Promise<void> {
     if (this.connections.has(name)) {
       console.warn(`Database connection "${name}" already exists`);
+
       return;
     }
 
@@ -250,7 +262,7 @@ export class ConnectionPool implements IConnectionPool {
 
     if (isProduction && config) {
       console.warn(
-        `⚠️  Config parameters are ignored in production. Using environment variables only for database "${name}".`
+        `⚠️  Config parameters are ignored in production. Using environment variables only for database "${name}".`,
       );
     }
 
@@ -262,6 +274,7 @@ export class ConnectionPool implements IConnectionPool {
       switch (type) {
         case "postgres": {
           const client = this.createPgClient();
+
           db = drizzle(client, { schema: schemas }) as PostgresJsDatabase<any>;
           break;
         }

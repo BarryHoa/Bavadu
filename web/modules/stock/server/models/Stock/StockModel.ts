@@ -1,8 +1,8 @@
-import { and, eq, sql } from "drizzle-orm";
+import type { StockTbStockLevel } from "../../schemas";
 
+import { and, eq, sql } from "drizzle-orm";
 import { BaseModel } from "@base/server/models/BaseModel";
 
-import type { StockTbStockLevel } from "../../schemas";
 import { stock_tb_stock_levels, stock_tb_stock_moves } from "../../schemas";
 
 type StockMovementKind = "inbound" | "outbound" | "adjustment" | "transfer";
@@ -97,7 +97,7 @@ export default class StockModel extends BaseModel<typeof stock_tb_stock_moves> {
           type: "transfer",
           relatedWarehouseId: input.targetWarehouseId,
         },
-        tx
+        tx,
       );
 
       await this.applyDelta(
@@ -111,7 +111,7 @@ export default class StockModel extends BaseModel<typeof stock_tb_stock_moves> {
           type: "transfer",
           relatedWarehouseId: input.sourceWarehouseId,
         },
-        tx
+        tx,
       );
 
       return true;
@@ -120,7 +120,7 @@ export default class StockModel extends BaseModel<typeof stock_tb_stock_moves> {
 
   getStockLevel = async (
     productId: string,
-    warehouseId: string
+    warehouseId: string,
   ): Promise<StockTbStockLevel | null> => {
     const [record] = await this.db
       .select()
@@ -128,8 +128,8 @@ export default class StockModel extends BaseModel<typeof stock_tb_stock_moves> {
       .where(
         and(
           eq(stock_tb_stock_levels.productId, productId),
-          eq(stock_tb_stock_levels.warehouseId, warehouseId)
-        )
+          eq(stock_tb_stock_levels.warehouseId, warehouseId),
+        ),
       )
       .limit(1);
 
@@ -141,7 +141,7 @@ export default class StockModel extends BaseModel<typeof stock_tb_stock_moves> {
       type: StockMovementKind;
       relatedWarehouseId?: string;
     },
-    tx?: any
+    tx?: any,
   ) => {
     const now = new Date();
     const quantityDelta = Number(input.quantityDelta);
@@ -153,8 +153,8 @@ export default class StockModel extends BaseModel<typeof stock_tb_stock_moves> {
       .where(
         and(
           eq(stock_tb_stock_levels.productId, input.productId),
-          eq(stock_tb_stock_levels.warehouseId, input.warehouseId)
-        )
+          eq(stock_tb_stock_levels.warehouseId, input.warehouseId),
+        ),
       )
       .limit(1);
 
@@ -163,7 +163,7 @@ export default class StockModel extends BaseModel<typeof stock_tb_stock_moves> {
 
     if (nextQty < 0) {
       throw new Error(
-        `Insufficient stock for product ${input.productId} in warehouse ${input.warehouseId}`
+        `Insufficient stock for product ${input.productId} in warehouse ${input.warehouseId}`,
       );
     }
 
@@ -177,7 +177,10 @@ export default class StockModel extends BaseModel<typeof stock_tb_stock_moves> {
         updatedAt: now,
       })
       .onConflictDoUpdate({
-        target: [stock_tb_stock_levels.productId, stock_tb_stock_levels.warehouseId],
+        target: [
+          stock_tb_stock_levels.productId,
+          stock_tb_stock_levels.warehouseId,
+        ],
         set: {
           quantity: sql`${stock_tb_stock_levels.quantity} + ${quantityDelta}`,
           updatedAt: now,

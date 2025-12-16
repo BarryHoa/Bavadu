@@ -4,13 +4,16 @@ import { InputProps } from "@heroui/input";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import React, { useCallback, useMemo, useState } from "react";
+
 import { formatNumber } from "../../utils/number";
 import IBaseInput from "../IBaseInput";
 import IBaseTooltip from "../IBaseTooltip";
 
 type InputNumberValue = number | null | undefined;
-export interface IBaseInputNumberProps
-  extends Omit<InputProps, "onValueChange" | "value" | "defaultValue"> {
+export interface IBaseInputNumberProps extends Omit<
+  InputProps,
+  "onValueChange" | "value" | "defaultValue"
+> {
   value?: InputNumberValue;
   defaultValue?: InputNumberValue;
   onValueChange?: (value: InputNumberValue) => void;
@@ -32,9 +35,10 @@ function formatDisplay(
     thousandSeparator: string;
     decimalSeparator: string;
     fixZero: boolean;
-  }
+  },
 ): string {
   if (num === null || num === undefined) return "";
+
   return formatNumber(num, {
     decimalPlaces: options.decimalPlaces,
     thousandSeparator: options.thousandSeparator,
@@ -48,10 +52,12 @@ function getRaw(num: InputNumberValue, decimalPlaces: number): string {
   if (num === null || num === undefined) return "";
   if (decimalPlaces > 0) {
     const formatted = num.toFixed(decimalPlaces);
+
     return formatted.includes(".")
       ? formatted.replace(/\.?0+$/, "")
       : formatted;
   }
+
   return num.toString();
 }
 
@@ -63,7 +69,7 @@ function parseToNumber(
     decimalSeparator: string;
     allowNegative: boolean;
     decimalPlaces: number;
-  }
+  },
 ): InputNumberValue {
   if (!str?.trim()) return null;
 
@@ -74,7 +80,7 @@ function parseToNumber(
   if (options.decimalSeparator !== ".") {
     cleaned = cleaned.replace(
       new RegExp(`\\${options.decimalSeparator}`, "g"),
-      "."
+      ".",
     );
   }
 
@@ -85,6 +91,7 @@ function parseToNumber(
   if (!cleaned) return null;
 
   const parsed = parseFloat(cleaned);
+
   if (isNaN(parsed)) return null;
 
   return options.decimalPlaces >= 0
@@ -96,12 +103,14 @@ function parseToNumber(
 function clampValue(
   num: InputNumberValue,
   min?: number,
-  max?: number
+  max?: number,
 ): InputNumberValue {
   if (num === null || num === undefined) return num;
   let result = num;
+
   if (min !== undefined && result < min) result = min;
   if (max !== undefined && result > max) result = max;
+
   return result;
 }
 
@@ -153,7 +162,7 @@ const IBaseInputNumber = React.forwardRef<
   // Get current numeric value
   const currentValue = useMemo(
     () => (isControlled ? controlledValue : inputState.raw),
-    [controlledValue, inputState.raw]
+    [controlledValue, inputState.raw],
   );
 
   const handleChange = useCallback(
@@ -172,10 +181,11 @@ const IBaseInputNumber = React.forwardRef<
           .replace(/[^\d.-]/g, "");
 
         let normalized = cleaned;
+
         if (decimalSeparator !== ".") {
           normalized = cleaned.replace(
             new RegExp(`\\${decimalSeparator}`, "g"),
-            "."
+            ".",
           );
         }
 
@@ -195,11 +205,13 @@ const IBaseInputNumber = React.forwardRef<
             raw: null,
           }));
           onValueChange?.(null);
+
           return;
         }
 
         // Try to parse, but allow NaN for partial input
         const parsed = parseFloat(normalized);
+
         if (!isNaN(parsed)) {
           // Don't apply decimalPlaces restriction while typing
           const parsedValue =
@@ -244,7 +256,7 @@ const IBaseInputNumber = React.forwardRef<
       decimalPlaces,
       onValueChange,
       inputState.isFocused,
-    ]
+    ],
   );
 
   const handleFocus = useCallback(
@@ -268,7 +280,7 @@ const IBaseInputNumber = React.forwardRef<
       e.preventDefault();
       e.stopPropagation();
     },
-    [rest.onFocus, inputState.raw, decimalPlaces]
+    [rest.onFocus, inputState.raw, decimalPlaces],
   );
 
   const handleBlur = useCallback(
@@ -321,7 +333,7 @@ const IBaseInputNumber = React.forwardRef<
       decimalSeparator,
       allowNegative,
       decimalPlaces,
-    ]
+    ],
   );
 
   // Update display when value changes externally
@@ -333,6 +345,7 @@ const IBaseInputNumber = React.forwardRef<
         decimalSeparator,
         fixZero,
       });
+
       setInputState((prev) => ({
         ...prev,
         display,
@@ -377,6 +390,7 @@ const IBaseInputNumber = React.forwardRef<
 
     if (outOfRange) {
       const rangeParts: string[] = [];
+
       if (min !== undefined)
         rangeParts.push(`Min: ${formatDisplay(min, formatOptions)}`);
       if (max !== undefined)
@@ -413,25 +427,25 @@ const IBaseInputNumber = React.forwardRef<
     >
       <IBaseInput
         ref={ref}
-        type="text"
-        inputMode="decimal"
-        value={
-          inputState.isFocused
-            ? inputState.rawInput
-            : (inputState.display ?? "")
-        }
-        onValueChange={handleChange}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        placeholder={placeholder ?? defaultPlaceholder}
         classNames={{
           ...rest.classNames,
           input: clsx(
             rest.classNames?.input,
             hasValue ? "text-right" : "text-left",
-            isInvalid && "text-danger"
+            isInvalid && "text-danger",
           ),
         }}
+        inputMode="decimal"
+        placeholder={placeholder ?? defaultPlaceholder}
+        type="text"
+        value={
+          inputState.isFocused
+            ? inputState.rawInput
+            : (inputState.display ?? "")
+        }
+        onBlur={handleBlur}
+        onFocus={handleFocus}
+        onValueChange={handleChange}
         {...rest}
       />
     </IBaseTooltip>

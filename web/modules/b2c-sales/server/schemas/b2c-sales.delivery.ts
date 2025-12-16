@@ -7,8 +7,9 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { mdlSaleB2cSchema } from "./schema";
 import { stock_tb_stock_warehouses } from "@mdl/stock/server/schemas/stock.warehouse";
+
+import { mdlSaleB2cSchema } from "./schema";
 
 // Sales Order Delivery - Track deliveries from orders (warehouse receipts)
 export const sale_b2c_tb_deliveries = mdlSaleB2cSchema.table(
@@ -35,7 +36,7 @@ export const sale_b2c_tb_deliveries = mdlSaleB2cSchema.table(
     index("deliveries_warehouse_idx").on(table.warehouseId),
     index("deliveries_date_idx").on(table.deliveryDate),
     index("deliveries_status_idx").on(table.status),
-  ]
+  ],
 );
 
 export type SaleB2cTbDelivery = typeof sale_b2c_tb_deliveries.$inferSelect;
@@ -58,10 +59,14 @@ export const sale_b2c_tb_delivery_lines = mdlSaleB2cSchema.table(
   },
   (table) => [
     index("delivery_lines_delivery_idx").on(table.deliveryId),
-    index("delivery_lines_order_line_idx").on(table.orderType, table.orderLineId),
-  ]
+    index("delivery_lines_order_line_idx").on(
+      table.orderType,
+      table.orderLineId,
+    ),
+  ],
 );
 
-export type SaleB2cTbDeliveryLine = typeof sale_b2c_tb_delivery_lines.$inferSelect;
-export type NewSaleB2cTbDeliveryLine = typeof sale_b2c_tb_delivery_lines.$inferInsert;
-
+export type SaleB2cTbDeliveryLine =
+  typeof sale_b2c_tb_delivery_lines.$inferSelect;
+export type NewSaleB2cTbDeliveryLine =
+  typeof sale_b2c_tb_delivery_lines.$inferInsert;

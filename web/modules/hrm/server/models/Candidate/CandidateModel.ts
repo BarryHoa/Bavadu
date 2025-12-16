@@ -55,7 +55,9 @@ export interface CandidateInput {
   notes?: string | null;
 }
 
-export default class CandidateModel extends BaseModel<typeof hrm_tb_candidates> {
+export default class CandidateModel extends BaseModel<
+  typeof hrm_tb_candidates
+> {
   constructor() {
     super(hrm_tb_candidates);
   }
@@ -64,6 +66,7 @@ export default class CandidateModel extends BaseModel<typeof hrm_tb_candidates> 
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
@@ -99,6 +102,7 @@ export default class CandidateModel extends BaseModel<typeof hrm_tb_candidates> 
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -132,7 +136,9 @@ export default class CandidateModel extends BaseModel<typeof hrm_tb_candidates> 
     };
   };
 
-  getDataById = async (params: { id: string }): Promise<CandidateRow | null> => {
+  getDataById = async (params: {
+    id: string;
+  }): Promise<CandidateRow | null> => {
     return this.getCandidateById(params.id);
   };
 
@@ -168,13 +174,15 @@ export default class CandidateModel extends BaseModel<typeof hrm_tb_candidates> 
     if (!created) throw new Error("Failed to create candidate");
 
     const candidate = await this.getCandidateById(created.id);
+
     if (!candidate) throw new Error("Failed to load candidate after creation");
+
     return candidate;
   };
 
   updateCandidate = async (
     id: string,
-    payload: Partial<CandidateInput>
+    payload: Partial<CandidateInput>,
   ): Promise<CandidateRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -191,19 +199,26 @@ export default class CandidateModel extends BaseModel<typeof hrm_tb_candidates> 
     if (payload.phone !== undefined) updateData.phone = payload.phone ?? null;
     if (payload.dateOfBirth !== undefined)
       updateData.dateOfBirth = payload.dateOfBirth ?? null;
-    if (payload.gender !== undefined) updateData.gender = payload.gender ?? null;
+    if (payload.gender !== undefined)
+      updateData.gender = payload.gender ?? null;
     if (payload.address !== undefined)
       updateData.address = payload.address ?? null;
     if (payload.cvUrl !== undefined) updateData.cvUrl = payload.cvUrl ?? null;
     if (payload.coverLetter !== undefined)
       updateData.coverLetter = payload.coverLetter ?? null;
-    if (payload.source !== undefined) updateData.source = payload.source ?? null;
+    if (payload.source !== undefined)
+      updateData.source = payload.source ?? null;
     if (payload.status !== undefined) updateData.status = payload.status;
     if (payload.stage !== undefined) updateData.stage = payload.stage ?? null;
-    if (payload.rating !== undefined) updateData.rating = payload.rating ?? null;
+    if (payload.rating !== undefined)
+      updateData.rating = payload.rating ?? null;
     if (payload.notes !== undefined) updateData.notes = payload.notes ?? null;
 
-    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db
+      .update(this.table)
+      .set(updateData)
+      .where(eq(this.table.id, id));
+
     return this.getCandidateById(id);
   };
 
@@ -227,17 +242,23 @@ export default class CandidateModel extends BaseModel<typeof hrm_tb_candidates> 
           : String(payload.lastName);
     }
     if (payload.fullName !== undefined) {
-      normalizedPayload.fullName = this.normalizeLocaleInput(payload.fullName) ?? {
+      normalizedPayload.fullName = this.normalizeLocaleInput(
+        payload.fullName,
+      ) ?? {
         en: "",
       };
     }
     if (payload.email !== undefined) {
       normalizedPayload.email =
-        payload.email === null || payload.email === "" ? null : String(payload.email);
+        payload.email === null || payload.email === ""
+          ? null
+          : String(payload.email);
     }
     if (payload.phone !== undefined) {
       normalizedPayload.phone =
-        payload.phone === null || payload.phone === "" ? null : String(payload.phone);
+        payload.phone === null || payload.phone === ""
+          ? null
+          : String(payload.phone);
     }
     if (payload.dateOfBirth !== undefined) {
       normalizedPayload.dateOfBirth =
@@ -247,14 +268,18 @@ export default class CandidateModel extends BaseModel<typeof hrm_tb_candidates> 
     }
     if (payload.gender !== undefined) {
       normalizedPayload.gender =
-        payload.gender === null || payload.gender === "" ? null : String(payload.gender);
+        payload.gender === null || payload.gender === ""
+          ? null
+          : String(payload.gender);
     }
     if (payload.address !== undefined) {
       normalizedPayload.address = payload.address;
     }
     if (payload.cvUrl !== undefined) {
       normalizedPayload.cvUrl =
-        payload.cvUrl === null || payload.cvUrl === "" ? null : String(payload.cvUrl);
+        payload.cvUrl === null || payload.cvUrl === ""
+          ? null
+          : String(payload.cvUrl);
     }
     if (payload.coverLetter !== undefined) {
       normalizedPayload.coverLetter =
@@ -264,14 +289,18 @@ export default class CandidateModel extends BaseModel<typeof hrm_tb_candidates> 
     }
     if (payload.source !== undefined) {
       normalizedPayload.source =
-        payload.source === null || payload.source === "" ? null : String(payload.source);
+        payload.source === null || payload.source === ""
+          ? null
+          : String(payload.source);
     }
     if (payload.status !== undefined) {
       normalizedPayload.status = String(payload.status);
     }
     if (payload.stage !== undefined) {
       normalizedPayload.stage =
-        payload.stage === null || payload.stage === "" ? null : String(payload.stage);
+        payload.stage === null || payload.stage === ""
+          ? null
+          : String(payload.stage);
     }
     if (payload.rating !== undefined) {
       normalizedPayload.rating =
@@ -281,10 +310,11 @@ export default class CandidateModel extends BaseModel<typeof hrm_tb_candidates> 
     }
     if (payload.notes !== undefined) {
       normalizedPayload.notes =
-        payload.notes === null || payload.notes === "" ? null : String(payload.notes);
+        payload.notes === null || payload.notes === ""
+          ? null
+          : String(payload.notes);
     }
 
     return this.updateCandidate(id, normalizedPayload);
   };
 }
-

@@ -11,6 +11,7 @@ import { formatDate } from "@base/client/utils/date/formatDate";
 import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
+
 import { CustomerIndividual } from "../../interface/Customer";
 
 type CustomerIndividualRow = CustomerIndividual & {
@@ -28,6 +29,7 @@ export default function CustomerIndividualsListPage(): React.ReactNode {
         label: "Code",
         render: (value, row) => {
           if (!row?.id) return value;
+
           return (
             <LinkAs
               href={`/workspace/modules/b2c-sales/customers/individuals/view/${row.id}`}
@@ -60,8 +62,8 @@ export default function CustomerIndividualsListPage(): React.ReactNode {
         render: (_, row) => (
           <Chip
             color={row.isActive ? "success" : "danger"}
-            variant="flat"
             size="sm"
+            variant="flat"
           >
             {row.isActive ? "Active" : "Inactive"}
           </Chip>
@@ -80,6 +82,7 @@ export default function CustomerIndividualsListPage(): React.ReactNode {
           if (!row?.id) return null;
           const viewLink = `/workspace/modules/b2c-sales/customers/individuals/view/${row.id}`;
           const editLink = `/workspace/modules/b2c-sales/customers/individuals/edit/${row.id}`;
+
           return (
             <ActionMenu
               actions={[
@@ -99,15 +102,12 @@ export default function CustomerIndividualsListPage(): React.ReactNode {
         },
       },
     ],
-    [tDataTable]
+    [tDataTable],
   );
 
   return (
     <div className="space-y-4">
       <ViewListDataTable<CustomerIndividualRow>
-        model="b2c-sales-customer-individual"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -119,6 +119,9 @@ export default function CustomerIndividualsListPage(): React.ReactNode {
             },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="b2c-sales-customer-individual"
       />
     </div>
   );

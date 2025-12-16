@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
     // If CRON_SECRET is set, require it in Authorization header
     if (cronSecret) {
       const authHeader = request.headers.get("authorization");
+
       if (authHeader !== `Bearer ${cronSecret}`) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
@@ -33,12 +34,13 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("[Cron] Error cleaning up expired sessions:", error);
+
     return NextResponse.json(
       {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -30,9 +30,12 @@ export default function PayrollListPage(): React.ReactNode {
         label: t("labels.employee"),
         render: (value, row) => {
           if (!row?.id) return null;
+
           return (
             <LinkAs href={`/workspace/modules/hrm/payroll/view/${row.id}`}>
-              {getLocalizedText(row.employee?.fullName) || row.employee?.employeeCode || "—"}
+              {getLocalizedText(row.employee?.fullName) ||
+                row.employee?.employeeCode ||
+                "—"}
             </LinkAs>
           );
         },
@@ -45,23 +48,23 @@ export default function PayrollListPage(): React.ReactNode {
       {
         key: "grossSalary",
         label: t("labels.grossSalary"),
-        render: (value) => value ? value.toLocaleString() : "—",
+        render: (value) => (value ? value.toLocaleString() : "—"),
       },
       {
         key: "totalDeductions",
         label: t("labels.totalDeductions"),
-        render: (value) => value ? value.toLocaleString() : "—",
+        render: (value) => (value ? value.toLocaleString() : "—"),
       },
       {
         key: "netSalary",
         label: t("labels.netSalary"),
-        render: (value) => value ? value.toLocaleString() : "—",
+        render: (value) => (value ? value.toLocaleString() : "—"),
       },
       {
         key: "status",
         label: t("labels.status"),
         render: (value) => (
-          <Chip size="sm" variant="flat" className="capitalize">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value || "draft"}
           </Chip>
         ),
@@ -73,6 +76,7 @@ export default function PayrollListPage(): React.ReactNode {
         render: (_, row) => {
           if (!row?.id) return null;
           const viewLink = `/workspace/modules/hrm/payroll/view/${row.id}`;
+
           return (
             <ActionMenu
               actions={[
@@ -87,15 +91,12 @@ export default function PayrollListPage(): React.ReactNode {
         },
       },
     ],
-    [tDataTable, t, getLocalizedText]
+    [tDataTable, t, getLocalizedText],
   );
 
   return (
     <div className="space-y-4">
       <ViewListDataTable<PayrollRow>
-        model="hrm.payroll"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -107,8 +108,10 @@ export default function PayrollListPage(): React.ReactNode {
             },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="hrm.payroll"
       />
     </div>
   );
 }
-

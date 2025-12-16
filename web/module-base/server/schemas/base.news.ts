@@ -7,6 +7,7 @@ import {
   varchar,
   boolean,
 } from "drizzle-orm/pg-core";
+
 import { mdBaseSchema } from "./schema";
 
 export const base_tb_news = mdBaseSchema.table(
@@ -35,11 +36,13 @@ export const base_tb_news = mdBaseSchema.table(
   },
   (table) => ({
     authorIdx: index("news_author_id_idx").on(table.authorId),
-    publishedIdx: index("news_published_idx").on(table.isPublished, table.publishedAt),
+    publishedIdx: index("news_published_idx").on(
+      table.isPublished,
+      table.publishedAt,
+    ),
     createdAtIdx: index("news_created_at_idx").on(table.createdAt),
-  })
+  }),
 );
 
 export type BaseTbNews = typeof base_tb_news.$inferSelect;
 export type NewBaseTbNews = typeof base_tb_news.$inferInsert;
-

@@ -1,13 +1,14 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
@@ -76,7 +77,6 @@ class PositionViewListModel extends BaseViewListModel<
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): PositionRow => ({
     id: row.id,
     code: row.code,
@@ -100,13 +100,12 @@ class PositionViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<PositionRow>> => {
     return this.buildQueryDataList(params, (query) =>
-      query.leftJoin(department, eq(this.table.departmentId, department.id))
+      query.leftJoin(department, eq(this.table.departmentId, department.id)),
     );
   };
 }
 
 export default PositionViewListModel;
-

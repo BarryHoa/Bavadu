@@ -1,14 +1,15 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type { Column } from "drizzle-orm";
-import { eq, ilike } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
+import { ilike } from "drizzle-orm";
 
 import { hrm_tb_departments } from "../../schemas";
 
@@ -50,7 +51,6 @@ class DepartmentDropdownListModel extends BaseViewListModel<
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): DepartmentDropdownRow => ({
     id: row.id,
     code: row.code,
@@ -59,11 +59,10 @@ class DepartmentDropdownListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<DepartmentDropdownRow>> => {
     return this.buildQueryDataList(params);
   };
 }
 
 export default DepartmentDropdownListModel;
-

@@ -11,4 +11,3 @@ export const SYSTEM_CONFIG = {
    */
   timezone: SYSTEM_TIMEZONE,
 } as const;
-

@@ -52,4 +52,3 @@ export const rawMaterialOptionalFields: OptionalFieldDefinition[] = [
     validation: { min: 0 },
   },
 ];
-

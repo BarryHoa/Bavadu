@@ -1,4 +1,5 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
+
 import { RuntimeContext } from "../../../runtime/RuntimeContext";
 
 const getModelList = async () => {
@@ -14,11 +15,13 @@ const getModelList = async () => {
         path: model.path,
       };
     });
+
   return sortedModelKeys;
 };
 
 export async function GET() {
   const modelList = await getModelList();
+
   return JSONResponse({
     data: modelList,
     total: modelList.length,

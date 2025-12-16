@@ -1,4 +1,5 @@
 import type { ListParamsResponse } from "@base/server/models/interfaces/ListInterface";
+
 import {
   ProductMasterEnum,
   type ProductMasterType,
@@ -42,6 +43,7 @@ class ProductMasterTypeDropdownListModel {
       value: value as ProductMasterType,
       label: PRODUCT_TYPE_LABELS[value as ProductMasterType],
     }));
+
     return {
       data: PRODUCT_TYPES,
       total: PRODUCT_TYPES.length,

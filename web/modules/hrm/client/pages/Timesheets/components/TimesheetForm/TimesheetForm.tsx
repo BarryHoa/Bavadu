@@ -13,6 +13,7 @@ import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Textarea } from "@heroui/react";
+
 import {
   createTimesheetValidation,
   type TimesheetFormValues,
@@ -73,10 +74,10 @@ export default function TimesheetForm({
         )}
         <Button
           color="primary"
-          type="submit"
-          size="sm"
-          isLoading={isSubmitting}
           disabled={isSubmitting}
+          isLoading={isSubmitting}
+          size="sm"
+          type="submit"
         >
           {tCommon("actions.save")}
         </Button>
@@ -87,179 +88,187 @@ export default function TimesheetForm({
           <h2 className="text-base font-semibold mb-2">{t("generalInfo")}</h2>
           <div className="grid gap-2 md:grid-cols-2">
             <Controller
-              name="employeeId"
               control={control}
+              name="employeeId"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  isRequired
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.employee")}
                   model="hrm.employee.dropdown"
                   selectedKey={field.value}
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="workDate"
               control={control}
+              name="workDate"
               render={({ field, fieldState }) => (
                 <DatePicker
-                  label={t("labels.workDate")}
-                  value={field.value ? (typeof field.value === "string" ? parseDate(field.value) : field.value) : null}
-                  onChange={(val) => field.onChange(val ? val.toString() : null)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                   isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={t("labels.workDate")}
+                  value={
+                    field.value
+                      ? typeof field.value === "string"
+                        ? parseDate(field.value)
+                        : field.value
+                      : null
+                  }
+                  onChange={(val) =>
+                    field.onChange(val ? val.toString() : null)
+                  }
                 />
               )}
             />
             <Controller
-              name="shiftId"
               control={control}
+              name="shiftId"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.shift")}
                   model="hrm.shift.dropdown"
                   selectedKey={field.value}
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="checkInTime"
               control={control}
+              name="checkInTime"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.checkInTime")}
                   size="sm"
                   type="datetime-local"
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="checkOutTime"
               control={control}
+              name="checkOutTime"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.checkOutTime")}
                   size="sm"
                   type="datetime-local"
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="breakDuration"
               control={control}
+              name="breakDuration"
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.breakDuration")}
+                  min={0}
                   size="sm"
                   value={typeof field.value === "number" ? field.value : 0}
                   onValueChange={(val) => field.onChange(val ?? 0)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  min={0}
                 />
               )}
             />
             <Controller
-              name="status"
               control={control}
+              name="status"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.status")}
                   model="base-timesheet-status"
                   selectedKey={field.value}
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="checkInMethod"
               control={control}
+              name="checkInMethod"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.checkInMethod")}
                   model="base-check-method"
                   selectedKey={field.value}
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="checkInLocation"
               control={control}
+              name="checkInLocation"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.checkInLocation")}
                   size="sm"
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="checkOutLocation"
               control={control}
+              name="checkOutLocation"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.checkOutLocation")}
                   size="sm"
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="notes"
               control={control}
+              name="notes"
               render={({ field, fieldState }) => (
                 <div className="md:col-span-2">
                   <Textarea
                     {...field}
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
                     label={t("labels.notes")}
                     size="sm"
                     value={field.value ?? ""}
                     onValueChange={field.onChange}
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
                   />
                 </div>
               )}
@@ -270,4 +279,3 @@ export default function TimesheetForm({
     </form>
   );
 }
-

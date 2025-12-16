@@ -1,13 +1,15 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { asc, eq, inArray } from "drizzle-orm";
+
 import { base_tb_payment_terms } from "../../schemas/base.payment-term";
 import { ParamFilter } from "../interfaces/FilterInterface";
 
@@ -69,10 +71,9 @@ class PaymentTermDropdownListModel extends BaseViewListModel<
       ],
     ]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (
     row: any,
-    index?: number
+    index?: number,
   ): PaymentTermDropdownOption => {
     const name =
       typeof row.name === "string"
@@ -88,7 +89,7 @@ class PaymentTermDropdownListModel extends BaseViewListModel<
   };
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<PaymentTermDropdownOption>> => {
     const result = await this.buildQueryDataListWithSelect(
       params,
@@ -99,13 +100,15 @@ class PaymentTermDropdownListModel extends BaseViewListModel<
         order: base_tb_payment_terms.order,
       },
       (query) => {
-        return query.orderBy(asc(base_tb_payment_terms.order)).limit(params.limit);
-      }
+        return query
+          .orderBy(asc(base_tb_payment_terms.order))
+          .limit(params.limit);
+      },
     );
 
     return {
       data: result.data.map((row: any, index: number) =>
-        this.declarationMappingData(row, index)
+        this.declarationMappingData(row, index),
       ),
       total: result.total,
     };

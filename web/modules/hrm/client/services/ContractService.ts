@@ -102,5 +102,3 @@ export default class ContractService extends JsonRpcClientService {
 }
 
 export const contractService = new ContractService();
-
-

@@ -1,5 +1,7 @@
 "use client";
 
+import type { WarehouseDto } from "../../services/StockService";
+
 import {
   DATA_TABLE_COLUMN_KEY_ACTION,
   type DataTableColumn,
@@ -9,8 +11,6 @@ import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-
-import type { WarehouseDto } from "../../services/StockService";
 
 const statusColorMap: Record<string, "success" | "warning" | "danger"> = {
   ACTIVE: "success",
@@ -27,19 +27,21 @@ const formatLocation = (warehouse: WarehouseDto) => {
   const getLocalizedName = (name: any): string => {
     if (!name) return "";
     if (typeof name === "string") return name;
+
     return name.vi || name.en || "";
   };
   const parts = [
     address.administrativeUnits?.find((u) => u.level === 2)
       ? getLocalizedName(
-          address.administrativeUnits.find((u) => u.level === 2)?.name
+          address.administrativeUnits.find((u) => u.level === 2)?.name,
         )
       : undefined,
     address.country ? getLocalizedName(address.country.name) : undefined,
   ].filter(
     (value): value is string =>
-      Boolean(value) && typeof value === "string" && value.trim().length > 0
+      Boolean(value) && typeof value === "string" && value.trim().length > 0,
   );
+
   return parts.length ? parts.join(", ") : "—";
 };
 
@@ -47,6 +49,7 @@ const formatStockRange = (warehouse: WarehouseDto) => {
   if (warehouse.maxStock === null || warehouse.maxStock === undefined) {
     return `≥ ${warehouse.minStock}`;
   }
+
   return `${warehouse.minStock} - ${warehouse.maxStock}`;
 };
 
@@ -88,9 +91,9 @@ export default function WarehouseListPage(): React.ReactNode {
         label: t("columns.status"),
         render: (_, row) => (
           <Chip
+            color={statusColorMap[row.status] ?? "warning"}
             size="sm"
             variant="flat"
-            color={statusColorMap[row.status] ?? "warning"}
           >
             {t(`status.${row.status}`)}
           </Chip>
@@ -107,15 +110,12 @@ export default function WarehouseListPage(): React.ReactNode {
         ),
       },
     ],
-    [t, tDataTable]
+    [t, tDataTable],
   );
 
   return (
     <div className="space-y-4">
       <ViewListDataTable<WarehouseDto>
-        model="stock-warehouse"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -127,6 +127,9 @@ export default function WarehouseListPage(): React.ReactNode {
             },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="stock-warehouse"
       />
     </div>
   );

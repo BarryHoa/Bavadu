@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { jsonb, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 
 // Audit Log - Nhật ký kiểm toán cho compliance
@@ -19,7 +20,7 @@ export const hrm_tb_audit_logs = mdlHrmSchema.table(
     metadata: jsonb("metadata"), // Additional context
     createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
   },
-  (table) => []
+  (table) => [],
 );
 
 export type HrmTbAuditLog = typeof hrm_tb_audit_logs.$inferSelect;

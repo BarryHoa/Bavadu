@@ -41,6 +41,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   User,
   NewspaperIcon,
 };
+
 interface MenuProps {
   menuItems: MenuWorkspaceElement[];
   isOpen: boolean;
@@ -61,7 +62,7 @@ export default function Menu({
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [isHoverOpen, setIsHoverOpen] = useState(false);
   const [activeKey, setActiveKey] = useState<string | null>(null);
-  const activeItemRef = useRef<HTMLDivElement>(null);
+  const activeItemRef = useRef<HTMLButtonElement>(null);
 
   const effectiveOpen = isOpen || isHoverOpen;
 
@@ -71,13 +72,16 @@ export default function Menu({
       .flatMap((item) => {
         if (item.children && item.children.length > 0) {
           const children = item.children.flat();
+
           return [item, ...children];
         }
+
         return [item];
       })
       .sort((a: any, b: any) => {
         const lenA = (a.path || "").length;
         const lenB = (b.path || "").length;
+
         return lenB - lenA; // long to short
       });
   }, [menuItems]);
@@ -86,7 +90,7 @@ export default function Menu({
     setExpandedItems((prev) =>
       prev.includes(itemName)
         ? prev.filter((name) => name !== itemName)
-        : [...prev, itemName]
+        : [...prev, itemName],
     );
   };
 
@@ -102,7 +106,7 @@ export default function Menu({
   // Tìm tất cả các item cha cần expand theo một đường dẫn bất kỳ
   const findParentItemsToExpandByPath = (
     items: MenuWorkspaceElement[],
-    path: string
+    path: string,
   ): string[] => {
     const parentsToExpand: string[] = [];
 
@@ -136,7 +140,7 @@ export default function Menu({
 
   const findKeyByPath = (
     items: MenuWorkspaceElement[],
-    path: string
+    path: string,
   ): string | null => {
     const normalized = normalizePath(path);
     let foundKey: string | null = null;
@@ -166,12 +170,12 @@ export default function Menu({
 
   const hasActiveChildByKey = (
     item: MenuWorkspaceElement,
-    key: string | null
+    key: string | null,
   ): boolean => {
     if (!key || !item.children) return false;
 
     return item.children.some(
-      (child) => child.key === key || hasActiveChildByKey(child, key)
+      (child) => child.key === key || hasActiveChildByKey(child, key),
     );
   };
 
@@ -179,20 +183,20 @@ export default function Menu({
   useEffect(() => {
     const parentsToExpand: string[] = findParentItemsToExpandByPath(
       flattenedMenus,
-      pathname
+      pathname,
     );
 
     const normalizedPathName = normalizePath(pathname);
     const keyToSet: string | null =
       flattenedMenus.find(
-        (item) => normalizePath(item.path || "") === normalizedPathName
+        (item) => normalizePath(item.path || "") === normalizedPathName,
       )?.key || null;
 
     setActiveKey(keyToSet);
 
     if (parentsToExpand.length > 0) {
       setExpandedItems((prev) =>
-        Array.from(new Set([...prev, ...parentsToExpand]))
+        Array.from(new Set([...prev, ...parentsToExpand])),
       );
     }
   }, [pathname, menuItems]);
@@ -206,7 +210,7 @@ export default function Menu({
           "inline-flex h-7 w-7 items-center justify-center rounded-lg border text-[11px] flex-shrink-0",
           isHighlighted
             ? "bg-blue-600 border-blue-600 text-white shadow-sm"
-            : "bg-slate-50 border-slate-200 text-slate-500 group-hover:bg-blue-50 group-hover:border-blue-200 group-hover:text-blue-500"
+            : "bg-slate-50 border-slate-200 text-slate-500 group-hover:bg-blue-50 group-hover:border-blue-200 group-hover:text-blue-500",
         )}
       >
         <IconComponent className="h-4 w-4" />
@@ -225,22 +229,23 @@ export default function Menu({
     const isHighlighted = isItemActive || hasActiveChildren;
 
     const content = (
-      <div
+      <button
         ref={isItemActive ? activeItemRef : null}
+        aria-current={isItemActive ? "page" : undefined}
+        aria-expanded={hasChildren ? isExpanded : undefined}
         className={clsx(
-          "group flex items-center justify-between px-2 py-1 rounded-xl cursor-pointer transition-all duration-200",
+          "group flex w-full items-center justify-between px-2 py-1 rounded-xl cursor-pointer transition-all duration-200 text-left",
           "border border-transparent",
           isHighlighted
             ? "bg-blue-50 text-blue-700 border-blue-100 shadow-[0_0_0_1px_rgba(59,130,246,0.15)]"
-            : "text-slate-700 hover:bg-slate-50 hover:text-blue-600"
+            : "text-slate-700 hover:bg-slate-50 hover:text-blue-600",
         )}
+        type="button"
         onClick={() => {
           if (hasChildren) {
             toggleExpanded(item.name);
           }
         }}
-        aria-expanded={hasChildren ? isExpanded : undefined}
-        aria-current={isItemActive ? "page" : undefined}
       >
         <div className="flex items-center flex-1 gap-2">
           {renderIcon(item.icon, Boolean(isHighlighted))}
@@ -251,7 +256,7 @@ export default function Menu({
               "transition-all duration-300",
               effectiveOpen
                 ? "opacity-100 translate-x-0 max-w-[160px]"
-                : "opacity-0 -translate-x-1 max-w-0"
+                : "opacity-0 -translate-x-1 max-w-0",
             )}
           >
             {item.name}
@@ -262,17 +267,17 @@ export default function Menu({
           <div
             className={clsx(
               "transition-all duration-200",
-              effectiveOpen ? "opacity-100" : "opacity-0 hidden"
+              effectiveOpen ? "opacity-100" : "opacity-0 hidden",
             )}
           >
             {isExpanded ? (
-              <ChevronDown size={14} className="text-slate-400" />
+              <ChevronDown className="text-slate-400" size={14} />
             ) : (
-              <ChevronRight size={14} className="text-slate-400" />
+              <ChevronRight className="text-slate-400" size={14} />
             )}
           </div>
         )}
-      </div>
+      </button>
     );
 
     return (
@@ -289,12 +294,13 @@ export default function Menu({
           </>
         ) : (
           <Link
+            className="block"
             href={itemPath || "#"}
             onClick={() => {
               if (typeof window !== "undefined" && item.key) {
                 window.localStorage.setItem(
                   KEY_WORKSPACE_LAST_MENU_PATH,
-                  item.key
+                  item.key,
                 );
               }
 
@@ -302,7 +308,6 @@ export default function Menu({
 
               onClose();
             }}
-            className="block"
           >
             {effectiveOpen ? (
               content
@@ -321,7 +326,7 @@ export default function Menu({
               "transition-all duration-200",
               effectiveOpen
                 ? "opacity-100"
-                : "opacity-0 max-h-0 overflow-hidden"
+                : "opacity-0 max-h-0 overflow-hidden",
             )}
           >
             {item.children?.map((child) => {
@@ -333,12 +338,18 @@ export default function Menu({
                 <Link
                   key={child.name}
                   as={childAs || childPath}
+                  className={clsx(
+                    "flex items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-all duration-150",
+                    isChildActive
+                      ? "bg-blue-100 text-blue-700 font-medium"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-blue-600",
+                  )}
                   href={childPath || "#"}
                   onClick={() => {
                     if (typeof window !== "undefined" && child.key) {
                       window.localStorage.setItem(
                         KEY_WORKSPACE_LAST_MENU_PATH,
-                        child.key
+                        child.key,
                       );
                     }
 
@@ -346,12 +357,6 @@ export default function Menu({
 
                     onClose();
                   }}
-                  className={clsx(
-                    "flex items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-all duration-150",
-                    isChildActive
-                      ? "bg-blue-100 text-blue-700 font-medium"
-                      : "text-slate-600 hover:bg-slate-50 hover:text-blue-600"
-                  )}
                 >
                   <div className="flex items-center gap-2">
                     <span
@@ -359,7 +364,7 @@ export default function Menu({
                         "transition-all duration-300 whitespace-nowrap overflow-hidden text-ellipsis",
                         effectiveOpen
                           ? "opacity-100 translate-x-0 max-w-[160px]"
-                          : "opacity-0 -translate-x-1 max-w-0"
+                          : "opacity-0 -translate-x-1 max-w-0",
                       )}
                     >
                       {child.name}
@@ -384,12 +389,12 @@ export default function Menu({
     <>
       {/* Desktop sidebar */}
       <aside
+        aria-label="Workspace navigation"
         className={clsx(
           "hidden lg:flex lg:flex-col flex-shrink-0 transition-all duration-300 ease-in-out",
           "bg-white/90 backdrop-blur border-r border-slate-100 shadow-sm",
-          effectiveOpen ? "w-64" : "w-[4.25rem]"
+          effectiveOpen ? "w-64" : "w-[4.25rem]",
         )}
-        aria-label="Workspace navigation"
         onMouseEnter={() => {
           if (!isOpen) {
             setIsHoverOpen(true);
@@ -407,7 +412,7 @@ export default function Menu({
             className={clsx(
               "mb-2 flex items-center gap-2 rounded-xl px-2 py-1.5",
               "bg-slate-50/80 border border-slate-100",
-              effectiveOpen ? "justify-between" : "justify-center"
+              effectiveOpen ? "justify-between" : "justify-center",
             )}
           >
             <div
@@ -416,17 +421,17 @@ export default function Menu({
                 "transition-all duration-300 whitespace-nowrap overflow-hidden",
                 effectiveOpen
                   ? "opacity-100 translate-x-0 max-w-[160px]"
-                  : "opacity-0 -translate-x-1 max-w-0"
+                  : "opacity-0 -translate-x-1 max-w-0",
               )}
             >
               Main
             </div>
 
             <button
-              type="button"
-              className="cursor-pointer inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all"
-              onClick={onToggleSidebar}
               aria-label={isOpen ? "Bỏ ghim menu" : "Ghim menu"}
+              className="cursor-pointer inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all"
+              type="button"
+              onClick={onToggleSidebar}
             >
               {isOpen ? (
                 <Pin className="h-4 w-4" />

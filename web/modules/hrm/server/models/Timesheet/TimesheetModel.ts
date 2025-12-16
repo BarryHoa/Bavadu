@@ -1,5 +1,5 @@
 import { BaseModel } from "@base/server/models/BaseModel";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { NewHrmTbTimesheet, hrm_tb_timesheets } from "../../schemas";
@@ -58,7 +58,9 @@ export interface TimesheetInput {
   notes?: string | null;
 }
 
-export default class TimesheetModel extends BaseModel<typeof hrm_tb_timesheets> {
+export default class TimesheetModel extends BaseModel<
+  typeof hrm_tb_timesheets
+> {
   constructor() {
     super(hrm_tb_timesheets);
   }
@@ -98,6 +100,7 @@ export default class TimesheetModel extends BaseModel<typeof hrm_tb_timesheets> 
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -138,14 +141,20 @@ export default class TimesheetModel extends BaseModel<typeof hrm_tb_timesheets> 
     };
   };
 
-  getDataById = async (params: { id: string }): Promise<TimesheetRow | null> => {
+  getDataById = async (params: {
+    id: string;
+  }): Promise<TimesheetRow | null> => {
     return this.getTimesheetById(params.id);
   };
 
   createTimesheet = async (payload: TimesheetInput): Promise<TimesheetRow> => {
     const now = new Date();
-    const checkInTime = payload.checkInTime ? new Date(payload.checkInTime) : null;
-    const checkOutTime = payload.checkOutTime ? new Date(payload.checkOutTime) : null;
+    const checkInTime = payload.checkInTime
+      ? new Date(payload.checkInTime)
+      : null;
+    const checkOutTime = payload.checkOutTime
+      ? new Date(payload.checkOutTime)
+      : null;
 
     // Calculate hours if both check in/out are provided
     let actualHours: number | null = null;
@@ -154,7 +163,9 @@ export default class TimesheetModel extends BaseModel<typeof hrm_tb_timesheets> 
 
     if (checkInTime && checkOutTime) {
       const diffMs = checkOutTime.getTime() - checkInTime.getTime();
-      const diffHours = diffMs / (1000 * 60 * 60) - (payload.breakDuration ?? 0) / 60;
+      const diffHours =
+        diffMs / (1000 * 60 * 60) - (payload.breakDuration ?? 0) / 60;
+
       actualHours = Math.max(0, Math.round(diffHours * 100) / 100);
       // TODO: Calculate regular vs OT based on shift rules
       regularHours = actualHours;
@@ -189,26 +200,35 @@ export default class TimesheetModel extends BaseModel<typeof hrm_tb_timesheets> 
     if (!created) throw new Error("Failed to create timesheet");
 
     const timesheet = await this.getTimesheetById(created.id);
+
     if (!timesheet) throw new Error("Failed to load timesheet after creation");
+
     return timesheet;
   };
 
   updateTimesheet = async (
     id: string,
-    payload: Partial<TimesheetInput>
+    payload: Partial<TimesheetInput>,
   ): Promise<TimesheetRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
     };
 
-    if (payload.employeeId !== undefined) updateData.employeeId = payload.employeeId;
-    if (payload.rosterId !== undefined) updateData.rosterId = payload.rosterId ?? null;
+    if (payload.employeeId !== undefined)
+      updateData.employeeId = payload.employeeId;
+    if (payload.rosterId !== undefined)
+      updateData.rosterId = payload.rosterId ?? null;
     if (payload.workDate !== undefined) updateData.workDate = payload.workDate;
-    if (payload.shiftId !== undefined) updateData.shiftId = payload.shiftId ?? null;
+    if (payload.shiftId !== undefined)
+      updateData.shiftId = payload.shiftId ?? null;
     if (payload.checkInTime !== undefined)
-      updateData.checkInTime = payload.checkInTime ? new Date(payload.checkInTime) : null;
+      updateData.checkInTime = payload.checkInTime
+        ? new Date(payload.checkInTime)
+        : null;
     if (payload.checkOutTime !== undefined)
-      updateData.checkOutTime = payload.checkOutTime ? new Date(payload.checkOutTime) : null;
+      updateData.checkOutTime = payload.checkOutTime
+        ? new Date(payload.checkOutTime)
+        : null;
     if (payload.breakDuration !== undefined)
       updateData.breakDuration = payload.breakDuration;
     if (payload.status !== undefined) updateData.status = payload.status;
@@ -223,22 +243,40 @@ export default class TimesheetModel extends BaseModel<typeof hrm_tb_timesheets> 
     if (payload.notes !== undefined) updateData.notes = payload.notes ?? null;
 
     // Recalculate hours if times updated
-    if (payload.checkInTime !== undefined || payload.checkOutTime !== undefined) {
+    if (
+      payload.checkInTime !== undefined ||
+      payload.checkOutTime !== undefined
+    ) {
       const existing = await this.getTimesheetById(id);
+
       if (existing) {
-        const checkIn = updateData.checkInTime ?? (existing.checkInTime ? new Date(existing.checkInTime) : null);
-        const checkOut = updateData.checkOutTime ?? (existing.checkOutTime ? new Date(existing.checkOutTime) : null);
+        const checkIn =
+          updateData.checkInTime ??
+          (existing.checkInTime ? new Date(existing.checkInTime) : null);
+        const checkOut =
+          updateData.checkOutTime ??
+          (existing.checkOutTime ? new Date(existing.checkOutTime) : null);
+
         if (checkIn && checkOut) {
           const diffMs = checkOut.getTime() - checkIn.getTime();
-          const breakMins = updateData.breakDuration ?? existing.breakDuration ?? 0;
+          const breakMins =
+            updateData.breakDuration ?? existing.breakDuration ?? 0;
           const diffHours = diffMs / (1000 * 60 * 60) - breakMins / 60;
-          updateData.actualHours = Math.max(0, Math.round(diffHours * 100) / 100);
+
+          updateData.actualHours = Math.max(
+            0,
+            Math.round(diffHours * 100) / 100,
+          );
           updateData.regularHours = updateData.actualHours;
         }
       }
     }
 
-    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db
+      .update(this.table)
+      .set(updateData)
+      .where(eq(this.table.id, id));
+
     return this.getTimesheetById(id);
   };
 
@@ -251,14 +289,18 @@ export default class TimesheetModel extends BaseModel<typeof hrm_tb_timesheets> 
     }
     if (payload.rosterId !== undefined) {
       normalizedPayload.rosterId =
-        payload.rosterId === null || payload.rosterId === "" ? null : String(payload.rosterId);
+        payload.rosterId === null || payload.rosterId === ""
+          ? null
+          : String(payload.rosterId);
     }
     if (payload.workDate !== undefined) {
       normalizedPayload.workDate = String(payload.workDate);
     }
     if (payload.shiftId !== undefined) {
       normalizedPayload.shiftId =
-        payload.shiftId === null || payload.shiftId === "" ? null : String(payload.shiftId);
+        payload.shiftId === null || payload.shiftId === ""
+          ? null
+          : String(payload.shiftId);
     }
     if (payload.checkInTime !== undefined) {
       normalizedPayload.checkInTime =
@@ -304,10 +346,11 @@ export default class TimesheetModel extends BaseModel<typeof hrm_tb_timesheets> 
     }
     if (payload.notes !== undefined) {
       normalizedPayload.notes =
-        payload.notes === null || payload.notes === "" ? null : String(payload.notes);
+        payload.notes === null || payload.notes === ""
+          ? null
+          : String(payload.notes);
     }
 
     return this.updateTimesheet(id, normalizedPayload);
   };
 }
-

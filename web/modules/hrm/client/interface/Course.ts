@@ -28,4 +28,3 @@ export interface CreateCoursePayload {
 export interface UpdateCoursePayload extends Partial<CreateCoursePayload> {
   id: string;
 }
-

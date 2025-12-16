@@ -1,11 +1,6 @@
 import { sql } from "drizzle-orm";
-import {
-  index,
-  numeric,
-  timestamp,
-  uuid,
-  varchar,
-} from "drizzle-orm/pg-core";
+import { index, numeric, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+
 import { mdlStockSchema } from "./schema";
 import { stock_tb_stock_lots } from "./stock.lot";
 import { stock_tb_stock_moves } from "./stock.move";
@@ -14,7 +9,9 @@ import { stock_tb_stock_moves } from "./stock.move";
 export const stock_tb_stock_lots_move = mdlStockSchema.table(
   "lot_moves",
   {
-    id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuid_generate_v7()`),
 
     // Link to stock move
     stockMoveId: uuid("stock_move_id")
@@ -40,9 +37,9 @@ export const stock_tb_stock_lots_move = mdlStockSchema.table(
     index("lot_moves_stock_move_idx").on(table.stockMoveId),
     index("lot_moves_stock_lot_idx").on(table.stockLotId),
     index("lot_moves_type_idx").on(table.moveType),
-  ]
+  ],
 );
 
 export type StockTbStockLotMove = typeof stock_tb_stock_lots_move.$inferSelect;
-export type NewStockTbStockLotMove = typeof stock_tb_stock_lots_move.$inferInsert;
-
+export type NewStockTbStockLotMove =
+  typeof stock_tb_stock_lots_move.$inferInsert;

@@ -4,6 +4,7 @@ import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { positionService } from "@mdl/hrm/client/services/PositionService";
+
 import PositionForm, {
   type PositionFormValues,
 } from "../components/PositionForm/PositionForm";
@@ -22,9 +23,11 @@ export default function PositionCreatePageClient(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await positionService.create(payload);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToCreate"));
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-positions"]],
@@ -52,11 +55,10 @@ export default function PositionCreatePageClient(): React.ReactNode {
 
   return (
     <PositionForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push("/workspace/modules/hrm/positions")}
-      submitError={submitError}
       isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() => router.push("/workspace/modules/hrm/positions")}
+      onSubmit={handleSubmit}
     />
   );
 }
-

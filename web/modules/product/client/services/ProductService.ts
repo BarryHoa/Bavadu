@@ -1,11 +1,11 @@
-import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
-
 import type {
   ProductDetail,
   ProductFormPayload,
   ProductFormUpdatePayload,
 } from "../interface/Product";
+
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export type ProductTypeOption = {
   value: string;
@@ -66,14 +66,14 @@ class ProductService extends JsonRpcClientService {
   async getProductFeatures() {
     return this.call<ProductFeaturesResponse>(
       "product-features.dropdown.getData",
-      {}
+      {},
     );
   }
 
   async getOptionalFieldsByProductType(type: string) {
     return this.call<OptionalFieldsResponse>(
       "product.curd.getOptionalFieldsByProductType",
-      { type }
+      { type },
     );
   }
 }

@@ -43,6 +43,7 @@ export default class WorkflowModel extends BaseModel<typeof hrm_tb_workflows> {
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
@@ -81,7 +82,11 @@ export default class WorkflowModel extends BaseModel<typeof hrm_tb_workflows> {
     const insertData: NewHrmTbWorkflow = {
       code: payload.code,
       name: payload.name,
-      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
+      description: payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null,
       workflowType: payload.workflowType,
       steps: payload.steps,
       isActive:
@@ -102,15 +107,17 @@ export default class WorkflowModel extends BaseModel<typeof hrm_tb_workflows> {
     }
 
     const workflow = await this.getWorkflowById(created.id);
+
     if (!workflow) {
       throw new Error("Failed to load workflow after creation");
     }
+
     return workflow;
   };
 
   updateWorkflow = async (
     id: string,
-    payload: Partial<WorkflowInput>
+    payload: Partial<WorkflowInput>,
   ): Promise<WorkflowRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -119,13 +126,20 @@ export default class WorkflowModel extends BaseModel<typeof hrm_tb_workflows> {
     if (payload.code !== undefined) updateData.code = payload.code;
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.description !== undefined)
-      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
+      updateData.description = payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null;
     if (payload.workflowType !== undefined)
       updateData.workflowType = payload.workflowType;
     if (payload.steps !== undefined) updateData.steps = payload.steps;
     if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
 
-    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db
+      .update(this.table)
+      .set(updateData)
+      .where(eq(this.table.id, id));
 
     return this.getWorkflowById(id);
   };
@@ -145,7 +159,7 @@ export default class WorkflowModel extends BaseModel<typeof hrm_tb_workflows> {
     }
     if (payload.description !== undefined) {
       normalizedPayload.description = this.normalizeLocaleInput(
-        payload.description
+        payload.description,
       );
     }
     if (payload.workflowType !== undefined) {
@@ -163,4 +177,3 @@ export default class WorkflowModel extends BaseModel<typeof hrm_tb_workflows> {
     return this.updateWorkflow(id, normalizedPayload);
   };
 }
-

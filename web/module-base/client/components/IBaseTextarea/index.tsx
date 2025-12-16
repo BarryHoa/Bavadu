@@ -18,6 +18,7 @@ const IBaseTextarea = React.forwardRef<HTMLTextAreaElement, IBaseTextareaProps>(
       ...rest
     } = props;
     const defaultPlaceholder = t("placeholder");
+
     return (
       <HeroUITextarea
         ref={ref}
@@ -26,20 +27,20 @@ const IBaseTextarea = React.forwardRef<HTMLTextAreaElement, IBaseTextareaProps>(
           label: "text-small text-default-600",
           mainWrapper: clsx(
             "cursor-not-allowed",
-            isDisabled ? "bg-default-200" : ""
+            isDisabled ? "bg-default-200" : "",
           ),
           input: "placeholder:text-default-400 italic text-sm",
         }}
-        variant="bordered"
-        size={size}
         labelPlacement={labelPlacement}
-        placeholder={placeholder ?? defaultPlaceholder}
         minRows={minRows}
+        placeholder={placeholder ?? defaultPlaceholder}
+        size={size}
+        variant="bordered"
         {...rest}
         isDisabled={isDisabled}
       />
     );
-  }
+  },
 );
 
 IBaseTextarea.displayName = "IBaseTextarea";

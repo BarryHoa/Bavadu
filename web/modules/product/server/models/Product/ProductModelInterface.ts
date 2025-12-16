@@ -1,5 +1,6 @@
 import { ParamFilter } from "@base/server";
 import { LocaleDataType } from "@base/server/interfaces/Locale";
+
 import { ProductAttribute } from "../interfaces/ProductAttribute";
 import {
   MasterProduct,

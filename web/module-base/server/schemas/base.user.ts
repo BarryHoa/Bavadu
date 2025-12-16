@@ -7,6 +7,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdBaseSchema } from "./schema";
 
 // Users
@@ -37,7 +38,7 @@ export const base_tb_users = mdBaseSchema.table(
   (table) => [
     index("users_status_idx").on(table.status),
     index("users_lastname_idx").on(table.lastName),
-  ]
+  ],
 );
 
 export type BaseTbUser = typeof base_tb_users.$inferSelect;
@@ -68,7 +69,7 @@ export const base_tb_users_login = mdBaseSchema.table(
     index("users_login_user_id_idx").on(table.userId),
     index("users_login_phone_idx").on(table.phone),
     index("users_login_last_login_idx").on(table.lastLoginAt),
-  ]
+  ],
 );
 
 export type BaseTbUserLogin = typeof base_tb_users_login.$inferSelect;

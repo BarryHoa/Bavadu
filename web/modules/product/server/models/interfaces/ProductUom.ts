@@ -7,7 +7,7 @@ export type UnitOfMeasure = {
   isActive?: boolean;
   createdAt?: number; // unix timestamp (ms)
   updatedAt?: number; // unix timestamp (ms)
-}
+};
 
 // ========================================
 //  Uom conversion
@@ -18,6 +18,4 @@ export type UnitOfMeasureConversion = {
   conversionRatio: number;
   createdAt?: number; // unix timestamp (ms)
   updatedAt?: number; // unix timestamp (ms)
-}
-
-
+};

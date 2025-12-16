@@ -1,5 +1,7 @@
 "use client";
 
+import type { EmployeeFormValues } from "../../validation/employeeValidation";
+
 import {
   IBaseInput,
   IBaseInputMultipleLang,
@@ -9,10 +11,9 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
-
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/react";
-import type { EmployeeFormValues } from "../../validation/employeeValidation";
+
 import { createEmployeeValidation } from "../../validation/employeeValidation";
 
 export type { EmployeeFormValues };
@@ -73,10 +74,10 @@ export default function EmployeeForm({
         )}
         <Button
           color="primary"
-          type="submit"
-          size="sm"
-          isLoading={isSubmitting}
           disabled={isSubmitting}
+          isLoading={isSubmitting}
+          size="sm"
+          type="submit"
         >
           {tLabels("save")}
         </Button>
@@ -90,89 +91,89 @@ export default function EmployeeForm({
           </h2>
           <div className="grid gap-4 md:grid-cols-2">
             <Controller
-              name="employeeCode"
               control={control}
+              name="employeeCode"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("employeeCode")}
                   size="sm"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
 
             <Controller
-              name="fullName"
               control={control}
+              name="fullName"
               render={({ field, fieldState }) => (
                 <IBaseInputMultipleLang
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("fullName")}
                   size="sm"
                   value={field.value || { vi: "", en: "" }}
                   onChange={field.onChange}
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
 
             <Controller
-              name="firstName"
               control={control}
+              name="firstName"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("firstName")}
                   size="sm"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
 
             <Controller
-              name="lastName"
               control={control}
+              name="lastName"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("lastName")}
                   size="sm"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
 
             <Controller
-              name="email"
               control={control}
+              name="email"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
-                  type="email"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("email")}
                   size="sm"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
+                  type="email"
                 />
               )}
             />
 
             <Controller
-              name="phone"
               control={control}
+              name="phone"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("phone")}
                   size="sm"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
@@ -188,104 +189,104 @@ export default function EmployeeForm({
           </h2>
           <div className="grid gap-4 md:grid-cols-2">
             <Controller
-              name="departmentId"
               control={control}
+              name="departmentId"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  isRequired
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("department")}
-                  size="sm"
                   model="department.dropdown"
                   selectedKey={field.value}
+                  size="sm"
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
 
             <Controller
-              name="positionId"
               control={control}
+              name="positionId"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  isRequired
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("position")}
-                  size="sm"
                   model="position.dropdown"
                   selectedKey={field.value}
+                  size="sm"
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
 
             <Controller
-              name="managerId"
               control={control}
+              name="managerId"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("manager")}
-                  size="sm"
                   model="employee.dropdown"
                   selectedKey={field.value}
+                  size="sm"
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
 
             <Controller
-              name="hireDate"
               control={control}
+              name="hireDate"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
-                  type="date"
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("hireDate")}
                   size="sm"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
+                  type="date"
                 />
               )}
             />
 
             <Controller
-              name="employmentStatus"
               control={control}
+              name="employmentStatus"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("employmentStatus")}
                   size="sm"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
 
             <Controller
-              name="baseSalary"
               control={control}
+              name="baseSalary"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
-                  type="number"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("baseSalary")}
                   size="sm"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
+                  type="number"
                 />
               )}
             />
@@ -301,30 +302,30 @@ export default function EmployeeForm({
           </h2>
           <div className="grid gap-4 md:grid-cols-2">
             <Controller
-              name="dateOfBirth"
               control={control}
+              name="dateOfBirth"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
-                  type="date"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("dateOfBirth")}
                   size="sm"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
+                  type="date"
                 />
               )}
             />
 
             <Controller
-              name="gender"
               control={control}
+              name="gender"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("gender")}
                   size="sm"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />

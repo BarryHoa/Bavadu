@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { departmentService } from "@mdl/hrm/client/services/DepartmentService";
+
 import DepartmentForm, {
   type DepartmentFormValues,
 } from "./components/DepartmentForm/DepartmentForm";
@@ -19,9 +20,11 @@ export default function DepartmentEditPage(): React.ReactNode {
     queryKey: ["hrm-department", id],
     queryFn: async () => {
       const response = await departmentService.getById(id);
+
       if (!response.data) {
         throw new Error(response.message ?? "Department not found");
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -37,9 +40,11 @@ export default function DepartmentEditPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await departmentService.update(payload);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToUpdate"));
       }
+
       return { id: response.data.id };
     },
     invalidateQueries: [["hrm-departments"], ["hrm-department", id]],
@@ -74,10 +79,6 @@ export default function DepartmentEditPage(): React.ReactNode {
 
   return (
     <DepartmentForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push(`/workspace/modules/hrm/departments/view/${id}`)}
-      submitError={submitError}
-      isSubmitting={isPending}
       defaultValues={{
         code: departmentData.code,
         name: (departmentData.name as any) || { vi: "", en: "" },
@@ -88,7 +89,12 @@ export default function DepartmentEditPage(): React.ReactNode {
         locationId: departmentData.locationId || "",
         isActive: departmentData.isActive ?? true,
       }}
+      isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() =>
+        router.push(`/workspace/modules/hrm/departments/view/${id}`)
+      }
+      onSubmit={handleSubmit}
     />
   );
 }
-

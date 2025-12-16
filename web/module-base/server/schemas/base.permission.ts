@@ -9,6 +9,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdBaseSchema } from "./schema";
 
 // Permission Registry - Registry để quản lý tất cả permissions trong system
@@ -35,7 +36,7 @@ export const base_tb_permissions = mdBaseSchema.table(
   (table) => [
     index("permissions_module_idx").on(table.module),
     uniqueIndex("permissions_key_idx").on(table.key),
-  ]
+  ],
 );
 
 export type BaseTbPermission = typeof base_tb_permissions.$inferSelect;

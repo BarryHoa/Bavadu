@@ -33,4 +33,3 @@ export interface CreateCertificatePayload {
 export interface UpdateCertificatePayload extends Partial<CreateCertificatePayload> {
   id: string;
 }
-

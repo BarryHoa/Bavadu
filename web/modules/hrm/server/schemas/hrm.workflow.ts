@@ -8,6 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 
 // Workflow Definitions - Định nghĩa quy trình
@@ -28,7 +29,7 @@ export const hrm_tb_workflows = mdlHrmSchema.table(
     createdBy: varchar("created_by", { length: 36 }),
     updatedBy: varchar("updated_by", { length: 36 }),
   },
-  (table) => []
+  (table) => [],
 );
 
 export type HrmTbWorkflow = typeof hrm_tb_workflows.$inferSelect;
@@ -53,11 +54,13 @@ export const hrm_tb_workflows_instance = mdlHrmSchema.table(
     createdAt: timestamp("created_at", { withTimezone: true }),
     updatedAt: timestamp("updated_at", { withTimezone: true }),
   },
-  (table) => []
+  (table) => [],
 );
 
-export type HrmTbWorkflowInstance = typeof hrm_tb_workflows_instance.$inferSelect;
-export type NewHrmTbWorkflowInstance = typeof hrm_tb_workflows_instance.$inferInsert;
+export type HrmTbWorkflowInstance =
+  typeof hrm_tb_workflows_instance.$inferSelect;
+export type NewHrmTbWorkflowInstance =
+  typeof hrm_tb_workflows_instance.$inferInsert;
 
 // Workflow Approvals - Phê duyệt từng bước
 export const hrm_tb_workflows_approval = mdlHrmSchema.table(
@@ -76,9 +79,10 @@ export const hrm_tb_workflows_approval = mdlHrmSchema.table(
     approvedAt: timestamp("approved_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }),
   },
-  (table) => []
+  (table) => [],
 );
 
-export type HrmTbWorkflowApproval = typeof hrm_tb_workflows_approval.$inferSelect;
-export type NewHrmTbWorkflowApproval = typeof hrm_tb_workflows_approval.$inferInsert;
-
+export type HrmTbWorkflowApproval =
+  typeof hrm_tb_workflows_approval.$inferSelect;
+export type NewHrmTbWorkflowApproval =
+  typeof hrm_tb_workflows_approval.$inferInsert;

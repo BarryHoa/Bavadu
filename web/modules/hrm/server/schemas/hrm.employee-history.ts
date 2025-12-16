@@ -8,6 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_employees } from "./hrm.employee";
 
@@ -35,9 +36,9 @@ export const hrm_tb_employees_history = mdlHrmSchema.table(
     index("employee_history_employee_idx").on(table.employeeId),
     index("employee_history_type_idx").on(table.changeType),
     index("employee_history_date_idx").on(table.effectiveDate),
-  ]
+  ],
 );
 
 export type HrmTbEmployeeHistory = typeof hrm_tb_employees_history.$inferSelect;
-export type NewHrmTbEmployeeHistory = typeof hrm_tb_employees_history.$inferInsert;
-
+export type NewHrmTbEmployeeHistory =
+  typeof hrm_tb_employees_history.$inferInsert;

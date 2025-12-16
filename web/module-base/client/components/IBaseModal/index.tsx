@@ -34,13 +34,13 @@ const IBaseModal = React.forwardRef<HTMLDivElement, IBaseModalProps>(
     return (
       <HeroUIModal
         ref={ref}
+        backdrop={backdrop}
         placement={placement}
         scrollBehavior={scrollBehavior}
-        backdrop={backdrop}
         {...rest}
       />
     );
-  }
+  },
 );
 
 IBaseModal.displayName = "IBaseModal";

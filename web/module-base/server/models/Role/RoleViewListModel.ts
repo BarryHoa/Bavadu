@@ -1,17 +1,19 @@
+import type {
+  ListParamsRequest,
+  ListParamsResponse,
+} from "@base/server/models/interfaces/ListInterface";
+import type { RoleRow } from "./RoleModel";
+
 import {
   BaseViewListModel,
   type ColumnMap,
   type FilterConditionMap,
   type SearchConditionMap,
 } from "@base/server/models/BaseViewListModel";
-import type {
-  ListParamsRequest,
-  ListParamsResponse,
-} from "@base/server/models/interfaces/ListInterface";
 import { eq, ilike, sql } from "drizzle-orm";
+
 import { base_tb_roles } from "../../schemas/base.role";
 import { ParamFilter } from "../interfaces/FilterInterface";
-import type { RoleRow } from "./RoleModel";
 
 class RoleViewListModel extends BaseViewListModel<
   typeof base_tb_roles,
@@ -86,7 +88,7 @@ class RoleViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<RoleRow>> => this.buildQueryDataList(params);
 }
 

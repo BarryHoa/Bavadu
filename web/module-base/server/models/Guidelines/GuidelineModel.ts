@@ -1,4 +1,5 @@
 import { eq } from "drizzle-orm";
+
 import { base_tb_guidelines } from "../../schemas/base.guideline";
 import { BaseModel } from "../BaseModel";
 
@@ -55,6 +56,7 @@ class GuidelineModel extends BaseModel<typeof base_tb_guidelines> {
 
     // Check if key already exists
     const existing = await this.getByKey(key);
+
     if (existing) {
       throw new Error(`Guideline with key "${key}" already exists`);
     }
@@ -89,7 +91,7 @@ class GuidelineModel extends BaseModel<typeof base_tb_guidelines> {
    */
   async updateByKey(
     key: string,
-    params: UpdateGuidelineParams
+    params: UpdateGuidelineParams,
   ): Promise<GuidelineData> {
     const { content } = params;
 

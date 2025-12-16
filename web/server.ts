@@ -4,9 +4,11 @@
  * Loads all models at server startup before handling requests
  */
 
-import { RuntimeContext } from "@base/server/runtime/RuntimeContext";
 import http from "http";
+
+import { RuntimeContext } from "@base/server/runtime/RuntimeContext";
 import next from "next";
+
 import { ScheduledTask } from "./cron";
 
 // Mark that we're running custom server to skip instrumentation
@@ -34,6 +36,7 @@ async function startServer(): Promise<void> {
     // This handles database and environment initialization
     console.log("> 🔧 Initializing runtime...");
     const context = RuntimeContext.getInstance(process.cwd());
+
     await context.ensureInitialized();
     console.log("> ✅ Runtime initialized");
 
@@ -56,12 +59,14 @@ async function startServer(): Promise<void> {
           }
           seen.add(value);
         }
+
         return value;
       });
       const sizeInBytes = Buffer.byteLength(envProcessJson, "utf8");
       const sizeInKB = (sizeInBytes / 1024).toFixed(2);
+
       console.log(
-        `> 📊 Environment size: ${sizeInKB} KB (${sizeInBytes} bytes)`
+        `> 📊 Environment size: ${sizeInKB} KB (${sizeInBytes} bytes)`,
       );
     } catch (error) {
       console.log(`> ⚠️  Could not calculate environment size:`, error);
@@ -69,6 +74,7 @@ async function startServer(): Promise<void> {
 
     // Initialize and start cron scheduler
     const scheduler = new ScheduledTask();
+
     scheduler.start();
 
     const server = http.createServer(async (req, res) => {
@@ -104,6 +110,7 @@ async function startServer(): Promise<void> {
 
     server.listen(port, hostname === "localhost" ? "0.0.0.0" : hostname, () => {
       const serverUrl = `http://${hostname}:${port}`;
+
       console.log(`> 🚀 Server ready on ${serverUrl}`);
       console.log(`> 📦 Environment: ${dev ? "development" : "production"}`);
     });

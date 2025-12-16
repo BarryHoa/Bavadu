@@ -3,7 +3,10 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewHrmTbOnboardingChecklist, hrm_tb_onboarding_checklists } from "../../schemas";
+import {
+  NewHrmTbOnboardingChecklist,
+  hrm_tb_onboarding_checklists,
+} from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";
 
 const employee = alias(hrm_tb_employees, "employee");
@@ -56,11 +59,12 @@ export default class OnboardingChecklistModel extends BaseModel<
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
   getOnboardingChecklistById = async (
-    id: string
+    id: string,
   ): Promise<OnboardingChecklistRow | null> => {
     const result = await this.db
       .select({
@@ -83,11 +87,15 @@ export default class OnboardingChecklistModel extends BaseModel<
       })
       .from(this.table)
       .leftJoin(employee, eq(this.table.employeeId, employee.id))
-      .leftJoin(assignedEmployee, eq(this.table.assignedTo, assignedEmployee.id))
+      .leftJoin(
+        assignedEmployee,
+        eq(this.table.assignedTo, assignedEmployee.id),
+      )
       .where(eq(this.table.id, id))
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -127,13 +135,17 @@ export default class OnboardingChecklistModel extends BaseModel<
   };
 
   createOnboardingChecklist = async (
-    payload: OnboardingChecklistInput
+    payload: OnboardingChecklistInput,
   ): Promise<OnboardingChecklistRow> => {
     const now = new Date();
     const insertData: NewHrmTbOnboardingChecklist = {
       employeeId: payload.employeeId,
       taskName: payload.taskName,
-      taskDescription: payload.taskDescription ? (typeof payload.taskDescription === "string" ? payload.taskDescription : JSON.stringify(payload.taskDescription)) : null,
+      taskDescription: payload.taskDescription
+        ? typeof payload.taskDescription === "string"
+          ? payload.taskDescription
+          : JSON.stringify(payload.taskDescription)
+        : null,
       category: payload.category ?? null,
       assignedTo: payload.assignedTo ?? null,
       dueDate: payload.dueDate ?? null,
@@ -151,14 +163,16 @@ export default class OnboardingChecklistModel extends BaseModel<
     if (!created) throw new Error("Failed to create onboarding checklist");
 
     const checklist = await this.getOnboardingChecklistById(created.id);
+
     if (!checklist)
       throw new Error("Failed to load onboarding checklist after creation");
+
     return checklist;
   };
 
   updateOnboardingChecklist = async (
     id: string,
-    payload: Partial<OnboardingChecklistInput>
+    payload: Partial<OnboardingChecklistInput>,
   ): Promise<OnboardingChecklistRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -168,7 +182,11 @@ export default class OnboardingChecklistModel extends BaseModel<
       updateData.employeeId = payload.employeeId;
     if (payload.taskName !== undefined) updateData.taskName = payload.taskName;
     if (payload.taskDescription !== undefined)
-      updateData.taskDescription = payload.taskDescription ? (typeof payload.taskDescription === "string" ? payload.taskDescription : JSON.stringify(payload.taskDescription)) : null;
+      updateData.taskDescription = payload.taskDescription
+        ? typeof payload.taskDescription === "string"
+          ? payload.taskDescription
+          : JSON.stringify(payload.taskDescription)
+        : null;
     if (payload.category !== undefined)
       updateData.category = payload.category ?? null;
     if (payload.assignedTo !== undefined)
@@ -187,6 +205,7 @@ export default class OnboardingChecklistModel extends BaseModel<
       .update(this.table)
       .set(updateData)
       .where(eq(this.table.id, id));
+
     return this.getOnboardingChecklistById(id);
   };
 
@@ -198,13 +217,15 @@ export default class OnboardingChecklistModel extends BaseModel<
       normalizedPayload.employeeId = String(payload.employeeId);
     }
     if (payload.taskName !== undefined) {
-      normalizedPayload.taskName = this.normalizeLocaleInput(payload.taskName) ?? {
+      normalizedPayload.taskName = this.normalizeLocaleInput(
+        payload.taskName,
+      ) ?? {
         en: "",
       };
     }
     if (payload.taskDescription !== undefined) {
       normalizedPayload.taskDescription = this.normalizeLocaleInput(
-        payload.taskDescription
+        payload.taskDescription,
       );
     }
     if (payload.category !== undefined) {
@@ -230,10 +251,11 @@ export default class OnboardingChecklistModel extends BaseModel<
     }
     if (payload.notes !== undefined) {
       normalizedPayload.notes =
-        payload.notes === null || payload.notes === "" ? null : String(payload.notes);
+        payload.notes === null || payload.notes === ""
+          ? null
+          : String(payload.notes);
     }
 
     return this.updateOnboardingChecklist(id, normalizedPayload);
   };
 }
-

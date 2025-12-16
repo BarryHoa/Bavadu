@@ -4,6 +4,7 @@ import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { performanceReviewService } from "@mdl/hrm/client/services/PerformanceReviewService";
+
 import PerformanceReviewForm, {
   type PerformanceReviewFormValues,
 } from "../components/PerformanceReviewForm/PerformanceReviewForm";
@@ -22,14 +23,20 @@ export default function PerformanceReviewCreatePageClient(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await performanceReviewService.create(payload);
+
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToCreatePerformanceReview"));
+        throw new Error(
+          response.message ?? t("errors.failedToCreatePerformanceReview"),
+        );
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-performance-reviews"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/performance-reviews/view/${data.data.id}`);
+      router.push(
+        `/workspace/modules/hrm/performance-reviews/view/${data.data.id}`,
+      );
     },
   });
 
@@ -52,11 +59,10 @@ export default function PerformanceReviewCreatePageClient(): React.ReactNode {
 
   return (
     <PerformanceReviewForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push("/workspace/modules/hrm/performance-reviews")}
-      submitError={submitError}
       isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() => router.push("/workspace/modules/hrm/performance-reviews")}
+      onSubmit={handleSubmit}
     />
   );
 }
-

@@ -1,9 +1,10 @@
-import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 import type {
   CertificateDto,
   CreateCertificatePayload,
   UpdateCertificatePayload,
 } from "../interface/Certificate";
+
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export default class CertificateService extends JsonRpcClientService {
   list() {
@@ -37,4 +38,3 @@ export default class CertificateService extends JsonRpcClientService {
 }
 
 export const certificateService = new CertificateService();
-

@@ -11,7 +11,7 @@ export function formatNumber(
     thousandSeparator?: string;
     decimalSeparator?: string;
     fixZero?: boolean;
-  } = {}
+  } = {},
 ): string {
   const {
     decimalPlaces = 2,
@@ -34,7 +34,7 @@ export function formatNumber(
   // Add thousand separators to integer part
   const integerWithSeparators = integerPart.replace(
     /\B(?=(\d{3})+(?!\d))/g,
-    thousandSeparator
+    thousandSeparator,
   );
 
   // Combine parts
@@ -49,9 +49,11 @@ export function formatNumber(
     } else {
       // Only show decimal part if it's not all zeros
       const hasNonZeroDecimal = decimalPart && /[1-9]/.test(decimalPart);
+
       if (hasNonZeroDecimal) {
         // Remove trailing zeros from decimal part
         const trimmedDecimal = decimalPart.replace(/0+$/, "");
+
         result += decimalSeparator + trimmedDecimal;
       }
     }

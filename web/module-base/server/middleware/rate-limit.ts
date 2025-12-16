@@ -1,6 +1,9 @@
 import { RATE_LIMIT_CONFIG } from "@base/server/config";
 import { rateLimitStore } from "@base/server/stores";
-import { getClientIp, logRateLimitViolation } from "@base/server/utils/security-logger";
+import {
+  getClientIp,
+  logRateLimitViolation,
+} from "@base/server/utils/security-logger";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -9,7 +12,7 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export function checkRateLimit(
   request: NextRequest,
-  pathname: string
+  pathname: string,
 ): NextResponse | null {
   const ip = getClientIp(request);
   const isAuthRoute = pathname.startsWith("/api/base/auth/");
@@ -20,7 +23,7 @@ export function checkRateLimit(
 
   if (count > config.max) {
     const resetTime = Math.ceil(
-      (rateLimitStore.getTimeUntilReset(key) + Date.now()) / 1000
+      (rateLimitStore.getTimeUntilReset(key) + Date.now()) / 1000,
     );
     const retryAfter = Math.ceil(rateLimitStore.getTimeUntilReset(key) / 1000);
 
@@ -50,7 +53,7 @@ export function checkRateLimit(
           "X-RateLimit-Reset": String(resetTime),
           "Retry-After": String(retryAfter),
         },
-      }
+      },
     );
   }
 

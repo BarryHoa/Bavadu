@@ -6,16 +6,17 @@ const LinkAs = (
     className?: string;
     children: React.ReactNode;
     hrefAs?: any;
-  }
+  },
 ) => {
   const { hrefAs, ...rest } = props;
+
   return (
     <Link
       {...rest}
       as={hrefAs ?? rest.as}
       className={clsx(
         "text-primary-600 cursor-pointer hover:text-danger-400",
-        props.className
+        props.className,
       )}
     >
       {props.children}

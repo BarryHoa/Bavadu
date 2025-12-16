@@ -1,8 +1,10 @@
 import { sql } from "drizzle-orm";
 import { index, numeric, timestamp, uuid } from "drizzle-orm/pg-core";
-import { mdlStockSchema } from "./schema";
+
 import { product_tb_product_variants } from "../../../product/server/schemas/product.variant";
 import { purchase_tb_purchase_orders_line } from "../../../purchase/server/schemas/purchase.order-line";
+
+import { mdlStockSchema } from "./schema";
 
 // Cost Variance - Theo dõi chênh lệch (cho Standard Cost method)
 export const stock_tb_cost_variances = mdlStockSchema.table(
@@ -14,10 +16,12 @@ export const stock_tb_cost_variances = mdlStockSchema.table(
 
     productVariantId: uuid("product_variant_id")
       .notNull()
-      .references(() => product_tb_product_variants.id, { onDelete: "cascade" }),
+      .references(() => product_tb_product_variants.id, {
+        onDelete: "cascade",
+      }),
     purchaseOrderLineId: uuid("purchase_order_line_id").references(
       () => purchase_tb_purchase_orders_line.id,
-      { onDelete: "set null" }
+      { onDelete: "set null" },
     ),
 
     standardCost: numeric("standard_cost", {
@@ -40,10 +44,11 @@ export const stock_tb_cost_variances = mdlStockSchema.table(
     // Composite index for variant and date range queries
     index("cost_variance_variant_created_idx").on(
       table.productVariantId,
-      table.createdAt
+      table.createdAt,
     ),
-  ]
+  ],
 );
 
 export type StockTbCostVariance = typeof stock_tb_cost_variances.$inferSelect;
-export type NewStockTbCostVariance = typeof stock_tb_cost_variances.$inferInsert;
+export type NewStockTbCostVariance =
+  typeof stock_tb_cost_variances.$inferInsert;

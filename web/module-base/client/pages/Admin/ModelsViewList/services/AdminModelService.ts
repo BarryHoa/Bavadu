@@ -37,4 +37,5 @@ class AdminModelService extends ClientHttpService {
 }
 
 const adminModelService = new AdminModelService();
+
 export default adminModelService;

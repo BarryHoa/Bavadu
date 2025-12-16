@@ -9,6 +9,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_employees } from "./hrm.employee";
 
@@ -39,7 +40,7 @@ export const hrm_tb_onboarding_checklists = mdlHrmSchema.table(
     index("onboarding_checklists_employee_idx").on(table.employeeId),
     index("onboarding_checklists_assigned_idx").on(table.assignedTo),
     index("onboarding_checklists_completed_idx").on(table.isCompleted),
-  ]
+  ],
 );
 
 export type HrmTbOnboardingChecklist =

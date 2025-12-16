@@ -2,7 +2,10 @@ import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { NewHrmTbPerformanceReview, hrm_tb_performance_reviews } from "../../schemas";
+import {
+  NewHrmTbPerformanceReview,
+  hrm_tb_performance_reviews,
+} from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";
 
 const employee = alias(hrm_tb_employees, "employee");
@@ -60,7 +63,7 @@ export default class PerformanceReviewModel extends BaseModel<
   }
 
   getPerformanceReviewById = async (
-    id: string
+    id: string,
   ): Promise<PerformanceReviewRow | null> => {
     const result = await this.db
       .select({
@@ -92,6 +95,7 @@ export default class PerformanceReviewModel extends BaseModel<
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -135,7 +139,7 @@ export default class PerformanceReviewModel extends BaseModel<
   };
 
   createPerformanceReview = async (
-    payload: PerformanceReviewInput
+    payload: PerformanceReviewInput,
   ): Promise<PerformanceReviewRow> => {
     const now = new Date();
     const insertData: NewHrmTbPerformanceReview = {
@@ -163,14 +167,16 @@ export default class PerformanceReviewModel extends BaseModel<
     if (!created) throw new Error("Failed to create performance review");
 
     const review = await this.getPerformanceReviewById(created.id);
+
     if (!review)
       throw new Error("Failed to load performance review after creation");
+
     return review;
   };
 
   updatePerformanceReview = async (
     id: string,
-    payload: Partial<PerformanceReviewInput>
+    payload: Partial<PerformanceReviewInput>,
   ): Promise<PerformanceReviewRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -208,6 +214,7 @@ export default class PerformanceReviewModel extends BaseModel<
       .update(this.table)
       .set(updateData)
       .where(eq(this.table.id, id));
+
     return this.getPerformanceReviewById(id);
   };
 
@@ -247,7 +254,8 @@ export default class PerformanceReviewModel extends BaseModel<
     }
     if (payload.areasForImprovement !== undefined) {
       normalizedPayload.areasForImprovement =
-        payload.areasForImprovement === null || payload.areasForImprovement === ""
+        payload.areasForImprovement === null ||
+        payload.areasForImprovement === ""
           ? null
           : String(payload.areasForImprovement);
     }
@@ -273,4 +281,3 @@ export default class PerformanceReviewModel extends BaseModel<
     return this.updatePerformanceReview(id, normalizedPayload);
   };
 }
-

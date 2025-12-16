@@ -1,5 +1,7 @@
 "use client";
 
+import type { MasterFieldValue } from "./types";
+
 import {
   IBaseInput,
   IBaseInputMultipleLang,
@@ -15,6 +17,7 @@ import { Checkbox, CheckboxGroup } from "@heroui/react";
 import { HelpCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
+
 import {
   ProductMasterFeatures,
   ProductMasterType,
@@ -23,7 +26,6 @@ import {
   FORBIDDEN_FEATURES_BY_TYPE,
   REQUIRED_FEATURES_BY_TYPE,
 } from "../../../utils/product-features-validator";
-import type { MasterFieldValue } from "./types";
 
 type MasterTabProps = {
   value: MasterFieldValue;
@@ -61,6 +63,7 @@ export default function MasterTab({
     if (!value.type) return new Set<ProductMasterFeatures>();
     const required =
       REQUIRED_FEATURES_BY_TYPE[value.type as ProductMasterType] || [];
+
     return new Set(required);
   }, [value.type]);
 
@@ -69,6 +72,7 @@ export default function MasterTab({
     if (!value.type) return new Set<ProductMasterFeatures>();
     const forbidden =
       FORBIDDEN_FEATURES_BY_TYPE[value.type as ProductMasterType] || [];
+
     return new Set(forbidden);
   }, [value.type]);
 
@@ -76,7 +80,7 @@ export default function MasterTab({
   const allowedFeatureOptions = useMemo(() => {
     return featureOptions.filter(
       (feature) =>
-        !forbiddenFeatures.has(feature.value as ProductMasterFeatures)
+        !forbiddenFeatures.has(feature.value as ProductMasterFeatures),
     );
   }, [featureOptions, forbiddenFeatures]);
 
@@ -88,6 +92,10 @@ export default function MasterTab({
   return (
     <div className="flex flex-col gap-4 pt-4">
       <IBaseInputMultipleLang
+        isRequired
+        errorMessage={errors?.name?.en?.message}
+        isDisabled={isBusy}
+        isInvalid={Boolean(errors?.name?.en)}
         label={t("name")}
         value={value.name}
         onValueChange={(langs) =>
@@ -96,44 +104,45 @@ export default function MasterTab({
             name: langs as MasterFieldValue["name"],
           }))
         }
-        isRequired
-        isInvalid={Boolean(errors?.name?.en)}
-        errorMessage={errors?.name?.en?.message}
-        isDisabled={isBusy}
       />
 
       <div className="grid gap-4 md:grid-cols-2 items-start">
         <IBaseInput
+          isRequired
+          errorMessage={errors?.code?.message}
+          isDisabled={isBusy}
+          isInvalid={Boolean(errors?.code)}
           label={t("code")}
           value={value.code ?? ""}
           onValueChange={(next) =>
             onUpdate((current) => ({ ...current, code: next }))
           }
-          isRequired
-          isInvalid={Boolean(errors?.code)}
-          errorMessage={errors?.code?.message}
-          isDisabled={isBusy}
         />
 
         <IBaseSingleSelectAsync
+          callWhen="mount"
+          errorMessage={errors?.type?.message}
+          isDisabled={isBusy}
+          isInvalid={Boolean(errors?.type)}
           label={tProduct("productType")}
           model="product-type.dropdown"
           selectedKey={value.type || undefined}
           onSelectionChange={(key) => {
             const next = (key as ProductMasterType) || ProductMasterType.GOODS;
+
             onUpdate((current) => ({ ...current, type: next }));
           }}
-          isInvalid={Boolean(errors?.type)}
-          errorMessage={errors?.type?.message}
-          isDisabled={isBusy}
-          callWhen="mount"
         />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 items-start">
         <IBaseSingleSelect
-          label={t("category")}
+          errorMessage={errors?.categoryId?.message}
+          isDisabled={isBusy || categoryQueryLoading}
+          isInvalid={Boolean(errors?.categoryId)}
+          isLoading={categoryQueryLoading}
           items={categoryOptions}
+          label={t("category")}
           selectedKey={value.categoryId}
           onSelectionChange={(key) => {
             onUpdate((current) => ({
@@ -141,19 +150,15 @@ export default function MasterTab({
               categoryId: key || undefined,
             }));
           }}
-          isLoading={categoryQueryLoading}
-          isInvalid={Boolean(errors?.categoryId)}
-          errorMessage={errors?.categoryId?.message}
-          isDisabled={isBusy || categoryQueryLoading}
         />
 
         <IBaseInput
+          isDisabled={isBusy}
           label={t("brand")}
           value={value.brand ?? ""}
           onValueChange={(next) =>
             onUpdate((current) => ({ ...current, brand: next }))
           }
-          isDisabled={isBusy}
         />
       </div>
 
@@ -167,22 +172,25 @@ export default function MasterTab({
             placement="top"
           >
             <HelpCircle
-              size={16}
-              className="text-default-400 cursor-help"
               aria-label="Thông tin về tính năng sản phẩm"
+              className="text-default-400 cursor-help"
+              size={16}
             />
           </IBaseTooltip>
         </div>
         <CheckboxGroup
+          classNames={{ wrapper: "flex flex-wrap gap-3" }}
+          isDisabled={isBusy}
           orientation="horizontal"
           value={allowedFeatureOptions
             .filter(
               (feature) =>
-                value.features?.[feature.value as ProductMasterFeatures]
+                value.features?.[feature.value as ProductMasterFeatures],
             )
             .map((feature) => feature.value as ProductMasterFeatures)}
           onChange={(selected) => {
             const selectedSet = new Set(selected as string[]);
+
             onUpdate((current) => ({
               ...current,
               features: featureOptions.reduce(
@@ -190,10 +198,11 @@ export default function MasterTab({
                   // If feature is forbidden, set to false and don't allow changes
                   if (
                     forbiddenFeatures.has(
-                      feature.value as ProductMasterFeatures
+                      feature.value as ProductMasterFeatures,
                     )
                   ) {
                     acc[feature.value as ProductMasterFeatures] = false;
+
                     return acc;
                   }
                   // If feature is disabled, keep it false
@@ -202,40 +211,40 @@ export default function MasterTab({
                     disabledFeatures.has(feature.value as ProductMasterFeatures)
                       ? false
                       : isFeatureRequired(
-                            feature.value as ProductMasterFeatures
+                            feature.value as ProductMasterFeatures,
                           )
                         ? true
                         : selectedSet.has(
-                            feature.value as ProductMasterFeatures
+                            feature.value as ProductMasterFeatures,
                           );
+
                   return acc;
                 },
-                {} as Record<ProductMasterFeatures, boolean>
+                {} as Record<ProductMasterFeatures, boolean>,
               ),
             }));
           }}
-          classNames={{ wrapper: "flex flex-wrap gap-3" }}
-          isDisabled={isBusy}
         >
           {allowedFeatureOptions.map((feature) => {
             const isRequired = isFeatureRequired(
-              feature.value as ProductMasterFeatures
+              feature.value as ProductMasterFeatures,
             );
+
             return (
               <Checkbox
                 key={feature.value}
-                value={feature.value as ProductMasterFeatures}
-                isDisabled={
-                  isBusy ||
-                  disabledFeatures.has(
-                    feature.value as ProductMasterFeatures
-                  ) ||
-                  isRequired
-                }
-                color={isRequired ? "danger" : undefined}
                 classNames={{
                   label: isRequired ? "text-danger font-medium" : "",
                 }}
+                color={isRequired ? "danger" : undefined}
+                isDisabled={
+                  isBusy ||
+                  disabledFeatures.has(
+                    feature.value as ProductMasterFeatures,
+                  ) ||
+                  isRequired
+                }
+                value={feature.value as ProductMasterFeatures}
               >
                 {feature.label}
               </Checkbox>
@@ -245,23 +254,23 @@ export default function MasterTab({
       </div>
 
       <IBaseTextarea
+        isDisabled={isBusy}
         label={t("description")}
         value={value.description ?? ""}
         onValueChange={(next) =>
           onUpdate((current) => ({ ...current, description: next }))
         }
-        isDisabled={isBusy}
       />
 
       <IBaseUploadImageTiny
-        label={tProduct("images")}
-        values={value.images ?? []}
-        onChange={(images) => onUpdate((current) => ({ ...current, images }))}
-        isDisabled={isBusy}
-        maxCount={10}
-        maxSize={5 * 1024 * 1024} // 5MB
         required
         error={errors?.images?.message}
+        isDisabled={isBusy}
+        label={tProduct("images")}
+        maxCount={10}
+        maxSize={5 * 1024 * 1024} // 5MB
+        values={value.images ?? []}
+        onChange={(images) => onUpdate((current) => ({ ...current, images }))}
       />
     </div>
   );

@@ -1,16 +1,18 @@
 "use client";
 
-import { RefreshCw } from "lucide-react";
-import { useMemo } from "react";
-
 import type { IBaseTableCoreColumn } from "@base/client/components";
-import { IBaseTooltip } from "@base/client/components";
 import type { Selection } from "@heroui/react";
 import type { TableProps } from "@heroui/table";
+
+import { RefreshCw } from "lucide-react";
+import { useMemo } from "react";
+import { IBaseTooltip } from "@base/client/components";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
+
 import PaginationComponent from "../Pagination/Pagination";
 import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
+
 import { useIBaseTableCore } from "./IBaseTableCore";
 import {
   I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
@@ -133,6 +135,7 @@ export default function IBaseTable<T = any>({
           core.toggleAllRowsSelection(true);
         } else if (keys instanceof Set) {
           const newSelection: Record<string, boolean> = {};
+
           keys.forEach((key) => {
             newSelection[String(key)] = true;
           });
@@ -159,33 +162,35 @@ export default function IBaseTable<T = any>({
     <div className={clsx("w-full bg-content1", classNames.wrapper)}>
       <div className="flex flex-1 flex-col gap-4">
         <IBaseTableUI
-          headerGroups={core.headerGroups}
-          rows={core.rows}
-          visibleColumns={core.visibleColumns}
-          loading={loading}
-          emptyContent={emptyContent ?? t("empty")}
+          aria-label={t("ariaLabel")}
           classNames={classNames}
-          tableLayout={tableLayout}
           color={color}
-          isStriped={true}
+          emptyContent={emptyContent ?? t("empty")}
+          getRowKey={core.getRowKey}
+          headerGroups={core.headerGroups}
           isCompact={true}
           isHeaderSticky={true}
-          selectionMode={selectionProps?.selectionMode}
-          selectedKeys={selectionProps?.selectedKeys}
-          onSelectionChange={selectionProps?.onSelectionChange}
-          sortDescriptor={core.sortDescriptor}
-          onSortChange={core.handleSortChange}
-          getRowKey={core.getRowKey}
+          isStriped={true}
+          loading={loading}
           renderCell={(column, row, cellValue) => {
             // Handle row number column with pagination offset
             const meta = (column.columnDef.meta as Record<string, any>) || {};
+
             if (meta.isRowNumber && paginationState.paginationInfo) {
               return paginationState.paginationInfo.from + row.index + 1;
             }
+
             // Return undefined - IBaseTableUI will check and use flexRender if undefined
             return undefined;
           }}
-          aria-label={t("ariaLabel")}
+          rows={core.rows}
+          selectedKeys={selectionProps?.selectedKeys}
+          selectionMode={selectionProps?.selectionMode}
+          sortDescriptor={core.sortDescriptor}
+          tableLayout={tableLayout}
+          visibleColumns={core.visibleColumns}
+          onSelectionChange={selectionProps?.onSelectionChange}
+          onSortChange={core.handleSortChange}
           {...rest}
         />
       </div>
@@ -194,7 +199,7 @@ export default function IBaseTable<T = any>({
         <div
           className={clsx(
             "flex flex-col items-center justify-between px-2 sm:flex-row",
-            classNames.pagination
+            classNames.pagination,
           )}
         >
           <div className="flex items-center py-2 text-small text-default-500">
@@ -202,9 +207,9 @@ export default function IBaseTable<T = any>({
             {isRefreshData && (
               <IBaseTooltip content={t("refresh")}>
                 <button
-                  type="button"
                   aria-label={t("refresh")}
                   className="ml-2 inline-flex items-center rounded p-1 transition-colors hover:bg-default-100"
+                  type="button"
                   onClick={onRefresh}
                 >
                   <RefreshCw className="h-4 w-4 text-default-500 hover:text-primary" />
@@ -219,10 +224,10 @@ export default function IBaseTable<T = any>({
               <PaginationComponent
                 page={paginationState.paginationInfo.currentPage}
                 pageSize={paginationState.paginationInfo.pageSize}
-                pages={paginationState.paginationInfo.pages}
                 pageSizeOptions={
                   paginationState.paginationDefault.pageSizeOptions
                 }
+                pages={paginationState.paginationInfo.pages}
                 onChange={core.handlePageChange}
                 onPageSizeChange={core.handlePageSizeChange}
               />

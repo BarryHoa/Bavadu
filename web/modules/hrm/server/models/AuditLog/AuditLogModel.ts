@@ -76,7 +76,7 @@ export default class AuditLogModel extends BaseModel<typeof hrm_tb_audit_logs> {
   };
 
   queryAuditLogs = async (
-    query: AuditLogQuery
+    query: AuditLogQuery,
   ): Promise<{ logs: AuditLogRow[]; total: number }> => {
     const conditions = [];
 
@@ -132,4 +132,3 @@ export default class AuditLogModel extends BaseModel<typeof hrm_tb_audit_logs> {
     };
   };
 }
-

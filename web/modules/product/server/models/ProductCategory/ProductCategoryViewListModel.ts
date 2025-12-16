@@ -1,13 +1,14 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
@@ -50,10 +51,22 @@ class ProductCategoryViewListModel extends BaseViewListModel<
         { column: product_tb_product_categories.description, sort: false },
       ],
       ["level", { column: product_tb_product_categories.level, sort: true }],
-      ["isActive", { column: product_tb_product_categories.isActive, sort: true }],
-      ["parentId", { column: product_tb_product_categories.parentId, sort: true }],
-      ["createdAt", { column: product_tb_product_categories.createdAt, sort: true }],
-      ["updatedAt", { column: product_tb_product_categories.updatedAt, sort: true }],
+      [
+        "isActive",
+        { column: product_tb_product_categories.isActive, sort: true },
+      ],
+      [
+        "parentId",
+        { column: product_tb_product_categories.parentId, sort: true },
+      ],
+      [
+        "createdAt",
+        { column: product_tb_product_categories.createdAt, sort: true },
+      ],
+      [
+        "updatedAt",
+        { column: product_tb_product_categories.updatedAt, sort: true },
+      ],
     ]);
 
   constructor() {
@@ -62,14 +75,19 @@ class ProductCategoryViewListModel extends BaseViewListModel<
 
   protected declarationSearch = () =>
     new Map([
-      ["code", (text: string) => ilike(product_tb_product_categories.code, text)],
-      ["name", (text: string) => ilike(product_tb_product_categories.name, text)],
+      [
+        "code",
+        (text: string) => ilike(product_tb_product_categories.code, text),
+      ],
+      [
+        "name",
+        (text: string) => ilike(product_tb_product_categories.name, text),
+      ],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): ProductCategoryRow => ({
     id: row.id,
     code: row.code,
@@ -88,10 +106,13 @@ class ProductCategoryViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<ProductCategoryRow>> => {
     return this.buildQueryDataList(params, (query) =>
-      query.leftJoin(parentCategory, eq(this.table.parentId, parentCategory.id))
+      query.leftJoin(
+        parentCategory,
+        eq(this.table.parentId, parentCategory.id),
+      ),
     );
   };
 }

@@ -4,6 +4,7 @@ import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { leaveTypeService } from "@mdl/hrm/client/services/LeaveTypeService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+
 import LeaveTypeForm, {
   type LeaveTypeFormValues,
 } from "../components/LeaveTypeForm/LeaveTypeForm";
@@ -22,11 +23,13 @@ export default function LeaveTypeCreatePageClient(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await leaveTypeService.create(payload);
+
       if (!response.data) {
         throw new Error(
-          response.message ?? t("errors.failedToCreateLeaveType")
+          response.message ?? t("errors.failedToCreateLeaveType"),
         );
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-leave-types"]],
@@ -73,10 +76,10 @@ export default function LeaveTypeCreatePageClient(): React.ReactNode {
 
   return (
     <LeaveTypeForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push("/workspace/modules/hrm/leave-types")}
-      submitError={submitError}
       isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() => router.push("/workspace/modules/hrm/leave-types")}
+      onSubmit={handleSubmit}
     />
   );
 }

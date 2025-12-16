@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useLayoutEffect } from "react";
+
 import {
   getRootStoreValue,
   hasRootStore,
@@ -66,7 +67,7 @@ export interface CreateStoreReturn<T> {
  * Cần dùng HOC inject() để inject vào root-store
  */
 export function createStore<T>(
-  options: CreateStoreOptions<T>
+  options: CreateStoreOptions<T>,
 ): CreateStoreReturn<T> {
   const { key, init } = options;
 
@@ -92,6 +93,7 @@ export function createStore<T>(
     useSelector: <R = T>(selector: (value: T) => R) => {
       return rootStore((state) => {
         const value = (state.stores.get(key) as T | undefined) ?? init;
+
         return selector(value);
       });
     },

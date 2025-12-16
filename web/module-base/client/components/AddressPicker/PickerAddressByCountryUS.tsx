@@ -1,5 +1,6 @@
-import { Dispatch, SetStateAction } from "react";
 import type { Address, countryCode } from "../../interface/Address";
+
+import { Dispatch, SetStateAction } from "react";
 
 interface PickerAddressByCountryUSProps {
   countryCode?: countryCode;

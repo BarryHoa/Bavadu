@@ -1,5 +1,6 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { NextRequest } from "next/server";
+
 import RoleModel from "../../../models/Role/RoleModel";
 
 export async function DELETE(request: NextRequest) {
@@ -30,6 +31,7 @@ export async function DELETE(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error deleting role:", error);
+
     return JSONResponse({
       error: "Failed to delete role",
       message: error instanceof Error ? error.message : "Unknown error",

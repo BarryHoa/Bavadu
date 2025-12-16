@@ -10,7 +10,7 @@ export function addSecurityHeaders(response: NextResponse): NextResponse {
   // Note: 'unsafe-eval' and 'unsafe-inline' are currently required for Next.js
   // and some third-party libraries. Consider implementing nonce-based CSP
   // for better security in the future.
-  // 
+  //
   // To improve CSP security:
   // 1. Generate nonces for inline scripts and styles
   // 2. Use 'nonce-{value}' instead of 'unsafe-inline'
@@ -54,7 +54,7 @@ export function addSecurityHeaders(response: NextResponse): NextResponse {
   // Permissions-Policy
   response.headers.set(
     "Permissions-Policy",
-    "geolocation=(), microphone=(), camera=()"
+    "geolocation=(), microphone=(), camera=()",
   );
 
   // X-XSS-Protection
@@ -64,10 +64,9 @@ export function addSecurityHeaders(response: NextResponse): NextResponse {
   if (isProduction) {
     response.headers.set(
       "Strict-Transport-Security",
-      "max-age=31536000; includeSubDomains; preload"
+      "max-age=31536000; includeSubDomains; preload",
     );
   }
 
   return response;
 }
-

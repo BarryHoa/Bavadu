@@ -1,6 +1,6 @@
 /**
  * XSS Protection Utilities
- * 
+ *
  * Provides utilities to sanitize and escape user-generated content
  * to prevent XSS (Cross-Site Scripting) attacks.
  */
@@ -19,10 +19,10 @@ const HTML_ENTITIES: Record<string, string> = {
 
 /**
  * Escape HTML special characters to prevent XSS
- * 
+ *
  * @param str - String to escape
  * @returns Escaped string safe for HTML content
- * 
+ *
  * @example
  * escapeHtml('<script>alert("XSS")</script>')
  * // Returns: '&lt;script&gt;alert(&quot;XSS&quot;)&lt;&#x2F;script&gt;'
@@ -33,7 +33,7 @@ export function escapeHtml(str: string): string {
 
 /**
  * Escape HTML attributes (for use in HTML attribute values)
- * 
+ *
  * @param str - String to escape
  * @returns Escaped string safe for HTML attributes
  */
@@ -48,7 +48,7 @@ export function escapeHtmlAttribute(str: string): string {
 
 /**
  * Escape JavaScript string (for use in JavaScript code)
- * 
+ *
  * @param str - String to escape
  * @returns Escaped string safe for JavaScript strings
  */
@@ -66,7 +66,7 @@ export function escapeJavaScript(str: string): string {
 
 /**
  * Sanitize URL to prevent javascript: and data: protocol attacks
- * 
+ *
  * @param url - URL to sanitize
  * @returns Sanitized URL or empty string if unsafe
  */
@@ -117,7 +117,7 @@ export function sanitizeUrl(url: string): string {
 /**
  * Sanitize object recursively, escaping all string values
  * Useful for sanitizing user input before storing or displaying
- * 
+ *
  * @param obj - Object to sanitize
  * @param options - Sanitization options
  * @returns Sanitized object
@@ -129,7 +129,7 @@ export function sanitizeObject<T extends Record<string, unknown>>(
     escapeAttributes?: boolean;
     sanitizeUrls?: boolean;
     maxDepth?: number;
-  } = {}
+  } = {},
 ): T {
   const {
     escapeHtml: shouldEscapeHtml = true,
@@ -150,11 +150,19 @@ export function sanitizeObject<T extends Record<string, unknown>>(
     } else if (typeof value === "string") {
       let sanitizedValue = value;
 
-      if (sanitizeUrls && (key.toLowerCase().includes("url") || key.toLowerCase().includes("link"))) {
+      if (
+        sanitizeUrls &&
+        (key.toLowerCase().includes("url") ||
+          key.toLowerCase().includes("link"))
+      ) {
         sanitizedValue = sanitizeUrl(value) || value;
       }
 
-      if (escapeAttributes && (key.toLowerCase().includes("attr") || key.toLowerCase().includes("attribute"))) {
+      if (
+        escapeAttributes &&
+        (key.toLowerCase().includes("attr") ||
+          key.toLowerCase().includes("attribute"))
+      ) {
         sanitizedValue = escapeHtmlAttribute(sanitizedValue);
       } else if (shouldEscapeHtml) {
         sanitizedValue = escapeHtml(sanitizedValue);
@@ -171,8 +179,10 @@ export function sanitizeObject<T extends Record<string, unknown>>(
               maxDepth: maxDepth - 1,
             })
           : typeof item === "string"
-            ? (shouldEscapeHtml ? escapeHtml(item) : item)
-            : item
+            ? shouldEscapeHtml
+              ? escapeHtml(item)
+              : item
+            : item,
       ) as T[keyof T];
     } else if (typeof value === "object") {
       sanitized[key as keyof T] = sanitizeObject(
@@ -182,7 +192,7 @@ export function sanitizeObject<T extends Record<string, unknown>>(
           escapeAttributes,
           sanitizeUrls,
           maxDepth: maxDepth - 1,
-        }
+        },
       ) as T[keyof T];
     } else {
       sanitized[key as keyof T] = value as T[keyof T];
@@ -194,7 +204,7 @@ export function sanitizeObject<T extends Record<string, unknown>>(
 
 /**
  * Strip HTML tags from string (for plain text output)
- * 
+ *
  * @param html - HTML string to strip
  * @returns Plain text without HTML tags
  */
@@ -205,7 +215,7 @@ export function stripHtmlTags(html: string): string {
 /**
  * Validate and sanitize user input for display
  * This is a convenience function that combines multiple sanitization steps
- * 
+ *
  * @param input - User input to sanitize
  * @param options - Sanitization options
  * @returns Sanitized string safe for HTML display
@@ -216,7 +226,7 @@ export function sanitizeUserInput(
     allowHtml?: boolean;
     maxLength?: number;
     stripTags?: boolean;
-  } = {}
+  } = {},
 ): string {
   const { allowHtml = false, maxLength, stripTags = false } = options;
 
@@ -243,4 +253,3 @@ export function sanitizeUserInput(
 
   return sanitized;
 }
-

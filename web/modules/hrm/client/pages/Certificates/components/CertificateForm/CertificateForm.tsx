@@ -13,6 +13,7 @@ import { parseDate } from "@internationalized/date";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+
 import {
   createCertificateValidation,
   type CertificateFormValues,
@@ -72,10 +73,10 @@ export default function CertificateForm({
         )}
         <Button
           color="primary"
-          type="submit"
-          size="sm"
-          isLoading={isSubmitting}
           disabled={isSubmitting}
+          isLoading={isSubmitting}
+          size="sm"
+          type="submit"
         >
           {tCommon("actions.save")}
         </Button>
@@ -86,74 +87,77 @@ export default function CertificateForm({
           <h2 className="text-base font-semibold mb-2">{t("generalInfo")}</h2>
           <div className="grid gap-2 md:grid-cols-2">
             <Controller
-              name="employeeId"
               control={control}
+              name="employeeId"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  isRequired
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.employee")}
                   model="hrm.employee.dropdown"
                   selectedKey={field.value}
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="name"
               control={control}
+              name="name"
               render={({ field, fieldState }) => (
                 <IBaseInputMultipleLang
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.name")}
                   size="sm"
                   value={field.value as any}
                   onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  isRequired
                 />
               )}
             />
             <Controller
-              name="issuer"
               control={control}
+              name="issuer"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.issuer")}
                   size="sm"
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  isRequired
                 />
               )}
             />
             <Controller
-              name="certificateNumber"
               control={control}
+              name="certificateNumber"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.certificateNumber")}
                   size="sm"
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="issueDate"
               control={control}
+              name="issueDate"
               render={({ field, fieldState }) => (
                 <DatePicker
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.issueDate")}
                   value={
                     field.value
@@ -165,17 +169,16 @@ export default function CertificateForm({
                   onChange={(val) =>
                     field.onChange(val ? val.toString() : null)
                   }
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  isRequired
                 />
               )}
             />
             <Controller
-              name="expiryDate"
               control={control}
+              name="expiryDate"
               render={({ field, fieldState }) => (
                 <DatePicker
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.expiryDate")}
                   value={
                     field.value
@@ -187,29 +190,27 @@ export default function CertificateForm({
                   onChange={(val) =>
                     field.onChange(val ? val.toString() : null)
                   }
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="documentUrl"
               control={control}
+              name="documentUrl"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.documentUrl")}
                   size="sm"
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="isActive"
               control={control}
+              name="isActive"
               render={({ field }) => (
                 <Checkbox
                   isSelected={field.value === "true"}

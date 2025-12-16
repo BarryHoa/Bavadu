@@ -26,9 +26,11 @@ export default function CourseViewPage(): React.ReactNode {
     queryKey: ["hrm-courses", id],
     queryFn: async () => {
       const response = await courseService.getById(id);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToLoadCourse"));
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -103,7 +105,9 @@ export default function CourseViewPage(): React.ReactNode {
             />
             <IBaseDigitViewer
               label={t("labels.isActive")}
-              value={courseData.isActive ? tCommon("active") : tCommon("inactive")}
+              value={
+                courseData.isActive ? tCommon("active") : tCommon("inactive")
+              }
             />
           </div>
         </CardBody>
@@ -111,4 +115,3 @@ export default function CourseViewPage(): React.ReactNode {
     </div>
   );
 }
-

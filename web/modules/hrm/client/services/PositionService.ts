@@ -79,5 +79,3 @@ export default class PositionService extends JsonRpcClientService {
 }
 
 export const positionService = new PositionService();
-
-

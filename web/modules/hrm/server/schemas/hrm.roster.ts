@@ -1,11 +1,6 @@
 import { sql } from "drizzle-orm";
-import {
-  date,
-  index,
-  timestamp,
-  uuid,
-  varchar,
-} from "drizzle-orm/pg-core";
+import { date, index, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_employees } from "./hrm.employee";
 import { hrm_tb_shifts } from "./hrm.shift";
@@ -36,7 +31,7 @@ export const hrm_tb_rosters = mdlHrmSchema.table(
     index("rosters_shift_idx").on(table.shiftId),
     index("rosters_date_idx").on(table.workDate),
     index("rosters_employee_date_idx").on(table.employeeId, table.workDate),
-  ]
+  ],
 );
 
 export type HrmTbRoster = typeof hrm_tb_rosters.$inferSelect;

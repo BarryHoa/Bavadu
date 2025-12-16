@@ -5,6 +5,7 @@
  */
 
 import { NextRequest } from "next/server";
+
 import { getClientIp, logSuspiciousRequest } from "./security-logger";
 
 interface RequestMetrics {
@@ -59,10 +60,12 @@ function cleanupHistory() {
   const maxAge = 5 * 60 * 1000; // 5 minutes
 
   const entries = Array.from(requestHistory.entries());
+
   for (const [ip, history] of entries) {
     const filtered = history.filter(
-      (entry: RequestMetrics) => now - entry.timestamp < maxAge
+      (entry: RequestMetrics) => now - entry.timestamp < maxAge,
     );
+
     if (filtered.length === 0) {
       requestHistory.delete(ip);
     } else {
@@ -73,12 +76,15 @@ function cleanupHistory() {
   // Limit total history size
   if (requestHistory.size > MAX_HISTORY_SIZE) {
     const entries = Array.from(requestHistory.entries());
+
     entries.sort((a, b) => {
       const aLatest = a[1][a[1].length - 1]?.timestamp || 0;
       const bLatest = b[1][b[1].length - 1]?.timestamp || 0;
+
       return aLatest - bLatest;
     });
     const toRemove = entries.slice(0, entries.length - MAX_HISTORY_SIZE);
+
     toRemove.forEach(([ip]) => requestHistory.delete(ip));
   }
 }
@@ -88,7 +94,7 @@ function cleanupHistory() {
  */
 export function checkSuspiciousRequest(
   request: NextRequest,
-  pathname: string
+  pathname: string,
 ): void {
   const ip = getClientIp(request);
   const userAgent = request.headers.get("user-agent") || "";
@@ -103,6 +109,7 @@ export function checkSuspiciousRequest(
         path: pathname,
         method,
       });
+
       return;
     }
   }
@@ -116,6 +123,7 @@ export function checkSuspiciousRequest(
         path: pathname,
         method,
       });
+
       return;
     }
   }
@@ -140,7 +148,7 @@ export function checkSuspiciousRequest(
   const recentRequests = history.filter(
     (entry) =>
       now - entry.timestamp <
-      SUSPICIOUS_PATTERNS.RAPID_ENDPOINT_CHANGES.windowMs
+      SUSPICIOUS_PATTERNS.RAPID_ENDPOINT_CHANGES.windowMs,
   );
 
   if (
@@ -148,6 +156,7 @@ export function checkSuspiciousRequest(
     SUSPICIOUS_PATTERNS.RAPID_ENDPOINT_CHANGES.threshold
   ) {
     const uniquePaths = new Set(recentRequests.map((r) => r.path));
+
     if (
       uniquePaths.size >= SUSPICIOUS_PATTERNS.RAPID_ENDPOINT_CHANGES.threshold
     ) {
@@ -175,7 +184,7 @@ export function checkSuspiciousRequest(
 export function recordErrorResponse(
   request: NextRequest,
   pathname: string,
-  statusCode: number
+  statusCode: number,
 ): void {
   // Only track 4xx and 5xx errors
   if (statusCode < 400 || statusCode >= 600) {
@@ -210,7 +219,7 @@ export function getRequestStats(ip: string): {
   const recentWindow = 60000; // 1 minute
 
   const recent = history.filter(
-    (entry) => now - entry.timestamp < recentWindow
+    (entry) => now - entry.timestamp < recentWindow,
   );
   const uniquePaths = new Set(history.map((r) => r.path));
 

@@ -144,9 +144,7 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
     };
   };
 
-  getDataById = async (params: {
-    id: string;
-  }): Promise<ContractRow | null> => {
+  getDataById = async (params: { id: string }): Promise<ContractRow | null> => {
     return this.getContractById(params.id);
   };
 
@@ -197,7 +195,7 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
 
   updateContract = async (
     id: string,
-    payload: Partial<ContractInput>
+    payload: Partial<ContractInput>,
   ): Promise<ContractRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -209,8 +207,10 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
       updateData.employeeId = payload.employeeId;
     if (payload.contractType !== undefined)
       updateData.contractType = payload.contractType;
-    if (payload.startDate !== undefined) updateData.startDate = payload.startDate;
-    if (payload.endDate !== undefined) updateData.endDate = payload.endDate ?? null;
+    if (payload.startDate !== undefined)
+      updateData.startDate = payload.startDate;
+    if (payload.endDate !== undefined)
+      updateData.endDate = payload.endDate ?? null;
     if (payload.baseSalary !== undefined)
       updateData.baseSalary = payload.baseSalary;
     if (payload.currency !== undefined)
@@ -233,7 +233,10 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
       updateData.metadata = payload.metadata ?? null;
     if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
 
-    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db
+      .update(this.table)
+      .set(updateData)
+      .where(eq(this.table.id, id));
 
     return this.getContractById(id);
   };
@@ -257,14 +260,18 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
     }
     if (payload.endDate !== undefined) {
       normalizedPayload.endDate =
-        payload.endDate === null || payload.endDate === "" ? null : String(payload.endDate);
+        payload.endDate === null || payload.endDate === ""
+          ? null
+          : String(payload.endDate);
     }
     if (payload.baseSalary !== undefined) {
       normalizedPayload.baseSalary = Number(payload.baseSalary);
     }
     if (payload.currency !== undefined) {
       normalizedPayload.currency =
-        payload.currency === null || payload.currency === "" ? null : String(payload.currency);
+        payload.currency === null || payload.currency === ""
+          ? null
+          : String(payload.currency);
     }
     if (payload.workingHours !== undefined) {
       normalizedPayload.workingHours =
@@ -301,11 +308,15 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
     }
     if (payload.signedBy !== undefined) {
       normalizedPayload.signedBy =
-        payload.signedBy === null || payload.signedBy === "" ? null : String(payload.signedBy);
+        payload.signedBy === null || payload.signedBy === ""
+          ? null
+          : String(payload.signedBy);
     }
     if (payload.notes !== undefined) {
       normalizedPayload.notes =
-        payload.notes === null || payload.notes === "" ? null : String(payload.notes);
+        payload.notes === null || payload.notes === ""
+          ? null
+          : String(payload.notes);
     }
     if (payload.metadata !== undefined) {
       normalizedPayload.metadata = payload.metadata;
@@ -317,4 +328,3 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
     return this.updateContract(id, normalizedPayload);
   };
 }
-

@@ -1,13 +1,15 @@
-import { asc, desc, or, sql, type Column } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
-import { isNil, omitBy } from "lodash";
-import { BaseModel } from "./BaseModel";
 import type { ParamFilter } from "./interfaces/FilterInterface";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "./interfaces/ListInterface";
 import type { ParamSortMultiple } from "./interfaces/SortInterface";
+
+import { isNil, omitBy } from "lodash";
+import { asc, desc, or, sql, type Column } from "drizzle-orm";
+
+import { BaseModel } from "./BaseModel";
 
 /**
  * Abstract base class for models that support view list data table functionality
@@ -26,7 +28,7 @@ export type ColumnMap = Map<
 export type SearchConditionMap = Map<string, (text: string) => unknown>;
 export type FilterCondition<TFilter extends ParamFilter> = (
   currentFilterValue?: unknown,
-  filters?: TFilter | undefined
+  filters?: TFilter | undefined,
 ) => unknown | undefined;
 export type FilterConditionMap<TFilter extends ParamFilter> = Map<
   string,
@@ -60,6 +62,7 @@ export abstract class BaseViewListModel<
     if (!this._columns) {
       this._columns = this.declarationColumns();
     }
+
     return this._columns;
   }
 
@@ -67,6 +70,7 @@ export abstract class BaseViewListModel<
     if (!this._search) {
       this._search = this.declarationSearch();
     }
+
     return this._search;
   }
 
@@ -74,6 +78,7 @@ export abstract class BaseViewListModel<
     if (!this._filter) {
       this._filter = this.declarationFilter();
     }
+
     return this._filter;
   }
 
@@ -86,6 +91,7 @@ export abstract class BaseViewListModel<
         },
       ];
     }
+
     return this._sortDefault;
   }
 
@@ -121,7 +127,7 @@ export abstract class BaseViewListModel<
    * Default implementation returns an empty Map (no additional filters).
    * Subclass can override to provide filter conditions.
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   protected declarationFilter = (): FilterConditionMap<TFilter> => {
     return new Map();
   };
@@ -149,7 +155,7 @@ export abstract class BaseViewListModel<
   buildQueryDataListWithSelect = async (
     params: ListParamsRequest<TFilter>,
     select?: Record<string, Column>,
-    callBackBuildQuery?: (query: any) => any
+    callBackBuildQuery?: (query: any) => any,
   ): Promise<ListParamsResponse<TRow>> => {
     const {
       filters = undefined,
@@ -162,8 +168,9 @@ export abstract class BaseViewListModel<
     const totalResultKey = "total-data-response" as keyof TRow;
 
     // Start with a query builder: allow calling with select clauses
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     let query: any;
+
     switch (typeof select) {
       case "object":
         {
@@ -171,7 +178,7 @@ export abstract class BaseViewListModel<
             ...select,
             [totalResultKey]: sql<number>`count(*) over()::int`.as("total"),
           };
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
           query = this.db
             .select(selectWithTotal as any)
             .from(this.table as any);
@@ -184,7 +191,7 @@ export abstract class BaseViewListModel<
             ...this.table, // select all columns (i.e., SELECT *)
             [totalResultKey]: sql<number>`count(*) over()::int`.as("total"),
           };
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
           query = this.db
             .select(selectWithTotal as any)
             .from(this.table as any);
@@ -214,18 +221,18 @@ export abstract class BaseViewListModel<
 
     // 2. Search
     const searchText = isNil(search) ? undefined : String(search).trim();
+
     if (searchText) {
       const searchExpressions = Array.from(this.search.values())
         .map((searchTerm) => searchTerm(searchText))
         .filter((expr): expr is Exclude<typeof expr, undefined> =>
-          Boolean(expr)
+          Boolean(expr),
         );
 
       if (searchExpressions.length > 0) {
         console.log("searchExpressions", searchExpressions);
         console.log("searchText", searchText);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         query = query.where(or(...(searchExpressions as any[])) as any);
       }
     }
@@ -240,12 +247,14 @@ export abstract class BaseViewListModel<
       sorts
         ?.map((sortObj: ParamSortMultiple[number]) => {
           const sortColumn = this.columns.get(sortObj.column);
+
           if (!sortColumn || !sortColumn.sort) {
             return undefined;
           }
           if (sortObj.direction === "descending") {
             return desc(sortColumn.column);
           }
+
           return asc(sortColumn.column);
         })
         .filter((expr): expr is ReturnType<typeof asc> => Boolean(expr)) ?? [];
@@ -254,12 +263,14 @@ export abstract class BaseViewListModel<
       orderByExpressions = this.sortDefault
         .map((sort) => {
           const sortColumn = this.columns.get(sort.column);
+
           if (!sortColumn || !sortColumn.sort) {
             return undefined;
           }
           if (sort.direction === "descending") {
             return desc(sortColumn.column);
           }
+
           return asc(sortColumn.column);
         })
         .filter((expr): expr is ReturnType<typeof asc> => Boolean(expr));
@@ -279,7 +290,7 @@ export abstract class BaseViewListModel<
 
     const total = (result?.[0]?.[totalResultKey as string] as number) ?? 0;
     const data = result?.map((row) =>
-      omitBy(row, totalResultKey as string)
+      omitBy(row, totalResultKey as string),
     ) as TRow[];
 
     return { data, total };
@@ -298,28 +309,28 @@ export abstract class BaseViewListModel<
    */
   protected buildQueryDataList = async (
     params: ListParamsRequest<TFilter>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    callBackBuildQuery?: (query: any) => any
+
+    callBackBuildQuery?: (query: any) => any,
   ) => {
     // Build base SELECT list from column map with total count
     const selectColumns = Object.fromEntries(
       Array.from(this.columns.entries()).map(([key, config]) => [
         key,
         config.column,
-      ])
+      ]),
     );
 
     // Use buildQueryDataListWithSelect with custom select and callback
     const result = await this.buildQueryDataListWithSelect(
       params,
       selectColumns as Record<string, Column>,
-      callBackBuildQuery
+      callBackBuildQuery,
     );
 
     return {
       data:
         result?.data?.map((row, index) =>
-          this.declarationMappingData(row, index)
+          this.declarationMappingData(row, index),
         ) ?? [],
       total: result?.total ?? 0,
     };
@@ -333,7 +344,7 @@ export abstract class BaseViewListModel<
    * Default getData implementation using shared query/mapping logic
    */
   getData = async (
-    params: ListParamsRequest<TFilter>
+    params: ListParamsRequest<TFilter>,
   ): Promise<ListParamsResponse<TRow>> => {
     return await this.buildQueryDataList(params);
   };

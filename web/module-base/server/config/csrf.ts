@@ -17,4 +17,3 @@ export const CSRF_CONFIG = {
    */
   expirationMs: 24 * 60 * 60 * 1000, // 24 hours
 } as const;
-

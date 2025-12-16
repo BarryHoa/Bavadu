@@ -1,13 +1,14 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
@@ -61,7 +62,10 @@ class EmployeeViewListModel extends BaseViewListModel<
       ["phone", { column: hrm_tb_employees.phone, sort: true }],
       ["positionId", { column: hrm_tb_employees.positionId, sort: true }],
       ["departmentId", { column: hrm_tb_employees.departmentId, sort: true }],
-      ["employmentStatus", { column: hrm_tb_employees.employmentStatus, sort: true }],
+      [
+        "employmentStatus",
+        { column: hrm_tb_employees.employmentStatus, sort: true },
+      ],
       ["hireDate", { column: hrm_tb_employees.hireDate, sort: true }],
       ["baseSalary", { column: hrm_tb_employees.baseSalary, sort: true }],
       ["isActive", { column: hrm_tb_employees.isActive, sort: true }],
@@ -75,7 +79,10 @@ class EmployeeViewListModel extends BaseViewListModel<
 
   protected declarationSearch = () =>
     new Map([
-      ["employeeCode", (text: string) => ilike(hrm_tb_employees.employeeCode, text)],
+      [
+        "employeeCode",
+        (text: string) => ilike(hrm_tb_employees.employeeCode, text),
+      ],
       ["fullName", (text: string) => ilike(hrm_tb_employees.fullName, text)],
       ["email", (text: string) => ilike(hrm_tb_employees.email, text)],
     ]);
@@ -83,7 +90,6 @@ class EmployeeViewListModel extends BaseViewListModel<
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): EmployeeRow => ({
     id: row.id,
     employeeCode: row.employeeCode,
@@ -113,15 +119,14 @@ class EmployeeViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<EmployeeRow>> => {
     return this.buildQueryDataList(params, (query) =>
       query
         .leftJoin(position, eq(this.table.positionId, position.id))
-        .leftJoin(department, eq(this.table.departmentId, department.id))
+        .leftJoin(department, eq(this.table.departmentId, department.id)),
     );
   };
 }
 
 export default EmployeeViewListModel;
-

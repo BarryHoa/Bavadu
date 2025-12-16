@@ -1,18 +1,21 @@
 import type { Column } from "drizzle-orm";
-import { and, eq, ilike, sql } from "drizzle-orm";
-
-import { ParamFilter } from "@base/server";
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 
+import { eq, ilike, sql } from "drizzle-orm";
+import { ParamFilter } from "@base/server";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { product_tb_product_masters } from "@mdl/product/server/schemas/product.master";
-import { stock_tb_stock_levels, stock_tb_stock_warehouses } from "../../schemas";
+
+import {
+  stock_tb_stock_levels,
+  stock_tb_stock_warehouses,
+} from "../../schemas";
 
 export interface StockSummaryViewRow {
   id: string;
@@ -124,12 +127,31 @@ class StockSummaryViewListModel extends BaseViewListModel<
 
   protected declarationSearch = () =>
     new Map([
-      ["productId", (text: string) => ilike(stock_tb_stock_levels.productId, text)],
-      ["productCode", (text: string) => ilike(product_tb_product_masters.code, text)],
-      ["productName", (text: string) => ilike(sql`${product_tb_product_masters.name}::text`, text)],
-      ["warehouseId", (text: string) => ilike(stock_tb_stock_levels.warehouseId, text)],
-      ["warehouseCode", (text: string) => ilike(stock_tb_stock_warehouses.code, text)],
-      ["warehouseName", (text: string) => ilike(stock_tb_stock_warehouses.name, text)],
+      [
+        "productId",
+        (text: string) => ilike(stock_tb_stock_levels.productId, text),
+      ],
+      [
+        "productCode",
+        (text: string) => ilike(product_tb_product_masters.code, text),
+      ],
+      [
+        "productName",
+        (text: string) =>
+          ilike(sql`${product_tb_product_masters.name}::text`, text),
+      ],
+      [
+        "warehouseId",
+        (text: string) => ilike(stock_tb_stock_levels.warehouseId, text),
+      ],
+      [
+        "warehouseCode",
+        (text: string) => ilike(stock_tb_stock_warehouses.code, text),
+      ],
+      [
+        "warehouseName",
+        (text: string) => ilike(stock_tb_stock_warehouses.name, text),
+      ],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<StockSummaryFilter> =>
@@ -138,6 +160,7 @@ class StockSummaryViewListModel extends BaseViewListModel<
         "productId",
         (value?: unknown, _filters?: StockSummaryFilter) => {
           if (typeof value !== "string" || !value) return undefined;
+
           return eq(stock_tb_stock_levels.productId, value);
         },
       ],
@@ -145,12 +168,12 @@ class StockSummaryViewListModel extends BaseViewListModel<
         "warehouseId",
         (value?: unknown, _filters?: StockSummaryFilter) => {
           if (typeof value !== "string" || !value) return undefined;
+
           return eq(stock_tb_stock_levels.warehouseId, value);
         },
       ],
     ]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): StockSummaryViewRow => ({
     id: `${row.productId}-${row.warehouseId}`,
     productId: row.productId,
@@ -168,18 +191,18 @@ class StockSummaryViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest<StockSummaryFilter> = {}
+    params: ListParamsRequest<StockSummaryFilter> = {},
   ): Promise<ListParamsResponse<StockSummaryViewRow>> => {
     return this.buildQueryDataList(params, (query) =>
       query
         .leftJoin(
           product_tb_product_masters,
-          eq(stock_tb_stock_levels.productId, product_tb_product_masters.id)
+          eq(stock_tb_stock_levels.productId, product_tb_product_masters.id),
         )
         .leftJoin(
           stock_tb_stock_warehouses,
-          eq(stock_tb_stock_levels.warehouseId, stock_tb_stock_warehouses.id)
-        )
+          eq(stock_tb_stock_levels.warehouseId, stock_tb_stock_warehouses.id),
+        ),
     );
   };
 }

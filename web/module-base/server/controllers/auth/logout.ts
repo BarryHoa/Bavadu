@@ -1,5 +1,6 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { NextRequest } from "next/server";
+
 import { SESSION_CONFIG } from "../../config";
 import SessionModel from "../../models/Sessions/SessionModel";
 
@@ -13,6 +14,7 @@ export async function POST(request: NextRequest) {
 
     if (sessionToken) {
       const sessionModel = new SessionModel();
+
       await sessionModel.destroySession(sessionToken);
     }
 
@@ -31,6 +33,7 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     console.error("Logout error:", error);
+
     return JSONResponse({
       error: "Logout failed",
       message: error instanceof Error ? error.message : "Unknown error",

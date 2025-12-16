@@ -38,7 +38,9 @@ export interface CertificateInput {
   isActive?: boolean;
 }
 
-export default class CertificateModel extends BaseModel<typeof hrm_tb_certificates> {
+export default class CertificateModel extends BaseModel<
+  typeof hrm_tb_certificates
+> {
   constructor() {
     super(hrm_tb_certificates);
   }
@@ -47,6 +49,7 @@ export default class CertificateModel extends BaseModel<typeof hrm_tb_certificat
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
@@ -73,6 +76,7 @@ export default class CertificateModel extends BaseModel<typeof hrm_tb_certificat
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -104,7 +108,7 @@ export default class CertificateModel extends BaseModel<typeof hrm_tb_certificat
   };
 
   createCertificate = async (
-    payload: CertificateInput
+    payload: CertificateInput,
   ): Promise<CertificateRow> => {
     const now = new Date();
     const insertData: NewHrmTbCertificate = {
@@ -128,14 +132,16 @@ export default class CertificateModel extends BaseModel<typeof hrm_tb_certificat
     if (!created) throw new Error("Failed to create certificate");
 
     const certificate = await this.getCertificateById(created.id);
+
     if (!certificate)
       throw new Error("Failed to load certificate after creation");
+
     return certificate;
   };
 
   updateCertificate = async (
     id: string,
-    payload: Partial<CertificateInput>
+    payload: Partial<CertificateInput>,
   ): Promise<CertificateRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -159,6 +165,7 @@ export default class CertificateModel extends BaseModel<typeof hrm_tb_certificat
       .update(this.table)
       .set(updateData)
       .where(eq(this.table.id, id));
+
     return this.getCertificateById(id);
   };
 
@@ -170,7 +177,9 @@ export default class CertificateModel extends BaseModel<typeof hrm_tb_certificat
       normalizedPayload.employeeId = String(payload.employeeId);
     }
     if (payload.name !== undefined) {
-      normalizedPayload.name = this.normalizeLocaleInput(payload.name) ?? { en: "" };
+      normalizedPayload.name = this.normalizeLocaleInput(payload.name) ?? {
+        en: "",
+      };
     }
     if (payload.issuer !== undefined) {
       normalizedPayload.issuer = String(payload.issuer);
@@ -203,4 +212,3 @@ export default class CertificateModel extends BaseModel<typeof hrm_tb_certificat
     return this.updateCertificate(id, normalizedPayload);
   };
 }
-

@@ -1,13 +1,14 @@
 "use client";
 
+import type { Address, countryCode } from "@base/client/interface/Address";
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
+
 import {
   IBaseInput,
   IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import type { Address, countryCode } from "@base/client/interface/Address";
-import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import locationService from "@base/client/services/LocationService";
 import { buildAddressString } from "@base/client/utils/address/addressUtils";
 import { Button } from "@heroui/button";
@@ -28,10 +29,10 @@ import { useMemo, useState } from "react";
 // @ts-ignore
 // dynamic import PickerAddressByCountryUS
 const PickerAddressByCountryUS = dynamic(
-  () => import("./PickerAddressByCountryUS")
+  () => import("./PickerAddressByCountryUS"),
 );
 const PickerAddressByCountryVN = dynamic(
-  () => import("./PickerAddressByCountryVN")
+  () => import("./PickerAddressByCountryVN"),
 );
 
 interface AddressPickerProps {
@@ -58,6 +59,7 @@ export default function AddressPicker({
     queryKey: ["countries"],
     queryFn: async () => {
       const response = await locationService.getCountries();
+
       return response.data || [];
     },
   });
@@ -66,6 +68,7 @@ export default function AddressPicker({
     return countries.map((country) => {
       const name = getLocalizedName(country.name as LocalizeText);
       const nameObj = country.name as LocalizeText;
+
       return {
         value: country.code,
         label: name,
@@ -75,7 +78,7 @@ export default function AddressPicker({
   }, [countries, getLocalizedName]);
 
   const [selectedCountryCode, setSelectedCountryCode] = useState<countryCode>(
-    value?.country?.code ?? "VN"
+    value?.country?.code ?? "VN",
   );
 
   const [tempAddress, setTempAddress] = useState<Address>({
@@ -138,6 +141,7 @@ export default function AddressPicker({
   const handleClose = () => {
     // Reset state when closing modal
     const initialCountryCode = value?.country?.code ?? "VN";
+
     setSelectedCountryCode(initialCountryCode);
 
     if (value) {
@@ -174,16 +178,16 @@ export default function AddressPicker({
         return (
           <PickerAddressByCountryVN
             countryCode={countryCode}
-            tempAddress={tempAddress}
             setTempAddress={setTempAddress}
+            tempAddress={tempAddress}
           />
         );
       default:
         return (
           <PickerAddressByCountryUS
             countryCode={countryCode}
-            tempAddress={tempAddress}
             setTempAddress={setTempAddress}
+            tempAddress={tempAddress}
           />
         );
     }
@@ -198,21 +202,21 @@ export default function AddressPicker({
         >
           <Button
             isIconOnly
-            type="button"
+            color="primary"
             size="sm"
+            startContent={<MapPin size={16} />}
+            type="button"
             variant="bordered"
             onPress={handleOpen}
-            startContent={<MapPin size={16} />}
-            color="primary"
           />
         </Tooltip>
       </div>
 
       <Modal
         isOpen={isOpen}
-        onClose={handleClose}
-        size="2xl"
         scrollBehavior="inside"
+        size="2xl"
+        onClose={handleClose}
       >
         <ModalContent>
           {() => (
@@ -223,20 +227,20 @@ export default function AddressPicker({
               <ModalBody>
                 <div className="flex flex-col gap-4">
                   <IBaseSingleSelect
+                    disallowEmptySelection
+                    isRequired
+                    classNames={{
+                      popoverContent: "max-w-full",
+                    }}
+                    items={countryItems}
                     label={t("modal.country.label")}
                     placeholder={t("modal.country.placeholder")}
-                    items={countryItems}
-                    isRequired
                     selectedKey={selectedCountryCode || "VN"}
                     onSelectionChange={(key) => {
                       // Prevent deselection - at least one item must be selected
                       if (key) {
                         setSelectedCountryCode(key as countryCode);
                       }
-                    }}
-                    disallowEmptySelection
-                    classNames={{
-                      popoverContent: "max-w-full",
                     }}
                   />
 
@@ -264,14 +268,14 @@ export default function AddressPicker({
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="bordered" onPress={handleCancel} size="sm">
+                <Button size="sm" variant="bordered" onPress={handleCancel}>
                   {tCommon("modal.buttons.cancel")}
                 </Button>
                 <Button
                   color="primary"
-                  onPress={handleSave}
                   isDisabled={!selectedCountryCode}
                   size="sm"
+                  onPress={handleSave}
                 >
                   {tCommon("modal.buttons.apply")}
                 </Button>

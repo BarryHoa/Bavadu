@@ -1,6 +1,5 @@
 import { sql } from "drizzle-orm";
 import {
-  boolean,
   date,
   index,
   jsonb,
@@ -9,6 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 
 // Compliance Reports - Báo cáo tuân thủ
@@ -39,9 +39,10 @@ export const hrm_tb_compliance_reports = mdlHrmSchema.table(
     index("compliance_reports_type_idx").on(table.reportType),
     index("compliance_reports_period_idx").on(table.reportingPeriod),
     index("compliance_reports_status_idx").on(table.status),
-  ]
+  ],
 );
 
-export type HrmTbComplianceReport = typeof hrm_tb_compliance_reports.$inferSelect;
-export type NewHrmTbComplianceReport = typeof hrm_tb_compliance_reports.$inferInsert;
-
+export type HrmTbComplianceReport =
+  typeof hrm_tb_compliance_reports.$inferSelect;
+export type NewHrmTbComplianceReport =
+  typeof hrm_tb_compliance_reports.$inferInsert;

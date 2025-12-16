@@ -10,6 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { hrm_tb_employees } from "./hrm.employee";
 import { mdlHrmSchema } from "./schema";
 
@@ -53,7 +54,7 @@ export const hrm_tb_contracts = mdlHrmSchema.table(
     index("contracts_status_idx").on(table.status),
     index("contracts_dates_idx").on(table.startDate, table.endDate),
     index("contracts_active_idx").on(table.isActive),
-  ]
+  ],
 );
 
 export type HrmTbContract = typeof hrm_tb_contracts.$inferSelect;

@@ -2,6 +2,6 @@ import PerformanceReviewCreatePageClient from "./PerformanceReviewCreatePageClie
 
 export default async function PerformanceReviewCreatePageSSR() {
   const props = {};
+
   return <PerformanceReviewCreatePageClient {...props} />;
 }
-

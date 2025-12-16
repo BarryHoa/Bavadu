@@ -9,7 +9,7 @@ import { useEffect } from "react";
 export function usePrefetchModuleMessages(
   allModuleNames: string[],
   currentModule: string | null,
-  locale: string
+  locale: string,
 ) {
   const { setModuleMessages, setLoadingModule, isLoadingModule } =
     useMessagesStore();
@@ -21,7 +21,7 @@ export function usePrefetchModuleMessages(
       (moduleName) =>
         moduleName !== currentModule &&
         !isLoadingModule(moduleName) &&
-        !state.messages[moduleName]
+        !state.messages[moduleName],
     );
 
     if (modulesToLoad.length === 0) return;
@@ -42,7 +42,7 @@ export function usePrefetchModuleMessages(
       } catch (error) {
         console.error(
           `Error loading messages for module ${moduleName}:`,
-          error
+          error,
         );
         // Set empty object on error
         setModuleMessages(moduleName, {});

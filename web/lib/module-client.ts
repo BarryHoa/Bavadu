@@ -7,13 +7,13 @@ const toModuleId = (name: string) =>
     .replace(/[^a-z0-9-]/g, "");
 
 const installedModuleIds = new Set(
-  moduleRegistry.map((module) => toModuleId(module.name))
+  moduleRegistry.map((module) => toModuleId(module.name)),
 );
 
 export const moduleClient = {
   async getInstalledModules(): Promise<ModuleInfo[]> {
     return moduleRegistry.filter((module) =>
-      installedModuleIds.has(toModuleId(module.name))
+      installedModuleIds.has(toModuleId(module.name)),
     );
   },
 
@@ -23,6 +23,7 @@ export const moduleClient = {
     }
 
     installedModuleIds.delete(moduleId);
+
     return true;
   },
 

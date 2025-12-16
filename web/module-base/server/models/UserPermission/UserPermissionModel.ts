@@ -1,5 +1,6 @@
 import { BaseModel } from "@base/server/models/BaseModel";
 import { and, eq, inArray } from "drizzle-orm";
+
 import {
   base_tb_permissions,
   base_tb_role_permissions_default,
@@ -33,6 +34,7 @@ export default class UserPermissionModel extends BaseModel<
       .from(this.table)
       .where(eq(this.table.id, params.id))
       .limit(1);
+
     return result[0] || null;
   };
 
@@ -59,8 +61,8 @@ export default class UserPermissionModel extends BaseModel<
         and(
           eq(base_tb_user_roles.userId, userId),
           eq(base_tb_user_roles.isActive, true),
-          eq(base_tb_roles.isActive, true)
-        )
+          eq(base_tb_roles.isActive, true),
+        ),
       );
 
     const roles = userRoles.map((r) => ({
@@ -83,15 +85,15 @@ export default class UserPermissionModel extends BaseModel<
           base_tb_permissions,
           eq(
             base_tb_role_permissions_default.permissionId,
-            base_tb_permissions.id
-          )
+            base_tb_permissions.id,
+          ),
         )
         .where(
           and(
             inArray(base_tb_role_permissions_default.roleId, roleIds),
             eq(base_tb_role_permissions_default.isActive, true),
-            eq(base_tb_permissions.isActive, true)
-          )
+            eq(base_tb_permissions.isActive, true),
+          ),
         );
 
       for (const rp of rolePerms) {
@@ -107,18 +109,19 @@ export default class UserPermissionModel extends BaseModel<
       .from(base_tb_user_permissions)
       .innerJoin(
         base_tb_permissions,
-        eq(base_tb_user_permissions.permissionId, base_tb_permissions.id)
+        eq(base_tb_user_permissions.permissionId, base_tb_permissions.id),
       )
       .where(
         and(
           eq(base_tb_user_permissions.userId, userId),
           eq(base_tb_user_permissions.isActive, true),
-          eq(base_tb_permissions.isActive, true)
-        )
+          eq(base_tb_permissions.isActive, true),
+        ),
       );
 
     // 4. Combine role permissions and user permissions
     const finalPermissions = new Set(rolePermissions);
+
     for (const up of userPerms) {
       finalPermissions.add(up.permissionKey);
     }
@@ -134,6 +137,7 @@ export default class UserPermissionModel extends BaseModel<
    */
   async getPermissionsByUserArray(userId: string): Promise<string[]> {
     const result = await this.getPermissionsByUser(userId);
+
     return Array.from(result.permissions).sort();
   }
 
@@ -142,6 +146,7 @@ export default class UserPermissionModel extends BaseModel<
    */
   async hasPermission(userId: string, permission: string): Promise<boolean> {
     const result = await this.getPermissionsByUser(userId);
+
     return result.permissions.has(permission);
   }
 
@@ -150,9 +155,10 @@ export default class UserPermissionModel extends BaseModel<
    */
   async hasAnyPermission(
     userId: string,
-    permissions: string[]
+    permissions: string[],
   ): Promise<boolean> {
     const result = await this.getPermissionsByUser(userId);
+
     return permissions.some((perm) => result.permissions.has(perm));
   }
 
@@ -161,9 +167,10 @@ export default class UserPermissionModel extends BaseModel<
    */
   async hasAllPermissions(
     userId: string,
-    permissions: string[]
+    permissions: string[],
   ): Promise<boolean> {
     const result = await this.getPermissionsByUser(userId);
+
     return permissions.every((perm) => result.permissions.has(perm));
   }
 
@@ -173,7 +180,7 @@ export default class UserPermissionModel extends BaseModel<
   async addPermissionToUser(
     userId: string,
     permissionId: string,
-    createdBy?: string
+    createdBy?: string,
   ) {
     const now = new Date();
 
@@ -184,8 +191,8 @@ export default class UserPermissionModel extends BaseModel<
       .where(
         and(
           eq(this.table.userId, userId),
-          eq(this.table.permissionId, permissionId)
-        )
+          eq(this.table.permissionId, permissionId),
+        ),
       )
       .limit(1);
 
@@ -199,6 +206,7 @@ export default class UserPermissionModel extends BaseModel<
           })
           .where(eq(this.table.id, existing[0].id));
       }
+
       return existing[0];
     }
 
@@ -230,8 +238,8 @@ export default class UserPermissionModel extends BaseModel<
         and(
           eq(this.table.userId, userId),
           eq(this.table.permissionId, permissionId),
-          eq(this.table.isActive, true)
-        )
+          eq(this.table.isActive, true),
+        ),
       )
       .returning();
 

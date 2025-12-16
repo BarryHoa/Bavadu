@@ -1,4 +1,3 @@
-
 "use client";
 
 export default function GlobalError({
@@ -9,7 +8,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   return (
-    <html>
+    <html lang="en">
       <body>
         <div className="min-h-[60vh] flex flex-col items-center justify-center text-center gap-4 p-6">
           <h1 className="text-4xl font-semibold">Something went wrong</h1>
@@ -20,9 +19,9 @@ export default function GlobalError({
             <code className="text-xs text-default-400">{error.digest}</code>
           ) : null}
           <button
+            className="inline-flex items-center px-4 py-2 rounded-md bg-primary text-white hover:opacity-90"
             type="button"
             onClick={() => reset()}
-            className="inline-flex items-center px-4 py-2 rounded-md bg-primary text-white hover:opacity-90"
           >
             Try again
           </button>
@@ -31,5 +30,3 @@ export default function GlobalError({
     </html>
   );
 }
-
-

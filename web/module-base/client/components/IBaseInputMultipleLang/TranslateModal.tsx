@@ -12,6 +12,7 @@ import {
 import { Languages } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
+
 import {
   DEFAULT_SUPPORTED_LANGS,
   LocalizeText,
@@ -38,9 +39,11 @@ export default function TranslateModal({
     if (typeof value === "object" && value !== null) {
       return value as LocalizeText;
     }
+
     return DEFAULT_SUPPORTED_LANGS.reduce<LocalizeText>((acc, lang) => {
       acc[lang as LocalizeTextKey] =
         (value as unknown as LocalizeText)?.[lang as LocalizeTextKey] ?? "";
+
       return acc;
     }, {} as LocalizeText);
   });
@@ -76,18 +79,18 @@ export default function TranslateModal({
             </ModalHeader>
             <ModalBody className="space-y-4">
               {DEFAULT_SUPPORTED_LANGS.filter(
-                (lang) => lang !== curentLocale
+                (lang) => lang !== curentLocale,
               ).map((lang) => (
-                <div className="flex flex-col gap-2" key={lang}>
+                <div key={lang} className="flex flex-col gap-2">
                   <label className="text-sm font-medium">
                     {labelText[lang as LocalizeTextKey] ?? lang.toUpperCase()}
                   </label>
                   <IBaseInput
                     value={langValues[lang as LocalizeTextKey]}
+                    variant="bordered"
                     onValueChange={(val) =>
                       handleLangChange(lang as LocalizeTextKey, val)
                     }
-                    variant="bordered"
                   />
                 </div>
               ))}

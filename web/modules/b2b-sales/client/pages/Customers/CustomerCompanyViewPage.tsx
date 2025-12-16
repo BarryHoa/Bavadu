@@ -8,4 +8,3 @@ export default function CustomerCompanyViewPage(): React.ReactNode {
     </div>
   );
 }
-

@@ -1,9 +1,10 @@
-import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 import type {
   JobRequisitionDto,
   CreateJobRequisitionPayload,
   UpdateJobRequisitionPayload,
 } from "../interface/JobRequisition";
+
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export default class JobRequisitionService extends JsonRpcClientService {
   list() {
@@ -37,4 +38,3 @@ export default class JobRequisitionService extends JsonRpcClientService {
 }
 
 export const jobRequisitionService = new JobRequisitionService();
-

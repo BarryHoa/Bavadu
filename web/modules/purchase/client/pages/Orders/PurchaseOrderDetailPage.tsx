@@ -46,6 +46,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
       }
 
       const response = await purchaseOrderService.getById(orderId);
+
       if (!response.data) {
         throw new Error("Failed to fetch purchase order.");
       }
@@ -66,8 +67,9 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
     setQuantities(
       lines.reduce<Record<string, string>>((acc, line) => {
         acc[line.id] = "0";
+
         return acc;
-      }, {})
+      }, {}),
     );
   }, [order?.id, order?.warehouseId, lines]);
 
@@ -75,9 +77,9 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
     () =>
       lines.filter(
         (line) =>
-          Number(line.quantityOrdered) - Number(line.quantityReceived) > 0.0001
+          Number(line.quantityOrdered) - Number(line.quantityReceived) > 0.0001,
       ),
-    [lines]
+    [lines],
   );
 
   const {
@@ -87,6 +89,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
   } = useCreateUpdate<string, PurchaseOrderDto>({
     mutationFn: async (id) => {
       const response = await purchaseOrderService.confirm(id);
+
       if (!response.data) {
         throw new Error("Failed to confirm purchase order.");
       }
@@ -114,6 +117,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await purchaseOrderService.receive(payload);
+
       if (!response.data) {
         throw new Error("Failed to receive products.");
       }
@@ -138,9 +142,9 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
         </div>
         <Button
           as={LinkAs as any}
+          href="/workspace/modules/purchase"
           size="sm"
           variant="light"
-          href="/workspace/modules/purchase"
         >
           Back to list
         </Button>
@@ -166,9 +170,9 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
         </div>
         <Button
           as={LinkAs as any}
+          href="/workspace/modules/purchase"
           size="sm"
           variant="light"
-          href="/workspace/modules/purchase"
         >
           Back to list
         </Button>
@@ -182,9 +186,9 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
         <p className="text-default-500">Purchase order not found.</p>
         <Button
           as={LinkAs as any}
+          href="/workspace/modules/purchase"
           size="sm"
           variant="light"
-          href="/workspace/modules/purchase"
         >
           Back to list
         </Button>
@@ -197,9 +201,9 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
       <div className="flex justify-end">
         <Button
           as={LinkAs as any}
+          href="/workspace/modules/purchase"
           size="sm"
           variant="light"
-          href="/workspace/modules/purchase"
         >
           Back to list
         </Button>
@@ -214,7 +218,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
       <Card>
         <CardBody className="space-y-3">
           <div className="flex flex-wrap items-center gap-3">
-            <Chip variant="flat" color="primary">
+            <Chip color="primary" variant="flat">
               Status: {order.status}
             </Chip>
             <Chip variant="flat">
@@ -241,7 +245,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
       <Card>
         <CardBody className="space-y-3">
           <h2 className="text-lg font-semibold">Lines</h2>
-          <Table aria-label="Purchase order lines" removeWrapper>
+          <Table removeWrapper aria-label="Purchase order lines">
             <TableHeader>
               <TableColumn>Product</TableColumn>
               <TableColumn>Description</TableColumn>
@@ -276,10 +280,10 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
       <div className="flex items-center gap-3">
         <Button
           color="primary"
-          size="sm"
-          onPress={() => confirmOrder(orderId)}
           isDisabled={order.status !== "draft"}
           isLoading={isConfirming}
+          size="sm"
+          onPress={() => confirmOrder(orderId)}
         >
           Confirm order
         </Button>
@@ -327,6 +331,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
               {pendingLines.map((line) => {
                 const openQty =
                   Number(line.quantityOrdered) - Number(line.quantityReceived);
+
                 return (
                   <div
                     key={line.id}
@@ -340,10 +345,10 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
                     </div>
                     <IBaseInput
                       label="Quantity to receive"
+                      max={openQty}
+                      min={0}
                       type="number"
                       value={quantities[line.id] ?? "0"}
-                      min={0}
-                      max={openQty}
                       onValueChange={(value: string) =>
                         setQuantities((prev) => ({
                           ...prev,
@@ -352,16 +357,16 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
                       }
                     />
                     <IBaseInput
+                      isReadOnly
                       label="Description"
                       value={line.description ?? ""}
-                      isReadOnly
                     />
                     <IBaseInput
+                      isReadOnly
                       label="Ordered / Received"
                       value={`${Number(line.quantityOrdered).toFixed(
-                        2
+                        2,
                       )} / ${Number(line.quantityReceived).toFixed(2)}`}
-                      isReadOnly
                     />
                   </div>
                 );
@@ -371,6 +376,8 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
 
           <Button
             color="primary"
+            isDisabled={pendingLines.length === 0}
+            isLoading={isReceiving}
             onPress={async () => {
               if (!orderId) return;
 
@@ -383,6 +390,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
 
               if (payloadLines.length === 0) {
                 setLocalError("Enter at least one quantity to receive.");
+
                 return;
               }
 
@@ -393,8 +401,6 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
                 lines: payloadLines,
               });
             }}
-            isDisabled={pendingLines.length === 0}
-            isLoading={isReceiving}
           >
             Receive selected quantities
           </Button>

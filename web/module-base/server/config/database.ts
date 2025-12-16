@@ -12,4 +12,3 @@ export const DATABASE_CONFIG = {
     connectTimeout: 10, // seconds
   },
 } as const;
-

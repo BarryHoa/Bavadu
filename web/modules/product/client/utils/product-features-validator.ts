@@ -169,7 +169,7 @@ export const FORBIDDEN_FEATURES_BY_TYPE: Record<
  * Get default features for a product type
  */
 export function getDefaultFeaturesForType(
-  type: ProductMasterType
+  type: ProductMasterType,
 ): Partial<Record<ProductMasterFeatures, boolean>> {
   return DEFAULT_FEATURES_BY_TYPE[type] || {};
 }

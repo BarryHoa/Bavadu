@@ -13,13 +13,17 @@ class ClientHttpService {
       return url.replace(/\/$/, "");
     }
     // Avoid double slashes và nếu kết thúc là / thì remove luôn
-    let cleanUrl = `${this.baseUrl.replace(/\/$/, "")}/${url.replace(/^\//, "")}`.replace(/\/$/, "");
-   
+    let cleanUrl =
+      `${this.baseUrl.replace(/\/$/, "")}/${url.replace(/^\//, "")}`.replace(
+        /\/$/,
+        "",
+      );
+
     return cleanUrl;
   }
 
   private async getHeadersWithCsrf(
-    options?: RequestInit
+    options?: RequestInit,
   ): Promise<HeadersInit> {
     const safeMethods = ["GET", "HEAD", "OPTIONS"];
     const method = (options?.method || "GET").toUpperCase();
@@ -48,7 +52,7 @@ class ClientHttpService {
     url: string,
     method: string,
     data?: unknown,
-    options?: RequestInit
+    options?: RequestInit,
   ): Promise<T> {
     const requestInit: RequestInit = {
       ...options,
@@ -65,7 +69,7 @@ class ClientHttpService {
 
     if (!response.ok) {
       throw new Error(
-        `HTTP ${method} error: ${response.status} ${response.statusText}`
+        `HTTP ${method} error: ${response.status} ${response.statusText}`,
       );
     }
 
@@ -79,7 +83,7 @@ class ClientHttpService {
   async post<T>(
     url: string,
     data?: unknown,
-    options?: RequestInit
+    options?: RequestInit,
   ): Promise<T> {
     return this.send<T>(url, "POST", data, options);
   }
@@ -91,7 +95,7 @@ class ClientHttpService {
   async patch<T>(
     url: string,
     data?: unknown,
-    options?: RequestInit
+    options?: RequestInit,
   ): Promise<T> {
     return this.send<T>(url, "PATCH", data, options);
   }

@@ -42,4 +42,3 @@ export interface CreateLeaveRequestPayload {
 export interface UpdateLeaveRequestPayload extends Partial<CreateLeaveRequestPayload> {
   id: string;
 }
-

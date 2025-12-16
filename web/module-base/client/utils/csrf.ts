@@ -12,12 +12,15 @@ export function getCsrfTokenFromCookie(): string | null {
   if (typeof document === "undefined") return null;
 
   const cookies = document.cookie.split(";");
+
   for (const cookie of cookies) {
     const [name, value] = cookie.trim().split("=");
+
     if (name === CSRF_COOKIE_NAME) {
       return decodeURIComponent(value);
     }
   }
+
   return null;
 }
 
@@ -28,6 +31,7 @@ export function getCsrfTokenFromCookie(): string | null {
 export function extractTokenFromSigned(signedToken: string): string | null {
   try {
     const parts = signedToken.split(":");
+
     return parts[0] || null;
   } catch {
     return null;
@@ -40,7 +44,9 @@ export function extractTokenFromSigned(signedToken: string): string | null {
  */
 export function getCsrfToken(): string | null {
   const signedToken = getCsrfTokenFromCookie();
+
   if (!signedToken) return null;
+
   return extractTokenFromSigned(signedToken);
 }
 
@@ -57,13 +63,16 @@ export async function fetchCsrfToken(): Promise<string | null> {
 
     if (!response.ok) {
       console.error("Failed to fetch CSRF token");
+
       return null;
     }
 
     const data = await response.json();
+
     return data.data?.token || null;
   } catch (error) {
     console.error("Error fetching CSRF token:", error);
+
     return null;
   }
 }
@@ -74,10 +83,12 @@ export async function fetchCsrfToken(): Promise<string | null> {
 export async function ensureCsrfToken(): Promise<string | null> {
   // Try to get from cookie first
   let token = getCsrfToken();
+
   if (token) return token;
 
   // If not in cookie, fetch from API
   token = await fetchCsrfToken();
+
   return token;
 }
 
@@ -85,7 +96,7 @@ export async function ensureCsrfToken(): Promise<string | null> {
  * Get headers with CSRF token
  */
 export async function getHeadersWithCsrf(
-  additionalHeaders?: HeadersInit
+  additionalHeaders?: HeadersInit,
 ): Promise<HeadersInit> {
   const token = await ensureCsrfToken();
   const headers: HeadersInit = {

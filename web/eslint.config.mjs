@@ -7,6 +7,7 @@ import _import from "eslint-plugin-import";
 import jsxA11Y from "eslint-plugin-jsx-a11y";
 import prettier from "eslint-plugin-prettier";
 import react from "eslint-plugin-react";
+import reactHooks from "eslint-plugin-react-hooks";
 import unusedImports from "eslint-plugin-unused-imports";
 import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
@@ -47,11 +48,9 @@ export default defineConfig([
   {
     extends: fixupConfigRules(
       compat.extends(
-        "airbnb",
         "plugin:react/recommended",
         "plugin:prettier/recommended",
-        "plugin:jsx-a11y/recommended",
-        "plugin:@next/next/recommended"
+        "plugin:jsx-a11y/recommended"
       )
     ),
 
@@ -62,6 +61,7 @@ export default defineConfig([
       "@typescript-eslint": typescriptEslint,
       "jsx-a11y": fixupPluginRules(jsxA11Y),
       prettier: fixupPluginRules(prettier),
+      "react-hooks": fixupPluginRules(reactHooks),
     },
 
     languageOptions: {

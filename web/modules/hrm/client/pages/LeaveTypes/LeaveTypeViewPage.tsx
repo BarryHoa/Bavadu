@@ -26,9 +26,11 @@ export default function LeaveTypeViewPage(): React.ReactNode {
     queryKey: ["hrm-leave-types", id],
     queryFn: async () => {
       const response = await leaveTypeService.getById(id);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToLoadLeaveType"));
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -91,23 +93,39 @@ export default function LeaveTypeViewPage(): React.ReactNode {
             />
             <IBaseDigitViewer
               label={t("labels.accrualRate")}
-              value={leaveTypeData.accrualRate ? `${leaveTypeData.accrualRate} days` : "—"}
+              value={
+                leaveTypeData.accrualRate
+                  ? `${leaveTypeData.accrualRate} days`
+                  : "—"
+              }
             />
             <IBaseDigitViewer
               label={t("labels.maxAccrual")}
-              value={leaveTypeData.maxAccrual ? `${leaveTypeData.maxAccrual} days` : "—"}
+              value={
+                leaveTypeData.maxAccrual
+                  ? `${leaveTypeData.maxAccrual} days`
+                  : "—"
+              }
             />
             <IBaseDigitViewer
               label={t("labels.carryForward")}
-              value={leaveTypeData.carryForward ? tCommon("yes") : tCommon("no")}
+              value={
+                leaveTypeData.carryForward ? tCommon("yes") : tCommon("no")
+              }
             />
             <IBaseDigitViewer
               label={t("labels.maxCarryForward")}
-              value={leaveTypeData.maxCarryForward ? `${leaveTypeData.maxCarryForward} days` : "—"}
+              value={
+                leaveTypeData.maxCarryForward
+                  ? `${leaveTypeData.maxCarryForward} days`
+                  : "—"
+              }
             />
             <IBaseDigitViewer
               label={t("labels.requiresApproval")}
-              value={leaveTypeData.requiresApproval ? tCommon("yes") : tCommon("no")}
+              value={
+                leaveTypeData.requiresApproval ? tCommon("yes") : tCommon("no")
+              }
             />
             <IBaseDigitViewer
               label={t("labels.isPaid")}
@@ -115,7 +133,9 @@ export default function LeaveTypeViewPage(): React.ReactNode {
             />
             <IBaseDigitViewer
               label={t("labels.isActive")}
-              value={leaveTypeData.isActive ? tCommon("active") : tCommon("inactive")}
+              value={
+                leaveTypeData.isActive ? tCommon("active") : tCommon("inactive")
+              }
             />
           </div>
         </CardBody>
@@ -123,4 +143,3 @@ export default function LeaveTypeViewPage(): React.ReactNode {
     </div>
   );
 }
-

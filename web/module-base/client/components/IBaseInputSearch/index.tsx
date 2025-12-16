@@ -30,8 +30,8 @@ const IBaseInputSearch = React.forwardRef<
 
   // Memoize search icon to prevent recreation
   const searchIcon = useMemo(
-    () => <Search size={16} className="text-default-400" />,
-    []
+    () => <Search className="text-default-400" size={16} />,
+    [],
   );
 
   // Handle clear button - show when there's a value and showClearButton is true
@@ -48,12 +48,12 @@ const IBaseInputSearch = React.forwardRef<
     if (shouldShowClear) {
       return (
         <button
+          aria-label="Clear search"
+          className="outline-none focus:outline-none hover:opacity-70 transition-opacity cursor-pointer"
           type="button"
           onClick={() => onValueChange?.("")}
-          className="outline-none focus:outline-none hover:opacity-70 transition-opacity cursor-pointer"
-          aria-label="Clear search"
         >
-          <X size={16} className="text-default-400" />
+          <X className="text-default-400" size={16} />
         </button>
       );
     }
@@ -69,17 +69,17 @@ const IBaseInputSearch = React.forwardRef<
         label: "text-small text-default-600",
         mainWrapper: clsx(
           "cursor-not-allowed",
-          isDisabled ? "bg-default-200" : ""
+          isDisabled ? "bg-default-200" : "",
         ),
         input: "placeholder:text-default-400 italic text-sm",
       }}
-      variant="bordered"
-      size={size}
+      endContent={endContent}
       labelPlacement={labelPlacement}
       placeholder={placeholder ?? defaultPlaceholder}
+      size={size}
       startContent={rest.startContent ?? searchIcon}
-      endContent={endContent}
       value={value}
+      variant="bordered"
       onValueChange={onValueChange}
       {...rest}
       isDisabled={isDisabled}

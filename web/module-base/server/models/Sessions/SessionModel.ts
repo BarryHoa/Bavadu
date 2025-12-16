@@ -1,13 +1,16 @@
-import { randomBytes } from "crypto";
-import { and, eq, gt, lt } from "drizzle-orm";
-import { base_tb_sessions } from "../../schemas/base.session";
-import { base_tb_users, base_tb_users_login } from "../../schemas/base.user";
-import { BaseModel } from "../BaseModel";
 import type {
   CreateSessionParams,
   SessionData,
   ValidateSessionResult,
 } from "./SessionInterface";
+
+import { randomBytes } from "crypto";
+
+import { and, eq, gt, lt } from "drizzle-orm";
+
+import { base_tb_sessions } from "../../schemas/base.session";
+import { base_tb_users, base_tb_users_login } from "../../schemas/base.user";
+import { BaseModel } from "../BaseModel";
 
 class SessionModel extends BaseModel<typeof base_tb_sessions> {
   constructor() {
@@ -77,12 +80,15 @@ class SessionModel extends BaseModel<typeof base_tb_sessions> {
       })
       .from(this.table)
       .innerJoin(base_tb_users, eq(this.table.userId, base_tb_users.id))
-      .leftJoin(base_tb_users_login, eq(base_tb_users.id, base_tb_users_login.userId))
+      .leftJoin(
+        base_tb_users_login,
+        eq(base_tb_users.id, base_tb_users_login.userId),
+      )
       .where(
         and(
           eq(this.table.sessionToken, sessionToken),
-          gt(this.table.expiresAt, now)
-        )
+          gt(this.table.expiresAt, now),
+        ),
       )
       .limit(1);
 
@@ -158,11 +164,11 @@ class SessionModel extends BaseModel<typeof base_tb_sessions> {
    */
   async extendSession(
     sessionToken: string,
-    expiresIn?: number
+    expiresIn?: number,
   ): Promise<boolean> {
     const now = new Date();
     const newExpiresAt = new Date(
-      now.getTime() + (expiresIn || 7 * 24 * 60 * 60 * 1000)
+      now.getTime() + (expiresIn || 7 * 24 * 60 * 60 * 1000),
     );
 
     const result = await this.db

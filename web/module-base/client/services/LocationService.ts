@@ -30,7 +30,7 @@ class LocationService extends JsonRpcClientService {
   async getCountries() {
     return this.call<{ success: boolean; data: Country[]; message: string }>(
       "location.curd.getCountries",
-      {}
+      {},
     );
   }
 
@@ -39,7 +39,7 @@ class LocationService extends JsonRpcClientService {
     params?: {
       parentId?: string | null;
       level?: number;
-    }
+    },
   ) {
     return this.call<{
       success: boolean;
@@ -64,4 +64,5 @@ class LocationService extends JsonRpcClientService {
 }
 
 const locationService = new LocationService();
+
 export default locationService;

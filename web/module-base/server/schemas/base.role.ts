@@ -8,6 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdBaseSchema } from "./schema";
 
 // Base Roles - Core role system for entire application
@@ -36,7 +37,7 @@ export const base_tb_roles = mdBaseSchema.table(
   (table) => [
     index("roles_active_idx").on(table.isActive),
     index("roles_code_idx").on(table.code),
-  ]
+  ],
 );
 
 export type BaseTbRole = typeof base_tb_roles.$inferSelect;

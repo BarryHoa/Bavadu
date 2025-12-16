@@ -1,6 +1,7 @@
 import { compare } from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
+
 import { SESSION_CONFIG } from "../../config";
 import { setCsrfTokenCookie } from "../../middleware/csrf";
 import SessionModel from "../../models/Sessions/SessionModel";
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
           .from(base_tb_users_login)
           .where(eq(base_tb_users_login.username, username))
           .limit(1)
-          .then((result) => result[0] || null)
+          .then((result) => result[0] || null),
       );
       queries.push(
         db
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
           .from(base_tb_users_login)
           .where(eq(base_tb_users_login.email, username))
           .limit(1)
-          .then((result) => result[0] || null)
+          .then((result) => result[0] || null),
       );
       queries.push(
         db
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
           .from(base_tb_users_login)
           .where(eq(base_tb_users_login.phone, username))
           .limit(1)
-          .then((result) => result[0] || null)
+          .then((result) => result[0] || null),
       );
     }
 
@@ -85,6 +86,7 @@ export async function POST(request: NextRequest) {
         path: request.nextUrl.pathname,
         username,
       });
+
       return JSONResponse({
         error: "Invalid credentials",
         status: 401,
@@ -94,6 +96,7 @@ export async function POST(request: NextRequest) {
     // Verify password
 
     const passwordValid = await compare(password, userLogin.passwordHash);
+
     if (!passwordValid) {
       logAuthFailure("Password mismatch", {
         ip: getClientIp(request),
@@ -102,6 +105,7 @@ export async function POST(request: NextRequest) {
         username: userLogin.username || undefined,
         email: userLogin.email || undefined,
       });
+
       return JSONResponse({
         error: "Invalid credentials",
         status: 401,
@@ -150,6 +154,7 @@ export async function POST(request: NextRequest) {
 
     // Update last login info
     const now = new Date();
+
     await db
       .update(base_tb_users_login)
       .set({
@@ -200,6 +205,7 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     console.error("Login error:", error);
+
     return JSONResponse({
       error: "Login failed",
       message: error instanceof Error ? error.message : "Unknown error",

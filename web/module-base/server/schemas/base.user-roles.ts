@@ -7,6 +7,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { base_tb_roles } from "./base.role";
 import { base_tb_users } from "./base.user";
 import { mdBaseSchema } from "./schema";
@@ -40,9 +41,8 @@ export const base_tb_user_roles = mdBaseSchema.table(
     index("user_roles_user_idx").on(table.userId),
     index("user_roles_role_idx").on(table.roleId),
     index("user_roles_active_idx").on(table.isActive),
-  ]
+  ],
 );
 
 export type BaseTbUserRoles = typeof base_tb_user_roles.$inferSelect;
 export type NewBaseTbUserRoles = typeof base_tb_user_roles.$inferInsert;
-

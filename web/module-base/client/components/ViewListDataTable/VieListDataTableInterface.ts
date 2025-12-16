@@ -1,7 +1,9 @@
+import type { IBaseTableProps } from "../IBaseTable/IBaseTableInterface";
+
 import { LocaleDataType } from "@base/server";
 import { ButtonProps, LinkProps } from "@heroui/react";
 import { ReactNode } from "react";
-import type { IBaseTableProps } from "../IBaseTable/IBaseTableInterface";
+
 import { FilterOption } from "./components/FilterMenu";
 import { GroupOption } from "./components/GroupByMenu";
 

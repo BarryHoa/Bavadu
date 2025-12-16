@@ -49,4 +49,3 @@ export const consumableOptionalFields: OptionalFieldDefinition[] = [
     validation: { maxLength: 50 },
   },
 ];
-

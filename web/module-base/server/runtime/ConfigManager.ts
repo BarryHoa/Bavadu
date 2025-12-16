@@ -21,6 +21,7 @@ export class ConfigManager implements IConfigManager {
     if (!this.instance) {
       this.instance = new ConfigManager();
     }
+
     return this.instance;
   }
 
@@ -38,7 +39,7 @@ export class ConfigManager implements IConfigManager {
     // 1. Validate required env vars
     // 2. Parse and cache complex configs
     // 3. Set defaults
-    
+
     // For now, we just mark as loaded
     // Config values are read directly from process.env when needed
     this.loaded = true;
@@ -56,6 +57,7 @@ export class ConfigManager implements IConfigManager {
 
     // Read from process.env
     const value = process.env[key];
+
     return value as T | undefined;
   }
 
@@ -75,4 +77,3 @@ export class ConfigManager implements IConfigManager {
     this.loaded = false;
   }
 }
-

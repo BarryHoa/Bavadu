@@ -1,7 +1,10 @@
 import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 
-import { NewHrmTbComplianceReport, hrm_tb_compliance_reports } from "../../schemas";
+import {
+  NewHrmTbComplianceReport,
+  hrm_tb_compliance_reports,
+} from "../../schemas";
 
 export interface ComplianceReportRow {
   id: string;
@@ -40,7 +43,7 @@ export default class ComplianceReportModel extends BaseModel<
   }
 
   getComplianceReportById = async (
-    id: string
+    id: string,
   ): Promise<ComplianceReportRow | null> => {
     const result = await this.db
       .select()
@@ -49,6 +52,7 @@ export default class ComplianceReportModel extends BaseModel<
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -76,7 +80,7 @@ export default class ComplianceReportModel extends BaseModel<
   };
 
   createComplianceReport = async (
-    payload: ComplianceReportInput
+    payload: ComplianceReportInput,
   ): Promise<ComplianceReportRow> => {
     const now = new Date();
     const insertData: NewHrmTbComplianceReport = {
@@ -101,14 +105,16 @@ export default class ComplianceReportModel extends BaseModel<
     if (!created) throw new Error("Failed to create compliance report");
 
     const report = await this.getComplianceReportById(created.id);
+
     if (!report)
       throw new Error("Failed to load compliance report after creation");
+
     return report;
   };
 
   updateComplianceReport = async (
     id: string,
-    payload: Partial<ComplianceReportInput>
+    payload: Partial<ComplianceReportInput>,
   ): Promise<ComplianceReportRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -134,6 +140,7 @@ export default class ComplianceReportModel extends BaseModel<
       .update(this.table)
       .set(updateData)
       .where(eq(this.table.id, id));
+
     return this.getComplianceReportById(id);
   };
 
@@ -164,17 +171,20 @@ export default class ComplianceReportModel extends BaseModel<
     }
     if (payload.fileUrl !== undefined) {
       normalizedPayload.fileUrl =
-        payload.fileUrl === null || payload.fileUrl === "" ? null : String(payload.fileUrl);
+        payload.fileUrl === null || payload.fileUrl === ""
+          ? null
+          : String(payload.fileUrl);
     }
     if (payload.data !== undefined) {
       normalizedPayload.data = payload.data;
     }
     if (payload.notes !== undefined) {
       normalizedPayload.notes =
-        payload.notes === null || payload.notes === "" ? null : String(payload.notes);
+        payload.notes === null || payload.notes === ""
+          ? null
+          : String(payload.notes);
     }
 
     return this.updateComplianceReport(id, normalizedPayload);
   };
 }
-

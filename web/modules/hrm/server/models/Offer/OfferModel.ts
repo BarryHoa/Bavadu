@@ -60,6 +60,7 @@ export default class OfferModel extends BaseModel<typeof hrm_tb_offers> {
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
@@ -95,6 +96,7 @@ export default class OfferModel extends BaseModel<typeof hrm_tb_offers> {
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -159,13 +161,15 @@ export default class OfferModel extends BaseModel<typeof hrm_tb_offers> {
     if (!created) throw new Error("Failed to create offer");
 
     const offer = await this.getOfferById(created.id);
+
     if (!offer) throw new Error("Failed to load offer after creation");
+
     return offer;
   };
 
   updateOffer = async (
     id: string,
-    payload: Partial<OfferInput>
+    payload: Partial<OfferInput>,
   ): Promise<OfferRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -181,7 +185,8 @@ export default class OfferModel extends BaseModel<typeof hrm_tb_offers> {
       updateData.baseSalary = payload.baseSalary;
     if (payload.currency !== undefined)
       updateData.currency = payload.currency ?? null;
-    if (payload.startDate !== undefined) updateData.startDate = payload.startDate;
+    if (payload.startDate !== undefined)
+      updateData.startDate = payload.startDate;
     if (payload.employmentType !== undefined)
       updateData.employmentType = payload.employmentType ?? null;
     if (payload.benefits !== undefined)
@@ -192,7 +197,11 @@ export default class OfferModel extends BaseModel<typeof hrm_tb_offers> {
       updateData.expiryDate = payload.expiryDate ?? null;
     if (payload.notes !== undefined) updateData.notes = payload.notes ?? null;
 
-    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db
+      .update(this.table)
+      .set(updateData)
+      .where(eq(this.table.id, id));
+
     return this.getOfferById(id);
   };
 
@@ -208,7 +217,7 @@ export default class OfferModel extends BaseModel<typeof hrm_tb_offers> {
     }
     if (payload.positionTitle !== undefined) {
       normalizedPayload.positionTitle = this.normalizeLocaleInput(
-        payload.positionTitle
+        payload.positionTitle,
       ) ?? { en: "" };
     }
     if (payload.baseSalary !== undefined) {
@@ -216,7 +225,9 @@ export default class OfferModel extends BaseModel<typeof hrm_tb_offers> {
     }
     if (payload.currency !== undefined) {
       normalizedPayload.currency =
-        payload.currency === null || payload.currency === "" ? null : String(payload.currency);
+        payload.currency === null || payload.currency === ""
+          ? null
+          : String(payload.currency);
     }
     if (payload.startDate !== undefined) {
       normalizedPayload.startDate = String(payload.startDate);
@@ -232,7 +243,9 @@ export default class OfferModel extends BaseModel<typeof hrm_tb_offers> {
     }
     if (payload.terms !== undefined) {
       normalizedPayload.terms =
-        payload.terms === null || payload.terms === "" ? null : String(payload.terms);
+        payload.terms === null || payload.terms === ""
+          ? null
+          : String(payload.terms);
     }
     if (payload.status !== undefined) {
       normalizedPayload.status = String(payload.status);
@@ -245,10 +258,11 @@ export default class OfferModel extends BaseModel<typeof hrm_tb_offers> {
     }
     if (payload.notes !== undefined) {
       normalizedPayload.notes =
-        payload.notes === null || payload.notes === "" ? null : String(payload.notes);
+        payload.notes === null || payload.notes === ""
+          ? null
+          : String(payload.notes);
     }
 
     return this.updateOffer(id, normalizedPayload);
   };
 }
-

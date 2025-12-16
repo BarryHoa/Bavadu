@@ -29,6 +29,7 @@ export default function CustomerCompaniesListPage(): React.ReactNode {
         label: "Code",
         render: (value, row) => {
           if (!row?.id) return value;
+
           return (
             <LinkAs
               href={`/workspace/modules/b2b-sales/customers/companies/view/${row.id}`}
@@ -60,8 +61,8 @@ export default function CustomerCompaniesListPage(): React.ReactNode {
         render: (_, row) => (
           <Chip
             color={row.isActive ? "success" : "danger"}
-            variant="flat"
             size="sm"
+            variant="flat"
           >
             {row.isActive ? "Active" : "Inactive"}
           </Chip>
@@ -80,6 +81,7 @@ export default function CustomerCompaniesListPage(): React.ReactNode {
           if (!row?.id) return null;
           const viewLink = `/workspace/modules/b2b-sales/customers/companies/view/${row.id}`;
           const editLink = `/workspace/modules/b2b-sales/customers/companies/edit/${row.id}`;
+
           return (
             <ActionMenu
               actions={[
@@ -99,15 +101,12 @@ export default function CustomerCompaniesListPage(): React.ReactNode {
         },
       },
     ],
-    [tDataTable]
+    [tDataTable],
   );
 
   return (
     <div className="space-y-4">
       <ViewListDataTable<CustomerCompanyRow>
-        model="b2b-sales-customer-company"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -119,6 +118,9 @@ export default function CustomerCompaniesListPage(): React.ReactNode {
             },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="b2b-sales-customer-company"
       />
     </div>
   );

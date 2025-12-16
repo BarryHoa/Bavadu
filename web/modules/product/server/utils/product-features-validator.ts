@@ -146,7 +146,7 @@ export const FORBIDDEN_FEATURES_BY_TYPE: Record<
  */
 export function validateProductFeatures(
   type: ProductMasterType,
-  features: Partial<ProductMasterFeatures>
+  features: Partial<ProductMasterFeatures>,
 ): string[] {
   const errors: string[] = [];
   const required = REQUIRED_FEATURES_BY_TYPE[type] || [];
@@ -156,7 +156,7 @@ export function validateProductFeatures(
   for (const feature of required) {
     if (features[feature] !== true) {
       errors.push(
-        `Product type "${type}" requires feature "${feature}" to be true`
+        `Product type "${type}" requires feature "${feature}" to be true`,
       );
     }
   }
@@ -165,7 +165,7 @@ export function validateProductFeatures(
   for (const feature of forbidden) {
     if (features[feature] === true) {
       errors.push(
-        `Product type "${type}" cannot have feature "${feature}" set to true`
+        `Product type "${type}" cannot have feature "${feature}" set to true`,
       );
     }
   }
@@ -177,7 +177,7 @@ export function validateProductFeatures(
  * Get default features for a product type
  */
 export function getDefaultFeaturesForType(
-  type: ProductMasterType
+  type: ProductMasterType,
 ): Partial<ProductMasterFeatures> {
   return DEFAULT_FEATURES_BY_TYPE[type] || {};
 }
@@ -187,7 +187,7 @@ export function getDefaultFeaturesForType(
  */
 export function normalizeProductFeatures(
   type: ProductMasterType,
-  userFeatures?: Partial<ProductMasterFeatures>
+  userFeatures?: Partial<ProductMasterFeatures>,
 ): Partial<ProductMasterFeatures> {
   const defaults = getDefaultFeaturesForType(type);
 
@@ -199,12 +199,14 @@ export function normalizeProductFeatures(
 
   // Ensure forbidden features are false
   const forbidden = FORBIDDEN_FEATURES_BY_TYPE[type] || [];
+
   for (const feature of forbidden) {
     merged[feature] = false;
   }
 
   // Ensure required features are true
   const required = REQUIRED_FEATURES_BY_TYPE[type] || [];
+
   for (const feature of required) {
     merged[feature] = true;
   }

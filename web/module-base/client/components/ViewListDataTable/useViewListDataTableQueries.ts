@@ -3,10 +3,12 @@
 import { SortDescriptor } from "@heroui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
+
 import ViewListDataTableService from "../../services/ViewListDataTableService";
 import { IBaseTablePagination } from "../IBaseTable/IBaseTableInterface";
 import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface UseViewListDataTableQueriesOptions<T = any> {
   model: string;
   isDummyData?: boolean;
@@ -59,6 +61,7 @@ export function useViewListDataTableQueries<T = any>({
       });
 
       const dataResponse = response.data ?? [];
+
       if (response.total > 0) {
         return {
           data: dataResponse as T[],
@@ -73,6 +76,7 @@ export function useViewListDataTableQueries<T = any>({
           isDummyData: true,
         };
       }
+
       return { data: [], total: 0, isDummyData: false };
     },
     onSuccess: (result) => {
@@ -84,8 +88,7 @@ export function useViewListDataTableQueries<T = any>({
   useEffect(() => {
     if (!modelKey) return;
     fetchMutation.mutate(undefined); // undefined = dùng params từ state
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [modelKey]);
+  }, [modelKey, fetchMutation]);
 
   const refresh = () => {
     if (!modelKey) return;

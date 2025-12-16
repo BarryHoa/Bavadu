@@ -1,6 +1,6 @@
 import { createSignedCsrfToken } from "@base/server/utils/csrf-token";
 import { JSONResponse } from "@base/server/utils/JSONResponse";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 /**
  * GET /api/base/utils/get-csrf-token
@@ -22,9 +22,7 @@ export async function GET(request: NextRequest) {
 
     // Set the same signed token in cookie (not generating a new one)
     const isProduction = process.env.NODE_ENV === "production";
-    const maxAge = Math.floor(
-      (expiresAt - Date.now()) / 1000
-    ); // Convert to seconds
+    const maxAge = Math.floor((expiresAt - Date.now()) / 1000); // Convert to seconds
 
     response.cookies.set("csrf-token", signedToken, {
       httpOnly: false, // Allow client-side JavaScript to read it
@@ -37,6 +35,7 @@ export async function GET(request: NextRequest) {
     return response;
   } catch (error) {
     console.error("CSRF token generation error:", error);
+
     return JSONResponse({
       error: "Failed to generate CSRF token",
       message: error instanceof Error ? error.message : "Unknown error",
@@ -44,4 +43,3 @@ export async function GET(request: NextRequest) {
     });
   }
 }
-

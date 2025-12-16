@@ -19,9 +19,11 @@ export default function DepartmentViewPage(): React.ReactNode {
     queryKey: ["hrm-department", id],
     queryFn: async () => {
       const response = await departmentService.getById(id);
+
       if (!response.data) {
         throw new Error(response.message ?? "Department not found");
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -48,9 +50,11 @@ export default function DepartmentViewPage(): React.ReactNode {
             {t("backToList")}
           </Button>
           <Button
-            size="sm"
             color="primary"
-            onPress={() => router.push(`/workspace/modules/hrm/departments/edit/${id}`)}
+            size="sm"
+            onPress={() =>
+              router.push(`/workspace/modules/hrm/departments/edit/${id}`)
+            }
           >
             {t("edit")}
           </Button>
@@ -67,11 +71,17 @@ export default function DepartmentViewPage(): React.ReactNode {
             </div>
             <div>
               <div className="text-sm text-default-500">{t("name")}</div>
-              <div className="text-base">{getLocalizedText(department.name as any)}</div>
+              <div className="text-base">
+                {getLocalizedText(department.name as any)}
+              </div>
             </div>
             <div>
-              <div className="text-sm text-default-500">{t("parentDepartment")}</div>
-              <div className="text-base">{getLocalizedText(department.parent?.name as any) || "—"}</div>
+              <div className="text-sm text-default-500">
+                {t("parentDepartment")}
+              </div>
+              <div className="text-base">
+                {getLocalizedText(department.parent?.name as any) || "—"}
+              </div>
             </div>
             <div>
               <div className="text-sm text-default-500">{t("level")}</div>
@@ -83,4 +93,3 @@ export default function DepartmentViewPage(): React.ReactNode {
     </div>
   );
 }
-

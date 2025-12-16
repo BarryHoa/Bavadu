@@ -29,8 +29,8 @@ export default function Breadcrumb({ items }: { items?: BreadcrumbItem[] }) {
       {data.map((item) => (
         <HeroBreadcrumbItem
           key={item.href}
-          href={item.href}
           className={`${item.href ? "hover:red" : ""} ${data[data.length - 1] !== item ? "italic" : ""}`}
+          href={item.href}
           startContent={
             item.icon ? <item.icon className="mr-1" size={16} /> : undefined
           }

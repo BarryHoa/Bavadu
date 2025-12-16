@@ -11,4 +11,3 @@ export interface ProductPacking {
   createdBy?: User;
   updatedBy?: User;
 }
-

@@ -4,6 +4,7 @@ import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { courseService } from "@mdl/hrm/client/services/CourseService";
+
 import CourseForm, {
   type CourseFormValues,
 } from "../components/CourseForm/CourseForm";
@@ -22,9 +23,11 @@ export default function CourseCreatePageClient(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await courseService.create(payload);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToCreateCourse"));
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-courses"]],
@@ -48,11 +51,10 @@ export default function CourseCreatePageClient(): React.ReactNode {
 
   return (
     <CourseForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push("/workspace/modules/hrm/courses")}
-      submitError={submitError}
       isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() => router.push("/workspace/modules/hrm/courses")}
+      onSubmit={handleSubmit}
     />
   );
 }
-

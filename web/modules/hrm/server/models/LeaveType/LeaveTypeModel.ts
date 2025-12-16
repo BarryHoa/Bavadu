@@ -35,7 +35,9 @@ export interface LeaveTypeInput {
   isActive?: boolean;
 }
 
-export default class LeaveTypeModel extends BaseModel<typeof hrm_tb_leave_types> {
+export default class LeaveTypeModel extends BaseModel<
+  typeof hrm_tb_leave_types
+> {
   constructor() {
     super(hrm_tb_leave_types);
   }
@@ -44,6 +46,7 @@ export default class LeaveTypeModel extends BaseModel<typeof hrm_tb_leave_types>
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
@@ -55,6 +58,7 @@ export default class LeaveTypeModel extends BaseModel<typeof hrm_tb_leave_types>
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -75,7 +79,9 @@ export default class LeaveTypeModel extends BaseModel<typeof hrm_tb_leave_types>
     };
   };
 
-  getDataById = async (params: { id: string }): Promise<LeaveTypeRow | null> => {
+  getDataById = async (params: {
+    id: string;
+  }): Promise<LeaveTypeRow | null> => {
     return this.getLeaveTypeById(params.id);
   };
 
@@ -84,7 +90,11 @@ export default class LeaveTypeModel extends BaseModel<typeof hrm_tb_leave_types>
     const insertData: NewHrmTbLeaveType = {
       code: payload.code,
       name: payload.name,
-      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
+      description: payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null,
       accrualType: payload.accrualType,
       accrualRate: payload.accrualRate ?? null,
       maxAccrual: payload.maxAccrual ?? null,
@@ -105,13 +115,15 @@ export default class LeaveTypeModel extends BaseModel<typeof hrm_tb_leave_types>
     if (!created) throw new Error("Failed to create leave type");
 
     const leaveType = await this.getLeaveTypeById(created.id);
+
     if (!leaveType) throw new Error("Failed to load leave type after creation");
+
     return leaveType;
   };
 
   updateLeaveType = async (
     id: string,
-    payload: Partial<LeaveTypeInput>
+    payload: Partial<LeaveTypeInput>,
   ): Promise<LeaveTypeRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -120,7 +132,11 @@ export default class LeaveTypeModel extends BaseModel<typeof hrm_tb_leave_types>
     if (payload.code !== undefined) updateData.code = payload.code;
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.description !== undefined)
-      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
+      updateData.description = payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null;
     if (payload.accrualType !== undefined)
       updateData.accrualType = payload.accrualType;
     if (payload.accrualRate !== undefined)
@@ -140,6 +156,7 @@ export default class LeaveTypeModel extends BaseModel<typeof hrm_tb_leave_types>
       .update(this.table)
       .set(updateData)
       .where(eq(this.table.id, id));
+
     return this.getLeaveTypeById(id);
   };
 
@@ -147,12 +164,17 @@ export default class LeaveTypeModel extends BaseModel<typeof hrm_tb_leave_types>
     const { id, payload } = params;
     const normalizedPayload: Partial<LeaveTypeInput> = {};
 
-    if (payload.code !== undefined) normalizedPayload.code = String(payload.code);
+    if (payload.code !== undefined)
+      normalizedPayload.code = String(payload.code);
     if (payload.name !== undefined) {
-      normalizedPayload.name = this.normalizeLocaleInput(payload.name) ?? { en: "" };
+      normalizedPayload.name = this.normalizeLocaleInput(payload.name) ?? {
+        en: "",
+      };
     }
     if (payload.description !== undefined) {
-      normalizedPayload.description = this.normalizeLocaleInput(payload.description);
+      normalizedPayload.description = this.normalizeLocaleInput(
+        payload.description,
+      );
     }
     if (payload.accrualType !== undefined) {
       normalizedPayload.accrualType = String(payload.accrualType);
@@ -191,4 +213,3 @@ export default class LeaveTypeModel extends BaseModel<typeof hrm_tb_leave_types>
     return this.updateLeaveType(id, normalizedPayload);
   };
 }
-

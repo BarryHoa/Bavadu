@@ -1,11 +1,12 @@
 import { ProductMasterFeatures } from "../interface/Product";
 
 export const convertProductMasterFeaturesToArrayKey = (
-  features?: Record<ProductMasterFeatures, boolean>
+  features?: Record<ProductMasterFeatures, boolean>,
 ) => {
   if (!features) return [];
+
   return Object.keys(features).filter(
-    (key) => features[key as ProductMasterFeatures] === true
+    (key) => features[key as ProductMasterFeatures] === true,
   );
 };
 

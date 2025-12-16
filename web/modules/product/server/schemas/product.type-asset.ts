@@ -7,6 +7,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlProductSchema } from "./schema";
 import { product_tb_product_variants } from "./product.variant";
 
@@ -53,11 +54,12 @@ export const product_tb_product_type_assets = mdlProductSchema.table(
     // Composite index for assigned assets query
     index("type_asset_assigned_location_idx").on(
       table.assignedToUserId,
-      table.location
+      table.location,
     ),
-  ]
+  ],
 );
 
-export type ProductTbProductTypeAsset = typeof product_tb_product_type_assets.$inferSelect;
+export type ProductTbProductTypeAsset =
+  typeof product_tb_product_type_assets.$inferSelect;
 export type NewProductTbProductTypeAsset =
   typeof product_tb_product_type_assets.$inferInsert;

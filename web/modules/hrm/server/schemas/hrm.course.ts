@@ -9,6 +9,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 
 // Courses - Khóa học
@@ -35,9 +36,8 @@ export const hrm_tb_courses = mdlHrmSchema.table(
     index("courses_code_idx").on(table.code),
     index("courses_category_idx").on(table.category),
     index("courses_active_idx").on(table.isActive),
-  ]
+  ],
 );
 
 export type HrmTbCourse = typeof hrm_tb_courses.$inferSelect;
 export type NewHrmTbCourse = typeof hrm_tb_courses.$inferInsert;
-

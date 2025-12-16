@@ -31,6 +31,7 @@ export default function EmployeesListPage(): React.ReactNode {
         label: t("employeeCode"),
         render: (value, row) => {
           if (!row?.id) return value;
+
           return (
             <LinkAs href={`/workspace/modules/hrm/employees/view/${row.id}`}>
               {row.employeeCode}
@@ -55,7 +56,7 @@ export default function EmployeesListPage(): React.ReactNode {
         key: "employmentStatus",
         label: t("status"),
         render: (value) => (
-          <Chip size="sm" variant="flat" className="capitalize">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value || "active"}
           </Chip>
         ),
@@ -72,6 +73,7 @@ export default function EmployeesListPage(): React.ReactNode {
         render: (_, row) => {
           if (!row?.id) return null;
           const viewLink = `/workspace/modules/hrm/employees/view/${row.id}`;
+
           return (
             <ActionMenu
               actions={[
@@ -91,15 +93,12 @@ export default function EmployeesListPage(): React.ReactNode {
         },
       },
     ],
-    [t, tDataTable, getLocalizedText]
+    [t, tDataTable, getLocalizedText],
   );
 
   return (
     <div className="space-y-4">
       <ViewListDataTable<EmployeeRow>
-        model="employee"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -111,8 +110,10 @@ export default function EmployeesListPage(): React.ReactNode {
             },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="employee"
       />
     </div>
   );
 }
-

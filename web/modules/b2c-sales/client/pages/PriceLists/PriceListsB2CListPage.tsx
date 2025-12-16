@@ -31,6 +31,7 @@ export default function PriceListsB2CListPage(): React.ReactNode {
         label: "Code",
         render: (value, row) => {
           if (!row?.id) return value;
+
           return (
             <LinkAs
               href={`/workspace/modules/b2c-sales/price-lists/view/${row.id}`}
@@ -47,6 +48,7 @@ export default function PriceListsB2CListPage(): React.ReactNode {
           if (typeof value === "object" && value !== null) {
             return value.vi || value.en || "";
           }
+
           return value || "";
         },
       },
@@ -54,7 +56,7 @@ export default function PriceListsB2CListPage(): React.ReactNode {
         key: "type",
         label: "Type",
         render: (value) => (
-          <Chip size="sm" variant="flat" className="capitalize">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value || "standard"}
           </Chip>
         ),
@@ -63,7 +65,7 @@ export default function PriceListsB2CListPage(): React.ReactNode {
         key: "status",
         label: "Status",
         render: (value) => (
-          <Chip size="sm" variant="flat" className="capitalize">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value || "draft"}
           </Chip>
         ),
@@ -95,6 +97,7 @@ export default function PriceListsB2CListPage(): React.ReactNode {
           if (!row?.id) return null;
           const viewLink = `/workspace/modules/b2c-sales/price-lists/view/${row.id}`;
           const editLink = `/workspace/modules/b2c-sales/price-lists/edit/${row.id}`;
+
           return (
             <ActionMenu
               actions={[
@@ -114,15 +117,12 @@ export default function PriceListsB2CListPage(): React.ReactNode {
         },
       },
     ],
-    [tDataTable]
+    [tDataTable],
   );
 
   return (
     <div className="space-y-4">
       <ViewListDataTable<PriceListB2CRow>
-        model="b2c-sales-price-list"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -134,6 +134,9 @@ export default function PriceListsB2CListPage(): React.ReactNode {
             },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="b2c-sales-price-list"
       />
     </div>
   );

@@ -31,9 +31,14 @@ export default function PerformanceReviewsListPage(): React.ReactNode {
         label: t("labels.employee"),
         render: (value, row) => {
           if (!row?.id) return null;
+
           return (
-            <LinkAs href={`/workspace/modules/hrm/performance-reviews/view/${row.id}`}>
-              {getLocalizedText(row.employee?.fullName) || row.employee?.employeeCode || "—"}
+            <LinkAs
+              href={`/workspace/modules/hrm/performance-reviews/view/${row.id}`}
+            >
+              {getLocalizedText(row.employee?.fullName) ||
+                row.employee?.employeeCode ||
+                "—"}
             </LinkAs>
           );
         },
@@ -56,18 +61,21 @@ export default function PerformanceReviewsListPage(): React.ReactNode {
       {
         key: "reviewer",
         label: t("labels.reviewer"),
-        render: (value, row) => getLocalizedText(row.reviewer?.fullName) || row.reviewer?.employeeCode || "—",
+        render: (value, row) =>
+          getLocalizedText(row.reviewer?.fullName) ||
+          row.reviewer?.employeeCode ||
+          "—",
       },
       {
         key: "overallRating",
         label: t("labels.overallRating"),
-        render: (value) => value ? `${value}/5` : "—",
+        render: (value) => (value ? `${value}/5` : "—"),
       },
       {
         key: "status",
         label: t("labels.status"),
         render: (value) => (
-          <Chip size="sm" variant="flat" className="capitalize">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value || "draft"}
           </Chip>
         ),
@@ -79,6 +87,7 @@ export default function PerformanceReviewsListPage(): React.ReactNode {
         render: (_, row) => {
           if (!row?.id) return null;
           const viewLink = `/workspace/modules/hrm/performance-reviews/view/${row.id}`;
+
           return (
             <ActionMenu
               actions={[
@@ -93,15 +102,12 @@ export default function PerformanceReviewsListPage(): React.ReactNode {
         },
       },
     ],
-    [tDataTable, t, getLocalizedText]
+    [tDataTable, t, getLocalizedText],
   );
 
   return (
     <div className="space-y-4">
       <ViewListDataTable<PerformanceReviewRow>
-        model="hrm.performance-review"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -113,8 +119,10 @@ export default function PerformanceReviewsListPage(): React.ReactNode {
             },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="hrm.performance-review"
       />
     </div>
   );
 }
-

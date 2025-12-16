@@ -1,7 +1,3 @@
-import { desc, eq } from "drizzle-orm";
-
-import { BaseModel } from "@base/server/models/BaseModel";
-import { RuntimeContext } from "@base/server/runtime/RuntimeContext";
 import type {
   CreateCustomerCompanyInput,
   CreateCustomerIndividualInput,
@@ -14,6 +10,11 @@ import type {
   SaleB2cTbCustomer,
   SaleB2cTbCustomerCompany,
 } from "../../schemas";
+
+import { desc, eq } from "drizzle-orm";
+import { BaseModel } from "@base/server/models/BaseModel";
+import { RuntimeContext } from "@base/server/runtime/RuntimeContext";
+
 import {
   sale_b2c_tb_customer_companies,
   sale_b2c_tb_customers,
@@ -31,6 +32,7 @@ export default class CustomerModel {
   // Company methods
   listCompanies = async (): Promise<SaleB2cTbCustomerCompany[]> => {
     const db = await RuntimeContext.getDbConnect();
+
     return db
       .select()
       .from(sale_b2c_tb_customer_companies)
@@ -38,7 +40,7 @@ export default class CustomerModel {
   };
 
   getCompanyById = async (
-    id: string
+    id: string,
   ): Promise<SaleB2cTbCustomerCompany | null> => {
     const db = await RuntimeContext.getDbConnect();
     const [company] = await db
@@ -46,6 +48,7 @@ export default class CustomerModel {
       .from(sale_b2c_tb_customer_companies)
       .where(eq(sale_b2c_tb_customer_companies.id, id))
       .limit(1);
+
     return company ?? null;
   };
 
@@ -60,7 +63,7 @@ export default class CustomerModel {
         .toString()
         .padStart(
           2,
-          "0"
+          "0",
         )}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
     const payload: NewSaleB2cTbCustomerCompany = {
@@ -123,6 +126,7 @@ export default class CustomerModel {
   // Individual methods
   listIndividuals = async (): Promise<SaleB2cTbCustomer[]> => {
     const db = await RuntimeContext.getDbConnect();
+
     return db
       .select()
       .from(sale_b2c_tb_customers)
@@ -136,6 +140,7 @@ export default class CustomerModel {
       .from(sale_b2c_tb_customers)
       .where(eq(sale_b2c_tb_customers.id, id))
       .limit(1);
+
     return individual ?? null;
   };
 
@@ -150,7 +155,7 @@ export default class CustomerModel {
         .toString()
         .padStart(
           2,
-          "0"
+          "0",
         )}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
     const payload: NewSaleB2cTbCustomer = {

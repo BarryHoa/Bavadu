@@ -29,6 +29,7 @@ export default function PositionsListPage(): React.ReactNode {
         label: t("code"),
         render: (value, row) => {
           if (!row?.id) return value;
+
           return (
             <LinkAs href={`/workspace/modules/hrm/positions/view/${row.id}`}>
               {row.code}
@@ -44,13 +45,14 @@ export default function PositionsListPage(): React.ReactNode {
       {
         key: "department",
         label: t("department"),
-        render: (_, row) => getLocalizedText(row.department?.name as any) || "—",
+        render: (_, row) =>
+          getLocalizedText(row.department?.name as any) || "—",
       },
       {
         key: "isActive",
         label: t("status"),
         render: (value) => (
-          <Chip size="sm" variant="flat" className="capitalize">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value ? "active" : "inactive"}
           </Chip>
         ),
@@ -62,6 +64,7 @@ export default function PositionsListPage(): React.ReactNode {
         render: (_, row) => {
           if (!row?.id) return null;
           const viewLink = `/workspace/modules/hrm/positions/view/${row.id}`;
+
           return (
             <ActionMenu
               actions={[
@@ -81,15 +84,12 @@ export default function PositionsListPage(): React.ReactNode {
         },
       },
     ],
-    [t, tDataTable, getLocalizedText]
+    [t, tDataTable, getLocalizedText],
   );
 
   return (
     <div className="space-y-4">
       <ViewListDataTable<PositionRow>
-        model="position"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -101,8 +101,10 @@ export default function PositionsListPage(): React.ReactNode {
             },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="position"
       />
     </div>
   );
 }
-

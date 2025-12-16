@@ -9,7 +9,8 @@ import { useTranslations } from "next-intl";
 import roleService from "@base/client/services/RoleService";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
-const ROLE_QUERY_KEY = (id: string) => ["settings", "roles", "get", id] as const;
+const ROLE_QUERY_KEY = (id: string) =>
+  ["settings", "roles", "get", id] as const;
 
 export default function RoleViewPage() {
   const t = useTranslations("settings.roles");
@@ -23,6 +24,7 @@ export default function RoleViewPage() {
     queryKey: ROLE_QUERY_KEY(id),
     queryFn: async () => {
       const response = await roleService.getRole(id);
+
       return response.data;
     },
     enabled: !!id,
@@ -98,9 +100,7 @@ export default function RoleViewPage() {
                 {t("form.type")}
               </label>
               <p className="mt-1">
-                {role.isSystem
-                  ? t("form.systemRole")
-                  : t("form.customRole")}
+                {role.isSystem ? t("form.systemRole") : t("form.customRole")}
               </p>
             </div>
             <div>
@@ -139,4 +139,3 @@ export default function RoleViewPage() {
     </div>
   );
 }
-

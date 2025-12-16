@@ -10,6 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdBaseSchema } from "./schema";
 
 // Tax Rates
@@ -36,7 +37,7 @@ export const base_tb_tax_rates = mdBaseSchema.table(
     index("tax_rates_active_idx").on(table.isActive),
     index("tax_rates_type_idx").on(table.type),
     index("tax_rates_type_active_idx").on(table.type, table.isActive),
-  ]
+  ],
 );
 
 export type BaseTbTaxRate = typeof base_tb_tax_rates.$inferSelect;

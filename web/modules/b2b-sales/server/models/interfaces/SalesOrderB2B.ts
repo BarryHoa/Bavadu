@@ -1,6 +1,5 @@
-import type { LocaleDataType } from "@base/server/interfaces/Locale";
 import type { User } from "@base/server/interfaces/User";
-import type { SaleB2bTbOrder, SaleB2bTbOrderLine } from "../../schemas";
+import type { SaleB2bTbOrder } from "../../schemas";
 
 export type SalesOrderB2BStatus = "draft" | "sent" | "delivered" | "cancelled";
 
@@ -72,4 +71,3 @@ export interface DeliverSalesOrderB2BInput {
   note?: string;
   userId?: string;
 }
-

@@ -48,4 +48,3 @@ export const finishedGoodOptionalFields: OptionalFieldDefinition[] = [
     isRequired: false,
   },
 ];
-

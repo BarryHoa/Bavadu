@@ -1,16 +1,17 @@
-import { eq } from "drizzle-orm";
+import type StockModel from "@mdl/stock/server/models/Stock/StockModel";
+import type {
+  NewSaleB2cTbDelivery,
+  NewSaleB2cTbDeliveryLine,
+} from "../../schemas";
 
+import { eq } from "drizzle-orm";
 import { RuntimeContext } from "@base/server/runtime/RuntimeContext";
 import { BaseModel } from "@base/server/models/BaseModel";
 import {
   sale_b2b_tb_orders,
   sale_b2b_tb_order_lines,
 } from "@mdl/b2b-sales/server/schemas";
-import type StockModel from "@mdl/stock/server/models/Stock/StockModel";
-import type {
-  NewSaleB2cTbDelivery,
-  NewSaleB2cTbDeliveryLine,
-} from "../../schemas";
+
 import {
   sale_b2c_tb_orders,
   sale_b2c_tb_deliveries,
@@ -40,7 +41,8 @@ export default class DeliveryModel extends BaseModel<
   }
 
   create = async (input: CreateDeliveryInput) => {
-    const stockModel = await RuntimeContext.getModelInstanceBy<StockModel>("stock");
+    const stockModel =
+      await RuntimeContext.getModelInstanceBy<StockModel>("stock");
 
     if (!stockModel) {
       throw new Error("Stock model is not registered");
@@ -49,12 +51,14 @@ export default class DeliveryModel extends BaseModel<
     // Get order to validate
     let order: any;
     let orderCode: string;
+
     if (input.orderType === "B2B") {
       const [b2bOrder] = await this.db
         .select()
         .from(sale_b2b_tb_orders)
         .where(eq(sale_b2b_tb_orders.id, input.orderId))
         .limit(1);
+
       if (!b2bOrder) {
         throw new Error("Order not found");
       }
@@ -66,6 +70,7 @@ export default class DeliveryModel extends BaseModel<
         .from(sale_b2c_tb_orders)
         .where(eq(sale_b2c_tb_orders.id, input.orderId))
         .limit(1);
+
       if (!b2cOrder) {
         throw new Error("Order not found");
       }
@@ -84,6 +89,7 @@ export default class DeliveryModel extends BaseModel<
       .where(eq(lineTable.orderId, input.orderId));
 
     const linesById = new Map();
+
     for (const line of orderLines) {
       linesById.set(line.id, line);
     }
@@ -112,11 +118,13 @@ export default class DeliveryModel extends BaseModel<
       // Process delivery lines and create stock moves
       for (const deliveryLine of input.lines) {
         const orderLine = linesById.get(deliveryLine.lineId);
+
         if (!orderLine) {
           throw new Error(`Order line ${deliveryLine.lineId} not found`);
         }
 
         const quantity = Number(deliveryLine.quantity ?? 0);
+
         if (quantity <= 0) continue;
 
         const alreadyDelivered = Number(orderLine.quantityDelivered ?? 0);
@@ -125,7 +133,7 @@ export default class DeliveryModel extends BaseModel<
 
         if (nextDelivered - orderedQty > 0.0001) {
           throw new Error(
-            `Cannot deliver more than ordered for product ${orderLine.productId}`
+            `Cannot deliver more than ordered for product ${orderLine.productId}`,
           );
         }
 
@@ -137,9 +145,7 @@ export default class DeliveryModel extends BaseModel<
           quantity: quantity.toString(),
         };
 
-        await tx
-          .insert(sale_b2c_tb_delivery_lines)
-          .values(deliveryLinePayload);
+        await tx.insert(sale_b2c_tb_delivery_lines).values(deliveryLinePayload);
 
         // Update order line delivered quantity
         await tx

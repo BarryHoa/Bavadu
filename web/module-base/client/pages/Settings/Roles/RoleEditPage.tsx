@@ -1,12 +1,13 @@
 "use client";
 
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
+
 import {
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseSelect,
   SelectItem,
 } from "@base/client/components";
-import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import roleService from "@base/client/services/RoleService";
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
@@ -36,7 +37,7 @@ export default function RoleEditPage() {
   });
   const [description, setDescription] = useState("");
   const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>(
-    []
+    [],
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{
@@ -48,6 +49,7 @@ export default function RoleEditPage() {
     queryKey: ROLE_QUERY_KEY(id),
     queryFn: async () => {
       const response = await roleService.getRole(id);
+
       return response.data;
     },
     enabled: !!id,
@@ -57,6 +59,7 @@ export default function RoleEditPage() {
     queryKey: PERMISSIONS_QUERY_KEY,
     queryFn: async () => {
       const response = await roleService.getPermissionList();
+
       return response.data;
     },
   });
@@ -64,11 +67,12 @@ export default function RoleEditPage() {
   useEffect(() => {
     if (roleQuery.data) {
       const role = roleQuery.data;
+
       setCode(role.code);
       setName(role.name);
       setDescription(role.description || "");
       setSelectedPermissionIds(
-        role.permissions ? role.permissions.map((p) => p.id) : []
+        role.permissions ? role.permissions.map((p) => p.id) : [],
       );
     }
   }, [roleQuery.data]);
@@ -92,6 +96,7 @@ export default function RoleEditPage() {
     onError: (error) => {
       const errorMessage =
         error instanceof Error ? error.message : t("toast.updateError");
+
       setToast({ message: errorMessage, type: "error" });
     },
   });
@@ -110,6 +115,7 @@ export default function RoleEditPage() {
     }
 
     setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   }, [code, name, errorsT, t]);
 
@@ -183,8 +189,8 @@ export default function RoleEditPage() {
             </Button>
             <Button
               color="primary"
-              onPress={handleSubmit}
               isLoading={updateRoleMutation.isPending}
+              onPress={handleSubmit}
             >
               {actionsT("save")}
             </Button>
@@ -193,41 +199,41 @@ export default function RoleEditPage() {
         <CardBody className="flex flex-col gap-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <IBaseInput
+              isRequired
+              description={t("form.codeDescription")}
+              errorMessage={errors.code}
+              isInvalid={!!errors.code}
               label={t("form.code")}
               value={code}
               onValueChange={setCode}
-              errorMessage={errors.code}
-              isInvalid={!!errors.code}
-              isRequired
-              description={t("form.codeDescription")}
             />
             <IBaseInputMultipleLang
+              isRequired
+              errorMessage={errors.name}
+              isInvalid={!!errors.name}
               label={t("form.name")}
               value={name}
               onValueChange={setName as (value: LocalizeText) => void}
-              errorMessage={errors.name}
-              isInvalid={!!errors.name}
-              isRequired
             />
             <div className="md:col-span-2">
               <IBaseInput
+                description={t("form.descriptionDescription")}
                 label={t("form.description")}
                 value={description}
                 onValueChange={setDescription}
-                description={t("form.descriptionDescription")}
               />
             </div>
             <div className="md:col-span-2">
               <IBaseSelect
+                description={t("form.permissionsDescription")}
+                isLoading={permissionsQuery.isLoading}
                 label={t("form.defaultPermissions")}
-                selectionMode="multiple"
+                placeholder={t("form.selectPermissions")}
                 selectedKeys={selectedPermissionIds}
+                selectionMode="multiple"
                 onSelectionChange={(keys) => {
                   setSelectedPermissionIds(Array.from(keys) as string[]);
                 }}
-                description={t("form.permissionsDescription")}
-                placeholder={t("form.selectPermissions")}
-                isLoading={permissionsQuery.isLoading}
               >
                 {permissions.map((permission) => (
                   <SelectItem key={permission.id} textValue={permission.key}>

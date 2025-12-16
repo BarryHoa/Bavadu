@@ -1,6 +1,6 @@
-import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
-
 import type { ProductCategoryRow } from "../interface/ProductCategory";
+
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export type ProductCategoryPayload = {
   code: string;
@@ -19,6 +19,7 @@ class ProductCategoryService extends JsonRpcClientService {
     }>("product-category.list.getData", {});
 
     const data = response.data;
+
     return Array.isArray(data) ? data : [];
   }
 
@@ -32,7 +33,7 @@ class ProductCategoryService extends JsonRpcClientService {
   }
 
   async createCategory(
-    payload: ProductCategoryPayload
+    payload: ProductCategoryPayload,
   ): Promise<ProductCategoryRow> {
     const response = await this.call<{
       success: boolean;
@@ -44,7 +45,7 @@ class ProductCategoryService extends JsonRpcClientService {
 
   async updateCategory(
     id: string,
-    payload: ProductCategoryPayload
+    payload: ProductCategoryPayload,
   ): Promise<ProductCategoryRow> {
     const response = await this.call<{
       success: boolean;

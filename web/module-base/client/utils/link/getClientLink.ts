@@ -15,6 +15,7 @@ export const getClientLink = (props: {
     : "";
   const fullPath = `/workspace/modules/${mdl}/${path}${paramsString}`;
   const fullAsPath = `/workspace/modules/${mdl}/${as}${paramsString}`;
+
   return {
     path: fullPath,
     as: as ? fullAsPath : fullPath,

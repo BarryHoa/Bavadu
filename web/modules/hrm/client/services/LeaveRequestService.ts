@@ -1,9 +1,10 @@
-import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 import type {
   LeaveRequestDto,
   CreateLeaveRequestPayload,
   UpdateLeaveRequestPayload,
 } from "../interface/LeaveRequest";
+
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export default class LeaveRequestService extends JsonRpcClientService {
   list() {
@@ -37,4 +38,3 @@ export default class LeaveRequestService extends JsonRpcClientService {
 }
 
 export const leaveRequestService = new LeaveRequestService();
-

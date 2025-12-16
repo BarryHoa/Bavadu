@@ -8,6 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { hrm_tb_employees } from "./hrm.employee";
 import { mdlHrmSchema } from "./schema";
 
@@ -40,7 +41,7 @@ export const hrm_tb_documents = mdlHrmSchema.table(
     createdBy: varchar("created_by", { length: 36 }),
     updatedBy: varchar("updated_by", { length: 36 }),
   },
-  (table) => []
+  (table) => [],
 );
 
 export type HrmTbDocument = typeof hrm_tb_documents.$inferSelect;

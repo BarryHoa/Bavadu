@@ -12,6 +12,7 @@ import { parseDate } from "@internationalized/date";
 import { useTranslations } from "next-intl";
 import { useCallback, useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+
 import {
   createLeaveRequestValidation,
   type LeaveRequestFormValues,
@@ -63,6 +64,7 @@ export default function LeaveRequestForm({
       const end = new Date(endDate);
       const diffTime = Math.abs(end.getTime() - start.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
       if (diffDays > 0) {
         setValue("days", diffDays);
       }
@@ -70,7 +72,7 @@ export default function LeaveRequestForm({
   }, [startDate, endDate, setValue]);
 
   const onSubmitForm: SubmitHandler<LeaveRequestFormValues> = async (
-    values
+    values,
   ) => {
     await onSubmit(values);
   };
@@ -91,10 +93,10 @@ export default function LeaveRequestForm({
         )}
         <Button
           color="primary"
-          type="submit"
-          size="sm"
-          isLoading={isSubmitting}
           disabled={isSubmitting}
+          isLoading={isSubmitting}
+          size="sm"
+          type="submit"
         >
           {tCommon("actions.save")}
         </Button>
@@ -105,122 +107,134 @@ export default function LeaveRequestForm({
           <h2 className="text-base font-semibold mb-2">{t("generalInfo")}</h2>
           <div className="grid gap-2 md:grid-cols-2">
             <Controller
-              name="employeeId"
               control={control}
+              name="employeeId"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  isRequired
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.employee")}
                   model="hrm.employee.dropdown"
                   selectedKey={field.value}
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="leaveTypeId"
               control={control}
+              name="leaveTypeId"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  isRequired
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.leaveType")}
                   model="hrm.leave-type.dropdown"
                   selectedKey={field.value}
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
+              control={control}
               name="startDate"
-              control={control}
               render={({ field, fieldState }) => (
                 <DatePicker
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.startDate")}
-                  value={field.value ? (typeof field.value === "string" ? parseDate(field.value) : field.value) : null}
+                  value={
+                    field.value
+                      ? typeof field.value === "string"
+                        ? parseDate(field.value)
+                        : field.value
+                      : null
+                  }
                   onChange={(val) => {
                     field.onChange(val ? val.toString() : null);
                     calculateDays();
                   }}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  isRequired
                 />
               )}
             />
             <Controller
-              name="endDate"
               control={control}
+              name="endDate"
               render={({ field, fieldState }) => (
                 <DatePicker
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.endDate")}
-                  value={field.value ? (typeof field.value === "string" ? parseDate(field.value) : field.value) : null}
+                  value={
+                    field.value
+                      ? typeof field.value === "string"
+                        ? parseDate(field.value)
+                        : field.value
+                      : null
+                  }
                   onChange={(val) => {
                     field.onChange(val ? val.toString() : null);
                     calculateDays();
                   }}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  isRequired
                 />
               )}
             />
             <Controller
-              name="days"
               control={control}
+              name="days"
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   {...field}
+                  readOnly
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.days")}
+                  min={1}
                   size="sm"
                   value={field.value}
                   onValueChange={(val) => field.onChange(val ?? 1)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  min={1}
-                  readOnly
                 />
               )}
             />
             <Controller
-              name="status"
               control={control}
+              name="status"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.status")}
                   model="base-leave-request-status"
                   selectedKey={field.value}
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="reason"
               control={control}
+              name="reason"
               render={({ field, fieldState }) => (
                 <div className="md:col-span-2">
                   <Textarea
                     {...field}
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
                     label={t("labels.reason")}
                     size="sm"
                     value={field.value ?? ""}
                     onValueChange={field.onChange}
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
                   />
                 </div>
               )}

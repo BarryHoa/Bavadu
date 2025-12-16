@@ -8,6 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlProductSchema } from "./schema";
 import { product_tb_product_variants } from "./product.variant";
 
@@ -32,8 +33,10 @@ export const product_tb_product_packings = mdlProductSchema.table(
   (table) => [
     index("packings_variant_idx").on(table.productVariantId),
     index("packings_active_idx").on(table.isActive),
-  ]
+  ],
 );
 
-export type ProductTbProductPacking = typeof product_tb_product_packings.$inferSelect;
-export type NewProductTbProductPacking = typeof product_tb_product_packings.$inferInsert;
+export type ProductTbProductPacking =
+  typeof product_tb_product_packings.$inferSelect;
+export type NewProductTbProductPacking =
+  typeof product_tb_product_packings.$inferInsert;

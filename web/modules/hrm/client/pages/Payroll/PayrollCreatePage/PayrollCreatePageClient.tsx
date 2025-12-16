@@ -4,6 +4,7 @@ import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { payrollService } from "@mdl/hrm/client/services/PayrollService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+
 import PayrollForm, {
   type PayrollFormValues,
 } from "../components/PayrollForm/PayrollForm";
@@ -22,9 +23,11 @@ export default function PayrollCreatePageClient(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await payrollService.create(payload);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToCreatePayroll"));
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-payroll"]],
@@ -72,10 +75,10 @@ export default function PayrollCreatePageClient(): React.ReactNode {
 
   return (
     <PayrollForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push("/workspace/modules/hrm/payroll")}
-      submitError={submitError}
       isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() => router.push("/workspace/modules/hrm/payroll")}
+      onSubmit={handleSubmit}
     />
   );
 }

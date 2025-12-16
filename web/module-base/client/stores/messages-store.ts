@@ -39,7 +39,7 @@ export const useMessagesStore = create<MessagesState>((set, get) => ({
         [moduleName]: messages,
       },
       loadingModules: new Set(
-        Array.from(state.loadingModules).filter((m) => m !== moduleName)
+        Array.from(state.loadingModules).filter((m) => m !== moduleName),
       ),
     }));
   },
@@ -47,11 +47,11 @@ export const useMessagesStore = create<MessagesState>((set, get) => ({
   getCombinedMessages: () => {
     const state = get();
     const { common, ...moduleMessages } = state.messages;
-    
+
     // Combine all messages: common first, then modules (later modules override earlier ones)
     return Object.values(moduleMessages).reduce(
       (acc, moduleMsg) => ({ ...acc, ...moduleMsg }),
-      common
+      common,
     );
   },
 
@@ -62,13 +62,14 @@ export const useMessagesStore = create<MessagesState>((set, get) => ({
   setLoadingModule: (moduleName: string, loading: boolean) => {
     set((state) => {
       const newLoadingModules = new Set(state.loadingModules);
+
       if (loading) {
         newLoadingModules.add(moduleName);
       } else {
         newLoadingModules.delete(moduleName);
       }
+
       return { loadingModules: newLoadingModules };
     });
   },
 }));
-

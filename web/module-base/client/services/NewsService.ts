@@ -36,7 +36,7 @@ class NewsService extends JsonRpcClientService {
    */
   async getList(
     limit: number = 12,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<NewsListResponse> {
     return this.call<NewsListResponse>("news.curd.getList", {
       limit,
@@ -46,4 +46,5 @@ class NewsService extends JsonRpcClientService {
 }
 
 const newsService = new NewsService();
+
 export default newsService;

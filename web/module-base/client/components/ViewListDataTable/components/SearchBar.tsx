@@ -14,10 +14,10 @@ export default function SearchBar({
 }: SearchBarProps) {
   return (
     <IBaseInputSearch
+      className="min-w-[180px]"
       placeholder={placeholder}
       value={value}
       onValueChange={onChange}
-      className="min-w-[180px]"
     />
   );
 }

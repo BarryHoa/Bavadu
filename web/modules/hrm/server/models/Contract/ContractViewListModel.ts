@@ -1,13 +1,14 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
@@ -48,7 +49,10 @@ class ContractViewListModel extends BaseViewListModel<
       }
     >([
       ["id", { column: hrm_tb_contracts.id, sort: true }],
-      ["contractNumber", { column: hrm_tb_contracts.contractNumber, sort: true }],
+      [
+        "contractNumber",
+        { column: hrm_tb_contracts.contractNumber, sort: true },
+      ],
       ["employeeId", { column: hrm_tb_contracts.employeeId, sort: true }],
       ["contractType", { column: hrm_tb_contracts.contractType, sort: true }],
       ["startDate", { column: hrm_tb_contracts.startDate, sort: true }],
@@ -75,7 +79,6 @@ class ContractViewListModel extends BaseViewListModel<
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): ContractRow => ({
     id: row.id,
     contractNumber: row.contractNumber,
@@ -98,13 +101,12 @@ class ContractViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<ContractRow>> => {
     return this.buildQueryDataList(params, (query) =>
-      query.leftJoin(employee, eq(this.table.employeeId, employee.id))
+      query.leftJoin(employee, eq(this.table.employeeId, employee.id)),
     );
   };
 }
 
 export default ContractViewListModel;
-

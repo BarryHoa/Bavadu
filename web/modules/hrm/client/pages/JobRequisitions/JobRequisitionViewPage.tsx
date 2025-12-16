@@ -27,9 +27,13 @@ export default function JobRequisitionViewPage(): React.ReactNode {
     queryKey: ["hrm-job-requisitions", id],
     queryFn: async () => {
       const response = await jobRequisitionService.getById(id);
+
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToLoadJobRequisition"));
+        throw new Error(
+          response.message ?? t("errors.failedToLoadJobRequisition"),
+        );
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -156,4 +160,3 @@ export default function JobRequisitionViewPage(): React.ReactNode {
     </div>
   );
 }
-

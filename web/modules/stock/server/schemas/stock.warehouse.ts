@@ -10,14 +10,15 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { mdlStockSchema } from "./schema";
-
 import { base_tb_users } from "@base/server/schemas/base.user";
+
 import {
   WarehouseAddress,
   warehouseStatuses,
   warehouseValuationMethods,
 } from "../../common/constants";
+
+import { mdlStockSchema } from "./schema";
 
 export const stock_tb_stock_warehouses = mdlStockSchema.table(
   "warehouses",
@@ -63,26 +64,25 @@ export const stock_tb_stock_warehouses = mdlStockSchema.table(
       "warehouses_status_check",
       sql`${table.status} IN (${sql.join(
         warehouseStatuses.map((status) => sql.raw(`'${status}'`)),
-        sql`, `
-      )})`
+        sql`, `,
+      )})`,
     ),
     check(
       "warehouses_valuation_check",
       sql`${table.valuationMethod} IN (${sql.join(
         warehouseValuationMethods.map((method) => sql.raw(`'${method}'`)),
-        sql`, `
-      )})`
+        sql`, `,
+      )})`,
     ),
-    check(
-      "warehouses_min_stock_check",
-      sql`${table.minStock}::numeric >= 0`
-    ),
+    check("warehouses_min_stock_check", sql`${table.minStock}::numeric >= 0`),
     check(
       "warehouses_min_max_check",
-      sql`(${table.maxStock} IS NULL) OR (${table.maxStock}::numeric >= ${table.minStock}::numeric)`
+      sql`(${table.maxStock} IS NULL) OR (${table.maxStock}::numeric >= ${table.minStock}::numeric)`,
     ),
-  ]
+  ],
 );
 
-export type StockTbStockWarehouse = typeof stock_tb_stock_warehouses.$inferSelect;
-export type NewStockTbStockWarehouse = typeof stock_tb_stock_warehouses.$inferInsert;
+export type StockTbStockWarehouse =
+  typeof stock_tb_stock_warehouses.$inferSelect;
+export type NewStockTbStockWarehouse =
+  typeof stock_tb_stock_warehouses.$inferInsert;

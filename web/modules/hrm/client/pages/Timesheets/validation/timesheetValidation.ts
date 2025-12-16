@@ -1,5 +1,4 @@
 import {
-  custom,
   minLength,
   minValue,
   number,
@@ -18,22 +17,19 @@ export function createTimesheetValidation(t: TranslateFn) {
     employeeId: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.employeeId.required"))
+      minLength(1, t("validation.employeeId.required")),
     ),
     rosterId: optional(pipe(string(), trim())),
     workDate: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.workDate.required"))
+      minLength(1, t("validation.workDate.required")),
     ),
     shiftId: optional(pipe(string(), trim())),
     checkInTime: optional(pipe(string(), trim())),
     checkOutTime: optional(pipe(string(), trim())),
     breakDuration: optional(
-      pipe(
-        number(),
-        minValue(0, t("validation.breakDuration.invalid"))
-      )
+      pipe(number(), minValue(0, t("validation.breakDuration.invalid"))),
     ),
     status: optional(pipe(string(), trim())),
     checkInMethod: optional(pipe(string(), trim())),
@@ -51,4 +47,3 @@ export function createTimesheetValidation(t: TranslateFn) {
 export type TimesheetFormValues = InferOutput<
   ReturnType<typeof createTimesheetValidation>["timesheetFormSchema"]
 >;
-

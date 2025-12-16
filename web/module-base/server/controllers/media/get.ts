@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ type: string; filename: string }> }
+  context: { params: Promise<{ type: string; filename: string }> },
 ) {
   try {
     const params = await context.params;
@@ -13,14 +13,14 @@ export async function GET(
     if (type !== "image" && type !== "file") {
       return NextResponse.json(
         { error: "Invalid type. Must be 'image' or 'file'" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const mediaService = getMediaServiceModel();
     const fileData = await mediaService.getFile(
       type as "image" | "file",
-      filename
+      filename,
     );
 
     if (!fileData) {
@@ -45,12 +45,13 @@ export async function GET(
     return new NextResponse(fileData.buffer as any, { headers });
   } catch (error) {
     console.error("Get file error:", error);
+
     return NextResponse.json(
       {
         error: "Failed to get file",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

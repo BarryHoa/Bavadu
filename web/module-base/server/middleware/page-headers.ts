@@ -10,7 +10,7 @@ import { NextRequest } from "next/server";
 export function addPageHeaders(
   request: NextRequest,
   nextHeaders: Headers,
-  pathname: string
+  pathname: string,
 ): void {
   // Get locale from cookie and set it to x-locale header
   const cookie = request.headers.get("cookie");
@@ -21,8 +21,10 @@ export function addPageHeaders(
       .split(";")
       .map((c) => c.trim())
       .find((c) => c.startsWith("NEXT_LOCALE="));
+
     if (localeMatch) {
       const localeCookie = localeMatch.split("=")[1];
+
       if (localeCookie) {
         locale = localeCookie;
       }
@@ -33,15 +35,18 @@ export function addPageHeaders(
   // Handle workspace module header
   if (pathname.startsWith("/workspace/modules/")) {
     const match = pathname.match(/^\/workspace\/modules\/([^/]+)/);
+
     if (match?.[1]) {
       nextHeaders.set("x-workspace-module", match[1]);
     }
   }
 
   // Optionally inject session token for pages (if authenticated)
-  const sessionToken = request.cookies.get(AUTH_CONFIG.sessionCookieName)?.value;
+  const sessionToken = request.cookies.get(
+    AUTH_CONFIG.sessionCookieName,
+  )?.value;
+
   if (sessionToken) {
     nextHeaders.set("x-session-token", sessionToken);
   }
 }
-

@@ -4,6 +4,7 @@ import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { certificateService } from "@mdl/hrm/client/services/CertificateService";
+
 import CertificateForm, {
   type CertificateFormValues,
 } from "../components/CertificateForm/CertificateForm";
@@ -22,9 +23,13 @@ export default function CertificateCreatePageClient(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await certificateService.create(payload);
+
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToCreateCertificate"));
+        throw new Error(
+          response.message ?? t("errors.failedToCreateCertificate"),
+        );
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-certificates"]],
@@ -48,11 +53,10 @@ export default function CertificateCreatePageClient(): React.ReactNode {
 
   return (
     <CertificateForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push("/workspace/modules/hrm/certificates")}
-      submitError={submitError}
       isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() => router.push("/workspace/modules/hrm/certificates")}
+      onSubmit={handleSubmit}
     />
   );
 }
-

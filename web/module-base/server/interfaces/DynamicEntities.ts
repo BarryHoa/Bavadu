@@ -41,11 +41,11 @@ export interface DynamicEntity<V = string> {
     | DynamicEntityValidationString
   )[];
 
-  useIn?:{
+  useIn?: {
     report?: boolean;
     list?: boolean;
     filter?: boolean;
-  }
+  };
   isActive: boolean;
   order: number;
   createdAt?: number; // unix timestamp (ms)
@@ -53,4 +53,3 @@ export interface DynamicEntity<V = string> {
   createdBy?: User;
   updatedBy?: User;
 }
-

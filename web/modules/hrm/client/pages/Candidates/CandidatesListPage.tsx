@@ -32,6 +32,7 @@ export default function CandidatesListPage(): React.ReactNode {
         label: t("labels.fullName"),
         render: (value, row) => {
           if (!row?.id) return getLocalizedText(value);
+
           return (
             <LinkAs href={`/workspace/modules/hrm/candidates/view/${row.id}`}>
               {getLocalizedText(value)}
@@ -56,7 +57,7 @@ export default function CandidatesListPage(): React.ReactNode {
         key: "status",
         label: t("labels.status"),
         render: (value) => (
-          <Chip size="sm" variant="flat" className="capitalize">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value || "applied"}
           </Chip>
         ),
@@ -69,7 +70,7 @@ export default function CandidatesListPage(): React.ReactNode {
       {
         key: "rating",
         label: t("labels.rating"),
-        render: (value) => value ? `${value}/5` : "—",
+        render: (value) => (value ? `${value}/5` : "—"),
       },
       {
         key: "appliedDate",
@@ -83,6 +84,7 @@ export default function CandidatesListPage(): React.ReactNode {
         render: (_, row) => {
           if (!row?.id) return null;
           const viewLink = `/workspace/modules/hrm/candidates/view/${row.id}`;
+
           return (
             <ActionMenu
               actions={[
@@ -97,15 +99,12 @@ export default function CandidatesListPage(): React.ReactNode {
         },
       },
     ],
-    [tDataTable, t, getLocalizedText]
+    [tDataTable, t, getLocalizedText],
   );
 
   return (
     <div className="space-y-4">
       <ViewListDataTable<CandidateRow>
-        model="hrm.candidate"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -117,8 +116,10 @@ export default function CandidatesListPage(): React.ReactNode {
             },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="hrm.candidate"
       />
     </div>
   );
 }
-

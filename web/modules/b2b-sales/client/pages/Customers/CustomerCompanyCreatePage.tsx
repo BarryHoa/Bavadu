@@ -8,4 +8,3 @@ export default function CustomerCompanyCreatePage(): React.ReactNode {
     </div>
   );
 }
-

@@ -44,6 +44,7 @@ export default function LoginPage() {
 
       if (!response.ok) {
         setError(data.message || "Login failed");
+
         return;
       }
 
@@ -64,11 +65,11 @@ export default function LoginPage() {
           <div className="flex flex-col items-center gap-3 mb-2">
             <div className="flex items-center gap-3">
               <Image
-                src="/favicon/logo.png"
                 alt="BAVADU Logo"
-                width={48}
-                height={48}
                 className="object-contain"
+                height={48}
+                src="/favicon/logo.png"
+                width={48}
               />
               <h2 className="text-3xl font-bold text-orange-500">BAVADU</h2>
             </div>
@@ -79,7 +80,7 @@ export default function LoginPage() {
           </p>
         </CardHeader>
         <CardBody className="px-6 pb-6">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             {error && (
               <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">
                 {error}
@@ -87,70 +88,70 @@ export default function LoginPage() {
             )}
 
             <HeroUIInput
+              required
+              autoComplete="username"
               label="Username"
               placeholder="Enter your username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              autoComplete="username"
               variant="bordered"
+              onChange={(e) => setUsername(e.target.value)}
             />
 
             <HeroUIInput
-              label="Password"
-              type={isPasswordVisible ? "text" : "password"}
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               required
               autoComplete="current-password"
-              variant="bordered"
               endContent={
                 <button
-                  type="button"
-                  onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                  className="focus:outline-none"
                   aria-label={
                     isPasswordVisible ? "Hide password" : "Show password"
                   }
+                  className="focus:outline-none"
+                  type="button"
+                  onClick={() => setIsPasswordVisible(!isPasswordVisible)}
                 >
                   {isPasswordVisible ? (
                     <EyeOff
-                      size={20}
                       className="text-default-400 pointer-events-none"
+                      size={20}
                     />
                   ) : (
                     <Eye
-                      size={20}
                       className="text-default-400 pointer-events-none"
+                      size={20}
                     />
                   )}
                 </button>
               }
+              label="Password"
+              placeholder="Enter your password"
+              type={isPasswordVisible ? "text" : "password"}
+              value={password}
+              variant="bordered"
+              onChange={(e) => setPassword(e.target.value)}
             />
 
             <div className="flex items-center justify-between">
               <Checkbox
                 isSelected={rememberMe}
-                onValueChange={setRememberMe}
                 size="sm"
+                onValueChange={setRememberMe}
               >
                 <span className="text-sm">Remember me</span>
               </Checkbox>
               <Link
-                href="/reset-password"
                 className="text-sm text-primary-600 hover:text-primary-500"
+                href="/reset-password"
               >
                 Forgot password?
               </Link>
             </div>
 
             <Button
-              type="submit"
-              color="primary"
-              size="lg"
-              isLoading={isLoading}
               className="w-full"
+              color="primary"
+              isLoading={isLoading}
+              size="lg"
+              type="submit"
             >
               Sign in
             </Button>

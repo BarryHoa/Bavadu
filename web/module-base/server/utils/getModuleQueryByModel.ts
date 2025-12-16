@@ -1,4 +1,5 @@
 import { RuntimeContext } from "../runtime/RuntimeContext";
+
 import { JSONResponse } from "./JSONResponse";
 
 type GetModuleQueryByModelProps = {
@@ -19,12 +20,13 @@ const getModuleQueryByModel = async (props: GetModuleQueryByModelProps) => {
   }
   // get model instance
   const modelInstance = await RuntimeContext.getModelInstanceBy(modelKey);
+
   // validate model
   if (!modelInstance) {
     return JSONResponse({ status: 500, message: "MODEL NOT FOUND" });
   }
   const method = (modelInstance as any)[modelMethod] as (
-    params?: Record<string, any>
+    params?: Record<string, any>,
   ) => Promise<any>;
 
   if (!method) {
@@ -32,9 +34,11 @@ const getModuleQueryByModel = async (props: GetModuleQueryByModelProps) => {
   }
   try {
     const result = await method(params);
+
     return JSONResponse({ status: 200, data: result });
   } catch (error) {
     console.error("Error in getModuleQueryByModel", error);
+
     return JSONResponse({
       status: 500,
       message: "ERROR IN METHOD",

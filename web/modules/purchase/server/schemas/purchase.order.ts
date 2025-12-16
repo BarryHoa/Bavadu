@@ -7,6 +7,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlPurchaseSchema } from "./schema";
 
 export const purchase_tb_purchase_orders = mdlPurchaseSchema.table(
@@ -36,8 +37,10 @@ export const purchase_tb_purchase_orders = mdlPurchaseSchema.table(
     index("orders_warehouse_idx").on(table.warehouseId),
     index("orders_expected_idx").on(table.expectedDate),
     index("orders_created_idx").on(table.createdAt),
-  ]
+  ],
 );
 
-export type PurchaseTbPurchaseOrder = typeof purchase_tb_purchase_orders.$inferSelect;
-export type NewPurchaseTbPurchaseOrder = typeof purchase_tb_purchase_orders.$inferInsert;
+export type PurchaseTbPurchaseOrder =
+  typeof purchase_tb_purchase_orders.$inferSelect;
+export type NewPurchaseTbPurchaseOrder =
+  typeof purchase_tb_purchase_orders.$inferInsert;

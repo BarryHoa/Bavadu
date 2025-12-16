@@ -1,16 +1,22 @@
-import {
-  BaseViewListModel,
-  type FilterCondition,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterCondition,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { eq, ilike, or, sql } from "drizzle-orm";
-import { product_tb_product_masters, product_tb_product_variants } from "../../schemas";
+
+import {
+  product_tb_product_masters,
+  product_tb_product_variants,
+} from "../../schemas";
 import { ProductMasterFeaturesEnum } from "../interfaces/ProductMaster";
+
 import { ProductFilter } from "./ProductModelInterface";
 
 type ProductDropdownOption = {
@@ -48,8 +54,14 @@ class ProductDropdownListModel extends BaseViewListModel<
       ["name", { column: product_tb_product_variants.name, sort: false }],
       ["sku", { column: product_tb_product_variants.sku, sort: false }],
       ["barcode", { column: product_tb_product_variants.barcode, sort: false }],
-      ["baseUomId", { column: product_tb_product_variants.baseUomId, sort: false }],
-      ["features", { column: product_tb_product_masters.features, sort: false }],
+      [
+        "baseUomId",
+        { column: product_tb_product_variants.baseUomId, sort: false },
+      ],
+      [
+        "features",
+        { column: product_tb_product_masters.features, sort: false },
+      ],
     ]);
 
   protected declarationSearch = () =>
@@ -60,10 +72,14 @@ class ProductDropdownListModel extends BaseViewListModel<
         (text: string) =>
           ilike(sql`${product_tb_product_variants.name}::text`, `%${text}%`),
       ],
-      ["sku", (text: string) => ilike(product_tb_product_variants.sku, `%${text}%`)],
+      [
+        "sku",
+        (text: string) => ilike(product_tb_product_variants.sku, `%${text}%`),
+      ],
       [
         "barcode",
-        (text: string) => ilike(product_tb_product_variants.barcode, `%${text}%`),
+        (text: string) =>
+          ilike(product_tb_product_variants.barcode, `%${text}%`),
       ],
     ]);
 
@@ -82,12 +98,13 @@ class ProductDropdownListModel extends BaseViewListModel<
           const featureList = Array.isArray(value)
             ? (value as ProductMasterFeaturesEnum[])
             : undefined;
+
           return featureList && featureList.length > 0
             ? or(
                 ...featureList.map(
                   (feature) =>
-                    sql`${product_tb_product_masters.features} ->> '${feature}' = 'true'`
-                )
+                    sql`${product_tb_product_masters.features} ->> '${feature}' = 'true'`,
+                ),
               )
             : undefined;
         },
@@ -97,7 +114,6 @@ class ProductDropdownListModel extends BaseViewListModel<
     return new Map(filters);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): ProductDropdownOption => {
     return {
       label: row.name,
@@ -107,12 +123,15 @@ class ProductDropdownListModel extends BaseViewListModel<
   };
 
   getData = async (
-    params: ListParamsRequest<ProductFilter>
+    params: ListParamsRequest<ProductFilter>,
   ): Promise<ListParamsResponse<ProductDropdownOption>> => {
     return this.buildQueryDataList(params, (query) => {
       return query.innerJoin(
         product_tb_product_masters,
-        eq(product_tb_product_variants.productMasterId, product_tb_product_masters.id)
+        eq(
+          product_tb_product_variants.productMasterId,
+          product_tb_product_masters.id,
+        ),
       );
     });
   };

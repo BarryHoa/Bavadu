@@ -41,4 +41,3 @@ export type MovementPayload = {
   primaryWarehouseId: string;
   secondaryWarehouseId?: string;
 };
-

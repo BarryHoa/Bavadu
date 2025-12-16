@@ -2,15 +2,15 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   index,
-  jsonb,
   numeric,
   text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { mdlSaleB2cSchema } from "./schema";
 import { base_tb_payment_terms } from "@base/server/schemas/base.payment-term";
+
+import { mdlSaleB2cSchema } from "./schema";
 
 // Customer Companies (B2B customers) - Note: This should be in b2b-sales module
 export const sale_b2c_tb_customer_companies = mdlSaleB2cSchema.table(
@@ -30,7 +30,7 @@ export const sale_b2c_tb_customer_companies = mdlSaleB2cSchema.table(
     creditLimit: numeric("credit_limit", { precision: 14, scale: 2 }),
     paymentTermsId: uuid("payment_terms_id").references(
       () => base_tb_payment_terms.id,
-      { onDelete: "set null" }
+      { onDelete: "set null" },
     ),
     isActive: boolean("is_active").default(true).notNull(),
     notes: text("notes"),
@@ -44,11 +44,13 @@ export const sale_b2c_tb_customer_companies = mdlSaleB2cSchema.table(
     index("customer_companies_name_idx").on(table.name),
     index("customer_companies_tax_id_idx").on(table.taxId),
     index("customer_companies_active_idx").on(table.isActive),
-  ]
+  ],
 );
 
-export type SaleB2cTbCustomerCompany = typeof sale_b2c_tb_customer_companies.$inferSelect;
-export type NewSaleB2cTbCustomerCompany = typeof sale_b2c_tb_customer_companies.$inferInsert;
+export type SaleB2cTbCustomerCompany =
+  typeof sale_b2c_tb_customer_companies.$inferSelect;
+export type NewSaleB2cTbCustomerCompany =
+  typeof sale_b2c_tb_customer_companies.$inferInsert;
 
 // Customer Individuals (B2C customers)
 export const sale_b2c_tb_customers = mdlSaleB2cSchema.table(
@@ -78,9 +80,8 @@ export const sale_b2c_tb_customers = mdlSaleB2cSchema.table(
     index("customers_phone_idx").on(table.phone),
     index("customers_email_idx").on(table.email),
     index("customers_active_idx").on(table.isActive),
-  ]
+  ],
 );
 
 export type SaleB2cTbCustomer = typeof sale_b2c_tb_customers.$inferSelect;
 export type NewSaleB2cTbCustomer = typeof sale_b2c_tb_customers.$inferInsert;
-

@@ -1,5 +1,6 @@
 import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
+
 import {
   product_tb_product_attributes,
   product_tb_product_categories,
@@ -12,8 +13,8 @@ import {
   product_tb_product_masters,
   ProductTbProductMaster,
 } from "../../schemas/product.master";
-
 import { MasterProduct } from "../interfaces/ProductMaster";
+
 import {
   ProductAttributeInput,
   ProductCreateInput,
@@ -27,7 +28,9 @@ class ProductModel extends BaseModel<typeof product_tb_product_variants> {
     super(product_tb_product_variants);
   }
 
-  private mapToMasterProduct = (dbProduct: ProductTbProductMaster): MasterProduct => {
+  private mapToMasterProduct = (
+    dbProduct: ProductTbProductMaster,
+  ): MasterProduct => {
     return {
       id: dbProduct.id,
       code: dbProduct.code,
@@ -59,7 +62,7 @@ class ProductModel extends BaseModel<typeof product_tb_product_variants> {
 
   private getProductDetailInternal = async (
     id: string,
-    db = this.db
+    db = this.db,
   ): Promise<ProductDetail | null> => {
     const rows = await db
       .select({
@@ -71,15 +74,18 @@ class ProductModel extends BaseModel<typeof product_tb_product_variants> {
       .from(this.table)
       .innerJoin(
         product_tb_product_masters,
-        eq(this.table.productMasterId, product_tb_product_masters.id)
+        eq(this.table.productMasterId, product_tb_product_masters.id),
       )
       .leftJoin(
         product_tb_product_categories,
-        eq(product_tb_product_masters.categoryId, product_tb_product_categories.id)
+        eq(
+          product_tb_product_masters.categoryId,
+          product_tb_product_categories.id,
+        ),
       )
       .leftJoin(
         product_tb_units_of_measure,
-        eq(this.table.baseUomId, product_tb_units_of_measure.id)
+        eq(this.table.baseUomId, product_tb_units_of_measure.id),
       )
       .where(eq(this.table.id, id))
       .limit(1);
@@ -164,16 +170,16 @@ class ProductModel extends BaseModel<typeof product_tb_product_variants> {
   };
 
   private ensurePackingValues = (
-    packings: ProductPackingInput[] | undefined
+    packings: ProductPackingInput[] | undefined,
   ): ProductPackingInput[] => {
     return (packings ?? []).filter((packing) => Boolean(packing?.name));
   };
 
   private ensureAttributeValues = (
-    attributes: ProductAttributeInput[] | undefined
+    attributes: ProductAttributeInput[] | undefined,
   ): ProductAttributeInput[] => {
     return (attributes ?? []).filter((attribute) =>
-      Boolean(attribute?.code && attribute?.name)
+      Boolean(attribute?.code && attribute?.name),
     );
   };
 
@@ -248,12 +254,12 @@ class ProductModel extends BaseModel<typeof product_tb_product_variants> {
             isActive: packing.isActive ?? true,
             createdAt: now,
             updatedAt: now,
-          }))
+          })),
         );
       }
 
       const normalizedAttributes = this.ensureAttributeValues(
-        payload.attributes
+        payload.attributes,
       );
 
       if (normalizedAttributes.length) {
@@ -267,12 +273,13 @@ class ProductModel extends BaseModel<typeof product_tb_product_variants> {
             value: attribute.value,
             createdAt: now,
             updatedAt: now,
-          }))
+          })),
         );
       }
 
       // Handle uomConversions - create units_of_measure records
       const normalizedUomConversions = payload.uomConversions ?? [];
+
       if (normalizedUomConversions.length > 0 && payload.variant.baseUomId) {
         // Insert UOM records first
         const uomInserts = await tx
@@ -286,7 +293,7 @@ class ProductModel extends BaseModel<typeof product_tb_product_variants> {
               isActive: true,
               createdAt: now,
               updatedAt: now,
-            }))
+            })),
           )
           .returning({ id: product_tb_units_of_measure.id });
 
@@ -298,7 +305,7 @@ class ProductModel extends BaseModel<typeof product_tb_product_variants> {
               conversionRatio: conversion.conversionRatio.toString(),
               createdAt: now,
               updatedAt: now,
-            }))
+            })),
           );
         }
       }
@@ -385,7 +392,7 @@ class ProductModel extends BaseModel<typeof product_tb_product_variants> {
             isActive: packing.isActive ?? true,
             createdAt: now,
             updatedAt: now,
-          }))
+          })),
         );
       }
 
@@ -394,7 +401,7 @@ class ProductModel extends BaseModel<typeof product_tb_product_variants> {
         .where(eq(product_tb_product_attributes.productVariantId, payload.id));
 
       const normalizedAttributes = this.ensureAttributeValues(
-        payload.attributes
+        payload.attributes,
       );
 
       if (normalizedAttributes.length) {
@@ -408,7 +415,7 @@ class ProductModel extends BaseModel<typeof product_tb_product_variants> {
             value: attribute.value,
             createdAt: now,
             updatedAt: now,
-          }))
+          })),
         );
       }
 

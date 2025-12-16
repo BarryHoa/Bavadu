@@ -17,6 +17,7 @@ import { RefreshCwIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useMemo } from "react";
 import { Control, Controller, useWatch } from "react-hook-form";
+
 import {
   customerService,
   type CustomerIndividualDto,
@@ -53,6 +54,7 @@ export default function CustomerInfoSection({
     queryKey: ["customer-individuals"],
     queryFn: async () => {
       const response = await customerService.listIndividuals();
+
       return response.data ?? [];
     },
     enabled: isCustomerModalOpen,
@@ -66,11 +68,12 @@ export default function CustomerInfoSection({
   const handleSelectCustomer = useCallback(
     (customer: CustomerIndividualDto) => {
       const fullName = `${customer.firstName} ${customer.lastName}`.trim();
+
       setValue("customerName", fullName);
       setSelectedCustomer(customer);
       onCustomerModalClose();
     },
-    [setValue, setSelectedCustomer, onCustomerModalClose]
+    [setValue, setSelectedCustomer, onCustomerModalClose],
   );
 
   const customerColumns = useMemo<DataTableColumn<CustomerIndividualDto>[]>(
@@ -93,8 +96,8 @@ export default function CustomerInfoSection({
         label: t("actions"),
         render: (_, row) => (
           <Button
-            size="sm"
             color="primary"
+            size="sm"
             onPress={() => handleSelectCustomer(row)}
           >
             Chọn
@@ -102,7 +105,7 @@ export default function CustomerInfoSection({
         ),
       },
     ],
-    [handleSelectCustomer]
+    [handleSelectCustomer],
   );
 
   return (
@@ -112,12 +115,12 @@ export default function CustomerInfoSection({
         <div className=" flex flex-col space-y-3">
           <div>
             <Controller
-              name="requireInvoice"
               control={control}
+              name="requireInvoice"
               render={({ field }) => (
                 <Checkbox
-                  size="sm"
                   isSelected={field.value}
+                  size="sm"
                   onValueChange={field.onChange}
                 >
                   {t("requireInvoice")}
@@ -129,30 +132,30 @@ export default function CustomerInfoSection({
           <div className="flex gap-2 justify-between items-end">
             <div className="flex-1">
               <Controller
-                name="customerName"
                 control={control}
+                name="customerName"
                 render={({ field, fieldState }) => (
                   <div className="space-y-1">
                     <div className="flex gap-2">
                       <IBaseInput
                         {...field}
-                        size="sm"
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        label={t("customerName")}
                         isRequired
-                        isInvalid={fieldState.invalid}
-                        errorMessage={fieldState.error?.message}
                         className="flex-1"
                         endContent={
                           isCustomerNotDefault ? (
                             <RefreshCwIcon
-                              size={16}
                               className="text-primary cursor-pointer hover:text-orange-500"
+                              size={16}
                               onClick={handleResetCustomer}
                             />
                           ) : null
                         }
+                        errorMessage={fieldState.error?.message}
+                        isInvalid={fieldState.invalid}
+                        label={t("customerName")}
+                        size="sm"
+                        value={field.value}
+                        onValueChange={field.onChange}
                       />
                     </div>
                   </div>
@@ -165,10 +168,10 @@ export default function CustomerInfoSection({
               )}
             </div>
             <Button
+              color="primary"
               size="sm"
               variant="solid"
               onPress={onCustomerModalOpen}
-              color="primary"
             >
               {t("selectCustomer")}
             </Button>
@@ -179,9 +182,9 @@ export default function CustomerInfoSection({
       {/* Customer Selection Modal */}
       <Modal
         isOpen={isCustomerModalOpen}
-        onClose={onCustomerModalClose}
-        size="3xl"
         scrollBehavior="inside"
+        size="3xl"
+        onClose={onCustomerModalClose}
       >
         <ModalContent>
           <ModalHeader>{t("selectCustomer")}</ModalHeader>
@@ -189,9 +192,9 @@ export default function CustomerInfoSection({
             <DataTable
               columns={customerColumns}
               dataSource={customersQuery.data ?? []}
-              rowKey="id"
-              pagination={{ pageSize: 10, page: 1 }}
               loading={customersQuery.isLoading}
+              pagination={{ pageSize: 10, page: 1 }}
+              rowKey="id"
             />
           </ModalBody>
           <ModalFooter>

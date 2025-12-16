@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { RuntimeContext } from "../runtime/RuntimeContext";
 import {
   sanitizeJsonRpcParams,
@@ -31,7 +32,7 @@ export class JsonRpcError extends Error {
   constructor(
     public code: number,
     message: string,
-    public data?: any
+    public data?: any,
   ) {
     super(message);
     this.name = "JsonRpcError";
@@ -84,15 +85,16 @@ export class JsonRpcHandler {
   private async handleDynamicModelQuery(
     method: string,
     params: any,
-    request: NextRequest
+    request: NextRequest,
   ): Promise<any> {
     // Parse method: <model-id>.<sub-type>.<method>
     const parts = method.split(".");
+
     if (parts.length < 3) {
       throw new JsonRpcError(
         JSON_RPC_ERROR_CODES.INVALID_PARAMS,
         `Invalid model method format. Expected: <model-id>.<sub-type>.<method>\n` +
-          `Example: product-category.list.getData, product.curd.create`
+          `Example: product-category.list.getData, product.curd.create`,
       );
     }
 
@@ -106,7 +108,7 @@ export class JsonRpcHandler {
     ) {
       throw new JsonRpcError(
         JSON_RPC_ERROR_CODES.INVALID_PARAMS,
-        `Invalid model type. Expected: ${SUB_TYPE_LIST}, ${SUB_TYPE_DROPDOWN}, ${SUB_TYPE_CRUD}`
+        `Invalid model type. Expected: ${SUB_TYPE_LIST}, ${SUB_TYPE_DROPDOWN}, ${SUB_TYPE_CRUD}`,
       );
     }
 
@@ -115,22 +117,23 @@ export class JsonRpcHandler {
 
     // Get model instance
     const modelInstance = await RuntimeContext.getModelInstanceBy(modelKey);
+
     if (!modelInstance) {
       throw new JsonRpcError(
         JSON_RPC_ERROR_CODES.MODEL_NOT_FOUND,
-        `Model "${modelKey}" not found`
+        `Model "${modelKey}" not found`,
       );
     }
 
     // Get method function
     const modelMethodFunction = (modelInstance as any)[methodName] as (
-      params?: Record<string, any>
+      params?: Record<string, any>,
     ) => Promise<any>;
 
     if (!modelMethodFunction || typeof modelMethodFunction !== "function") {
       throw new JsonRpcError(
         JSON_RPC_ERROR_CODES.METHOD_NOT_FOUND,
-        `Method "${methodName}" not found on model "${modelKey}"`
+        `Method "${methodName}" not found on model "${modelKey}"`,
       );
     }
 
@@ -145,7 +148,7 @@ export class JsonRpcHandler {
     code: number,
     message: string,
     data?: any,
-    id?: string | number | null
+    id?: string | number | null,
   ): JsonRpcResponse {
     return {
       jsonrpc: "2.0" as const,
@@ -163,7 +166,7 @@ export class JsonRpcHandler {
    */
   private createSuccessResponse(
     result: any,
-    id?: string | number | null
+    id?: string | number | null,
   ): JsonRpcResponse {
     return {
       jsonrpc: "2.0" as const,
@@ -177,13 +180,13 @@ export class JsonRpcHandler {
    */
   private async handleRequest(
     request: JsonRpcRequest,
-    httpRequest: NextRequest
+    httpRequest: NextRequest,
   ): Promise<JsonRpcResponse> {
     // Validate JSON-RPC version
     if (request.jsonrpc !== this.rpcVersion) {
       throw new JsonRpcError(
         JSON_RPC_ERROR_CODES.INVALID_REQUEST,
-        `Invalid JSON-RPC version. Only ${this.rpcVersion} is supported`
+        `Invalid JSON-RPC version. Only ${this.rpcVersion} is supported`,
       );
     }
 
@@ -191,16 +194,17 @@ export class JsonRpcHandler {
     if (!request.method) {
       throw new JsonRpcError(
         JSON_RPC_ERROR_CODES.INVALID_REQUEST,
-        "Method is required"
+        "Method is required",
       );
     }
 
     // Validate method format
     const methodValidation = validateJsonRpcMethod(request.method);
+
     if (!methodValidation.valid) {
       throw new JsonRpcError(
         JSON_RPC_ERROR_CODES.INVALID_PARAMS,
-        methodValidation.error || "Invalid method format"
+        methodValidation.error || "Invalid method format",
       );
     }
 
@@ -213,7 +217,7 @@ export class JsonRpcHandler {
       const result = await this.handleDynamicModelQuery(
         request.method,
         sanitizedParams,
-        httpRequest
+        httpRequest,
       );
 
       return this.createSuccessResponse(result, request.id);
@@ -223,16 +227,17 @@ export class JsonRpcHandler {
           error.code,
           error.message,
           error.data,
-          request.id
+          request.id,
         );
       }
 
       console.error("JSON-RPC internal error:", error);
+
       return this.createErrorResponse(
         JSON_RPC_ERROR_CODES.INTERNAL_ERROR,
         error instanceof Error ? error.message : "Internal error",
         process.env.NODE_ENV === "development" ? String(error) : undefined,
-        request.id
+        request.id,
       );
     }
   }
@@ -250,14 +255,14 @@ export class JsonRpcHandler {
           return NextResponse.json(
             this.createErrorResponse(
               JSON_RPC_ERROR_CODES.INVALID_REQUEST,
-              "Empty batch request"
+              "Empty batch request",
             ),
-            { status: 400 }
+            { status: 400 },
           );
         }
 
         const responses = await Promise.all(
-          body.map((request) => this.handleRequest(request, httpRequest))
+          body.map((request) => this.handleRequest(request, httpRequest)),
         );
 
         return NextResponse.json(responses);
@@ -272,9 +277,9 @@ export class JsonRpcHandler {
         this.createErrorResponse(
           JSON_RPC_ERROR_CODES.PARSE_ERROR,
           "Parse error",
-          error instanceof Error ? error.message : String(error)
+          error instanceof Error ? error.message : String(error),
         ),
-        { status: 400 }
+        { status: 400 },
       );
     }
   }

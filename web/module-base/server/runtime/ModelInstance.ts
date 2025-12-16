@@ -1,8 +1,10 @@
+import { existsSync, readdirSync, readFileSync } from "fs";
+import { dirname, join, relative } from "path";
+
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import { existsSync, readdirSync, readFileSync } from "fs";
-import { dirname, join, relative } from "path";
+
 import { MenuFactoryElm } from "../interfaces/Menu";
 import { loadAllMenus } from "../loaders/menu-loader";
 
@@ -37,10 +39,12 @@ export class ModelInstance {
   }
 
   static async create(
-    options: ModelInstanceOptions = {}
+    options: ModelInstanceOptions = {},
   ): Promise<ModelInstance> {
     const instance = new ModelInstance(options.projectRoot ?? process.cwd());
+
     await instance.init();
+
     return instance;
   }
 
@@ -56,7 +60,7 @@ export class ModelInstance {
         "Log load model: ",
         modelId,
         "created at: ",
-        factoryElm.timestamp
+        factoryElm.timestamp,
       );
       const instance = factoryElm.instance();
 
@@ -66,7 +70,7 @@ export class ModelInstance {
     } catch (error) {
       console.error(
         `Failed to instantiate model "${modelId}"${factoryElm.path ? ` from ${factoryElm.path}` : ""}:`,
-        error
+        error,
       );
     }
 
@@ -83,8 +87,10 @@ export class ModelInstance {
 
   async reloadModel(modelId: string): Promise<boolean> {
     const factoryElm = this.modelFactories.get(modelId);
+
     if (!factoryElm) {
       console.warn(`Model "${modelId}" is not registered.`);
+
       return false;
     }
 
@@ -113,27 +119,31 @@ export class ModelInstance {
 
     if (!modelPath) {
       console.error(
-        `Failed to find model file for "${modelId}" in module "${factoryElm.module}"`
+        `Failed to find model file for "${modelId}" in module "${factoryElm.module}"`,
       );
+
       return false;
     }
 
     try {
       const mod = await import(this.toImportPath(modelPath));
       const ModelClass = mod?.default;
+
       if (!ModelClass) {
         throw new Error("Missing default export");
       }
 
       const factory = () => new ModelClass();
+
       this.registerOneModel(modelId, folderName, factory, factoryElm.path);
 
       return true;
     } catch (error) {
       console.error(
         `Failed to reload model "${modelId}"${factoryElm.path ? ` from ${factoryElm.path}` : ""}:`,
-        error
+        error,
       );
+
       return false;
     }
   }
@@ -155,6 +165,7 @@ export class ModelInstance {
         models?: Record<string, string>;
       }>(moduleJsonPath);
       const configuredModels = moduleDefinition?.models;
+
       if (!configuredModels) continue;
 
       for (const [modelId, fileName] of Object.entries(configuredModels)) {
@@ -170,25 +181,27 @@ export class ModelInstance {
         try {
           const mod = await import(this.toImportPath(modelPath));
           const ModelClass = mod?.default;
+
           if (!ModelClass) {
             throw new Error("Missing default export");
           }
 
           const factory = () => new ModelClass();
+
           this.registerOneModel(modelId, folderName, factory, fileName);
           loadedCount++;
         } catch (error) {
           errorCount++;
           console.error(
             `Failed to load model "${modelId}" from ${modelPath}:`,
-            error
+            error,
           );
         }
       }
     }
 
     console.log(
-      `Model registry: ${loadedCount} loaded${errorCount ? `, ${errorCount} errors` : ""}`
+      `Model registry: ${loadedCount} loaded${errorCount ? `, ${errorCount} errors` : ""}`,
     );
   }
 
@@ -196,13 +209,16 @@ export class ModelInstance {
     const paths: string[] = [];
 
     const baseModuleJson = join(this.projectRoot, "module-base", "module.json");
+
     if (existsSync(baseModuleJson)) {
       paths.push(baseModuleJson);
     }
 
     const modulesRoot = join(this.projectRoot, "modules");
+
     for (const dir of this.safeReadDir(modulesRoot)) {
       const moduleJson = join(modulesRoot, dir, "module.json");
+
       if (existsSync(moduleJson)) {
         paths.push(moduleJson);
       }
@@ -222,9 +238,11 @@ export class ModelInstance {
   private safeReadJson<T>(filePath: string): T | null {
     try {
       const raw = readFileSync(filePath, "utf8");
+
       return JSON.parse(raw) as T;
     } catch (error) {
       console.error(`Failed to parse JSON from ${filePath}:`, error);
+
       return null;
     }
   }
@@ -232,8 +250,9 @@ export class ModelInstance {
   private toImportPath(targetPath: string): string {
     const relativePath = relative(this.projectRoot, targetPath).replace(
       /\\/g,
-      "/"
+      "/",
     );
+
     return `@/${relativePath}`;
   }
 
@@ -241,7 +260,7 @@ export class ModelInstance {
     modelId: string,
     moduleName: string,
     factory: () => object,
-    sourcePath: string
+    sourcePath: string,
   ): void {
     const entry: ModelFactoryElm = {
       instance: factory,
@@ -258,7 +277,7 @@ export class ModelInstance {
     } catch (error) {
       console.error(
         `Model "${modelId}" threw during initialization${sourcePath ? ` from ${sourcePath}` : ""}:`,
-        error
+        error,
       );
       throw error;
     }
@@ -268,7 +287,7 @@ export class ModelInstance {
     const moduleDir = dirname(moduleJsonPath);
     const relativeModuleDir = relative(this.projectRoot, moduleDir).replace(
       /\\/g,
-      "/"
+      "/",
     );
 
     if (!relativeModuleDir || relativeModuleDir === ".") {
@@ -276,12 +295,14 @@ export class ModelInstance {
     }
 
     const segments = relativeModuleDir.split("/").filter(Boolean);
+
     return segments.pop() ?? relativeModuleDir;
   }
 
   private registerMenuStatic(): void {
     console.log("Registering menus...");
     const menus = loadAllMenus();
+
     for (const menu of menus) {
       this.menuFactories.push(menu);
     }

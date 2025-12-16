@@ -32,9 +32,12 @@ export default function TimesheetsListPage(): React.ReactNode {
         label: t("labels.employee"),
         render: (value, row) => {
           if (!row?.id) return null;
+
           return (
             <LinkAs href={`/workspace/modules/hrm/timesheets/view/${row.id}`}>
-              {getLocalizedText(row.employee?.fullName) || row.employee?.employeeCode || "—"}
+              {getLocalizedText(row.employee?.fullName) ||
+                row.employee?.employeeCode ||
+                "—"}
             </LinkAs>
           );
         },
@@ -52,23 +55,23 @@ export default function TimesheetsListPage(): React.ReactNode {
       {
         key: "checkInTime",
         label: t("labels.checkInTime"),
-        render: (value) => value ? formatDate(value) : "—",
+        render: (value) => (value ? formatDate(value) : "—"),
       },
       {
         key: "checkOutTime",
         label: t("labels.checkOutTime"),
-        render: (value) => value ? formatDate(value) : "—",
+        render: (value) => (value ? formatDate(value) : "—"),
       },
       {
         key: "actualHours",
         label: t("labels.actualHours"),
-        render: (value) => value ? `${value}h` : "—",
+        render: (value) => (value ? `${value}h` : "—"),
       },
       {
         key: "status",
         label: t("labels.status"),
         render: (value) => (
-          <Chip size="sm" variant="flat" className="capitalize">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value || "pending"}
           </Chip>
         ),
@@ -80,6 +83,7 @@ export default function TimesheetsListPage(): React.ReactNode {
         render: (_, row) => {
           if (!row?.id) return null;
           const viewLink = `/workspace/modules/hrm/timesheets/view/${row.id}`;
+
           return (
             <ActionMenu
               actions={[
@@ -94,15 +98,12 @@ export default function TimesheetsListPage(): React.ReactNode {
         },
       },
     ],
-    [tDataTable, t, getLocalizedText]
+    [tDataTable, t, getLocalizedText],
   );
 
   return (
     <div className="space-y-4">
       <ViewListDataTable<TimesheetRow>
-        model="hrm.timesheet"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -114,8 +115,10 @@ export default function TimesheetsListPage(): React.ReactNode {
             },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="hrm.timesheet"
       />
     </div>
   );
 }
-

@@ -42,7 +42,9 @@ export interface OffboardingInput {
   status?: string;
 }
 
-export default class OffboardingModel extends BaseModel<typeof hrm_tb_offboardings> {
+export default class OffboardingModel extends BaseModel<
+  typeof hrm_tb_offboardings
+> {
   constructor() {
     super(hrm_tb_offboardings);
   }
@@ -73,6 +75,7 @@ export default class OffboardingModel extends BaseModel<typeof hrm_tb_offboardin
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -100,11 +103,15 @@ export default class OffboardingModel extends BaseModel<typeof hrm_tb_offboardin
     };
   };
 
-  getDataById = async (params: { id: string }): Promise<OffboardingRow | null> => {
+  getDataById = async (params: {
+    id: string;
+  }): Promise<OffboardingRow | null> => {
     return this.getOffboardingById(params.id);
   };
 
-  createOffboarding = async (payload: OffboardingInput): Promise<OffboardingRow> => {
+  createOffboarding = async (
+    payload: OffboardingInput,
+  ): Promise<OffboardingRow> => {
     const now = new Date();
     const insertData: NewHrmTbOffboarding = {
       employeeId: payload.employeeId,
@@ -129,13 +136,16 @@ export default class OffboardingModel extends BaseModel<typeof hrm_tb_offboardin
     if (!created) throw new Error("Failed to create offboarding");
 
     const offboarding = await this.getOffboardingById(created.id);
-    if (!offboarding) throw new Error("Failed to load offboarding after creation");
+
+    if (!offboarding)
+      throw new Error("Failed to load offboarding after creation");
+
     return offboarding;
   };
 
   updateOffboarding = async (
     id: string,
-    payload: Partial<OffboardingInput>
+    payload: Partial<OffboardingInput>,
   ): Promise<OffboardingRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -147,7 +157,8 @@ export default class OffboardingModel extends BaseModel<typeof hrm_tb_offboardin
       updateData.resignationDate = payload.resignationDate;
     if (payload.lastWorkingDate !== undefined)
       updateData.lastWorkingDate = payload.lastWorkingDate;
-    if (payload.reason !== undefined) updateData.reason = payload.reason ?? null;
+    if (payload.reason !== undefined)
+      updateData.reason = payload.reason ?? null;
     if (payload.reasonDetails !== undefined)
       updateData.reasonDetails = payload.reasonDetails ?? null;
     if (payload.exitInterviewDate !== undefined)
@@ -165,7 +176,11 @@ export default class OffboardingModel extends BaseModel<typeof hrm_tb_offboardin
       }
     }
 
-    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db
+      .update(this.table)
+      .set(updateData)
+      .where(eq(this.table.id, id));
+
     return this.getOffboardingById(id);
   };
 
@@ -184,7 +199,9 @@ export default class OffboardingModel extends BaseModel<typeof hrm_tb_offboardin
     }
     if (payload.reason !== undefined) {
       normalizedPayload.reason =
-        payload.reason === null || payload.reason === "" ? null : String(payload.reason);
+        payload.reason === null || payload.reason === ""
+          ? null
+          : String(payload.reason);
     }
     if (payload.reasonDetails !== undefined) {
       normalizedPayload.reasonDetails =
@@ -220,4 +237,3 @@ export default class OffboardingModel extends BaseModel<typeof hrm_tb_offboardin
     return this.updateOffboarding(id, normalizedPayload);
   };
 }
-

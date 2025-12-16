@@ -8,7 +8,7 @@ import { JSONResponse } from "../utils/JSONResponse";
  */
 export async function validateModelName(
   model: string,
-  type: string
+  type: string,
 ): Promise<void | Response> {
   if (!model || !type) {
     return JSONResponse({
@@ -19,6 +19,7 @@ export async function validateModelName(
 
   // Get the last segment after the last dot
   const lastSegment = model.split(".").pop();
+
   if (!lastSegment || lastSegment !== type) {
     return JSONResponse({
       status: 400,

@@ -1,4 +1,5 @@
 import * as v from "valibot";
+
 import { escapeHtml, sanitizeObject } from "../../utils/xss-protection";
 
 /**
@@ -13,8 +14,8 @@ export const jsonRpcRequestSchema = v.object({
     // Method name should follow pattern: <model-id>.<sub-type>.<method>
     v.regex(
       /^[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+){2,}$/,
-      "Method name must follow format: <model-id>.<sub-type>.<method>"
-    )
+      "Method name must follow format: <model-id>.<sub-type>.<method>",
+    ),
   ),
   params: v.optional(v.any()),
   id: v.optional(v.union([v.string(), v.number(), v.null()])),
@@ -25,7 +26,7 @@ export const jsonRpcRequestSchema = v.object({
  */
 export const jsonRpcBatchRequestSchema = v.array(
   jsonRpcRequestSchema,
-  "Batch request must be a non-empty array"
+  "Batch request must be a non-empty array",
 );
 
 /**
@@ -52,6 +53,7 @@ export function validateJsonRpcMethod(method: string): {
 
   // Validate sub-type
   const validSubTypes = ["list", "dropdown", "curd"];
+
   if (!validSubTypes.includes(subType)) {
     return {
       valid: false,

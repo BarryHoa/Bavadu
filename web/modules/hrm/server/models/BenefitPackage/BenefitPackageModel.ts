@@ -40,11 +40,12 @@ export default class BenefitPackageModel extends BaseModel<
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
   getBenefitPackageById = async (
-    id: string
+    id: string,
   ): Promise<BenefitPackageRow | null> => {
     const result = await this.db
       .select()
@@ -53,6 +54,7 @@ export default class BenefitPackageModel extends BaseModel<
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -77,13 +79,17 @@ export default class BenefitPackageModel extends BaseModel<
   };
 
   createBenefitPackage = async (
-    payload: BenefitPackageInput
+    payload: BenefitPackageInput,
   ): Promise<BenefitPackageRow> => {
     const now = new Date();
     const insertData: NewHrmTbBenefitPackage = {
       code: payload.code,
       name: payload.name,
-      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
+      description: payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null,
       benefitType: payload.benefitType,
       coverage: payload.coverage ?? null,
       cost: payload.cost ?? null,
@@ -101,14 +107,16 @@ export default class BenefitPackageModel extends BaseModel<
     if (!created) throw new Error("Failed to create benefit package");
 
     const benefitPackage = await this.getBenefitPackageById(created.id);
+
     if (!benefitPackage)
       throw new Error("Failed to load benefit package after creation");
+
     return benefitPackage;
   };
 
   updateBenefitPackage = async (
     id: string,
-    payload: Partial<BenefitPackageInput>
+    payload: Partial<BenefitPackageInput>,
   ): Promise<BenefitPackageRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -117,7 +125,11 @@ export default class BenefitPackageModel extends BaseModel<
     if (payload.code !== undefined) updateData.code = payload.code;
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.description !== undefined)
-      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
+      updateData.description = payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null;
     if (payload.benefitType !== undefined)
       updateData.benefitType = payload.benefitType;
     if (payload.coverage !== undefined)
@@ -131,6 +143,7 @@ export default class BenefitPackageModel extends BaseModel<
       .update(this.table)
       .set(updateData)
       .where(eq(this.table.id, id));
+
     return this.getBenefitPackageById(id);
   };
 
@@ -142,11 +155,13 @@ export default class BenefitPackageModel extends BaseModel<
       normalizedPayload.code = String(payload.code);
     }
     if (payload.name !== undefined) {
-      normalizedPayload.name = this.normalizeLocaleInput(payload.name) ?? { en: "" };
+      normalizedPayload.name = this.normalizeLocaleInput(payload.name) ?? {
+        en: "",
+      };
     }
     if (payload.description !== undefined) {
       normalizedPayload.description = this.normalizeLocaleInput(
-        payload.description
+        payload.description,
       );
     }
     if (payload.benefitType !== undefined) {
@@ -157,11 +172,15 @@ export default class BenefitPackageModel extends BaseModel<
     }
     if (payload.cost !== undefined) {
       normalizedPayload.cost =
-        payload.cost === null || payload.cost === "" ? null : Number(payload.cost);
+        payload.cost === null || payload.cost === ""
+          ? null
+          : Number(payload.cost);
     }
     if (payload.currency !== undefined) {
       normalizedPayload.currency =
-        payload.currency === null || payload.currency === "" ? null : String(payload.currency);
+        payload.currency === null || payload.currency === ""
+          ? null
+          : String(payload.currency);
     }
     if (payload.isActive !== undefined) {
       normalizedPayload.isActive = Boolean(payload.isActive);
@@ -170,4 +189,3 @@ export default class BenefitPackageModel extends BaseModel<
     return this.updateBenefitPackage(id, normalizedPayload);
   };
 }
-

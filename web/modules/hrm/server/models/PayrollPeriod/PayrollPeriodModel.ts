@@ -34,7 +34,7 @@ export default class PayrollPeriodModel extends BaseModel<
   }
 
   getPayrollPeriodById = async (
-    id: string
+    id: string,
   ): Promise<PayrollPeriodRow | null> => {
     const result = await this.db
       .select()
@@ -43,6 +43,7 @@ export default class PayrollPeriodModel extends BaseModel<
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -66,7 +67,7 @@ export default class PayrollPeriodModel extends BaseModel<
   };
 
   createPayrollPeriod = async (
-    payload: PayrollPeriodInput
+    payload: PayrollPeriodInput,
   ): Promise<PayrollPeriodRow> => {
     const now = new Date();
     const insertData: NewHrmTbPayrollPeriod = {
@@ -89,13 +90,16 @@ export default class PayrollPeriodModel extends BaseModel<
     if (!created) throw new Error("Failed to create payroll period");
 
     const period = await this.getPayrollPeriodById(created.id);
-    if (!period) throw new Error("Failed to load payroll period after creation");
+
+    if (!period)
+      throw new Error("Failed to load payroll period after creation");
+
     return period;
   };
 
   updatePayrollPeriod = async (
     id: string,
-    payload: Partial<PayrollPeriodInput>
+    payload: Partial<PayrollPeriodInput>,
   ): Promise<PayrollPeriodRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -103,7 +107,8 @@ export default class PayrollPeriodModel extends BaseModel<
 
     if (payload.code !== undefined) updateData.code = payload.code;
     if (payload.name !== undefined) updateData.name = payload.name ?? null;
-    if (payload.startDate !== undefined) updateData.startDate = payload.startDate;
+    if (payload.startDate !== undefined)
+      updateData.startDate = payload.startDate;
     if (payload.endDate !== undefined) updateData.endDate = payload.endDate;
     if (payload.payDate !== undefined) updateData.payDate = payload.payDate;
     if (payload.status !== undefined) updateData.status = payload.status;
@@ -113,6 +118,7 @@ export default class PayrollPeriodModel extends BaseModel<
       .update(this.table)
       .set(updateData)
       .where(eq(this.table.id, id));
+
     return this.getPayrollPeriodById(id);
   };
 
@@ -120,10 +126,13 @@ export default class PayrollPeriodModel extends BaseModel<
     const { id, payload } = params;
     const normalizedPayload: Partial<PayrollPeriodInput> = {};
 
-    if (payload.code !== undefined) normalizedPayload.code = String(payload.code);
+    if (payload.code !== undefined)
+      normalizedPayload.code = String(payload.code);
     if (payload.name !== undefined) {
       normalizedPayload.name =
-        payload.name === null || payload.name === "" ? null : String(payload.name);
+        payload.name === null || payload.name === ""
+          ? null
+          : String(payload.name);
     }
     if (payload.startDate !== undefined) {
       normalizedPayload.startDate = String(payload.startDate);
@@ -144,4 +153,3 @@ export default class PayrollPeriodModel extends BaseModel<
     return this.updatePayrollPeriod(id, normalizedPayload);
   };
 }
-

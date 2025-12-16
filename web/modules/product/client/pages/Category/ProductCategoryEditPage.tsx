@@ -1,23 +1,24 @@
 "use client";
 
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
+import type { ProductCategoryRow } from "../../interface/ProductCategory";
+
 import { Button } from "@heroui/button";
 import { addToast } from "@heroui/toast";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
-
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
+
 import ProductCategoryForm, {
   ProductCategoryFormValues,
 } from "../../components/Category/ProductCategoryForm";
-import type { ProductCategoryRow } from "../../interface/ProductCategory";
 import ProductCategoryService from "../../services/ProductCategoryService";
 
 const getParamValue = (
-  value: string | string[] | undefined
+  value: string | string[] | undefined,
 ): string | undefined => (Array.isArray(value) ? value[0] : value);
 
 const ProductCategoryEditPage = (): React.ReactNode => {
@@ -31,7 +32,7 @@ const ProductCategoryEditPage = (): React.ReactNode => {
         mdl: "product",
         path: "category",
       }),
-    []
+    [],
   );
 
   const getCategoryViewLink = useCallback(
@@ -41,7 +42,7 @@ const ProductCategoryEditPage = (): React.ReactNode => {
         path: "category/view/[id]",
         as: `category/view/${id}`,
       }),
-    []
+    [],
   );
 
   const navigateToList = useCallback(() => {
@@ -61,6 +62,7 @@ const ProductCategoryEditPage = (): React.ReactNode => {
       if (!categoryId) {
         throw new Error("Missing category id");
       }
+
       return ProductCategoryService.getById(categoryId);
     },
   });
@@ -74,6 +76,7 @@ const ProductCategoryEditPage = (): React.ReactNode => {
       if (!categoryId) {
         throw new Error("Missing category id");
       }
+
       return ProductCategoryService.updateCategory(categoryId, values);
     },
   });
@@ -81,6 +84,7 @@ const ProductCategoryEditPage = (): React.ReactNode => {
   const handleSubmit = async (values: ProductCategoryFormValues) => {
     try {
       const updated = await updateMutation.mutateAsync(values);
+
       addToast({
         title: "Category updated",
         description: "Changes saved successfully.",
@@ -90,11 +94,13 @@ const ProductCategoryEditPage = (): React.ReactNode => {
       });
       setTimeout(() => {
         const link = getCategoryViewLink(updated.id);
+
         router.push(link.as ?? link.path);
       }, 500);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to update category";
+
       addToast({
         title: "Update failed",
         description: message,
@@ -110,7 +116,8 @@ const ProductCategoryEditPage = (): React.ReactNode => {
       ? {
           name: localized(categoryQuery.data.name as LocalizeText) ?? "",
           code: categoryQuery.data.code ?? "",
-          description: localized(categoryQuery.data.description as LocalizeText) ?? "",
+          description:
+            localized(categoryQuery.data.description as LocalizeText) ?? "",
           parentId: categoryQuery.data.parent?.id ?? "",
           level: categoryQuery.data.level ?? undefined,
           isActive:
@@ -124,11 +131,11 @@ const ProductCategoryEditPage = (): React.ReactNode => {
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
         <Button
-          size="sm"
-          variant="light"
-          startContent={<ArrowLeft size={14} />}
-          onPress={() => router.back()}
           isDisabled={updateMutation.isPending}
+          size="sm"
+          startContent={<ArrowLeft size={14} />}
+          variant="light"
+          onPress={() => router.back()}
         >
           Back
         </Button>
@@ -149,21 +156,22 @@ const ProductCategoryEditPage = (): React.ReactNode => {
         </div>
       ) : categoryQuery.data ? (
         <ProductCategoryForm
-          title="Edit Category"
-          subtitle="Update the metadata for this category."
-          submitLabel="Save changes"
+          categoryId={categoryId}
           initialValues={initialValues}
           loading={updateMutation.isPending}
-          onSubmit={handleSubmit}
+          submitLabel="Save changes"
+          subtitle="Update the metadata for this category."
+          title="Edit Category"
           onCancel={() => {
             if (categoryId) {
               const link = getCategoryViewLink(categoryId);
+
               router.push(link.as ?? link.path);
             } else {
               navigateToList();
             }
           }}
-          categoryId={categoryId}
+          onSubmit={handleSubmit}
         />
       ) : null}
     </div>

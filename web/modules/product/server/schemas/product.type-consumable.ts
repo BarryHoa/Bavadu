@@ -8,6 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlProductSchema } from "./schema";
 import { product_tb_product_variants } from "./product.variant";
 
@@ -15,7 +16,9 @@ import { product_tb_product_variants } from "./product.variant";
 export const product_tb_product_type_consumables = mdlProductSchema.table(
   "type_consumable",
   {
-    id: uuid("id").primaryKey().default(sql`uuid_generate_v7()`),
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuid_generate_v7()`),
     productVariantId: uuid("product_variant_id")
       .references(() => product_tb_product_variants.id, { onDelete: "cascade" })
       .notNull()
@@ -45,13 +48,10 @@ export const product_tb_product_type_consumables = mdlProductSchema.table(
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
-  (table) => [
-    index("type_consumable_variant_idx").on(table.productVariantId),
-  ]
+  (table) => [index("type_consumable_variant_idx").on(table.productVariantId)],
 );
 
 export type ProductTbProductTypeConsumable =
   typeof product_tb_product_type_consumables.$inferSelect;
 export type NewProductTbProductTypeConsumable =
   typeof product_tb_product_type_consumables.$inferInsert;
-

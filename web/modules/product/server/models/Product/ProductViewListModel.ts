@@ -1,13 +1,15 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { eq, ilike, sql } from "drizzle-orm";
+
 import {
   product_tb_product_categories,
   product_tb_product_variants,
@@ -56,13 +58,22 @@ class ProductViewListModel extends BaseViewListModel<
         { column: product_tb_product_variants.manufacturer, sort: true },
       ],
       ["images", { column: product_tb_product_variants.images, sort: true }],
-      ["isActive", { column: product_tb_product_variants.isActive, sort: true }],
+      [
+        "isActive",
+        { column: product_tb_product_variants.isActive, sort: true },
+      ],
       [
         "productMasterId",
         { column: product_tb_product_variants.productMasterId, sort: true },
       ],
-      ["productMasterName", { column: product_tb_product_masters.name, sort: true }],
-      ["productMasterType", { column: product_tb_product_masters.type, sort: true }],
+      [
+        "productMasterName",
+        { column: product_tb_product_masters.name, sort: true },
+      ],
+      [
+        "productMasterType",
+        { column: product_tb_product_masters.type, sort: true },
+      ],
       [
         "productMasterBrand",
         { column: product_tb_product_masters.brand, sort: true },
@@ -72,18 +83,36 @@ class ProductViewListModel extends BaseViewListModel<
         { column: product_tb_product_masters.features, sort: true },
       ],
       ["categoryId", { column: product_tb_product_categories.id, sort: true }],
-      ["categoryName", { column: product_tb_product_categories.name, sort: true }],
-      ["categoryCode", { column: product_tb_product_categories.code, sort: true }],
-      ["baseUomId", { column: product_tb_product_variants.baseUomId, sort: true }],
+      [
+        "categoryName",
+        { column: product_tb_product_categories.name, sort: true },
+      ],
+      [
+        "categoryCode",
+        { column: product_tb_product_categories.code, sort: true },
+      ],
+      [
+        "baseUomId",
+        { column: product_tb_product_variants.baseUomId, sort: true },
+      ],
       ["baseUomName", { column: product_tb_units_of_measure.name, sort: true }],
-      ["createdAt", { column: product_tb_product_variants.createdAt, sort: true }],
-      ["updatedAt", { column: product_tb_product_variants.updatedAt, sort: true }],
+      [
+        "createdAt",
+        { column: product_tb_product_variants.createdAt, sort: true },
+      ],
+      [
+        "updatedAt",
+        { column: product_tb_product_variants.updatedAt, sort: true },
+      ],
     ]);
 
   protected declarationSearch = () =>
     new Map([
       ["sku", (text: string) => ilike(product_tb_product_variants.sku, text)],
-      ["barcode", (text: string) => ilike(product_tb_product_variants.barcode, text)],
+      [
+        "barcode",
+        (text: string) => ilike(product_tb_product_variants.barcode, text),
+      ],
       [
         "manufacturer",
         (text: string) => ilike(product_tb_product_variants.manufacturer, text),
@@ -95,7 +124,8 @@ class ProductViewListModel extends BaseViewListModel<
       ],
       [
         "productMasterName",
-        (text: string) => ilike(sql`${product_tb_product_masters.name}::text`, text),
+        (text: string) =>
+          ilike(sql`${product_tb_product_masters.name}::text`, text),
       ],
       [
         "categoryCode",
@@ -140,7 +170,7 @@ class ProductViewListModel extends BaseViewListModel<
     ]);
 
   // Map raw DB row + joined columns -> view row
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   protected declarationMappingData = (row: any): ProductVariantElm => {
     return {
       id: row.id,
@@ -173,24 +203,28 @@ class ProductViewListModel extends BaseViewListModel<
   };
 
   getData = async (
-    params: ListParamsRequest<ProductFilter>
+    params: ListParamsRequest<ProductFilter>,
   ): Promise<ListParamsResponse<ProductVariantElm>> => {
     // delegate to shared dataList (which already applies mapping)
     const result = await this.buildQueryDataList(params, (query) => {
       return query
         .innerJoin(
           product_tb_product_masters,
-          eq(this.table.productMasterId, product_tb_product_masters.id)
+          eq(this.table.productMasterId, product_tb_product_masters.id),
         )
         .leftJoin(
           product_tb_product_categories,
-          eq(product_tb_product_masters.categoryId, product_tb_product_categories.id)
+          eq(
+            product_tb_product_masters.categoryId,
+            product_tb_product_categories.id,
+          ),
         )
         .leftJoin(
           product_tb_units_of_measure,
-          eq(this.table.baseUomId, product_tb_units_of_measure.id)
+          eq(this.table.baseUomId, product_tb_units_of_measure.id),
         );
     });
+
     return result as ListParamsResponse<ProductVariantElm>;
   };
 }

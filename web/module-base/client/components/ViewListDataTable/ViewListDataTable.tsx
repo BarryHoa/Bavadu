@@ -1,15 +1,17 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
-import { IBaseTable } from "../IBaseTable";
 import type { FilterOption } from "./components/FilterMenu";
 import type { GroupOption } from "./components/GroupByMenu";
 
+import { useCallback, useMemo } from "react";
 import { Button, Card, CardBody, Divider, LinkProps } from "@heroui/react";
+
+import { IBaseTable } from "../IBaseTable";
 import { useLocalizedText } from "../../hooks/useLocalizedText";
 import { IBaseTablePagination } from "../IBaseTable/IBaseTableInterface";
 import LinkAs from "../LinkAs";
 import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
+
 import ColumnVisibilityMenu from "./components/ColumnVisibilityMenu";
 import FilterMenu from "./components/FilterMenu";
 import GroupByMenu from "./components/GroupByMenu";
@@ -19,7 +21,7 @@ import { useViewListDataTableStore } from "./useViewListDataTableStore";
 import { ActionElm, ViewListDataTableProps } from "./VieListDataTableInterface";
 
 export default function ViewListDataTable<T = any>(
-  props: ViewListDataTableProps<T>
+  props: ViewListDataTableProps<T>,
 ) {
   const {
     columns,
@@ -76,14 +78,16 @@ export default function ViewListDataTable<T = any>(
   // Prepare columns list with only visible columns
   const displayColumns = useMemo(() => {
     const cols = columns.filter((col: any) =>
-      store.visibleColumns.has(col.key)
+      store.visibleColumns.has(col.key),
     );
+
     if (isDataDummy) {
       return cols.map((col: any) => ({
         ...col,
         render: () => null,
       }));
     }
+
     return cols;
   }, [columns, store.visibleColumns, isDataDummy]);
 
@@ -93,15 +97,16 @@ export default function ViewListDataTable<T = any>(
         const size = action.size ?? "sm";
         const variant = action.variant ?? "solid";
         const color = action.color ?? "default";
+
         switch (action.type) {
           case "button":
             return (
               <Button
-                isIconOnly
                 key={action.key}
+                isIconOnly
+                color={color}
                 size={size}
                 variant={variant}
-                color={color}
                 {...(action.props as any)}
               >
                 {action.title}
@@ -115,11 +120,11 @@ export default function ViewListDataTable<T = any>(
             return (
               <Button
                 key={action.key}
-                variant={variant}
-                color={color}
-                size={size}
                 as={LinkAs as any}
+                color={color}
                 href={linkProps.href as string}
+                size={size}
+                variant={variant}
                 hrefAs={linkProps.hrefAs as any}
                 // {...(linkProps as any)}
               >
@@ -131,7 +136,7 @@ export default function ViewListDataTable<T = any>(
         }
       });
     },
-    [actionsLeft, actionsRight]
+    [actionsLeft, actionsRight],
   );
 
   // Render
@@ -154,22 +159,22 @@ export default function ViewListDataTable<T = any>(
           <div className="flex gap-2 flex-1 justify-end">
             {!isSearchHidden && (
               <SearchBar
+                placeholder={search?.placeholder}
                 value={store.search}
                 onChange={store.setSearch}
-                placeholder={search?.placeholder}
               />
             )}
             {!isFilterHidden && (
               <FilterMenu
-                filterOptions={filterOptions}
                 activeFilters={store.activeFilters}
+                filterOptions={filterOptions}
                 onToggleFilter={store.toggleFilter}
               />
             )}
             {!isGroupByHidden && (
               <GroupByMenu
-                groupByOptions={groupByOptions}
                 currentGroupBy={store.groupBy}
+                groupByOptions={groupByOptions}
                 onSelectGroupBy={store.setGroupBy}
               />
             )}
@@ -188,13 +193,13 @@ export default function ViewListDataTable<T = any>(
         {/* Table */}
         <IBaseTable
           {...dataTableProps}
-          total={total}
           columns={displayColumns}
           dataSource={dataSource}
           loading={isLoading || isFetching || dataTableProps.loading}
-          onRefresh={refresh}
-          onChangeTable={onChangeTable}
           pagination={_pagination}
+          total={total}
+          onChangeTable={onChangeTable}
+          onRefresh={refresh}
         />
       </CardBody>
     </Card>

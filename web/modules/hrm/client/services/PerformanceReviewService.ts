@@ -1,9 +1,10 @@
-import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 import type {
   PerformanceReviewDto,
   CreatePerformanceReviewPayload,
   UpdatePerformanceReviewPayload,
 } from "../interface/PerformanceReview";
+
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export default class PerformanceReviewService extends JsonRpcClientService {
   list() {
@@ -37,4 +38,3 @@ export default class PerformanceReviewService extends JsonRpcClientService {
 }
 
 export const performanceReviewService = new PerformanceReviewService();
-

@@ -49,4 +49,3 @@ export function getSessionInfo(request: NextRequest): {
 export function isAuthenticated(request: NextRequest): boolean {
   return !!getAuthenticatedUser(request);
 }
-

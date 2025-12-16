@@ -8,6 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_employees } from "./hrm.employee";
 
@@ -39,9 +40,8 @@ export const hrm_tb_offboardings = mdlHrmSchema.table(
   (table) => [
     index("offboarding_employee_idx").on(table.employeeId),
     index("offboarding_status_idx").on(table.status),
-  ]
+  ],
 );
 
 export type HrmTbOffboarding = typeof hrm_tb_offboardings.$inferSelect;
 export type NewHrmTbOffboarding = typeof hrm_tb_offboardings.$inferInsert;
-

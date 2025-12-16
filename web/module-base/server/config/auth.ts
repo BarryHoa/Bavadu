@@ -8,4 +8,3 @@ export const AUTH_CONFIG = {
    */
   sessionCookieName: "session_token",
 } as const;
-

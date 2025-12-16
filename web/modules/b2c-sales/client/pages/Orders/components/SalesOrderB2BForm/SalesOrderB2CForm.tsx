@@ -1,5 +1,7 @@
 "use client";
 
+import type { SalesOrderB2CFormValues } from "../../validation/createSalesOrderB2CValidation";
+
 import { SelectItemOption } from "@base/client/components";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
@@ -11,7 +13,6 @@ import {
   useForm,
   type SubmitHandler,
 } from "react-hook-form";
-
 import {
   paymentMethodService,
   shippingMethodService,
@@ -22,9 +23,10 @@ import { Button } from "@heroui/button";
 import { Card, CardBody, Textarea } from "@heroui/react";
 import UnitOfMeasureService from "@mdl/product/client/services/UnitOfMeasureService";
 import StockService from "@mdl/stock/client/services/StockService";
+
 import { type CustomerIndividualDto } from "../../../../services/CustomerService";
-import type { SalesOrderB2CFormValues } from "../../validation/createSalesOrderB2CValidation";
 import { createSalesOrderB2CValidation } from "../../validation/createSalesOrderB2CValidation";
+
 import CustomerInfoSection from "./CustomerInfoSection";
 import DeliveryInfoSection from "./DeliveryInfoSection";
 import GeneralInfoSection from "./GeneralInfoSection";
@@ -133,11 +135,12 @@ export default function SalesOrderB2CForm({
     queryKey: ["warehouses"],
     queryFn: async () => {
       const response = await StockService.listWarehouses();
+
       // Filter only internal warehouses
       return (response.data ?? []).filter(
         (wh) =>
           wh.typeCode?.toUpperCase() === "INTERNAL" ||
-          wh.typeCode?.toUpperCase().includes("INTERNAL")
+          wh.typeCode?.toUpperCase().includes("INTERNAL"),
       );
     },
   });
@@ -146,6 +149,7 @@ export default function SalesOrderB2CForm({
     queryKey: ["payment-methods-dropdown"],
     queryFn: async () => {
       const response = await paymentMethodService.getOptionsDropdown();
+
       return response.data ?? [];
     },
   });
@@ -154,6 +158,7 @@ export default function SalesOrderB2CForm({
     queryKey: ["shipping-methods-dropdown"],
     queryFn: async () => {
       const response = await shippingMethodService.getOptionsDropdown();
+
       return response.data ?? [];
     },
   });
@@ -162,6 +167,7 @@ export default function SalesOrderB2CForm({
     queryKey: ["shipping-terms-dropdown"],
     queryFn: async () => {
       const response = await shippingTermService.getOptionsDropdown();
+
       return response.data ?? [];
     },
   });
@@ -170,6 +176,7 @@ export default function SalesOrderB2CForm({
     queryKey: ["tax-rates-dropdown"],
     queryFn: async () => {
       const response = await taxRateService.getOptionsDropdown();
+
       return response.data ?? [];
     },
   });
@@ -178,6 +185,7 @@ export default function SalesOrderB2CForm({
     queryKey: ["units-of-measure"],
     queryFn: async () => {
       const response = await UnitOfMeasureService.getList();
+
       return response.data ?? [];
     },
   });
@@ -185,19 +193,21 @@ export default function SalesOrderB2CForm({
   // Find default payment method (Cash/Tiền mặt)
   const defaultPaymentMethod = useMemo(() => {
     if (!paymentMethodsQuery.data) return undefined;
+
     return paymentMethodsQuery.data.find(
       (pm) =>
         pm.code?.toLowerCase().includes("cash") ||
         (typeof pm.name === "object" &&
           (pm.name.vi?.toLowerCase().includes("tiền mặt") ||
             pm.name.en?.toLowerCase().includes("cash"))) ||
-        (typeof pm.name === "string" && pm.name.toLowerCase().includes("cash"))
+        (typeof pm.name === "string" && pm.name.toLowerCase().includes("cash")),
     );
   }, [paymentMethodsQuery.data]);
 
   // Find default shipping method (Pickup/Tự nhận)
   const defaultShippingMethod = useMemo(() => {
     if (!shippingMethodsQuery.data) return undefined;
+
     return shippingMethodsQuery.data.find(
       (sm) =>
         sm.code?.toLowerCase().includes("pickup") ||
@@ -205,22 +215,24 @@ export default function SalesOrderB2CForm({
           (sm.name.vi?.toLowerCase().includes("tự nhận") ||
             sm.name.en?.toLowerCase().includes("pickup"))) ||
         (typeof sm.name === "string" &&
-          sm.name.toLowerCase().includes("pickup"))
+          sm.name.toLowerCase().includes("pickup")),
     );
   }, [shippingMethodsQuery.data]);
 
   // Check if shipping method is not pickup
   const isShippingOtherThanPickup = useMemo(() => {
     if (!watchedShippingMethodId || !defaultShippingMethod) return false;
+
     return watchedShippingMethodId !== defaultShippingMethod.value;
   }, [watchedShippingMethodId, defaultShippingMethod]);
 
   const onSubmitForm: SubmitHandler<SalesOrderB2CFormValues> = async (
-    values
+    values,
   ) => {
     // Validate delivery address if shipping is not pickup
     if (isShippingOtherThanPickup && !values.deliveryAddress?.trim()) {
       setValue("deliveryAddress", "", { shouldValidate: true });
+
       return;
     }
 
@@ -230,6 +242,7 @@ export default function SalesOrderB2CForm({
   // Format server time for display
   const formattedCreatedAt = useMemo(() => {
     const now = new Date();
+
     return now.toLocaleString("vi-VN", {
       year: "numeric",
       month: "2-digit",
@@ -246,12 +259,13 @@ export default function SalesOrderB2CForm({
         // Extract rate from name if available, otherwise use value
         const rate = tr.rate || tr.name?.rate || "";
         const label = rate ? `${tr.label} (${rate}%)` : tr.label;
+
         return {
           value: tr.value,
           label,
         };
       }),
-    [taxRatesQuery.data]
+    [taxRatesQuery.data],
   );
 
   const uomOptions = useMemo<SelectItemOption[]>(
@@ -261,12 +275,13 @@ export default function SalesOrderB2CForm({
         .map((uom) => {
           const name = (uom.name as any)?.vi || (uom.name as any)?.en || "";
           const label = uom.symbol ? `${name} (${uom.symbol})` : name;
+
           return {
             value: uom.id,
             label,
           };
         }),
-    [uomQuery.data]
+    [uomQuery.data],
   );
 
   return (
@@ -286,10 +301,10 @@ export default function SalesOrderB2CForm({
         )}
         <Button
           color="primary"
-          type="submit"
-          size="sm"
-          isLoading={isSubmitting}
           disabled={isSubmitting}
+          isLoading={isSubmitting}
+          size="sm"
+          type="submit"
         >
           {tLabels("createOrder")}
         </Button>
@@ -310,19 +325,19 @@ export default function SalesOrderB2CForm({
       <Card>
         <CardBody className="p-4">
           <OrderLinesSection
-            control={control}
-            fields={fields}
             append={append}
+            control={control}
+            defaultLine={validation.defaultLine}
+            errors={errors}
+            fields={fields}
             remove={remove}
-            watchedLines={watchedLines}
-            watchedCurrency={watchedCurrency}
-            watchedPriceListId={watchedPriceListId}
+            setValue={setValue}
             taxRateOptions={taxRateOptions}
             taxRatesQuery={taxRatesQuery}
             uomOptions={uomOptions}
-            errors={errors}
-            defaultLine={validation.defaultLine}
-            setValue={setValue}
+            watchedCurrency={watchedCurrency}
+            watchedLines={watchedLines}
+            watchedPriceListId={watchedPriceListId}
           />
         </CardBody>
       </Card>
@@ -332,8 +347,8 @@ export default function SalesOrderB2CForm({
         <CardBody className="p-4">
           <DeliveryInfoSection
             control={control}
-            isShippingOtherThanPickup={isShippingOtherThanPickup}
             errors={errors}
+            isShippingOtherThanPickup={isShippingOtherThanPickup}
           />
         </CardBody>
       </Card>
@@ -342,11 +357,11 @@ export default function SalesOrderB2CForm({
       <Card>
         <CardBody className="p-4">
           <OrderTotalsSection
-            control={control}
             calculatedTotals={calculatedTotals}
-            watchedCurrency={watchedCurrency}
-            isShippingOtherThanPickup={isShippingOtherThanPickup}
+            control={control}
             errors={errors}
+            isShippingOtherThanPickup={isShippingOtherThanPickup}
+            watchedCurrency={watchedCurrency}
           />
         </CardBody>
       </Card>
@@ -356,10 +371,10 @@ export default function SalesOrderB2CForm({
         <CardBody className="p-4">
           <CustomerInfoSection
             control={control}
-            setValue={setValue}
+            errors={errors}
             selectedCustomer={selectedCustomer}
             setSelectedCustomer={setSelectedCustomer}
-            errors={errors}
+            setValue={setValue}
           />
         </CardBody>
       </Card>
@@ -368,18 +383,18 @@ export default function SalesOrderB2CForm({
       <Card>
         <CardBody className="p-4">
           <Controller
-            name="notes"
             control={control}
+            name="notes"
             render={({ field, fieldState }) => (
               <Textarea
                 {...field}
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 label={tLabels("notes")}
-                size="sm"
                 minRows={2}
+                size="sm"
                 value={field.value ?? ""}
                 onValueChange={field.onChange}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               />
             )}
           />

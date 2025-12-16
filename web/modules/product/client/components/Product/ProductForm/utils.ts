@@ -3,6 +3,7 @@ import type {
   ProductMasterType,
 } from "../../../interface/Product";
 import type { ProductCategoryRow } from "../../../interface/ProductCategory";
+
 import {
   FORBIDDEN_FEATURES_BY_TYPE,
   REQUIRED_FEATURES_BY_TYPE,
@@ -18,6 +19,7 @@ export const buildHierarchyOptions = (categories: ProductCategoryRow[]) => {
   categories.forEach((category) => {
     const parentKey = category.parent?.id ?? null;
     const siblings = grouped.get(parentKey) ?? [];
+
     siblings.push(category);
     grouped.set(parentKey, siblings);
   });
@@ -26,11 +28,13 @@ export const buildHierarchyOptions = (categories: ProductCategoryRow[]) => {
 
   const traverse = (parentKey: string | null, depth: number) => {
     const nodes = grouped.get(parentKey);
+
     if (!nodes) return;
 
     nodes.forEach((node) => {
       const prefix = depth > 1 ? `${"―".repeat(depth - 1)} ` : "";
       const label = typeof node.name === "string" ? node.name : node.code;
+
       results.push({
         id: node.id,
         label: `${prefix}${label ?? node.id}`,
@@ -55,7 +59,7 @@ export const buildHierarchyOptions = (categories: ProductCategoryRow[]) => {
 export const getFeaturesByProductType = (
   productType: ProductMasterType,
   featureOptions: { value: string; label: string }[],
-  currentFeatures?: Record<ProductMasterFeatures, boolean>
+  currentFeatures?: Record<ProductMasterFeatures, boolean>,
 ): Record<ProductMasterFeatures, boolean> => {
   const defaultFeatures = getDefaultFeaturesForType(productType);
   const requiredFeatures = REQUIRED_FEATURES_BY_TYPE[productType] || [];
@@ -80,8 +84,9 @@ export const getFeaturesByProductType = (
           defaultFeatures[featureValue] ??
           false;
       }
+
       return acc;
     },
-    {} as Record<ProductMasterFeatures, boolean>
+    {} as Record<ProductMasterFeatures, boolean>,
   );
 };

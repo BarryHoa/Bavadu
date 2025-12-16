@@ -11,5 +11,6 @@ export const getNameProductType = (type?: ProductMasterType) => {
     [ProductMasterType.ASSET]: "Asset",
     [ProductMasterType.TOOL]: "Tool",
   };
+
   return text[type];
 };

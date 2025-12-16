@@ -34,10 +34,10 @@ export default function FilterMenu<T = any>({
     <Dropdown>
       <DropdownTrigger>
         <Button
-          variant="bordered"
           size="sm"
           startContent={<Filter size={16} />}
           title="Filter"
+          variant="bordered"
         />
       </DropdownTrigger>
       <DropdownMenu aria-label="Filter options" className="min-w-[150px]">

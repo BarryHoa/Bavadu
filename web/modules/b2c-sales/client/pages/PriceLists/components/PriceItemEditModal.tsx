@@ -27,7 +27,7 @@ interface PriceItemEditModalProps {
   variantOptions: SelectItemOption[];
   uomOptions: SelectItemOption[];
   getAvailableUomsForVariant: (
-    variantId: string | undefined
+    variantId: string | undefined,
   ) => SelectItemOption[];
   watchedPriceItems: any[];
   isLoading?: boolean;
@@ -54,11 +54,12 @@ export default function PriceItemEditModal({
   // Check for duplicate
   const isDuplicate = useMemo(() => {
     if (!variantId || !minimumQuantity) return false;
+
     return watchedPriceItems.some(
       (item: any, idx: number) =>
         idx !== index &&
         item.variantId === variantId &&
-        item.minimumQuantity === minimumQuantity
+        item.minimumQuantity === minimumQuantity,
     );
   }, [variantId, minimumQuantity, watchedPriceItems, index]);
 
@@ -66,7 +67,9 @@ export default function PriceItemEditModal({
   const variantName = useMemo(() => {
     if (!variantId) return "";
     const variant = variantOptions.find((v) => v.value === variantId);
+
     if (!variant) return "";
+
     return typeof variant.label === "string"
       ? variant.label
       : getLocalizedText(variant.label);
@@ -75,10 +78,11 @@ export default function PriceItemEditModal({
   // Get all tiers for this variant
   const variantTiers = useMemo(() => {
     if (!variantId) return [];
+
     return watchedPriceItems
       .filter(
         (item: any, idx: number) =>
-          idx !== index && item.variantId === variantId && item.minimumQuantity
+          idx !== index && item.variantId === variantId && item.minimumQuantity,
       )
       .map((item: any) => ({
         minQty: Number(item.minimumQuantity) || 0,
@@ -90,12 +94,14 @@ export default function PriceItemEditModal({
   const handleVariantChange = (key: string) => {
     if (key) {
       const variant = variantOptions.find((v) => v.value === key);
+
       if (variant) {
         const saleUomId =
           typeof variant.saleUomId === "string" ? variant.saleUomId : undefined;
         const baseUomId =
           typeof variant.baseUomId === "string" ? variant.baseUomId : undefined;
         const uomId = saleUomId || baseUomId;
+
         if (uomId) {
           setValue(`priceItems.${index}.uomId`, uomId, {
             shouldValidate: false,
@@ -112,10 +118,10 @@ export default function PriceItemEditModal({
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
-      size="2xl"
-      scrollBehavior="inside"
       placement="center"
+      scrollBehavior="inside"
+      size="2xl"
+      onClose={onClose}
     >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
@@ -162,49 +168,49 @@ export default function PriceItemEditModal({
             <div className="space-y-4">
               {/* Product Variant - Full Width */}
               <Controller
-                name={`priceItems.${index}.variantId`}
                 control={control}
+                name={`priceItems.${index}.variantId`}
                 render={({ field, fieldState }) => (
                   <IBaseSingleSelect
-                    label="Product (Variant)"
-                    size="sm"
-                    items={variantOptions}
-                    selectedKey={field.value}
-                    onSelectionChange={(key) => {
-                      field.onChange(key || "");
-                      handleVariantChange(key || "");
-                    }}
-                    searchPlaceholder="Search product variant..."
                     isRequired
-                    isInvalid={fieldState.invalid || isDuplicate}
                     errorMessage={
                       fieldState.error?.message ||
                       (isDuplicate
                         ? "This variant + minimum quantity combination already exists"
                         : undefined)
                     }
+                    isInvalid={fieldState.invalid || isDuplicate}
                     isLoading={isLoading}
+                    items={variantOptions}
+                    label="Product (Variant)"
+                    searchPlaceholder="Search product variant..."
+                    selectedKey={field.value}
+                    size="sm"
+                    onSelectionChange={(key) => {
+                      field.onChange(key || "");
+                      handleVariantChange(key || "");
+                    }}
                   />
                 )}
               />
 
               {/* UOM - Full Width */}
               <Controller
-                name={`priceItems.${index}.uomId`}
                 control={control}
+                name={`priceItems.${index}.uomId`}
                 render={({ field: uomField, fieldState: uomFieldState }) => (
                   <IBaseSingleSelect
-                    label="UOM"
-                    size="sm"
+                    isRequired
+                    errorMessage={uomFieldState.error?.message}
+                    isDisabled={!variantId || availableUoms.length === 0}
+                    isInvalid={uomFieldState.invalid}
                     items={availableUoms}
+                    label="UOM"
                     selectedKey={uomField.value}
+                    size="sm"
                     onSelectionChange={(key) => {
                       uomField.onChange(key || "");
                     }}
-                    isRequired
-                    isInvalid={uomFieldState.invalid}
-                    errorMessage={uomFieldState.error?.message}
-                    isDisabled={!variantId || availableUoms.length === 0}
                   />
                 )}
               />
@@ -212,13 +218,28 @@ export default function PriceItemEditModal({
               {/* Quantity and Unit Price - Same Row */}
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <Controller
-                  name={`priceItems.${index}.minimumQuantity`}
                   control={control}
+                  name={`priceItems.${index}.minimumQuantity`}
+                  render={({ field, fieldState }) => (
+                    <IBaseInputNumber
+                      isRequired
+                      errorMessage={fieldState.error?.message}
+                      isInvalid={fieldState.invalid || isDuplicate}
+                      label="Minimum Quantity"
+                      min={1}
+                      size="sm"
+                      value={field.value ? Number(field.value) : undefined}
+                      onValueChange={(value) =>
+                        field.onChange(value?.toString() || "")
+                      }
+                    />
+                  )}
                   rules={{
                     required: "Minimum quantity is required",
                     validate: (value) => {
                       if (!value) return true;
                       const numValue = Number(value);
+
                       if (numValue < 1)
                         return "Minimum quantity must be at least 1";
                       // Check duplicate
@@ -226,45 +247,33 @@ export default function PriceItemEditModal({
                         (item: any, idx: number) =>
                           idx !== index &&
                           item.variantId === variantId &&
-                          item.minimumQuantity === value
+                          item.minimumQuantity === value,
                       );
+
                       if (duplicate) {
                         return "This variant + minimum quantity combination already exists";
                       }
+
                       return true;
                     },
                   }}
-                  render={({ field, fieldState }) => (
-                    <IBaseInputNumber
-                      label="Minimum Quantity"
-                      size="sm"
-                      value={field.value ? Number(field.value) : undefined}
-                      onValueChange={(value) =>
-                        field.onChange(value?.toString() || "")
-                      }
-                      min={1}
-                      isRequired
-                      isInvalid={fieldState.invalid || isDuplicate}
-                      errorMessage={fieldState.error?.message}
-                    />
-                  )}
                 />
 
                 <Controller
-                  name={`priceItems.${index}.unitPrice`}
                   control={control}
+                  name={`priceItems.${index}.unitPrice`}
                   render={({ field, fieldState }) => (
                     <IBaseInputNumber
+                      isRequired
+                      errorMessage={fieldState.error?.message}
+                      isInvalid={fieldState.invalid}
                       label="Unit Price (VND)"
+                      min={0}
                       size="sm"
                       value={field.value ? Number(field.value) : undefined}
                       onValueChange={(value) =>
                         field.onChange(value?.toString() || "")
                       }
-                      min={0}
-                      isRequired
-                      isInvalid={fieldState.invalid}
-                      errorMessage={fieldState.error?.message}
                     />
                   )}
                 />

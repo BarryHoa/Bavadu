@@ -1,13 +1,14 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { ilike } from "drizzle-orm";
 
 import { hrm_tb_employees } from "../../schemas";
@@ -43,14 +44,16 @@ class EmployeeDropdownListModel extends BaseViewListModel<
 
   protected declarationSearch = () =>
     new Map([
-      ["employeeCode", (text: string) => ilike(hrm_tb_employees.employeeCode, text)],
+      [
+        "employeeCode",
+        (text: string) => ilike(hrm_tb_employees.employeeCode, text),
+      ],
       ["fullName", (text: string) => ilike(hrm_tb_employees.fullName, text)],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): EmployeeDropdownRow => ({
     id: row.id,
     employeeCode: row.employeeCode,
@@ -59,11 +62,10 @@ class EmployeeDropdownListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<EmployeeDropdownRow>> => {
     return this.buildQueryDataList(params);
   };
 }
 
 export default EmployeeDropdownListModel;
-

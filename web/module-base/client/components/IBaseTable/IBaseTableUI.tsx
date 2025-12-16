@@ -1,7 +1,10 @@
 "use client";
 
-import { Spinner } from "@heroui/spinner";
 import type { SortDescriptor, TableProps } from "@heroui/table";
+import type { Column, HeaderGroup, Row } from "@tanstack/react-table";
+import type { ReactNode } from "react";
+
+import { Spinner } from "@heroui/spinner";
 import {
   Table,
   TableBody,
@@ -10,11 +13,9 @@ import {
   TableHeader,
   TableRow,
 } from "@heroui/table";
-import type { Column, HeaderGroup, Row } from "@tanstack/react-table";
 import { flexRender } from "@tanstack/react-table";
 import clsx from "clsx";
 import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";
-import type { ReactNode } from "react";
 import { useCallback, useMemo } from "react";
 
 export interface IBaseTableUIProps<T = any> {
@@ -55,19 +56,19 @@ export interface IBaseTableUIProps<T = any> {
   renderCell?: (
     column: Column<T, unknown>,
     row: Row<T>,
-    value: any
+    value: any,
   ) => ReactNode;
   renderHeader?: (
     header: HeaderGroup<T>,
-    column: Column<T, unknown>
+    column: Column<T, unknown>,
   ) => ReactNode;
 }
 
 // Memoize sort icons to prevent recreation
 const sortIcons = {
-  default: <ChevronsUpDown className="h-3.5 w-3.5 opacity-70" aria-hidden />,
-  ascending: <ChevronUp className="h-3.5 w-3.5 opacity-90" aria-hidden />,
-  descending: <ChevronDown className="h-3.5 w-3.5 opacity-90" aria-hidden />,
+  default: <ChevronsUpDown aria-hidden className="h-3.5 w-3.5 opacity-70" />,
+  ascending: <ChevronUp aria-hidden className="h-3.5 w-3.5 opacity-90" />,
+  descending: <ChevronDown aria-hidden className="h-3.5 w-3.5 opacity-90" />,
 } as const;
 
 export default function IBaseTableUI<T = any>({
@@ -97,11 +98,12 @@ export default function IBaseTableUI<T = any>({
       if (!sortDescriptor || sortDescriptor.column !== columnId) {
         return sortIcons.default;
       }
+
       return sortDescriptor.direction === "ascending"
         ? sortIcons.ascending
         : sortIcons.descending;
     },
-    [sortDescriptor]
+    [sortDescriptor],
   );
 
   // Memoize header click handler
@@ -121,7 +123,7 @@ export default function IBaseTableUI<T = any>({
         direction: nextDirection,
       });
     },
-    [sortDescriptor, onSortChange]
+    [sortDescriptor, onSortChange],
   );
 
   // Memoize classNames to prevent object recreation
@@ -132,32 +134,32 @@ export default function IBaseTableUI<T = any>({
       wrapper: clsx("rounded-none p-0", classNames.wrapper),
       th: clsx(
         "px-0 bg-primary-600 text-white hover:bg-primary-700/80",
-        classNames.th
+        classNames.th,
       ),
       tr: clsx("hover:bg-primary-700/10", classNames.tr),
       td: clsx("rounded-none py-1 px-2", classNames.td),
     }),
-    [classNames]
+    [classNames],
   );
 
   // Create column lookup map for O(1) access - memoize to prevent recreation
   const columnMap = useMemo(
     () => new Map(visibleColumns.map((col) => [col.id, col])),
-    [visibleColumns]
+    [visibleColumns],
   );
 
   return (
     <Table
       aria-label="Data table"
-      selectionMode={selectionMode}
-      selectedKeys={selectedKeys}
-      onSelectionChange={onSelectionChange}
+      classNames={memoizedClassNames}
+      color={color}
+      isCompact={isCompact}
       isHeaderSticky={isHeaderSticky}
       isStriped={isStriped}
-      isCompact={isCompact}
       layout={tableLayout}
-      color={color}
-      classNames={memoizedClassNames}
+      selectedKeys={selectedKeys}
+      selectionMode={selectionMode}
+      onSelectionChange={onSelectionChange}
     >
       <TableHeader>
         {headerGroups.flatMap((headerGroup) =>
@@ -183,12 +185,12 @@ export default function IBaseTableUI<T = any>({
                 className={clsx(
                   isPinned && "frozen-column",
                   isPinned === "left" && "frozen-left",
-                  isPinned === "right" && "frozen-right"
+                  isPinned === "right" && "frozen-right",
                 )}
+                maxWidth={column?.columnDef.maxSize}
+                minWidth={column?.columnDef.minSize}
                 style={pinStyle}
                 width={column?.getSize()}
-                minWidth={column?.columnDef.minSize}
-                maxWidth={column?.columnDef.maxSize}
               >
                 {renderHeader ? (
                   renderHeader(headerGroup, column!)
@@ -196,11 +198,11 @@ export default function IBaseTableUI<T = any>({
                   <div
                     className={clsx(
                       "inline-flex h-full w-full items-center",
-                      isSortable && "cursor-pointer select-none"
+                      isSortable && "cursor-pointer select-none",
                     )}
-                    onClick={() => handleHeaderClick(header.column)}
                     role={isSortable ? "button" : undefined}
                     tabIndex={isSortable ? 0 : -1}
+                    onClick={() => handleHeaderClick(header.column)}
                   >
                     <span
                       className={clsx(
@@ -209,12 +211,12 @@ export default function IBaseTableUI<T = any>({
                           ? "justify-end"
                           : meta.align === "center"
                             ? "justify-center"
-                            : "justify-start"
+                            : "justify-start",
                       )}
                     >
                       {flexRender(
                         header.column.columnDef.header,
-                        header.getContext()
+                        header.getContext(),
                       )}
                       {isSortable && (
                         <span className="ml-2 inline-flex items-center justify-end">
@@ -226,7 +228,7 @@ export default function IBaseTableUI<T = any>({
                 )}
               </TableColumn>
             );
-          })
+          }),
         )}
       </TableHeader>
       <TableBody
@@ -239,7 +241,7 @@ export default function IBaseTableUI<T = any>({
               original: row.original,
               index: row.index,
             })),
-          [rows]
+          [rows],
         )}
         loadingContent={<Spinner label="Loading..." />}
       >
@@ -276,14 +278,14 @@ export default function IBaseTableUI<T = any>({
                     className={clsx(
                       isPinned && "frozen-column",
                       isPinned === "left" && "frozen-left",
-                      isPinned === "right" && "frozen-right"
+                      isPinned === "right" && "frozen-right",
                     )}
                     style={pinStyle}
                   >
                     <div
                       className={clsx(
                         "flex",
-                        `justify-${meta.align || "start"}`
+                        `justify-${meta.align || "start"}`,
                       )}
                     >
                       {renderCell
@@ -291,19 +293,20 @@ export default function IBaseTableUI<T = any>({
                             const customRender = renderCell(
                               column!,
                               row,
-                              cell.getValue()
+                              cell.getValue(),
                             );
+
                             return customRender !== null &&
                               customRender !== undefined
                               ? customRender
                               : flexRender(
                                   cell.column.columnDef.cell,
-                                  cell.getContext()
+                                  cell.getContext(),
                                 );
                           })()
                         : flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                     </div>
                   </TableCell>

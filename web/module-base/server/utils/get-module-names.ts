@@ -17,4 +17,3 @@ export function getModuleNames(): string[] {
 
   return moduleDirs;
 }
-

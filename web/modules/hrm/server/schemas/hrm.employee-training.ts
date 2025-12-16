@@ -8,6 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_courses } from "./hrm.course";
 import { hrm_tb_employees } from "./hrm.employee";
@@ -40,9 +41,10 @@ export const hrm_tb_employees_training = mdlHrmSchema.table(
     index("employee_trainings_employee_idx").on(table.employeeId),
     index("employee_trainings_course_idx").on(table.courseId),
     index("employee_trainings_status_idx").on(table.status),
-  ]
+  ],
 );
 
-export type HrmTbEmployeeTraining = typeof hrm_tb_employees_training.$inferSelect;
-export type NewHrmTbEmployeeTraining = typeof hrm_tb_employees_training.$inferInsert;
-
+export type HrmTbEmployeeTraining =
+  typeof hrm_tb_employees_training.$inferSelect;
+export type NewHrmTbEmployeeTraining =
+  typeof hrm_tb_employees_training.$inferInsert;

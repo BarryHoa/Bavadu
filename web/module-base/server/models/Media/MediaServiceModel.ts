@@ -54,6 +54,7 @@ class MediaServiceModel {
   constructor() {
     // Get storage directory from env or use default
     const rootDir = process.cwd();
+
     this.storageDir = path.join(rootDir, "storage");
     this.imageDir = path.join(this.storageDir, "image");
     this.fileDir = path.join(this.storageDir, "file");
@@ -105,6 +106,7 @@ class MediaServiceModel {
     const allowedExtensions = isImage
       ? ALLOWED_IMAGE_EXTENSIONS
       : ALLOWED_FILE_EXTENSIONS;
+
     return allowedExtensions.includes(extension);
   }
 
@@ -115,6 +117,7 @@ class MediaServiceModel {
     const allowedMimeTypes = isImage
       ? ALLOWED_IMAGE_MIME_TYPES
       : ALLOWED_FILE_MIME_TYPES;
+
     return allowedMimeTypes.includes(mimeType);
   }
 
@@ -138,7 +141,7 @@ class MediaServiceModel {
       // 1. Validate file size
       if (!this.validateFileSize(file.size)) {
         throw new Error(
-          `File size exceeds maximum allowed size of ${MAX_FILE_SIZE} bytes (${Math.round(MAX_FILE_SIZE / 1024 / 1024)}MB)`
+          `File size exceeds maximum allowed size of ${MAX_FILE_SIZE} bytes (${Math.round(MAX_FILE_SIZE / 1024 / 1024)}MB)`,
         );
       }
 
@@ -152,16 +155,17 @@ class MediaServiceModel {
 
       // 4. Get and validate file extension
       const fileExtension = this.getFileExtension(sanitizedOriginalName);
+
       if (!this.validateExtension(fileExtension, isImageFile)) {
         throw new Error(
-          `File extension ${fileExtension} is not allowed for ${fileType} uploads`
+          `File extension ${fileExtension} is not allowed for ${fileType} uploads`,
         );
       }
 
       // 5. Validate MIME type
       if (!this.validateMimeType(file.type, isImageFile)) {
         throw new Error(
-          `MIME type ${file.type} is not allowed for ${fileType} uploads`
+          `MIME type ${file.type} is not allowed for ${fileType} uploads`,
         );
       }
 
@@ -174,6 +178,7 @@ class MediaServiceModel {
 
       // 8. Ensure the resolved path is still within the target directory
       const resolvedTargetDir = path.resolve(targetDir);
+
       if (!filePath.startsWith(resolvedTargetDir)) {
         throw new Error("Invalid file path detected");
       }
@@ -211,11 +216,12 @@ class MediaServiceModel {
    */
   getFile = async (
     type: "image" | "file",
-    filename: string
+    filename: string,
   ): Promise<{ buffer: Buffer; mimeType: string; size: number } | null> => {
     try {
       // 1. Sanitize filename to prevent path traversal
       const sanitizedFilename = this.sanitizeFilename(filename);
+
       if (sanitizedFilename !== filename) {
         // Filename was modified, reject request
         return null;
@@ -224,6 +230,7 @@ class MediaServiceModel {
       // 2. Validate file extension
       const ext = this.getFileExtension(sanitizedFilename);
       const isImage = type === "image";
+
       if (!this.validateExtension(ext, isImage)) {
         return null;
       }
@@ -236,6 +243,7 @@ class MediaServiceModel {
       // 4. Ensure the resolved path is still within the target directory
       if (!filePath.startsWith(resolvedTargetDir)) {
         console.error("Path traversal attempt detected:", filename);
+
         return null;
       }
 
@@ -277,6 +285,7 @@ class MediaServiceModel {
       };
     } catch (error) {
       console.error("Error getting file:", error);
+
       return null;
     }
   };
@@ -286,7 +295,7 @@ class MediaServiceModel {
    */
   deleteFile = async (
     type: "image" | "file",
-    filename: string
+    filename: string,
   ): Promise<boolean> => {
     try {
       const targetDir = type === "image" ? this.imageDir : this.fileDir;
@@ -301,9 +310,11 @@ class MediaServiceModel {
 
       // Delete file
       await fs.unlink(filePath);
+
       return true;
     } catch (error) {
       console.error("Error deleting file:", error);
+
       return false;
     }
   };
@@ -316,6 +327,7 @@ export const getMediaServiceModel = (): MediaServiceModel => {
   if (!mediaServiceModelInstance) {
     mediaServiceModelInstance = new MediaServiceModel();
   }
+
   return mediaServiceModelInstance;
 };
 

@@ -18,6 +18,7 @@ export function createCandidateValidation(t: TranslateFn) {
   const fullNameSchema = custom<{ vi?: string; en?: string }>((value) => {
     if (!value || typeof value !== "object") return false;
     const obj = value as any;
+
     return (
       (obj.vi !== undefined &&
         typeof obj.vi === "string" &&
@@ -33,15 +34,16 @@ export function createCandidateValidation(t: TranslateFn) {
     trim(),
     custom((value) => {
       const str = value as string;
+
       return str === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
-    }, t("validation.email.invalid"))
+    }, t("validation.email.invalid")),
   );
 
   const candidateFormSchema = object({
     requisitionId: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.requisitionId.required"))
+      minLength(1, t("validation.requisitionId.required")),
     ),
     firstName: optional(pipe(string(), trim())),
     lastName: optional(pipe(string(), trim())),
@@ -60,8 +62,8 @@ export function createCandidateValidation(t: TranslateFn) {
       pipe(
         number(),
         minValue(0, t("validation.rating.min")),
-        maxValue(5, t("validation.rating.max"))
-      )
+        maxValue(5, t("validation.rating.max")),
+      ),
     ),
     notes: optional(pipe(string(), trim())),
   });

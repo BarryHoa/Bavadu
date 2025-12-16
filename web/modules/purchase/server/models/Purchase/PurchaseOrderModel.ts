@@ -1,17 +1,18 @@
-import { and, desc, eq, sql } from "drizzle-orm";
-
-import { BaseModel } from "@base/server/models/BaseModel";
-import { RuntimeContext } from "@base/server/runtime/RuntimeContext";
-import {
-  purchase_tb_purchase_orders,
-  purchase_tb_purchase_orders_line,
-} from "../../schemas";
 import type {
   NewPurchaseTbPurchaseOrder,
   PurchaseTbPurchaseOrder,
   PurchaseTbPurchaseOrderLine,
 } from "../../schemas";
 import type StockModel from "@mdl/stock/server/models/Stock/StockModel";
+
+import { desc, eq, sql } from "drizzle-orm";
+import { BaseModel } from "@base/server/models/BaseModel";
+import { RuntimeContext } from "@base/server/runtime/RuntimeContext";
+
+import {
+  purchase_tb_purchase_orders,
+  purchase_tb_purchase_orders_line,
+} from "../../schemas";
 
 type PurchaseStatus = "draft" | "confirmed" | "received" | "cancelled";
 
@@ -65,6 +66,7 @@ export default class PurchaseOrderModel extends BaseModel<
       .from(purchase_tb_purchase_orders)
       .where(eq(purchase_tb_purchase_orders.id, id))
       .limit(1);
+
     if (!order) {
       return null;
     }
@@ -72,6 +74,7 @@ export default class PurchaseOrderModel extends BaseModel<
       .select()
       .from(purchase_tb_purchase_orders_line)
       .where(eq(purchase_tb_purchase_orders_line.orderId, order.id));
+
     return { order, lines };
   };
 
@@ -88,7 +91,10 @@ export default class PurchaseOrderModel extends BaseModel<
         .padStart(2, "0")}${now
         .getDate()
         .toString()
-        .padStart(2, "0")}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+        .padStart(
+          2,
+          "0",
+        )}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
     return this.db.transaction(async (tx) => {
       const orderPayload: NewPurchaseTbPurchaseOrder = {
@@ -114,9 +120,11 @@ export default class PurchaseOrderModel extends BaseModel<
 
       for (const line of input.lines) {
         const quantity = Number(line.quantity ?? 0);
+
         if (quantity <= 0) continue;
 
         const unitPrice = Number(line.unitPrice ?? 0);
+
         totalAmount += quantity * unitPrice;
 
         await tx.insert(purchase_tb_purchase_orders_line).values({
@@ -138,9 +146,11 @@ export default class PurchaseOrderModel extends BaseModel<
         .where(eq(purchase_tb_purchase_orders.id, order.id));
 
       const result = await this.getById(order.id);
+
       if (!result) {
         throw new Error("Failed to load purchase order after creation");
       }
+
       return result;
     });
   };
@@ -163,13 +173,15 @@ export default class PurchaseOrderModel extends BaseModel<
   };
 
   receive = async (input: ReceivePurchaseOrderInput) => {
-    const stockModel = await RuntimeContext.getModelInstanceBy<StockModel>("stock");
+    const stockModel =
+      await RuntimeContext.getModelInstanceBy<StockModel>("stock");
 
     if (!stockModel) {
       throw new Error("Stock model is not registered");
     }
 
     const orderData = await this.getById(input.orderId);
+
     if (!orderData) {
       throw new Error("Purchase order not found");
     }
@@ -183,6 +195,7 @@ export default class PurchaseOrderModel extends BaseModel<
     }
 
     const linesById = new Map<string, PurchaseTbPurchaseOrderLine>();
+
     for (const line of lines) {
       linesById.set(line.id, line);
     }
@@ -192,13 +205,15 @@ export default class PurchaseOrderModel extends BaseModel<
     await this.db.transaction(async (tx) => {
       for (const receivedLine of input.lines) {
         const line = linesById.get(receivedLine.lineId);
+
         if (!line) {
           throw new Error(
-            `Purchase order line ${receivedLine.lineId} not found`
+            `Purchase order line ${receivedLine.lineId} not found`,
           );
         }
 
         const receiveQty = Number(receivedLine.quantity ?? 0);
+
         if (receiveQty <= 0) {
           continue;
         }
@@ -209,7 +224,7 @@ export default class PurchaseOrderModel extends BaseModel<
 
         if (nextReceived - orderedQty > 0.0001) {
           throw new Error(
-            `Cannot receive more than ordered for product ${line.productId}`
+            `Cannot receive more than ordered for product ${line.productId}`,
           );
         }
 
@@ -274,6 +289,4 @@ export default class PurchaseOrderModel extends BaseModel<
 
     return updated;
   };
-
 }
-

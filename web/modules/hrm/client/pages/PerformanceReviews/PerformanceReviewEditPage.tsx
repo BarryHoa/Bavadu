@@ -5,10 +5,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { performanceReviewService } from "@mdl/hrm/client/services/PerformanceReviewService";
+import { LoadingOverlay } from "@base/client/components";
+
 import PerformanceReviewForm, {
   type PerformanceReviewFormValues,
 } from "./components/PerformanceReviewForm/PerformanceReviewForm";
-import { LoadingOverlay } from "@base/client/components";
 
 export default function PerformanceReviewEditPage(): React.ReactNode {
   const router = useRouter();
@@ -26,9 +27,13 @@ export default function PerformanceReviewEditPage(): React.ReactNode {
     queryKey: ["hrm-performance-reviews", id],
     queryFn: async () => {
       const response = await performanceReviewService.getById(id);
+
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToLoadPerformanceReview"));
+        throw new Error(
+          response.message ?? t("errors.failedToLoadPerformanceReview"),
+        );
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -44,12 +49,19 @@ export default function PerformanceReviewEditPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await performanceReviewService.update(payload);
+
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToUpdatePerformanceReview"));
+        throw new Error(
+          response.message ?? t("errors.failedToUpdatePerformanceReview"),
+        );
       }
+
       return { data: { id: response.data.id } };
     },
-    invalidateQueries: [["hrm-performance-reviews"], ["hrm-performance-reviews", id]],
+    invalidateQueries: [
+      ["hrm-performance-reviews"],
+      ["hrm-performance-reviews", id],
+    ],
     onSuccess: (data) => {
       router.push(`/workspace/modules/hrm/.../view/${data.data.id}`);
     },
@@ -93,10 +105,6 @@ export default function PerformanceReviewEditPage(): React.ReactNode {
 
   return (
     <PerformanceReviewForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push(`/workspace/modules/hrm/performance-reviews/view/${id}`)}
-      submitError={submitError}
-      isSubmitting={isPending}
       defaultValues={{
         employeeId: performanceReviewData.employeeId,
         reviewType: performanceReviewData.reviewType,
@@ -110,7 +118,12 @@ export default function PerformanceReviewEditPage(): React.ReactNode {
         employeeComments: performanceReviewData.employeeComments || "",
         status: performanceReviewData.status,
       }}
+      isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() =>
+        router.push(`/workspace/modules/hrm/performance-reviews/view/${id}`)
+      }
+      onSubmit={handleSubmit}
     />
   );
 }
-

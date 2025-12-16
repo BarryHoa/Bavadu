@@ -4,6 +4,7 @@ import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { employeeService } from "@mdl/hrm/client/services/EmployeeService";
+
 import EmployeeForm, {
   type EmployeeFormValues,
 } from "../components/EmployeeForm/EmployeeForm";
@@ -22,9 +23,11 @@ export default function EmployeeCreatePageClient(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await employeeService.create(payload);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToCreate"));
       }
+
       return response.data;
     },
     invalidateQueries: [["hrm-employees"]],
@@ -64,11 +67,10 @@ export default function EmployeeCreatePageClient(): React.ReactNode {
 
   return (
     <EmployeeForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push("/workspace/modules/hrm/employees")}
-      submitError={submitError}
       isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() => router.push("/workspace/modules/hrm/employees")}
+      onSubmit={handleSubmit}
     />
   );
 }
-

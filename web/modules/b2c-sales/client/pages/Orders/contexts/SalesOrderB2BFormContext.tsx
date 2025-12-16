@@ -22,10 +22,12 @@ export const SalesOrderB2BFormProvider = ({
 
 export const useSalesOrderB2BForm = () => {
   const context = useContext(SalesOrderB2BFormContext);
+
   if (!context) {
     throw new Error(
-      "useSalesOrderB2BForm must be used within a SalesOrderB2BFormProvider"
+      "useSalesOrderB2BForm must be used within a SalesOrderB2BFormProvider",
     );
   }
+
   return context;
 };

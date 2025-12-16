@@ -1,15 +1,16 @@
 import type { Column } from "drizzle-orm";
-import { ilike } from "drizzle-orm";
-
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
+
+import { ilike } from "drizzle-orm";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
+
 import { sale_b2c_tb_customer_companies } from "../../schemas";
 
 class CustomerCompanyViewListModel extends BaseViewListModel<
@@ -42,22 +43,39 @@ class CustomerCompanyViewListModel extends BaseViewListModel<
       ["taxId", { column: sale_b2c_tb_customer_companies.taxId, sort: true }],
       ["phone", { column: sale_b2c_tb_customer_companies.phone, sort: true }],
       ["email", { column: sale_b2c_tb_customer_companies.email, sort: true }],
-      ["isActive", { column: sale_b2c_tb_customer_companies.isActive, sort: true }],
-      ["createdAt", { column: sale_b2c_tb_customer_companies.createdAt, sort: true }],
-      ["updatedAt", { column: sale_b2c_tb_customer_companies.updatedAt, sort: true }],
+      [
+        "isActive",
+        { column: sale_b2c_tb_customer_companies.isActive, sort: true },
+      ],
+      [
+        "createdAt",
+        { column: sale_b2c_tb_customer_companies.createdAt, sort: true },
+      ],
+      [
+        "updatedAt",
+        { column: sale_b2c_tb_customer_companies.updatedAt, sort: true },
+      ],
     ]);
 
   protected declarationSearch = () =>
     new Map([
-      ["code", (text: string) => ilike(sale_b2c_tb_customer_companies.code, text)],
-      ["name", (text: string) => ilike(sale_b2c_tb_customer_companies.name, text)],
-      ["taxId", (text: string) => ilike(sale_b2c_tb_customer_companies.taxId, text)],
+      [
+        "code",
+        (text: string) => ilike(sale_b2c_tb_customer_companies.code, text),
+      ],
+      [
+        "name",
+        (text: string) => ilike(sale_b2c_tb_customer_companies.name, text),
+      ],
+      [
+        "taxId",
+        (text: string) => ilike(sale_b2c_tb_customer_companies.taxId, text),
+      ],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): any => ({
     id: row.id,
     code: row.code,
@@ -77,11 +95,10 @@ class CustomerCompanyViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<any>> => {
     return this.buildQueryDataList(params);
   };
 }
 
 export default CustomerCompanyViewListModel;
-

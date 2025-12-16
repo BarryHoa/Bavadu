@@ -6,6 +6,7 @@ import { payrollService } from "@mdl/hrm/client/services/PayrollService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
+
 import PayrollForm, {
   type PayrollFormValues,
 } from "./components/PayrollForm/PayrollForm";
@@ -26,9 +27,11 @@ export default function PayrollEditPage(): React.ReactNode {
     queryKey: ["hrm-payroll", id],
     queryFn: async () => {
       const response = await payrollService.getById(id);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToLoadPayroll"));
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -44,9 +47,11 @@ export default function PayrollEditPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await payrollService.update(payload);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToUpdatePayroll"));
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-payroll"], ["hrm-payroll", id]],
@@ -126,10 +131,6 @@ export default function PayrollEditPage(): React.ReactNode {
 
   return (
     <PayrollForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push(`/workspace/modules/hrm/payroll/view/${id}`)}
-      submitError={submitError}
-      isSubmitting={isPending}
       defaultValues={{
         payrollPeriodId: payrollData.payrollPeriodId,
         employeeId: payrollData.employeeId,
@@ -147,6 +148,10 @@ export default function PayrollEditPage(): React.ReactNode {
         status: payrollData.status,
         notes: payrollData.notes || "",
       }}
+      isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() => router.push(`/workspace/modules/hrm/payroll/view/${id}`)}
+      onSubmit={handleSubmit}
     />
   );
 }

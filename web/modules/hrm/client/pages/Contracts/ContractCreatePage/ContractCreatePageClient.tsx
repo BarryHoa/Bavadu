@@ -4,6 +4,7 @@ import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { contractService } from "@mdl/hrm/client/services/ContractService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+
 import ContractForm, {
   type ContractFormValues,
 } from "../components/ContractForm/ContractForm";
@@ -22,9 +23,11 @@ export default function ContractCreatePageClient(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await contractService.create(payload);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToCreate"));
       }
+
       return response.data;
     },
     invalidateQueries: [["hrm-contracts"]],
@@ -60,10 +63,10 @@ export default function ContractCreatePageClient(): React.ReactNode {
 
   return (
     <ContractForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push("/workspace/modules/hrm/contracts")}
-      submitError={submitError}
       isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() => router.push("/workspace/modules/hrm/contracts")}
+      onSubmit={handleSubmit}
     />
   );
 }

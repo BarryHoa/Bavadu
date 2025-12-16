@@ -1,5 +1,8 @@
 "use client";
 
+import type { Resolver, SubmitHandler } from "react-hook-form";
+import type { ProductCategoryRow } from "../../interface/ProductCategory";
+
 import { IBaseInput } from "@base/client/components";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Switch, Textarea } from "@heroui/react";
@@ -7,7 +10,6 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
 import { Save } from "lucide-react";
 import { useEffect, useMemo } from "react";
-import type { Resolver, SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import {
   boolean,
@@ -20,7 +22,6 @@ import {
   trim,
 } from "valibot";
 
-import type { ProductCategoryRow } from "../../interface/ProductCategory";
 import ProductCategoryService from "../../services/ProductCategoryService";
 
 export type ProductCategoryFormValues = {
@@ -42,7 +43,7 @@ interface ProductCategoryFormProps {
   error?: string | null;
   onSubmit: (values: ProductCategoryFormValues) => Promise<void> | void;
   onSubmitAndContinue?: (
-    values: ProductCategoryFormValues
+    values: ProductCategoryFormValues,
   ) => Promise<void> | void;
   onCancel?: () => void;
   categoryId?: string;
@@ -66,6 +67,7 @@ const getDisplayName = (node: ProductCategoryRow) => {
   if (typeof name === "string") return name;
   if (name && typeof name === "object") {
     const record = name as Record<string, string>;
+
     return record.en ?? record.vi ?? code ?? id ?? "";
   }
 
@@ -74,7 +76,7 @@ const getDisplayName = (node: ProductCategoryRow) => {
 
 const buildHierarchyOptions = (
   categories: ProductCategoryRow[],
-  excludeId?: string
+  excludeId?: string,
 ): { id: string; label: string; level: number }[] => {
   const grouped = new Map<string | null, ProductCategoryRow[]>();
 
@@ -85,6 +87,7 @@ const buildHierarchyOptions = (
 
     const parentKey = category.parent?.id ?? null;
     const siblings = grouped.get(parentKey) ?? [];
+
     siblings.push(category);
     grouped.set(parentKey, siblings);
   });
@@ -93,12 +96,14 @@ const buildHierarchyOptions = (
 
   const traverse = (parentKey: string | null, depth: number) => {
     const items = grouped.get(parentKey);
+
     if (!items) {
       return;
     }
 
     items.forEach((item) => {
       const prefix = depth > 1 ? `${"―".repeat(depth - 1)} ` : "";
+
       results.push({
         id: item.id,
         label: `${prefix}${getDisplayName(item)}`,
@@ -123,7 +128,7 @@ const productCategorySchema = object({
 });
 
 const normalizeValues = (
-  values?: ProductCategoryFormValues
+  values?: ProductCategoryFormValues,
 ): ProductCategoryFormValues => ({
   ...defaultValues,
   ...values,
@@ -162,7 +167,7 @@ export default function ProductCategoryForm({
   } = useForm<ProductCategoryFormValues>({
     defaultValues: normalizedDefaults,
     resolver: valibotResolver(
-      productCategorySchema
+      productCategorySchema,
     ) as Resolver<ProductCategoryFormValues>,
   });
 
@@ -172,6 +177,7 @@ export default function ProductCategoryForm({
 
   const categoryNodes = useMemo(() => {
     if (!categoriesQuery.data) return [];
+
     return buildHierarchyOptions(categoriesQuery.data, categoryId);
   }, [categoriesQuery.data, categoryId]);
 
@@ -179,6 +185,7 @@ export default function ProductCategoryForm({
   const computedLevel = useMemo(() => {
     if (!parentId) return 1;
     const parentNode = categoryNodes.find((node) => node.id === parentId);
+
     return parentNode ? parentNode.level + 1 : 1;
   }, [parentId, categoryNodes]);
 
@@ -199,7 +206,7 @@ export default function ProductCategoryForm({
   const levelValue = isLevelValid ? computedLevel : `>${MAX_LEVEL}`;
 
   const handleValidSubmit: SubmitHandler<ProductCategoryFormValues> = async (
-    formValues
+    formValues,
   ) => {
     if (!isLevelValid) {
       return;
@@ -265,15 +272,15 @@ export default function ProductCategoryForm({
             render={({ field }) => (
               <IBaseInput
                 {...field}
+                isRequired
+                errorMessage={errors.name?.message}
+                isDisabled={isBusy}
+                isInvalid={Boolean(errors.name)}
                 label="Name"
                 placeholder="Electronics"
                 value={field.value}
-                onValueChange={field.onChange}
                 variant="bordered"
-                isRequired
-                isInvalid={Boolean(errors.name)}
-                errorMessage={errors.name?.message}
-                isDisabled={isBusy}
+                onValueChange={field.onChange}
               />
             )}
           />
@@ -284,15 +291,15 @@ export default function ProductCategoryForm({
             render={({ field }) => (
               <IBaseInput
                 {...field}
+                isRequired
+                errorMessage={errors.code?.message}
+                isDisabled={isBusy}
+                isInvalid={Boolean(errors.code)}
                 label="Code"
                 placeholder="CAT-001"
                 value={field.value}
-                onValueChange={field.onChange}
                 variant="bordered"
-                isRequired
-                isInvalid={Boolean(errors.code)}
-                errorMessage={errors.code?.message}
-                isDisabled={isBusy}
+                onValueChange={field.onChange}
               />
             )}
           />
@@ -314,11 +321,11 @@ export default function ProductCategoryForm({
                 render={({ field }) => (
                   <select
                     className="rounded-medium border border-default-200 px-3 py-2 text-sm outline-none focus:border-primary"
+                    disabled={isBusy}
                     value={field.value ?? ""}
                     onChange={(event) =>
                       field.onChange(event.target.value || undefined)
                     }
-                    disabled={isBusy}
                   >
                     <option value="">— Root (level 1) —</option>
                     {categoryNodes.map((node) => (
@@ -348,13 +355,13 @@ export default function ProductCategoryForm({
             render={({ field }) => (
               <Textarea
                 {...field}
+                isDisabled={isBusy}
                 label="Description"
+                minRows={3}
                 placeholder="Write a short description"
                 value={field.value ?? ""}
-                onValueChange={field.onChange}
                 variant="bordered"
-                minRows={3}
-                isDisabled={isBusy}
+                onValueChange={field.onChange}
               />
             )}
           />
@@ -364,9 +371,9 @@ export default function ProductCategoryForm({
             name="isActive"
             render={({ field }) => (
               <Switch
+                isDisabled={isBusy}
                 isSelected={field.value}
                 onValueChange={field.onChange}
-                isDisabled={isBusy}
               >
                 Active
               </Switch>
@@ -376,10 +383,10 @@ export default function ProductCategoryForm({
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
             {onCancel ? (
               <Button
-                variant="light"
-                size="sm"
-                onPress={onCancel}
                 isDisabled={isBusy}
+                size="sm"
+                variant="light"
+                onPress={onCancel}
               >
                 Cancel
               </Button>
@@ -387,9 +394,10 @@ export default function ProductCategoryForm({
 
             {onSubmitAndContinue ? (
               <Button
-                variant="bordered"
+                isDisabled={isBusy || !isLevelValid}
                 size="sm"
                 type="button"
+                variant="bordered"
                 onPress={
                   onSubmitAndContinueForm
                     ? async () => {
@@ -397,7 +405,6 @@ export default function ProductCategoryForm({
                       }
                     : undefined
                 }
-                isDisabled={isBusy || !isLevelValid}
               >
                 {secondarySubmitLabel}
               </Button>
@@ -405,11 +412,11 @@ export default function ProductCategoryForm({
 
             <Button
               color="primary"
-              size="sm"
               endContent={<Save size={16} />}
-              type="submit"
-              isLoading={isBusy}
               isDisabled={!isLevelValid}
+              isLoading={isBusy}
+              size="sm"
+              type="submit"
             >
               {submitLabel}
             </Button>

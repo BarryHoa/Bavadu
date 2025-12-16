@@ -8,6 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_candidates } from "./hrm.candidate";
 import { hrm_tb_employees } from "./hrm.employee";
@@ -23,7 +24,9 @@ export const hrm_tb_interviews = mdlHrmSchema.table(
       .references(() => hrm_tb_candidates.id, { onDelete: "cascade" })
       .notNull(),
     interviewType: varchar("interview_type", { length: 50 }).notNull(), // phone_screen, technical, final, etc.
-    scheduledDate: timestamp("scheduled_date", { withTimezone: true }).notNull(),
+    scheduledDate: timestamp("scheduled_date", {
+      withTimezone: true,
+    }).notNull(),
     duration: integer("duration"), // Minutes
     location: varchar("location", { length: 255 }), // Physical location or video link
     interviewerIds: jsonb("interviewer_ids").notNull(), // Array of employee IDs
@@ -43,9 +46,8 @@ export const hrm_tb_interviews = mdlHrmSchema.table(
     index("interviews_candidate_idx").on(table.candidateId),
     index("interviews_status_idx").on(table.status),
     index("interviews_date_idx").on(table.scheduledDate),
-  ]
+  ],
 );
 
 export type HrmTbInterview = typeof hrm_tb_interviews.$inferSelect;
 export type NewHrmTbInterview = typeof hrm_tb_interviews.$inferInsert;
-

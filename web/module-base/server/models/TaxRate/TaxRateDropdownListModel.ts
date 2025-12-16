@@ -1,13 +1,15 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { asc, eq, inArray } from "drizzle-orm";
+
 import { base_tb_tax_rates } from "../../schemas/base.tax-rate";
 import { ParamFilter } from "../interfaces/FilterInterface";
 
@@ -69,10 +71,9 @@ class TaxRateDropdownListModel extends BaseViewListModel<
       ],
     ]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (
     row: any,
-    index?: number
+    index?: number,
   ): TaxRateDropdownOption => {
     const name =
       typeof row.name === "string"
@@ -85,10 +86,10 @@ class TaxRateDropdownListModel extends BaseViewListModel<
       code: row.code,
       name: row.name,
     };
-  }
+  };
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<TaxRateDropdownOption>> => {
     const result = await this.buildQueryDataListWithSelect(
       params,
@@ -100,12 +101,12 @@ class TaxRateDropdownListModel extends BaseViewListModel<
       },
       (query) => {
         return query.orderBy(asc(base_tb_tax_rates.order)).limit(params.limit);
-      }
+      },
     );
 
     return {
       data: result.data.map((row: any, index: number) =>
-        this.declarationMappingData(row, index)
+        this.declarationMappingData(row, index),
       ),
       total: result.total,
     };

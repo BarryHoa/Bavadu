@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
     // If CRON_SECRET is set, require it in Authorization header
     if (cronSecret) {
       const authHeader = request.headers.get("authorization");
+
       if (authHeader !== `Bearer ${cronSecret}`) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
@@ -26,17 +27,19 @@ export async function GET(request: NextRequest) {
 
     console.log(
       `[Cron] Files to compress: ${statsBefore.filesToCompress}, ` +
-        `Size: ${(statsBefore.sizeToCompress / 1024 / 1024).toFixed(2)} MB`
+        `Size: ${(statsBefore.sizeToCompress / 1024 / 1024).toFixed(2)} MB`,
     );
 
     const result = await compressionModel.compressLogs();
 
     let message = "";
+
     if (result.compressed > 0) {
       const compressionRatio = (
         (1 - result.compressedSize / result.totalSize) *
         100
       ).toFixed(1);
+
       message =
         `Compressed ${result.compressed} log files. ` +
         `Original: ${(result.totalSize / 1024 / 1024).toFixed(2)} MB, ` +
@@ -63,12 +66,13 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("[Cron] Error compressing logs:", error);
+
     return NextResponse.json(
       {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

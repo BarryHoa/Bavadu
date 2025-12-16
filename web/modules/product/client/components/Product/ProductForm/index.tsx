@@ -1,5 +1,8 @@
 "use client";
 
+import type { Resolver, SubmitHandler } from "react-hook-form";
+import type { VariantFieldValue } from "./types";
+
 import {
   IBaseTabs,
   IBaseTooltip,
@@ -14,22 +17,23 @@ import { useQuery } from "@tanstack/react-query";
 import { HelpCircle, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { Resolver, SubmitHandler } from "react-hook-form";
 import {
   FormProvider,
   useFieldArray,
   useForm,
   useWatch,
 } from "react-hook-form";
+import { MediaService } from "@base/client/services";
+
 import {
   ProductFormValues,
   ProductMasterFeatures,
   ProductMasterType,
 } from "../../../interface/Product";
-import { MediaService } from "@base/client/services";
 import ProductCategoryService from "../../../services/ProductCategoryService";
 import ProductService from "../../../services/ProductService";
 import { FORBIDDEN_FEATURES_BY_TYPE } from "../../../utils/product-features-validator";
+
 import MasterTab from "./MasterTab";
 import ProductFormGuideModal from "./ProductFormGuideModal";
 import VariantTab from "./VariantTab";
@@ -40,7 +44,6 @@ import {
   mapToProductFormValues,
   type ProductFormFieldValues,
 } from "./mappers";
-import type { VariantFieldValue } from "./types";
 import { buildHierarchyOptions, getFeaturesByProductType } from "./utils";
 import { createProductFormSchema } from "./validation";
 
@@ -75,11 +78,12 @@ export default function ProductForm({
       // Type assertion to allow passing variables to next-intl translation function
       const tWithVars = tProductForm as unknown as (
         key: string,
-        values?: Record<string, string | number>
+        values?: Record<string, string | number>,
       ) => string;
+
       return tWithVars(key, values);
     },
-    [tProductForm]
+    [tProductForm],
   );
 
   const productFeaturesQuery = useQuery({
@@ -91,6 +95,7 @@ export default function ProductForm({
     if (!productFeaturesQuery.data?.data) {
       return [];
     }
+
     return productFeaturesQuery.data.data.map((option: any) => {
       return {
         value: option.value as ProductMasterFeatures,
@@ -102,7 +107,7 @@ export default function ProductForm({
   const form = useForm<ProductFormFieldValues>({
     defaultValues: mapToFieldValues(initialValues, featureOptions),
     resolver: valibotResolver(
-      createProductFormSchema(t, tProduct, tProductForm, formatMessage)
+      createProductFormSchema(t, tProduct, tProductForm, formatMessage),
     ) as unknown as Resolver<ProductFormFieldValues>,
     mode: "onSubmit", // Only validate on submit initially
     reValidateMode: "onChange", // After submit, re-validate on change for fields with errors
@@ -145,6 +150,7 @@ export default function ProductForm({
     const categories = Array.isArray(categoryQuery.data)
       ? categoryQuery.data
       : [];
+
     return buildHierarchyOptions(categories).map((option) => ({
       value: option.id,
       label: option.label,
@@ -168,6 +174,7 @@ export default function ProductForm({
     // Only reset tab if we're on a variant tab that no longer exists
     if (selectedTab.startsWith("variant-")) {
       const variantIndex = parseInt(selectedTab.replace("variant-", ""), 10);
+
       if (isNaN(variantIndex) || variantIndex >= (variants?.length ?? 0)) {
         // Variant tab no longer exists, switch to master
         setSelectedTab("master");
@@ -181,12 +188,14 @@ export default function ProductForm({
   const disabledFeatures = useMemo(() => {
     if (!masterType) return new Set<string>();
     const forbidden = FORBIDDEN_FEATURES_BY_TYPE[masterType] || [];
+
     return new Set(forbidden.map((f) => f));
   }, [masterType]);
 
   const addVariant = useCallback(() => {
     if (variantFields.length >= 20) return;
     const newIndex = variantFields.length;
+
     appendVariant(createDefaultVariant());
     // Switch to the new variant tab
     setSelectedTab(`variant-${newIndex}`);
@@ -207,7 +216,7 @@ export default function ProductForm({
         }
       }
     },
-    [variantFields.length, removeVariant, selectedTab]
+    [variantFields.length, removeVariant, selectedTab],
   );
 
   // Helper function to find first error field path
@@ -225,21 +234,23 @@ export default function ProductForm({
 
         if (typeof error === "object" && error !== null) {
           const nestedError = findFirstErrorField(error, currentPath);
+
           if (nestedError) return nestedError;
         }
       }
 
       return null;
     },
-    []
+    [],
   );
 
   const updateVariant = useCallback(
     (
       variantIndex: number,
-      updater: (current: VariantFieldValue) => VariantFieldValue
+      updater: (current: VariantFieldValue) => VariantFieldValue,
     ) => {
       const currentVariant = getValues(`variants.${variantIndex}`);
+
       if (!currentVariant) return;
 
       const updatedVariant = updater(currentVariant);
@@ -262,11 +273,11 @@ export default function ProductForm({
         });
       }
     },
-    [getValues, setValue, trigger, errors, isSubmitted]
+    [getValues, setValue, trigger, errors, isSubmitted],
   );
 
   const handleValidSubmit: SubmitHandler<ProductFormFieldValues> = async (
-    formValues
+    formValues,
   ) => {
     try {
       // Upload images before mapping to payload
@@ -274,8 +285,9 @@ export default function ProductForm({
 
       // Upload master images
       if (formValues.master.images.length > 0) {
-        uploadedFormValues.master.images =
-          await MediaService.uploadImageItems(formValues.master.images);
+        uploadedFormValues.master.images = await MediaService.uploadImageItems(
+          formValues.master.images,
+        );
       }
 
       // Upload variant images
@@ -283,21 +295,23 @@ export default function ProductForm({
         formValues.variants.map(async (variant) => {
           if (variant.images.length > 0) {
             const uploadedImages = await MediaService.uploadImageItems(
-              variant.images
+              variant.images,
             );
+
             return { ...variant, images: uploadedImages };
           }
+
           return variant;
-        })
+        }),
       );
 
       // Check for upload errors
       const hasUploadErrors =
         uploadedFormValues.master.images.some(
-          (img) => img.status === "error"
+          (img) => img.status === "error",
         ) ||
         uploadedFormValues.variants.some((variant) =>
-          variant.images.some((img) => img.status === "error")
+          variant.images.some((img) => img.status === "error"),
         );
 
       if (hasUploadErrors) {
@@ -306,6 +320,7 @@ export default function ProductForm({
 
       // Map to payload after upload
       const payload = mapToProductFormValues(uploadedFormValues);
+
       await onSubmit(payload);
     } catch (error) {
       console.error("Error uploading images:", error);
@@ -317,12 +332,15 @@ export default function ProductForm({
   const handleSubmitError = useCallback(
     (submitErrors: any) => {
       const firstErrorPath = findFirstErrorField(submitErrors);
+
       if (firstErrorPath) {
         // Switch to appropriate tab if error is in variant
         if (firstErrorPath.startsWith("variants.")) {
           const variantMatch = firstErrorPath.match(/variants\.(\d+)/);
+
           if (variantMatch) {
             const variantIndex = parseInt(variantMatch[1], 10);
+
             setSelectedTab(`variant-${variantIndex}`);
             // Wait for tab switch then focus
             setTimeout(() => {
@@ -332,6 +350,7 @@ export default function ProductForm({
                 // Ignore focus errors for nested paths
               }
             }, 150);
+
             return;
           }
         } else if (firstErrorPath.startsWith("master.")) {
@@ -348,7 +367,7 @@ export default function ProductForm({
         }, 100);
       }
     },
-    [findFirstErrorField, setFocus]
+    [findFirstErrorField, setFocus],
   );
 
   const handleValidSubmitAndContinue: SubmitHandler<
@@ -364,8 +383,9 @@ export default function ProductForm({
 
       // Upload master images
       if (formValues.master.images.length > 0) {
-        uploadedFormValues.master.images =
-          await MediaService.uploadImageItems(formValues.master.images);
+        uploadedFormValues.master.images = await MediaService.uploadImageItems(
+          formValues.master.images,
+        );
       }
 
       // Upload variant images
@@ -373,21 +393,23 @@ export default function ProductForm({
         formValues.variants.map(async (variant) => {
           if (variant.images.length > 0) {
             const uploadedImages = await MediaService.uploadImageItems(
-              variant.images
+              variant.images,
             );
+
             return { ...variant, images: uploadedImages };
           }
+
           return variant;
-        })
+        }),
       );
 
       // Check for upload errors
       const hasUploadErrors =
         uploadedFormValues.master.images.some(
-          (img) => img.status === "error"
+          (img) => img.status === "error",
         ) ||
         uploadedFormValues.variants.some((variant) =>
-          variant.images.some((img) => img.status === "error")
+          variant.images.some((img) => img.status === "error"),
         );
 
       if (hasUploadErrors) {
@@ -396,6 +418,7 @@ export default function ProductForm({
 
       // Map to payload after upload
       const payload = mapToProductFormValues(uploadedFormValues);
+
       await onSubmitAndContinue(payload);
       reset(createDefaultValues(featureOptions));
     } catch (error) {
@@ -417,12 +440,12 @@ export default function ProductForm({
           <div className="flex gap-2 justify-between">
             <div className="justify-start">
               <Button
-                size="sm"
-                variant="light"
                 color="primary"
-                startContent={<Plus size={14} />}
-                onPress={addVariant}
                 isDisabled={isBusy || variantFields.length >= 20}
+                size="sm"
+                startContent={<Plus size={14} />}
+                variant="light"
+                onPress={addVariant}
               >
                 {t("actions.add")} {t("variant")}
               </Button>
@@ -431,21 +454,21 @@ export default function ProductForm({
               <IBaseTooltip content={tProduct("guideTooltip")} placement="top">
                 <Button
                   isIconOnly
-                  variant="light"
-                  size="sm"
-                  onPress={() => setIsGuideModalOpen(true)}
-                  isDisabled={isBusy}
                   aria-label={tProduct("guideAriaLabel")}
+                  isDisabled={isBusy}
+                  size="sm"
+                  variant="light"
+                  onPress={() => setIsGuideModalOpen(true)}
                 >
-                  <HelpCircle size={18} className="text-default-500" />
+                  <HelpCircle className="text-default-500" size={18} />
                 </Button>
               </IBaseTooltip>
               {onCancel ? (
                 <Button
-                  variant="light"
-                  size="sm"
-                  onPress={onCancel}
                   isDisabled={isBusy}
+                  size="sm"
+                  variant="light"
+                  onPress={onCancel}
                 >
                   {t("actions.cancel")}
                 </Button>
@@ -453,13 +476,13 @@ export default function ProductForm({
 
               {onSubmitAndContinue && submitAndContinueForm ? (
                 <Button
-                  variant="bordered"
+                  isDisabled={isBusy}
                   size="sm"
                   type="button"
+                  variant="bordered"
                   onPress={async () => {
                     await submitAndContinueForm();
                   }}
-                  isDisabled={isBusy}
                 >
                   {secondarySubmitLabel ??
                     `${t("actions.save")} & ${t("actions.add")} ${t("another")}`}
@@ -468,13 +491,13 @@ export default function ProductForm({
 
               <Button
                 color="primary"
+                isDisabled={isBusy}
+                isLoading={isBusy}
                 size="sm"
                 type="submit"
                 onPress={() => {
                   submitForm();
                 }}
-                isLoading={isBusy}
-                isDisabled={isBusy}
               >
                 {submitLabel ?? t("actions.save")}
               </Button>
@@ -484,20 +507,26 @@ export default function ProductForm({
           <FormProvider {...form}>
             <IBaseTabs
               aria-label="Product form tabs"
-              color="primary"
-              selectedKey={selectedTab}
-              onSelectionChange={(key: React.Key) =>
-                setSelectedTab(key as string)
-              }
               classNames={{
                 tabList: "overflow-x-auto mb-0",
                 tab: "max-w-[80px]",
                 tabContent: "max-w-[80px] truncate",
                 base: "mb-0",
               }}
+              color="primary"
+              selectedKey={selectedTab}
+              onSelectionChange={(key: React.Key) =>
+                setSelectedTab(key as string)
+              }
             >
               <Tab key="master" title={t("master")}>
                 <MasterTab
+                  categoryOptions={categoryOptions}
+                  categoryQueryLoading={categoryQuery.isLoading}
+                  disabledFeatures={disabledFeatures}
+                  errors={errors.master}
+                  featureOptions={featureOptions}
+                  isBusy={isBusy}
                   value={{
                     name: masterName ?? { en: "", vi: "" },
                     code: masterCode ?? "",
@@ -509,12 +538,6 @@ export default function ProductForm({
                     isActive: true,
                     images: [],
                   }}
-                  categoryOptions={categoryOptions}
-                  featureOptions={featureOptions}
-                  disabledFeatures={disabledFeatures}
-                  errors={errors.master}
-                  isBusy={isBusy}
-                  categoryQueryLoading={categoryQuery.isLoading}
                   onUpdate={(updater) => {
                     const current = {
                       name: masterName ?? { en: "", vi: "" },
@@ -537,7 +560,7 @@ export default function ProductForm({
                       updated.features = getFeaturesByProductType(
                         updated.type,
                         featureOptions,
-                        current.features
+                        current.features,
                       );
                     }
 
@@ -573,15 +596,16 @@ export default function ProductForm({
                         : tabTitle;
                     // Use stable key based on index to prevent tab switching
                     const tabKey = `variant-${variantIndex}`;
+
                     return (
                       <Tab key={tabKey} title={truncatedTitle}>
                         <VariantTab
-                          value={variant ?? createDefaultVariant()}
-                          masterFeatures={masterFeatures}
-                          variantIndex={variantIndex}
-                          variantErrors={variantErrors as any}
-                          isBusy={isBusy}
                           canRemove={variantFields.length > 1}
+                          isBusy={isBusy}
+                          masterFeatures={masterFeatures}
+                          value={variant ?? createDefaultVariant()}
+                          variantErrors={variantErrors as any}
+                          variantIndex={variantIndex}
                           onRemove={() => removeVariantAtIndex(variantIndex)}
                           onUpdate={(updater) =>
                             updateVariant(variantIndex, updater)
@@ -599,7 +623,7 @@ export default function ProductForm({
                   t,
                   removeVariantAtIndex,
                   updateVariant,
-                ]
+                ],
               )}
             </IBaseTabs>
           </FormProvider>
@@ -613,4 +637,3 @@ export default function ProductForm({
     </form>
   );
 }
-

@@ -11,18 +11,18 @@ const IBaseTooltip = React.forwardRef<HTMLDivElement, IBaseTooltipProps>(
     return (
       <Tooltip
         ref={ref}
-        placement={placement}
-        showArrow={showArrow}
-        color="primary"
         classNames={{
           base: clsx("bg-primary-400/80 backdrop-blur-sm", classNames?.base),
           content: clsx("text-white/90", classNames?.content),
           ...classNames,
         }}
+        color="primary"
+        placement={placement}
+        showArrow={showArrow}
         {...rest}
       />
     );
-  }
+  },
 );
 
 IBaseTooltip.displayName = "IBaseTooltip";

@@ -74,11 +74,12 @@ export default class JobRequisitionModel extends BaseModel<
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
   getJobRequisitionById = async (
-    id: string
+    id: string,
   ): Promise<JobRequisitionRow | null> => {
     const result = await this.db
       .select({
@@ -113,6 +114,7 @@ export default class JobRequisitionModel extends BaseModel<
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -159,13 +161,17 @@ export default class JobRequisitionModel extends BaseModel<
   };
 
   createJobRequisition = async (
-    payload: JobRequisitionInput
+    payload: JobRequisitionInput,
   ): Promise<JobRequisitionRow> => {
     const now = new Date();
     const insertData: NewHrmTbJobRequisition = {
       requisitionNumber: payload.requisitionNumber,
       title: payload.title,
-      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
+      description: payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null,
       departmentId: payload.departmentId,
       positionId: payload.positionId,
       numberOfOpenings: payload.numberOfOpenings ?? 1,
@@ -193,14 +199,16 @@ export default class JobRequisitionModel extends BaseModel<
     if (!created) throw new Error("Failed to create job requisition");
 
     const requisition = await this.getJobRequisitionById(created.id);
+
     if (!requisition)
       throw new Error("Failed to load job requisition after creation");
+
     return requisition;
   };
 
   updateJobRequisition = async (
     id: string,
-    payload: Partial<JobRequisitionInput>
+    payload: Partial<JobRequisitionInput>,
   ): Promise<JobRequisitionRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -210,7 +218,11 @@ export default class JobRequisitionModel extends BaseModel<
       updateData.requisitionNumber = payload.requisitionNumber;
     if (payload.title !== undefined) updateData.title = payload.title;
     if (payload.description !== undefined)
-      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
+      updateData.description = payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null;
     if (payload.departmentId !== undefined)
       updateData.departmentId = payload.departmentId;
     if (payload.positionId !== undefined)
@@ -244,6 +256,7 @@ export default class JobRequisitionModel extends BaseModel<
       .update(this.table)
       .set(updateData)
       .where(eq(this.table.id, id));
+
     return this.getJobRequisitionById(id);
   };
 
@@ -261,7 +274,7 @@ export default class JobRequisitionModel extends BaseModel<
     }
     if (payload.description !== undefined) {
       normalizedPayload.description = this.normalizeLocaleInput(
-        payload.description
+        payload.description,
       );
     }
     if (payload.departmentId !== undefined) {
@@ -299,7 +312,9 @@ export default class JobRequisitionModel extends BaseModel<
     }
     if (payload.currency !== undefined) {
       normalizedPayload.currency =
-        payload.currency === null || payload.currency === "" ? null : String(payload.currency);
+        payload.currency === null || payload.currency === ""
+          ? null
+          : String(payload.currency);
     }
     if (payload.requirements !== undefined) {
       normalizedPayload.requirements =
@@ -336,10 +351,11 @@ export default class JobRequisitionModel extends BaseModel<
     }
     if (payload.notes !== undefined) {
       normalizedPayload.notes =
-        payload.notes === null || payload.notes === "" ? null : String(payload.notes);
+        payload.notes === null || payload.notes === ""
+          ? null
+          : String(payload.notes);
     }
 
     return this.updateJobRequisition(id, normalizedPayload);
   };
 }
-

@@ -1,8 +1,10 @@
 import type { Column } from "drizzle-orm";
-import { and, eq } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+
+import { and, eq } from "drizzle-orm";
 import { isEmpty } from "lodash";
+
 import { RuntimeContext } from "../runtime/RuntimeContext";
 
 export class BaseModel<TTable extends PgTable = PgTable> {
@@ -21,10 +23,12 @@ export class BaseModel<TTable extends PgTable = PgTable> {
       });
     this.table = table;
   }
+
   public get db(): PostgresJsDatabase<Record<string, never>> {
     if (!this._db) {
       throw new Error("Database connection not initialized");
     }
+
     return this._db;
   }
 
@@ -40,6 +44,7 @@ export class BaseModel<TTable extends PgTable = PgTable> {
     const column = this.table[field as keyof typeof this.table] as
       | Column
       | undefined;
+
     if (!column) {
       throw new Error(`Field ${field} not found in table definition.`);
     }
@@ -54,6 +59,7 @@ export class BaseModel<TTable extends PgTable = PgTable> {
             | undefined
         )
       );
+
       if (ignoredColumnsInTable.length !== ignoredColumns.length) {
         throw new Error(`Ignored columns not found in table definition.`);
       }
@@ -66,11 +72,13 @@ export class BaseModel<TTable extends PgTable = PgTable> {
             const ignoreColumn = this.table[key as keyof typeof this.table] as
               | Column
               | undefined;
+
             if (!ignoreColumn) {
               throw new Error(
                 `Ignored column ${key} not found in table definition.`
               );
             }
+
             return eq(ignoreColumn, value);
           })
         )

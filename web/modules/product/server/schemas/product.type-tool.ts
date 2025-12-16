@@ -7,6 +7,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlProductSchema } from "./schema";
 import { product_tb_product_variants } from "./product.variant";
 
@@ -56,15 +57,17 @@ export const product_tb_product_type_tools = mdlProductSchema.table(
     // Composite index for maintenance scheduling queries
     index("type_tool_status_next_maintenance_idx").on(
       table.status,
-      table.nextMaintenanceDate
+      table.nextMaintenanceDate,
     ),
     // Composite index for assigned tools
     index("type_tool_assigned_status_idx").on(
       table.assignedToUserId,
-      table.status
+      table.status,
     ),
-  ]
+  ],
 );
 
-export type ProductTbProductTypeTool = typeof product_tb_product_type_tools.$inferSelect;
-export type NewProductTbProductTypeTool = typeof product_tb_product_type_tools.$inferInsert;
+export type ProductTbProductTypeTool =
+  typeof product_tb_product_type_tools.$inferSelect;
+export type NewProductTbProductTypeTool =
+  typeof product_tb_product_type_tools.$inferInsert;

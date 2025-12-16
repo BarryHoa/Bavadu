@@ -1,5 +1,8 @@
 "use client";
 
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
+import type { ProductCategoryRow } from "../../interface/ProductCategory";
+
 import { Button } from "@heroui/button";
 import { Card, CardBody, Divider } from "@heroui/react";
 import { Spinner } from "@heroui/spinner";
@@ -7,15 +10,13 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo } from "react";
-
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import type { ProductCategoryRow } from "../../interface/ProductCategory";
+
 import ProductCategoryService from "../../services/ProductCategoryService";
 
 const getParamValue = (
-  value: string | string[] | undefined
+  value: string | string[] | undefined,
 ): string | undefined => (Array.isArray(value) ? value[0] : value);
 
 const ProductCategoryDetailPage = (): React.ReactNode => {
@@ -77,8 +78,8 @@ const ProductCategoryDetailPage = (): React.ReactNode => {
       <div>
         <Button
           size="sm"
-          variant="light"
           startContent={<ArrowLeft size={14} />}
+          variant="light"
           onPress={() => router.back()}
         >
           Back to categories

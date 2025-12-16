@@ -1,13 +1,14 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { ilike } from "drizzle-orm";
 
 import { hrm_tb_job_requisitions } from "../../schemas";
@@ -32,7 +33,10 @@ class JobRequisitionDropdownListModel extends BaseViewListModel<
       }
     >([
       ["id", { column: hrm_tb_job_requisitions.id, sort: true }],
-      ["requisitionNumber", { column: hrm_tb_job_requisitions.requisitionNumber, sort: true }],
+      [
+        "requisitionNumber",
+        { column: hrm_tb_job_requisitions.requisitionNumber, sort: true },
+      ],
       ["title", { column: hrm_tb_job_requisitions.title, sort: true }],
     ]);
 
@@ -42,14 +46,17 @@ class JobRequisitionDropdownListModel extends BaseViewListModel<
 
   protected declarationSearch = () =>
     new Map([
-      ["requisitionNumber", (text: string) => ilike(hrm_tb_job_requisitions.requisitionNumber, text)],
+      [
+        "requisitionNumber",
+        (text: string) =>
+          ilike(hrm_tb_job_requisitions.requisitionNumber, text),
+      ],
       ["title", (text: string) => ilike(hrm_tb_job_requisitions.title, text)],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): JobRequisitionDropdownRow => ({
     id: row.id,
     requisitionNumber: row.requisitionNumber,
@@ -57,11 +64,10 @@ class JobRequisitionDropdownListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<JobRequisitionDropdownRow>> => {
     return this.buildQueryDataList(params);
   };
 }
 
 export default JobRequisitionDropdownListModel;
-

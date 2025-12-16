@@ -54,6 +54,7 @@ export default class PositionModel extends BaseModel<typeof hrm_tb_positions> {
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
@@ -79,7 +80,10 @@ export default class PositionModel extends BaseModel<typeof hrm_tb_positions> {
       })
       .from(this.table)
       .leftJoin(department, eq(this.table.departmentId, department.id))
-      .leftJoin(reportingPosition, eq(this.table.reportsTo, reportingPosition.id))
+      .leftJoin(
+        reportingPosition,
+        eq(this.table.reportsTo, reportingPosition.id),
+      )
       .where(eq(this.table.id, id))
       .limit(1);
 
@@ -118,9 +122,7 @@ export default class PositionModel extends BaseModel<typeof hrm_tb_positions> {
     };
   };
 
-  getDataById = async (params: {
-    id: string;
-  }): Promise<PositionRow | null> => {
+  getDataById = async (params: { id: string }): Promise<PositionRow | null> => {
     return this.getPositionById(params.id);
   };
 
@@ -129,7 +131,11 @@ export default class PositionModel extends BaseModel<typeof hrm_tb_positions> {
     const insertData: NewHrmTbPosition = {
       code: payload.code,
       name: payload.name,
-      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
+      description: payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null,
       departmentId: payload.departmentId,
       jobFamily: payload.jobFamily ?? null,
       jobGrade: payload.jobGrade ?? null,
@@ -164,7 +170,7 @@ export default class PositionModel extends BaseModel<typeof hrm_tb_positions> {
 
   updatePosition = async (
     id: string,
-    payload: Partial<PositionInput>
+    payload: Partial<PositionInput>,
   ): Promise<PositionRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -173,7 +179,11 @@ export default class PositionModel extends BaseModel<typeof hrm_tb_positions> {
     if (payload.code !== undefined) updateData.code = payload.code;
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.description !== undefined)
-      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
+      updateData.description = payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null;
     if (payload.departmentId !== undefined)
       updateData.departmentId = payload.departmentId;
     if (payload.jobFamily !== undefined)
@@ -188,7 +198,10 @@ export default class PositionModel extends BaseModel<typeof hrm_tb_positions> {
       updateData.maxSalary = payload.maxSalary ?? null;
     if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
 
-    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db
+      .update(this.table)
+      .set(updateData)
+      .where(eq(this.table.id, id));
 
     return this.getPositionById(id);
   };
@@ -208,7 +221,7 @@ export default class PositionModel extends BaseModel<typeof hrm_tb_positions> {
     }
     if (payload.description !== undefined) {
       normalizedPayload.description = this.normalizeLocaleInput(
-        payload.description
+        payload.description,
       );
     }
     if (payload.departmentId !== undefined) {
@@ -251,4 +264,3 @@ export default class PositionModel extends BaseModel<typeof hrm_tb_positions> {
     return this.updatePosition(id, normalizedPayload);
   };
 }
-

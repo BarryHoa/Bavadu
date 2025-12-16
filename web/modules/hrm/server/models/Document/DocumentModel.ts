@@ -57,6 +57,7 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
@@ -130,7 +131,11 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
       documentNumber: payload.documentNumber ?? null,
       documentType: payload.documentType,
       title: payload.title,
-      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
+      description: payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null,
       employeeId: payload.employeeId ?? null,
       fileUrl: payload.fileUrl,
       fileSize: payload.fileSize ?? null,
@@ -167,7 +172,7 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
 
   updateDocument = async (
     id: string,
-    payload: Partial<DocumentInput>
+    payload: Partial<DocumentInput>,
   ): Promise<DocumentRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -179,7 +184,11 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
       updateData.documentType = payload.documentType;
     if (payload.title !== undefined) updateData.title = payload.title;
     if (payload.description !== undefined)
-      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
+      updateData.description = payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null;
     if (payload.employeeId !== undefined)
       updateData.employeeId = payload.employeeId ?? null;
     if (payload.fileUrl !== undefined) updateData.fileUrl = payload.fileUrl;
@@ -188,16 +197,23 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
     if (payload.mimeType !== undefined)
       updateData.mimeType = payload.mimeType ?? null;
     if (payload.signedDate !== undefined)
-      updateData.signedDate = payload.signedDate ? new Date(payload.signedDate) : null;
+      updateData.signedDate = payload.signedDate
+        ? new Date(payload.signedDate)
+        : null;
     if (payload.expiryDate !== undefined)
-      updateData.expiryDate = payload.expiryDate ? new Date(payload.expiryDate) : null;
+      updateData.expiryDate = payload.expiryDate
+        ? new Date(payload.expiryDate)
+        : null;
     if (payload.isDigitalSignature !== undefined)
       updateData.isDigitalSignature = payload.isDigitalSignature;
     if (payload.metadata !== undefined)
       updateData.metadata = payload.metadata ?? null;
     if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
 
-    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db
+      .update(this.table)
+      .set(updateData)
+      .where(eq(this.table.id, id));
 
     return this.getDocumentById(id);
   };
@@ -223,7 +239,7 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
     }
     if (payload.description !== undefined) {
       normalizedPayload.description = this.normalizeLocaleInput(
-        payload.description
+        payload.description,
       );
     }
     if (payload.employeeId !== undefined) {
@@ -260,7 +276,9 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
           : String(payload.expiryDate);
     }
     if (payload.isDigitalSignature !== undefined) {
-      normalizedPayload.isDigitalSignature = Boolean(payload.isDigitalSignature);
+      normalizedPayload.isDigitalSignature = Boolean(
+        payload.isDigitalSignature,
+      );
     }
     if (payload.metadata !== undefined) {
       normalizedPayload.metadata = payload.metadata;
@@ -272,4 +290,3 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
     return this.updateDocument(id, normalizedPayload);
   };
 }
-

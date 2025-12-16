@@ -13,6 +13,7 @@ import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Textarea } from "@heroui/react";
+
 import {
   createPerformanceReviewValidation,
   type PerformanceReviewFormValues,
@@ -52,7 +53,9 @@ export default function PerformanceReviewForm({
     },
   });
 
-  const onSubmitForm: SubmitHandler<PerformanceReviewFormValues> = async (values) => {
+  const onSubmitForm: SubmitHandler<PerformanceReviewFormValues> = async (
+    values,
+  ) => {
     await onSubmit(values);
   };
 
@@ -72,10 +75,10 @@ export default function PerformanceReviewForm({
         )}
         <Button
           color="primary"
-          type="submit"
-          size="sm"
-          isLoading={isSubmitting}
           disabled={isSubmitting}
+          isLoading={isSubmitting}
+          size="sm"
+          type="submit"
         >
           {tCommon("actions.save")}
         </Button>
@@ -86,186 +89,194 @@ export default function PerformanceReviewForm({
           <h2 className="text-base font-semibold mb-2">{t("generalInfo")}</h2>
           <div className="grid gap-2 md:grid-cols-2">
             <Controller
-              name="employeeId"
               control={control}
+              name="employeeId"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  isRequired
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.employee")}
                   model="hrm.employee.dropdown"
                   selectedKey={field.value}
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="reviewType"
               control={control}
+              name="reviewType"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  isRequired
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.reviewType")}
                   model="base-review-type"
                   selectedKey={field.value}
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="reviewPeriod"
               control={control}
+              name="reviewPeriod"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.reviewPeriod")}
                   size="sm"
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="reviewDate"
               control={control}
+              name="reviewDate"
               render={({ field, fieldState }) => (
                 <DatePicker
-                  label={t("labels.reviewDate")}
-                  value={field.value ? (typeof field.value === "string" ? parseDate(field.value) : field.value) : null}
-                  onChange={(val) => field.onChange(val ? val.toString() : null)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                   isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={t("labels.reviewDate")}
+                  value={
+                    field.value
+                      ? typeof field.value === "string"
+                        ? parseDate(field.value)
+                        : field.value
+                      : null
+                  }
+                  onChange={(val) =>
+                    field.onChange(val ? val.toString() : null)
+                  }
                 />
               )}
             />
             <Controller
-              name="reviewerId"
               control={control}
+              name="reviewerId"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  isRequired
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.reviewer")}
                   model="hrm.employee.dropdown"
                   selectedKey={field.value}
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="overallRating"
               control={control}
+              name="overallRating"
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.overallRating")}
+                  max={5}
+                  min={1}
                   size="sm"
                   value={typeof field.value === "number" ? field.value : null}
                   onValueChange={(val) => field.onChange(val ?? null)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  min={1}
-                  max={5}
                 />
               )}
             />
             <Controller
-              name="status"
               control={control}
+              name="status"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.status")}
                   model="base-performance-review-status"
                   selectedKey={field.value}
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="strengths"
               control={control}
+              name="strengths"
               render={({ field, fieldState }) => (
                 <div className="md:col-span-2">
                   <Textarea
                     {...field}
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
                     label={t("labels.strengths")}
                     size="sm"
                     value={field.value ?? ""}
                     onValueChange={field.onChange}
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
                   />
                 </div>
               )}
             />
             <Controller
-              name="areasForImprovement"
               control={control}
+              name="areasForImprovement"
               render={({ field, fieldState }) => (
                 <div className="md:col-span-2">
                   <Textarea
                     {...field}
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
                     label={t("labels.areasForImprovement")}
                     size="sm"
                     value={field.value ?? ""}
                     onValueChange={field.onChange}
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
                   />
                 </div>
               )}
             />
             <Controller
-              name="feedback"
               control={control}
+              name="feedback"
               render={({ field, fieldState }) => (
                 <div className="md:col-span-2">
                   <Textarea
                     {...field}
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
                     label={t("labels.feedback")}
                     size="sm"
                     value={field.value ?? ""}
                     onValueChange={field.onChange}
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
                   />
                 </div>
               )}
             />
             <Controller
-              name="employeeComments"
               control={control}
+              name="employeeComments"
               render={({ field, fieldState }) => (
                 <div className="md:col-span-2">
                   <Textarea
                     {...field}
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
                     label={t("labels.employeeComments")}
                     size="sm"
                     value={field.value ?? ""}
                     onValueChange={field.onChange}
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
                   />
                 </div>
               )}
@@ -276,4 +287,3 @@ export default function PerformanceReviewForm({
     </form>
   );
 }
-

@@ -13,11 +13,13 @@ dayjs.extend(utc);
  */
 export const formatDateWithTime = (
   date: number | undefined | null | string,
-  timezone: string | undefined = SYSTEM_TIMEZONE
+  timezone: string | undefined = SYSTEM_TIMEZONE,
 ) => {
   if (!date) return "";
   const d = dayjs(date).tz(timezone);
+
   if (!d.isValid()) return "";
+
   return d.format("DD/MM/YYYY HH:mm");
 };
 /**
@@ -28,10 +30,12 @@ export const formatDateWithTime = (
  */
 export const formatDate = (
   date: number | undefined | null | string,
-  timezone: string | undefined = SYSTEM_TIMEZONE
+  timezone: string | undefined = SYSTEM_TIMEZONE,
 ) => {
   if (!date) return "";
   const d = dayjs(date).tz(timezone);
+
   if (!d.isValid()) return "";
+
   return d.format("DD/MM/YYYY");
 };

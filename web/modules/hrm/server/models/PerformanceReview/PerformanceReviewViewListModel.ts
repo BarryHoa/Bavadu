@@ -1,13 +1,14 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
@@ -53,14 +54,35 @@ class PerformanceReviewViewListModel extends BaseViewListModel<
       }
     >([
       ["id", { column: hrm_tb_performance_reviews.id, sort: true }],
-      ["employeeId", { column: hrm_tb_performance_reviews.employeeId, sort: true }],
-      ["reviewType", { column: hrm_tb_performance_reviews.reviewType, sort: true }],
-      ["reviewDate", { column: hrm_tb_performance_reviews.reviewDate, sort: true }],
-      ["reviewerId", { column: hrm_tb_performance_reviews.reviewerId, sort: true }],
-      ["overallRating", { column: hrm_tb_performance_reviews.overallRating, sort: true }],
+      [
+        "employeeId",
+        { column: hrm_tb_performance_reviews.employeeId, sort: true },
+      ],
+      [
+        "reviewType",
+        { column: hrm_tb_performance_reviews.reviewType, sort: true },
+      ],
+      [
+        "reviewDate",
+        { column: hrm_tb_performance_reviews.reviewDate, sort: true },
+      ],
+      [
+        "reviewerId",
+        { column: hrm_tb_performance_reviews.reviewerId, sort: true },
+      ],
+      [
+        "overallRating",
+        { column: hrm_tb_performance_reviews.overallRating, sort: true },
+      ],
       ["status", { column: hrm_tb_performance_reviews.status, sort: true }],
-      ["createdAt", { column: hrm_tb_performance_reviews.createdAt, sort: true }],
-      ["updatedAt", { column: hrm_tb_performance_reviews.updatedAt, sort: true }],
+      [
+        "createdAt",
+        { column: hrm_tb_performance_reviews.createdAt, sort: true },
+      ],
+      [
+        "updatedAt",
+        { column: hrm_tb_performance_reviews.updatedAt, sort: true },
+      ],
     ]);
 
   constructor() {
@@ -76,7 +98,6 @@ class PerformanceReviewViewListModel extends BaseViewListModel<
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): PerformanceReviewRow => ({
     id: row.id,
     employeeId: row.employeeId,
@@ -105,15 +126,14 @@ class PerformanceReviewViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<PerformanceReviewRow>> => {
     return this.buildQueryDataList(params, (query) =>
       query
         .leftJoin(employee, eq(this.table.employeeId, employee.id))
-        .leftJoin(reviewer, eq(this.table.reviewerId, reviewer.id))
+        .leftJoin(reviewer, eq(this.table.reviewerId, reviewer.id)),
     );
   };
 }
 
 export default PerformanceReviewViewListModel;
-

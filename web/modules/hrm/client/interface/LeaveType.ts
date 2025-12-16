@@ -34,4 +34,3 @@ export interface CreateLeaveTypePayload {
 export interface UpdateLeaveTypePayload extends Partial<CreateLeaveTypePayload> {
   id: string;
 }
-

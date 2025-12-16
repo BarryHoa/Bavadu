@@ -57,7 +57,7 @@ export default function ProductFormGuideModal({
                 {t("error")}
               </div>
             ) : guideContent ? (
-            <MarkdownContent content={guideContent} />
+              <MarkdownContent content={guideContent} />
             ) : (
               <div className="py-4 text-center text-sm text-default-500">
                 {t("notFound")}

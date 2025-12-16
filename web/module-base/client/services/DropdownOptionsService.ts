@@ -43,7 +43,7 @@ class DropdownOptionsService extends JsonRpcClientService {
 
   getOptionsDropdown = async (
     model: string,
-    params?: DropdownOptionsParams
+    params?: DropdownOptionsParams,
   ): Promise<DropdownOptionsResponse> => {
     // Convert model name to base model ID
     // Example: "product.dropdown" -> "product"
@@ -54,8 +54,9 @@ class DropdownOptionsService extends JsonRpcClientService {
 
     const result = await this.call<DropdownOptionsResponse>(
       method,
-      params ?? {}
+      params ?? {},
     );
+
     return result;
   };
 }

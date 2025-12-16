@@ -7,6 +7,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { base_tb_permissions } from "./base.permission";
 import { base_tb_users } from "./base.user";
 import { mdBaseSchema } from "./schema";
@@ -38,15 +39,15 @@ export const base_tb_user_permissions = mdBaseSchema.table(
     // Unique: one user can only have one instance of a permission
     uniqueIndex("user_permissions_user_permission_idx").on(
       table.userId,
-      table.permissionId
+      table.permissionId,
     ),
     index("user_permissions_user_idx").on(table.userId),
     index("user_permissions_permission_idx").on(table.permissionId),
     index("user_permissions_active_idx").on(table.isActive),
-  ]
+  ],
 );
 
-export type BaseTbUserPermissions = typeof base_tb_user_permissions.$inferSelect;
+export type BaseTbUserPermissions =
+  typeof base_tb_user_permissions.$inferSelect;
 export type NewBaseTbUserPermissions =
   typeof base_tb_user_permissions.$inferInsert;
-

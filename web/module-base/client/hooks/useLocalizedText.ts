@@ -1,9 +1,10 @@
 import { useLocale } from "next-intl";
+
 import { DEFAULT_LANG, LocalizeText } from "../interface/LocalizeText";
 
 const getLocalizedValue = (
   text: LocalizeText | string | undefined | null,
-  locale: string
+  locale: string,
 ) => {
   if (!text) return "";
   if (typeof text === "string") return text;
@@ -20,6 +21,7 @@ export const useLocalizedText = (locale?: string) => {
 
   try {
     const contextLocale = useLocale();
+
     detectedLocale = locale ?? contextLocale ?? DEFAULT_LANG;
   } catch (error) {
     detectedLocale = locale ?? DEFAULT_LANG;

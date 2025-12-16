@@ -8,4 +8,3 @@ export type {
   IConnectionPool,
   IConfigManager,
 } from "./types";
-

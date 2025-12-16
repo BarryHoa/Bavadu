@@ -3,7 +3,7 @@ import { useEffect } from "react";
 /**
  * Hook to prevent browser back navigation when pressing Backspace key.
  * Only prevents navigation when the user is NOT typing in an input field.
- * 
+ *
  * This is useful to prevent accidental navigation when users press Backspace
  * while not focused on an editable element.
  */
@@ -17,6 +17,7 @@ export function usePreventBackspaceNavigation() {
 
       // Get the currently focused element
       const target = e.target as HTMLElement;
+
       if (!target) {
         return;
       }
@@ -47,4 +48,3 @@ export function usePreventBackspaceNavigation() {
     };
   }, []);
 }
-

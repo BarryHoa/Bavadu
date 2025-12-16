@@ -14,4 +14,3 @@ export const RATE_LIMIT_CONFIG = {
     windowMs: 60 * 1000, // 1 minute
   },
 } as const;
-

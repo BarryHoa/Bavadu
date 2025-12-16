@@ -1,13 +1,14 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
@@ -48,7 +49,10 @@ class CandidateViewListModel extends BaseViewListModel<
       }
     >([
       ["id", { column: hrm_tb_candidates.id, sort: true }],
-      ["requisitionId", { column: hrm_tb_candidates.requisitionId, sort: true }],
+      [
+        "requisitionId",
+        { column: hrm_tb_candidates.requisitionId, sort: true },
+      ],
       ["fullName", { column: hrm_tb_candidates.fullName, sort: true }],
       ["email", { column: hrm_tb_candidates.email, sort: true }],
       ["phone", { column: hrm_tb_candidates.phone, sort: true }],
@@ -69,13 +73,15 @@ class CandidateViewListModel extends BaseViewListModel<
       ["fullName", (text: string) => ilike(hrm_tb_candidates.fullName, text)],
       ["email", (text: string) => ilike(hrm_tb_candidates.email, text)],
       ["phone", (text: string) => ilike(hrm_tb_candidates.phone, text)],
-      ["requisitionNumber", (text: string) => ilike(requisition.requisitionNumber, text)],
+      [
+        "requisitionNumber",
+        (text: string) => ilike(requisition.requisitionNumber, text),
+      ],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): CandidateRow => ({
     id: row.id,
     requisitionId: row.requisitionId,
@@ -98,13 +104,12 @@ class CandidateViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<CandidateRow>> => {
     return this.buildQueryDataList(params, (query) =>
-      query.leftJoin(requisition, eq(this.table.requisitionId, requisition.id))
+      query.leftJoin(requisition, eq(this.table.requisitionId, requisition.id)),
     );
   };
 }
 
 export default CandidateViewListModel;
-

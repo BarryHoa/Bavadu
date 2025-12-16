@@ -48,7 +48,9 @@ export interface LeaveRequestInput {
   workflowInstanceId?: string | null;
 }
 
-export default class LeaveRequestModel extends BaseModel<typeof hrm_tb_leave_requests> {
+export default class LeaveRequestModel extends BaseModel<
+  typeof hrm_tb_leave_requests
+> {
   constructor() {
     super(hrm_tb_leave_requests);
   }
@@ -83,6 +85,7 @@ export default class LeaveRequestModel extends BaseModel<typeof hrm_tb_leave_req
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -118,11 +121,15 @@ export default class LeaveRequestModel extends BaseModel<typeof hrm_tb_leave_req
     };
   };
 
-  getDataById = async (params: { id: string }): Promise<LeaveRequestRow | null> => {
+  getDataById = async (params: {
+    id: string;
+  }): Promise<LeaveRequestRow | null> => {
     return this.getLeaveRequestById(params.id);
   };
 
-  createLeaveRequest = async (payload: LeaveRequestInput): Promise<LeaveRequestRow> => {
+  createLeaveRequest = async (
+    payload: LeaveRequestInput,
+  ): Promise<LeaveRequestRow> => {
     const now = new Date();
     const insertData: NewHrmTbLeaveRequest = {
       employeeId: payload.employeeId,
@@ -145,29 +152,40 @@ export default class LeaveRequestModel extends BaseModel<typeof hrm_tb_leave_req
     if (!created) throw new Error("Failed to create leave request");
 
     const request = await this.getLeaveRequestById(created.id);
-    if (!request) throw new Error("Failed to load leave request after creation");
+
+    if (!request)
+      throw new Error("Failed to load leave request after creation");
+
     return request;
   };
 
   updateLeaveRequest = async (
     id: string,
-    payload: Partial<LeaveRequestInput>
+    payload: Partial<LeaveRequestInput>,
   ): Promise<LeaveRequestRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
     };
 
-    if (payload.employeeId !== undefined) updateData.employeeId = payload.employeeId;
-    if (payload.leaveTypeId !== undefined) updateData.leaveTypeId = payload.leaveTypeId;
-    if (payload.startDate !== undefined) updateData.startDate = payload.startDate;
+    if (payload.employeeId !== undefined)
+      updateData.employeeId = payload.employeeId;
+    if (payload.leaveTypeId !== undefined)
+      updateData.leaveTypeId = payload.leaveTypeId;
+    if (payload.startDate !== undefined)
+      updateData.startDate = payload.startDate;
     if (payload.endDate !== undefined) updateData.endDate = payload.endDate;
     if (payload.days !== undefined) updateData.days = payload.days;
-    if (payload.reason !== undefined) updateData.reason = payload.reason ?? null;
+    if (payload.reason !== undefined)
+      updateData.reason = payload.reason ?? null;
     if (payload.status !== undefined) updateData.status = payload.status;
     if (payload.workflowInstanceId !== undefined)
       updateData.workflowInstanceId = payload.workflowInstanceId ?? null;
 
-    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db
+      .update(this.table)
+      .set(updateData)
+      .where(eq(this.table.id, id));
+
     return this.getLeaveRequestById(id);
   };
 
@@ -192,7 +210,9 @@ export default class LeaveRequestModel extends BaseModel<typeof hrm_tb_leave_req
     }
     if (payload.reason !== undefined) {
       normalizedPayload.reason =
-        payload.reason === null || payload.reason === "" ? null : String(payload.reason);
+        payload.reason === null || payload.reason === ""
+          ? null
+          : String(payload.reason);
     }
     if (payload.status !== undefined) {
       normalizedPayload.status = String(payload.status);
@@ -207,4 +227,3 @@ export default class LeaveRequestModel extends BaseModel<typeof hrm_tb_leave_req
     return this.updateLeaveRequest(id, normalizedPayload);
   };
 }
-

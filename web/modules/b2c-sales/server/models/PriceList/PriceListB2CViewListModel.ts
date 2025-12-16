@@ -1,15 +1,16 @@
 import type { Column } from "drizzle-orm";
-import { ilike, sql } from "drizzle-orm";
-
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
+
+import { ilike, sql } from "drizzle-orm";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
+
 import { sale_b2c_tb_price_lists } from "../../schemas/b2c-sales.price-list";
 
 class PriceListB2CViewListModel extends BaseViewListModel<
@@ -68,7 +69,6 @@ class PriceListB2CViewListModel extends BaseViewListModel<
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): any => ({
     id: row.id,
     code: row.code,
@@ -87,7 +87,7 @@ class PriceListB2CViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<any>> => {
     return this.buildQueryDataList(params);
   };

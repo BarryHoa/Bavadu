@@ -10,6 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdBaseSchema } from "./schema";
 
 // Dynamic Entities allow defining custom fields per model and can be nested via parentId
@@ -45,7 +46,7 @@ export const base_tb_dynamic_entities = mdBaseSchema.table(
     index("dynamic_entities_model_idx").on(table.model),
     index("dynamic_entities_parent_idx").on(table.parentId),
     index("dynamic_entities_active_idx").on(table.isActive),
-  ]
+  ],
 );
 
 export type BaseTbDynamicEntity = typeof base_tb_dynamic_entities.$inferSelect;

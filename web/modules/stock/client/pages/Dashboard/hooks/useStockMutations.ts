@@ -1,12 +1,14 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback } from "react";
-import StockService from "../../../services/StockService";
 import type {
   AdjustPayload,
   InOutPayload,
   MovementResult,
   TransferPayload,
 } from "../types";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
+
+import StockService from "../../../services/StockService";
 
 export function useStockMutations() {
   const queryClient = useQueryClient();
@@ -60,7 +62,7 @@ export function useStockMutations() {
   const handleMovement = useCallback(
     async (
       action: "adjust" | "inbound" | "outbound" | "transfer",
-      payload: Record<string, string | number | undefined>
+      payload: Record<string, string | number | undefined>,
     ): Promise<MovementResult | null> => {
       try {
         switch (action) {
@@ -74,6 +76,7 @@ export function useStockMutations() {
                 : undefined,
               note: payload.note ? String(payload.note) : undefined,
             });
+
             return {
               type: "success",
               message: "Stock movement recorded successfully.",
@@ -88,6 +91,7 @@ export function useStockMutations() {
                 : undefined,
               note: payload.note ? String(payload.note) : undefined,
             });
+
             return {
               type: "success",
               message: "Stock movement recorded successfully.",
@@ -102,6 +106,7 @@ export function useStockMutations() {
                 : undefined,
               note: payload.note ? String(payload.note) : undefined,
             });
+
             return {
               type: "success",
               message: "Stock movement recorded successfully.",
@@ -117,6 +122,7 @@ export function useStockMutations() {
                 : undefined,
               note: payload.note ? String(payload.note) : undefined,
             });
+
             return {
               type: "success",
               message: "Stock movement recorded successfully.",
@@ -128,7 +134,13 @@ export function useStockMutations() {
         return onMovementError(error);
       }
     },
-    [adjustMutation, issueMutation, receiveMutation, transferMutation, onMovementError]
+    [
+      adjustMutation,
+      issueMutation,
+      receiveMutation,
+      transferMutation,
+      onMovementError,
+    ],
   );
 
   return {
@@ -139,4 +151,3 @@ export function useStockMutations() {
     handleMovement,
   };
 }
-

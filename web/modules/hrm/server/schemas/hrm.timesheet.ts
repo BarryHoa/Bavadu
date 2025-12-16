@@ -7,6 +7,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_employees } from "./hrm.employee";
 import { hrm_tb_rosters } from "./hrm.roster";
@@ -51,12 +52,9 @@ export const hrm_tb_timesheets = mdlHrmSchema.table(
   (table) => [
     index("timesheets_employee_idx").on(table.employeeId),
     index("timesheets_date_idx").on(table.workDate),
-    index("timesheets_employee_date_idx").on(
-      table.employeeId,
-      table.workDate
-    ),
+    index("timesheets_employee_date_idx").on(table.employeeId, table.workDate),
     index("timesheets_status_idx").on(table.status),
-  ]
+  ],
 );
 
 export type HrmTbTimesheet = typeof hrm_tb_timesheets.$inferSelect;

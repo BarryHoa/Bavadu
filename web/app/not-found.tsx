@@ -6,13 +6,11 @@ export default function NotFound() {
         The page you are looking for doesn&apos;t exist or has been moved.
       </p>
       <a
-        href="/"
         className="inline-flex items-center px-4 py-2 rounded-md bg-primary text-white hover:opacity-90"
+        href="/"
       >
         Go home
       </a>
     </div>
   );
 }
-
-

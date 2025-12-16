@@ -38,8 +38,10 @@ export function LoadingBar({ isLoading }: LoadingBarProps) {
               clearInterval(intervalRef.current);
               intervalRef.current = null;
             }
+
             return MAX_PROGRESS;
           }
+
           return Math.min(prev + Math.random() * 10, MAX_PROGRESS);
         });
       }, PROGRESS_INTERVAL);

@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+
 import { IBaseTableColumnDefinition } from "../IBaseTable/IBaseTableInterface";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface ViewListDataTableStoreState<T = any> {
   // Search state
   search: string;
@@ -48,7 +50,7 @@ export interface ViewListDataTableStore<T = any>
   extends ViewListDataTableStoreState<T>, ViewListDataTableStoreActions {}
 
 function getDefaultVisibleColumns<T>(
-  columns: IBaseTableColumnDefinition<T>[]
+  columns: IBaseTableColumnDefinition<T>[],
 ): Set<string> {
   return new Set(columns.map((c) => c.key));
 }
@@ -63,7 +65,7 @@ export interface UseViewListDataTableStoreOptions<T = any> {
 }
 
 export function useViewListDataTableStore<T = any>(
-  options: UseViewListDataTableStoreOptions<T>
+  options: UseViewListDataTableStoreOptions<T>,
 ): ViewListDataTableStore<T> {
   const {
     columns,
@@ -77,10 +79,10 @@ export function useViewListDataTableStore<T = any>(
   // Initialize state
   const [search, setSearch] = useState<string>(initialSearch);
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
-    () => initialVisibleColumns || getDefaultVisibleColumns(columns)
+    () => initialVisibleColumns || getDefaultVisibleColumns(columns),
   );
   const [activeFilters, setActiveFilters] = useState<Set<string>>(
-    initialActiveFilters || new Set()
+    initialActiveFilters || new Set(),
   );
   const [groupBy, setGroupBy] = useState<string | null>(initialGroupBy);
   const [showFavorite, setShowFavorite] =
@@ -90,11 +92,13 @@ export function useViewListDataTableStore<T = any>(
   const toggleColumn = useCallback((key: string) => {
     setVisibleColumns((prev) => {
       const next = new Set(prev);
+
       if (next.has(key)) {
         next.delete(key);
       } else {
         next.add(key);
       }
+
       return next;
     });
   }, []);
@@ -103,11 +107,13 @@ export function useViewListDataTableStore<T = any>(
   const toggleFilter = useCallback((label: string) => {
     setActiveFilters((prev) => {
       const newSet = new Set(prev);
+
       if (newSet.has(label)) {
         newSet.delete(label);
       } else {
         newSet.add(label);
       }
+
       return newSet;
     });
   }, []);
@@ -126,7 +132,7 @@ export function useViewListDataTableStore<T = any>(
   const reset = useCallback(() => {
     setSearch(initialSearch);
     setVisibleColumns(
-      initialVisibleColumns || getDefaultVisibleColumns(columns)
+      initialVisibleColumns || getDefaultVisibleColumns(columns),
     );
     setActiveFilters(initialActiveFilters || new Set());
     setGroupBy(initialGroupBy);
@@ -173,6 +179,6 @@ export function useViewListDataTableStore<T = any>(
       clearFilters,
       toggleFavorite,
       reset,
-    ]
+    ],
   );
 }

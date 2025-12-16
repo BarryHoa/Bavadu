@@ -3,13 +3,13 @@ import {
   boolean,
   date,
   index,
-  integer,
   jsonb,
   text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 
 // Payroll Rules - Quy tắc tính lương (compliance rules)
@@ -37,9 +37,8 @@ export const hrm_tb_payrolls_rule = mdlHrmSchema.table(
     index("payroll_rules_type_idx").on(table.ruleType),
     index("payroll_rules_active_idx").on(table.isActive),
     index("payroll_rules_dates_idx").on(table.effectiveDate, table.expiryDate),
-  ]
+  ],
 );
 
 export type HrmTbPayrollRule = typeof hrm_tb_payrolls_rule.$inferSelect;
 export type NewHrmTbPayrollRule = typeof hrm_tb_payrolls_rule.$inferInsert;
-

@@ -27,9 +27,13 @@ export default function CertificateViewPage(): React.ReactNode {
     queryKey: ["hrm-certificates", id],
     queryFn: async () => {
       const response = await certificateService.getById(id);
+
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToLoadCertificate"));
+        throw new Error(
+          response.message ?? t("errors.failedToLoadCertificate"),
+        );
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -80,7 +84,10 @@ export default function CertificateViewPage(): React.ReactNode {
           <div className="grid gap-2 md:grid-cols-2">
             <IBaseDigitViewer
               label={t("labels.employee")}
-              value={getLocalizedText(certificateData.employee?.fullName) || certificateData.employee?.employeeCode}
+              value={
+                getLocalizedText(certificateData.employee?.fullName) ||
+                certificateData.employee?.employeeCode
+              }
             />
             <IBaseDigitViewer
               label={t("labels.name")}
@@ -108,7 +115,11 @@ export default function CertificateViewPage(): React.ReactNode {
             />
             <IBaseDigitViewer
               label={t("labels.isActive")}
-              value={certificateData.isActive ? tCommon("active") : tCommon("inactive")}
+              value={
+                certificateData.isActive
+                  ? tCommon("active")
+                  : tCommon("inactive")
+              }
             />
           </div>
         </CardBody>
@@ -116,4 +127,3 @@ export default function CertificateViewPage(): React.ReactNode {
     </div>
   );
 }
-

@@ -59,6 +59,7 @@ function NavigationLoaderContent({
     };
 
     document.addEventListener("click", handleClick, true);
+
     return () => document.removeEventListener("click", handleClick, true);
   }, [clearLoadingTimer]);
 
@@ -67,6 +68,7 @@ function NavigationLoaderContent({
     // Skip first render
     if (isFirstRenderRef.current) {
       isFirstRenderRef.current = false;
+
       return;
     }
 

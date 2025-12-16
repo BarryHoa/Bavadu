@@ -9,7 +9,7 @@ export interface IBaseTableRowSelection<T = any> {
   defaultSelectedRowKeys?: Array<string | number>;
   onChange?: (
     selectedRowKeys: Array<string | number>,
-    selectedRows: T[]
+    selectedRows: T[],
   ) => void;
 }
 

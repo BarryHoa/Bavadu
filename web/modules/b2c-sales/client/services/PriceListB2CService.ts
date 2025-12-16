@@ -127,7 +127,7 @@ export default class PriceListB2CService extends JsonRpcClientService {
   }) {
     return dropdownOptionsService.getOptionsDropdown(
       "b2c-sales-price-list.dropdown",
-      params
+      params,
     );
   }
 }

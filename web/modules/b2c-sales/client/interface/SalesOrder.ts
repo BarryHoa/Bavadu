@@ -5,4 +5,3 @@ import type {
 
 export type SalesOrder = SalesOrderDto;
 export type SalesOrderLine = SalesOrderLineDto;
-

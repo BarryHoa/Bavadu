@@ -3,11 +3,11 @@ import {
   boolean,
   index,
   jsonb,
-  text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_employees } from "./hrm.employee";
 
@@ -35,9 +35,8 @@ export const hrm_tb_notifications = mdlHrmSchema.table(
     index("notifications_type_idx").on(table.type),
     index("notifications_read_idx").on(table.isRead),
     index("notifications_employee_read_idx").on(table.employeeId, table.isRead),
-  ]
+  ],
 );
 
 export type HrmTbNotification = typeof hrm_tb_notifications.$inferSelect;
 export type NewHrmTbNotification = typeof hrm_tb_notifications.$inferInsert;
-

@@ -24,6 +24,7 @@ export function useCreateUpdate<TPayload, TResult>({
   const mutation = useMutation({
     mutationFn: async (payload: TPayload) => {
       setErrorMessage(null);
+
       return mutationFn(payload);
     },
     onSuccess: (data) => {
@@ -39,6 +40,7 @@ export function useCreateUpdate<TPayload, TResult>({
         error instanceof Error
           ? error.message
           : "Something went wrong, please try again.";
+
       setErrorMessage(message);
       onError?.(error);
     },
@@ -48,7 +50,7 @@ export function useCreateUpdate<TPayload, TResult>({
     async (payload: TPayload) => {
       await mutation.mutateAsync(payload);
     },
-    [mutation]
+    [mutation],
   );
 
   const resetError = useCallback(() => {

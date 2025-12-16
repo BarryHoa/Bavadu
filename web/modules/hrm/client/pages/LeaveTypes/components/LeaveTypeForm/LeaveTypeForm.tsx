@@ -12,6 +12,7 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+
 import {
   createLeaveTypeValidation,
   type LeaveTypeFormValues,
@@ -75,10 +76,10 @@ export default function LeaveTypeForm({
         )}
         <Button
           color="primary"
-          type="submit"
-          size="sm"
-          isLoading={isSubmitting}
           disabled={isSubmitting}
+          isLoading={isSubmitting}
+          size="sm"
+          type="submit"
         >
           {tCommon("actions.save")}
         </Button>
@@ -89,105 +90,105 @@ export default function LeaveTypeForm({
           <h2 className="text-base font-semibold mb-2">{t("generalInfo")}</h2>
           <div className="grid gap-2 md:grid-cols-2">
             <Controller
-              name="code"
               control={control}
+              name="code"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.code")}
                   size="sm"
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  isRequired
                 />
               )}
             />
             <Controller
-              name="name"
               control={control}
+              name="name"
               render={({ field, fieldState }) => (
                 <IBaseInputMultipleLang
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.name")}
                   size="sm"
                   value={field.value as any}
                   onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  isRequired
                 />
               )}
             />
             <Controller
-              name="accrualType"
               control={control}
+              name="accrualType"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  isRequired
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.accrualType")}
                   model="base-accrual-type"
                   selectedKey={field.value}
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
+              control={control}
               name="accrualRate"
-              control={control}
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.accrualRate")}
+                  min={0}
                   size="sm"
                   value={typeof field.value === "number" ? field.value : null}
                   onValueChange={(val) => field.onChange(val ?? null)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  min={0}
                 />
               )}
             />
             <Controller
+              control={control}
               name="maxAccrual"
-              control={control}
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.maxAccrual")}
+                  min={0}
                   size="sm"
                   value={typeof field.value === "number" ? field.value : null}
                   onValueChange={(val) => field.onChange(val ?? null)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  min={0}
                 />
               )}
             />
             <Controller
-              name="maxCarryForward"
               control={control}
+              name="maxCarryForward"
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={t("labels.maxCarryForward")}
+                  min={0}
                   size="sm"
                   value={typeof field.value === "number" ? field.value : null}
                   onValueChange={(val) => field.onChange(val ?? null)}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
-                  min={0}
                 />
               )}
             />
             <Controller
-              name="carryForward"
               control={control}
+              name="carryForward"
               render={({ field }) => (
                 <Checkbox
                   isSelected={field.value === "true"}
@@ -200,8 +201,8 @@ export default function LeaveTypeForm({
               )}
             />
             <Controller
-              name="requiresApproval"
               control={control}
+              name="requiresApproval"
               render={({ field }) => (
                 <Checkbox
                   isSelected={field.value === "true"}
@@ -214,8 +215,8 @@ export default function LeaveTypeForm({
               )}
             />
             <Controller
-              name="isPaid"
               control={control}
+              name="isPaid"
               render={({ field }) => (
                 <Checkbox
                   isSelected={field.value === "true"}
@@ -228,8 +229,8 @@ export default function LeaveTypeForm({
               )}
             />
             <Controller
-              name="isActive"
               control={control}
+              name="isActive"
               render={({ field }) => (
                 <Checkbox
                   isSelected={field.value === "true"}
@@ -242,20 +243,20 @@ export default function LeaveTypeForm({
               )}
             />
             <Controller
-              name="description"
               control={control}
+              name="description"
               render={({ field, fieldState }) => (
                 <div className="md:col-span-2">
                   <Textarea
                     {...field}
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
                     label={t("labels.description")}
                     size="sm"
                     value={field.value ? JSON.stringify(field.value) : ""}
                     onValueChange={(val) =>
                       field.onChange(val ? {} : undefined)
                     }
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
                   />
                 </div>
               )}

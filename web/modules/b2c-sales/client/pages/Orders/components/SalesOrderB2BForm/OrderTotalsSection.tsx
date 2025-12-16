@@ -46,40 +46,40 @@ export default function OrderTotalsSection({
         <div className="space-y-3">
           <div className="grid gap-2">
             <Controller
-              name="totalDiscount"
               control={control}
+              name="totalDiscount"
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
+                  allowNegative={false}
+                  decimalPlaces={2}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={t("orderDiscount")}
+                  min={0}
+                  size="sm"
                   value={field.value ? Number(field.value) : 0}
                   onValueChange={(val) =>
                     field.onChange(val?.toString() ?? "0")
                   }
-                  size="sm"
-                  label={t("orderDiscount")}
-                  min={0}
-                  decimalPlaces={2}
-                  allowNegative={false}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="totalTax"
               control={control}
+              name="totalTax"
               render={({ field, fieldState }) => (
                 <IBaseInputNumber
+                  allowNegative={false}
+                  decimalPlaces={2}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={t("orderTax")}
+                  min={0}
+                  size="sm"
                   value={field.value ? Number(field.value) : 0}
                   onValueChange={(val) =>
                     field.onChange(val?.toString() ?? "0")
                   }
-                  size="sm"
-                  label={t("orderTax")}
-                  min={0}
-                  decimalPlaces={2}
-                  allowNegative={false}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />

@@ -1,5 +1,6 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { NextRequest } from "next/server";
+
 import RoleModel, { type RoleInput } from "../../../models/Role/RoleModel";
 
 export async function PUT(request: NextRequest) {
@@ -65,6 +66,7 @@ export async function PUT(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error updating role:", error);
+
     return JSONResponse({
       error: "Failed to update role",
       message: error instanceof Error ? error.message : "Unknown error",

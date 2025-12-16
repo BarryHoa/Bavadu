@@ -1,14 +1,15 @@
 import type { ImageUploadItem } from "@base/client/components";
-import {
-  ProductFormValues,
-  ProductMasterFeatures,
-  ProductMasterType,
-} from "../../../interface/Product";
 import type {
   LocaleFieldValue,
   UomConversions,
   VariantFieldValue,
 } from "./types";
+
+import {
+  ProductFormValues,
+  ProductMasterFeatures,
+  ProductMasterType,
+} from "../../../interface/Product";
 
 export type ProductFormFieldValues = {
   master: {
@@ -47,7 +48,7 @@ const createDefaultVariant = (): VariantFieldValue => ({
 
 // Helper function to create default values with feature options
 export const createDefaultValues = (
-  featureOptions: { value: string; label: string }[]
+  featureOptions: { value: string; label: string }[],
 ): ProductFormFieldValues => {
   const {
     getDefaultFeaturesForType,
@@ -66,7 +67,7 @@ export const createDefaultValues = (
           [feature.value as ProductMasterFeatures]:
             defaultFeatures[feature.value as ProductMasterFeatures] ?? false,
         }),
-        {} as Record<ProductMasterFeatures, boolean>
+        {} as Record<ProductMasterFeatures, boolean>,
       ),
       isActive: true,
       brand: "",
@@ -85,7 +86,7 @@ export { createDefaultVariant };
  */
 export const mapToFieldValues = (
   initialValues: ProductFormValues | undefined,
-  featureOptions: { value: string; label: string }[]
+  featureOptions: { value: string; label: string }[],
 ): ProductFormFieldValues => {
   const defaults = createDefaultValues(featureOptions);
 
@@ -101,7 +102,7 @@ export const mapToFieldValues = (
           feature.value as ProductMasterFeatures
         ] ?? defaults.master.features[feature.value as ProductMasterFeatures],
     }),
-    {} as Record<ProductMasterFeatures, boolean>
+    {} as Record<ProductMasterFeatures, boolean>,
   );
 
   // Map all variants from initialValues to variants array
@@ -158,6 +159,7 @@ export const mapToFieldValues = (
               status: "done" as const,
             } as ImageUploadItem;
           }
+
           return img as ImageUploadItem;
         }) ?? []) as ImageUploadItem[],
         packings:
@@ -224,6 +226,7 @@ export const mapToFieldValues = (
             status: "done" as const,
           } as ImageUploadItem;
         }
+
         return img as ImageUploadItem;
       }) ?? []) as ImageUploadItem[],
     },
@@ -236,7 +239,7 @@ export const mapToFieldValues = (
  * Used when submitting the form
  */
 export const mapToProductFormValues = (
-  values: ProductFormFieldValues
+  values: ProductFormFieldValues,
 ): ProductFormValues => {
   // Map all variants to array
   const mappedVariants = values.variants.map((variant) => ({
@@ -267,7 +270,7 @@ export const mapToProductFormValues = (
     isActive: variant.isActive,
     images: variant.images
       .filter(
-        (img: ImageUploadItem) => img.status === "done" && (img.id || img.url)
+        (img: ImageUploadItem) => img.status === "done" && (img.id || img.url),
       )
       .map((img: ImageUploadItem) => ({
         id: img.id,
@@ -308,7 +311,8 @@ export const mapToProductFormValues = (
       categoryId: values.master.categoryId,
       images: values.master.images
         .filter(
-          (img: ImageUploadItem) => img.status === "done" && (img.id || img.url)
+          (img: ImageUploadItem) =>
+            img.status === "done" && (img.id || img.url),
         )
         .map((img: ImageUploadItem) => ({
           id: img.id,

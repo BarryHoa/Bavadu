@@ -1,5 +1,7 @@
 "use client";
 
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
+
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import {
   DATA_TABLE_COLUMN_KEY_ACTION,
@@ -7,15 +9,13 @@ import {
 } from "@base/client/components";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import { formatDate } from "@base/client/utils/date/formatDate";
-
 import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import React, { useMemo } from "react";
-
 import LinkAs from "@base/client/components/LinkAs";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
+
 import { ProductCategoryRow } from "../../interface/ProductCategory";
 
 const ProductCategoryListPage = (): React.ReactNode => {
@@ -34,8 +34,9 @@ const ProductCategoryListPage = (): React.ReactNode => {
             path: "categories/view/[id]",
             as: `categories/view/${row.id}`,
           });
+
           return (
-            <LinkAs href={path} as={as}>
+            <LinkAs as={as} href={path}>
               {localized(row.name as LocalizeText) || row.code}
             </LinkAs>
           );
@@ -70,8 +71,8 @@ const ProductCategoryListPage = (): React.ReactNode => {
         render: (_, row) => (
           <Chip
             color={row.isActive ? "success" : "danger"}
-            variant="flat"
             size="sm"
+            variant="flat"
           >
             {row.isActive ? "Active" : "Inactive"}
           </Chip>
@@ -104,6 +105,7 @@ const ProductCategoryListPage = (): React.ReactNode => {
             path: "categories/edit/[id]",
             as: `categories/edit/${row.id}`,
           });
+
           return (
             <ActionMenu
               actions={[
@@ -135,8 +137,6 @@ const ProductCategoryListPage = (): React.ReactNode => {
   return (
     <div className="space-y-4">
       <ViewListDataTable
-        model="product-category"
-        columns={columns}
         actionsRight={[
           {
             key: "new",
@@ -149,6 +149,8 @@ const ProductCategoryListPage = (): React.ReactNode => {
             },
           },
         ]}
+        columns={columns}
+        model="product-category"
       />
     </div>
   );

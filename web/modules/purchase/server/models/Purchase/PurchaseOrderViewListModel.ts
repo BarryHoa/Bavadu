@@ -1,15 +1,16 @@
 import type { Column } from "drizzle-orm";
-import { ilike } from "drizzle-orm";
-
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
+
+import { ilike } from "drizzle-orm";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
+
 import { purchase_tb_purchase_orders } from "../../schemas";
 
 class PurchaseOrderViewListModel extends BaseViewListModel<
@@ -55,7 +56,10 @@ class PurchaseOrderViewListModel extends BaseViewListModel<
         "totalAmount",
         { column: purchase_tb_purchase_orders.totalAmount, sort: true },
       ],
-      ["currency", { column: purchase_tb_purchase_orders.currency, sort: true }],
+      [
+        "currency",
+        { column: purchase_tb_purchase_orders.currency, sort: true },
+      ],
       ["notes", { column: purchase_tb_purchase_orders.notes, sort: false }],
       [
         "createdAt",
@@ -70,13 +74,15 @@ class PurchaseOrderViewListModel extends BaseViewListModel<
   protected declarationSearch = () =>
     new Map([
       ["code", (text: string) => ilike(purchase_tb_purchase_orders.code, text)],
-      ["vendorName", (text: string) => ilike(purchase_tb_purchase_orders.vendorName, text)],
+      [
+        "vendorName",
+        (text: string) => ilike(purchase_tb_purchase_orders.vendorName, text),
+      ],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): any => ({
     id: row.id,
     code: row.code,
@@ -92,7 +98,7 @@ class PurchaseOrderViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<any>> => {
     return this.buildQueryDataList(params);
   };

@@ -1,15 +1,16 @@
 import type { Column } from "drizzle-orm";
-import { ilike } from "drizzle-orm";
-
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
+
+import { ilike } from "drizzle-orm";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
+
 import { sale_b2c_tb_customers } from "../../schemas";
 
 class CustomerIndividualViewListModel extends BaseViewListModel<
@@ -38,22 +39,13 @@ class CustomerIndividualViewListModel extends BaseViewListModel<
     >([
       ["id", { column: sale_b2c_tb_customers.id, sort: true }],
       ["code", { column: sale_b2c_tb_customers.code, sort: true }],
-      [
-        "firstName",
-        { column: sale_b2c_tb_customers.firstName, sort: true },
-      ],
+      ["firstName", { column: sale_b2c_tb_customers.firstName, sort: true }],
       ["lastName", { column: sale_b2c_tb_customers.lastName, sort: true }],
       ["phone", { column: sale_b2c_tb_customers.phone, sort: true }],
       ["email", { column: sale_b2c_tb_customers.email, sort: true }],
       ["isActive", { column: sale_b2c_tb_customers.isActive, sort: true }],
-      [
-        "createdAt",
-        { column: sale_b2c_tb_customers.createdAt, sort: true },
-      ],
-      [
-        "updatedAt",
-        { column: sale_b2c_tb_customers.updatedAt, sort: true },
-      ],
+      ["createdAt", { column: sale_b2c_tb_customers.createdAt, sort: true }],
+      ["updatedAt", { column: sale_b2c_tb_customers.updatedAt, sort: true }],
     ]);
 
   protected declarationSearch = () =>
@@ -74,7 +66,6 @@ class CustomerIndividualViewListModel extends BaseViewListModel<
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): any => ({
     id: row.id,
     code: row.code,
@@ -92,7 +83,7 @@ class CustomerIndividualViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<any>> => {
     return this.buildQueryDataList(params);
   };

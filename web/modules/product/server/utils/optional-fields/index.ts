@@ -1,11 +1,13 @@
+import type { OptionalFieldDefinition } from "./types";
+
 import { ProductMasterEnum } from "../../models/interfaces/ProductMaster";
+
 import { assetOptionalFields } from "./asset";
 import { consumableOptionalFields } from "./consumable";
 import { finishedGoodOptionalFields } from "./finished-good";
 import { goodsOptionalFields } from "./goods";
 import { rawMaterialOptionalFields } from "./raw-material";
 import { serviceOptionalFields } from "./service";
-import type { OptionalFieldDefinition } from "./types";
 import { toolOptionalFields } from "./tool";
 
 export type { OptionalFieldDefinition };
@@ -24,8 +26,7 @@ export const OPTIONAL_FIELDS_BY_TYPE: Record<
 };
 
 export function getOptionalFieldsByProductType(
-  type: ProductMasterEnum
+  type: ProductMasterEnum,
 ): OptionalFieldDefinition[] {
   return OPTIONAL_FIELDS_BY_TYPE[type] || [];
 }
-

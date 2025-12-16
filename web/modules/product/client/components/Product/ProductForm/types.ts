@@ -63,7 +63,7 @@ export type MasterFieldValue = {
 export const updateLocaleValue = (
   value: LocaleFieldValue,
   locale: keyof LocaleFieldValue,
-  next: string
+  next: string,
 ): LocaleFieldValue => ({
   ...value,
   [locale]: next,

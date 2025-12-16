@@ -1,4 +1,5 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
+
 import RoleModel from "../../../models/Role/RoleModel";
 
 export async function GET() {
@@ -14,6 +15,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error loading roles:", error);
+
     return JSONResponse({
       data: [],
       error: "Failed to load roles",
@@ -22,4 +24,3 @@ export async function GET() {
     });
   }
 }
-

@@ -9,6 +9,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_candidates } from "./hrm.candidate";
 import { hrm_tb_employees } from "./hrm.employee";
@@ -49,9 +50,8 @@ export const hrm_tb_offers = mdlHrmSchema.table(
     index("offers_candidate_idx").on(table.candidateId),
     index("offers_number_idx").on(table.offerNumber),
     index("offers_status_idx").on(table.status),
-  ]
+  ],
 );
 
 export type HrmTbOffer = typeof hrm_tb_offers.$inferSelect;
 export type NewHrmTbOffer = typeof hrm_tb_offers.$inferInsert;
-

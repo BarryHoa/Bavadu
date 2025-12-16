@@ -86,7 +86,7 @@ export type AdministrativeUnitLevelMap = {
  * Get the default level for an administrative unit type
  */
 export const getDefaultLevelForType = (
-  type: AdministrativeUnitType
+  type: AdministrativeUnitType,
 ): number => {
   const levelMap: AdministrativeUnitLevelMap = {
     province: 1,
@@ -100,6 +100,7 @@ export const getDefaultLevelForType = (
     neighborhood: 3,
     township: 3,
   };
+
   return levelMap[type];
 };
 

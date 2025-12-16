@@ -8,6 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_employees } from "./hrm.employee";
 
@@ -37,9 +38,8 @@ export const hrm_tb_certificates = mdlHrmSchema.table(
     index("certificates_employee_idx").on(table.employeeId),
     index("certificates_expiry_idx").on(table.expiryDate),
     index("certificates_active_idx").on(table.isActive),
-  ]
+  ],
 );
 
 export type HrmTbCertificate = typeof hrm_tb_certificates.$inferSelect;
 export type NewHrmTbCertificate = typeof hrm_tb_certificates.$inferInsert;
-

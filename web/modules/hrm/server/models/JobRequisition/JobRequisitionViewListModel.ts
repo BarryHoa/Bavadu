@@ -1,13 +1,14 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
@@ -54,14 +55,29 @@ class JobRequisitionViewListModel extends BaseViewListModel<
       }
     >([
       ["id", { column: hrm_tb_job_requisitions.id, sort: true }],
-      ["requisitionNumber", { column: hrm_tb_job_requisitions.requisitionNumber, sort: true }],
+      [
+        "requisitionNumber",
+        { column: hrm_tb_job_requisitions.requisitionNumber, sort: true },
+      ],
       ["title", { column: hrm_tb_job_requisitions.title, sort: true }],
-      ["departmentId", { column: hrm_tb_job_requisitions.departmentId, sort: true }],
-      ["positionId", { column: hrm_tb_job_requisitions.positionId, sort: true }],
-      ["numberOfOpenings", { column: hrm_tb_job_requisitions.numberOfOpenings, sort: true }],
+      [
+        "departmentId",
+        { column: hrm_tb_job_requisitions.departmentId, sort: true },
+      ],
+      [
+        "positionId",
+        { column: hrm_tb_job_requisitions.positionId, sort: true },
+      ],
+      [
+        "numberOfOpenings",
+        { column: hrm_tb_job_requisitions.numberOfOpenings, sort: true },
+      ],
       ["priority", { column: hrm_tb_job_requisitions.priority, sort: true }],
       ["status", { column: hrm_tb_job_requisitions.status, sort: true }],
-      ["openedDate", { column: hrm_tb_job_requisitions.openedDate, sort: true }],
+      [
+        "openedDate",
+        { column: hrm_tb_job_requisitions.openedDate, sort: true },
+      ],
       ["createdAt", { column: hrm_tb_job_requisitions.createdAt, sort: true }],
       ["updatedAt", { column: hrm_tb_job_requisitions.updatedAt, sort: true }],
     ]);
@@ -72,14 +88,17 @@ class JobRequisitionViewListModel extends BaseViewListModel<
 
   protected declarationSearch = () =>
     new Map([
-      ["requisitionNumber", (text: string) => ilike(hrm_tb_job_requisitions.requisitionNumber, text)],
+      [
+        "requisitionNumber",
+        (text: string) =>
+          ilike(hrm_tb_job_requisitions.requisitionNumber, text),
+      ],
       ["title", (text: string) => ilike(hrm_tb_job_requisitions.title, text)],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): JobRequisitionRow => ({
     id: row.id,
     requisitionNumber: row.requisitionNumber,
@@ -108,15 +127,14 @@ class JobRequisitionViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<JobRequisitionRow>> => {
     return this.buildQueryDataList(params, (query) =>
       query
         .leftJoin(department, eq(this.table.departmentId, department.id))
-        .leftJoin(position, eq(this.table.positionId, position.id))
+        .leftJoin(position, eq(this.table.positionId, position.id)),
     );
   };
 }
 
 export default JobRequisitionViewListModel;
-

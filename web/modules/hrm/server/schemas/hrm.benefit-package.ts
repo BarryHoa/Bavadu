@@ -9,6 +9,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 
 // Benefit Packages - Gói phúc lợi
@@ -35,8 +36,9 @@ export const hrm_tb_benefit_packages = mdlHrmSchema.table(
     index("benefit_packages_code_idx").on(table.code),
     index("benefit_packages_type_idx").on(table.benefitType),
     index("benefit_packages_active_idx").on(table.isActive),
-  ]
+  ],
 );
 
 export type HrmTbBenefitPackage = typeof hrm_tb_benefit_packages.$inferSelect;
-export type NewHrmTbBenefitPackage = typeof hrm_tb_benefit_packages.$inferInsert;
+export type NewHrmTbBenefitPackage =
+  typeof hrm_tb_benefit_packages.$inferInsert;

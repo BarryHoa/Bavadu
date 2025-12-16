@@ -29,8 +29,8 @@ import {
   string,
   trim,
 } from "valibot";
-
 import StockService from "@mdl/stock/client/services/StockService";
+
 import { purchaseOrderService } from "../../services/PurchaseOrderService";
 
 const quantitySchema = pipe(
@@ -39,8 +39,8 @@ const quantitySchema = pipe(
   minLength(1, "Quantity is required"),
   custom(
     (value) => !Number.isNaN(Number(value)) && Number(value) > 0,
-    "Quantity must be a positive number"
-  )
+    "Quantity must be a positive number",
+  ),
 );
 
 const unitPriceSchema = pipe(
@@ -49,8 +49,8 @@ const unitPriceSchema = pipe(
   custom(
     (value) =>
       value === "" || (!Number.isNaN(Number(value)) && Number(value) >= 0),
-    "Unit price must be a number greater than or equal to 0"
-  )
+    "Unit price must be a number greater than or equal to 0",
+  ),
 );
 
 const orderLineSchema = object({
@@ -68,7 +68,7 @@ const purchaseOrderFormSchema = object({
   notes: optional(pipe(string(), trim())),
   lines: pipe(
     array(orderLineSchema),
-    minLength(1, "At least one order line is required")
+    minLength(1, "At least one order line is required"),
   ),
 });
 
@@ -121,6 +121,7 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
     queryKey: ["warehouses"],
     queryFn: async () => {
       const response = await StockService.listWarehouses();
+
       return response.data ?? [];
     },
   });
@@ -145,6 +146,7 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await purchaseOrderService.create(payload);
+
       if (!response.data) {
         throw new Error(response.message ?? "Failed to create purchase order.");
       }
@@ -183,7 +185,7 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
         value: warehouse.id,
         label: `${warehouse.code} — ${warehouse.name}`,
       })),
-    [warehousesQuery.data]
+    [warehousesQuery.data],
   );
 
   return (
@@ -191,9 +193,9 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
       <div className="flex justify-end">
         <Button
           as={LinkAs as any}
+          href="/workspace/modules/purchase"
           size="sm"
           variant="light"
-          href="/workspace/modules/purchase"
         >
           Back to list
         </Button>
@@ -216,79 +218,79 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="grid gap-4 md:grid-cols-2">
               <Controller
-                name="vendorName"
                 control={control}
+                name="vendorName"
                 render={({ field, fieldState }) => (
                   <IBaseInput
                     {...field}
+                    isRequired
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
+                    label="Vendor name"
                     value={field.value}
                     onValueChange={field.onChange}
-                    label="Vendor name"
-                    isRequired
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
                   />
                 )}
               />
               <Controller
-                name="warehouseId"
                 control={control}
+                name="warehouseId"
                 render={({ field, fieldState }) => (
                   <IBaseSingleSelect
-                    label="Warehouse (optional)"
+                    errorMessage={fieldState.error?.message}
+                    isDisabled={warehousesQuery.isLoading}
+                    isInvalid={fieldState.invalid}
                     items={warehouseOptions}
+                    label="Warehouse (optional)"
                     selectedKey={field.value}
                     onSelectionChange={(key) => {
                       field.onChange(key || undefined);
                     }}
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
-                    isDisabled={warehousesQuery.isLoading}
                   />
                 )}
               />
               <Controller
-                name="expectedDate"
                 control={control}
+                name="expectedDate"
                 render={({ field, fieldState }) => (
                   <IBaseInput
                     {...field}
-                    type="date"
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
                     label="Expected date"
+                    type="date"
                     value={field.value ?? ""}
                     onValueChange={field.onChange}
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
                   />
                 )}
               />
               <Controller
-                name="currency"
                 control={control}
+                name="currency"
                 render={({ field, fieldState }) => (
                   <IBaseInput
                     {...field}
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
                     label="Currency"
                     value={field.value}
                     onValueChange={field.onChange}
-                    isInvalid={fieldState.invalid}
-                    errorMessage={fieldState.error?.message}
                   />
                 )}
               />
             </div>
 
             <Controller
-              name="notes"
               control={control}
+              name="notes"
               render={({ field, fieldState }) => (
                 <Textarea
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label="Notes"
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
@@ -310,62 +312,62 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
                   <CardBody className="space-y-3">
                     <div className="grid gap-3 md:grid-cols-4">
                       <Controller
-                        name={`lines.${index}.productId`}
                         control={control}
+                        name={`lines.${index}.productId`}
                         render={({ field, fieldState }) => (
                           <IBaseInput
                             {...field}
+                            isRequired
+                            errorMessage={fieldState.error?.message}
+                            isInvalid={fieldState.invalid}
                             label="Product ID"
                             value={field.value}
                             onValueChange={field.onChange}
-                            isRequired
-                            isInvalid={fieldState.invalid}
-                            errorMessage={fieldState.error?.message}
                           />
                         )}
                       />
                       <Controller
-                        name={`lines.${index}.quantity`}
                         control={control}
+                        name={`lines.${index}.quantity`}
                         render={({ field, fieldState }) => (
                           <IBaseInput
                             {...field}
+                            isRequired
+                            errorMessage={fieldState.error?.message}
+                            isInvalid={fieldState.invalid}
                             label="Quantity"
                             type="number"
                             value={field.value}
                             onValueChange={field.onChange}
-                            isRequired
-                            isInvalid={fieldState.invalid}
-                            errorMessage={fieldState.error?.message}
                           />
                         )}
                       />
                       <Controller
-                        name={`lines.${index}.unitPrice`}
                         control={control}
+                        name={`lines.${index}.unitPrice`}
                         render={({ field, fieldState }) => (
                           <IBaseInput
                             {...field}
+                            errorMessage={fieldState.error?.message}
+                            isInvalid={fieldState.invalid}
                             label="Unit price"
                             type="number"
                             value={field.value}
                             onValueChange={field.onChange}
-                            isInvalid={fieldState.invalid}
-                            errorMessage={fieldState.error?.message}
                           />
                         )}
                       />
                       <Controller
-                        name={`lines.${index}.description`}
                         control={control}
+                        name={`lines.${index}.description`}
                         render={({ field, fieldState }) => (
                           <IBaseInput
                             {...field}
+                            errorMessage={fieldState.error?.message}
+                            isInvalid={fieldState.invalid}
                             label="Description"
                             value={field.value ?? ""}
                             onValueChange={field.onChange}
-                            isInvalid={fieldState.invalid}
-                            errorMessage={fieldState.error?.message}
                           />
                         )}
                       />
@@ -393,9 +395,9 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
 
             <Button
               color="primary"
-              type="submit"
-              isLoading={isSubmitting}
               disabled={isSubmitting}
+              isLoading={isSubmitting}
+              type="submit"
             >
               Create purchase order
             </Button>

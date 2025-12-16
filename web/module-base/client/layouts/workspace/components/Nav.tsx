@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
 import { Avatar } from "@heroui/avatar";
 import { Badge } from "@heroui/badge";
 import { Button } from "@heroui/button";
@@ -64,21 +63,21 @@ export default function Nav() {
     <HeroNavbar
       shouldHideOnScroll
       className="border-b border-gray-200 bg-white"
-      height="48px"
-      maxWidth="full"
       classNames={{
         wrapper: "px-4",
       }}
+      height="48px"
+      maxWidth="full"
     >
       <NavbarBrand as="li" className="gap-3 max-w-fit">
         <div className="flex items-center">
           <Image
-            src="/favicon/logo.png"
-            alt={siteConfig.name}
-            width={32}
-            height={32}
-            className="mr-3 rounded-lg bg-white"
             priority
+            alt={siteConfig.name}
+            className="mr-3 rounded-lg bg-white"
+            height={32}
+            src="/favicon/logo.png"
+            width={32}
           />
           <h1 className="text-xl font-bold text-orange-600">
             {siteConfig.name}
@@ -96,9 +95,9 @@ export default function Nav() {
           <Badge
             color="danger"
             content=""
-            shape="circle"
-            placement="top-right"
             isInvisible={false}
+            placement="top-right"
+            shape="circle"
           >
             <Button isIconOnly size="sm" variant="light">
               <Bell size={20} />
@@ -110,25 +109,25 @@ export default function Nav() {
             <DropdownTrigger>
               <Avatar
                 className="cursor-pointer transition-transform hover:scale-105"
-                size="sm"
-                src={displayAvatar}
-                onError={() => setAvatarError(true)}
                 fallback={
                   <User
-                    size={16}
                     className="text-default-500"
+                    size={16}
                     strokeWidth={2}
                   />
                 }
+                size="sm"
+                src={displayAvatar}
+                onError={() => setAvatarError(true)}
               />
             </DropdownTrigger>
             <DropdownMenu aria-label="User menu" variant="flat">
               <DropdownItem
                 key="logout"
                 color="danger"
+                isDisabled={isLoggingOut}
                 startContent={<LogOut size={16} />}
                 onPress={handleLogout}
-                isDisabled={isLoggingOut}
               >
                 {isLoggingOut ? "Logging out..." : "Logout"}
               </DropdownItem>

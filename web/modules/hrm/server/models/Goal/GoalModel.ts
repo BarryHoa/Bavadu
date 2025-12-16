@@ -54,6 +54,7 @@ export default class GoalModel extends BaseModel<typeof hrm_tb_goals> {
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
@@ -84,6 +85,7 @@ export default class GoalModel extends BaseModel<typeof hrm_tb_goals> {
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     // Calculate progress if target value exists
@@ -130,8 +132,8 @@ export default class GoalModel extends BaseModel<typeof hrm_tb_goals> {
         ? Math.min(
             100,
             Math.round(
-              ((payload.currentValue ?? 0) / payload.targetValue) * 100
-            )
+              ((payload.currentValue ?? 0) / payload.targetValue) * 100,
+            ),
           )
         : 0;
 
@@ -139,7 +141,11 @@ export default class GoalModel extends BaseModel<typeof hrm_tb_goals> {
       employeeId: payload.employeeId,
       goalType: payload.goalType,
       title: payload.title,
-      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
+      description: payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null,
       targetValue: payload.targetValue ?? null,
       currentValue: payload.currentValue ?? 0,
       unit: payload.unit ?? null,
@@ -160,13 +166,15 @@ export default class GoalModel extends BaseModel<typeof hrm_tb_goals> {
     if (!created) throw new Error("Failed to create goal");
 
     const goal = await this.getGoalById(created.id);
+
     if (!goal) throw new Error("Failed to load goal after creation");
+
     return goal;
   };
 
   updateGoal = async (
     id: string,
-    payload: Partial<GoalInput>
+    payload: Partial<GoalInput>,
   ): Promise<GoalRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -177,7 +185,11 @@ export default class GoalModel extends BaseModel<typeof hrm_tb_goals> {
     if (payload.goalType !== undefined) updateData.goalType = payload.goalType;
     if (payload.title !== undefined) updateData.title = payload.title;
     if (payload.description !== undefined)
-      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
+      updateData.description = payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null;
     if (payload.targetValue !== undefined)
       updateData.targetValue = payload.targetValue ?? null;
     if (payload.currentValue !== undefined)
@@ -190,15 +202,20 @@ export default class GoalModel extends BaseModel<typeof hrm_tb_goals> {
     if (payload.status !== undefined) updateData.status = payload.status;
 
     // Recalculate progress if target or current value changed
-    if (payload.targetValue !== undefined || payload.currentValue !== undefined) {
+    if (
+      payload.targetValue !== undefined ||
+      payload.currentValue !== undefined
+    ) {
       const existing = await this.getGoalById(id);
+
       if (existing) {
         const targetValue = updateData.targetValue ?? existing.targetValue;
         const currentValue = updateData.currentValue ?? existing.currentValue;
+
         if (targetValue && targetValue > 0) {
           updateData.progress = Math.min(
             100,
-            Math.round((currentValue / targetValue) * 100)
+            Math.round((currentValue / targetValue) * 100),
           );
         } else {
           updateData.progress = 0;
@@ -206,7 +223,11 @@ export default class GoalModel extends BaseModel<typeof hrm_tb_goals> {
       }
     }
 
-    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db
+      .update(this.table)
+      .set(updateData)
+      .where(eq(this.table.id, id));
+
     return this.getGoalById(id);
   };
 
@@ -227,7 +248,7 @@ export default class GoalModel extends BaseModel<typeof hrm_tb_goals> {
     }
     if (payload.description !== undefined) {
       normalizedPayload.description = this.normalizeLocaleInput(
-        payload.description
+        payload.description,
       );
     }
     if (payload.targetValue !== undefined) {
@@ -241,7 +262,9 @@ export default class GoalModel extends BaseModel<typeof hrm_tb_goals> {
     }
     if (payload.unit !== undefined) {
       normalizedPayload.unit =
-        payload.unit === null || payload.unit === "" ? null : String(payload.unit);
+        payload.unit === null || payload.unit === ""
+          ? null
+          : String(payload.unit);
     }
     if (payload.period !== undefined) {
       normalizedPayload.period = String(payload.period);
@@ -259,4 +282,3 @@ export default class GoalModel extends BaseModel<typeof hrm_tb_goals> {
     return this.updateGoal(id, normalizedPayload);
   };
 }
-

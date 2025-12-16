@@ -5,4 +5,3 @@ import type {
 
 export type SalesOrderB2B = SalesOrderB2BDto;
 export type SalesOrderB2BLine = SalesOrderB2BLineDto;
-

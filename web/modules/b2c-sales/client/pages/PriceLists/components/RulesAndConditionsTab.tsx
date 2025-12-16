@@ -1,8 +1,12 @@
 "use client";
 
-import { IBaseInput, IBaseSingleSelect, SelectItemOption } from "@base/client/components";
+import {
+  IBaseInput,
+  IBaseSingleSelect,
+  SelectItemOption,
+} from "@base/client/components";
 import { Button } from "@heroui/button";
-import { Card, CardBody, Checkbox, Textarea } from "@heroui/react";
+import { Card, CardBody, Checkbox } from "@heroui/react";
 import { Control, Controller, useFieldArray } from "react-hook-form";
 import { Plus, Trash2 } from "lucide-react";
 
@@ -19,7 +23,11 @@ export default function RulesAndConditionsTab({
   categoryOptions = [],
   brandOptions = [],
 }: RulesAndConditionsTabProps) {
-  const { fields: ruleFields, append: appendRule, remove: removeRule } = useFieldArray({
+  const {
+    fields: ruleFields,
+    append: appendRule,
+    remove: removeRule,
+  } = useFieldArray({
     control,
     name: "pricingRules",
   });
@@ -36,10 +44,10 @@ export default function RulesAndConditionsTab({
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold">Pricing Rules</h3>
         <Button
-          size="sm"
           color="primary"
-          variant="flat"
+          size="sm"
           startContent={<Plus size={16} />}
+          variant="flat"
           onPress={() =>
             appendRule({
               name: "",
@@ -65,35 +73,35 @@ export default function RulesAndConditionsTab({
               <CardBody className="p-0 space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
                   <Controller
-                    name={`pricingRules.${index}.name`}
                     control={control}
+                    name={`pricingRules.${index}.name`}
                     render={({ field, fieldState }) => (
                       <IBaseInput
+                        isRequired
+                        errorMessage={fieldState.error?.message}
+                        isInvalid={fieldState.invalid}
                         label="Rule Name"
                         size="sm"
                         value={field.value}
                         onChange={field.onChange}
-                        isRequired
-                        isInvalid={fieldState.invalid}
-                        errorMessage={fieldState.error?.message}
                       />
                     )}
                   />
                   <Controller
-                    name={`pricingRules.${index}.method`}
                     control={control}
+                    name={`pricingRules.${index}.method`}
                     render={({ field, fieldState }) => (
                       <IBaseSingleSelect
-                        label="Method"
-                        size="sm"
+                        isRequired
+                        errorMessage={fieldState.error?.message}
+                        isInvalid={fieldState.invalid}
                         items={ruleMethodOptions}
+                        label="Method"
                         selectedKey={field.value}
+                        size="sm"
                         onSelectionChange={(key) => {
                           field.onChange(key || "");
                         }}
-                        isRequired
-                        isInvalid={fieldState.invalid}
-                        errorMessage={fieldState.error?.message}
                       />
                     )}
                   />
@@ -101,30 +109,30 @@ export default function RulesAndConditionsTab({
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <Controller
-                    name={`pricingRules.${index}.value`}
                     control={control}
+                    name={`pricingRules.${index}.value`}
                     render={({ field, fieldState }) => (
                       <IBaseInput
+                        isRequired
+                        errorMessage={fieldState.error?.message}
+                        isInvalid={fieldState.invalid}
                         label="Value"
+                        placeholder="Enter value or formula"
                         size="sm"
                         type="number"
                         value={field.value}
                         onChange={field.onChange}
-                        isRequired
-                        isInvalid={fieldState.invalid}
-                        errorMessage={fieldState.error?.message}
-                        placeholder="Enter value or formula"
                       />
                     )}
                   />
                   <div className="flex items-end">
                     <Controller
-                      name={`pricingRules.${index}.applyToExceptions`}
                       control={control}
+                      name={`pricingRules.${index}.applyToExceptions`}
                       render={({ field }) => (
                         <Checkbox
-                          size="sm"
                           isSelected={field.value === true}
+                          size="sm"
                           onValueChange={field.onChange}
                         >
                           Apply to Exceptions
@@ -138,14 +146,14 @@ export default function RulesAndConditionsTab({
                   <h4 className="text-xs font-medium mb-2">Conditions</h4>
                   <div className="grid gap-4 md:grid-cols-2">
                     <Controller
-                      name={`pricingRules.${index}.conditions.categories`}
                       control={control}
+                      name={`pricingRules.${index}.conditions.categories`}
                       render={({ field }) => (
                         <IBaseSingleSelect
-                          label="Categories"
-                          size="sm"
                           items={categoryOptions}
+                          label="Categories"
                           selectedKey={field.value}
+                          size="sm"
                           onSelectionChange={(key) => {
                             field.onChange(key || undefined);
                           }}
@@ -153,14 +161,14 @@ export default function RulesAndConditionsTab({
                       )}
                     />
                     <Controller
-                      name={`pricingRules.${index}.conditions.brands`}
                       control={control}
+                      name={`pricingRules.${index}.conditions.brands`}
                       render={({ field }) => (
                         <IBaseSingleSelect
-                          label="Brands"
-                          size="sm"
                           items={brandOptions}
+                          label="Brands"
                           selectedKey={field.value}
+                          size="sm"
                           onSelectionChange={(key) => {
                             field.onChange(key || undefined);
                           }}
@@ -172,10 +180,10 @@ export default function RulesAndConditionsTab({
 
                 <div className="flex justify-end">
                   <Button
-                    size="sm"
                     color="danger"
-                    variant="light"
+                    size="sm"
                     startContent={<Trash2 size={16} />}
+                    variant="light"
                     onPress={() => removeRule(index)}
                   >
                     Remove
@@ -189,4 +197,3 @@ export default function RulesAndConditionsTab({
     </div>
   );
 }
-

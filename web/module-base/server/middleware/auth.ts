@@ -13,9 +13,11 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export async function authenticateRequest(
   request: NextRequest,
-  nextHeaders: Headers
+  nextHeaders: Headers,
 ): Promise<NextResponse | null> {
-  const sessionToken = request.cookies.get(AUTH_CONFIG.sessionCookieName)?.value;
+  const sessionToken = request.cookies.get(
+    AUTH_CONFIG.sessionCookieName,
+  )?.value;
 
   if (!sessionToken) {
     logAuthFailure("Missing session token", {
@@ -31,7 +33,7 @@ export async function authenticateRequest(
         error: "Authentication required",
         message: "Session token is required",
       },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -45,7 +47,9 @@ export async function authenticateRequest(
         userAgent: getUserAgent(request),
         path: request.nextUrl.pathname,
         method: request.method,
-        reason: validationResult.valid ? "Session expired" : "Invalid session token",
+        reason: validationResult.valid
+          ? "Session expired"
+          : "Invalid session token",
       });
 
       return NextResponse.json(
@@ -54,7 +58,7 @@ export async function authenticateRequest(
           error: "Authentication failed",
           message: "Invalid or expired session",
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -85,7 +89,7 @@ export async function authenticateRequest(
         error: "Authentication failed",
         message: "Failed to validate session",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

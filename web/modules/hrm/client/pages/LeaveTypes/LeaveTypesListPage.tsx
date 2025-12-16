@@ -30,6 +30,7 @@ export default function LeaveTypesListPage(): React.ReactNode {
         label: t("labels.code"),
         render: (value, row) => {
           if (!row?.id) return value;
+
           return (
             <LinkAs href={`/workspace/modules/hrm/leave-types/view/${row.id}`}>
               {value}
@@ -50,13 +51,13 @@ export default function LeaveTypesListPage(): React.ReactNode {
       {
         key: "accrualRate",
         label: t("labels.accrualRate"),
-        render: (value) => value ? `${value} days` : "—",
+        render: (value) => (value ? `${value} days` : "—"),
       },
       {
         key: "isActive",
         label: t("labels.isActive"),
         render: (value) => (
-          <Chip size="sm" variant="flat" color={value ? "success" : "default"}>
+          <Chip color={value ? "success" : "default"} size="sm" variant="flat">
             {value ? "Active" : "Inactive"}
           </Chip>
         ),
@@ -68,6 +69,7 @@ export default function LeaveTypesListPage(): React.ReactNode {
         render: (_, row) => {
           if (!row?.id) return null;
           const viewLink = `/workspace/modules/hrm/leave-types/view/${row.id}`;
+
           return (
             <ActionMenu
               actions={[
@@ -82,15 +84,12 @@ export default function LeaveTypesListPage(): React.ReactNode {
         },
       },
     ],
-    [tDataTable, t, getLocalizedText]
+    [tDataTable, t, getLocalizedText],
   );
 
   return (
     <div className="space-y-4">
       <ViewListDataTable<LeaveTypeRow>
-        model="hrm.leave-type"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -102,8 +101,10 @@ export default function LeaveTypesListPage(): React.ReactNode {
             },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="hrm.leave-type"
       />
     </div>
   );
 }
-

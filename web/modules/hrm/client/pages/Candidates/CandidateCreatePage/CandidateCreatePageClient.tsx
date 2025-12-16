@@ -4,6 +4,7 @@ import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { candidateService } from "@mdl/hrm/client/services/CandidateService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+
 import CandidateForm, {
   type CandidateFormValues,
 } from "../components/CandidateForm/CandidateForm";
@@ -22,11 +23,13 @@ export default function CandidateCreatePageClient(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await candidateService.create(payload);
+
       if (!response.data) {
         throw new Error(
-          response.message ?? t("errors.failedToCreateCandidate")
+          response.message ?? t("errors.failedToCreateCandidate"),
         );
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-candidates"]],
@@ -58,10 +61,10 @@ export default function CandidateCreatePageClient(): React.ReactNode {
 
   return (
     <CandidateForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push("/workspace/modules/hrm/candidates")}
-      submitError={submitError}
       isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() => router.push("/workspace/modules/hrm/candidates")}
+      onSubmit={handleSubmit}
     />
   );
 }

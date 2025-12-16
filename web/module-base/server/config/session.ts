@@ -34,4 +34,3 @@ export const SESSION_CONFIG = {
     },
   },
 } as const;
-

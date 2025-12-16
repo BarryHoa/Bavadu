@@ -1,9 +1,11 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
+
 import { loadAllMenus } from "../../loaders/menu-loader";
 
 export async function GET() {
   try {
     const menus = loadAllMenus();
+
     return JSONResponse({
       data: menus,
       message: `Loaded ${menus.length} menu(s)`,

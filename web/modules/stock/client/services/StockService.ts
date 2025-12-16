@@ -60,35 +60,35 @@ class StockService extends JsonRpcClientService {
   listWarehouses() {
     return this.call<ApiResponse<WarehouseDto[]>>(
       "stock-warehouse.list.getData",
-      {}
+      {},
     );
   }
 
   createWarehouse(payload: WarehousePayload) {
     return this.call<ApiResponse<WarehouseDto>>(
       "stock-warehouse.curd.create",
-      payload
+      payload,
     );
   }
 
   getWarehouseById(id: string) {
     return this.call<ApiResponse<WarehouseDto>>(
       "stock-warehouse.curd.getById",
-      { id }
+      { id },
     );
   }
 
   updateWarehouse(payload: WarehousePayload & { id: string }) {
     return this.call<ApiResponse<WarehouseDto>>(
       "stock-warehouse.curd.update",
-      payload
+      payload,
     );
   }
 
   getStockSummary(params?: { productId?: string; warehouseId?: string }) {
     return this.call<ApiResponse<StockSummaryItem[]>>(
       "stock-summary.list.getData",
-      params || {}
+      params || {},
     );
   }
 

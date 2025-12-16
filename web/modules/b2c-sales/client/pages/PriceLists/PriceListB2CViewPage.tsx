@@ -14,6 +14,7 @@ export default function PriceListB2CViewPage(): React.ReactNode {
     queryKey: ["price-list-b2c", id],
     queryFn: async () => {
       const response = await priceListB2CService.getById(id);
+
       return response.data;
     },
     enabled: !!id,

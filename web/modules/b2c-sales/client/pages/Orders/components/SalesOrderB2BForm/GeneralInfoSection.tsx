@@ -3,6 +3,7 @@
 import { IBaseSingleSelectAsync } from "@base/client/components";
 import { useTranslations } from "next-intl";
 import { Control, Controller } from "react-hook-form";
+
 import { useSalesOrderB2BForm } from "../../contexts/SalesOrderB2BFormContext";
 
 interface GeneralInfoSectionProps {
@@ -18,6 +19,7 @@ export default function GeneralInfoSection({
 }: GeneralInfoSectionProps) {
   const t = useTranslations("b2cSales.order.create.labels");
   const { page } = useSalesOrderB2BForm();
+
   return (
     <div>
       <h2 className="text-base font-semibold mb-2">{t("generalInfo")}</h2>
@@ -28,21 +30,21 @@ export default function GeneralInfoSection({
       <div className="grid gap-2 md:grid-cols-3">
         {/* Pricing */}
         <Controller
-          name="priceListId"
           control={control}
+          name="priceListId"
           render={({ field, fieldState }) => (
             <IBaseSingleSelectAsync
+              isRequired
+              callWhen="mount"
+              errorMessage={fieldState.error?.message}
+              isInvalid={fieldState.invalid}
               label={t("pricing")}
-              size="sm"
               model="b2c-sales-price-list"
               selectedKey={field.value}
+              size="sm"
               onSelectionChange={(key) => {
                 field.onChange(key || undefined);
               }}
-              callWhen="mount"
-              isRequired
-              isInvalid={fieldState.invalid}
-              errorMessage={fieldState.error?.message}
               onTheFirstFetchSuccess={(data) => {
                 if (page === "create") {
                   if (!field.value && data?.data?.length > 0) {
@@ -55,20 +57,20 @@ export default function GeneralInfoSection({
         />
 
         <Controller
-          name="warehouseId"
           control={control}
+          name="warehouseId"
           render={({ field, fieldState }) => (
             <IBaseSingleSelectAsync
+              isRequired
+              callWhen="mount"
+              errorMessage={fieldState.error?.message}
+              isInvalid={fieldState.invalid}
               label={t("warehouse")}
               model="b2c-sales-warehouse"
               selectedKey={field.value}
               onSelectionChange={(key) => {
                 field.onChange(key || undefined);
               }}
-              callWhen="mount"
-              isRequired
-              isInvalid={fieldState.invalid}
-              errorMessage={fieldState.error?.message}
               onTheFirstFetchSuccess={(data) => {
                 if (page === "create") {
                   if (!field.value && data?.data?.length > 0) {

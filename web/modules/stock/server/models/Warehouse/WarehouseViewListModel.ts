@@ -1,10 +1,4 @@
-import { ilike } from "drizzle-orm";
 import type { Column } from "drizzle-orm";
-
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
@@ -12,9 +6,12 @@ import type {
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 
 import {
-  WarehouseAddress,
-} from "../../../common/constants";
-import type { StockTbStockWarehouse } from "../../schemas";
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
+import { ilike } from "drizzle-orm";
+
+import { WarehouseAddress } from "../../../common/constants";
 import { stock_tb_stock_warehouses } from "../../schemas";
 
 export interface WarehouseViewRow {
@@ -64,10 +61,7 @@ class WarehouseViewListModel extends BaseViewListModel<
       ["id", { column: stock_tb_stock_warehouses.id, sort: true }],
       ["code", { column: stock_tb_stock_warehouses.code, sort: true }],
       ["name", { column: stock_tb_stock_warehouses.name, sort: true }],
-      [
-        "typeCode",
-        { column: stock_tb_stock_warehouses.typeCode, sort: true },
-      ],
+      ["typeCode", { column: stock_tb_stock_warehouses.typeCode, sort: true }],
       ["status", { column: stock_tb_stock_warehouses.status, sort: true }],
       [
         "companyId",
@@ -81,22 +75,13 @@ class WarehouseViewListModel extends BaseViewListModel<
         "contactId",
         { column: stock_tb_stock_warehouses.contactId, sort: true },
       ],
-      [
-        "address",
-        { column: stock_tb_stock_warehouses.address, sort: false },
-      ],
+      ["address", { column: stock_tb_stock_warehouses.address, sort: false }],
       [
         "valuationMethod",
         { column: stock_tb_stock_warehouses.valuationMethod, sort: true },
       ],
-      [
-        "minStock",
-        { column: stock_tb_stock_warehouses.minStock, sort: true },
-      ],
-      [
-        "maxStock",
-        { column: stock_tb_stock_warehouses.maxStock, sort: true },
-      ],
+      ["minStock", { column: stock_tb_stock_warehouses.minStock, sort: true }],
+      ["maxStock", { column: stock_tb_stock_warehouses.maxStock, sort: true }],
       [
         "accountInventory",
         { column: stock_tb_stock_warehouses.accountInventory, sort: false },
@@ -120,14 +105,19 @@ class WarehouseViewListModel extends BaseViewListModel<
     new Map([
       ["code", (text: string) => ilike(stock_tb_stock_warehouses.code, text)],
       ["name", (text: string) => ilike(stock_tb_stock_warehouses.name, text)],
-      ["typeCode", (text: string) => ilike(stock_tb_stock_warehouses.typeCode, text)],
-      ["status", (text: string) => ilike(stock_tb_stock_warehouses.status, text)],
+      [
+        "typeCode",
+        (text: string) => ilike(stock_tb_stock_warehouses.typeCode, text),
+      ],
+      [
+        "status",
+        (text: string) => ilike(stock_tb_stock_warehouses.status, text),
+      ],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): WarehouseViewRow => ({
     id: row.id,
     code: row.code,
@@ -152,11 +142,10 @@ class WarehouseViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest = {}
+    params: ListParamsRequest = {},
   ): Promise<ListParamsResponse<WarehouseViewRow>> => {
     return this.buildQueryDataList(params);
   };
 }
 
 export default WarehouseViewListModel;
-

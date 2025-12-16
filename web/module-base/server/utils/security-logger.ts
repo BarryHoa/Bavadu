@@ -32,7 +32,7 @@ async function writeLog(
   type: LogType,
   severity: LogSeverity,
   message: string,
-  metadata: Record<string, unknown> = {}
+  metadata: Record<string, unknown> = {},
 ): Promise<void> {
   const entry: LogEntry = {
     timestamp: new Date().toISOString(),
@@ -44,11 +44,13 @@ async function writeLog(
 
   // Write using LogModel
   const logModel = getLogModel();
+
   await logModel.write(entry);
 
   // Also output to console for development/debugging
   if (process.env.NODE_ENV === "development") {
     const formatted = formatSecurityLog(entry);
+
     if (severity === "high" || severity === "critical") {
       console.error(formatted);
     } else if (severity === "medium") {
@@ -72,7 +74,7 @@ export function logAuthFailure(
     username?: string;
     userId?: string;
     [key: string]: unknown;
-  } = {}
+  } = {},
 ): void {
   writeLog(
     LogType.AUTH_FAILURE,
@@ -81,7 +83,7 @@ export function logAuthFailure(
     {
       ...metadata,
       reason,
-    }
+    },
   ).catch((error) => {
     console.error("Failed to write auth failure log:", error);
   });
@@ -106,7 +108,7 @@ export function logAuthSuccess(metadata: {
       LogType.AUTH_SUCCESS,
       LogSeverity.LOW,
       "Authentication successful",
-      metadata
+      metadata,
     ).catch((error) => {
       console.error("Failed to write auth success log:", error);
     });
@@ -127,7 +129,7 @@ export function logAuthzFailure(
     username?: string;
     requiredPermission?: string;
     [key: string]: unknown;
-  } = {}
+  } = {},
 ): void {
   writeLog(
     LogType.AUTHZ_FAILURE,
@@ -136,7 +138,7 @@ export function logAuthzFailure(
     {
       ...metadata,
       reason,
-    }
+    },
   ).catch((error) => {
     console.error("Failed to write authz failure log:", error);
   });
@@ -154,7 +156,7 @@ export function logSuspiciousRequest(
     method?: string;
     userId?: string;
     [key: string]: unknown;
-  } = {}
+  } = {},
 ): void {
   writeLog(
     LogType.SUSPICIOUS_REQUEST,
@@ -163,7 +165,7 @@ export function logSuspiciousRequest(
     {
       ...metadata,
       reason,
-    }
+    },
   ).catch((error) => {
     console.error("Failed to write suspicious request log:", error);
   });
@@ -181,13 +183,13 @@ export function logRateLimitViolation(
     limit?: number;
     window?: number;
     [key: string]: unknown;
-  } = {}
+  } = {},
 ): void {
   writeLog(
     LogType.RATE_LIMIT,
     LogSeverity.MEDIUM,
     "Rate limit exceeded",
-    metadata
+    metadata,
   ).catch((error) => {
     console.error("Failed to write rate limit log:", error);
   });
@@ -202,13 +204,16 @@ export function getClientIp(request: {
 }): string {
   const headers = request.headers;
   const forwarded = headers.get("x-forwarded-for");
+
   if (forwarded) {
     return forwarded.split(",")[0].trim();
   }
   const realIp = headers.get("x-real-ip");
+
   if (realIp) {
     return realIp;
   }
+
   return "unknown";
 }
 
@@ -220,5 +225,6 @@ export function getUserAgent(request: {
   headers: Headers | { get: (key: string) => string | null };
 }): string {
   const headers = request.headers;
+
   return headers.get("user-agent") || "unknown";
 }

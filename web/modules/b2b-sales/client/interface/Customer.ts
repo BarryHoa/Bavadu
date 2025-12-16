@@ -5,4 +5,3 @@ import type {
 
 export type CustomerCompany = CustomerCompanyDto;
 export type CustomerIndividual = CustomerIndividualDto;
-

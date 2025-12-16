@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+
 import SalesOrderB2CCreatePageClient from "./SalesOrderB2CCreatePageClient";
 
 export default async function SalesOrderB2CCreatePageSSR() {

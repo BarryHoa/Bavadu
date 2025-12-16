@@ -26,6 +26,7 @@ export default function NewsListPage() {
       newsService.getList(ITEMS_PER_PAGE, pageParam),
     getNextPageParam: (lastPage) => {
       if (!lastPage.pagination?.hasMore) return undefined;
+
       return (lastPage.pagination?.offset || 0) + ITEMS_PER_PAGE;
     },
     initialPageParam: 0,
@@ -41,7 +42,7 @@ export default function NewsListPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <Spinner size="lg" color="primary" />
+        <Spinner color="primary" size="lg" />
       </div>
     );
   }
@@ -86,16 +87,16 @@ export default function NewsListPage() {
         {news.map((item) => (
           <Card
             key={item.id}
-            className="group cursor-pointer border border-gray-200 transition-all hover:border-primary-300 hover:shadow-lg"
             isPressable
+            className="group cursor-pointer border border-gray-200 transition-all hover:border-primary-300 hover:shadow-lg"
           >
             {item.imageUrl && (
               <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
                 <Image
-                  src={item.imageUrl}
-                  alt={item.title}
                   fill
+                  alt={item.title}
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  src={item.imageUrl}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
               </div>
@@ -113,7 +114,7 @@ export default function NewsListPage() {
             <CardBody className="px-4 pb-4">
               <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
                 <div className="flex items-center gap-1.5">
-                  <Calendar size={14} className="text-gray-400" />
+                  <Calendar className="text-gray-400" size={14} />
                   <span>
                     {item.publishedAt
                       ? formatDate(item.publishedAt)
@@ -121,12 +122,12 @@ export default function NewsListPage() {
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Eye size={14} className="text-gray-400" />
+                  <Eye className="text-gray-400" size={14} />
                   <span>{item.viewCount || "0"}</span>
                 </div>
                 {item.authorName && (
                   <div className="flex items-center gap-1.5">
-                    <User size={14} className="text-gray-400" />
+                    <User className="text-gray-400" size={14} />
                     <span className="truncate max-w-[100px]">
                       {item.authorName}
                     </span>
@@ -159,15 +160,15 @@ export default function NewsListPage() {
       {hasNextPage && (
         <div className="mt-8 flex justify-center">
           <Button
+            className="min-w-[140px]"
             color="primary"
-            variant="flat"
-            size="lg"
-            onPress={() => fetchNextPage()}
-            isLoading={isFetchingNextPage}
             endContent={
               !isFetchingNextPage ? <ChevronDown size={18} /> : undefined
             }
-            className="min-w-[140px]"
+            isLoading={isFetchingNextPage}
+            size="lg"
+            variant="flat"
+            onPress={() => fetchNextPage()}
           >
             {isFetchingNextPage ? "Loading..." : "Load More"}
           </Button>

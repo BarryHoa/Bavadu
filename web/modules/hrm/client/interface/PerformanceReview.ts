@@ -47,4 +47,3 @@ export interface CreatePerformanceReviewPayload {
 export interface UpdatePerformanceReviewPayload extends Partial<CreatePerformanceReviewPayload> {
   id: string;
 }
-

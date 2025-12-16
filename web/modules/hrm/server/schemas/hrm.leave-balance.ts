@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { index, integer, timestamp, uuid } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_employees } from "./hrm.employee";
 import { hrm_tb_leave_types } from "./hrm.leave-type";
@@ -32,9 +33,9 @@ export const hrm_tb_leave_balances = mdlHrmSchema.table(
     index("leave_balances_employee_type_year_idx").on(
       table.employeeId,
       table.leaveTypeId,
-      table.year
+      table.year,
     ),
-  ]
+  ],
 );
 
 export type HrmTbLeaveBalance = typeof hrm_tb_leave_balances.$inferSelect;

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { employeeService } from "@mdl/hrm/client/services/EmployeeService";
+
 import EmployeeForm, {
   type EmployeeFormValues,
 } from "./components/EmployeeForm/EmployeeForm";
@@ -19,9 +20,11 @@ export default function EmployeeEditPage(): React.ReactNode {
     queryKey: ["hrm-employee", id],
     queryFn: async () => {
       const response = await employeeService.getById(id);
+
       if (!response.data) {
         throw new Error(response.message ?? "Employee not found");
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -37,9 +40,11 @@ export default function EmployeeEditPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await employeeService.update(payload);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToUpdate"));
       }
+
       return { id: response.data.id };
     },
     invalidateQueries: [["hrm-employees"], ["hrm-employee", id]],
@@ -88,10 +93,6 @@ export default function EmployeeEditPage(): React.ReactNode {
 
   return (
     <EmployeeForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push(`/workspace/modules/hrm/employees/view/${id}`)}
-      submitError={submitError}
-      isSubmitting={isPending}
       defaultValues={{
         employeeCode: employeeData.employeeCode,
         firstName: employeeData.firstName || "",
@@ -115,7 +116,12 @@ export default function EmployeeEditPage(): React.ReactNode {
         locationId: employeeData.locationId || "",
         isActive: employeeData.isActive ?? true,
       }}
+      isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() =>
+        router.push(`/workspace/modules/hrm/employees/view/${id}`)
+      }
+      onSubmit={handleSubmit}
     />
   );
 }
-

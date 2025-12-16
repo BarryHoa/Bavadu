@@ -13,6 +13,7 @@ import {
   priceListB2CService,
   type CreatePriceListB2CParams,
 } from "../../services/PriceListB2CService";
+
 import PriceListForm from "./components/PriceListForm";
 
 const priceItemSchema = object({
@@ -120,6 +121,7 @@ export default function PriceListB2CCreatePage(): React.ReactNode {
 
   const onSubmit = (data: PriceListFormValues) => {
     const applicableTo: any = {};
+
     if (data.applicableTo.channels && data.applicableTo.channels.length > 0) {
       applicableTo.channels = data.applicableTo.channels;
     }
@@ -132,7 +134,10 @@ export default function PriceListB2CCreatePage(): React.ReactNode {
     if (data.applicableTo.regions && data.applicableTo.regions.length > 0) {
       applicableTo.regions = data.applicableTo.regions;
     }
-    if (data.applicableTo.customerGroups && data.applicableTo.customerGroups.length > 0) {
+    if (
+      data.applicableTo.customerGroups &&
+      data.applicableTo.customerGroups.length > 0
+    ) {
       applicableTo.customerGroups = data.applicableTo.customerGroups;
     }
 
@@ -150,7 +155,8 @@ export default function PriceListB2CCreatePage(): React.ReactNode {
       validFrom: data.validFrom,
       validTo: data.validTo || null,
       isDefault: data.isDefault === "true",
-      applicableTo: Object.keys(applicableTo).length > 0 ? applicableTo : undefined,
+      applicableTo:
+        Object.keys(applicableTo).length > 0 ? applicableTo : undefined,
     };
 
     // Add price items if any
@@ -206,34 +212,34 @@ export default function PriceListB2CCreatePage(): React.ReactNode {
       <Card>
         <CardBody>
           <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
               <PriceListForm
-              control={control}
-              setValue={setValue}
-              errors={errors}
-              typeOptions={typeOptions}
-              statusOptions={statusOptions}
-              channelOptions={channelOptions}
-              storeOptions={storeOptions}
-              locationOptions={locationOptions}
-              regionOptions={regionOptions}
-              customerGroupOptions={customerGroupOptions}
-              productOptions={productOptions}
-              categoryOptions={[]}
-              brandOptions={[]}
-            />
-            <div className="flex gap-2 justify-end pt-4">
-              <Button
-                type="button"
-                variant="light"
-                onPress={() => router.back()}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" color="primary" isLoading={isPending}>
-                Create
-              </Button>
-            </div>
+                brandOptions={[]}
+                categoryOptions={[]}
+                channelOptions={channelOptions}
+                control={control}
+                customerGroupOptions={customerGroupOptions}
+                errors={errors}
+                locationOptions={locationOptions}
+                productOptions={productOptions}
+                regionOptions={regionOptions}
+                setValue={setValue}
+                statusOptions={statusOptions}
+                storeOptions={storeOptions}
+                typeOptions={typeOptions}
+              />
+              <div className="flex gap-2 justify-end pt-4">
+                <Button
+                  type="button"
+                  variant="light"
+                  onPress={() => router.back()}
+                >
+                  Cancel
+                </Button>
+                <Button color="primary" isLoading={isPending} type="submit">
+                  Create
+                </Button>
+              </div>
             </form>
           </FormProvider>
         </CardBody>

@@ -2,6 +2,7 @@ import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
+
 import { ProductMasterFeaturesEnum } from "../interfaces/ProductMaster";
 
 type ProductFeaturesDropdownOption = {
@@ -17,8 +18,14 @@ const PRODUCT_FEATURE_LABELS: Record<
 > = {
   [ProductMasterFeaturesEnum.SALE]: { en: "Sale", vi: "Bán hàng" },
   [ProductMasterFeaturesEnum.PURCHASE]: { en: "Purchase", vi: "Mua hàng" },
-  [ProductMasterFeaturesEnum.MANUFACTURE]: { en: "Manufacture", vi: "Sản xuất" },
-  [ProductMasterFeaturesEnum.SUBCONTRACT]: { en: "Subcontract", vi: "Gia công" },
+  [ProductMasterFeaturesEnum.MANUFACTURE]: {
+    en: "Manufacture",
+    vi: "Sản xuất",
+  },
+  [ProductMasterFeaturesEnum.SUBCONTRACT]: {
+    en: "Subcontract",
+    vi: "Gia công",
+  },
   [ProductMasterFeaturesEnum.STOCKABLE]: { en: "Stockable", vi: "Lưu kho" },
   [ProductMasterFeaturesEnum.MAINTENANCE]: { en: "Maintenance", vi: "Bảo trì" },
   [ProductMasterFeaturesEnum.ASSET]: { en: "Asset", vi: "Tài sản" },
@@ -26,26 +33,30 @@ const PRODUCT_FEATURE_LABELS: Record<
 };
 
 // Generate product features from enum
-const PRODUCT_FEATURES = Object.values(ProductMasterFeaturesEnum).map((key) => ({
-  key,
-  label: PRODUCT_FEATURE_LABELS[key],
-}));
+const PRODUCT_FEATURES = Object.values(ProductMasterFeaturesEnum).map(
+  (key) => ({
+    key,
+    label: PRODUCT_FEATURE_LABELS[key],
+  }),
+);
 
 class ProductFeaturesDropdownListModel {
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<ProductFeaturesDropdownOption>> => {
     const { search, limit = 20, offset = 0 } = params;
 
     // Filter by search term if provided
     let filteredData = PRODUCT_FEATURES;
+
     if (search && typeof search === "string") {
       const searchLower = search.toLowerCase();
+
       filteredData = PRODUCT_FEATURES.filter(
         (feature) =>
           feature.label.en.toLowerCase().includes(searchLower) ||
           feature.label.vi.toLowerCase().includes(searchLower) ||
-          feature.key.toLowerCase().includes(searchLower)
+          feature.key.toLowerCase().includes(searchLower),
       );
     }
 
@@ -66,4 +77,3 @@ class ProductFeaturesDropdownListModel {
 }
 
 export default ProductFeaturesDropdownListModel;
-

@@ -1,5 +1,7 @@
 "use client";
 
+import type { MovementResult, StockFilters } from "./types";
+
 import LinkAs from "@base/client/components/LinkAs";
 import { Button } from "@heroui/button";
 import { useQuery } from "@tanstack/react-query";
@@ -9,14 +11,13 @@ import { useCallback, useState } from "react";
 import QuickActionsSection from "./components/QuickActionsSection";
 import StockSummarySection from "./components/StockSummarySection";
 import { useStockMutations } from "./hooks/useStockMutations";
-import type { MovementResult, StockFilters } from "./types";
 
 export default function StockDashboardPage(): React.ReactNode {
   const router = useRouter();
   const [filters, setFilters] = useState<StockFilters>({});
   const [appliedFilters, setAppliedFilters] = useState<StockFilters>({});
   const [movementResult, setMovementResult] = useState<MovementResult | null>(
-    null
+    null,
   );
 
   const {
@@ -31,10 +32,12 @@ export default function StockDashboardPage(): React.ReactNode {
     queryKey: ["warehouses"],
     queryFn: async () => {
       const res = await fetch("/api/modules/stock/warehouses");
+
       if (!res.ok) {
         throw new Error("Failed to load warehouses.");
       }
       const json = await res.json();
+
       return json.data ?? [];
     },
   });
@@ -65,11 +68,12 @@ export default function StockDashboardPage(): React.ReactNode {
         reference: data.reference,
         note: data.note,
       });
+
       if (result) {
         setMovementResult(result);
       }
     },
-    [handleMovement]
+    [handleMovement],
   );
 
   const handleReceive = useCallback(
@@ -89,11 +93,12 @@ export default function StockDashboardPage(): React.ReactNode {
         reference: data.reference,
         note: data.note,
       });
+
       if (result) {
         setMovementResult(result);
       }
     },
-    [handleMovement]
+    [handleMovement],
   );
 
   const handleIssue = useCallback(
@@ -113,11 +118,12 @@ export default function StockDashboardPage(): React.ReactNode {
         reference: data.reference,
         note: data.note,
       });
+
       if (result) {
         setMovementResult(result);
       }
     },
-    [handleMovement]
+    [handleMovement],
   );
 
   const handleTransfer = useCallback(
@@ -138,11 +144,12 @@ export default function StockDashboardPage(): React.ReactNode {
         reference: data.reference,
         note: data.note,
       });
+
       if (result) {
         setMovementResult(result);
       }
     },
-    [handleMovement]
+    [handleMovement],
   );
 
   return (
@@ -150,33 +157,33 @@ export default function StockDashboardPage(): React.ReactNode {
       <div className="flex justify-end">
         <Button
           as={LinkAs as any}
-          size="sm"
           color="primary"
           href="/workspace/modules/stock/warehouses"
+          size="sm"
         >
           Manage warehouses
         </Button>
       </div>
 
       <StockSummarySection
-        filters={filters}
         appliedFilters={appliedFilters}
-        onFilterChange={handleFilterChange}
-        onResetFilters={handleResetFilters}
+        filters={filters}
         warehouses={warehousesQuery.data ?? []}
         warehousesLoading={warehousesQuery.isLoading}
+        onFilterChange={handleFilterChange}
+        onResetFilters={handleResetFilters}
       />
 
       <QuickActionsSection
-        warehouses={warehousesQuery.data ?? []}
-        movementResult={movementResult}
         adjustMutationPending={adjustMutation.isPending}
-        receiveMutationPending={receiveMutation.isPending}
         issueMutationPending={issueMutation.isPending}
+        movementResult={movementResult}
+        receiveMutationPending={receiveMutation.isPending}
         transferMutationPending={transferMutation.isPending}
+        warehouses={warehousesQuery.data ?? []}
         onAdjust={handleAdjust}
-        onReceive={handleReceive}
         onIssue={handleIssue}
+        onReceive={handleReceive}
         onTransfer={handleTransfer}
       />
 
@@ -189,9 +196,9 @@ export default function StockDashboardPage(): React.ReactNode {
           Go to Purchase Orders
         </Button>
         <Button
+          className="ml-2"
           size="sm"
           variant="light"
-          className="ml-2"
           onPress={() => router.push("/workspace/modules/b2b-sales/orders")}
         >
           Go to Sales Orders

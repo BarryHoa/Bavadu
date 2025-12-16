@@ -1,5 +1,8 @@
 "use client";
 
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
+import type { ProductDetail } from "../../interface/Product";
+
 import { Button } from "@heroui/button";
 import { Card, CardBody, Chip, Divider } from "@heroui/react";
 import { Spinner } from "@heroui/spinner";
@@ -7,17 +10,14 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo } from "react";
-
 import LinkAs from "@base/client/components/LinkAs";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import type { LocalizeText } from "@base/client/interface/LocalizeText";
-
 import { getClientLink } from "@base/client/utils/link/getClientLink";
-import type { ProductDetail } from "../../interface/Product";
+
 import ProductService from "../../services/ProductService";
 
 const getParamValue = (
-  value: string | string[] | undefined
+  value: string | string[] | undefined,
 ): string | undefined => (Array.isArray(value) ? value[0] : value);
 
 export default function ProductsViewPage(): React.ReactNode {
@@ -51,9 +51,11 @@ export default function ProductsViewPage(): React.ReactNode {
         throw new Error("Missing product id");
       }
       const response = await ProductService.getProductById(productId);
+
       if (!response.data) {
         throw new Error("Failed to load product");
       }
+
       return response.data as ProductDetail;
     },
   });
@@ -89,19 +91,19 @@ export default function ProductsViewPage(): React.ReactNode {
       <div>
         <Button
           size="sm"
-          variant="light"
           startContent={<ArrowLeft size={14} />}
+          variant="light"
           onPress={() => router.back()}
         >
           Back to products
         </Button>
         {editLink ? (
           <Button
-            size="sm"
-            color="primary"
-            className="ml-2"
             as={LinkAs as any}
+            className="ml-2"
+            color="primary"
             href={editLink.path}
+            size="sm"
           >
             Edit product
           </Button>
@@ -111,7 +113,7 @@ export default function ProductsViewPage(): React.ReactNode {
       <Card>
         <CardBody className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
-            <Chip variant="flat" size="sm">
+            <Chip size="sm" variant="flat">
               Product ID: {productId}
             </Chip>
           </div>
@@ -133,7 +135,7 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
   const localized = useLocalizedText();
 
   const features = Object.entries(detail.master.features ?? {}).filter(
-    ([, value]) => Boolean(value)
+    ([, value]) => Boolean(value),
   );
 
   return (
@@ -144,7 +146,10 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
           <InfoRow label="Code" value={detail.master.code} />
           <InfoRow
             label="Name"
-            value={localized(detail.master.name as LocalizeText) ?? detail.master.code}
+            value={
+              localized(detail.master.name as LocalizeText) ??
+              detail.master.code
+            }
           />
           <InfoRow
             label="Type"
@@ -193,7 +198,10 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
         <div className="grid gap-3 md:grid-cols-2">
           <InfoRow
             label="Name"
-            value={localized(detail.variant.name as LocalizeText) ?? detail.master.code}
+            value={
+              localized(detail.variant.name as LocalizeText) ??
+              detail.master.code
+            }
           />
           <InfoRow label="SKU" value={detail.variant.sku ?? "-"} />
           <InfoRow label="Barcode" value={detail.variant.barcode ?? "-"} />
@@ -233,7 +241,11 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
           <div className="space-y-3">
             {detail.packings.map((packing) => (
               <Card
-                key={packing.id ?? localized(packing.name as LocalizeText) ?? Math.random()}
+                key={
+                  packing.id ??
+                  localized(packing.name as LocalizeText) ??
+                  Math.random()
+                }
               >
                 <CardBody className="space-y-2">
                   <span className="font-medium">
@@ -264,7 +276,8 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
                     <span className="font-medium">{attribute.code}</span>
                   </div>
                   <p className="text-small text-default-500">
-                    {localized(attribute.name as LocalizeText) ?? attribute.code}
+                    {localized(attribute.name as LocalizeText) ??
+                      attribute.code}
                   </p>
                   <p className="text-small text-default-600">
                     {attribute.value}

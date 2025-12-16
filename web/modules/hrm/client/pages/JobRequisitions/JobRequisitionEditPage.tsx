@@ -6,6 +6,7 @@ import { jobRequisitionService } from "@mdl/hrm/client/services/JobRequisitionSe
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
+
 import JobRequisitionForm, {
   type JobRequisitionFormValues,
 } from "./components/JobRequisitionForm/JobRequisitionForm";
@@ -26,11 +27,13 @@ export default function JobRequisitionEditPage(): React.ReactNode {
     queryKey: ["hrm-job-requisitions", id],
     queryFn: async () => {
       const response = await jobRequisitionService.getById(id);
+
       if (!response.data) {
         throw new Error(
-          response.message ?? t("errors.failedToLoadJobRequisition")
+          response.message ?? t("errors.failedToLoadJobRequisition"),
         );
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -46,17 +49,19 @@ export default function JobRequisitionEditPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await jobRequisitionService.update(payload);
+
       if (!response.data) {
         throw new Error(
-          response.message ?? t("errors.failedToUpdateJobRequisition")
+          response.message ?? t("errors.failedToUpdateJobRequisition"),
         );
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-job-requisitions"], ["hrm-job-requisitions", id]],
     onSuccess: (data) => {
       router.push(
-        `/workspace/modules/hrm/job-requisitions/view/${data.data.id}`
+        `/workspace/modules/hrm/job-requisitions/view/${data.data.id}`,
       );
     },
   });
@@ -144,12 +149,6 @@ export default function JobRequisitionEditPage(): React.ReactNode {
 
   return (
     <JobRequisitionForm
-      onSubmit={handleSubmit}
-      onCancel={() =>
-        router.push(`/workspace/modules/hrm/job-requisitions/view/${id}`)
-      }
-      submitError={submitError}
-      isSubmitting={isPending}
       defaultValues={{
         requisitionNumber: jobRequisitionData.requisitionNumber,
         title: (jobRequisitionData.title as any) || { vi: "", en: "" },
@@ -170,6 +169,12 @@ export default function JobRequisitionEditPage(): React.ReactNode {
         recruiterId: jobRequisitionData.recruiterId || "",
         notes: jobRequisitionData.notes || "",
       }}
+      isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() =>
+        router.push(`/workspace/modules/hrm/job-requisitions/view/${id}`)
+      }
+      onSubmit={handleSubmit}
     />
   );
 }

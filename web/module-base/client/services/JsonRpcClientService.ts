@@ -22,7 +22,7 @@ export class JsonRpcError extends Error {
   constructor(
     public code: number,
     message: string,
-    public data?: any
+    public data?: any,
   ) {
     super(message);
     this.name = "JsonRpcError";
@@ -48,7 +48,7 @@ export class JsonRpcClientService extends ClientHttpService {
   async call<T = any>(
     method: string,
     params?: any,
-    options?: { notification?: boolean }
+    options?: { notification?: boolean },
   ): Promise<T> {
     const request: JsonRpcRequest = {
       jsonrpc: this.rpc_version,
@@ -68,7 +68,7 @@ export class JsonRpcClientService extends ClientHttpService {
       throw new JsonRpcError(
         response.error.code,
         response.error.message,
-        response.error.data
+        response.error.data,
       );
     }
 
@@ -79,7 +79,7 @@ export class JsonRpcClientService extends ClientHttpService {
    * Call multiple methods in batch
    */
   async batch<T extends any[]>(
-    calls: Array<{ method: string; params?: any }>
+    calls: Array<{ method: string; params?: any }>,
   ): Promise<T> {
     const requests: JsonRpcRequest[] = calls.map((call) => ({
       jsonrpc: this.rpc_version,
@@ -93,6 +93,7 @@ export class JsonRpcClientService extends ClientHttpService {
     responses.sort((a, b) => {
       const idA = typeof a.id === "number" ? a.id : 0;
       const idB = typeof b.id === "number" ? b.id : 0;
+
       return idA - idB;
     });
 
@@ -101,9 +102,10 @@ export class JsonRpcClientService extends ClientHttpService {
         throw new JsonRpcError(
           rpcResponse.error.code,
           rpcResponse.error.message,
-          rpcResponse.error.data
+          rpcResponse.error.data,
         );
       }
+
       return rpcResponse.result;
     }) as T;
   }

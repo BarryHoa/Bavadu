@@ -10,6 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 
 // Shifts - Ca làm việc
@@ -33,11 +34,8 @@ export const hrm_tb_shifts = mdlHrmSchema.table(
     createdBy: varchar("created_by", { length: 36 }),
     updatedBy: varchar("updated_by", { length: 36 }),
   },
-  (table) => [
-    index("shifts_active_idx").on(table.isActive),
-  ]
+  (table) => [index("shifts_active_idx").on(table.isActive)],
 );
 
 export type HrmTbShift = typeof hrm_tb_shifts.$inferSelect;
 export type NewHrmTbShift = typeof hrm_tb_shifts.$inferInsert;
-

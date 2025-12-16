@@ -1,9 +1,10 @@
-import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 import type {
   PayrollDto,
   CreatePayrollPayload,
   UpdatePayrollPayload,
 } from "../interface/Payroll";
+
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export default class PayrollService extends JsonRpcClientService {
   list() {
@@ -37,4 +38,3 @@ export default class PayrollService extends JsonRpcClientService {
 }
 
 export const payrollService = new PayrollService();
-

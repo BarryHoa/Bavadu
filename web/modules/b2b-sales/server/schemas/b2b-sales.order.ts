@@ -11,8 +11,9 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { mdlSaleB2bSchema } from "./schema";
 import { stock_tb_stock_warehouses } from "@mdl/stock/server/schemas/stock.warehouse";
+
+import { mdlSaleB2bSchema } from "./schema";
 
 export const sale_b2b_tb_orders = mdlSaleB2bSchema.table(
   "orders",
@@ -34,23 +35,23 @@ export const sale_b2b_tb_orders = mdlSaleB2bSchema.table(
     // Business fields
     paymentTermsId: uuid("payment_terms_id").references(
       () => base_tb_payment_terms.id,
-      { onDelete: "set null" }
+      { onDelete: "set null" },
     ),
     creditLimit: numeric("credit_limit", { precision: 14, scale: 2 }),
     invoiceRequired: boolean("invoice_required").default(true).notNull(),
     shippingMethodId: uuid("shipping_method_id").references(
       () => base_tb_shipping_methods.id,
-      { onDelete: "set null" }
+      { onDelete: "set null" },
     ),
     shippingTermsId: uuid("shipping_terms_id").references(
       () => base_tb_shipping_terms.id,
-      { onDelete: "set null" }
+      { onDelete: "set null" },
     ),
 
     // Common fields
     warehouseId: uuid("warehouse_id").references(
       () => stock_tb_stock_warehouses.id,
-      { onDelete: "set null" }
+      { onDelete: "set null" },
     ),
     expectedDate: timestamp("expected_date", { withTimezone: true }),
 
@@ -88,7 +89,7 @@ export const sale_b2b_tb_orders = mdlSaleB2bSchema.table(
     index("orders_warehouse_idx").on(table.warehouseId),
     index("orders_expected_idx").on(table.expectedDate),
     index("orders_created_idx").on(table.createdAt),
-  ]
+  ],
 );
 
 export type SaleB2bTbOrder = typeof sale_b2b_tb_orders.$inferSelect;

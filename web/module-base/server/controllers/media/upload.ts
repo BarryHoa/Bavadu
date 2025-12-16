@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Upload error:", error);
+
     return JSONResponse({
       error: "Failed to upload file",
       message: error instanceof Error ? error.message : "Unknown error",
@@ -31,4 +32,3 @@ export async function POST(request: NextRequest) {
     });
   }
 }
-

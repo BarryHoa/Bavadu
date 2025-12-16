@@ -68,5 +68,3 @@ export default class DepartmentService extends JsonRpcClientService {
 }
 
 export const departmentService = new DepartmentService();
-
-

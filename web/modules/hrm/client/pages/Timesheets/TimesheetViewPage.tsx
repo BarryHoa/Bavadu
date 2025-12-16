@@ -27,9 +27,11 @@ export default function TimesheetViewPage(): React.ReactNode {
     queryKey: ["hrm-timesheets", id],
     queryFn: async () => {
       const response = await timesheetService.getById(id);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToLoadTimesheet"));
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -80,7 +82,10 @@ export default function TimesheetViewPage(): React.ReactNode {
           <div className="grid gap-2 md:grid-cols-2">
             <IBaseDigitViewer
               label={t("labels.employee")}
-              value={getLocalizedText(timesheetData.employee?.fullName) || timesheetData.employee?.employeeCode}
+              value={
+                getLocalizedText(timesheetData.employee?.fullName) ||
+                timesheetData.employee?.employeeCode
+              }
             />
             <IBaseDigitViewer
               label={t("labels.workDate")}
@@ -92,27 +97,51 @@ export default function TimesheetViewPage(): React.ReactNode {
             />
             <IBaseDigitViewer
               label={t("labels.checkInTime")}
-              value={timesheetData.checkInTime ? formatDate(timesheetData.checkInTime) : "—"}
+              value={
+                timesheetData.checkInTime
+                  ? formatDate(timesheetData.checkInTime)
+                  : "—"
+              }
             />
             <IBaseDigitViewer
               label={t("labels.checkOutTime")}
-              value={timesheetData.checkOutTime ? formatDate(timesheetData.checkOutTime) : "—"}
+              value={
+                timesheetData.checkOutTime
+                  ? formatDate(timesheetData.checkOutTime)
+                  : "—"
+              }
             />
             <IBaseDigitViewer
               label={t("labels.actualHours")}
-              value={timesheetData.actualHours ? `${timesheetData.actualHours}h` : "—"}
+              value={
+                timesheetData.actualHours
+                  ? `${timesheetData.actualHours}h`
+                  : "—"
+              }
             />
             <IBaseDigitViewer
               label={t("labels.regularHours")}
-              value={timesheetData.regularHours ? `${timesheetData.regularHours}h` : "—"}
+              value={
+                timesheetData.regularHours
+                  ? `${timesheetData.regularHours}h`
+                  : "—"
+              }
             />
             <IBaseDigitViewer
               label={t("labels.overtimeHours")}
-              value={timesheetData.overtimeHours ? `${timesheetData.overtimeHours}h` : "—"}
+              value={
+                timesheetData.overtimeHours
+                  ? `${timesheetData.overtimeHours}h`
+                  : "—"
+              }
             />
             <IBaseDigitViewer
               label={t("labels.breakDuration")}
-              value={timesheetData.breakDuration ? `${timesheetData.breakDuration} phút` : "—"}
+              value={
+                timesheetData.breakDuration
+                  ? `${timesheetData.breakDuration} phút`
+                  : "—"
+              }
             />
             <IBaseDigitViewer
               label={t("labels.status")}
@@ -144,4 +173,3 @@ export default function TimesheetViewPage(): React.ReactNode {
     </div>
   );
 }
-

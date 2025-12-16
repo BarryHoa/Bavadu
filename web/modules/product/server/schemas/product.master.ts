@@ -8,6 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlProductSchema } from "./schema";
 import { product_tb_product_categories } from "./product.category";
 
@@ -28,7 +29,9 @@ export const product_tb_product_masters = mdlProductSchema.table(
     features: jsonb("features"), // Partial<ProductMasterFeatures>
     isActive: boolean("is_active").default(true).notNull(),
     brand: text("brand"), // string
-    categoryId: uuid("category_id").references(() => product_tb_product_categories.id),
+    categoryId: uuid("category_id").references(
+      () => product_tb_product_categories.id,
+    ),
     createdAt: timestamp("created_at", { withTimezone: true }),
     updatedAt: timestamp("updated_at", { withTimezone: true }),
     createdBy: varchar("created_by", { length: 36 }), // uuid user id
@@ -41,12 +44,11 @@ export const product_tb_product_masters = mdlProductSchema.table(
     // Composite index for common query: get active products by type
     index("masters_type_active_idx").on(table.type, table.isActive),
     // Composite index for category and active status
-    index("masters_category_active_idx").on(
-      table.categoryId,
-      table.isActive
-    ),
-  ]
+    index("masters_category_active_idx").on(table.categoryId, table.isActive),
+  ],
 );
 
-export type ProductTbProductMaster = typeof product_tb_product_masters.$inferSelect;
-export type NewProductTbProductMaster = typeof product_tb_product_masters.$inferInsert;
+export type ProductTbProductMaster =
+  typeof product_tb_product_masters.$inferSelect;
+export type NewProductTbProductMaster =
+  typeof product_tb_product_masters.$inferInsert;

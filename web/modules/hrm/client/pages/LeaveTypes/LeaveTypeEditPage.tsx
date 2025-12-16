@@ -6,6 +6,7 @@ import { leaveTypeService } from "@mdl/hrm/client/services/LeaveTypeService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
+
 import LeaveTypeForm, {
   type LeaveTypeFormValues,
 } from "./components/LeaveTypeForm/LeaveTypeForm";
@@ -26,9 +27,11 @@ export default function LeaveTypeEditPage(): React.ReactNode {
     queryKey: ["hrm-leave-types", id],
     queryFn: async () => {
       const response = await leaveTypeService.getById(id);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToLoadLeaveType"));
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -44,11 +47,13 @@ export default function LeaveTypeEditPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await leaveTypeService.update(payload);
+
       if (!response.data) {
         throw new Error(
-          response.message ?? t("errors.failedToUpdateLeaveType")
+          response.message ?? t("errors.failedToUpdateLeaveType"),
         );
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-leave-types"], ["hrm-leave-types", id]],
@@ -116,12 +121,6 @@ export default function LeaveTypeEditPage(): React.ReactNode {
 
   return (
     <LeaveTypeForm
-      onSubmit={handleSubmit}
-      onCancel={() =>
-        router.push(`/workspace/modules/hrm/leave-types/view/${id}`)
-      }
-      submitError={submitError}
-      isSubmitting={isPending}
       defaultValues={{
         code: leaveTypeData.code,
         name: (leaveTypeData.name as any) || { vi: "", en: "" },
@@ -135,6 +134,12 @@ export default function LeaveTypeEditPage(): React.ReactNode {
         isPaid: leaveTypeData.isPaid ? "true" : "false",
         isActive: leaveTypeData.isActive ? "true" : "false",
       }}
+      isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() =>
+        router.push(`/workspace/modules/hrm/leave-types/view/${id}`)
+      }
+      onSubmit={handleSubmit}
     />
   );
 }

@@ -1,7 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
   date,
-  foreignKey,
   index,
   integer,
   text,
@@ -9,6 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_employees } from "./hrm.employee";
 import { hrm_tb_leave_types } from "./hrm.leave-type";
@@ -47,9 +47,8 @@ export const hrm_tb_leave_requests = mdlHrmSchema.table(
     index("leave_requests_type_idx").on(table.leaveTypeId),
     index("leave_requests_status_idx").on(table.status),
     index("leave_requests_dates_idx").on(table.startDate, table.endDate),
-  ]
+  ],
 );
 
 export type HrmTbLeaveRequest = typeof hrm_tb_leave_requests.$inferSelect;
 export type NewHrmTbLeaveRequest = typeof hrm_tb_leave_requests.$inferInsert;
-

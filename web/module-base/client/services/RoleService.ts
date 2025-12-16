@@ -1,5 +1,6 @@
-import ClientHttpService from "@base/client/services/ClientHttpService";
 import type { LocalizeText } from "../interface/LocalizeText";
+
+import ClientHttpService from "@base/client/services/ClientHttpService";
 
 export type Role = {
   id: string;
@@ -108,11 +109,14 @@ class RoleService extends ClientHttpService {
 
   getPermissionList() {
     // Create a temporary service instance for permissions endpoint
-    const permissionsService = new ClientHttpService("/api/base/settings/permissions");
+    const permissionsService = new ClientHttpService(
+      "/api/base/settings/permissions",
+    );
+
     return permissionsService.get<PermissionListResponse>("/list");
   }
 }
 
 const roleService = new RoleService();
-export default roleService;
 
+export default roleService;

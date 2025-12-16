@@ -13,7 +13,9 @@ import {
   ProductPackingRow,
 } from "../interface/Product";
 
-const ensureLocaleValue = (value?: LocaleFormValue | null): LocaleFormValue => ({
+const ensureLocaleValue = (
+  value?: LocaleFormValue | null,
+): LocaleFormValue => ({
   en: value?.en ?? "",
   vi: value?.vi ?? "",
 });
@@ -28,6 +30,7 @@ const toLocaleFormValue = (value: unknown): LocaleFormValue => {
   }
 
   const record = value as Record<string, string>;
+
   return {
     en: record?.en ?? "",
     vi: record?.vi ?? "",
@@ -36,7 +39,7 @@ const toLocaleFormValue = (value: unknown): LocaleFormValue => {
 
 const toLocaleRecord = (
   value: LocaleFormValue,
-  fallback?: string
+  fallback?: string,
 ): LocaleDataType<string> | null => {
   const record: Record<string, string> = {};
 
@@ -52,6 +55,7 @@ const toLocaleRecord = (
     if (fallback) {
       return { en: fallback };
     }
+
     return null;
   }
 
@@ -59,7 +63,7 @@ const toLocaleRecord = (
 };
 
 const sanitizePackings = (
-  packings: ProductFormPacking[]
+  packings: ProductFormPacking[],
 ): ProductFormPayload["packings"] => {
   return packings
     .map((packing) => ({
@@ -68,7 +72,7 @@ const sanitizePackings = (
       description: packing.description || "",
     }))
     .filter((packing) =>
-      Boolean(packing.name.en?.trim() || packing.name.vi?.trim())
+      Boolean(packing.name.en?.trim() || packing.name.vi?.trim()),
     )
     .map((packing) => ({
       id: packing.id,
@@ -79,32 +83,35 @@ const sanitizePackings = (
 };
 
 const sanitizeAttributes = (
-  attributes: ProductFormAttribute[]
+  attributes: ProductFormAttribute[],
 ): ProductFormPayload["attributes"] => {
   return attributes
     .filter((attribute) => attribute.code.trim())
     .map((attribute) => ({
       id: attribute.id,
       code: attribute.code.trim(),
-      name:
-        toLocaleRecord(ensureLocaleValue(attribute.name), attribute.code) ?? {
-          en: attribute.code.trim(),
-        },
+      name: toLocaleRecord(
+        ensureLocaleValue(attribute.name),
+        attribute.code,
+      ) ?? {
+        en: attribute.code.trim(),
+      },
       value: attribute.value,
     }));
 };
 
 export const mapDetailToFormValues = (
-  detail: ProductDetail
+  detail: ProductDetail,
 ): ProductFormValues => {
   const baseFeatures = Object.values(ProductMasterFeatures).reduce(
     (acc, key) => ({ ...acc, [key]: false }),
-    {} as Record<ProductMasterFeatures, boolean>
+    {} as Record<ProductMasterFeatures, boolean>,
   );
 
   const masterFeatures = detail.master.features ?? {};
 
   const features = { ...baseFeatures };
+
   Object.entries(masterFeatures).forEach(([key, value]) => {
     if (key in features) {
       features[key as ProductMasterFeatures] = Boolean(value);
@@ -115,14 +122,15 @@ export const mapDetailToFormValues = (
     packings.map((packing) => ({
       id: packing.id,
       name: toLocaleFormValue(packing.name),
-      description: typeof packing.description === "string" 
-        ? packing.description 
-        : (packing.description?.vi || packing.description?.en || ""),
+      description:
+        typeof packing.description === "string"
+          ? packing.description
+          : packing.description?.vi || packing.description?.en || "",
       isActive: packing.isActive ?? true,
     }));
 
   const mapAttributes = (
-    attributes: ProductAttributeRow[]
+    attributes: ProductAttributeRow[],
   ): ProductFormAttribute[] =>
     attributes.map((attribute) => ({
       id: attribute.id,
@@ -136,53 +144,60 @@ export const mapDetailToFormValues = (
       code: detail.master.code,
       name: toLocaleFormValue(detail.master.name),
       description: detail.master.description || "",
-      type: (detail.master.type as ProductMasterType) ?? ProductMasterType.GOODS,
+      type:
+        (detail.master.type as ProductMasterType) ?? ProductMasterType.GOODS,
       features,
       isActive: detail.master.isActive ?? true,
-      brand:
-        typeof detail.master.brand === "string" ? detail.master.brand : "",
+      brand: typeof detail.master.brand === "string" ? detail.master.brand : "",
       categoryId: detail.master.category?.id,
       images: (detail.master as any).images ?? [],
     },
-    variants: [{
-      name: toLocaleFormValue(detail.variant.name),
-      description: detail.variant.description || "",
-      sku: detail.variant.sku ?? "",
-      barcode: detail.variant.barcode ?? "",
-      manufacturerName:
-        typeof detail.variant.manufacturer?.name === "string"
-          ? detail.variant.manufacturer.name
-          : "",
-      manufacturerCode: detail.variant.manufacturer?.code ?? "",
-      baseUomId: detail.variant.baseUom?.id,
-      isActive: detail.variant.isActive ?? true,
-      images: detail.variant.images ?? [],
-      packings: mapPackings(detail.packings),
-      attributes: mapAttributes(detail.attributes),
-    }],
+    variants: [
+      {
+        name: toLocaleFormValue(detail.variant.name),
+        description: detail.variant.description || "",
+        sku: detail.variant.sku ?? "",
+        barcode: detail.variant.barcode ?? "",
+        manufacturerName:
+          typeof detail.variant.manufacturer?.name === "string"
+            ? detail.variant.manufacturer.name
+            : "",
+        manufacturerCode: detail.variant.manufacturer?.code ?? "",
+        baseUomId: detail.variant.baseUom?.id,
+        isActive: detail.variant.isActive ?? true,
+        images: detail.variant.images ?? [],
+        packings: mapPackings(detail.packings),
+        attributes: mapAttributes(detail.attributes),
+      },
+    ],
   };
 };
 
 export const mapFormValuesToPayload = (
-  values: ProductFormValues
+  values: ProductFormValues,
 ): ProductFormPayload => {
   const trimmedCode = values.master.code.trim();
-  const masterNameRecord =
-    toLocaleRecord(ensureLocaleValue(values.master.name), trimmedCode) ?? {
-      en: trimmedCode,
-    };
+  const masterNameRecord = toLocaleRecord(
+    ensureLocaleValue(values.master.name),
+    trimmedCode,
+  ) ?? {
+    en: trimmedCode,
+  };
   const masterDescription = values.master.description.trim() || null;
   const masterBrand = values.master.brand.trim() || null;
 
   const firstVariant = values.variants[0];
+
   if (!firstVariant) {
     throw new Error("At least one variant is required");
   }
 
-  const variantNameRecord =
-    toLocaleRecord(ensureLocaleValue(firstVariant.name), trimmedCode) ?? {
-      en: trimmedCode,
-    };
+  const variantNameRecord = toLocaleRecord(
+    ensureLocaleValue(firstVariant.name),
+    trimmedCode,
+  ) ?? {
+    en: trimmedCode,
+  };
   const variantDescription = firstVariant.description.trim() || null;
   const manufacturerName = firstVariant.manufacturerName.trim() || null;
 
@@ -205,8 +220,7 @@ export const mapFormValuesToPayload = (
       barcode: firstVariant.barcode ? firstVariant.barcode.trim() : null,
       manufacturer:
         manufacturerName ||
-        (firstVariant.manufacturerCode &&
-          firstVariant.manufacturerCode.trim())
+        (firstVariant.manufacturerCode && firstVariant.manufacturerCode.trim())
           ? {
               name: manufacturerName,
               code: firstVariant.manufacturerCode

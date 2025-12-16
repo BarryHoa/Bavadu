@@ -1,5 +1,4 @@
 import { base_tb_payment_methods } from "@base/server/schemas/base.payment-method";
-import { sale_b2c_tb_price_lists } from "./b2c-sales.price-list";
 import { base_tb_shipping_methods } from "@base/server/schemas/base.shipping-method";
 import { base_tb_shipping_terms } from "@base/server/schemas/base.shipping-term";
 import { stock_tb_stock_warehouses } from "@mdl/stock/server/schemas/stock.warehouse";
@@ -13,6 +12,8 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
+import { sale_b2c_tb_price_lists } from "./b2c-sales.price-list";
 import { mdlSaleB2cSchema } from "./schema";
 
 export const sale_b2c_tb_orders = mdlSaleB2cSchema.table(
@@ -33,28 +34,28 @@ export const sale_b2c_tb_orders = mdlSaleB2cSchema.table(
     // Business fields
     paymentMethodId: uuid("payment_method_id").references(
       () => base_tb_payment_methods.id,
-      { onDelete: "set null" }
+      { onDelete: "set null" },
     ),
     shippingMethodId: uuid("shipping_method_id").references(
       () => base_tb_shipping_methods.id,
-      { onDelete: "set null" }
+      { onDelete: "set null" },
     ),
     shippingTermsId: uuid("shipping_terms_id").references(
       () => base_tb_shipping_terms.id,
-      { onDelete: "set null" }
+      { onDelete: "set null" },
     ),
     requireInvoice: boolean("require_invoice").default(false).notNull(),
 
     // Pricing
     priceListId: uuid("price_list_id").references(
       () => sale_b2c_tb_price_lists.id,
-      { onDelete: "set null" }
+      { onDelete: "set null" },
     ),
 
     // Common fields
     warehouseId: uuid("warehouse_id").references(
       () => stock_tb_stock_warehouses.id,
-      { onDelete: "set null" }
+      { onDelete: "set null" },
     ),
     expectedDate: timestamp("expected_date", { withTimezone: true }),
 
@@ -97,7 +98,7 @@ export const sale_b2c_tb_orders = mdlSaleB2cSchema.table(
     index("orders_created_idx").on(table.createdAt),
     index("orders_completed_idx").on(table.completedAt),
     index("orders_price_list_idx").on(table.priceListId),
-  ]
+  ],
 );
 
 export type SaleB2cTbOrder = typeof sale_b2c_tb_orders.$inferSelect;

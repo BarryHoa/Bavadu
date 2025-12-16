@@ -5,13 +5,13 @@ import {
   boolean,
   index,
   integer,
-  jsonb,
   numeric,
   text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { sale_b2c_tb_price_lists } from "./b2c-sales.price-list";
 import { mdlSaleB2cSchema } from "./schema";
 
@@ -29,10 +29,14 @@ export const sale_b2c_tb_price_list_items = mdlSaleB2cSchema.table(
       .references(() => sale_b2c_tb_price_lists.id, { onDelete: "cascade" }),
     productVariantId: uuid("product_variant_id")
       .notNull()
-      .references(() => product_tb_product_variants.id, { onDelete: "restrict" }),
+      .references(() => product_tb_product_variants.id, {
+        onDelete: "restrict",
+      }),
     productMasterId: uuid("product_master_id")
       .notNull()
-      .references(() => product_tb_product_masters.id, { onDelete: "restrict" }),
+      .references(() => product_tb_product_masters.id, {
+        onDelete: "restrict",
+      }),
     pricingType: varchar("pricing_type", { length: 20 })
       .notNull()
       .default("fixed"), // 'fixed' | 'percentage_discount' | 'tiered'
@@ -58,27 +62,24 @@ export const sale_b2c_tb_price_list_items = mdlSaleB2cSchema.table(
   },
   (table) => [
     index("price_list_items_price_list_idx").on(table.priceListId),
-    index("price_list_items_product_variant_idx").on(
-      table.productVariantId
-    ),
+    index("price_list_items_product_variant_idx").on(table.productVariantId),
     index("price_list_items_product_master_idx").on(table.productMasterId),
     index("price_list_items_active_idx")
       .on(table.isActive)
       .where(sql`${table.isActive} = true`),
     index("price_list_items_valid_dates_idx").on(
       table.validFrom,
-      table.validTo
+      table.validTo,
     ),
     index("price_list_items_lookup_idx").on(
       table.productVariantId,
       table.priceListId,
-      table.isActive
+      table.isActive,
     ),
-  ]
+  ],
 );
 
 export type SaleB2cTbPriceListItem =
   typeof sale_b2c_tb_price_list_items.$inferSelect;
 export type NewSaleB2cTbPriceListItem =
   typeof sale_b2c_tb_price_list_items.$inferInsert;
-

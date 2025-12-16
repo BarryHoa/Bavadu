@@ -59,13 +59,13 @@ const ActionMenu = ({
             <Button
               key={action.key}
               as={Link}
+              disabled={action.disabled}
               href={action.href}
-              target={action.target}
               rel={action.as}
-              variant={action.variant ?? "bordered"}
               size="sm"
               startContent={action.startContent}
-              disabled={action.disabled}
+              target={action.target}
+              variant={action.variant ?? "bordered"}
             >
               {action.label}
             </Button>
@@ -75,11 +75,11 @@ const ActionMenu = ({
         return (
           <Button
             key={action.key}
-            variant={action.variant ?? "solid"}
+            disabled={action.disabled}
             size="sm"
             startContent={action.startContent}
+            variant={action.variant ?? "solid"}
             onPress={action.onPress}
-            disabled={action.disabled}
           >
             {action.label}
           </Button>
@@ -91,9 +91,9 @@ const ActionMenu = ({
           <DropdownTrigger>
             <Button
               isIconOnly
-              variant="faded"
-              radius="full"
               className="min-w-unit-8 h-6"
+              radius="full"
+              variant="faded"
             >
               <Ellipsis className="size-4" />
             </Button>
@@ -104,11 +104,11 @@ const ActionMenu = ({
                 return (
                   <DropdownItem
                     key={action.key}
-                    textValue={action.label}
-                    isReadOnly={action.disabled}
                     href={action.href}
-                    target={action.target}
+                    isReadOnly={action.disabled}
                     rel={action.as}
+                    target={action.target}
+                    textValue={action.label}
                   >
                     <div className="flex items-center gap-2">
                       {action.startContent}
@@ -121,8 +121,8 @@ const ActionMenu = ({
               return (
                 <DropdownItem
                   key={action.key}
-                  textValue={action.label}
                   isDisabled={action.disabled}
+                  textValue={action.label}
                   onPress={action.onPress}
                 >
                   <div className="flex items-center gap-2">

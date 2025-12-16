@@ -26,9 +26,11 @@ export default function PayrollViewPage(): React.ReactNode {
     queryKey: ["hrm-payroll", id],
     queryFn: async () => {
       const response = await payrollService.getById(id);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToLoadPayroll"));
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -79,7 +81,10 @@ export default function PayrollViewPage(): React.ReactNode {
           <div className="grid gap-2 md:grid-cols-2">
             <IBaseDigitViewer
               label={t("labels.employee")}
-              value={getLocalizedText(payrollData.employee?.fullName) || payrollData.employee?.employeeCode}
+              value={
+                getLocalizedText(payrollData.employee?.fullName) ||
+                payrollData.employee?.employeeCode
+              }
             />
             <IBaseDigitViewer
               label={t("labels.payrollPeriod")}
@@ -155,4 +160,3 @@ export default function PayrollViewPage(): React.ReactNode {
     </div>
   );
 }
-

@@ -1,17 +1,18 @@
 "use client";
 
+import type { ProductCategoryRow } from "../../interface/ProductCategory";
+
 import { Button } from "@heroui/button";
 import { addToast } from "@heroui/toast";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
-
 import { getClientLink } from "@base/client/utils/link/getClientLink";
+
 import ProductCategoryForm, {
   ProductCategoryFormValues,
 } from "../../components/Category/ProductCategoryForm";
-import type { ProductCategoryRow } from "../../interface/ProductCategory";
 import ProductCategoryService from "../../services/ProductCategoryService";
 
 const ProductCategoryCreatePage = (): React.ReactNode => {
@@ -23,7 +24,7 @@ const ProductCategoryCreatePage = (): React.ReactNode => {
         mdl: "product",
         path: "category",
       }),
-    []
+    [],
   );
 
   const getCategoryViewLink = useCallback(
@@ -33,7 +34,7 @@ const ProductCategoryCreatePage = (): React.ReactNode => {
         path: "category/view/[id]",
         as: `category/view/${id}`,
       }),
-    []
+    [],
   );
 
   const navigateToList = useCallback(() => {
@@ -52,6 +53,7 @@ const ProductCategoryCreatePage = (): React.ReactNode => {
   const handleSubmit = async (values: ProductCategoryFormValues) => {
     try {
       const created = await createMutation.mutateAsync(values);
+
       addToast({
         title: "Category created",
         description: "The category was created successfully.",
@@ -61,11 +63,13 @@ const ProductCategoryCreatePage = (): React.ReactNode => {
       });
       setTimeout(() => {
         const link = getCategoryViewLink(created.id);
+
         router.push(link.as ?? link.path);
       }, 500);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to create category";
+
       addToast({
         title: "Create failed",
         description: message,
@@ -89,6 +93,7 @@ const ProductCategoryCreatePage = (): React.ReactNode => {
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to create category";
+
       addToast({
         title: "Create failed",
         description: message,
@@ -104,25 +109,25 @@ const ProductCategoryCreatePage = (): React.ReactNode => {
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
         <Button
-          size="sm"
-          variant="light"
-          startContent={<ArrowLeft size={14} />}
-          onPress={navigateToList}
           isDisabled={createMutation.isPending}
+          size="sm"
+          startContent={<ArrowLeft size={14} />}
+          variant="light"
+          onPress={navigateToList}
         >
           Back
         </Button>
       </div>
 
       <ProductCategoryForm
-        title="Create Category"
-        subtitle="Define a new product category for organizing your catalog."
-        submitLabel="Create"
         loading={createMutation.isPending}
+        secondarySubmitLabel="Create & add another"
+        submitLabel="Create"
+        subtitle="Define a new product category for organizing your catalog."
+        title="Create Category"
+        onCancel={navigateToList}
         onSubmit={handleSubmit}
         onSubmitAndContinue={handleSubmitAndContinue}
-        secondarySubmitLabel="Create & add another"
-        onCancel={navigateToList}
       />
     </div>
   );

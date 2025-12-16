@@ -1,5 +1,6 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { escapeHtml } from "@base/server/utils/xss-protection";
+
 import { RuntimeContext } from "../../../runtime/RuntimeContext";
 
 type ReloadModelRequest = {
@@ -19,6 +20,7 @@ export async function POST(request: Request) {
     }
 
     const modelInstance = await RuntimeContext.getModelInstance();
+
     if (!modelInstance) {
       return JSONResponse({
         message: "Model instance is not available.",
@@ -27,9 +29,11 @@ export async function POST(request: Request) {
     }
 
     const reloaded = await modelInstance.reloadModel(modelKey);
+
     if (!reloaded) {
       // Sanitize modelKey to prevent XSS in error message
       const safeModelKey = escapeHtml(modelKey);
+
       return JSONResponse({
         message: `Failed to reload model "${safeModelKey}".`,
         status: 404,
@@ -38,12 +42,14 @@ export async function POST(request: Request) {
 
     // Sanitize modelKey to prevent XSS in success message
     const safeModelKey = escapeHtml(modelKey);
+
     return JSONResponse({
       message: `Model "${safeModelKey}" reloaded successfully.`,
       status: 200,
     });
   } catch (error) {
     console.error("Failed to reload model:", error);
+
     return JSONResponse({
       message: "Unexpected error while reloading model.",
       status: 500,

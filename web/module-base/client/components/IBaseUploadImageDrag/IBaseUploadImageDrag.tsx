@@ -6,7 +6,9 @@ import { chunk } from "lodash";
 import { Upload } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useRef, useState } from "react";
+
 import { ImageUploadItem } from "../../interface/ImageUpdload";
+
 import ImageUploadItemComponent from "./IBaseUploadImageDragItem";
 import { getFileExtension, normalizeItems, validateFile } from "./utils";
 
@@ -42,6 +44,7 @@ export default function IBaseUploadImageDrag({
   // init items from values
   const [items, setItems] = useState<ImageUploadItem[]>(() => {
     if (!values || values.length === 0) return [];
+
     return normalizeItems(values as ImageUploadItem[]);
   });
 
@@ -51,7 +54,7 @@ export default function IBaseUploadImageDrag({
       setItems(newItems);
       onChange?.(newItems);
     },
-    [onChange]
+    [onChange],
   );
 
   const handleFileSelect = useCallback(
@@ -67,6 +70,7 @@ export default function IBaseUploadImageDrag({
           description: t("tooManyFilesDescription", { count: remainingSlots }),
           color: "warning",
         });
+
         return;
       }
 
@@ -78,16 +82,17 @@ export default function IBaseUploadImageDrag({
 
       // Separate valid and invalid files
       const invalidFiles = validationResults.filter(
-        (result) => !result.validation.valid
+        (result) => !result.validation.valid,
       );
       const validFiles = validationResults.filter(
-        (result) => result.validation.valid
+        (result) => result.validation.valid,
       );
 
       if (invalidFiles.length > 0) {
         const invalidNotAllowed = invalidFiles.find(
-          (result) => result.validation.type === "FILE_TYPE_NOT_ALLOWED"
+          (result) => result.validation.type === "FILE_TYPE_NOT_ALLOWED",
         );
+
         if (invalidNotAllowed) {
           addToast({
             title: t("invalidFile"),
@@ -97,8 +102,9 @@ export default function IBaseUploadImageDrag({
         }
         const invalidFileSizeExceeded = invalidFiles.find(
           (result) =>
-            result.validation.type === "FILE_SIZE_EXCEEDS_MAXIMUM_ALLOWED_SIZE"
+            result.validation.type === "FILE_SIZE_EXCEEDS_MAXIMUM_ALLOWED_SIZE",
         );
+
         if (invalidFileSizeExceeded) {
           addToast({
             title: t("invalidFile"),
@@ -117,6 +123,7 @@ export default function IBaseUploadImageDrag({
       const newItems: ImageUploadItem[] = validFiles.map(({ file }) => {
         const extension = getFileExtension(file.name);
         const uid = `${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
         fileItemMap.set(uid, file);
 
         return {
@@ -132,6 +139,7 @@ export default function IBaseUploadImageDrag({
       // If no upload service, add items immediately
       if (!uploadService) {
         handleItemsChange([...items, ...newItems]);
+
         return;
       }
 
@@ -147,9 +155,12 @@ export default function IBaseUploadImageDrag({
       for (const chunk of chunks) {
         // Mark items as uploading
         const chunkUids = chunk.map((item) => item.uid);
+
         setUploadingItems((prev) => {
           const next = new Set(prev);
+
           chunkUids.forEach((uid) => next.add(uid));
+
           return next;
         });
 
@@ -159,15 +170,19 @@ export default function IBaseUploadImageDrag({
             if (chunkUids.includes(item.uid)) {
               return { ...item, status: "uploading" as const };
             }
+
             return item;
           });
+
           handleItemsChange(updated);
+
           return updated;
         });
 
         // Upload chunk in parallel
         const uploadPromises = chunk.map(async (item) => {
           const file = fileItemMap.get(item.uid);
+
           if (!file) {
             return {
               uid: item.uid,
@@ -178,6 +193,7 @@ export default function IBaseUploadImageDrag({
 
           try {
             const result = await uploadService(file);
+
             return {
               uid: item.uid,
               id: result.id,
@@ -205,38 +221,42 @@ export default function IBaseUploadImageDrag({
             status: result.success ? ("done" as const) : ("error" as const),
           };
         });
+
         handleItemsChange([...items, ...updatedItems] as ImageUploadItem[]);
         setItems([...items, ...updatedItems] as ImageUploadItem[]);
         setUploadingItems(new Set());
       }
     },
-    [items, maxCount, accept, maxSize, uploadService, handleItemsChange]
+    [items, maxCount, accept, maxSize, uploadService, handleItemsChange],
   );
 
   const handleRemove = useCallback(
     (uid: string) => {
       const newItems = items.filter((item) => item.uid !== uid);
+
       handleItemsChange(newItems);
     },
-    [items, handleItemsChange]
+    [items, handleItemsChange],
   );
 
   const canAddMore = items.length < maxCount;
   const isUploadDisabled = isDisabled || !canAddMore;
 
   const handleDrop = useCallback(
-    (e: React.DragEvent<HTMLDivElement>) => {
+    (e: React.DragEvent<HTMLDivElement | HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
       if (isUploadDisabled) return;
 
       const files = e.dataTransfer.files;
+
       handleFileSelect(files);
     },
-    [isUploadDisabled, handleFileSelect]
+    [isUploadDisabled, handleFileSelect],
   );
 
-  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragOver = useCallback(
+    (e: React.DragEvent<HTMLDivElement | HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
   }, []);
@@ -253,30 +273,31 @@ export default function IBaseUploadImageDrag({
         <label className="text-sm font-medium text-foreground">{label}</label>
       )}
 
-      <div
-        className={`border-2 border-dashed rounded-lg p-4 transition-colors ${
+      <button
+        className={`border-2 border-dashed rounded-lg p-4 transition-colors text-left ${
           isUploadDisabled
             ? "border-default-200 bg-default-50 cursor-not-allowed"
             : "border-default-300 hover:border-primary-400 cursor-pointer bg-default-50"
         }`}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
+        type="button"
         onClick={handleClick}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
       >
         <input
           ref={fileInputRef}
-          type="file"
-          accept={accept}
           multiple
+          accept={accept}
           className="hidden"
           disabled={isUploadDisabled}
+          type="file"
           onChange={(e) => handleFileSelect(e.target.files)}
         />
 
-        <div className="flex flex-col items-center justify-center gap-2 py-4">
+        <div className="flex flex-col items-center justify-center gap-2 py-4 pointer-events-none">
           <Upload
-            size={32}
             className={`${isUploadDisabled ? "text-default-300" : "text-default-400"}`}
+            size={32}
           />
           <p
             className={`text-sm text-center ${isUploadDisabled ? "text-default-400" : "text-default-500"}`}
@@ -294,7 +315,7 @@ export default function IBaseUploadImageDrag({
             </p>
           )}
         </div>
-      </div>
+      </button>
 
       {items.length > 0 && (
         <div className="flex flex-wrap gap-3 mt-2">
@@ -302,9 +323,9 @@ export default function IBaseUploadImageDrag({
             <Card key={item.uid}>
               <CardBody className="p-2">
                 <ImageUploadItemComponent
-                  item={item}
-                  isUploading={uploadingItems.has(item.uid)}
                   isDisabled={isDisabled}
+                  isUploading={uploadingItems.has(item.uid)}
+                  item={item}
                   onRemove={() => handleRemove(item.uid)}
                 />
               </CardBody>

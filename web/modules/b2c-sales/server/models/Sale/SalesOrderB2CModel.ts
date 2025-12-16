@@ -1,15 +1,16 @@
-import { desc, eq, sql } from "drizzle-orm";
-
-import { BaseModel } from "@base/server/models/BaseModel";
-import {
-  base_tb_currencies,
-  base_tb_currencies_exchange_rate,
-} from "@base/server/schemas";
 import type {
   CreateSalesOrderB2CInput,
   UpdateSalesOrderB2CInput,
 } from "../../models/interfaces/SalesOrderB2C";
 import type { NewSaleB2cTbOrder, SaleB2cTbOrder } from "../../schemas";
+
+import { desc, eq, sql } from "drizzle-orm";
+import { BaseModel } from "@base/server/models/BaseModel";
+import {
+  base_tb_currencies,
+  base_tb_currencies_exchange_rate,
+} from "@base/server/schemas";
+
 import {
   sale_b2c_tb_currency_rates,
   sale_b2c_tb_orders,
@@ -36,6 +37,7 @@ export default class SalesOrderB2CModel extends BaseModel<
       .from(sale_b2c_tb_orders)
       .where(eq(sale_b2c_tb_orders.id, id))
       .limit(1);
+
     if (!order) {
       return null;
     }
@@ -43,6 +45,7 @@ export default class SalesOrderB2CModel extends BaseModel<
       .select()
       .from(sale_b2c_tb_order_lines)
       .where(eq(sale_b2c_tb_order_lines.orderId, order.id));
+
     return { order, lines };
   };
 
@@ -61,12 +64,13 @@ export default class SalesOrderB2CModel extends BaseModel<
         .toString()
         .padStart(
           2,
-          "0"
+          "0",
         )}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
     // Get currency rate
     const currency = input.currency ?? "VND";
     let currencyRate: number | undefined;
+
     try {
       const [currencyRecord] = await this.db
         .select()
@@ -78,7 +82,9 @@ export default class SalesOrderB2CModel extends BaseModel<
         const [latestRate] = await this.db
           .select()
           .from(base_tb_currencies_exchange_rate)
-          .where(eq(base_tb_currencies_exchange_rate.currencyId, currencyRecord.id))
+          .where(
+            eq(base_tb_currencies_exchange_rate.currencyId, currencyRecord.id),
+          )
           .orderBy(desc(base_tb_currencies_exchange_rate.rateDate))
           .limit(1);
 
@@ -114,6 +120,7 @@ export default class SalesOrderB2CModel extends BaseModel<
 
       for (const line of input.lines) {
         const quantity = Number(line.quantity ?? 0);
+
         if (quantity <= 0) continue;
 
         const unitPrice = Number(line.unitPrice ?? 0);
@@ -212,15 +219,18 @@ export default class SalesOrderB2CModel extends BaseModel<
         .where(eq(sale_b2c_tb_orders.id, order.id));
 
       const result = await this.getById(order.id);
+
       if (!result) {
         throw new Error("Failed to load sales order after creation");
       }
+
       return result;
     });
   };
 
   update = async (input: UpdateSalesOrderB2CInput) => {
     const orderData = await this.getById(input.id);
+
     if (!orderData) {
       throw new Error("Sales order not found");
     }
@@ -252,6 +262,7 @@ export default class SalesOrderB2CModel extends BaseModel<
 
     for (const line of input.lines) {
       const quantity = Number(line.quantity ?? 0);
+
       if (quantity <= 0) continue;
 
       const unitPrice = Number(line.unitPrice ?? 0);

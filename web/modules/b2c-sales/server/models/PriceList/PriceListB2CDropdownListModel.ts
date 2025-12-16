@@ -1,14 +1,16 @@
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { Column } from "drizzle-orm";
+
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
 import { eq, ilike, sql } from "drizzle-orm";
+
 import { sale_b2c_tb_price_lists } from "../../schemas/b2c-sales.price-list";
 
 type PriceListB2CDropdownOption = {
@@ -68,10 +70,9 @@ class PriceListB2CDropdownListModel extends BaseViewListModel<
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (
     row: any,
-    index?: number
+    index?: number,
   ): PriceListB2CDropdownOption => {
     // Handle LocaleDataType<string> for name
     const name =
@@ -88,7 +89,7 @@ class PriceListB2CDropdownListModel extends BaseViewListModel<
   };
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<PriceListB2CDropdownOption>> => {
     // Use buildQueryDataListWithSelect to select only needed columns
     const result = await this.buildQueryDataListWithSelect(
@@ -101,12 +102,12 @@ class PriceListB2CDropdownListModel extends BaseViewListModel<
       (query) => {
         // Filter only active price lists
         return query.where(eq(sale_b2c_tb_price_lists.status, "active"));
-      }
+      },
     );
 
     return {
       data: result.data.map((row: any, index: number) =>
-        this.declarationMappingData(row, index)
+        this.declarationMappingData(row, index),
       ),
       total: result.total,
     };

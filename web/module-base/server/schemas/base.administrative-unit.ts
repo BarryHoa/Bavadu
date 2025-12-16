@@ -9,6 +9,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdBaseSchema } from "./schema";
 import { base_tb_location_countries } from "./base.country";
 
@@ -44,7 +45,7 @@ export const base_tb_location_administrative_units = mdBaseSchema.table(
     index("location_administrative_units_level_idx").on(table.level),
     index("location_administrative_units_type_idx").on(table.type),
     index("location_administrative_units_active_idx").on(table.isActive),
-  ]
+  ],
 );
 
 export type BaseTbLocationAdministrativeUnit =

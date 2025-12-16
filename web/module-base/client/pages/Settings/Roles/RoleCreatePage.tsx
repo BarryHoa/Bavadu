@@ -1,12 +1,13 @@
 "use client";
 
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
+
 import {
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseSelect,
   SelectItem,
 } from "@base/client/components";
-import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import roleService from "@base/client/services/RoleService";
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
@@ -32,7 +33,7 @@ export default function RoleCreatePage() {
   });
   const [description, setDescription] = useState("");
   const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>(
-    []
+    [],
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{
@@ -44,6 +45,7 @@ export default function RoleCreatePage() {
     queryKey: PERMISSIONS_QUERY_KEY,
     queryFn: async () => {
       const response = await roleService.getPermissionList();
+
       return response.data;
     },
   });
@@ -65,6 +67,7 @@ export default function RoleCreatePage() {
     onError: (error) => {
       const errorMessage =
         error instanceof Error ? error.message : t("toast.createError");
+
       setToast({ message: errorMessage, type: "error" });
     },
   });
@@ -83,6 +86,7 @@ export default function RoleCreatePage() {
     }
 
     setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   }, [code, name, errorsT, t]);
 
@@ -123,8 +127,8 @@ export default function RoleCreatePage() {
             </Button>
             <Button
               color="primary"
-              onPress={handleSubmit}
               isLoading={createRoleMutation.isPending}
+              onPress={handleSubmit}
             >
               {actionsT("save")}
             </Button>
@@ -133,41 +137,41 @@ export default function RoleCreatePage() {
         <CardBody className="flex flex-col gap-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <IBaseInput
+              isRequired
+              description={t("form.codeDescription")}
+              errorMessage={errors.code}
+              isInvalid={!!errors.code}
               label={t("form.code")}
               value={code}
               onValueChange={setCode}
-              errorMessage={errors.code}
-              isInvalid={!!errors.code}
-              isRequired
-              description={t("form.codeDescription")}
             />
             <IBaseInputMultipleLang
+              isRequired
+              errorMessage={errors.name}
+              isInvalid={!!errors.name}
               label={t("form.name")}
               value={name}
               onValueChange={setName as (value: LocalizeText) => void}
-              errorMessage={errors.name}
-              isInvalid={!!errors.name}
-              isRequired
             />
             <div className="md:col-span-2">
               <IBaseInput
+                description={t("form.descriptionDescription")}
                 label={t("form.description")}
                 value={description}
                 onValueChange={setDescription}
-                description={t("form.descriptionDescription")}
               />
             </div>
             <div className="md:col-span-2">
               <IBaseSelect
+                description={t("form.permissionsDescription")}
+                isLoading={permissionsQuery.isLoading}
                 label={t("form.defaultPermissions")}
-                selectionMode="multiple"
+                placeholder={t("form.selectPermissions")}
                 selectedKeys={selectedPermissionIds}
+                selectionMode="multiple"
                 onSelectionChange={(keys) => {
                   setSelectedPermissionIds(Array.from(keys) as string[]);
                 }}
-                description={t("form.permissionsDescription")}
-                placeholder={t("form.selectPermissions")}
-                isLoading={permissionsQuery.isLoading}
               >
                 {permissions.map((permission) => (
                   <SelectItem key={permission.id} textValue={permission.key}>

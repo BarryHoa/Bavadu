@@ -19,9 +19,11 @@ export default function PositionViewPage(): React.ReactNode {
     queryKey: ["hrm-position", id],
     queryFn: async () => {
       const response = await positionService.getById(id);
+
       if (!response.data) {
         throw new Error(response.message ?? "Position not found");
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -48,9 +50,11 @@ export default function PositionViewPage(): React.ReactNode {
             {t("backToList")}
           </Button>
           <Button
-            size="sm"
             color="primary"
-            onPress={() => router.push(`/workspace/modules/hrm/positions/edit/${id}`)}
+            size="sm"
+            onPress={() =>
+              router.push(`/workspace/modules/hrm/positions/edit/${id}`)
+            }
           >
             {t("edit")}
           </Button>
@@ -67,11 +71,15 @@ export default function PositionViewPage(): React.ReactNode {
             </div>
             <div>
               <div className="text-sm text-default-500">{t("name")}</div>
-              <div className="text-base">{getLocalizedText(position.name as any)}</div>
+              <div className="text-base">
+                {getLocalizedText(position.name as any)}
+              </div>
             </div>
             <div>
               <div className="text-sm text-default-500">{t("department")}</div>
-              <div className="text-base">{getLocalizedText(position.department?.name as any) || "—"}</div>
+              <div className="text-base">
+                {getLocalizedText(position.department?.name as any) || "—"}
+              </div>
             </div>
             <div>
               <div className="text-sm text-default-500">{t("jobFamily")}</div>
@@ -83,4 +91,3 @@ export default function PositionViewPage(): React.ReactNode {
     </div>
   );
 }
-

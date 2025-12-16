@@ -5,7 +5,6 @@ import { ToastProvider } from "@heroui/toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useLayoutEffect, useState } from "react";
-
 import { NavigationLoader } from "@base/client/components/NavigationLoader";
 import { GlobalSettingsProvider } from "@base/client/contexts/global-settings";
 import { usePreventBackspaceNavigation } from "@base/client/hooks/usePreventBackspaceNavigation";
@@ -38,7 +37,7 @@ export function Providers({ children }: ProvidersProps) {
             retry: 1,
           },
         },
-      })
+      }),
   );
 
   // Initialize root-store và test DevTools

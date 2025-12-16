@@ -1,5 +1,8 @@
 "use client";
 
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
+import type { LocaleDataType } from "@base/server/interfaces/Locale";
+
 import {
   DATA_TABLE_COLUMN_KEY_ACTION,
   type DataTableColumn,
@@ -7,13 +10,10 @@ import {
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import { Button, Chip } from "@heroui/react";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
-
 import { getClientLink } from "@base/client/utils/link/getClientLink";
-import type { LocaleDataType } from "@base/server/interfaces/Locale";
 
 interface UnitOfMeasureRow {
   id: string;
@@ -31,7 +31,8 @@ const UnitOfMeasureListPage = (): React.ReactNode => {
       {
         key: "name",
         label: "Unit name",
-        render: (_, row) => localized((row.name ?? row.id) as LocalizeText) || row.id,
+        render: (_, row) =>
+          localized((row.name ?? row.id) as LocalizeText) || row.id,
       },
       {
         key: "symbol",
@@ -44,10 +45,10 @@ const UnitOfMeasureListPage = (): React.ReactNode => {
         align: "center",
         render: (_, row) => (
           <Chip
+            className="capitalize"
+            color={row.isActive ? "success" : "default"}
             size="sm"
             variant="flat"
-            color={row.isActive ? "success" : "default"}
-            className="capitalize"
           >
             {row.isActive ? "active" : "inactive"}
           </Chip>
@@ -65,7 +66,7 @@ const UnitOfMeasureListPage = (): React.ReactNode => {
           });
 
           return (
-            <Button as={LinkAs as any} size="sm" variant="light" href={as}>
+            <Button as={LinkAs as any} href={as} size="sm" variant="light">
               View
             </Button>
           );
@@ -82,9 +83,6 @@ const UnitOfMeasureListPage = (): React.ReactNode => {
   return (
     <div className="space-y-4">
       <ViewListDataTable<UnitOfMeasureRow>
-        model="product.uom"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -97,6 +95,9 @@ const UnitOfMeasureListPage = (): React.ReactNode => {
             },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="product.uom"
       />
     </div>
   );

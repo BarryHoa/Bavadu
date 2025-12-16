@@ -1,11 +1,6 @@
 import { sql } from "drizzle-orm";
-import {
-  date,
-  index,
-  timestamp,
-  uuid,
-  varchar,
-} from "drizzle-orm/pg-core";
+import { date, index, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_benefit_packages } from "./hrm.benefit-package";
 import { hrm_tb_employees } from "./hrm.employee";
@@ -38,10 +33,13 @@ export const hrm_tb_employees_benefit = mdlHrmSchema.table(
     index("employee_benefits_employee_idx").on(table.employeeId),
     index("employee_benefits_package_idx").on(table.benefitPackageId),
     index("employee_benefits_status_idx").on(table.status),
-    index("employee_benefits_dates_idx").on(table.effectiveDate, table.expiryDate),
-  ]
+    index("employee_benefits_dates_idx").on(
+      table.effectiveDate,
+      table.expiryDate,
+    ),
+  ],
 );
 
 export type HrmTbEmployeeBenefit = typeof hrm_tb_employees_benefit.$inferSelect;
-export type NewHrmTbEmployeeBenefit = typeof hrm_tb_employees_benefit.$inferInsert;
-
+export type NewHrmTbEmployeeBenefit =
+  typeof hrm_tb_employees_benefit.$inferInsert;

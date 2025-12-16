@@ -1,10 +1,13 @@
+import type { RuntimeContextState } from "./types";
+
 import dayjs from "dayjs";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+
 import { getLogModel } from "../models/Logs/LogModel";
+
 import { ConfigManager } from "./ConfigManager";
 import { ConnectionPool } from "./ConnectionPool";
 import { ModelInstance } from "./ModelInstance";
-import type { RuntimeContextState } from "./types";
 
 /**
  * Runtime Context Manager
@@ -33,6 +36,7 @@ export class RuntimeContext {
     if (!this.instance) {
       this.instance = new RuntimeContext(projectRoot);
     }
+
     return this.instance;
   }
 
@@ -41,26 +45,32 @@ export class RuntimeContext {
    * Ensures the runtime is initialized before accessing the pool.
    */
   static async getDbConnect(
-    key: string = "primary"
+    key: string = "primary",
   ): Promise<PostgresJsDatabase<Record<string, never>>> {
     const context = await this.getInstance();
+
     await context.ensureInitialized();
     const pool = context.getConnectionPool();
+
     return pool.getConnection(key);
   }
 
   static async getModelInstance(): Promise<ModelInstance> {
     const context = this.getInstance();
+
     await context.ensureInitialized();
+
     return context.getModelInstance();
   }
 
   static async getModelInstanceBy<T extends object>(
-    modelId: string
+    modelId: string,
   ): Promise<T | undefined> {
     const context = this.getInstance();
+
     await context.ensureInitialized();
     const modelInstance = context.getModelInstance();
+
     return modelInstance.getModel<T>(modelId);
   }
 
@@ -115,6 +125,7 @@ export class RuntimeContext {
 
       debugLog("Creating connection pool...");
       const connectionPool = new ConnectionPool(this.projectRoot);
+
       debugLog("Connection pool created, initializing...");
       await connectionPool.initialize();
       debugLog("Connection pool initialized");
@@ -123,10 +134,12 @@ export class RuntimeContext {
       const modelInstance = await ModelInstance.create({
         projectRoot: this.projectRoot,
       });
+
       debugLog("Model instance created");
 
       debugLog("Loading configuration...");
       const configManager = ConfigManager.getInstance();
+
       await configManager.load();
       debugLog("Configuration loaded");
 
@@ -145,7 +158,7 @@ export class RuntimeContext {
       console.error("[RuntimeContext] Error during initialization:", error);
       console.error(
         "[RuntimeContext] Error stack:",
-        error instanceof Error ? error.stack : "No stack"
+        error instanceof Error ? error.stack : "No stack",
       );
       throw error;
     }
@@ -154,9 +167,10 @@ export class RuntimeContext {
   private _ensureState(): RuntimeContextState {
     if (!this.isInitialized || !this.state) {
       throw new Error(
-        "Runtime not initialized. Call ensureInitialized() first."
+        "Runtime not initialized. Call ensureInitialized() first.",
       );
     }
+
     return this.state;
   }
 }

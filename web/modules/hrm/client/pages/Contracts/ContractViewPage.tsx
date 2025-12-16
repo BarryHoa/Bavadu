@@ -19,9 +19,11 @@ export default function ContractViewPage(): React.ReactNode {
     queryKey: ["hrm-contract", id],
     queryFn: async () => {
       const response = await contractService.getById(id);
+
       if (!response.data) {
         throw new Error(response.message ?? "Contract not found");
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -48,8 +50,8 @@ export default function ContractViewPage(): React.ReactNode {
             {t("backToList")}
           </Button>
           <Button
-            size="sm"
             color="primary"
+            size="sm"
             onPress={() =>
               router.push(`/workspace/modules/hrm/contracts/edit/${id}`)
             }

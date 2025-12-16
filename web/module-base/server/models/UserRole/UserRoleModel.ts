@@ -1,5 +1,6 @@
 import { BaseModel } from "@base/server/models/BaseModel";
 import { and, eq, inArray } from "drizzle-orm";
+
 import {
   base_tb_permissions,
   base_tb_role_permissions_default,
@@ -16,7 +17,9 @@ export interface UserRoleRow {
   createdBy?: string;
 }
 
-export default class UserRoleModel extends BaseModel<typeof base_tb_user_roles> {
+export default class UserRoleModel extends BaseModel<
+  typeof base_tb_user_roles
+> {
   constructor() {
     super(base_tb_user_roles);
   }
@@ -36,8 +39,8 @@ export default class UserRoleModel extends BaseModel<typeof base_tb_user_roles> 
         and(
           eq(this.table.userId, userId),
           eq(this.table.isActive, true),
-          eq(base_tb_roles.isActive, true)
-        )
+          eq(base_tb_roles.isActive, true),
+        ),
       );
 
     const roleIds = userRoles.map((r) => r.roleId);
@@ -54,15 +57,15 @@ export default class UserRoleModel extends BaseModel<typeof base_tb_user_roles> 
           base_tb_permissions,
           eq(
             base_tb_role_permissions_default.permissionId,
-            base_tb_permissions.id
-          )
+            base_tb_permissions.id,
+          ),
         )
         .where(
           and(
             inArray(base_tb_role_permissions_default.roleId, roleIds),
             eq(base_tb_role_permissions_default.isActive, true),
-            eq(base_tb_permissions.isActive, true)
-          )
+            eq(base_tb_permissions.isActive, true),
+          ),
         );
 
       for (const rp of rolePerms) {
@@ -107,7 +110,7 @@ export default class UserRoleModel extends BaseModel<typeof base_tb_user_roles> 
   async assignRole(
     userId: string,
     roleId: string,
-    createdBy?: string
+    createdBy?: string,
   ): Promise<UserRoleRow> {
     const now = new Date();
 
@@ -115,12 +118,7 @@ export default class UserRoleModel extends BaseModel<typeof base_tb_user_roles> 
     const existing = await this.db
       .select()
       .from(this.table)
-      .where(
-        and(
-          eq(this.table.userId, userId),
-          eq(this.table.roleId, roleId)
-        )
-      )
+      .where(and(eq(this.table.userId, userId), eq(this.table.roleId, roleId)))
       .limit(1);
 
     if (existing[0]) {
@@ -181,8 +179,8 @@ export default class UserRoleModel extends BaseModel<typeof base_tb_user_roles> 
         and(
           eq(this.table.userId, userId),
           eq(this.table.roleId, roleId),
-          eq(this.table.isActive, true)
-        )
+          eq(this.table.isActive, true),
+        ),
       )
       .returning();
 
@@ -194,23 +192,31 @@ export default class UserRoleModel extends BaseModel<typeof base_tb_user_roles> 
    */
   async hasPermission(userId: string, permission: string): Promise<boolean> {
     const permissions = await this.getUserPermissions(userId);
+
     return permissions.has(permission);
   }
 
   /**
    * Check if user has any of the specified permissions
    */
-  async hasAnyPermission(userId: string, permissions: string[]): Promise<boolean> {
+  async hasAnyPermission(
+    userId: string,
+    permissions: string[],
+  ): Promise<boolean> {
     const userPermissions = await this.getUserPermissions(userId);
+
     return permissions.some((perm) => userPermissions.has(perm));
   }
 
   /**
    * Check if user has all of the specified permissions
    */
-  async hasAllPermissions(userId: string, permissions: string[]): Promise<boolean> {
+  async hasAllPermissions(
+    userId: string,
+    permissions: string[],
+  ): Promise<boolean> {
     const userPermissions = await this.getUserPermissions(userId);
+
     return permissions.every((perm) => userPermissions.has(perm));
   }
 }
-

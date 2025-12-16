@@ -7,8 +7,8 @@ export const uuidV7Schema = v.pipe(
   v.string(),
   v.regex(
     /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
-    "Invalid UUID format"
-  )
+    "Invalid UUID format",
+  ),
 );
 
 /**
@@ -19,8 +19,8 @@ export const uuidSchema = v.pipe(
   v.string(),
   v.regex(
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
-    "Invalid UUID format"
-  )
+    "Invalid UUID format",
+  ),
 );
 
 /**
@@ -36,7 +36,7 @@ export const emailSchema = v.pipe(
   v.string(),
   v.minLength(1, "Email is required"),
   v.maxLength(255, "Email must be at most 255 characters"),
-  v.email("Invalid email format")
+  v.email("Invalid email format"),
 );
 
 /**
@@ -48,8 +48,8 @@ export const phoneSchema = v.pipe(
   v.maxLength(20, "Phone must be at most 20 characters"),
   v.regex(
     /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/,
-    "Invalid phone format"
-  )
+    "Invalid phone format",
+  ),
 );
 
 /**
@@ -61,8 +61,8 @@ export const usernameSchema = v.pipe(
   v.maxLength(50, "Username must be at most 50 characters"),
   v.regex(
     /^[a-zA-Z0-9_-]+$/,
-    "Username can only contain letters, numbers, underscores, and hyphens"
-  )
+    "Username can only contain letters, numbers, underscores, and hyphens",
+  ),
 );
 
 /**
@@ -71,12 +71,12 @@ export const usernameSchema = v.pipe(
 export function stringLengthSchema(
   min: number,
   max: number,
-  fieldName: string = "Field"
+  fieldName: string = "Field",
 ) {
   return v.pipe(
     v.string(),
     v.minLength(min, `${fieldName} must be at least ${min} characters`),
-    v.maxLength(max, `${fieldName} must be at most ${max} characters`)
+    v.maxLength(max, `${fieldName} must be at most ${max} characters`),
   );
 }
 
@@ -86,14 +86,14 @@ export function stringLengthSchema(
 export function optionalStringLengthSchema(
   min: number,
   max: number,
-  fieldName: string = "Field"
+  fieldName: string = "Field",
 ) {
   return v.optional(
     v.pipe(
       v.string(),
       v.minLength(min, `${fieldName} must be at least ${min} characters`),
-      v.maxLength(max, `${fieldName} must be at most ${max} characters`)
-    )
+      v.maxLength(max, `${fieldName} must be at most ${max} characters`),
+    ),
   );
 }
 
@@ -102,7 +102,7 @@ export function optionalStringLengthSchema(
  */
 export const nonEmptyStringSchema = v.pipe(
   v.string(),
-  v.minLength(1, "Field cannot be empty")
+  v.minLength(1, "Field cannot be empty"),
 );
 
 /**
@@ -111,13 +111,13 @@ export const nonEmptyStringSchema = v.pipe(
 export function trimmedStringSchema(
   min: number = 1,
   max: number = 255,
-  fieldName: string = "Field"
+  fieldName: string = "Field",
 ) {
   return v.pipe(
     v.string(),
     v.transform((input) => input.trim()),
     v.minLength(min, `${fieldName} must be at least ${min} characters`),
-    v.maxLength(max, `${fieldName} must be at most ${max} characters`)
+    v.maxLength(max, `${fieldName} must be at most ${max} characters`),
   );
 }
 
@@ -127,15 +127,15 @@ export function trimmedStringSchema(
 export function optionalTrimmedStringSchema(
   min: number = 1,
   max: number = 255,
-  fieldName: string = "Field"
+  fieldName: string = "Field",
 ) {
   return v.optional(
     v.pipe(
       v.string(),
       v.transform((input) => input.trim()),
       v.minLength(min, `${fieldName} must be at least ${min} characters`),
-      v.maxLength(max, `${fieldName} must be at most ${max} characters`)
-    )
+      v.maxLength(max, `${fieldName} must be at most ${max} characters`),
+    ),
   );
 }
 
@@ -145,7 +145,7 @@ export function optionalTrimmedStringSchema(
 export const positiveIntegerSchema = v.pipe(
   v.number(),
   v.integer("Must be an integer"),
-  v.minValue(1, "Must be a positive number")
+  v.minValue(1, "Must be a positive number"),
 );
 
 /**
@@ -154,7 +154,7 @@ export const positiveIntegerSchema = v.pipe(
 export const nonNegativeIntegerSchema = v.pipe(
   v.number(),
   v.integer("Must be an integer"),
-  v.minValue(0, "Must be a non-negative number")
+  v.minValue(0, "Must be a non-negative number"),
 );
 
 /**
@@ -169,8 +169,8 @@ export const isoDateSchema = v.pipe(
   v.string(),
   v.regex(
     /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/,
-    "Invalid ISO date format"
-  )
+    "Invalid ISO date format",
+  ),
 );
 
 /**
@@ -183,8 +183,8 @@ export function arrayMinLengthSchema<
     v.array(itemSchema),
     v.minLength(
       minLength,
-      `${fieldName} must have at least ${minLength} item(s)`
-    )
+      `${fieldName} must have at least ${minLength} item(s)`,
+    ),
   );
 }
 
@@ -198,8 +198,8 @@ export function arrayMaxLengthSchema<
     v.array(itemSchema),
     v.maxLength(
       maxLength,
-      `${fieldName} must have at most ${maxLength} item(s)`
-    )
+      `${fieldName} must have at most ${maxLength} item(s)`,
+    ),
   );
 }
 
@@ -212,17 +212,17 @@ export function arrayLengthSchema<
   itemSchema: T,
   minLength: number,
   maxLength: number,
-  fieldName: string = "Array"
+  fieldName: string = "Array",
 ) {
   return v.pipe(
     v.array(itemSchema),
     v.minLength(
       minLength,
-      `${fieldName} must have at least ${minLength} item(s)`
+      `${fieldName} must have at least ${minLength} item(s)`,
     ),
     v.maxLength(
       maxLength,
-      `${fieldName} must have at most ${maxLength} item(s)`
-    )
+      `${fieldName} must have at most ${maxLength} item(s)`,
+    ),
   );
 }

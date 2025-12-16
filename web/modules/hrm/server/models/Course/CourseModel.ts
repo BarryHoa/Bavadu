@@ -38,6 +38,7 @@ export default class CourseModel extends BaseModel<typeof hrm_tb_courses> {
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
@@ -49,6 +50,7 @@ export default class CourseModel extends BaseModel<typeof hrm_tb_courses> {
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -75,7 +77,11 @@ export default class CourseModel extends BaseModel<typeof hrm_tb_courses> {
     const insertData: NewHrmTbCourse = {
       code: payload.code,
       name: payload.name,
-      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
+      description: payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null,
       category: payload.category ?? null,
       duration: payload.duration ?? null,
       format: payload.format ?? null,
@@ -93,13 +99,15 @@ export default class CourseModel extends BaseModel<typeof hrm_tb_courses> {
     if (!created) throw new Error("Failed to create course");
 
     const course = await this.getCourseById(created.id);
+
     if (!course) throw new Error("Failed to load course after creation");
+
     return course;
   };
 
   updateCourse = async (
     id: string,
-    payload: Partial<CourseInput>
+    payload: Partial<CourseInput>,
   ): Promise<CourseRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -108,17 +116,26 @@ export default class CourseModel extends BaseModel<typeof hrm_tb_courses> {
     if (payload.code !== undefined) updateData.code = payload.code;
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.description !== undefined)
-      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
+      updateData.description = payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null;
     if (payload.category !== undefined)
       updateData.category = payload.category ?? null;
     if (payload.duration !== undefined)
       updateData.duration = payload.duration ?? null;
-    if (payload.format !== undefined) updateData.format = payload.format ?? null;
+    if (payload.format !== undefined)
+      updateData.format = payload.format ?? null;
     if (payload.instructor !== undefined)
       updateData.instructor = payload.instructor ?? null;
     if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
 
-    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db
+      .update(this.table)
+      .set(updateData)
+      .where(eq(this.table.id, id));
+
     return this.getCourseById(id);
   };
 
@@ -130,16 +147,20 @@ export default class CourseModel extends BaseModel<typeof hrm_tb_courses> {
       normalizedPayload.code = String(payload.code);
     }
     if (payload.name !== undefined) {
-      normalizedPayload.name = this.normalizeLocaleInput(payload.name) ?? { en: "" };
+      normalizedPayload.name = this.normalizeLocaleInput(payload.name) ?? {
+        en: "",
+      };
     }
     if (payload.description !== undefined) {
       normalizedPayload.description = this.normalizeLocaleInput(
-        payload.description
+        payload.description,
       );
     }
     if (payload.category !== undefined) {
       normalizedPayload.category =
-        payload.category === null || payload.category === "" ? null : String(payload.category);
+        payload.category === null || payload.category === ""
+          ? null
+          : String(payload.category);
     }
     if (payload.duration !== undefined) {
       normalizedPayload.duration =
@@ -149,7 +170,9 @@ export default class CourseModel extends BaseModel<typeof hrm_tb_courses> {
     }
     if (payload.format !== undefined) {
       normalizedPayload.format =
-        payload.format === null || payload.format === "" ? null : String(payload.format);
+        payload.format === null || payload.format === ""
+          ? null
+          : String(payload.format);
     }
     if (payload.instructor !== undefined) {
       normalizedPayload.instructor =
@@ -164,4 +187,3 @@ export default class CourseModel extends BaseModel<typeof hrm_tb_courses> {
     return this.updateCourse(id, normalizedPayload);
   };
 }
-

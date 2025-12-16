@@ -1,5 +1,7 @@
 "use client";
 
+import type { DepartmentFormValues } from "../../validation/departmentValidation";
+
 import {
   IBaseInput,
   IBaseInputMultipleLang,
@@ -11,7 +13,7 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
-import type { DepartmentFormValues } from "../../validation/departmentValidation";
+
 import { createDepartmentValidation } from "../../validation/departmentValidation";
 
 export type { DepartmentFormValues };
@@ -68,10 +70,10 @@ export default function DepartmentForm({
         )}
         <Button
           color="primary"
-          type="submit"
-          size="sm"
-          isLoading={isSubmitting}
           disabled={isSubmitting}
+          isLoading={isSubmitting}
+          size="sm"
+          type="submit"
         >
           {tLabels("save")}
         </Button>
@@ -84,83 +86,83 @@ export default function DepartmentForm({
           </h2>
           <div className="grid gap-4 md:grid-cols-2">
             <Controller
-              name="code"
               control={control}
+              name="code"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("code")}
                   size="sm"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
 
             <Controller
-              name="name"
               control={control}
+              name="name"
               render={({ field, fieldState }) => (
                 <IBaseInputMultipleLang
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("name")}
                   size="sm"
                   value={field.value || { vi: "", en: "" }}
                   onChange={field.onChange}
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
 
             <Controller
-              name="parentId"
               control={control}
+              name="parentId"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("parentDepartment")}
-                  size="sm"
                   model="department.dropdown"
                   selectedKey={field.value}
+                  size="sm"
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
 
             <Controller
-              name="level"
               control={control}
+              name="level"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
-                  type="number"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("level")}
                   size="sm"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
+                  type="number"
                 />
               )}
             />
 
             <Controller
-              name="managerId"
               control={control}
+              name="managerId"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("manager")}
-                  size="sm"
                   model="employee.dropdown"
                   selectedKey={field.value}
+                  size="sm"
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />

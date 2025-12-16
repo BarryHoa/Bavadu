@@ -11,7 +11,7 @@ class UnitOfMeasureService extends JsonRpcClientService {
   async getList() {
     return this.call<{ success: boolean; data: UnitOfMeasureOption[] }>(
       "product.curd.getUomList",
-      {}
+      {},
     );
   }
 }

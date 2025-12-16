@@ -37,6 +37,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
@@ -121,15 +122,17 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
     }
 
     const role = await this.getRoleById(created.id);
+
     if (!role) {
       throw new Error("Failed to load role after creation");
     }
+
     return role;
   };
 
   updateRole = async (
     id: string,
-    payload: Partial<RoleInput>
+    payload: Partial<RoleInput>,
   ): Promise<RoleRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -153,6 +156,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
     if (payload.permissions !== undefined) {
       // Get permission IDs from keys
       const permissionIds: string[] = [];
+
       for (const permKey of payload.permissions) {
         const perm = await this.db
           .select({ id: base_tb_permissions.id })
@@ -173,6 +177,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
 
       // Add new permissions
       const now = new Date();
+
       for (const permissionId of permissionIds) {
         // Check if exists
         const existing = await this.db
@@ -181,8 +186,8 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
           .where(
             and(
               eq(base_tb_role_permissions_default.roleId, id),
-              eq(base_tb_role_permissions_default.permissionId, permissionId)
-            )
+              eq(base_tb_role_permissions_default.permissionId, permissionId),
+            ),
           )
           .limit(1);
 
@@ -222,7 +227,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
     }
     if (payload.description !== undefined) {
       normalizedPayload.description = this.normalizeLocaleInput(
-        payload.description
+        payload.description,
       );
     }
     if (payload.permissions !== undefined) {
@@ -238,7 +243,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
   };
 
   private async mapToRoleRow(
-    row: typeof base_tb_roles.$inferSelect
+    row: typeof base_tb_roles.$inferSelect,
   ): Promise<RoleRow> {
     // Get permissions for this role
     const permissions = await this.db
@@ -250,15 +255,15 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
         base_tb_permissions,
         eq(
           base_tb_role_permissions_default.permissionId,
-          base_tb_permissions.id
-        )
+          base_tb_permissions.id,
+        ),
       )
       .where(
         and(
           eq(base_tb_role_permissions_default.roleId, row.id),
           eq(base_tb_role_permissions_default.isActive, true),
-          eq(base_tb_permissions.isActive, true)
-        )
+          eq(base_tb_permissions.isActive, true),
+        ),
       );
 
     return {

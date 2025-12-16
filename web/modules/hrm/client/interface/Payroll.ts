@@ -59,4 +59,3 @@ export interface CreatePayrollPayload {
 export interface UpdatePayrollPayload extends Partial<CreatePayrollPayload> {
   id: string;
 }
-

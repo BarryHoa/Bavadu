@@ -1,5 +1,6 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { NextRequest } from "next/server";
+
 import RoleModel from "../../../models/Role/RoleModel";
 
 export async function GET(request: NextRequest) {
@@ -34,6 +35,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error loading role:", error);
+
     return JSONResponse({
       error: "Failed to load role",
       message: error instanceof Error ? error.message : "Unknown error",
@@ -41,4 +43,3 @@ export async function GET(request: NextRequest) {
     });
   }
 }
-

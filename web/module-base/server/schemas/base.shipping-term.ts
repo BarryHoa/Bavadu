@@ -10,6 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdBaseSchema } from "./schema";
 
 // Shipping Terms
@@ -35,7 +36,7 @@ export const base_tb_shipping_terms = mdBaseSchema.table(
     index("shipping_terms_active_idx").on(table.isActive),
     index("shipping_terms_type_idx").on(table.type),
     index("shipping_terms_type_active_idx").on(table.type, table.isActive),
-  ]
+  ],
 );
 
 export type BaseTbShippingTerm = typeof base_tb_shipping_terms.$inferSelect;

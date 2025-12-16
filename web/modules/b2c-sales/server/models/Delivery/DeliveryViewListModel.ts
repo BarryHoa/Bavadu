@@ -1,15 +1,16 @@
 import type { Column } from "drizzle-orm";
-import { ilike } from "drizzle-orm";
-
-import {
-  BaseViewListModel,
-  type FilterConditionMap,
-} from "@base/server/models/BaseViewListModel";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/server/models/interfaces/ListInterface";
 import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
+
+import { ilike } from "drizzle-orm";
+import {
+  BaseViewListModel,
+  type FilterConditionMap,
+} from "@base/server/models/BaseViewListModel";
+
 import { sale_b2c_tb_deliveries } from "../../schemas";
 
 class DeliveryViewListModel extends BaseViewListModel<
@@ -39,8 +40,14 @@ class DeliveryViewListModel extends BaseViewListModel<
       ["id", { column: sale_b2c_tb_deliveries.id, sort: true }],
       ["orderType", { column: sale_b2c_tb_deliveries.orderType, sort: true }],
       ["orderId", { column: sale_b2c_tb_deliveries.orderId, sort: true }],
-      ["warehouseId", { column: sale_b2c_tb_deliveries.warehouseId, sort: true }],
-      ["deliveryDate", { column: sale_b2c_tb_deliveries.deliveryDate, sort: true }],
+      [
+        "warehouseId",
+        { column: sale_b2c_tb_deliveries.warehouseId, sort: true },
+      ],
+      [
+        "deliveryDate",
+        { column: sale_b2c_tb_deliveries.deliveryDate, sort: true },
+      ],
       ["reference", { column: sale_b2c_tb_deliveries.reference, sort: true }],
       ["status", { column: sale_b2c_tb_deliveries.status, sort: true }],
       ["createdAt", { column: sale_b2c_tb_deliveries.createdAt, sort: true }],
@@ -49,13 +56,15 @@ class DeliveryViewListModel extends BaseViewListModel<
 
   protected declarationSearch = () =>
     new Map([
-      ["reference", (text: string) => ilike(sale_b2c_tb_deliveries.reference, text)],
+      [
+        "reference",
+        (text: string) => ilike(sale_b2c_tb_deliveries.reference, text),
+      ],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
     new Map() as FilterConditionMap<ParamFilter>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected declarationMappingData = (row: any): any => ({
     id: row.id,
     orderType: row.orderType,
@@ -71,11 +80,10 @@ class DeliveryViewListModel extends BaseViewListModel<
   });
 
   getData = async (
-    params: ListParamsRequest
+    params: ListParamsRequest,
   ): Promise<ListParamsResponse<any>> => {
     return this.buildQueryDataList(params);
   };
 }
 
 export default DeliveryViewListModel;
-

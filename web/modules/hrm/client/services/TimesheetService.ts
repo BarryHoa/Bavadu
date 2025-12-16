@@ -1,9 +1,10 @@
-import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 import type {
   TimesheetDto,
   CreateTimesheetPayload,
   UpdateTimesheetPayload,
 } from "../interface/Timesheet";
+
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export default class TimesheetService extends JsonRpcClientService {
   list() {
@@ -37,4 +38,3 @@ export default class TimesheetService extends JsonRpcClientService {
 }
 
 export const timesheetService = new TimesheetService();
-

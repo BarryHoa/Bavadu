@@ -83,4 +83,3 @@ export const assetOptionalFields: OptionalFieldDefinition[] = [
     isRequired: false,
   },
 ];
-

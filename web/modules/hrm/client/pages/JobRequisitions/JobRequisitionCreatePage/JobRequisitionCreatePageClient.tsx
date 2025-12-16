@@ -4,6 +4,7 @@ import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { jobRequisitionService } from "@mdl/hrm/client/services/JobRequisitionService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+
 import JobRequisitionForm, {
   type JobRequisitionFormValues,
 } from "../components/JobRequisitionForm/JobRequisitionForm";
@@ -22,17 +23,19 @@ export default function JobRequisitionCreatePageClient(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await jobRequisitionService.create(payload);
+
       if (!response.data) {
         throw new Error(
-          response.message ?? t("errors.failedToCreateJobRequisition")
+          response.message ?? t("errors.failedToCreateJobRequisition"),
         );
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-job-requisitions"]],
     onSuccess: (data) => {
       router.push(
-        `/workspace/modules/hrm/job-requisitions/view/${data.data.id}`
+        `/workspace/modules/hrm/job-requisitions/view/${data.data.id}`,
       );
     },
   });
@@ -94,10 +97,10 @@ export default function JobRequisitionCreatePageClient(): React.ReactNode {
 
   return (
     <JobRequisitionForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push("/workspace/modules/hrm/job-requisitions")}
-      submitError={submitError}
       isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() => router.push("/workspace/modules/hrm/job-requisitions")}
+      onSubmit={handleSubmit}
     />
   );
 }

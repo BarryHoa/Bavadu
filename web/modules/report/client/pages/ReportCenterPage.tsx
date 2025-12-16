@@ -51,10 +51,10 @@ export default function ReportCenterPage() {
               Sales over time (sample)
             </div>
             <ReactECharts
+              lazyUpdate
+              notMerge
               option={overviewOption}
               style={{ width: "100%", height: 360 }}
-              notMerge
-              lazyUpdate
             />
           </Card>
         </Tab>

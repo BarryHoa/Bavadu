@@ -86,6 +86,7 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
@@ -183,9 +184,7 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
     };
   };
 
-  getDataById = async (params: {
-    id: string;
-  }): Promise<EmployeeRow | null> => {
+  getDataById = async (params: { id: string }): Promise<EmployeeRow | null> => {
     return this.getEmployeeById(params.id);
   };
 
@@ -241,7 +240,7 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
 
   updateEmployee = async (
     id: string,
-    payload: Partial<EmployeeInput>
+    payload: Partial<EmployeeInput>,
   ): Promise<EmployeeRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -258,7 +257,8 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
     if (payload.phone !== undefined) updateData.phone = payload.phone ?? null;
     if (payload.dateOfBirth !== undefined)
       updateData.dateOfBirth = payload.dateOfBirth ?? null;
-    if (payload.gender !== undefined) updateData.gender = payload.gender ?? null;
+    if (payload.gender !== undefined)
+      updateData.gender = payload.gender ?? null;
     if (payload.nationalId !== undefined)
       updateData.nationalId = payload.nationalId ?? null;
     if (payload.taxId !== undefined) updateData.taxId = payload.taxId ?? null;
@@ -285,7 +285,10 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
       updateData.locationId = payload.locationId ?? null;
     if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
 
-    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db
+      .update(this.table)
+      .set(updateData)
+      .where(eq(this.table.id, id));
 
     return this.getEmployeeById(id);
   };
@@ -311,17 +314,23 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
           : String(payload.lastName);
     }
     if (payload.fullName !== undefined) {
-      normalizedPayload.fullName = this.normalizeLocaleInput(payload.fullName) ?? {
+      normalizedPayload.fullName = this.normalizeLocaleInput(
+        payload.fullName,
+      ) ?? {
         en: "",
       };
     }
     if (payload.email !== undefined) {
       normalizedPayload.email =
-        payload.email === null || payload.email === "" ? null : String(payload.email);
+        payload.email === null || payload.email === ""
+          ? null
+          : String(payload.email);
     }
     if (payload.phone !== undefined) {
       normalizedPayload.phone =
-        payload.phone === null || payload.phone === "" ? null : String(payload.phone);
+        payload.phone === null || payload.phone === ""
+          ? null
+          : String(payload.phone);
     }
     if (payload.dateOfBirth !== undefined) {
       normalizedPayload.dateOfBirth =
@@ -343,7 +352,9 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
     }
     if (payload.taxId !== undefined) {
       normalizedPayload.taxId =
-        payload.taxId === null || payload.taxId === "" ? null : String(payload.taxId);
+        payload.taxId === null || payload.taxId === ""
+          ? null
+          : String(payload.taxId);
     }
     if (payload.address !== undefined) {
       normalizedPayload.address = payload.address;
@@ -403,4 +414,3 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
     return this.updateEmployee(id, normalizedPayload);
   };
 }
-

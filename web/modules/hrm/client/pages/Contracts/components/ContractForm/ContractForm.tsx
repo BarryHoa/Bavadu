@@ -1,5 +1,7 @@
 "use client";
 
+import type { ContractFormValues } from "../../validation/contractValidation";
+
 import { IBaseInput, IBaseSingleSelectAsync } from "@base/client/components";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Textarea } from "@heroui/react";
@@ -7,7 +9,7 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
-import type { ContractFormValues } from "../../validation/contractValidation";
+
 import { createContractValidation } from "../../validation/contractValidation";
 
 export type { ContractFormValues };
@@ -66,10 +68,10 @@ export default function ContractForm({
         )}
         <Button
           color="primary"
-          type="submit"
-          size="sm"
-          isLoading={isSubmitting}
           disabled={isSubmitting}
+          isLoading={isSubmitting}
+          size="sm"
+          type="submit"
         >
           {tLabels("save")}
         </Button>
@@ -82,126 +84,126 @@ export default function ContractForm({
           </h2>
           <div className="grid gap-4 md:grid-cols-2">
             <Controller
-              name="contractNumber"
               control={control}
+              name="contractNumber"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("contractNumber")}
                   size="sm"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
 
             <Controller
-              name="employeeId"
               control={control}
+              name="employeeId"
               render={({ field, fieldState }) => (
                 <IBaseSingleSelectAsync
+                  isRequired
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("employee")}
-                  size="sm"
                   model="employee.dropdown"
                   selectedKey={field.value}
+                  size="sm"
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
-                  callWhen="mount"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
 
             <Controller
-              name="contractType"
               control={control}
+              name="contractType"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("contractType")}
                   size="sm"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
 
             <Controller
-              name="status"
               control={control}
+              name="status"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("status")}
                   size="sm"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
 
             <Controller
-              name="startDate"
               control={control}
+              name="startDate"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
-                  type="date"
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("startDate")}
                   size="sm"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
+                  type="date"
                 />
               )}
             />
 
             <Controller
-              name="endDate"
               control={control}
+              name="endDate"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
-                  type="date"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("endDate")}
                   size="sm"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
+                  type="date"
                 />
               )}
             />
 
             <Controller
-              name="baseSalary"
               control={control}
+              name="baseSalary"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
-                  type="number"
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("baseSalary")}
                   size="sm"
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
+                  type="number"
                 />
               )}
             />
 
             <Controller
-              name="currency"
               control={control}
+              name="currency"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("currency")}
                   size="sm"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
@@ -216,61 +218,61 @@ export default function ContractForm({
           </h2>
           <div className="grid gap-4 md:grid-cols-2">
             <Controller
-              name="workingHours"
               control={control}
+              name="workingHours"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
-                  type="number"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("workingHours")}
                   size="sm"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
+                  type="number"
                 />
               )}
             />
 
             <Controller
-              name="probationPeriod"
               control={control}
+              name="probationPeriod"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
-                  type="number"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("probationPeriod")}
                   size="sm"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
+                  type="number"
                 />
               )}
             />
 
             <Controller
-              name="probationEndDate"
               control={control}
+              name="probationEndDate"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
-                  type="date"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("probationEndDate")}
                   size="sm"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
+                  type="date"
                 />
               )}
             />
 
             <Controller
-              name="signedDate"
               control={control}
+              name="signedDate"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
-                  type="date"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("signedDate")}
                   size="sm"
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
+                  type="date"
                 />
               )}
             />
@@ -278,18 +280,18 @@ export default function ContractForm({
 
           <div className="mt-4">
             <Controller
-              name="notes"
               control={control}
+              name="notes"
               render={({ field, fieldState }) => (
                 <Textarea
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label={tLabels("notes")}
-                  size="sm"
                   minRows={2}
+                  size="sm"
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />

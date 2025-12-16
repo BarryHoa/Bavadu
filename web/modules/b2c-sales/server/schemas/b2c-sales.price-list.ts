@@ -10,6 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlSaleB2cSchema } from "./schema";
 
 // ============================================
@@ -58,14 +59,14 @@ export const sale_b2c_tb_price_lists = mdlSaleB2cSchema.table(
     // Check constraint: validTo phải >= validFrom (nếu có)
     check(
       "price_lists_valid_dates_check",
-      sql`(${table.validTo} IS NULL) OR (${table.validTo} >= ${table.validFrom})`
+      sql`(${table.validTo} IS NULL) OR (${table.validTo} >= ${table.validFrom})`,
     ),
     // Check constraint: Nếu type != 'standard' thì validTo không được NULL
     check(
       "price_lists_valid_to_required_check",
-      sql`(${table.type} = 'standard') OR (${table.validTo} IS NOT NULL)`
+      sql`(${table.type} = 'standard') OR (${table.validTo} IS NOT NULL)`,
     ),
-  ]
+  ],
 );
 
 export type SaleB2cTbPriceList = typeof sale_b2c_tb_price_lists.$inferSelect;

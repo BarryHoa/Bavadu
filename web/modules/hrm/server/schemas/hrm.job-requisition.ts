@@ -1,8 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
-  boolean,
   date,
-  foreignKey,
   index,
   integer,
   jsonb,
@@ -11,6 +9,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_departments } from "./hrm.department";
 import { hrm_tb_positions } from "./hrm.position";
@@ -22,7 +21,9 @@ export const hrm_tb_job_requisitions = mdlHrmSchema.table(
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
-    requisitionNumber: varchar("requisition_number", { length: 100 }).notNull().unique(),
+    requisitionNumber: varchar("requisition_number", { length: 100 })
+      .notNull()
+      .unique(),
     title: jsonb("title").notNull(), // LocaleDataType<string>
     description: text("description"), // Text description
     departmentId: uuid("department_id")
@@ -54,9 +55,9 @@ export const hrm_tb_job_requisitions = mdlHrmSchema.table(
     index("job_requisitions_department_idx").on(table.departmentId),
     index("job_requisitions_position_idx").on(table.positionId),
     index("job_requisitions_status_idx").on(table.status),
-  ]
+  ],
 );
 
 export type HrmTbJobRequisition = typeof hrm_tb_job_requisitions.$inferSelect;
-export type NewHrmTbJobRequisition = typeof hrm_tb_job_requisitions.$inferInsert;
-
+export type NewHrmTbJobRequisition =
+  typeof hrm_tb_job_requisitions.$inferInsert;

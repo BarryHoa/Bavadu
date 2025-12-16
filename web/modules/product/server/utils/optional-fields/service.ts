@@ -43,4 +43,3 @@ export const serviceOptionalFields: OptionalFieldDefinition[] = [
     isRequired: false,
   },
 ];
-

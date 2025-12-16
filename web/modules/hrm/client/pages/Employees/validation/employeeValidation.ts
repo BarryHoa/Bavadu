@@ -23,30 +23,33 @@ export function createEmployeeValidation(t: TranslateFn) {
   const employeeCodeSchema = pipe(
     string(),
     trim(),
-    minLength(1, t("validation.employeeCode.required"))
+    minLength(1, t("validation.employeeCode.required")),
   );
 
   // Full name validation (object with vi/en) - using custom validation
-  const fullNameSchema = custom<{ vi?: string; en?: string }>(
-    (value) => {
-      if (!value || typeof value !== "object") return false;
-      const obj = value as any;
-      return (
-        (obj.vi !== undefined && typeof obj.vi === "string" && obj.vi.trim() !== "") ||
-        (obj.en !== undefined && typeof obj.en === "string" && obj.en.trim() !== "")
-      );
-    },
-    t("validation.fullName.required")
-  );
+  const fullNameSchema = custom<{ vi?: string; en?: string }>((value) => {
+    if (!value || typeof value !== "object") return false;
+    const obj = value as any;
+
+    return (
+      (obj.vi !== undefined &&
+        typeof obj.vi === "string" &&
+        obj.vi.trim() !== "") ||
+      (obj.en !== undefined &&
+        typeof obj.en === "string" &&
+        obj.en.trim() !== "")
+    );
+  }, t("validation.fullName.required"));
 
   // Email validation
   const emailSchema = pipe(
     string(),
     trim(),
     custom(
-      (value) => value === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value)),
-      t("validation.email.invalid")
-    )
+      (value) =>
+        value === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value)),
+      t("validation.email.invalid"),
+    ),
   );
 
   // Phone validation
@@ -71,12 +74,12 @@ export function createEmployeeValidation(t: TranslateFn) {
     positionId: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.positionId.required"))
+      minLength(1, t("validation.positionId.required")),
     ),
     departmentId: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.departmentId.required"))
+      minLength(1, t("validation.departmentId.required")),
     ),
     managerId: optional(pipe(string(), trim())),
     employmentStatus: optional(pipe(string(), trim())),
@@ -84,14 +87,21 @@ export function createEmployeeValidation(t: TranslateFn) {
     hireDate: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.hireDate.required"))
+      minLength(1, t("validation.hireDate.required")),
     ),
     probationEndDate: optional(dateSchema),
-    baseSalary: optional(pipe(string(), trim(), custom((value) => {
-      if (value === "") return true;
-      const num = Number(value);
-      return !Number.isNaN(num) && num >= 0;
-    }, t("validation.baseSalary.invalid")))),
+    baseSalary: optional(
+      pipe(
+        string(),
+        trim(),
+        custom((value) => {
+          if (value === "") return true;
+          const num = Number(value);
+
+          return !Number.isNaN(num) && num >= 0;
+        }, t("validation.baseSalary.invalid")),
+      ),
+    ),
     currency: optional(pipe(string(), trim())),
     locationId: optional(pipe(string(), trim())),
     isActive: optional(boolean()),
@@ -108,4 +118,3 @@ export function createEmployeeValidation(t: TranslateFn) {
 export type EmployeeFormValues = InferOutput<
   ReturnType<typeof createEmployeeValidation>["employeeFormSchema"]
 >;
-

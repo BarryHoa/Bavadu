@@ -11,6 +11,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdBaseSchema } from "./schema";
 
 /**
@@ -49,7 +50,7 @@ export const base_tb_currencies = mdBaseSchema.table(
     index("currencies_is_active_idx").on(table.isActive),
     // Composite index for common queries
     index("currencies_default_active_idx").on(table.isDefault, table.isActive),
-  ]
+  ],
 );
 
 export type BaseTbCurrency = typeof base_tb_currencies.$inferSelect;
@@ -88,16 +89,16 @@ export const base_tb_currencies_exchange_rate = mdBaseSchema.table(
     // Unique constraint: mỗi currency chỉ có một tỷ giá mỗi ngày
     uniqueIndex("currency_exchange_rate_for_vnd_currency_date_unique").on(
       table.currencyId,
-      table.rateDate
+      table.rateDate,
     ),
     index("currency_exchange_rate_for_vnd_currency_idx").on(table.currencyId),
     index("currency_exchange_rate_for_vnd_date_idx").on(table.rateDate),
     // Composite index for common queries: get rate by currency and date range
     index("currency_exchange_rate_for_vnd_currency_date_idx").on(
       table.currencyId,
-      table.rateDate
+      table.rateDate,
     ),
-  ]
+  ],
 );
 
 export type BaseTbCurrencyExchangeRate =

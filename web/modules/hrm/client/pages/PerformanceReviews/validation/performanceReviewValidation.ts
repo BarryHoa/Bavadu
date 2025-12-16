@@ -1,5 +1,4 @@
 import {
-  custom,
   maxValue,
   minLength,
   minValue,
@@ -19,30 +18,30 @@ export function createPerformanceReviewValidation(t: TranslateFn) {
     employeeId: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.employeeId.required"))
+      minLength(1, t("validation.employeeId.required")),
     ),
     reviewType: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.reviewType.required"))
+      minLength(1, t("validation.reviewType.required")),
     ),
     reviewPeriod: optional(pipe(string(), trim())),
     reviewDate: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.reviewDate.required"))
+      minLength(1, t("validation.reviewDate.required")),
     ),
     reviewerId: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.reviewerId.required"))
+      minLength(1, t("validation.reviewerId.required")),
     ),
     overallRating: optional(
       pipe(
         number(),
         minValue(1, t("validation.overallRating.min")),
-        maxValue(5, t("validation.overallRating.max"))
-      )
+        maxValue(5, t("validation.overallRating.max")),
+      ),
     ),
     strengths: optional(pipe(string(), trim())),
     areasForImprovement: optional(pipe(string(), trim())),
@@ -58,6 +57,7 @@ export function createPerformanceReviewValidation(t: TranslateFn) {
 }
 
 export type PerformanceReviewFormValues = InferOutput<
-  ReturnType<typeof createPerformanceReviewValidation>["performanceReviewFormSchema"]
+  ReturnType<
+    typeof createPerformanceReviewValidation
+  >["performanceReviewFormSchema"]
 >;
-

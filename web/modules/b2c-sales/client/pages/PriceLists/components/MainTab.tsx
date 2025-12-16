@@ -39,6 +39,7 @@ export default function MainTab({
   customerGroupOptions = [],
 }: MainTabProps) {
   const getLocalizedText = useLocalizedText();
+
   return (
     <div className="space-y-6">
       {/* Basic Information */}
@@ -46,68 +47,68 @@ export default function MainTab({
         <h3 className="text-sm font-semibold mb-4">Basic Information</h3>
         <div className="grid gap-4 md:grid-cols-3">
           <Controller
-            name="name"
             control={control}
+            name="name"
             render={({ field, fieldState }) => (
               <IBaseInputMultipleLang
+                isRequired
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 label="Name"
                 size="sm"
                 value={field.value}
                 onValueChange={field.onChange}
-                isRequired
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               />
             )}
           />
           <Controller
-            name="code"
             control={control}
+            name="code"
             render={({ field, fieldState }) => (
               <IBaseInput
+                isRequired
+                errorMessage={fieldState.error?.message}
+                isDisabled={isEdit}
+                isInvalid={fieldState.invalid}
                 label="Code"
                 size="sm"
                 value={field.value}
                 onChange={field.onChange}
-                isRequired
-                isDisabled={isEdit}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               />
             )}
           />
           <Controller
-            name="type"
             control={control}
+            name="type"
             render={({ field, fieldState }) => (
               <IBaseSingleSelect
-                label="Type"
-                size="sm"
+                isRequired
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 items={typeOptions}
+                label="Type"
                 selectedKey={field.value}
+                size="sm"
                 onSelectionChange={(key) => {
                   field.onChange(key || "");
                 }}
-                isRequired
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               />
             )}
           />
         </div>
         <div className="mt-4">
           <Controller
-            name="description"
             control={control}
+            name="description"
             render={({ field, fieldState }) => (
               <Textarea
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 label="Description"
+                minRows={2}
                 size="sm"
                 value={field.value || ""}
                 onValueChange={field.onChange}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
-                minRows={2}
               />
             )}
           />
@@ -119,48 +120,48 @@ export default function MainTab({
         <h3 className="text-sm font-semibold mb-4">Status & Priority</h3>
         <div className="grid gap-4 md:grid-cols-3">
           <Controller
-            name="status"
             control={control}
+            name="status"
             render={({ field, fieldState }) => (
               <IBaseSingleSelect
-                label="Status"
-                size="sm"
+                isRequired
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 items={statusOptions}
+                label="Status"
                 selectedKey={field.value}
+                size="sm"
                 onSelectionChange={(key) => {
                   field.onChange(key || "");
                 }}
-                isRequired
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               />
             )}
           />
           <Controller
-            name="priority"
             control={control}
+            name="priority"
             render={({ field, fieldState }) => (
               <IBaseInputNumber
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 label="Priority"
+                min={0}
                 size="sm"
                 value={field.value ? Number(field.value) : 0}
                 onValueChange={(value) =>
                   field.onChange(value?.toString() || "0")
                 }
-                min={0}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               />
             )}
           />
           <div className="flex items-end">
             <Controller
-              name="isDefault"
               control={control}
+              name="isDefault"
               render={({ field }) => (
                 <Checkbox
-                  size="sm"
                   isSelected={field.value === "true" || field.value === true}
+                  size="sm"
                   onValueChange={(checked) =>
                     field.onChange(checked ? "true" : "false")
                   }
@@ -178,37 +179,37 @@ export default function MainTab({
         <h3 className="text-sm font-semibold mb-4">Validity Period</h3>
         <div className="grid gap-4 md:grid-cols-3">
           <Controller
-            name="validFrom"
             control={control}
+            name="validFrom"
             render={({ field, fieldState }) => (
               <IBaseInput
+                isRequired
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 label="Valid From"
                 size="sm"
                 type="date"
                 value={field.value}
                 onChange={field.onChange}
-                isRequired
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               />
             )}
           />
           <Controller
-            name="validTo"
             control={control}
+            name="validTo"
             render={({ field, fieldState }) => (
               <IBaseInput
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 label="Valid To (leave empty for forever - standard only)"
                 size="sm"
                 type="date"
                 value={field.value}
                 onChange={field.onChange}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               />
             )}
           />
-          <div></div>
+          <div />
         </div>
       </div>
 
@@ -217,28 +218,31 @@ export default function MainTab({
         <h3 className="text-sm font-semibold mb-4">Applicable To</h3>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Controller
-            name="applicableTo.channels"
             control={control}
+            name="applicableTo.channels"
             render={({ field, fieldState }) => (
               <IBaseSelect
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 label="Channels"
-                size="sm"
-                selectionMode="multiple"
                 selectedKeys={
                   field.value
                     ? new Set(
-                        Array.isArray(field.value) ? field.value : [field.value]
+                        Array.isArray(field.value)
+                          ? field.value
+                          : [field.value],
                       )
                     : new Set()
                 }
+                selectionMode="multiple"
+                size="sm"
                 onSelectionChange={(keys) => {
                   const selectedArray = Array.from(keys);
+
                   field.onChange(
-                    selectedArray.length > 0 ? selectedArray : undefined
+                    selectedArray.length > 0 ? selectedArray : undefined,
                   );
                 }}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               >
                 {channelOptions.map((option) => (
                   <SelectItem
@@ -258,28 +262,31 @@ export default function MainTab({
             )}
           />
           <Controller
-            name="applicableTo.stores"
             control={control}
+            name="applicableTo.stores"
             render={({ field, fieldState }) => (
               <IBaseSelect
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 label="Stores"
-                size="sm"
-                selectionMode="multiple"
                 selectedKeys={
                   field.value
                     ? new Set(
-                        Array.isArray(field.value) ? field.value : [field.value]
+                        Array.isArray(field.value)
+                          ? field.value
+                          : [field.value],
                       )
                     : new Set()
                 }
+                selectionMode="multiple"
+                size="sm"
                 onSelectionChange={(keys) => {
                   const selectedArray = Array.from(keys);
+
                   field.onChange(
-                    selectedArray.length > 0 ? selectedArray : undefined
+                    selectedArray.length > 0 ? selectedArray : undefined,
                   );
                 }}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               >
                 {storeOptions.map((option) => (
                   <SelectItem
@@ -299,28 +306,31 @@ export default function MainTab({
             )}
           />
           <Controller
-            name="applicableTo.locations"
             control={control}
+            name="applicableTo.locations"
             render={({ field, fieldState }) => (
               <IBaseSelect
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 label="Locations"
-                size="sm"
-                selectionMode="multiple"
                 selectedKeys={
                   field.value
                     ? new Set(
-                        Array.isArray(field.value) ? field.value : [field.value]
+                        Array.isArray(field.value)
+                          ? field.value
+                          : [field.value],
                       )
                     : new Set()
                 }
+                selectionMode="multiple"
+                size="sm"
                 onSelectionChange={(keys) => {
                   const selectedArray = Array.from(keys);
+
                   field.onChange(
-                    selectedArray.length > 0 ? selectedArray : undefined
+                    selectedArray.length > 0 ? selectedArray : undefined,
                   );
                 }}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               >
                 {locationOptions.map((option) => (
                   <SelectItem
@@ -340,28 +350,31 @@ export default function MainTab({
             )}
           />
           <Controller
-            name="applicableTo.regions"
             control={control}
+            name="applicableTo.regions"
             render={({ field, fieldState }) => (
               <IBaseSelect
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 label="Regions"
-                size="sm"
-                selectionMode="multiple"
                 selectedKeys={
                   field.value
                     ? new Set(
-                        Array.isArray(field.value) ? field.value : [field.value]
+                        Array.isArray(field.value)
+                          ? field.value
+                          : [field.value],
                       )
                     : new Set()
                 }
+                selectionMode="multiple"
+                size="sm"
                 onSelectionChange={(keys) => {
                   const selectedArray = Array.from(keys);
+
                   field.onChange(
-                    selectedArray.length > 0 ? selectedArray : undefined
+                    selectedArray.length > 0 ? selectedArray : undefined,
                   );
                 }}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               >
                 {regionOptions.map((option) => (
                   <SelectItem
@@ -381,28 +394,31 @@ export default function MainTab({
             )}
           />
           <Controller
-            name="applicableTo.customerGroups"
             control={control}
+            name="applicableTo.customerGroups"
             render={({ field, fieldState }) => (
               <IBaseSelect
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 label="Customer Groups"
-                size="sm"
-                selectionMode="multiple"
                 selectedKeys={
                   field.value
                     ? new Set(
-                        Array.isArray(field.value) ? field.value : [field.value]
+                        Array.isArray(field.value)
+                          ? field.value
+                          : [field.value],
                       )
                     : new Set()
                 }
+                selectionMode="multiple"
+                size="sm"
                 onSelectionChange={(keys) => {
                   const selectedArray = Array.from(keys);
+
                   field.onChange(
-                    selectedArray.length > 0 ? selectedArray : undefined
+                    selectedArray.length > 0 ? selectedArray : undefined,
                   );
                 }}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               >
                 {customerGroupOptions.map((option) => (
                   <SelectItem

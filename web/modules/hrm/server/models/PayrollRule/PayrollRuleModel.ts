@@ -29,7 +29,9 @@ export interface PayrollRuleInput {
   isActive?: boolean;
 }
 
-export default class PayrollRuleModel extends BaseModel<typeof hrm_tb_payrolls_rule> {
+export default class PayrollRuleModel extends BaseModel<
+  typeof hrm_tb_payrolls_rule
+> {
   constructor() {
     super(hrm_tb_payrolls_rule);
   }
@@ -38,6 +40,7 @@ export default class PayrollRuleModel extends BaseModel<typeof hrm_tb_payrolls_r
     if (!value) return null;
     if (typeof value === "string") return { en: value };
     if (typeof value === "object") return value as LocaleDataType<string>;
+
     return null;
   }
 
@@ -49,6 +52,7 @@ export default class PayrollRuleModel extends BaseModel<typeof hrm_tb_payrolls_r
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -66,16 +70,24 @@ export default class PayrollRuleModel extends BaseModel<typeof hrm_tb_payrolls_r
     };
   };
 
-  getDataById = async (params: { id: string }): Promise<PayrollRuleRow | null> => {
+  getDataById = async (params: {
+    id: string;
+  }): Promise<PayrollRuleRow | null> => {
     return this.getPayrollRuleById(params.id);
   };
 
-  createPayrollRule = async (payload: PayrollRuleInput): Promise<PayrollRuleRow> => {
+  createPayrollRule = async (
+    payload: PayrollRuleInput,
+  ): Promise<PayrollRuleRow> => {
     const now = new Date();
     const insertData: NewHrmTbPayrollRule = {
       code: payload.code,
       name: payload.name,
-      description: payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null,
+      description: payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null,
       ruleType: payload.ruleType,
       ruleConfig: payload.ruleConfig,
       effectiveDate: payload.effectiveDate,
@@ -93,13 +105,15 @@ export default class PayrollRuleModel extends BaseModel<typeof hrm_tb_payrolls_r
     if (!created) throw new Error("Failed to create payroll rule");
 
     const rule = await this.getPayrollRuleById(created.id);
+
     if (!rule) throw new Error("Failed to load payroll rule after creation");
+
     return rule;
   };
 
   updatePayrollRule = async (
     id: string,
-    payload: Partial<PayrollRuleInput>
+    payload: Partial<PayrollRuleInput>,
   ): Promise<PayrollRuleRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -108,7 +122,11 @@ export default class PayrollRuleModel extends BaseModel<typeof hrm_tb_payrolls_r
     if (payload.code !== undefined) updateData.code = payload.code;
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.description !== undefined)
-      updateData.description = payload.description ? (typeof payload.description === "string" ? payload.description : JSON.stringify(payload.description)) : null;
+      updateData.description = payload.description
+        ? typeof payload.description === "string"
+          ? payload.description
+          : JSON.stringify(payload.description)
+        : null;
     if (payload.ruleType !== undefined) updateData.ruleType = payload.ruleType;
     if (payload.ruleConfig !== undefined)
       updateData.ruleConfig = payload.ruleConfig;
@@ -118,7 +136,11 @@ export default class PayrollRuleModel extends BaseModel<typeof hrm_tb_payrolls_r
       updateData.expiryDate = payload.expiryDate ?? null;
     if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
 
-    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db
+      .update(this.table)
+      .set(updateData)
+      .where(eq(this.table.id, id));
+
     return this.getPayrollRuleById(id);
   };
 
@@ -130,11 +152,13 @@ export default class PayrollRuleModel extends BaseModel<typeof hrm_tb_payrolls_r
       normalizedPayload.code = String(payload.code);
     }
     if (payload.name !== undefined) {
-      normalizedPayload.name = this.normalizeLocaleInput(payload.name) ?? { en: "" };
+      normalizedPayload.name = this.normalizeLocaleInput(payload.name) ?? {
+        en: "",
+      };
     }
     if (payload.description !== undefined) {
       normalizedPayload.description = this.normalizeLocaleInput(
-        payload.description
+        payload.description,
       );
     }
     if (payload.ruleType !== undefined) {
@@ -159,4 +183,3 @@ export default class PayrollRuleModel extends BaseModel<typeof hrm_tb_payrolls_r
     return this.updatePayrollRule(id, normalizedPayload);
   };
 }
-

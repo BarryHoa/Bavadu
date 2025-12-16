@@ -10,23 +10,21 @@ type Diff<T> = {
  */
 export function useWhyDidUpdate<T extends Record<string, any>>(
   name: string,
-  value: T
+  value: T,
 ) {
   const previousRef = useRef<T | null>(null);
 
   useEffect(() => {
     if (previousRef.current === null) {
       previousRef.current = value;
+
       return;
     }
 
     const previous = previousRef.current;
     const changes: Diff<T> = {};
 
-    const allKeys = new Set([
-      ...Object.keys(previous),
-      ...Object.keys(value),
-    ]);
+    const allKeys = new Set([...Object.keys(previous), ...Object.keys(value)]);
 
     allKeys.forEach((key) => {
       const prevVal = (previous as any)[key];
@@ -45,5 +43,3 @@ export function useWhyDidUpdate<T extends Record<string, any>>(
     previousRef.current = value;
   });
 }
-
-

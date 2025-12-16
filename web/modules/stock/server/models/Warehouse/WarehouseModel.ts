@@ -1,5 +1,9 @@
-import { asc, eq, sql } from "drizzle-orm";
+import type {
+  NewStockTbStockWarehouse,
+  StockTbStockWarehouse,
+} from "../../schemas";
 
+import { asc, eq, sql } from "drizzle-orm";
 import { BaseModel } from "@base/server/models/BaseModel";
 
 import {
@@ -9,7 +13,6 @@ import {
   warehouseStatuses,
   warehouseValuationMethods,
 } from "../../../common/constants";
-import type { NewStockTbStockWarehouse, StockTbStockWarehouse } from "../../schemas";
 import { stock_tb_stock_warehouses } from "../../schemas";
 
 export interface WarehousePayload {
@@ -74,7 +77,7 @@ export default class WarehouseModel extends BaseModel<
   };
 
   createWarehouse = async (
-    payload: WarehousePayload
+    payload: WarehousePayload,
   ): Promise<StockTbStockWarehouse> => {
     const insertPayload = this.normalizeWarehousePayload(payload);
 
@@ -88,7 +91,7 @@ export default class WarehouseModel extends BaseModel<
 
   updateWarehouse = async (
     id: string,
-    payload: WarehousePayload
+    payload: WarehousePayload,
   ): Promise<StockTbStockWarehouse> => {
     const [record] = await this.db
       .update(stock_tb_stock_warehouses)
@@ -107,7 +110,7 @@ export default class WarehouseModel extends BaseModel<
   };
 
   private normalizeWarehousePayload = (
-    payload: WarehousePayload
+    payload: WarehousePayload,
   ): Omit<NewStockTbStockWarehouse, "id" | "createdAt" | "updatedAt"> => {
     return {
       code: payload.code.trim(),
@@ -141,6 +144,7 @@ export default class WarehouseModel extends BaseModel<
     }
 
     const normalized = status.toUpperCase() as WarehouseStatus;
+
     if (!warehouseStatuses.includes(normalized)) {
       throw new Error(`Invalid warehouse status: ${status}`);
     }
@@ -149,13 +153,14 @@ export default class WarehouseModel extends BaseModel<
   };
 
   private validateValuationMethod = (
-    value?: string | null
+    value?: string | null,
   ): WarehouseValuationMethod => {
     if (!value) {
       return "FIFO";
     }
 
     const normalized = value.toUpperCase() as WarehouseValuationMethod;
+
     if (!warehouseValuationMethods.includes(normalized)) {
       throw new Error(`Invalid warehouse valuation method: ${value}`);
     }

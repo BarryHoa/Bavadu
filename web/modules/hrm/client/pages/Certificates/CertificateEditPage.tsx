@@ -5,10 +5,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { certificateService } from "@mdl/hrm/client/services/CertificateService";
+import { LoadingOverlay } from "@base/client/components";
+
 import CertificateForm, {
   type CertificateFormValues,
 } from "./components/CertificateForm/CertificateForm";
-import { LoadingOverlay } from "@base/client/components";
 
 export default function CertificateEditPage(): React.ReactNode {
   const router = useRouter();
@@ -26,9 +27,13 @@ export default function CertificateEditPage(): React.ReactNode {
     queryKey: ["hrm-certificates", id],
     queryFn: async () => {
       const response = await certificateService.getById(id);
+
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToLoadCertificate"));
+        throw new Error(
+          response.message ?? t("errors.failedToLoadCertificate"),
+        );
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -44,9 +49,13 @@ export default function CertificateEditPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await certificateService.update(payload);
+
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToUpdateCertificate"));
+        throw new Error(
+          response.message ?? t("errors.failedToUpdateCertificate"),
+        );
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-certificates"], ["hrm-certificates", id]],
@@ -89,10 +98,6 @@ export default function CertificateEditPage(): React.ReactNode {
 
   return (
     <CertificateForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push(`/workspace/modules/hrm/certificates/view/${id}`)}
-      submitError={submitError}
-      isSubmitting={isPending}
       defaultValues={{
         employeeId: certificateData.employeeId,
         name: (certificateData.name as any) || { vi: "", en: "" },
@@ -103,7 +108,12 @@ export default function CertificateEditPage(): React.ReactNode {
         documentUrl: certificateData.documentUrl || "",
         isActive: certificateData.isActive ? "true" : "false",
       }}
+      isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() =>
+        router.push(`/workspace/modules/hrm/certificates/view/${id}`)
+      }
+      onSubmit={handleSubmit}
     />
   );
 }
-

@@ -56,4 +56,3 @@ export interface CreateJobRequisitionPayload {
 export interface UpdateJobRequisitionPayload extends Partial<CreateJobRequisitionPayload> {
   id: string;
 }
-

@@ -7,6 +7,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_employees } from "./hrm.employee";
 import { hrm_tb_payrolls_period } from "./hrm.payroll-period";
@@ -56,10 +57,10 @@ export const hrm_tb_payrolls = mdlHrmSchema.table(
     index("payrolls_employee_idx").on(table.employeeId),
     index("payrolls_period_employee_idx").on(
       table.payrollPeriodId,
-      table.employeeId
+      table.employeeId,
     ),
     index("payrolls_status_idx").on(table.status),
-  ]
+  ],
 );
 
 export type HrmTbPayroll = typeof hrm_tb_payrolls.$inferSelect;

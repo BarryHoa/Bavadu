@@ -58,7 +58,6 @@ export interface CreateSalesOrderB2CInput {
   userId?: string;
 }
 
-export interface UpdateSalesOrderB2CInput
-  extends Partial<CreateSalesOrderB2CInput> {
+export interface UpdateSalesOrderB2CInput extends Partial<CreateSalesOrderB2CInput> {
   id: string;
 }

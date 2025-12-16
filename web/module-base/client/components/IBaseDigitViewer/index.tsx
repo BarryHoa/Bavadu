@@ -1,9 +1,9 @@
 import clsx from "clsx";
 import React from "react";
+
 import { formatNumber } from "../../utils/number";
 
-export interface IBaseDigitViewerProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface IBaseDigitViewerProps extends React.HTMLAttributes<HTMLDivElement> {
   value: number | string | null | undefined;
   decimalPlaces?: number;
   thousandSeparator?: string;
@@ -62,6 +62,7 @@ const IBaseDigitViewer = React.forwardRef<
       decimalSeparator,
       fixZero,
     });
+
     return `${prefix}${formatted}${suffix}`;
   };
 
@@ -88,7 +89,7 @@ const IBaseDigitViewer = React.forwardRef<
           sizeClasses[size],
           !hasColorClass && variantClasses[variant],
           "opacity-100",
-          className
+          className,
         )}
       >
         {getDisplayValue()}

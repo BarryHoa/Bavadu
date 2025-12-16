@@ -108,6 +108,7 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {
@@ -138,7 +139,8 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
       healthInsurance: row.healthInsurance ?? 0,
       unemploymentInsurance: row.unemploymentInsurance ?? 0,
       personalIncomeTax: row.personalIncomeTax ?? 0,
-      otherDeductions: (row.otherDeductions as Record<string, number>) ?? undefined,
+      otherDeductions:
+        (row.otherDeductions as Record<string, number>) ?? undefined,
       totalDeductions: row.totalDeductions ?? 0,
       netSalary: row.netSalary,
       workingDays: row.workingDays ?? 0,
@@ -163,7 +165,10 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
       ? Object.values(payload.allowances).reduce((sum, val) => sum + val, 0)
       : 0;
     const otherDeductionsTotal = payload.otherDeductions
-      ? Object.values(payload.otherDeductions).reduce((sum, val) => sum + val, 0)
+      ? Object.values(payload.otherDeductions).reduce(
+          (sum, val) => sum + val,
+          0,
+        )
       : 0;
 
     const grossSalary =
@@ -215,13 +220,15 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
     if (!created) throw new Error("Failed to create payroll");
 
     const payroll = await this.getPayrollById(created.id);
+
     if (!payroll) throw new Error("Failed to load payroll after creation");
+
     return payroll;
   };
 
   updatePayroll = async (
     id: string,
-    payload: Partial<PayrollInput>
+    payload: Partial<PayrollInput>,
   ): Promise<PayrollRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -229,10 +236,14 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
 
     if (payload.payrollPeriodId !== undefined)
       updateData.payrollPeriodId = payload.payrollPeriodId;
-    if (payload.employeeId !== undefined) updateData.employeeId = payload.employeeId;
-    if (payload.baseSalary !== undefined) updateData.baseSalary = payload.baseSalary;
-    if (payload.allowances !== undefined) updateData.allowances = payload.allowances ?? null;
-    if (payload.overtimePay !== undefined) updateData.overtimePay = payload.overtimePay;
+    if (payload.employeeId !== undefined)
+      updateData.employeeId = payload.employeeId;
+    if (payload.baseSalary !== undefined)
+      updateData.baseSalary = payload.baseSalary;
+    if (payload.allowances !== undefined)
+      updateData.allowances = payload.allowances ?? null;
+    if (payload.overtimePay !== undefined)
+      updateData.overtimePay = payload.overtimePay;
     if (payload.bonuses !== undefined) updateData.bonuses = payload.bonuses;
     if (payload.otherEarnings !== undefined)
       updateData.otherEarnings = payload.otherEarnings;
@@ -246,8 +257,10 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
       updateData.personalIncomeTax = payload.personalIncomeTax;
     if (payload.otherDeductions !== undefined)
       updateData.otherDeductions = payload.otherDeductions ?? null;
-    if (payload.workingDays !== undefined) updateData.workingDays = payload.workingDays;
-    if (payload.workingHours !== undefined) updateData.workingHours = payload.workingHours;
+    if (payload.workingDays !== undefined)
+      updateData.workingDays = payload.workingDays;
+    if (payload.workingHours !== undefined)
+      updateData.workingHours = payload.workingHours;
     if (payload.overtimeHours !== undefined)
       updateData.overtimeHours = payload.overtimeHours;
     if (payload.status !== undefined) updateData.status = payload.status;
@@ -267,32 +280,45 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
       payload.otherDeductions !== undefined
     ) {
       const existing = await this.getPayrollById(id);
+
       if (existing) {
         const baseSalary = updateData.baseSalary ?? existing.baseSalary;
-        const allowances = (updateData.allowances ?? existing.allowances) as Record<string, number> | undefined;
+        const allowances = (updateData.allowances ?? existing.allowances) as
+          | Record<string, number>
+          | undefined;
         const allowancesTotal = allowances
           ? Object.values(allowances).reduce((sum, val) => sum + val, 0)
           : 0;
         const overtimePay = updateData.overtimePay ?? existing.overtimePay ?? 0;
         const bonuses = updateData.bonuses ?? existing.bonuses ?? 0;
-        const otherEarnings = updateData.otherEarnings ?? existing.otherEarnings ?? 0;
+        const otherEarnings =
+          updateData.otherEarnings ?? existing.otherEarnings ?? 0;
 
-        const grossSalary = baseSalary + allowancesTotal + overtimePay + bonuses + otherEarnings;
+        const grossSalary =
+          baseSalary + allowancesTotal + overtimePay + bonuses + otherEarnings;
 
-        const socialInsurance = updateData.socialInsurance ?? existing.socialInsurance ?? 0;
-        const healthInsurance = updateData.healthInsurance ?? existing.healthInsurance ?? 0;
+        const socialInsurance =
+          updateData.socialInsurance ?? existing.socialInsurance ?? 0;
+        const healthInsurance =
+          updateData.healthInsurance ?? existing.healthInsurance ?? 0;
         const unemploymentInsurance =
-          updateData.unemploymentInsurance ?? existing.unemploymentInsurance ?? 0;
-        const personalIncomeTax = updateData.personalIncomeTax ?? existing.personalIncomeTax ?? 0;
-        const otherDeductions = (updateData.otherDeductions ?? existing.otherDeductions) as
-          | Record<string, number>
-          | undefined;
+          updateData.unemploymentInsurance ??
+          existing.unemploymentInsurance ??
+          0;
+        const personalIncomeTax =
+          updateData.personalIncomeTax ?? existing.personalIncomeTax ?? 0;
+        const otherDeductions = (updateData.otherDeductions ??
+          existing.otherDeductions) as Record<string, number> | undefined;
         const otherDeductionsTotal = otherDeductions
           ? Object.values(otherDeductions).reduce((sum, val) => sum + val, 0)
           : 0;
 
         const totalDeductions =
-          socialInsurance + healthInsurance + unemploymentInsurance + personalIncomeTax + otherDeductionsTotal;
+          socialInsurance +
+          healthInsurance +
+          unemploymentInsurance +
+          personalIncomeTax +
+          otherDeductionsTotal;
         const netSalary = grossSalary - totalDeductions;
 
         updateData.grossSalary = grossSalary;
@@ -301,7 +327,11 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
       }
     }
 
-    await this.db.update(this.table).set(updateData).where(eq(this.table.id, id));
+    await this.db
+      .update(this.table)
+      .set(updateData)
+      .where(eq(this.table.id, id));
+
     return this.getPayrollById(id);
   };
 
@@ -337,7 +367,9 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
       normalizedPayload.healthInsurance = Number(payload.healthInsurance);
     }
     if (payload.unemploymentInsurance !== undefined) {
-      normalizedPayload.unemploymentInsurance = Number(payload.unemploymentInsurance);
+      normalizedPayload.unemploymentInsurance = Number(
+        payload.unemploymentInsurance,
+      );
     }
     if (payload.personalIncomeTax !== undefined) {
       normalizedPayload.personalIncomeTax = Number(payload.personalIncomeTax);
@@ -359,10 +391,11 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
     }
     if (payload.notes !== undefined) {
       normalizedPayload.notes =
-        payload.notes === null || payload.notes === "" ? null : String(payload.notes);
+        payload.notes === null || payload.notes === ""
+          ? null
+          : String(payload.notes);
     }
 
     return this.updatePayroll(id, normalizedPayload);
   };
 }
-

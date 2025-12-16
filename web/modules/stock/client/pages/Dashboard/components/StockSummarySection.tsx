@@ -1,22 +1,23 @@
 "use client";
 
+import type { DataTableColumn } from "@base/client/components";
+import type {
+  StockSummaryItem,
+  WarehouseDto,
+} from "../../../services/StockService";
+import type { StockFilters } from "../types";
+
 import {
   IBaseDigitViewer,
   IBaseInput,
   IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
-import type { DataTableColumn } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Divider } from "@heroui/react";
 import { useMemo } from "react";
-import type {
-  StockSummaryItem,
-  WarehouseDto,
-} from "../../../services/StockService";
-import type { StockFilters } from "../types";
 
 interface StockSummarySectionProps {
   filters: StockFilters;
@@ -41,7 +42,7 @@ export default function StockSummarySection({
         value: warehouse.id,
         label: `${warehouse.code} — ${warehouse.name}`,
       })),
-    [warehouses]
+    [warehouses],
   );
 
   const columns = useMemo<DataTableColumn<StockSummaryItem>[]>(() => {
@@ -80,6 +81,7 @@ export default function StockSummarySection({
         label: "On Hand",
         render: (_, row) => {
           let colorClass = "";
+
           if (row.quantity <= 0) {
             colorClass = "text-danger";
           } else if (
@@ -88,8 +90,9 @@ export default function StockSummarySection({
           ) {
             colorClass = "text-warning-600";
           }
+
           return (
-            <IBaseDigitViewer value={row.quantity} className={colorClass} />
+            <IBaseDigitViewer className={colorClass} value={row.quantity} />
           );
         },
       },
@@ -117,8 +120,10 @@ export default function StockSummarySection({
             }
           />
           <IBaseSingleSelect
-            label="Warehouse"
+            className="max-w-xs"
+            isDisabled={warehousesLoading || warehouseItems.length === 0}
             items={warehouseItems}
+            label="Warehouse"
             selectedKey={filters.warehouseId}
             onSelectionChange={(key) => {
               onFilterChange({
@@ -126,18 +131,16 @@ export default function StockSummarySection({
                 warehouseId: key || undefined,
               });
             }}
-            className="max-w-xs"
-            isDisabled={warehousesLoading || warehouseItems.length === 0}
           />
           <div className="flex items-center gap-2">
             <Button
               color="primary"
-              onPress={() => onFilterChange(filters)}
               size="sm"
+              onPress={() => onFilterChange(filters)}
             >
               Apply
             </Button>
-            <Button onPress={onResetFilters} size="sm" variant="light">
+            <Button size="sm" variant="light" onPress={onResetFilters}>
               Reset
             </Button>
           </div>
@@ -146,15 +149,15 @@ export default function StockSummarySection({
         <Divider />
 
         <ViewListDataTable<StockSummaryItem & { id: string }>
-          model="stock-summary"
+          columnVisibility={{ hidden: true }}
           columns={columns}
-          isDummyData={false}
-          search={{ hidden: true }}
+          favorite={{ hidden: true }}
           filter={{ hidden: true }}
           groupBy={{ hidden: true }}
-          favorite={{ hidden: true }}
-          columnVisibility={{ hidden: true }}
+          isDummyData={false}
+          model="stock-summary"
           rowKey="id"
+          search={{ hidden: true }}
         />
       </CardBody>
     </Card>

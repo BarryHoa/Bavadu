@@ -1,5 +1,6 @@
-import { uuidv7 } from "uuidv7";
 import type { ImageUploadItem } from "../../interface/ImageUpdload";
+
+import { uuidv7 } from "uuidv7";
 
 /**
  * Normalize image upload items
@@ -10,6 +11,7 @@ export const normalizeItems = (items: ImageUploadItem[]): ImageUploadItem[] => {
   return items.map((item) => {
     const uid = item.uid || uuidv7();
     let status = item.status;
+
     // override status if url is present
     if (item.url) {
       status = "done";
@@ -18,6 +20,7 @@ export const normalizeItems = (items: ImageUploadItem[]): ImageUploadItem[] => {
     if (item.blob && !status) {
       status = "idle";
     }
+
     return {
       uid,
       name: item.name,
@@ -35,6 +38,7 @@ export const normalizeItems = (items: ImageUploadItem[]): ImageUploadItem[] => {
  */
 export const getFileExtension = (filename: string): string => {
   const parts = filename.split(".");
+
   return parts.length > 1 ? parts[parts.length - 1].toLowerCase() : "";
 };
 
@@ -44,10 +48,11 @@ export const getFileExtension = (filename: string): string => {
 export const validateFile = (
   file: File,
   accept: string,
-  maxSize: number
+  maxSize: number,
 ): { valid: boolean; type?: string; error?: string } => {
   // Check file type
   const acceptedTypes = accept.split(",").map((t) => t.trim());
+
   if (!acceptedTypes.includes(file.type)) {
     return {
       valid: false,
@@ -59,6 +64,7 @@ export const validateFile = (
   // Check file size
   if (file.size > maxSize) {
     const maxSizeMB = (maxSize / (1024 * 1024)).toFixed(2);
+
     return {
       valid: false,
       type: "FILE_SIZE_EXCEEDS_MAXIMUM_ALLOWED_SIZE",

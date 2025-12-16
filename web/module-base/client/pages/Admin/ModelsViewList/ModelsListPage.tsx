@@ -6,7 +6,6 @@ import { Card, CardBody } from "@heroui/card";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import MiniSearch from "minisearch";
 import { useCallback, useEffect, useMemo, useState } from "react";
-
 import {
   IBaseTable,
   IBaseTableColumnDefinition,
@@ -36,7 +35,7 @@ export default function ModelsListPage() {
     (message: string, type: "error" | "success" = "error") => {
       setToast({ message, type });
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -53,6 +52,7 @@ export default function ModelsListPage() {
     queryKey: MODEL_LIST_QUERY_KEY,
     queryFn: async () => {
       const response = await adminModelService.getModelList();
+
       return response.data;
     },
   });
@@ -68,13 +68,16 @@ export default function ModelsListPage() {
       if (!data.success) {
         const errorMessage =
           data.message || t("toast.reloadError", { key: variables.key });
+
         setActionError(errorMessage);
         showToast(errorMessage, "error");
+
         return;
       }
 
       const successMessage =
         data.message || t("toast.reloadSuccess", { key: variables.key });
+
       setActionError(null);
       showToast(successMessage, "success");
       queryClient.invalidateQueries({ queryKey: MODEL_LIST_QUERY_KEY });
@@ -84,6 +87,7 @@ export default function ModelsListPage() {
         error instanceof Error
           ? error.message
           : t("toast.reloadError", { key: variables?.key ?? "-" });
+
       setActionError(errorMessage);
       showToast(errorMessage, "error");
     },
@@ -94,7 +98,7 @@ export default function ModelsListPage() {
       setActionError(null);
       reloadModelMutation.mutate({ key });
     },
-    [reloadModelMutation]
+    [reloadModelMutation],
   );
 
   const handleRefresh = useCallback(() => {
@@ -156,7 +160,6 @@ export default function ModelsListPage() {
         align: "end",
         render: (_, record) => (
           <Button
-            size="sm"
             color="primary"
             isDisabled={
               loading ||
@@ -165,6 +168,7 @@ export default function ModelsListPage() {
             isLoading={
               reloadModelMutation.isPending && currentReloadKey === record.key
             }
+            size="sm"
             onPress={() => handleReload(record.key)}
           >
             {actionsT("reload")}
@@ -179,7 +183,7 @@ export default function ModelsListPage() {
       loading,
       reloadModelMutation.isPending,
       t,
-    ]
+    ],
   );
 
   const emptyStateMessage =
@@ -195,10 +199,10 @@ export default function ModelsListPage() {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <IBaseInput
+              isClearable
               classNames={{
                 input: "text-sm",
               }}
-              isClearable
               labelPlacement="outside"
               placeholder={t("filters.searchPlaceholder")}
               size="sm"
@@ -208,14 +212,14 @@ export default function ModelsListPage() {
             />
           </div>
           <IBaseTable
-            rowKey="key"
             columns={columns}
             dataSource={filteredModels}
-            pagination={false}
-            loading={loading}
             emptyContent={emptyStateMessage}
-            onRefresh={handleRefresh}
+            loading={loading}
+            pagination={false}
+            rowKey="key"
             total={filteredModels.length}
+            onRefresh={handleRefresh}
           />
         </div>
         {toast && (

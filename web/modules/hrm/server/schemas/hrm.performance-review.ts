@@ -9,6 +9,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_employees } from "./hrm.employee";
 
@@ -46,9 +47,10 @@ export const hrm_tb_performance_reviews = mdlHrmSchema.table(
     index("performance_reviews_reviewer_idx").on(table.reviewerId),
     index("performance_reviews_type_idx").on(table.reviewType),
     index("performance_reviews_status_idx").on(table.status),
-  ]
+  ],
 );
 
-export type HrmTbPerformanceReview = typeof hrm_tb_performance_reviews.$inferSelect;
-export type NewHrmTbPerformanceReview = typeof hrm_tb_performance_reviews.$inferInsert;
-
+export type HrmTbPerformanceReview =
+  typeof hrm_tb_performance_reviews.$inferSelect;
+export type NewHrmTbPerformanceReview =
+  typeof hrm_tb_performance_reviews.$inferInsert;

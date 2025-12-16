@@ -1,4 +1,5 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
+
 import PermissionModel from "../../../models/Permission/PermissionModel";
 
 export async function GET() {
@@ -14,6 +15,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error loading permissions:", error);
+
     return JSONResponse({
       data: [],
       error: "Failed to load permissions",

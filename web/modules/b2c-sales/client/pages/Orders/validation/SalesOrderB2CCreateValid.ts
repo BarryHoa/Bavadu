@@ -8,7 +8,6 @@ import {
   pipe,
   string,
   trim,
-  type InferInput,
   type InferOutput,
 } from "valibot";
 
@@ -19,8 +18,9 @@ export const quantitySchema = pipe(
   minLength(1, "Quantity is required"),
   custom((value) => {
     const num = Number(value);
+
     return !Number.isNaN(num) && num >= 0 && num <= 5000;
-  }, "Quantity must be between 0 and 5000")
+  }, "Quantity must be between 0 and 5000"),
 );
 
 // Price validation: 0-100,000,000
@@ -30,8 +30,9 @@ export const priceSchema = pipe(
   custom((value) => {
     if (value === "") return true;
     const num = Number(value);
+
     return !Number.isNaN(num) && num >= 0 && num <= 100000000;
-  }, "Price must be between 0 and 100,000,000")
+  }, "Price must be between 0 and 100,000,000"),
 );
 
 // Discount validation: >= 0
@@ -41,8 +42,8 @@ export const discountSchema = pipe(
   custom(
     (value) =>
       value === "" || (!Number.isNaN(Number(value)) && Number(value) >= 0),
-    "Discount must be a number greater than or equal to 0"
-  )
+    "Discount must be a number greater than or equal to 0",
+  ),
 );
 
 // Tax rate validation: 0-100
@@ -55,8 +56,8 @@ export const taxRateSchema = pipe(
       (!Number.isNaN(Number(value)) &&
         Number(value) >= 0 &&
         Number(value) <= 100),
-    "Tax rate must be a number between 0 and 100"
-  )
+    "Tax rate must be a number between 0 and 100",
+  ),
 );
 
 // Order line schema
@@ -80,7 +81,7 @@ export const salesOrderB2CFormSchema = object({
   customerName: pipe(
     string(),
     trim(),
-    minLength(1, "Customer name is required")
+    minLength(1, "Customer name is required"),
   ),
   requireInvoice: optional(boolean()),
 
@@ -99,12 +100,14 @@ export const salesOrderB2CFormSchema = object({
   totalTax: optional(discountSchema),
   lines: pipe(
     array(orderLineSchema),
-    minLength(1, "At least one order line is required")
+    minLength(1, "At least one order line is required"),
   ),
 });
 
 // Form values type
-export type SalesOrderB2CFormValues = InferOutput<typeof salesOrderB2CFormSchema>;
+export type SalesOrderB2CFormValues = InferOutput<
+  typeof salesOrderB2CFormSchema
+>;
 
 // Default line for new order lines
 export const defaultLine: SalesOrderB2CFormValues["lines"][number] = {
@@ -116,4 +119,3 @@ export const defaultLine: SalesOrderB2CFormValues["lines"][number] = {
   lineDiscount: "0",
   taxRate: "0",
 };
-

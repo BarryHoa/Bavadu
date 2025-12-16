@@ -7,22 +7,34 @@ import type {
   BaseTbTaxRate,
 } from "@base/server/schemas";
 
-export interface PaymentMethod extends Omit<BaseTbPaymentMethod, "name" | "description"> {
+export interface PaymentMethod extends Omit<
+  BaseTbPaymentMethod,
+  "name" | "description"
+> {
   name: LocaleDataType<string>;
   description?: LocaleDataType<string> | null;
 }
 
-export interface PaymentTerm extends Omit<BaseTbPaymentTerm, "name" | "description"> {
+export interface PaymentTerm extends Omit<
+  BaseTbPaymentTerm,
+  "name" | "description"
+> {
   name: LocaleDataType<string>;
   description?: LocaleDataType<string> | null;
 }
 
-export interface ShippingMethod extends Omit<BaseTbShippingMethod, "name" | "description"> {
+export interface ShippingMethod extends Omit<
+  BaseTbShippingMethod,
+  "name" | "description"
+> {
   name: LocaleDataType<string>;
   description?: LocaleDataType<string> | null;
 }
 
-export interface ShippingTerm extends Omit<BaseTbShippingTerm, "name" | "description"> {
+export interface ShippingTerm extends Omit<
+  BaseTbShippingTerm,
+  "name" | "description"
+> {
   name: LocaleDataType<string>;
   description?: LocaleDataType<string> | null;
 }

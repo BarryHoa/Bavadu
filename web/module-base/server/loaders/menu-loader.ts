@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from "fs";
 import { join } from "path";
+
 import { MenuFactoryElm } from "../interfaces/Menu";
 
 const normalizePath = (modulePrefix: string, segment?: string) => {
@@ -29,7 +30,7 @@ const sortByOrder = (items: MenuFactoryElm[] = []) =>
 const attachPrefix = (
   items: MenuFactoryElm[] = [],
   modulePrefix: string,
-  type: "main" | "mdl"
+  type: "main" | "mdl",
 ): MenuFactoryElm[] =>
   sortByOrder(items).map((item) => ({
     ...item,
@@ -49,7 +50,7 @@ export function loadMenusFromBase(): MenuFactoryElm[] {
     process.cwd(),
     "module-base",
     "client",
-    "menu.json"
+    "menu.json",
   );
 
   if (!existsSync(baseMenuFile)) {
@@ -62,6 +63,7 @@ export function loadMenusFromBase(): MenuFactoryElm[] {
 
     if (!Array.isArray(menuDataArray)) {
       console.error("Base menu.json should be an array");
+
       return [];
     }
 
@@ -76,10 +78,11 @@ export function loadMenusFromBase(): MenuFactoryElm[] {
         children: menuData.children
           ? attachPrefix(menuData.children, basePrefix, "main")
           : undefined,
-      }))
+      })),
     );
   } catch (error) {
     console.error("Error parsing base menu.json:", error);
+
     return [];
   }
 }
@@ -124,7 +127,7 @@ export function loadMenusFromModules(): MenuFactoryElm[] {
     } catch (error) {
       console.error(
         `Error parsing menu.json for module "${moduleDir}":`,
-        error
+        error,
       );
     }
   }
@@ -140,10 +143,12 @@ export function loadAllMenus(): MenuFactoryElm[] {
 
   // Load base menus (type: "main")
   const baseMenus = loadMenusFromBase();
+
   menuItems.push(...baseMenus);
 
   // Load module menus (type: "mdl")
   const moduleMenus = loadMenusFromModules();
+
   menuItems.push(...moduleMenus);
 
   return sortByOrder(menuItems);

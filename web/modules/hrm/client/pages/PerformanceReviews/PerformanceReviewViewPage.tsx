@@ -27,9 +27,13 @@ export default function PerformanceReviewViewPage(): React.ReactNode {
     queryKey: ["hrm-performance-reviews", id],
     queryFn: async () => {
       const response = await performanceReviewService.getById(id);
+
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToLoadPerformanceReview"));
+        throw new Error(
+          response.message ?? t("errors.failedToLoadPerformanceReview"),
+        );
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -59,7 +63,9 @@ export default function PerformanceReviewViewPage(): React.ReactNode {
         <Button
           size="sm"
           variant="light"
-          onPress={() => router.push("/workspace/modules/hrm/performance-reviews")}
+          onPress={() =>
+            router.push("/workspace/modules/hrm/performance-reviews")
+          }
         >
           {tCommon("actions.backToList")}
         </Button>
@@ -80,7 +86,10 @@ export default function PerformanceReviewViewPage(): React.ReactNode {
           <div className="grid gap-2 md:grid-cols-2">
             <IBaseDigitViewer
               label={t("labels.employee")}
-              value={getLocalizedText(performanceReviewData.employee?.fullName) || performanceReviewData.employee?.employeeCode}
+              value={
+                getLocalizedText(performanceReviewData.employee?.fullName) ||
+                performanceReviewData.employee?.employeeCode
+              }
             />
             <IBaseDigitViewer
               label={t("labels.reviewType")}
@@ -96,11 +105,18 @@ export default function PerformanceReviewViewPage(): React.ReactNode {
             />
             <IBaseDigitViewer
               label={t("labels.reviewer")}
-              value={getLocalizedText(performanceReviewData.reviewer?.fullName) || performanceReviewData.reviewer?.employeeCode}
+              value={
+                getLocalizedText(performanceReviewData.reviewer?.fullName) ||
+                performanceReviewData.reviewer?.employeeCode
+              }
             />
             <IBaseDigitViewer
               label={t("labels.overallRating")}
-              value={performanceReviewData.overallRating ? `${performanceReviewData.overallRating}/5` : "—"}
+              value={
+                performanceReviewData.overallRating
+                  ? `${performanceReviewData.overallRating}/5`
+                  : "—"
+              }
             />
             <IBaseDigitViewer
               label={t("labels.status")}
@@ -140,4 +156,3 @@ export default function PerformanceReviewViewPage(): React.ReactNode {
     </div>
   );
 }
-

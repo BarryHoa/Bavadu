@@ -1,4 +1,5 @@
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
+
 import JsonRpcClientService from "./JsonRpcClientService";
 
 export interface Currency {
@@ -60,10 +61,11 @@ class CurrencyService extends JsonRpcClientService {
   }): Promise<ExchangeRateResponse> {
     return this.call<ExchangeRateResponse>(
       "currency.curd.getLatestRate",
-      options || {}
+      options || {},
     );
   }
 }
 
 const currencyService = new CurrencyService();
+
 export default currencyService;

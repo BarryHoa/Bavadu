@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { positionService } from "@mdl/hrm/client/services/PositionService";
+
 import PositionForm, {
   type PositionFormValues,
 } from "./components/PositionForm/PositionForm";
@@ -19,9 +20,11 @@ export default function PositionEditPage(): React.ReactNode {
     queryKey: ["hrm-position", id],
     queryFn: async () => {
       const response = await positionService.getById(id);
+
       if (!response.data) {
         throw new Error(response.message ?? "Position not found");
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -37,9 +40,11 @@ export default function PositionEditPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await positionService.update({ ...payload, id });
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToUpdate"));
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-positions"], ["hrm-position", id]],
@@ -75,10 +80,6 @@ export default function PositionEditPage(): React.ReactNode {
 
   return (
     <PositionForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push(`/workspace/modules/hrm/positions/view/${id}`)}
-      submitError={submitError}
-      isSubmitting={isPending}
       defaultValues={{
         code: positionData.code,
         name: (positionData.name as any) || { vi: "", en: "" },
@@ -91,7 +92,12 @@ export default function PositionEditPage(): React.ReactNode {
         maxSalary: positionData.maxSalary?.toString() || "",
         isActive: positionData.isActive ?? true,
       }}
+      isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() =>
+        router.push(`/workspace/modules/hrm/positions/view/${id}`)
+      }
+      onSubmit={handleSubmit}
     />
   );
 }
-

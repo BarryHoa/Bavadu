@@ -6,8 +6,10 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
-import { mdlStockSchema } from "./schema";
+
 import { product_tb_product_masters } from "../../../product/server/schemas/product.master";
+
+import { mdlStockSchema } from "./schema";
 import { stock_tb_stock_warehouses } from "./stock.warehouse";
 
 export const stock_tb_stock_levels = mdlStockSchema.table(
@@ -35,7 +37,7 @@ export const stock_tb_stock_levels = mdlStockSchema.table(
     })
       .notNull()
       .default("0"),
-    
+
     // Average Cost fields (used for average cost method)
     averageCost: numeric("average_cost", { precision: 18, scale: 4 })
       .notNull()
@@ -43,23 +45,23 @@ export const stock_tb_stock_levels = mdlStockSchema.table(
     totalCostValue: numeric("total_cost_value", { precision: 18, scale: 4 })
       .notNull()
       .default("0"),
-    
+
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
   (table) => [
     uniqueIndex("levels_product_warehouse_unique").on(
       table.productId,
-      table.warehouseId
+      table.warehouseId,
     ),
     index("levels_product_idx").on(table.productId),
     index("levels_warehouse_idx").on(table.warehouseId),
     // Composite index for low stock queries (quantity < threshold)
     index("levels_warehouse_quantity_idx").on(
       table.warehouseId,
-      table.quantity
+      table.quantity,
     ),
-  ]
+  ],
 );
 
 export type StockTbStockLevel = typeof stock_tb_stock_levels.$inferSelect;

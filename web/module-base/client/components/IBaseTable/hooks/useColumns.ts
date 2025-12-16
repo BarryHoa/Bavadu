@@ -1,7 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
-import { useMemo } from "react";
 
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
+
 import {
   I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
   type IBaseTableColumnDefinition,
@@ -20,7 +21,7 @@ type FrozenMeta = {
 };
 
 const computeFrozenMeta = <T>(
-  columns: IBaseTableColumnDefinition<T>[]
+  columns: IBaseTableColumnDefinition<T>[],
 ): FrozenMeta => {
   let leftOffset = 0;
   let rightOffset = 0;
@@ -32,7 +33,9 @@ const computeFrozenMeta = <T>(
       offset: leftOffset,
       width: column.width || 150,
     };
+
     leftOffset += column.width || 150;
+
     return frozen;
   });
 
@@ -47,7 +50,9 @@ const computeFrozenMeta = <T>(
         offset: rightOffset,
         width: column.width || 150,
       };
+
       rightOffset += column.width || 150;
+
       return frozen;
     })
     .reverse();
@@ -57,7 +62,7 @@ const computeFrozenMeta = <T>(
 
 const getFrozenStyle = (
   columnKey: string,
-  frozenMeta: FrozenMeta
+  frozenMeta: FrozenMeta,
 ): CSSProperties | undefined => {
   const leftColumn = frozenMeta.left.find((column) => column.key === columnKey);
 
@@ -70,7 +75,7 @@ const getFrozenStyle = (
   }
 
   const rightColumn = frozenMeta.right.find(
-    (column) => column.key === columnKey
+    (column) => column.key === columnKey,
   );
 
   if (rightColumn) {
@@ -86,13 +91,13 @@ const getFrozenStyle = (
 
 const getFrozenClassName = (
   columnKey: string,
-  frozenMeta: FrozenMeta
+  frozenMeta: FrozenMeta,
 ): string | undefined => {
   const isLeftFrozen = frozenMeta.left.some(
-    (column) => column.key === columnKey
+    (column) => column.key === columnKey,
   );
   const isRightFrozen = frozenMeta.right.some(
-    (column) => column.key === columnKey
+    (column) => column.key === columnKey,
   );
 
   if (isLeftFrozen) return "frozen-column frozen-left";
@@ -102,7 +107,7 @@ const getFrozenClassName = (
 };
 
 const buildRenderValue = <T>(
-  column: IBaseTableColumnDefinition<T>
+  column: IBaseTableColumnDefinition<T>,
 ): ((record: T, index: number) => ReactNode) => {
   return (record: T, index: number) => {
     const value = (record as any)[column.key];
@@ -116,9 +121,10 @@ const buildRenderValue = <T>(
 };
 
 const useColumns = <T>(
-  columns: IBaseTableColumnDefinition<T>[]
+  columns: IBaseTableColumnDefinition<T>[],
 ): ProcessedIBaseTableColumn<T>[] => {
   const t = useTranslations("dataTable");
+
   return useMemo(() => {
     const frozenMeta = computeFrozenMeta(columns);
 
@@ -128,10 +134,13 @@ const useColumns = <T>(
       width: 64,
       align: "center",
       fixed: "left",
-      frozenStyle: getFrozenStyle(I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER, frozenMeta),
+      frozenStyle: getFrozenStyle(
+        I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
+        frozenMeta,
+      ),
       frozenClassName: getFrozenClassName(
         I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
-        frozenMeta
+        frozenMeta,
       ),
       renderValue: (_record: T, index: number) => index + 1,
       isResizable: false,
@@ -149,22 +158,23 @@ const useColumns = <T>(
         frozenStyle,
         frozenClassName,
         renderValue: buildRenderValue(column),
-        isResizable: [I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER, "__action__"].includes(
-          column.key
-        )
+        isResizable: [
+          I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
+          "__action__",
+        ].includes(column.key)
           ? false
           : column.isResizable,
-        isDraggable: [I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER, "__action__"].includes(
-          column.key
-        )
+        isDraggable: [
+          I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
+          "__action__",
+        ].includes(column.key)
           ? false
           : column.isDraggable,
       } satisfies ProcessedIBaseTableColumn<T>;
     });
+
     return [numberColumn, ...processed];
   }, [columns, t]);
 };
 
 export default useColumns;
-
-

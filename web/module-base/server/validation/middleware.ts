@@ -17,7 +17,7 @@ export async function validateRequest<
   T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
 >(
   request: NextRequest,
-  schema: T
+  schema: T,
 ): Promise<
   | { valid: true; data: v.InferInput<T> }
   | { valid: false; errors: ValidationError[]; response: NextResponse }
@@ -35,6 +35,7 @@ export async function validateRequest<
                 return String(p.key);
               if (p && typeof p === "object" && "value" in p)
                 return String(p.value);
+
               return String(p);
             })
             .join(".") || "root",
@@ -51,7 +52,7 @@ export async function validateRequest<
             error: "Validation failed",
             errors,
           },
-          { status: 400 }
+          { status: 400 },
         ),
       };
     }
@@ -82,7 +83,7 @@ export async function validateRequest<
               ? error.message
               : "Request body must be valid JSON",
         },
-        { status: 400 }
+        { status: 400 },
       ),
     };
   }
@@ -95,13 +96,14 @@ export async function validateQuery<
   T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
 >(
   request: NextRequest,
-  schema: T
+  schema: T,
 ): Promise<
   | { valid: true; data: v.InferInput<T> }
   | { valid: false; errors: ValidationError[]; response: NextResponse }
 > {
   try {
     const queryParams: Record<string, string> = {};
+
     request.nextUrl.searchParams.forEach((value, key) => {
       queryParams[key] = value;
     });
@@ -117,6 +119,7 @@ export async function validateQuery<
                 return String(p.key);
               if (p && typeof p === "object" && "value" in p)
                 return String(p.value);
+
               return String(p);
             })
             .join(".") || "root",
@@ -133,7 +136,7 @@ export async function validateQuery<
             error: "Validation failed",
             errors,
           },
-          { status: 400 }
+          { status: 400 },
         ),
       };
     }
@@ -159,7 +162,7 @@ export async function validateQuery<
           message:
             error instanceof Error ? error.message : "Query validation failed",
         },
-        { status: 400 }
+        { status: 400 },
       ),
     };
   }
@@ -172,13 +175,14 @@ export function validateParams<
   T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
 >(
   params: Record<string, string | string[] | undefined>,
-  schema: T
+  schema: T,
 ):
   | { valid: true; data: v.InferInput<T> }
   | { valid: false; errors: ValidationError[]; response: NextResponse } {
   try {
     // Convert params to a plain object
     const paramsObj: Record<string, string> = {};
+
     for (const [key, value] of Object.entries(params)) {
       if (Array.isArray(value)) {
         paramsObj[key] = value[0];
@@ -198,6 +202,7 @@ export function validateParams<
                 return String(p.key);
               if (p && typeof p === "object" && "value" in p)
                 return String(p.value);
+
               return String(p);
             })
             .join(".") || "root",
@@ -214,7 +219,7 @@ export function validateParams<
             error: "Validation failed",
             errors,
           },
-          { status: 400 }
+          { status: 400 },
         ),
       };
     }
@@ -242,7 +247,7 @@ export function validateParams<
               ? error.message
               : "Parameter validation failed",
         },
-        { status: 400 }
+        { status: 400 },
       ),
     };
   }

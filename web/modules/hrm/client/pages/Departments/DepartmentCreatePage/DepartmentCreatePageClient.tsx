@@ -4,6 +4,7 @@ import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { departmentService } from "@mdl/hrm/client/services/DepartmentService";
+
 import DepartmentForm, {
   type DepartmentFormValues,
 } from "../components/DepartmentForm/DepartmentForm";
@@ -22,9 +23,11 @@ export default function DepartmentCreatePageClient(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await departmentService.create(payload);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToCreate"));
       }
+
       return response.data;
     },
     invalidateQueries: [["hrm-departments"]],
@@ -50,11 +53,10 @@ export default function DepartmentCreatePageClient(): React.ReactNode {
 
   return (
     <DepartmentForm
-      onSubmit={handleSubmit}
-      onCancel={() => router.push("/workspace/modules/hrm/departments")}
-      submitError={submitError}
       isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() => router.push("/workspace/modules/hrm/departments")}
+      onSubmit={handleSubmit}
     />
   );
 }
-

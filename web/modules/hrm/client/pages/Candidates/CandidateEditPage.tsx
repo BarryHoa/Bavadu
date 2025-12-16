@@ -6,6 +6,7 @@ import { candidateService } from "@mdl/hrm/client/services/CandidateService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
+
 import CandidateForm, {
   type CandidateFormValues,
 } from "./components/CandidateForm/CandidateForm";
@@ -26,9 +27,11 @@ export default function CandidateEditPage(): React.ReactNode {
     queryKey: ["hrm-candidates", id],
     queryFn: async () => {
       const response = await candidateService.getById(id);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToLoadCandidate"));
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -44,11 +47,13 @@ export default function CandidateEditPage(): React.ReactNode {
   >({
     mutationFn: async (payload) => {
       const response = await candidateService.update(payload);
+
       if (!response.data) {
         throw new Error(
-          response.message ?? t("errors.failedToUpdateCandidate")
+          response.message ?? t("errors.failedToUpdateCandidate"),
         );
       }
+
       return { data: { id: response.data.id } };
     },
     invalidateQueries: [["hrm-candidates"], ["hrm-candidates", id]],
@@ -99,12 +104,6 @@ export default function CandidateEditPage(): React.ReactNode {
 
   return (
     <CandidateForm
-      onSubmit={handleSubmit}
-      onCancel={() =>
-        router.push(`/workspace/modules/hrm/candidates/view/${id}`)
-      }
-      submitError={submitError}
-      isSubmitting={isPending}
       defaultValues={{
         requisitionId: candidateData.requisitionId,
         firstName: candidateData.firstName || "",
@@ -123,6 +122,12 @@ export default function CandidateEditPage(): React.ReactNode {
         rating: candidateData.rating || undefined,
         notes: candidateData.notes || "",
       }}
+      isSubmitting={isPending}
+      submitError={submitError}
+      onCancel={() =>
+        router.push(`/workspace/modules/hrm/candidates/view/${id}`)
+      }
+      onSubmit={handleSubmit}
     />
   );
 }

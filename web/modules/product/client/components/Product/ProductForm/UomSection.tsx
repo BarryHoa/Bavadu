@@ -21,10 +21,12 @@ import { useTranslations } from "next-intl";
 import { useCallback, useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { uuidv7 } from "uuidv7";
+
 import {
   ProductMasterFeatures,
   ProductMasterFeaturesType,
 } from "../../../interface/Product";
+
 import { UomConversions } from "./types";
 
 type UomSectionProps = {
@@ -81,10 +83,10 @@ export default function UomSection({
       uomId: string,
       currentUuid: string,
       currentType: ProductMasterFeaturesType | "other",
-      baseUomId?: string
+      baseUomId?: string,
     ): { isDuplicate: boolean; duplicateLabel?: string } => {
       const currentUom = uomConversions.find(
-        (uom: UomConversions) => uom.uuid === currentUuid
+        (uom: UomConversions) => uom.uuid === currentUuid,
       );
 
       // If current type is "other", check against everything
@@ -97,7 +99,7 @@ export default function UomSection({
         // Check against all other UOMs (sale, purchase, manufacture, and other "other" UOMs)
         const duplicate = uomConversions.find(
           (uom: UomConversions) =>
-            uom.uomId === uomId && uom.uuid !== currentUuid
+            uom.uomId === uomId && uom.uuid !== currentUuid,
         );
 
         if (duplicate) {
@@ -118,7 +120,7 @@ export default function UomSection({
           (uom: UomConversions) =>
             uom.type === "other" &&
             uom.uomId === uomId &&
-            uom.uuid !== currentUuid
+            uom.uuid !== currentUuid,
         );
 
         if (duplicateOther) {
@@ -128,7 +130,7 @@ export default function UomSection({
 
       return { isDuplicate: false };
     },
-    [uomConversions]
+    [uomConversions],
   );
 
   // Update UOM conversions in form
@@ -136,12 +138,13 @@ export default function UomSection({
     (updater: (prev: UomConversions[]) => UomConversions[]) => {
       const current = uomConversions || [];
       const updated = updater(current);
+
       setValue(`variants.${variantIndex}.uomConversions`, updated, {
         shouldDirty: true,
         shouldValidate: false,
       });
     },
-    [uomConversions, variantIndex, setValue]
+    [uomConversions, variantIndex, setValue],
   );
 
   // Build available UOM options (baseUom + uomConversions)
@@ -168,8 +171,9 @@ export default function UomSection({
   const canAddOtherUom = useMemo(() => {
     const MAX_OTHER_UOMS = 9;
     const uomConversionsCount = uomConversions.filter(
-      (uom: UomConversions) => uom.type === "other"
+      (uom: UomConversions) => uom.type === "other",
     ).length;
+
     return uomConversionsCount < MAX_OTHER_UOMS;
   }, [uomConversions]);
 
@@ -178,15 +182,16 @@ export default function UomSection({
     (
       uuid: string,
       selectedUomId: string | null,
-      selectedUomName: string | null
+      selectedUomName: string | null,
     ) => {
       if (!selectedUomId) {
         return;
       }
 
       const currentUom = uomConversions.find(
-        (uom: UomConversions) => uom.uuid === uuid
+        (uom: UomConversions) => uom.uuid === uuid,
       );
+
       if (!currentUom) {
         return;
       }
@@ -196,7 +201,7 @@ export default function UomSection({
         selectedUomId,
         uuid,
         currentUom.type,
-        baseUomId
+        baseUomId,
       );
 
       if (duplicateCheck.isDuplicate) {
@@ -207,6 +212,7 @@ export default function UomSection({
             (selectedUomName ? ` (${selectedUomName})` : ""),
           color: "warning",
         });
+
         return;
       }
       // Update UOM
@@ -218,8 +224,8 @@ export default function UomSection({
                 uomId: selectedUomId,
                 uomName: selectedUomName || "",
               }
-            : item
-        )
+            : item,
+        ),
       );
     },
     [
@@ -228,13 +234,14 @@ export default function UomSection({
       isDuplicateUom,
       updateUomConversions,
       tProductForm,
-    ]
+    ],
   );
 
   // Handle delete
   const handleDeleteUom = useCallback(
     (uuid: string) => {
       const uom = uomConversions.find((u: UomConversions) => u.uuid === uuid);
+
       if (uom) {
         setDeleteConfirmModal({
           isOpen: true,
@@ -243,14 +250,14 @@ export default function UomSection({
         });
       }
     },
-    [uomConversions]
+    [uomConversions],
   );
 
   const deleteUuid = deleteConfirmModal.uuid;
   const confirmDelete = useCallback(() => {
     if (deleteUuid) {
       updateUomConversions((prev) =>
-        prev.filter((item) => item.uuid !== deleteUuid)
+        prev.filter((item) => item.uuid !== deleteUuid),
       );
       setDeleteConfirmModal({ isOpen: false });
     }
@@ -281,11 +288,11 @@ export default function UomSection({
         prev.map((item) =>
           item.uuid === uuid
             ? { ...item, conversionRatio: ratio ?? null }
-            : item
-        )
+            : item,
+        ),
       );
     },
-    [updateUomConversions]
+    [updateUomConversions],
   );
 
   // Handle base UOM change
@@ -296,18 +303,21 @@ export default function UomSection({
           shouldDirty: true,
           shouldValidate: false,
         });
+
         return;
       }
 
       const duplicate = uomConversions.find(
-        (uom: UomConversions) => uom.uomId === key
+        (uom: UomConversions) => uom.uomId === key,
       );
+
       if (duplicate) {
         addToast({
           title: tProductForm("duplicateUom"),
           description: tProductForm("duplicateUomDescription"),
           color: "warning",
         });
+
         return;
       }
 
@@ -351,7 +361,7 @@ export default function UomSection({
               {
                 shouldDirty: true,
                 shouldValidate: false,
-              }
+              },
             );
           }
         }, 100);
@@ -366,7 +376,7 @@ export default function UomSection({
       purchaseUomIdProp,
       manufacturingUomIdProp,
       tProductForm,
-    ]
+    ],
   );
 
   // Build table columns
@@ -380,19 +390,19 @@ export default function UomSection({
           return (
             <IBaseSingleSelectAsync
               aria-label={tProductForm("otherUnitOfMeasure")}
-              model="product-uom.dropdown"
               defaultParams={{
                 filters: { isActive: true },
               }}
+              isDisabled={isBusy || !baseUomId}
+              model="product-uom.dropdown"
               selectedKey={record.uomId || undefined}
               onSelectionChange={(key, item) => {
                 handleSelectUomConversion(
                   record.uuid,
                   key ?? null,
-                  item?.localizedLabel ?? null
+                  item?.localizedLabel ?? null,
                 );
               }}
-              isDisabled={isBusy || !baseUomId}
             />
           );
         },
@@ -403,15 +413,15 @@ export default function UomSection({
         width: 200,
         render: (_, record) => (
           <IBaseInputNumber
-            id={`conversion-ratio-${record.uuid}`}
             key={`conversion-ratio-${record.uuid}`}
-            min={0.0001}
-            max={10000}
             decimalPlaces={4}
+            id={`conversion-ratio-${record.uuid}`}
+            isDisabled={isBusy || !baseUomId}
+            max={10000}
+            min={0.0001}
+            size="sm"
             value={record.conversionRatio}
             onValueChange={handleConversionRatioChange(record.uuid)}
-            isDisabled={isBusy || !baseUomId}
-            size="sm"
           />
         ),
       },
@@ -423,11 +433,11 @@ export default function UomSection({
         render: (_, record) => (
           <Button
             isIconOnly
-            variant="ghost"
             aria-label={tProductForm("deleteUom")}
-            isDisabled={isBusy || !baseUomId}
             color="danger"
+            isDisabled={isBusy || !baseUomId}
             size="sm"
+            variant="ghost"
             onPress={() => handleDeleteUom(record.uuid)}
           >
             <Trash size={14} />
@@ -446,7 +456,7 @@ export default function UomSection({
       handleSelectUomConversion,
       handleDeleteUom,
       handleConversionRatioChange,
-    ]
+    ],
   );
 
   const isStockable = masterFeatures[ProductMasterFeatures.STOCKABLE];
@@ -489,7 +499,7 @@ export default function UomSection({
       saleUom,
       purchaseUom,
       manufacturingUom,
-    ]
+    ],
   );
 
   return (
@@ -502,6 +512,11 @@ export default function UomSection({
         <div className="flex gap-4">
           <div className="flex-shrink-0 w-[400px]">
             <IBaseSingleSelectAsync
+              isRequired
+              defaultParams={{ filters: { isActive: true } }}
+              errorMessage={error?.message}
+              isDisabled={isBusy}
+              isInvalid={Boolean(error)}
               label={
                 tProductForm("baseUnitOfMeasure") +
                 (isStockable
@@ -510,12 +525,6 @@ export default function UomSection({
               }
               model="product-uom.dropdown"
               selectedKey={baseUomId}
-              onSelectionChange={(key, item) => handleBaseUomChange(key, item)}
-              defaultParams={{ filters: { isActive: true } }}
-              isRequired
-              isInvalid={Boolean(error)}
-              errorMessage={error?.message}
-              isDisabled={isBusy}
               onRenderOption={(item: any) => {
                 return (
                   <div>
@@ -525,6 +534,7 @@ export default function UomSection({
                   </div>
                 );
               }}
+              onSelectionChange={(key, item) => handleBaseUomChange(key, item)}
             />
           </div>
           <div className="flex flex-col gap-1 justify-center flex-1">
@@ -544,22 +554,22 @@ export default function UomSection({
                 <DataTable
                   columns={tableColumns}
                   dataSource={uomConversions}
-                  rowKey="uuid"
-                  pagination={false}
                   emptyContent={tProductForm("noOtherUoms")}
                   isRefreshData={false}
                   isStriped={false}
+                  pagination={false}
+                  rowKey="uuid"
                   total={uomConversions.length}
                 />
               </div>
               {canAddOtherUom && (
                 <Button
-                  size="sm"
-                  variant="light"
                   color="primary"
-                  startContent={<Plus size={14} />}
-                  onPress={handleAddNewUom}
                   isDisabled={isBusy || !baseUomId}
+                  size="sm"
+                  startContent={<Plus size={14} />}
+                  variant="light"
+                  onPress={handleAddNewUom}
                 >
                   {tProductForm("addOtherUom")}
                 </Button>
@@ -571,32 +581,35 @@ export default function UomSection({
                 {featureUomConfigs.map((config) => (
                   <IBaseSingleSelect
                     key={config.key}
-                    label={config.label}
+                    isDisabled={isBusy || !baseUomId}
                     items={availableUomOptions}
+                    label={config.label}
                     selectedKey={config.value}
                     onSelectionChange={(key, item) => {
                       const fieldPath = `variants.${variantIndex}.${config.fieldName}`;
+
                       if (!key) {
                         setValue(fieldPath, undefined, {
                           shouldDirty: true,
                           shouldValidate: false,
                         });
+
                         return;
                       }
                       const name =
                         typeof item?.label === "string"
                           ? item.label
                           : item?.label?.vi || item?.label?.en || "";
+
                       setValue(
                         fieldPath,
                         { id: key, name },
                         {
                           shouldDirty: true,
                           shouldValidate: false,
-                        }
+                        },
                       );
                     }}
-                    isDisabled={isBusy || !baseUomId}
                   />
                 ))}
               </div>
@@ -608,8 +621,8 @@ export default function UomSection({
       {/* Delete Confirm Modal */}
       <Modal
         isOpen={deleteConfirmModal.isOpen}
-        onClose={() => setDeleteConfirmModal({ isOpen: false })}
         placement="center"
+        onClose={() => setDeleteConfirmModal({ isOpen: false })}
       >
         <ModalContent>
           <ModalHeader>

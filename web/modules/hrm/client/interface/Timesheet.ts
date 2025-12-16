@@ -52,4 +52,3 @@ export interface CreateTimesheetPayload {
 export interface UpdateTimesheetPayload extends Partial<CreateTimesheetPayload> {
   id: string;
 }
-

@@ -3,6 +3,7 @@ import {
   type FilterConditionMap,
 } from "@base/server/models/BaseViewListModel";
 import { and, desc, eq, ilike, sql } from "drizzle-orm";
+
 import {
   NewSaleB2cTbPriceList,
   sale_b2c_tb_price_lists,
@@ -105,6 +106,7 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
 
   protected declarationColumns = () => {
     const map = new Map();
+
     map.set("id", { column: sale_b2c_tb_price_lists.id, sort: false });
     map.set("code", { column: sale_b2c_tb_price_lists.code, sort: true });
     map.set("name", { column: sale_b2c_tb_price_lists.name, sort: false });
@@ -131,6 +133,7 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
       column: sale_b2c_tb_price_lists.updatedAt,
       sort: true,
     });
+
     return map;
   };
 
@@ -198,13 +201,14 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
    * Get list of price lists (simple list, not for view list data table)
    */
   async getList(): Promise<SaleB2cTbPriceList[]> {
-    const db = await this.getDb();
+    const db = await this.db;
+
     return db
       .select()
       .from(sale_b2c_tb_price_lists)
       .orderBy(
         desc(sale_b2c_tb_price_lists.priority),
-        desc(sale_b2c_tb_price_lists.createdAt)
+        desc(sale_b2c_tb_price_lists.createdAt),
       );
   }
 
@@ -227,6 +231,7 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
   async create(params: CreatePriceListB2CParams): Promise<SaleB2cTbPriceList> {
     // Validate
     const validation = await this.validatePriceList(params);
+
     if (!validation.valid) {
       throw new Error(validation.errors.join("; "));
     }
@@ -236,12 +241,13 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
       field: "code",
       value: params.code,
     });
+
     if (existing.isExist) {
       throw new Error(`Price list with code "${params.code}" already exists`);
     }
 
     const now = new Date();
-    const db = await this.getDb();
+    const db = await this.db;
 
     const [priceList] = await db
       .insert(sale_b2c_tb_price_lists)
@@ -275,10 +281,11 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
    */
   async update(
     id: string,
-    params: UpdatePriceListB2CParams
+    params: UpdatePriceListB2CParams,
   ): Promise<SaleB2cTbPriceList> {
     // Get existing price list
     const existing = await this.getById(id);
+
     if (!existing) {
       throw new Error(`Price list with id "${id}" not found`);
     }
@@ -294,12 +301,13 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
 
     // Validate
     const validation = await this.validatePriceList(mergedData, id);
+
     if (!validation.valid) {
       throw new Error(validation.errors.join("; "));
     }
 
     const now = new Date();
-    const db = await this.getDb();
+    const db = await this.db;
 
     const [priceList] = await db
       .update(sale_b2c_tb_price_lists)
@@ -333,6 +341,7 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
   async delete(id: string): Promise<boolean> {
     // Get existing price list
     const existing = await this.getById(id);
+
     if (!existing) {
       throw new Error(`Price list with id "${id}" not found`);
     }
@@ -344,11 +353,12 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
       status: "inactive" as const,
     };
     const validation = await this.validatePriceList(simulatedData, id);
+
     if (!validation.valid) {
       throw new Error(validation.errors.join("; "));
     }
 
-    const db = await this.getDb();
+    const db = await this.db;
     const result = await db
       .delete(sale_b2c_tb_price_lists)
       .where(eq(sale_b2c_tb_price_lists.id, id))
@@ -362,7 +372,7 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
    */
   private async validatePriceList(
     data: NewSaleB2cTbPriceList | SaleB2cTbPriceList,
-    existingId?: string
+    existingId?: string,
   ): Promise<ValidationResult> {
     const errors: string[] = [];
 
@@ -377,7 +387,7 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
 
     if (data.type !== "standard" && !data.validTo) {
       errors.push(
-        "Nếu type != 'standard' thì validTo là bắt buộc (không được NULL)"
+        "Nếu type != 'standard' thì validTo là bắt buộc (không được NULL)",
       );
     }
 
@@ -386,6 +396,7 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
       errors.push("applicableTo là bắt buộc");
     } else {
       const applicableTo = data.applicableTo as ApplicableTo;
+
       if (
         !applicableTo.channels &&
         !applicableTo.stores &&
@@ -394,7 +405,7 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
         !applicableTo.customerGroups
       ) {
         errors.push(
-          "applicableTo phải có ít nhất một trong: channels, stores, locations, regions, customerGroups"
+          "applicableTo phải có ít nhất một trong: channels, stores, locations, regions, customerGroups",
         );
       }
     }
@@ -403,8 +414,9 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
     if (data.type === "standard" && data.status === "active") {
       const overlapError = await this.checkStandardPriceListOverlap(
         data,
-        existingId
+        existingId,
       );
+
       if (overlapError) {
         errors.push(overlapError);
       }
@@ -414,8 +426,9 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
     if (existingId) {
       const activeStandardError = await this.checkAtLeastOneActiveStandard(
         data,
-        existingId
+        existingId,
       );
+
       if (activeStandardError) {
         errors.push(activeStandardError);
       }
@@ -432,14 +445,14 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
    */
   private async checkStandardPriceListOverlap(
     data: NewSaleB2cTbPriceList | SaleB2cTbPriceList,
-    existingId?: string
+    existingId?: string,
   ): Promise<string | null> {
     if (!data.applicableTo || !data.validFrom) {
       return null;
     }
 
     const applicableTo = data.applicableTo as ApplicableTo;
-    const db = await this.getDb();
+    const db = await this.db;
 
     const existing = await db
       .select()
@@ -451,8 +464,8 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
           sql`${sale_b2c_tb_price_lists.applicableTo} = ${JSON.stringify(applicableTo)}::jsonb`,
           existingId
             ? sql`${sale_b2c_tb_price_lists.id} != ${existingId}::uuid`
-            : sql`1=1`
-        )
+            : sql`1=1`,
+        ),
       );
 
     for (const existingList of existing) {
@@ -488,9 +501,9 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
    */
   private async checkAtLeastOneActiveStandard(
     data: NewSaleB2cTbPriceList | SaleB2cTbPriceList,
-    existingId: string
+    existingId: string,
   ): Promise<string | null> {
-    const db = await this.getDb();
+    const db = await this.db;
     const existing = await db
       .select()
       .from(sale_b2c_tb_price_lists)
@@ -518,8 +531,8 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
         and(
           eq(sale_b2c_tb_price_lists.type, "standard"),
           eq(sale_b2c_tb_price_lists.status, "active"),
-          sql`${sale_b2c_tb_price_lists.id} != ${existingId}::uuid`
-        )
+          sql`${sale_b2c_tb_price_lists.id} != ${existingId}::uuid`,
+        ),
       );
 
     const count = Number(activeStandardCount[0]?.count || 0);
@@ -535,18 +548,19 @@ export default class PriceListB2CViewListModel extends BaseViewListModel<
    * Kiểm tra xem có ít nhất 1 standard price list đang active không
    */
   async hasActiveStandardPriceList(): Promise<boolean> {
-    const db = await this.getDb();
+    const db = await this.db;
     const result = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(sale_b2c_tb_price_lists)
       .where(
         and(
           eq(sale_b2c_tb_price_lists.type, "standard"),
-          eq(sale_b2c_tb_price_lists.status, "active")
-        )
+          eq(sale_b2c_tb_price_lists.status, "active"),
+        ),
       );
 
     const count = Number(result[0]?.count || 0);
+
     return count > 0;
   }
 }

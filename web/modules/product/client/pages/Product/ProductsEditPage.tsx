@@ -7,8 +7,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
-
 import { getClientLink } from "@base/client/utils/link/getClientLink";
+
 import ProductForm from "../../components/Product/ProductForm";
 import { ProductDetail, ProductFormValues } from "../../interface/Product";
 import ProductService from "../../services/ProductService";
@@ -18,7 +18,7 @@ import {
 } from "../../utils/productMapper";
 
 const getParamValue = (
-  value: string | string[] | undefined
+  value: string | string[] | undefined,
 ): string | undefined => (Array.isArray(value) ? value[0] : value);
 
 export default function ProductsEditPage(): React.ReactNode {
@@ -27,6 +27,7 @@ export default function ProductsEditPage(): React.ReactNode {
 
   const productId = useMemo(() => {
     const rawId = (params?.id ?? undefined) as string | string[] | undefined;
+
     return getParamValue(rawId);
   }, [params]);
 
@@ -36,7 +37,7 @@ export default function ProductsEditPage(): React.ReactNode {
         mdl: "product",
         path: "",
       }),
-    []
+    [],
   );
 
   const getViewLink = useCallback((id: string) => {
@@ -55,9 +56,11 @@ export default function ProductsEditPage(): React.ReactNode {
         throw new Error("Missing product id");
       }
       const response = await ProductService.getProductById(productId);
+
       if (!response.data) {
         throw new Error("Failed to load product");
       }
+
       return response.data as ProductDetail;
     },
   });
@@ -72,9 +75,11 @@ export default function ProductsEditPage(): React.ReactNode {
     }) => {
       const payload = mapFormValuesToPayload(values);
       const response = await ProductService.updateProduct(id, payload);
+
       if (!response.data) {
         throw new Error("Failed to update product");
       }
+
       return response.data;
     },
   });
@@ -97,6 +102,7 @@ export default function ProductsEditPage(): React.ReactNode {
       });
 
       const link = getViewLink(productId);
+
       setTimeout(() => {
         router.push(link.as ?? link.path);
       }, 500);
@@ -167,11 +173,11 @@ export default function ProductsEditPage(): React.ReactNode {
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
         <Button
-          size="sm"
-          variant="light"
-          startContent={<ArrowLeft size={14} />}
-          onPress={() => router.back()}
           isDisabled={updateMutation.isPending}
+          size="sm"
+          startContent={<ArrowLeft size={14} />}
+          variant="light"
+          onPress={() => router.back()}
         >
           Back
         </Button>
@@ -181,14 +187,15 @@ export default function ProductsEditPage(): React.ReactNode {
       </div>
 
       <ProductForm
-        submitLabel="Save changes"
         initialValues={initialFormValues}
         loading={updateMutation.isPending}
-        onSubmit={handleSubmit}
+        submitLabel="Save changes"
         onCancel={() => {
           const viewLink = getViewLink(productId);
+
           router.push(viewLink.as ?? viewLink.path);
         }}
+        onSubmit={handleSubmit}
       />
     </div>
   );

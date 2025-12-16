@@ -27,9 +27,11 @@ export default function CandidateViewPage(): React.ReactNode {
     queryKey: ["hrm-candidates", id],
     queryFn: async () => {
       const response = await candidateService.getById(id);
+
       if (!response.data) {
         throw new Error(response.message ?? t("errors.failedToLoadCandidate"));
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -152,4 +154,3 @@ export default function CandidateViewPage(): React.ReactNode {
     </div>
   );
 }
-

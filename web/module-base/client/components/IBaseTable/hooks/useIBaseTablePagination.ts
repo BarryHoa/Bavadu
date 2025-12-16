@@ -1,9 +1,11 @@
+import type { IBaseTablePagination } from "../IBaseTableInterface";
+
 import { useMemo } from "react";
+
 import {
   PAGINATION_DEFAULT_PAGE_SIZE,
   PAGINATION_PAGE_SIZE_OPTIONS,
 } from "../../Pagination/paginationConsts";
-import type { IBaseTablePagination } from "../IBaseTableInterface";
 
 export interface UseIBaseTablePaginationProps {
   pagination?: IBaseTablePagination | false;
@@ -48,7 +50,9 @@ export function useIBaseTablePagination({
   paginationInfo: corePaginationInfo,
 }: UseIBaseTablePaginationProps): UseIBaseTablePaginationReturn {
   // Pagination setup
-  const isPaginationEnabled = Boolean(pagination && typeof pagination === "object");
+  const isPaginationEnabled = Boolean(
+    pagination && typeof pagination === "object",
+  );
   const total = Math.max(0, typeof totalProps === "number" ? totalProps : 0);
   const paginationConfig = isPaginationEnabled
     ? (pagination as IBaseTablePagination)
@@ -76,13 +80,22 @@ export function useIBaseTablePagination({
     if (corePaginationInfo) {
       return corePaginationInfo;
     }
-    
+
     return {
       currentPage: paginationDefault.page,
       pageSize: paginationDefault.pageSize,
       pages: Math.max(1, Math.ceil(total / paginationDefault.pageSize)),
-      from: total === 0 ? 0 : (paginationDefault.page - 1) * paginationDefault.pageSize,
-      to: total === 0 ? 0 : Math.min(total, paginationDefault.page * paginationDefault.pageSize),
+      from:
+        total === 0
+          ? 0
+          : (paginationDefault.page - 1) * paginationDefault.pageSize,
+      to:
+        total === 0
+          ? 0
+          : Math.min(
+              total,
+              paginationDefault.page * paginationDefault.pageSize,
+            ),
       total,
     };
   }, [corePaginationInfo, paginationDefault, total]);
@@ -92,7 +105,7 @@ export function useIBaseTablePagination({
     const rowsTotal = paginationInfo.total;
     const from = Math.min(paginationInfo.from + 1, rowsTotal);
     const to = Math.min(paginationInfo.to, rowsTotal);
-    
+
     return {
       from,
       to,
@@ -112,5 +125,3 @@ export function useIBaseTablePagination({
     showPaginationControls,
   };
 }
-
-

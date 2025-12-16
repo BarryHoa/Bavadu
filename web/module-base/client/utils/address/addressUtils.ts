@@ -3,6 +3,7 @@ import type {
   AdministrativeUnit,
   AdministrativeUnitType,
 } from "@base/client/interface/Address";
+
 import { LocalizeText } from "@base/client/interface/LocalizeText";
 import isEmpty from "lodash/isEmpty";
 
@@ -11,11 +12,14 @@ type LocalizeTextOrString = LocalizeText | string;
  * Get localized name from LocalizeText
  */
 const getLocalizedName = (
-  name: string | { vi?: string; en?: string; [key: string]: string | undefined }
+  name:
+    | string
+    | { vi?: string; en?: string; [key: string]: string | undefined },
 ): string => {
   if (typeof name === "string") {
     return name;
   }
+
   return name.vi || name.en || "";
 };
 
@@ -25,19 +29,24 @@ const getLocalizedName = (
  */
 export const buildAddressString = (
   address: Partial<Address>,
-  locale: string
+  locale: string,
 ): string => {
   const buildObjectOrString = (
-    value: LocalizeTextOrString | undefined
+    value: LocalizeTextOrString | undefined,
   ): string => {
     if (typeof value === "string") {
       return value?.trim() || "";
     }
     if (typeof value === "object" && value !== null) {
       const localizeText = value as LocalizeText;
-      const result = (localizeText[locale as keyof LocalizeText] || localizeText.vi || localizeText.en || "") as string;
+      const result = (localizeText[locale as keyof LocalizeText] ||
+        localizeText.vi ||
+        localizeText.en ||
+        "") as string;
+
       return result?.trim() || "";
     }
+
     return "";
   };
 
@@ -64,7 +73,7 @@ export const buildAddressString = (
  */
 export const formatAddressDisplay = (
   address: Partial<Address>,
-  locale: string
+  locale: string,
 ): string => {
   return buildAddressString(address, locale);
 };
@@ -74,7 +83,7 @@ export const formatAddressDisplay = (
  */
 export const getUnitByLevel = (
   address: Partial<Address>,
-  level: number
+  level: number,
 ): AdministrativeUnit | undefined => {
   return address.administrativeUnits?.find((u) => u.level === level);
 };
@@ -84,7 +93,7 @@ export const getUnitByLevel = (
  */
 export const getUnitByType = (
   address: Partial<Address>,
-  type: AdministrativeUnitType
+  type: AdministrativeUnitType,
 ): AdministrativeUnit | undefined => {
   return address.administrativeUnits?.find((u) => u.type === type);
 };
@@ -94,7 +103,7 @@ export const getUnitByType = (
  */
 export const getUnitsByType = (
   address: Partial<Address>,
-  type: AdministrativeUnitType
+  type: AdministrativeUnitType,
 ): AdministrativeUnit[] => {
   return address.administrativeUnits?.filter((u) => u.type === type) || [];
 };
@@ -103,7 +112,7 @@ export const getUnitsByType = (
  * Get the highest level administrative unit (largest level number)
  */
 export const getHighestLevelUnit = (
-  address: Partial<Address>
+  address: Partial<Address>,
 ): AdministrativeUnit | undefined => {
   if (
     !address.administrativeUnits ||
@@ -111,6 +120,7 @@ export const getHighestLevelUnit = (
   ) {
     return undefined;
   }
+
   return [...address.administrativeUnits].sort((a, b) => b.level - a.level)[0];
 };
 
@@ -118,7 +128,7 @@ export const getHighestLevelUnit = (
  * Get the lowest level administrative unit (smallest level number > 0)
  */
 export const getLowestLevelUnit = (
-  address: Partial<Address>
+  address: Partial<Address>,
 ): AdministrativeUnit | undefined => {
   if (
     !address.administrativeUnits ||
@@ -126,6 +136,7 @@ export const getLowestLevelUnit = (
   ) {
     return undefined;
   }
+
   return [...address.administrativeUnits]
     .filter((u) => u.level > 0)
     .sort((a, b) => a.level - b.level)[0];
@@ -136,7 +147,7 @@ export const getLowestLevelUnit = (
  */
 export const hasUnitType = (
   address: Partial<Address>,
-  type: AdministrativeUnitType
+  type: AdministrativeUnitType,
 ): boolean => {
   return address.administrativeUnits?.some((u) => u.type === type) || false;
 };
@@ -184,11 +195,12 @@ export const isOldVietnamStructure = (address: Partial<Address>): boolean => {
  * ```
  */
 export const getVietnamStructureType = (
-  address: Partial<Address>
+  address: Partial<Address>,
 ): "old" | "new" | undefined => {
   if (address.country?.id !== "VN") {
     return undefined;
   }
+
   return isOldVietnamStructure(address) ? "old" : "new";
 };
 
@@ -239,11 +251,12 @@ export const validateVietnamAddress = (address: Partial<Address>): boolean => {
 export const createAdministrativeUnit = (
   id: string,
   name: string | { vi?: string; en?: string },
-  type: AdministrativeUnitType
+  type: AdministrativeUnitType,
 ): AdministrativeUnit => {
-  const nameObj: LocalizeText = typeof name === "string" 
-    ? { vi: name, en: name } 
-    : { vi: name.vi, en: name.en };
+  const nameObj: LocalizeText =
+    typeof name === "string"
+      ? { vi: name, en: name }
+      : { vi: name.vi, en: name.en };
 
   // Type-safe creation based on discriminated union
   // Note: "country", "street", and "postal_code" are not allowed here as they're stored separately in Address
@@ -279,6 +292,7 @@ export const createAdministrativeUnit = (
     default:
       // This should never happen, but TypeScript needs it for exhaustiveness
       const _exhaustive: never = type;
+
       throw new Error(`Unknown administrative unit type: ${_exhaustive}`);
   }
 };

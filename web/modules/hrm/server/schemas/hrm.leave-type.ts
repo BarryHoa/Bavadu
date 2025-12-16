@@ -8,6 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdlHrmSchema } from "./schema";
 
 // Leave Types - Loại nghỉ phép
@@ -33,7 +34,7 @@ export const hrm_tb_leave_types = mdlHrmSchema.table(
     createdBy: varchar("created_by", { length: 36 }),
     updatedBy: varchar("updated_by", { length: 36 }),
   },
-  (table) => []
+  (table) => [],
 );
 
 export type HrmTbLeaveType = typeof hrm_tb_leave_types.$inferSelect;

@@ -19,9 +19,9 @@ import {
   string,
   trim,
 } from "valibot";
-
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { Address } from "@base/client/interface/Address";
+
 import {
   warehouseStatuses,
   warehouseValuationMethods,
@@ -35,7 +35,7 @@ const warehouseFormSchema = object({
   status: pipe(
     string(),
     trim(),
-    picklist(warehouseStatuses, "Invalid warehouse status")
+    picklist(warehouseStatuses, "Invalid warehouse status"),
   ),
   companyId: optional(pipe(string(), trim())),
   managerId: optional(pipe(string(), trim())),
@@ -45,7 +45,7 @@ const warehouseFormSchema = object({
   valuationMethod: pipe(
     string(),
     trim(),
-    picklist(warehouseValuationMethods, "Invalid valuation method")
+    picklist(warehouseValuationMethods, "Invalid valuation method"),
   ),
   minStock: optional(pipe(string(), trim())),
   maxStock: optional(pipe(string(), trim())),
@@ -81,12 +81,13 @@ const valuationOptions: SelectItemOption[] = warehouseValuationMethods.map(
   (method) => ({
     value: method,
     label: method,
-  })
+  }),
 );
 
 const toNullableString = (value?: string) => {
   if (!value) return undefined;
   const trimmed = value.trim();
+
   return trimmed.length > 0 ? trimmed : undefined;
 };
 
@@ -95,9 +96,11 @@ const toNullableNumber = (value?: string) => {
     return null;
   }
   const numeric = Number(value);
+
   if (!Number.isFinite(numeric)) {
     throw new Error("Invalid number");
   }
+
   return numeric;
 };
 
@@ -108,6 +111,7 @@ const getSingleSelectionValue = (selection: SingleSelection) => {
     return undefined;
   }
   const [first] = Array.from(selection);
+
   return typeof first === "string" ? first : undefined;
 };
 
@@ -161,7 +165,7 @@ export default function WarehouseForm({
       accountAdjustment: initialData?.accountAdjustment ?? "",
       notes: initialData?.notes ?? "",
     }),
-    [initialData]
+    [initialData],
   );
 
   const {
@@ -181,10 +185,12 @@ export default function WarehouseForm({
         type: "manual",
         message: "Address 1 is required",
       });
+
       return;
     }
 
     let minStock = 0;
+
     if (values.minStock !== undefined) {
       try {
         minStock = toNullableNumber(values.minStock) ?? 0;
@@ -193,11 +199,13 @@ export default function WarehouseForm({
           type: "manual",
           message: error instanceof Error ? error.message : "Invalid value",
         });
+
         return;
       }
     }
 
     let maxStock: number | null = null;
+
     if (values.maxStock !== undefined) {
       try {
         maxStock = toNullableNumber(values.maxStock);
@@ -206,6 +214,7 @@ export default function WarehouseForm({
           type: "manual",
           message: error instanceof Error ? error.message : "Invalid value",
         });
+
         return;
       }
     }
@@ -215,6 +224,7 @@ export default function WarehouseForm({
         type: "manual",
         message: "Max stock must be greater than or equal to min stock",
       });
+
       return;
     }
 
@@ -227,7 +237,7 @@ export default function WarehouseForm({
       managerId: toNullableString(values.managerId) ?? null,
       contactId: toNullableString(values.contactId) ?? null,
       address: [values.address1, values.address2].filter(
-        (x) => x !== undefined
+        (x) => x !== undefined,
       ) as Address[],
       valuationMethod: values.valuationMethod.trim().toUpperCase(),
       minStock,
@@ -243,9 +253,9 @@ export default function WarehouseForm({
   return (
     <div className="w-full">
       <form
+        noValidate
         className="space-y-6"
         onSubmit={handleSubmit(handleFormSubmit)}
-        noValidate
       >
         {submitError ? (
           <div className="rounded-large border border-danger-200 bg-danger-50 px-3 py-2 text-sm text-danger-600">
@@ -255,129 +265,129 @@ export default function WarehouseForm({
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Controller
-            name="code"
             control={control}
+            name="code"
             render={({ field, fieldState }) => (
               <IBaseInput
                 {...field}
+                isRequired
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 label="Code"
                 placeholder="Unique warehouse code"
                 value={field.value}
                 onValueChange={field.onChange}
-                isRequired
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               />
             )}
           />
           <Controller
-            name="name"
             control={control}
+            name="name"
             render={({ field, fieldState }) => (
               <IBaseInput
                 {...field}
+                isRequired
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 label="Name"
                 placeholder="Warehouse name"
                 value={field.value}
                 onValueChange={field.onChange}
-                isRequired
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               />
             )}
           />
           <Controller
-            name="typeCode"
             control={control}
+            name="typeCode"
             render={({ field, fieldState }) => (
               <IBaseInput
                 {...field}
+                isRequired
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 label="Type"
                 placeholder="e.g. RAW_MATERIAL, FINISHED_GOODS"
                 value={field.value}
                 onValueChange={field.onChange}
-                isRequired
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               />
             )}
           />
           <Controller
+            control={control}
             name="status"
-            control={control}
             render={({ field, fieldState }) => (
               <IBaseSingleSelect
-                label="Status"
+                isRequired
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 items={statusOptions}
+                label="Status"
                 selectedKey={field.value}
                 onSelectionChange={(key) => {
                   field.onChange(key);
                 }}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
-                isRequired
               />
             )}
           />
           <Controller
-            name="valuationMethod"
             control={control}
+            name="valuationMethod"
             render={({ field, fieldState }) => (
               <IBaseSingleSelect
-                label="Valuation method"
+                isRequired
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 items={valuationOptions}
+                label="Valuation method"
                 selectedKey={field.value}
                 onSelectionChange={(key) => {
                   field.onChange(key);
                 }}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
-                isRequired
               />
             )}
           />
           <Controller
-            name="companyId"
             control={control}
+            name="companyId"
             render={({ field, fieldState }) => (
               <IBaseInput
                 {...field}
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 label="Company ID"
                 placeholder="Optional company relationship"
                 value={field.value ?? ""}
                 onValueChange={field.onChange}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               />
             )}
           />
           <Controller
-            name="managerId"
             control={control}
+            name="managerId"
             render={({ field, fieldState }) => (
               <IBaseInput
                 {...field}
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 label="Manager (user ID)"
                 placeholder="Optional manager user ID"
                 value={field.value ?? ""}
                 onValueChange={field.onChange}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               />
             )}
           />
           <Controller
-            name="contactId"
             control={control}
+            name="contactId"
             render={({ field, fieldState }) => (
               <IBaseInput
                 {...field}
+                errorMessage={fieldState.error?.message}
+                isInvalid={fieldState.invalid}
                 label="Contact (user ID)"
                 placeholder="Optional contact user ID"
                 value={field.value ?? ""}
                 onValueChange={field.onChange}
-                isInvalid={fieldState.invalid}
-                errorMessage={fieldState.error?.message}
               />
             )}
           />
@@ -387,19 +397,19 @@ export default function WarehouseForm({
           <h2 className="text-lg font-semibold mb-4">Address</h2>
           <div className="space-y-4">
             <Controller
-              name="address1"
               control={control}
+              name="address1"
               render={({ field, fieldState }) => (
                 <div className="flex gap-2 justify-between items-end">
                   <div className="flex-1">
                     <IBaseInput
+                      isDisabled
                       isRequired
+                      errorMessage={fieldState.error?.message}
+                      isInvalid={fieldState.invalid}
                       label="Main"
                       placeholder="Please select address"
                       value={getLocalizedName(field.value.formattedAddress)}
-                      isInvalid={fieldState.invalid}
-                      errorMessage={fieldState.error?.message}
-                      isDisabled
                     />
                   </div>
                   <AddressPicker
@@ -419,20 +429,20 @@ export default function WarehouseForm({
               )}
             />
             <Controller
-              name="address2"
               control={control}
+              name="address2"
               render={({ field, fieldState }) => (
                 <div className="flex gap-2 justify-between items-end">
                   <div className="flex-1">
                     <IBaseInput
+                      isDisabled
+                      errorMessage={fieldState.error?.message}
+                      isInvalid={fieldState.invalid}
                       label="Secondary"
                       placeholder="Please select address"
                       value={getLocalizedName(
-                        field.value?.formattedAddress ?? ""
+                        field.value?.formattedAddress ?? "",
                       )}
-                      isInvalid={fieldState.invalid}
-                      errorMessage={fieldState.error?.message}
-                      isDisabled
                     />
                   </div>
                   <AddressPicker
@@ -458,69 +468,69 @@ export default function WarehouseForm({
           <h2 className="text-lg font-semibold">Inventory Controls</h2>
           <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
             <Controller
-              name="minStock"
               control={control}
+              name="minStock"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  isRequired
+                  errorMessage={
+                    fieldState.error?.message ?? errors.minStock?.message
+                  }
+                  isInvalid={fieldState.invalid}
                   label="Minimum stock"
                   type="number"
                   value={field.value ?? ""}
                   onValueChange={(value) =>
                     field.onChange(value === "" ? undefined : value)
                   }
-                  isRequired
-                  isInvalid={fieldState.invalid}
-                  errorMessage={
-                    fieldState.error?.message ?? errors.minStock?.message
-                  }
                 />
               )}
             />
             <Controller
-              name="maxStock"
               control={control}
+              name="maxStock"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label="Maximum stock"
                   type="number"
                   value={field.value ?? ""}
                   onValueChange={(value) =>
                     field.onChange(value === "" ? undefined : value)
                   }
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="accountInventory"
               control={control}
+              name="accountInventory"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label="Inventory account"
                   placeholder="Optional account code"
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="accountAdjustment"
               control={control}
+              name="accountAdjustment"
               render={({ field, fieldState }) => (
                 <IBaseInput
                   {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
                   label="Adjustment account"
                   placeholder="Optional adjustment account"
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
-                  isInvalid={fieldState.invalid}
-                  errorMessage={fieldState.error?.message}
                 />
               )}
             />
@@ -528,17 +538,17 @@ export default function WarehouseForm({
         </div>
 
         <Controller
-          name="notes"
           control={control}
+          name="notes"
           render={({ field, fieldState }) => (
             <Textarea
               {...field}
+              errorMessage={fieldState.error?.message}
+              isInvalid={fieldState.invalid}
               label="Notes"
               placeholder="Internal notes (optional)"
               value={field.value ?? ""}
               onValueChange={field.onChange}
-              isInvalid={fieldState.invalid}
-              errorMessage={fieldState.error?.message}
             />
           )}
         />
@@ -547,10 +557,10 @@ export default function WarehouseForm({
           {secondaryAction && <div>{secondaryAction}</div>}
           <div className="flex gap-3">
             <Button
-              type="submit"
               color="primary"
-              isLoading={isSubmitting}
               disabled={isSubmitting}
+              isLoading={isSubmitting}
+              type="submit"
             >
               {submitLabel}
             </Button>

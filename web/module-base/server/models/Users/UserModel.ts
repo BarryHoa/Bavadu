@@ -13,6 +13,7 @@ class UserModel extends BaseModel<typeof base_tb_users> {
       .select()
       .from(this.table)
       .where(eq(this.table.id, id));
+
     return user[0];
   };
 }

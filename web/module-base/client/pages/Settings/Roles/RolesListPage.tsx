@@ -88,13 +88,13 @@ export default function RolesListPage() {
             label: actionsT("delete"),
             onPress: () => handleDelete(row),
             disabled: deleteRoleMutation.isPending,
-          }
+          },
         );
       }
 
       return baseActions;
     },
-    [actionsT, handleDelete, deleteRoleMutation.isPending]
+    [actionsT, handleDelete, deleteRoleMutation.isPending],
   );
 
   const columns = useMemo<DataTableColumn<RoleRow>[]>(
@@ -125,7 +125,7 @@ export default function RolesListPage() {
         key: "isSystem",
         label: t("table.columns.type"),
         render: (value) => (
-          <Chip size="sm" variant="flat" className="capitalize">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value
               ? t("table.columns.systemRole")
               : t("table.columns.customRole")}
@@ -136,7 +136,7 @@ export default function RolesListPage() {
         key: "isActive",
         label: t("table.columns.status"),
         render: (value) => (
-          <Chip size="sm" variant="flat" className="capitalize">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value ? t("table.columns.active") : t("table.columns.inactive")}
           </Chip>
         ),
@@ -149,15 +149,12 @@ export default function RolesListPage() {
           row?.id ? <ActionMenu actions={getActionMenuItems(row)} /> : null,
       },
     ],
-    [t, tDataTable, getText, getActionMenuItems]
+    [t, tDataTable, getText, getActionMenuItems],
   );
 
   return (
     <div className="space-y-4">
       <ViewListDataTable<RoleRow>
-        model="role.list"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -167,6 +164,9 @@ export default function RolesListPage() {
             props: { href: `${BASE_PATH}/create` },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="role.list"
       />
       <Modal isOpen={!!deleteConfirm} onClose={handleCloseModal}>
         <ModalContent>
@@ -178,16 +178,16 @@ export default function RolesListPage() {
               </ModalBody>
               <ModalFooter>
                 <Button
+                  isDisabled={deleteRoleMutation.isPending}
                   variant="light"
                   onPress={onClose}
-                  isDisabled={deleteRoleMutation.isPending}
                 >
                   {actionsT("cancel")}
                 </Button>
                 <Button
                   color="danger"
-                  onPress={handleConfirmDelete}
                   isLoading={deleteRoleMutation.isPending}
+                  onPress={handleConfirmDelete}
                 >
                   {actionsT("delete")}
                 </Button>

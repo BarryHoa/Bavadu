@@ -14,11 +14,11 @@ export default function FavoriteFilter({
 }: FavoriteFilterProps) {
   return (
     <Button
-      variant={isActive ? "solid" : "bordered"}
-      color={isActive ? "warning" : "default"}
       aria-label="Show favorites"
-      onPress={onToggle}
+      color={isActive ? "warning" : "default"}
       title="Show favorites"
+      variant={isActive ? "solid" : "bordered"}
+      onPress={onToggle}
     >
       <Star className={isActive ? "fill-current" : ""} />
     </Button>

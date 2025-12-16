@@ -7,6 +7,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { mdBaseSchema } from "./schema";
 
 // Location Countries
@@ -27,9 +28,10 @@ export const base_tb_location_countries = mdBaseSchema.table(
   (table) => [
     index("location_countries_code_idx").on(table.code),
     index("location_countries_is_active_idx").on(table.isActive),
-  ]
+  ],
 );
 
-export type BaseTbLocationCountry = typeof base_tb_location_countries.$inferSelect;
+export type BaseTbLocationCountry =
+  typeof base_tb_location_countries.$inferSelect;
 export type NewBaseTbLocationCountry =
   typeof base_tb_location_countries.$inferInsert;

@@ -3,4 +3,3 @@ export type {
   SalesOrderB2BDto as SalesOrderDto,
   SalesOrderB2BLineDto as SalesOrderLineDto,
 } from "./SalesOrderB2BService";
-

@@ -1,3 +1,5 @@
+import type { Key, SVGProps } from "react";
+
 import { Button } from "@heroui/button";
 import {
   Dropdown,
@@ -7,7 +9,6 @@ import {
 } from "@heroui/dropdown";
 import { Pagination } from "@heroui/pagination";
 import clsx from "clsx";
-import type { Key, SVGProps } from "react";
 import { useCallback, useMemo } from "react";
 
 import { PAGINATION_PAGE_SIZE_OPTIONS } from "./paginationConsts";
@@ -72,34 +73,34 @@ export default function PaginationComponent({
         onPageSizeChange(selectedValue);
       }
     },
-    [onPageSizeChange]
+    [onPageSizeChange],
   );
 
   return (
     <div className="flex items-center gap-4">
       <Pagination
-        disableCursorAnimation
         disableAnimation
+        disableCursorAnimation
         isCompact
         showControls
-        size="sm"
         classNames={{
           base: "items-center p-0 overflow-hidden",
           item: clsx(
             paginationItemBase,
-            "bg-transparent text-primary data-[hover=true]:bg-primary-50 data-[hover=true]:text-primary"
+            "bg-transparent text-primary data-[hover=true]:bg-primary-50 data-[hover=true]:text-primary",
           ),
           next: clsx(
             paginationItemBase,
-            "border border-transparent text-default-500 data-[hover=true]:border-primary data-[hover=true]:text-primary"
+            "border border-transparent text-default-500 data-[hover=true]:border-primary data-[hover=true]:text-primary",
           ),
           prev: clsx(
             paginationItemBase,
-            "border border-transparent text-default-500 data-[hover=true]:border-primary data-[hover=true]:text-primary"
+            "border border-transparent text-default-500 data-[hover=true]:border-primary data-[hover=true]:text-primary",
           ),
           cursor: clsx(paginationItemBase, "bg-primary-500 text-white"),
         }}
         page={page}
+        size="sm"
         total={pages}
         onChange={onChange}
       />

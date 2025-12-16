@@ -4,6 +4,7 @@ import { AlertCircle, Image as ImageIcon, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useRef, useState } from "react";
+
 import { ImageUploadItem } from "../../interface/ImageUpdload";
 
 type IBaseUploadImageTinyItemProps = {
@@ -16,6 +17,7 @@ type IBaseUploadImageTinyItemProps = {
 const convertBlobToBase64 = (blob: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
+
     reader.onloadend = () => {
       resolve(reader.result as string);
     };
@@ -75,6 +77,7 @@ export default function IBaseUploadImageTinyItem({
     if (hasError) return "border-2 border-danger";
     if (item.status === "done") return "border-2 border-success";
     if (isUploadingStatus) return "border-2 border-warning";
+
     return "";
   };
 
@@ -91,21 +94,21 @@ export default function IBaseUploadImageTinyItem({
           <div className="relative w-full h-full rounded-lg overflow-hidden bg-default-100">
             {imageError ? (
               <div className="w-full h-full flex items-center justify-center">
-                <AlertCircle size={16} className="text-danger" />
+                <AlertCircle className="text-danger" size={16} />
               </div>
             ) : src ? (
               <Image
-                src={src}
-                alt={item.name}
                 fill
+                alt={item.name}
                 className="object-cover"
+                src={src}
                 onError={() => {
                   setImageError(true);
                 }}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <ImageIcon size={16} className="text-default-400" />
+                <ImageIcon className="text-default-400" size={16} />
               </div>
             )}
 
@@ -119,13 +122,13 @@ export default function IBaseUploadImageTinyItem({
             {/* Remove button */}
             {!isDisabled && !isUploading && (
               <button
+                aria-label={t("removeImage")}
+                className="absolute top-0.5 right-0.5 p-0.5 bg-danger text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   onRemove();
                 }}
-                className="absolute top-0.5 right-0.5 p-0.5 bg-danger text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                aria-label={t("removeImage")}
               >
                 <X size={10} />
               </button>
@@ -138,21 +141,21 @@ export default function IBaseUploadImageTinyItem({
         >
           {imageError ? (
             <div className="w-full h-full flex items-center justify-center">
-              <AlertCircle size={16} className="text-danger" />
+              <AlertCircle className="text-danger" size={16} />
             </div>
           ) : src ? (
             <Image
-              src={src}
-              alt={item.name}
               fill
+              alt={item.name}
               className="object-cover"
+              src={src}
               onError={() => {
                 setImageError(true);
               }}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center ">
-              <ImageIcon size={16} className="text-default-400 " />
+              <ImageIcon className="text-default-400 " size={16} />
             </div>
           )}
 
@@ -175,13 +178,13 @@ export default function IBaseUploadImageTinyItem({
           {/* Remove button */}
           {!isDisabled && !isUploading && (
             <button
+              aria-label="Remove image"
+              className=" cursor-pointer absolute top-0.5 right-0.5 p-0.5 bg-danger text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onRemove();
               }}
-              className=" cursor-pointer absolute top-0.5 right-0.5 p-0.5 bg-danger text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-              aria-label="Remove image"
             >
               <X size={10} />
             </button>

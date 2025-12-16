@@ -1,11 +1,6 @@
 import * as v from "valibot";
-import {
-  uuidSchema,
-  trimmedStringSchema,
-  optionalTrimmedStringSchema,
-  stringLengthSchema,
-  optionalStringLengthSchema,
-} from "./common";
+
+import { uuidSchema, trimmedStringSchema } from "./common";
 
 /**
  * Locale data type validator
@@ -67,8 +62,12 @@ export const productMasterInputSchema = v.object({
  * Manufacturer schema
  */
 export const manufacturerSchema = v.object({
-  name: v.optional(v.union([trimmedStringSchema(1, 255, "Manufacturer name"), v.null_()])),
-  code: v.optional(v.union([trimmedStringSchema(1, 100, "Manufacturer code"), v.null_()])),
+  name: v.optional(
+    v.union([trimmedStringSchema(1, 255, "Manufacturer name"), v.null_()]),
+  ),
+  code: v.optional(
+    v.union([trimmedStringSchema(1, 100, "Manufacturer code"), v.null_()]),
+  ),
 });
 
 /**
@@ -87,7 +86,9 @@ export const productVariantInputSchema = v.object({
   name: localeInputSchema,
   description: v.optional(v.union([v.string(), v.null_()])),
   sku: v.optional(v.union([trimmedStringSchema(1, 100, "SKU"), v.null_()])),
-  barcode: v.optional(v.union([trimmedStringSchema(1, 100, "Barcode"), v.null_()])),
+  barcode: v.optional(
+    v.union([trimmedStringSchema(1, 100, "Barcode"), v.null_()]),
+  ),
   manufacturer: v.optional(v.union([manufacturerSchema, v.null_()])),
   baseUomId: v.optional(v.union([uuidSchema, v.null_()])),
   isActive: v.optional(v.boolean()),
@@ -111,7 +112,10 @@ export const productAttributeInputSchema = v.object({
   id: v.optional(uuidSchema),
   code: trimmedStringSchema(1, 100, "Attribute code"),
   name: localeInputSchema,
-  value: v.pipe(v.string(), v.maxLength(500, "Attribute value must be at most 500 characters")),
+  value: v.pipe(
+    v.string(),
+    v.maxLength(500, "Attribute value must be at most 500 characters"),
+  ),
 });
 
 /**
@@ -141,4 +145,3 @@ export const productUpdateInputSchema = v.object({
 export const productIdParamSchema = v.object({
   id: uuidSchema,
 });
-

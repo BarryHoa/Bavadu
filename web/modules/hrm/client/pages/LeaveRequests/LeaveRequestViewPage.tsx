@@ -27,9 +27,13 @@ export default function LeaveRequestViewPage(): React.ReactNode {
     queryKey: ["hrm-leave-requests", id],
     queryFn: async () => {
       const response = await leaveRequestService.getById(id);
+
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToLoadLeaveRequest"));
+        throw new Error(
+          response.message ?? t("errors.failedToLoadLeaveRequest"),
+        );
       }
+
       return response.data;
     },
     enabled: !!id,
@@ -80,7 +84,10 @@ export default function LeaveRequestViewPage(): React.ReactNode {
           <div className="grid gap-2 md:grid-cols-2">
             <IBaseDigitViewer
               label={t("labels.employee")}
-              value={getLocalizedText(leaveRequestData.employee?.fullName) || leaveRequestData.employee?.employeeCode}
+              value={
+                getLocalizedText(leaveRequestData.employee?.fullName) ||
+                leaveRequestData.employee?.employeeCode
+              }
             />
             <IBaseDigitViewer
               label={t("labels.leaveType")}
@@ -130,4 +137,3 @@ export default function LeaveRequestViewPage(): React.ReactNode {
     </div>
   );
 }
-

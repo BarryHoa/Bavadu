@@ -54,7 +54,7 @@ export default function ResetPasswordPage() {
                 If an account exists with the email <strong>{email}</strong>,
                 you will receive a password reset link shortly.
               </p>
-              <Link href="/login" className="text-sm text-primary-600">
+              <Link className="text-sm text-primary-600" href="/login">
                 Back to login
               </Link>
             </div>
@@ -75,7 +75,7 @@ export default function ResetPasswordPage() {
           </p>
         </CardHeader>
         <CardBody className="px-6 pb-6">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             {error && (
               <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">
                 {error}
@@ -83,30 +83,30 @@ export default function ResetPasswordPage() {
             )}
 
             <HeroUIInput
-              label="Email"
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
+              label="Email"
+              placeholder="Enter your email"
+              type="email"
+              value={email}
               variant="bordered"
+              onChange={(e) => setEmail(e.target.value)}
             />
 
             <Button
-              type="submit"
-              color="primary"
-              size="lg"
-              isLoading={isLoading}
               className="w-full"
+              color="primary"
+              isLoading={isLoading}
+              size="lg"
+              type="submit"
             >
               Send reset link
             </Button>
 
             <div className="text-center">
               <Link
-                href="/login"
                 className="text-sm text-primary-600 hover:text-primary-500"
+                href="/login"
               >
                 Back to login
               </Link>
@@ -117,4 +117,3 @@ export default function ResetPasswordPage() {
     </div>
   );
 }
-

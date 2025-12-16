@@ -1,5 +1,6 @@
-import { CSRF_CONFIG } from "@base/server/config";
 import { createHmac, randomBytes } from "crypto";
+
+import { CSRF_CONFIG } from "@base/server/config";
 
 /**
  * CSRF token configuration
@@ -36,6 +37,7 @@ const defaultConfig: Required<CsrfTokenConfig> = {
  */
 export function generateCsrfToken(config: CsrfTokenConfig = {}): string {
   const finalConfig = { ...defaultConfig, ...config };
+
   return randomBytes(finalConfig.tokenLength).toString("hex");
 }
 
@@ -72,7 +74,7 @@ export function createSignedCsrfToken(config: CsrfTokenConfig = {}): {
  */
 export function verifyCsrfToken(
   signedToken: string,
-  config: CsrfTokenConfig = {}
+  config: CsrfTokenConfig = {},
 ): {
   valid: boolean;
   expired: boolean;
@@ -82,6 +84,7 @@ export function verifyCsrfToken(
 
   try {
     const parts = signedToken.split(":");
+
     if (parts.length !== 3) {
       return { valid: false, expired: false };
     }

@@ -33,6 +33,7 @@ export default function DeliveriesListPage(): React.ReactNode {
         label: "Reference",
         render: (value, row) => {
           if (!row?.id) return value || "-";
+
           return (
             <LinkAs
               href={`/workspace/modules/b2b-sales/deliveries/view/${row.id}`}
@@ -46,7 +47,7 @@ export default function DeliveriesListPage(): React.ReactNode {
         key: "orderType",
         label: "Order Type",
         render: (value) => (
-          <Chip size="sm" variant="flat" className="capitalize">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value || "B2B"}
           </Chip>
         ),
@@ -60,7 +61,7 @@ export default function DeliveriesListPage(): React.ReactNode {
         key: "status",
         label: "Status",
         render: (value) => (
-          <Chip size="sm" variant="flat" className="capitalize">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value || "draft"}
           </Chip>
         ),
@@ -77,6 +78,7 @@ export default function DeliveriesListPage(): React.ReactNode {
         render: (_, row) => {
           if (!row?.id) return null;
           const viewLink = `/workspace/modules/b2b-sales/deliveries/view/${row.id}`;
+
           return (
             <ActionMenu
               actions={[
@@ -91,15 +93,12 @@ export default function DeliveriesListPage(): React.ReactNode {
         },
       },
     ],
-    [tDataTable]
+    [tDataTable],
   );
 
   return (
     <div className="space-y-4">
       <ViewListDataTable<DeliveryRow>
-        model="b2b-sales-delivery"
-        columns={columns}
-        isDummyData={false}
         actionsRight={[
           {
             key: "new",
@@ -111,6 +110,9 @@ export default function DeliveriesListPage(): React.ReactNode {
             },
           },
         ]}
+        columns={columns}
+        isDummyData={false}
+        model="b2b-sales-delivery"
       />
     </div>
   );

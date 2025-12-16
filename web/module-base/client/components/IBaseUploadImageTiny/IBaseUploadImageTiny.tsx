@@ -6,12 +6,14 @@ import { chunk } from "lodash";
 import { Upload } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useRef, useState } from "react";
+
 import { ImageUploadItem } from "../../interface/ImageUpdload";
 import {
   getFileExtension,
   normalizeItems,
   validateFile,
 } from "../IBaseUploadImageDrag/utils";
+
 import IBaseUploadImageTinyItem from "./IBaseUploadImageTinyItem";
 
 type IBaseUploadImageTinyProps = {
@@ -50,6 +52,7 @@ export default function IBaseUploadImageTiny({
   // init items from values
   const [items, setItems] = useState<ImageUploadItem[]>(() => {
     if (!values || values.length === 0) return [];
+
     return normalizeItems(values as ImageUploadItem[]);
   });
 
@@ -59,7 +62,7 @@ export default function IBaseUploadImageTiny({
       setItems(newItems);
       onChange?.(newItems);
     },
-    [onChange]
+    [onChange],
   );
 
   const handleFileSelect = useCallback(
@@ -75,6 +78,7 @@ export default function IBaseUploadImageTiny({
           description: t("tooManyFilesDescription", { count: remainingSlots }),
           color: "warning",
         });
+
         return;
       }
 
@@ -86,16 +90,17 @@ export default function IBaseUploadImageTiny({
 
       // Separate valid and invalid files
       const invalidFiles = validationResults.filter(
-        (result) => !result.validation.valid
+        (result) => !result.validation.valid,
       );
       const validFiles = validationResults.filter(
-        (result) => result.validation.valid
+        (result) => result.validation.valid,
       );
 
       if (invalidFiles.length > 0) {
         const invalidNotAllowed = invalidFiles.find(
-          (result) => result.validation.type === "FILE_TYPE_NOT_ALLOWED"
+          (result) => result.validation.type === "FILE_TYPE_NOT_ALLOWED",
         );
+
         if (invalidNotAllowed) {
           addToast({
             title: t("invalidFile"),
@@ -105,8 +110,9 @@ export default function IBaseUploadImageTiny({
         }
         const invalidFileSizeExceeded = invalidFiles.find(
           (result) =>
-            result.validation.type === "FILE_SIZE_EXCEEDS_MAXIMUM_ALLOWED_SIZE"
+            result.validation.type === "FILE_SIZE_EXCEEDS_MAXIMUM_ALLOWED_SIZE",
         );
+
         if (invalidFileSizeExceeded) {
           addToast({
             title: t("invalidFile"),
@@ -125,6 +131,7 @@ export default function IBaseUploadImageTiny({
       const newItems: ImageUploadItem[] = validFiles.map(({ file }) => {
         const extension = getFileExtension(file.name);
         const uid = `${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
         fileItemMap.set(uid, file);
 
         return {
@@ -140,6 +147,7 @@ export default function IBaseUploadImageTiny({
       // If no upload service, add items immediately
       if (!uploadService) {
         handleItemsChange([...items, ...newItems]);
+
         return;
       }
 
@@ -151,9 +159,12 @@ export default function IBaseUploadImageTiny({
       for (const chunk of chunks) {
         // Mark items as uploading
         const chunkUids = chunk.map((item) => item.uid);
+
         setUploadingItems((prev) => {
           const next = new Set(prev);
+
           chunkUids.forEach((uid) => next.add(uid));
+
           return next;
         });
 
@@ -163,15 +174,19 @@ export default function IBaseUploadImageTiny({
             if (chunkUids.includes(item.uid)) {
               return { ...item, status: "uploading" as const };
             }
+
             return item;
           });
+
           handleItemsChange(updated);
+
           return updated;
         });
 
         // Upload chunk in parallel
         const uploadPromises = chunk.map(async (item) => {
           const file = fileItemMap.get(item.uid);
+
           if (!file) {
             return {
               uid: item.uid,
@@ -182,6 +197,7 @@ export default function IBaseUploadImageTiny({
 
           try {
             const result = await uploadService(file);
+
             return {
               uid: item.uid,
               id: result.id,
@@ -208,41 +224,47 @@ export default function IBaseUploadImageTiny({
             status: result.success ? ("done" as const) : ("error" as const),
           };
         });
+
         handleItemsChange([...items, ...updatedItems] as ImageUploadItem[]);
         setItems([...items, ...updatedItems] as ImageUploadItem[]);
         setUploadingItems(new Set());
       }
     },
-    [items, maxCount, accept, maxSize, uploadService, handleItemsChange]
+    [items, maxCount, accept, maxSize, uploadService, handleItemsChange],
   );
 
   const handleRemove = useCallback(
     (uid: string) => {
       const newItems = items.filter((item) => item.uid !== uid);
+
       handleItemsChange(newItems);
     },
-    [items, handleItemsChange]
+    [items, handleItemsChange],
   );
 
   const canAddMore = items.length < maxCount;
   const isUploadDisabled = isDisabled || !canAddMore;
 
   const handleDrop = useCallback(
-    (e: React.DragEvent<HTMLDivElement>) => {
+    (e: React.DragEvent<HTMLDivElement | HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
       if (isUploadDisabled) return;
 
       const files = e.dataTransfer.files;
+
       handleFileSelect(files);
     },
-    [isUploadDisabled, handleFileSelect]
+    [isUploadDisabled, handleFileSelect],
   );
 
-  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-  }, []);
+  const handleDragOver = useCallback(
+    (e: React.DragEvent<HTMLDivElement | HTMLButtonElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+    },
+    [],
+  );
 
   const handleClick = useCallback(() => {
     if (!isUploadDisabled) {
@@ -263,9 +285,9 @@ export default function IBaseUploadImageTiny({
           <Card key={item.uid}>
             <CardBody className="p-1">
               <IBaseUploadImageTinyItem
-                item={item}
-                isUploading={uploadingItems.has(item.uid)}
                 isDisabled={isDisabled}
+                isUploading={uploadingItems.has(item.uid)}
+                item={item}
                 onRemove={() => handleRemove(item.uid)}
               />
             </CardBody>
@@ -273,30 +295,31 @@ export default function IBaseUploadImageTiny({
         ))}
 
         {canAddMore && (
-          <div
-            className={`border-2 border-dashed rounded-lg p-2 transition-colors ${
+          <button
+            className={`border-2 border-dashed rounded-lg p-2 transition-colors text-left ${
               isUploadDisabled
                 ? "border-default-200 bg-default-50 cursor-not-allowed"
                 : "border-default-300 hover:border-primary-400 cursor-pointer bg-default-50"
             }`}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
+            type="button"
             onClick={handleClick}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
           >
             <input
               ref={fileInputRef}
-              type="file"
-              accept={accept}
               multiple
+              accept={accept}
               className="hidden"
               disabled={isUploadDisabled}
+              type="file"
               onChange={(e) => handleFileSelect(e.target.files)}
             />
 
-            <div className="flex flex-col items-center justify-center gap-1 py-2">
+            <div className="flex flex-col items-center justify-center gap-1 py-2 pointer-events-none">
               <Upload
-                size={16}
                 className={`${isUploadDisabled ? "text-default-300" : "text-default-400"}`}
+                size={16}
               />
               <p
                 className={`text-xs text-center ${isUploadDisabled ? "text-default-400" : "text-default-500"}`}
@@ -310,7 +333,7 @@ export default function IBaseUploadImageTiny({
                 {t("maxSize", { size: (maxSize / (1024 * 1024)).toFixed(0) })}
               </p>
             </div>
-          </div>
+          </button>
         )}
       </div>
       {error && <p className="text-xs text-danger mt-1">{error}</p>}

@@ -1,16 +1,19 @@
 "use client";
 
+import type { InputProps } from "@heroui/input";
+
 import { IBaseInput } from "@base/client/components";
 import { Button } from "@heroui/button";
-import type { InputProps } from "@heroui/input";
 import { ArrowRight, Languages } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import React, { useCallback, useMemo, useState } from "react";
+
 import {
   DEFAULT_SUPPORTED_LANGS,
   LocalizeText,
   LocalizeTextKey,
 } from "../../interface/LocalizeText";
+
 import TranslateModal from "./TranslateModal";
 
 type IBaseInputMultipleLangProps = Omit<
@@ -25,7 +28,7 @@ type IBaseInputMultipleLangProps = Omit<
 // Helper function outside component to avoid recreation on each render
 const getLangValue = (
   value: LocalizeText | string | undefined,
-  lang: LocalizeTextKey
+  lang: LocalizeTextKey,
 ): string => {
   if (typeof value === "string") {
     return value;
@@ -33,6 +36,7 @@ const getLangValue = (
   if (typeof value === "object" && value !== null) {
     return value[lang] ?? "";
   }
+
   return "";
 };
 
@@ -49,17 +53,17 @@ const IBaseInputMultipleLang = React.forwardRef<
   // Get current locale value for main input
   const currentLocaleValue = useMemo(
     () => getLangValue(value, locale as LocalizeTextKey),
-    [value, locale]
+    [value, locale],
   );
 
   // Check if should show copy button
   const shouldShowCopyButton = useMemo(() => {
     const currentValue = currentLocaleValue.trim();
     const otherLangs = DEFAULT_SUPPORTED_LANGS.filter(
-      (lang) => lang !== locale
+      (lang) => lang !== locale,
     );
     const otherLangsValues = otherLangs.map((lang) =>
-      getLangValue(value, lang as LocalizeTextKey).trim()
+      getLangValue(value, lang as LocalizeTextKey).trim(),
     );
 
     // Case 1: Current locale is empty but at least one other lang has value
@@ -84,9 +88,10 @@ const IBaseInputMultipleLang = React.forwardRef<
         ...currentValue,
         [locale as LocalizeTextKey]: newValue,
       } as LocalizeText;
+
       onValueChange?.(newLocalizeValue);
     },
-    [value, locale, onValueChange]
+    [value, locale, onValueChange],
   );
 
   const handleCopyToAll = useCallback(() => {
@@ -95,10 +100,12 @@ const IBaseInputMultipleLang = React.forwardRef<
     const newLocalizeValue = DEFAULT_SUPPORTED_LANGS.reduce<LocalizeText>(
       (acc, lang) => {
         acc[lang as LocalizeTextKey] = valueToCopy;
+
         return acc;
       },
-      {} as LocalizeText
+      {} as LocalizeText,
     );
+
     onValueChange?.(newLocalizeValue);
   }, [currentLocaleValue, onValueChange]);
 
@@ -106,7 +113,7 @@ const IBaseInputMultipleLang = React.forwardRef<
     (langs: LocalizeText) => {
       onValueChange?.(langs);
     },
-    [onValueChange]
+    [onValueChange],
   );
 
   const handleOpenModal = useCallback(() => {
@@ -124,49 +131,51 @@ const IBaseInputMultipleLang = React.forwardRef<
         {shouldShowCopyButton && (
           <Button
             isIconOnly
+            className="min-w-0 w-6 h-6"
             size="sm"
+            title={t("copyToAll")}
             variant="light"
             onPress={handleCopyToAll}
-            className="min-w-0 w-6 h-6"
-            title={t("copyToAll")}
           >
-            <ArrowRight size={16} className="text-primary" />
+            <ArrowRight className="text-primary" size={16} />
           </Button>
         )}
         <Button
           isIconOnly
+          className="min-w-0 w-6 h-6"
           size="sm"
+          title={t("title")}
           variant="light"
           onPress={handleOpenModal}
-          className="min-w-0 w-6 h-6"
-          title={t("title")}
         >
-          <Languages size={16} className="text-primary" />
+          <Languages className="text-primary" size={16} />
         </Button>
       </div>
     ),
-    [shouldShowCopyButton, handleCopyToAll, handleOpenModal]
+    [shouldShowCopyButton, handleCopyToAll, handleOpenModal],
   );
 
   return (
     <>
       <IBaseInput
         ref={ref}
+        endContent={endContent}
         value={currentLocaleValue}
         onValueChange={handleMainInputChange}
-        endContent={endContent}
         {...restProps}
       />
       {isModalOpen && (
         <TranslateModal
           isOpen={isModalOpen}
+          value={value}
           onClose={handleCloseModal}
           onSave={handleSave}
-          value={value}
         />
       )}
     </>
   );
 });
+
+IBaseInputMultipleLang.displayName = "IBaseInputMultipleLang";
 
 export default IBaseInputMultipleLang;

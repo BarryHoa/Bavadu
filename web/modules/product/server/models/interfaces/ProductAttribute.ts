@@ -9,4 +9,3 @@ export interface ProductAttribute {
   name: LocaleDataType<string>;
   value: string;
 }
-

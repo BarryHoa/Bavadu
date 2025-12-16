@@ -2,7 +2,6 @@
 // User Type
 //========================================
 
-
 export interface User {
   id: string; // uuid v7
   username: string;
@@ -40,4 +39,3 @@ export interface UserInfo extends User {
   createdBy: string;
   updatedBy: string;
 }
-

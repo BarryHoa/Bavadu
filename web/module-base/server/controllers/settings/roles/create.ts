@@ -1,5 +1,6 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { NextRequest } from "next/server";
+
 import RoleModel, { type RoleInput } from "../../../models/Role/RoleModel";
 
 export async function POST(request: NextRequest) {
@@ -46,6 +47,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error creating role:", error);
+
     return JSONResponse({
       error: "Failed to create role",
       message: error instanceof Error ? error.message : "Unknown error",
