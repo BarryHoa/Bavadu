@@ -1,5 +1,7 @@
+import { requirePermissions } from "@base/server/middleware";
 import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { escapeHtml } from "@base/server/utils/xss-protection";
+import { NextRequest } from "next/server";
 
 import { RuntimeContext } from "../../../runtime/RuntimeContext";
 
@@ -7,8 +9,16 @@ type ReloadModelRequest = {
   key?: unknown;
 };
 
-export async function POST(request: Request) {
+const REQUIRED_PERMISSIONS = ["system.models.reload"];
+
+export async function POST(request: NextRequest) {
   try {
+    const authzResponse = await requirePermissions(request, REQUIRED_PERMISSIONS);
+
+    if (authzResponse) {
+      return authzResponse;
+    }
+
     const body = (await request.json().catch(() => ({}))) as ReloadModelRequest;
     const modelKey = typeof body.key === "string" ? body.key.trim() : "";
 

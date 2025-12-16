@@ -1,9 +1,19 @@
+import { requirePermissions } from "@base/server/middleware";
 import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { NextRequest } from "next/server";
 
 import RoleModel from "../../../models/Role/RoleModel";
 
-export async function GET() {
+const REQUIRED_PERMISSIONS = ["settings.roles.read"];
+
+export async function GET(request: NextRequest) {
   try {
+    const authzResponse = await requirePermissions(request, REQUIRED_PERMISSIONS);
+
+    if (authzResponse) {
+      return authzResponse;
+    }
+
     const roleModel = new RoleModel();
     const roles = await roleModel.getAllRoles();
 

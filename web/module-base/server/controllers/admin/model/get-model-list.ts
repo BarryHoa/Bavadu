@@ -1,4 +1,6 @@
+import { requirePermissions } from "@base/server/middleware";
 import { JSONResponse } from "@base/server/utils/JSONResponse";
+import { NextRequest } from "next/server";
 
 import { RuntimeContext } from "../../../runtime/RuntimeContext";
 
@@ -19,7 +21,15 @@ const getModelList = async () => {
   return sortedModelKeys;
 };
 
-export async function GET() {
+const REQUIRED_PERMISSIONS = ["system.models.read"];
+
+export async function GET(request: NextRequest) {
+  const authzResponse = await requirePermissions(request, REQUIRED_PERMISSIONS);
+
+  if (authzResponse) {
+    return authzResponse;
+  }
+
   const modelList = await getModelList();
 
   return JSONResponse({

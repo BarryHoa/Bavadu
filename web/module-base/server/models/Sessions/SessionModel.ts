@@ -82,17 +82,22 @@ class SessionModel extends BaseModel<typeof base_tb_sessions> {
       .innerJoin(base_tb_users, eq(this.table.userId, base_tb_users.id))
       .leftJoin(
         base_tb_users_login,
-        eq(base_tb_users.id, base_tb_users_login.userId),
+        eq(base_tb_users.id, base_tb_users_login.userId)
       )
       .where(
         and(
           eq(this.table.sessionToken, sessionToken),
-          gt(this.table.expiresAt, now),
-        ),
+          gt(this.table.expiresAt, now)
+        )
       )
       .limit(1);
 
     if (!session) {
+      return { valid: false };
+    }
+
+    // Ensure user is still active; if not, treat session as invalid
+    if (session.user.status !== "active") {
       return { valid: false };
     }
 
@@ -164,11 +169,11 @@ class SessionModel extends BaseModel<typeof base_tb_sessions> {
    */
   async extendSession(
     sessionToken: string,
-    expiresIn?: number,
+    expiresIn?: number
   ): Promise<boolean> {
     const now = new Date();
     const newExpiresAt = new Date(
-      now.getTime() + (expiresIn || 7 * 24 * 60 * 60 * 1000),
+      now.getTime() + (expiresIn || 7 * 24 * 60 * 60 * 1000)
     );
 
     const result = await this.db

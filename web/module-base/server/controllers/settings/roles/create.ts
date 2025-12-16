@@ -1,10 +1,19 @@
+import { requirePermissions } from "@base/server/middleware";
 import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { NextRequest } from "next/server";
 
 import RoleModel, { type RoleInput } from "../../../models/Role/RoleModel";
 
+const REQUIRED_PERMISSIONS = ["settings.roles.manage"];
+
 export async function POST(request: NextRequest) {
   try {
+    const authzResponse = await requirePermissions(request, REQUIRED_PERMISSIONS);
+
+    if (authzResponse) {
+      return authzResponse;
+    }
+
     const body = await request.json();
     const { code, name, description, permissionIds } = body;
 
