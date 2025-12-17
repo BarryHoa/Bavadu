@@ -2,7 +2,11 @@
 
 import type { ContractFormValues } from "../../validation/contractValidation";
 
-import { IBaseInput, IBaseSingleSelectAsync } from "@base/client/components";
+import {
+  IBaseDatePicker,
+  IBaseInput,
+  IBaseSingleSelectAsync,
+} from "@base/client/components";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
@@ -151,14 +155,14 @@ export default function ContractForm({
               control={control}
               name="startDate"
               render={({ field, fieldState }) => (
-                <IBaseInput
-                  {...field}
+                <IBaseDatePicker
                   isRequired
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={tLabels("startDate")}
                   size="sm"
-                  type="date"
+                  value={field.value ?? ""}
+                  onChange={(value) => field.onChange(value ?? "")}
                 />
               )}
             />
@@ -167,13 +171,13 @@ export default function ContractForm({
               control={control}
               name="endDate"
               render={({ field, fieldState }) => (
-                <IBaseInput
-                  {...field}
+                <IBaseDatePicker
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={tLabels("endDate")}
                   size="sm"
-                  type="date"
+                  value={field.value ?? ""}
+                  onChange={(value) => field.onChange(value ?? "")}
                 />
               )}
             />
@@ -251,13 +255,13 @@ export default function ContractForm({
               control={control}
               name="probationEndDate"
               render={({ field, fieldState }) => (
-                <IBaseInput
-                  {...field}
+                <IBaseDatePicker
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={tLabels("probationEndDate")}
                   size="sm"
-                  type="date"
+                  value={field.value ?? ""}
+                  onChange={(value) => field.onChange(value ?? "")}
                 />
               )}
             />
@@ -266,13 +270,13 @@ export default function ContractForm({
               control={control}
               name="signedDate"
               render={({ field, fieldState }) => (
-                <IBaseInput
-                  {...field}
+                <IBaseDatePicker
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={tLabels("signedDate")}
                   size="sm"
-                  type="date"
+                  value={field.value ?? ""}
+                  onChange={(value) => field.onChange(value ?? "")}
                 />
               )}
             />

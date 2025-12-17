@@ -1,7 +1,7 @@
 "use client";
 
 import type { Dayjs } from "dayjs";
-import React from "react";
+import { useTranslations } from "next-intl";
 
 import IBaseDatePicker, {
   type IBaseDatePickerProps,
@@ -10,23 +10,33 @@ import IBaseDatePicker, {
 
 export type IBaseMonthPickerValue = IBaseDatePickerValue;
 
-export type IBaseMonthPickerProps = Omit<IBaseDatePickerProps, "quickSelect"> & {
+export type IBaseMonthPickerProps = Omit<
+  IBaseDatePickerProps,
+  "quickSelect"
+> & {
   format?: string; // default YYYY-MM
   showThisMonth?: boolean;
 };
 
 export default function IBaseMonthPicker(props: IBaseMonthPickerProps) {
-  const { format = "YYYY-MM", showThisMonth = true, ...rest } = props;
+  const t = useTranslations("components.picker");
+  const {
+    placeholder,
+    format = "MM/YYYY",
+    showThisMonth = true,
+    ...rest
+  } = props;
 
   return (
     <IBaseDatePicker
       {...rest}
+      placeholder={placeholder ?? t("month.placeholder", { format })}
       calendarProps={{ showMonthAndYearPickers: true, ...rest.calendarProps }}
       format={format}
       quickSelect={
         showThisMonth
           ? ({
-              label: "This month",
+              label: t("month.thisMonth"),
               getValue: (now: Dayjs) => now.startOf("month"),
             } as const)
           : false
@@ -34,5 +44,3 @@ export default function IBaseMonthPicker(props: IBaseMonthPickerProps) {
     />
   );
 }
-
-

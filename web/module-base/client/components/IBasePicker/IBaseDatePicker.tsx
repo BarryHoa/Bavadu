@@ -6,11 +6,11 @@ import type { Dayjs } from "dayjs";
 
 import IBaseInput from "@base/client/components/IBaseInput";
 import { SYSTEM_TIMEZONE } from "@base/shared/constants";
-import { Button } from "@heroui/button";
 import { Calendar } from "@heroui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
 import clsx from "clsx";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React, {
   useCallback,
   useEffect,
@@ -26,6 +26,7 @@ import {
   nowInTz,
   toDayjs,
 } from "../../utils/date/parseDateInput";
+import ButtonFastChoose from "./components/ButtonFastChoose";
 
 export type IBaseDatePickerValue = string | Dayjs | null;
 
@@ -53,6 +54,13 @@ export interface IBaseDatePickerProps extends Omit<
   value?: IBaseDatePickerValue;
   defaultValue?: IBaseDatePickerValue;
   onChange?: (value: string | null) => void;
+  /**
+   * Allow clearing the current value via a clear icon.
+   * - true: show clear icon (when input has value) and allow setting value to null
+   * - false: hide clear icon and prevent clearing; empty input reverts to previous value
+   * @default true
+   */
+  allowClear?: boolean;
   format?: string;
   minDate?: string | Dayjs;
   maxDate?: string | Dayjs;
@@ -67,14 +75,16 @@ export interface IBaseDatePickerProps extends Omit<
   }) => React.ReactNode;
 }
 
-const DEFAULT_FORMAT = "YYYY-MM-DD";
+const DEFAULT_FORMAT = "DD/MM/YYYY";
 
 export default function IBaseDatePicker(props: IBaseDatePickerProps) {
+  const t = useTranslations("components.picker");
   const {
     value,
     defaultValue,
     onChange,
     format = DEFAULT_FORMAT,
+    allowClear = true,
     minDate,
     maxDate,
     timezone = SYSTEM_TIMEZONE,
@@ -169,6 +179,13 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
     const text = draftText.trim();
 
     if (!text) {
+      if (!allowClear) {
+        // Prevent clearing: revert to last committed value
+        setDraftText(committedText);
+        setDraftDayjs(committedDayjs);
+        setIsDraftInvalid(false);
+        return true;
+      }
       setIsDraftInvalid(false);
 
       if (value === undefined) setUncontrolledValue(null);
@@ -199,7 +216,17 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
     onChange?.(out);
 
     return true;
-  }, [draftText, format, onChange, timezone, validateAgainstMinMax, value]);
+  }, [
+    allowClear,
+    committedDayjs,
+    committedText,
+    draftText,
+    format,
+    onChange,
+    timezone,
+    validateAgainstMinMax,
+    value,
+  ]);
 
   const close = useCallback(() => {
     setIsOpen(false);
@@ -266,6 +293,13 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
     const parsed = toDayjs(next, format, timezone);
 
     if (!next.trim()) {
+      if (!allowClear) {
+        // Prevent clearing: revert to last committed value
+        setDraftText(committedText);
+        setDraftDayjs(committedDayjs);
+        setIsDraftInvalid(false);
+        return;
+      }
       setDraftDayjs(null);
       setIsDraftInvalid(false);
 
@@ -290,12 +324,31 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
     setIsDraftInvalid(false);
   };
 
+  const today = useMemo(() => nowInTz(timezone), [timezone]);
+  const todayCalendarValue = useMemo(
+    () => dayjsToCalendarDate(today, timezone),
+    [today, timezone]
+  );
+
   const handleCalendarChange = useCallback(
     (val: DateValue | null) => {
       if (!val) {
+        if (!allowClear) {
+          // Prevent clearing: revert to last committed value
+          setDraftText(committedText);
+          setDraftDayjs(committedDayjs);
+          setIsDraftInvalid(false);
+          close();
+          return;
+        }
         setDraftDayjs(null);
         setDraftText("");
         setIsDraftInvalid(false);
+        setFocusedValue(todayCalendarValue);
+
+        if (value === undefined) setUncontrolledValue(null);
+        onChange?.(null);
+        close();
 
         return;
       }
@@ -305,8 +358,24 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
       setDraftDayjs(d);
       setDraftText(out);
       setIsDraftInvalid(false);
+      setFocusedValue(val);
+
+      // Apply immediately then close
+      if (value === undefined) setUncontrolledValue(out);
+      onChange?.(out);
+      close();
     },
-    [format, timezone]
+    [
+      allowClear,
+      close,
+      committedDayjs,
+      committedText,
+      format,
+      onChange,
+      timezone,
+      todayCalendarValue,
+      value,
+    ]
   );
 
   const selectedValue = useMemo(() => {
@@ -315,7 +384,14 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
     return dayjsToCalendarDate(draftDayjs, timezone);
   }, [draftDayjs, timezone]);
 
-  const today = useMemo(() => nowInTz(timezone), [timezone]);
+  // Control the calendar focus so we can programmatically "jump" the view
+  // (e.g. when clicking ButtonFastChoose).
+  const [focusedValue, setFocusedValue] = useState<DateValue | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setFocusedValue(selectedValue ?? todayCalendarValue);
+  }, [isOpen, selectedValue, todayCalendarValue]);
 
   const resolvedQuickSelect: Exclude<IBaseDatePickerQuickSelect, false> | null =
     useMemo(() => {
@@ -324,40 +400,52 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
       if (!showToday) return null;
 
       return {
-        label: "Today",
+        label: t("date.quickToday"),
         getValue: (now) => (hasTime ? now : now.startOf("day")),
       };
-    }, [hasTime, quickSelect, showToday]);
+    }, [hasTime, quickSelect, showToday, t]);
 
   const content = (
-    <div className="flex flex-col gap-2 p-2">
+    <div className="flex flex-col gap-2 ">
       <Calendar
         {...calendarProps}
+        focusedValue={calendarProps?.focusedValue ?? focusedValue}
+        onFocusChange={(date) => {
+          setFocusedValue(date);
+          calendarProps?.onFocusChange?.(date);
+        }}
         bottomContent={
           resolvedQuickSelect ? (
-            <div className="flex justify-end pt-2">
-              <Button
-                size="sm"
-                variant="flat"
-                onPress={() => {
-                  const d = resolvedQuickSelect.getValue(today);
-                  const out = formatDayjs(d, format, timezone);
+            <ButtonFastChoose
+              label={resolvedQuickSelect.label}
+              onPress={() => {
+                const d = resolvedQuickSelect.getValue(today);
+                const out = formatDayjs(d, format, timezone);
+                const nextFocus = dayjsToCalendarDate(d, timezone);
 
-                  setDraftDayjs(d);
-                  setDraftText(out);
-                  setIsDraftInvalid(false);
-                }}
-              >
-                {resolvedQuickSelect.label}
-              </Button>
-            </div>
+                setDraftDayjs(d);
+                setDraftText(out);
+                setIsDraftInvalid(false);
+                setFocusedValue(nextFocus);
+                // If consumer provided controlled focus handling, notify them too.
+                calendarProps?.onFocusChange?.(nextFocus as any);
+
+                // Apply immediately then close
+                if (value === undefined) setUncontrolledValue(out);
+                onChange?.(out);
+                close();
+              }}
+            />
           ) : null
         }
         maxValue={maxValue}
         minValue={minValue}
         showHelper={false}
         value={selectedValue}
-        onChange={handleCalendarChange}
+        onChange={(val) => {
+          handleCalendarChange(val);
+          if (val) setFocusedValue(val);
+        }}
       />
     </div>
   );
@@ -366,21 +454,75 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
     ? dropdownRenderer({ content, close: commitAndClose, isOpen })
     : content;
 
+  const showClearIcon = allowClear && Boolean(draftText.trim());
+  const resolvedPlaceholder = useMemo(() => {
+    if (rest.placeholder) return rest.placeholder;
+    return hasTime
+      ? t("date.placeholderDateTime", { format })
+      : t("date.placeholder", { format });
+  }, [format, hasTime, rest.placeholder, t]);
+
+  const handleClear = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (isDisabled) return;
+
+      setDraftText("");
+      setDraftDayjs(null);
+      setIsDraftInvalid(false);
+      setFocusedValue(todayCalendarValue);
+
+      if (value === undefined) setUncontrolledValue(null);
+      onChange?.(null);
+      close();
+
+      requestAnimationFrame(() => inputRef.current?.focus());
+    },
+    [close, isDisabled, onChange, todayCalendarValue, value]
+  );
+
   return (
-    <Popover isOpen={isOpen} placement="bottom" onOpenChange={handleOpenChange}>
+    <Popover
+      isOpen={isOpen}
+      placement="bottom"
+      classNames={{
+        // Prevent HeroUI Popover trigger from shrinking/fading when open
+        trigger: "aria-expanded:!scale-100 aria-expanded:!opacity-100",
+      }}
+      onOpenChange={handleOpenChange}
+    >
       <PopoverTrigger>
         <div className={clsx("w-full", className)}>
           <IBaseInput
             {...rest}
             ref={inputRef}
+            placeholder={resolvedPlaceholder}
             endContent={
-              endContent ?? (
-                <CalendarIcon
-                  aria-hidden="true"
-                  className="text-default-400"
-                  size={16}
-                />
-              )
+              <div className="flex items-center gap-1 cursor-pointer">
+                {showClearIcon ? (
+                  <button
+                    aria-label={t("date.clearAriaLabel")}
+                    className="cursor-pointer rounded-small p-1 text-default-400 transition-colors hover:text-danger-500"
+                    type="button"
+                    onMouseDown={(e) => {
+                      // keep input focused
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    onClick={handleClear}
+                  >
+                    <X className="size-4" />
+                  </button>
+                ) : null}
+                {endContent ?? (
+                  <CalendarIcon
+                    aria-hidden="true"
+                    className="text-default-400"
+                    size={16}
+                  />
+                )}
+              </div>
             }
             isDisabled={isDisabled}
             isInvalid={rest.isInvalid || isDraftInvalid}

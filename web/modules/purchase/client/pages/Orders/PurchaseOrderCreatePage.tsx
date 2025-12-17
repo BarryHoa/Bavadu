@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  IBaseDatePicker,
   IBaseInput,
   IBaseSingleSelect,
   SelectItemOption,
@@ -10,6 +11,7 @@ import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { Button } from "@heroui/button";
 import { Card, CardBody, Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import StockService from "@mdl/stock/client/services/StockService";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
@@ -29,7 +31,6 @@ import {
   string,
   trim,
 } from "valibot";
-import StockService from "@mdl/stock/client/services/StockService";
 
 import { purchaseOrderService } from "../../services/PurchaseOrderService";
 
@@ -39,8 +40,8 @@ const quantitySchema = pipe(
   minLength(1, "Quantity is required"),
   custom(
     (value) => !Number.isNaN(Number(value)) && Number(value) > 0,
-    "Quantity must be a positive number",
-  ),
+    "Quantity must be a positive number"
+  )
 );
 
 const unitPriceSchema = pipe(
@@ -49,8 +50,8 @@ const unitPriceSchema = pipe(
   custom(
     (value) =>
       value === "" || (!Number.isNaN(Number(value)) && Number(value) >= 0),
-    "Unit price must be a number greater than or equal to 0",
-  ),
+    "Unit price must be a number greater than or equal to 0"
+  )
 );
 
 const orderLineSchema = object({
@@ -68,7 +69,7 @@ const purchaseOrderFormSchema = object({
   notes: optional(pipe(string(), trim())),
   lines: pipe(
     array(orderLineSchema),
-    minLength(1, "At least one order line is required"),
+    minLength(1, "At least one order line is required")
   ),
 });
 
@@ -185,7 +186,7 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
         value: warehouse.id,
         label: `${warehouse.code} — ${warehouse.name}`,
       })),
-    [warehousesQuery.data],
+    [warehousesQuery.data]
   );
 
   return (
@@ -253,14 +254,12 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
                 control={control}
                 name="expectedDate"
                 render={({ field, fieldState }) => (
-                  <IBaseInput
-                    {...field}
+                  <IBaseDatePicker
                     errorMessage={fieldState.error?.message}
                     isInvalid={fieldState.invalid}
                     label="Expected date"
-                    type="date"
                     value={field.value ?? ""}
-                    onValueChange={field.onChange}
+                    onChange={(value) => field.onChange(value ?? "")}
                   />
                 )}
               />

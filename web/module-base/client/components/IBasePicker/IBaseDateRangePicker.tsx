@@ -9,7 +9,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
 import type { DateValue } from "@react-types/calendar";
 import type { RangeValue } from "@react-types/shared";
 import clsx from "clsx";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React, {
   useCallback,
   useEffect,
@@ -53,6 +54,16 @@ export interface IBaseDateRangePickerProps extends Omit<
   onChange?: (
     value: { start: string | null; end: string | null } | null
   ) => void;
+  startPlaceholder?: string;
+  endPlaceholder?: string;
+  /**
+   * Allow clearing the current value via clear icons.
+   * - true: allow clearing both start/end
+   * - false: prevent clearing both start/end (empty input reverts)
+   * - [start, end]: allow clearing start/end individually
+   * @default true
+   */
+  allowClear?: boolean | [boolean, boolean];
   format?: string;
   minDate?: string | Dayjs;
   maxDate?: string | Dayjs;
@@ -65,13 +76,29 @@ export interface IBaseDateRangePickerProps extends Omit<
   }) => React.ReactNode;
 }
 
-const DEFAULT_FORMAT = "YYYY-MM-DD";
+const DEFAULT_FORMAT = "DD/MM/YYYY";
 
-function defaultPresets(tz: string): RangePreset[] {
+function defaultPresets(
+  tz: string,
+  labels: {
+    today: React.ReactNode;
+    thisWeek: React.ReactNode;
+    lastWeek: React.ReactNode;
+    thisMonth: React.ReactNode;
+    lastMonth: React.ReactNode;
+    last3Months: React.ReactNode;
+    last6Months: React.ReactNode;
+    thisYear: React.ReactNode;
+    lastYear: React.ReactNode;
+    last2Years: React.ReactNode;
+    last3Years: React.ReactNode;
+    last5Years: React.ReactNode;
+  }
+): RangePreset[] {
   const presets: RangePreset[] = [
     {
       key: "today",
-      label: "Today",
+      label: labels.today,
       range: (now) => ({
         start: now.startOf("day"),
         end: now.endOf("day"),
@@ -79,7 +106,7 @@ function defaultPresets(tz: string): RangePreset[] {
     },
     {
       key: "this_week",
-      label: "Tuần này",
+      label: labels.thisWeek,
       range: (now) => ({
         start: now.startOf("isoWeek"),
         end: now.endOf("isoWeek"),
@@ -87,7 +114,7 @@ function defaultPresets(tz: string): RangePreset[] {
     },
     {
       key: "last_week",
-      label: "Tuần trước",
+      label: labels.lastWeek,
       range: (now) => {
         const n = now.subtract(1, "week");
         return { start: n.startOf("isoWeek"), end: n.endOf("isoWeek") };
@@ -95,7 +122,7 @@ function defaultPresets(tz: string): RangePreset[] {
     },
     {
       key: "this_month",
-      label: "Tháng này",
+      label: labels.thisMonth,
       range: (now) => ({
         start: now.startOf("month"),
         end: now.endOf("month"),
@@ -103,7 +130,7 @@ function defaultPresets(tz: string): RangePreset[] {
     },
     {
       key: "last_month",
-      label: "Tháng trước",
+      label: labels.lastMonth,
       range: (now) => {
         const n = now.subtract(1, "month");
         return { start: n.startOf("month"), end: n.endOf("month") };
@@ -111,7 +138,7 @@ function defaultPresets(tz: string): RangePreset[] {
     },
     {
       key: "last_3_months",
-      label: "3 tháng gần nhất",
+      label: labels.last3Months,
       range: (now) => ({
         start: now.subtract(2, "month").startOf("month"),
         end: now.endOf("month"),
@@ -119,7 +146,7 @@ function defaultPresets(tz: string): RangePreset[] {
     },
     {
       key: "last_6_months",
-      label: "6 tháng gần nhất",
+      label: labels.last6Months,
       range: (now) => ({
         start: now.subtract(5, "month").startOf("month"),
         end: now.endOf("month"),
@@ -127,12 +154,12 @@ function defaultPresets(tz: string): RangePreset[] {
     },
     {
       key: "this_year",
-      label: "Năm nay",
+      label: labels.thisYear,
       range: (now) => ({ start: now.startOf("year"), end: now.endOf("year") }),
     },
     {
       key: "last_year",
-      label: "Năm trước",
+      label: labels.lastYear,
       range: (now) => {
         const n = now.subtract(1, "year");
         return { start: n.startOf("year"), end: n.endOf("year") };
@@ -140,7 +167,7 @@ function defaultPresets(tz: string): RangePreset[] {
     },
     {
       key: "last_2_years",
-      label: "2 năm gần nhất",
+      label: labels.last2Years,
       range: (now) => ({
         start: now.subtract(1, "year").startOf("year"),
         end: now.endOf("year"),
@@ -148,7 +175,7 @@ function defaultPresets(tz: string): RangePreset[] {
     },
     {
       key: "last_3_years",
-      label: "3 năm gần nhất",
+      label: labels.last3Years,
       range: (now) => ({
         start: now.subtract(2, "year").startOf("year"),
         end: now.endOf("year"),
@@ -156,7 +183,7 @@ function defaultPresets(tz: string): RangePreset[] {
     },
     {
       key: "last_5_years",
-      label: "5 năm gần nhất",
+      label: labels.last5Years,
       range: (now) => ({
         start: now.subtract(4, "year").startOf("year"),
         end: now.endOf("year"),
@@ -182,10 +209,15 @@ function toDayjsSafe(
 }
 
 export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
+  const t = useTranslations("components.picker");
   const {
     value,
     defaultValue,
     onChange,
+    placeholder,
+    startPlaceholder,
+    endPlaceholder,
+    allowClear = true,
     format = DEFAULT_FORMAT,
     minDate,
     maxDate,
@@ -203,7 +235,26 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
     ...rest
   } = props;
 
+  const [allowClearStart, allowClearEnd] = useMemo(() => {
+    if (Array.isArray(allowClear)) return allowClear;
+    return [allowClear, allowClear] as const;
+  }, [allowClear]);
+
   const hasTime = useMemo(() => /H|m|s/.test(format), [format]);
+  const resolvedStartPlaceholder = useMemo(() => {
+    if (startPlaceholder) return startPlaceholder;
+    if (placeholder) return placeholder;
+    return hasTime
+      ? t("range.startPlaceholderDateTime", { format })
+      : t("range.startPlaceholder", { format });
+  }, [format, hasTime, placeholder, startPlaceholder, t]);
+  const resolvedEndPlaceholder = useMemo(() => {
+    if (endPlaceholder) return endPlaceholder;
+    if (placeholder) return placeholder;
+    return hasTime
+      ? t("range.endPlaceholderDateTime", { format })
+      : t("range.endPlaceholder", { format });
+  }, [endPlaceholder, format, hasTime, placeholder, t]);
   const startRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLInputElement>(null);
 
@@ -292,6 +343,18 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
     const eText = draftEndText.trim();
 
     if (!sText && !eText) {
+      if (!allowClearStart && committedStartText) {
+        setDraftStartText(committedStartText);
+        setDraftStart(committedStart);
+      }
+      if (!allowClearEnd && committedEndText) {
+        setDraftEndText(committedEndText);
+        setDraftEnd(committedEnd);
+      }
+      if (!allowClearStart || !allowClearEnd) {
+        setIsDraftInvalid(false);
+        return true;
+      }
       setIsDraftInvalid(false);
       if (value === undefined) setUncontrolledValue(null);
       onChange?.(null);
@@ -329,6 +392,12 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
     onChange?.(out);
     return true;
   }, [
+    allowClearEnd,
+    allowClearStart,
+    committedEnd,
+    committedEndText,
+    committedStart,
+    committedStartText,
     draftEndText,
     draftStartText,
     format,
@@ -402,11 +471,23 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
 
   const handleStartChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const next = e.target.value;
+    if (!allowClearStart && !next.trim()) {
+      setDraftStartText(committedStartText);
+      setDraftStart(committedStart);
+      setIsDraftInvalid(false);
+      return;
+    }
     setDraftStartText(next);
     updateDraftFromText(next, draftEndText);
   };
   const handleEndChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const next = e.target.value;
+    if (!allowClearEnd && !next.trim()) {
+      setDraftEndText(committedEndText);
+      setDraftEnd(committedEnd);
+      setIsDraftInvalid(false);
+      return;
+    }
     setDraftEndText(next);
     updateDraftFromText(draftStartText, next);
   };
@@ -414,6 +495,20 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
   const handleRangeCalendarChange = useCallback(
     (val: RangeValue<DateValue> | null) => {
       if (!val?.start || !val?.end) {
+        if (!allowClearStart) {
+          setDraftStart(committedStart);
+          setDraftStartText(committedStartText);
+        } else {
+          setDraftStart(null);
+          setDraftStartText("");
+        }
+        if (!allowClearEnd) {
+          setDraftEnd(committedEnd);
+          setDraftEndText(committedEndText);
+        } else {
+          setDraftEnd(null);
+          setDraftEndText("");
+        }
         setDraftStart(null);
         setDraftEnd(null);
         setDraftStartText("");
@@ -429,7 +524,60 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
       setDraftEndText(formatDayjs(e, format, timezone));
       setIsDraftInvalid(false);
     },
-    [format, timezone]
+    [
+      allowClearEnd,
+      allowClearStart,
+      committedEnd,
+      committedEndText,
+      committedStart,
+      committedStartText,
+      format,
+      timezone,
+    ]
+  );
+
+  const handleClearStart = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (isDisabled) return;
+      if (!allowClearStart) return;
+
+      setDraftStart(null);
+      setDraftStartText("");
+      setIsDraftInvalid(false);
+
+      const outEnd = draftEndText.trim() ? draftEndText.trim() : null;
+      const out =
+        outEnd != null ? ({ start: null, end: outEnd } as const) : null;
+
+      if (value === undefined) setUncontrolledValue(out);
+      onChange?.(out);
+      close();
+    },
+    [allowClearStart, close, draftEndText, isDisabled, onChange, value]
+  );
+
+  const handleClearEnd = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (isDisabled) return;
+      if (!allowClearEnd) return;
+
+      setDraftEnd(null);
+      setDraftEndText("");
+      setIsDraftInvalid(false);
+
+      const outStart = draftStartText.trim() ? draftStartText.trim() : null;
+      const out =
+        outStart != null ? ({ start: outStart, end: null } as const) : null;
+
+      if (value === undefined) setUncontrolledValue(out);
+      onChange?.(out);
+      close();
+    },
+    [allowClearEnd, close, draftStartText, isDisabled, onChange, value]
   );
 
   const selectedValue = useMemo(() => {
@@ -442,8 +590,23 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
 
   const now = useMemo(() => nowInTz(timezone), [timezone]);
   const presetList = useMemo(
-    () => presets ?? defaultPresets(timezone),
-    [presets, timezone]
+    () =>
+      presets ??
+      defaultPresets(timezone, {
+        today: t("presets.today"),
+        thisWeek: t("presets.thisWeek"),
+        lastWeek: t("presets.lastWeek"),
+        thisMonth: t("presets.thisMonth"),
+        lastMonth: t("presets.lastMonth"),
+        last3Months: t("presets.last3Months"),
+        last6Months: t("presets.last6Months"),
+        thisYear: t("presets.thisYear"),
+        lastYear: t("presets.lastYear"),
+        last2Years: t("presets.last2Years"),
+        last3Years: t("presets.last3Years"),
+        last5Years: t("presets.last5Years"),
+      }),
+    [presets, t, timezone]
   );
 
   const content = (
@@ -483,7 +646,15 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
     : content;
 
   return (
-    <Popover isOpen={isOpen} onOpenChange={handleOpenChange} placement="bottom">
+    <Popover
+      isOpen={isOpen}
+      placement="bottom"
+      classNames={{
+        // Prevent HeroUI Popover trigger from shrinking/fading when open
+        trigger: "aria-expanded:!scale-100 aria-expanded:!opacity-100",
+      }}
+      onOpenChange={handleOpenChange}
+    >
       <PopoverTrigger>
         <div className={clsx("w-full", className)}>
           <div className="flex gap-2">
@@ -491,6 +662,7 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
               {...rest}
               ref={startRef}
               label={label}
+              placeholder={resolvedStartPlaceholder}
               errorMessage={errorMessage}
               isInvalid={isInvalid || isDraftInvalid}
               isDisabled={isDisabled}
@@ -498,11 +670,35 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
               onKeyDown={handleKeyDown}
               onClick={handleInputClick}
               onChange={handleStartChange}
+              endContent={
+                <div className="flex items-center gap-1 cursor-pointer">
+                  {allowClearStart && draftStartText.trim() ? (
+                    <button
+                      aria-label={t("range.clearStartAriaLabel")}
+                      className="cursor-pointer rounded-small p-1 text-default-400 transition-colors hover:text-danger-500"
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      onClick={handleClearStart}
+                    >
+                      <X className="size-4" />
+                    </button>
+                  ) : null}
+                  <CalendarIcon
+                    aria-hidden="true"
+                    className="text-default-400"
+                    size={16}
+                  />
+                </div>
+              }
             />
             <IBaseInput
               {...rest}
               ref={endRef}
               label={typeof label === "string" ? " " : undefined}
+              placeholder={resolvedEndPlaceholder}
               isInvalid={isInvalid || isDraftInvalid}
               isDisabled={isDisabled}
               value={draftEndText}
@@ -510,13 +706,29 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
               onClick={handleInputClick}
               onChange={handleEndChange}
               endContent={
-                endContent ?? (
-                  <CalendarIcon
-                    aria-hidden="true"
-                    className="text-default-400"
-                    size={16}
-                  />
-                )
+                <div className="flex items-center gap-1 cursor-pointer">
+                  {allowClearEnd && draftEndText.trim() ? (
+                    <button
+                      aria-label={t("range.clearEndAriaLabel")}
+                      className="cursor-pointer rounded-small p-1 text-default-400 transition-colors hover:text-danger-500"
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      onClick={handleClearEnd}
+                    >
+                      <X className="size-4" />
+                    </button>
+                  ) : null}
+                  {endContent ?? (
+                    <CalendarIcon
+                      aria-hidden="true"
+                      className="text-default-400"
+                      size={16}
+                    />
+                  )}
+                </div>
               }
             />
           </div>

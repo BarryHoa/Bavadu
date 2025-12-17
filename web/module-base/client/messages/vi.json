@@ -163,6 +163,49 @@
       "uploading": "Đang tải lên...",
       "uploadImages": "Tải lên hình ảnh",
       "removeImage": "Xóa hình ảnh"
+    },
+    "picker": {
+      "date": {
+        "placeholder": "Nhập ngày ({format})",
+        "placeholderDateTime": "Nhập ngày giờ ({format})",
+        "clearAriaLabel": "Xóa ngày",
+        "quickToday": "Hôm nay"
+      },
+      "time": {
+        "placeholder": "Nhập giờ ({format})",
+        "clearAriaLabel": "Xóa giờ",
+        "now": "Bây giờ"
+      },
+      "range": {
+        "startPlaceholder": "Từ ngày ({format})",
+        "endPlaceholder": "Đến ngày ({format})",
+        "startPlaceholderDateTime": "Từ ngày giờ ({format})",
+        "endPlaceholderDateTime": "Đến ngày giờ ({format})",
+        "clearStartAriaLabel": "Xóa ngày bắt đầu",
+        "clearEndAriaLabel": "Xóa ngày kết thúc"
+      },
+      "month": {
+        "placeholder": "Nhập tháng ({format})",
+        "thisMonth": "Tháng này"
+      },
+      "year": {
+        "placeholder": "Nhập năm ({format})",
+        "thisYear": "Năm nay"
+      },
+      "presets": {
+        "today": "Hôm nay",
+        "thisWeek": "Tuần này",
+        "lastWeek": "Tuần trước",
+        "thisMonth": "Tháng này",
+        "lastMonth": "Tháng trước",
+        "last3Months": "3 tháng gần nhất",
+        "last6Months": "6 tháng gần nhất",
+        "thisYear": "Năm nay",
+        "lastYear": "Năm trước",
+        "last2Years": "2 năm gần nhất",
+        "last3Years": "3 năm gần nhất",
+        "last5Years": "5 năm gần nhất"
+      }
     }
   },
   "settings": {

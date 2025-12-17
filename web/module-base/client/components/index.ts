@@ -58,6 +58,7 @@ export type {
   IBaseModalProps,
 } from "./IBaseModal";
 export {
+  ButtonFastChoose,
   IBaseDatePicker,
   IBaseDateRangePicker,
   IBaseMonthPicker,
@@ -66,6 +67,7 @@ export {
   IBaseYearPicker,
 } from "./IBasePicker";
 export type {
+  ButtonFastChooseProps,
   IBaseDatePickerProps,
   IBaseDatePickerValue,
   IBaseDateRangePickerProps,

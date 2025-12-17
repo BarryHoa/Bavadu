@@ -164,6 +164,49 @@
       "uploading": "Uploading...",
       "uploadImages": "Upload images",
       "removeImage": "Remove image"
+    },
+    "picker": {
+      "date": {
+        "placeholder": "Enter date ({format})",
+        "placeholderDateTime": "Enter date & time ({format})",
+        "clearAriaLabel": "Clear date",
+        "quickToday": "Today"
+      },
+      "time": {
+        "placeholder": "Enter time ({format})",
+        "clearAriaLabel": "Clear time",
+        "now": "Now"
+      },
+      "range": {
+        "startPlaceholder": "Start date ({format})",
+        "endPlaceholder": "End date ({format})",
+        "startPlaceholderDateTime": "Start date & time ({format})",
+        "endPlaceholderDateTime": "End date & time ({format})",
+        "clearStartAriaLabel": "Clear start date",
+        "clearEndAriaLabel": "Clear end date"
+      },
+      "month": {
+        "placeholder": "Enter month ({format})",
+        "thisMonth": "This month"
+      },
+      "year": {
+        "placeholder": "Enter year ({format})",
+        "thisYear": "This year"
+      },
+      "presets": {
+        "today": "Today",
+        "thisWeek": "This week",
+        "lastWeek": "Last week",
+        "thisMonth": "This month",
+        "lastMonth": "Last month",
+        "last3Months": "Last 3 months",
+        "last6Months": "Last 6 months",
+        "thisYear": "This year",
+        "lastYear": "Last year",
+        "last2Years": "Last 2 years",
+        "last3Years": "Last 3 years",
+        "last5Years": "Last 5 years"
+      }
     }
   },
   "settings": {

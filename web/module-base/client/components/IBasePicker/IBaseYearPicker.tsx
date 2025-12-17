@@ -1,6 +1,7 @@
 "use client";
 
 import type { Dayjs } from "dayjs";
+import { useTranslations } from "next-intl";
 
 import IBaseDatePicker, {
   type IBaseDatePickerProps,
@@ -15,17 +16,19 @@ export type IBaseYearPickerProps = Omit<IBaseDatePickerProps, "quickSelect"> & {
 };
 
 export default function IBaseYearPicker(props: IBaseYearPickerProps) {
-  const { format = "YYYY", showThisYear = true, ...rest } = props;
+  const t = useTranslations("components.picker");
+  const { placeholder, format = "YYYY", showThisYear = true, ...rest } = props;
 
   return (
     <IBaseDatePicker
       {...rest}
+      placeholder={placeholder ?? t("year.placeholder", { format })}
       calendarProps={{ showMonthAndYearPickers: true, ...rest.calendarProps }}
       format={format}
       quickSelect={
         showThisYear
           ? ({
-              label: "This year",
+              label: t("year.thisYear"),
               getValue: (now: Dayjs) => now.startOf("year"),
             } as const)
           : false

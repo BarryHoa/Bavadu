@@ -8,7 +8,8 @@ import { SYSTEM_TIMEZONE } from "@base/shared/constants";
 import { Button } from "@heroui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
 import clsx from "clsx";
-import { Clock } from "lucide-react";
+import { Clock, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React, {
   useCallback,
   useEffect,
@@ -18,6 +19,7 @@ import React, {
 } from "react";
 
 import { formatDayjs, nowInTz, toDayjs } from "../../utils/date/parseDateInput";
+import ButtonFastChoose from "./components/ButtonFastChoose";
 
 export type IBaseTimePickerValue = string | Dayjs | null;
 
@@ -28,6 +30,13 @@ export interface IBaseTimePickerProps extends Omit<
   value?: IBaseTimePickerValue;
   defaultValue?: IBaseTimePickerValue;
   onChange?: (value: string | null) => void;
+  /**
+   * Allow clearing the current value via a clear icon.
+   * - true: show clear icon (when input has value) and allow setting value to null
+   * - false: hide clear icon and prevent clearing; empty input reverts to previous value
+   * @default true
+   */
+  allowClear?: boolean;
   format?: string; // default HH:mm
   timezone?: string;
   showNow?: boolean;
@@ -50,10 +59,12 @@ function buildTimes(step: number) {
 }
 
 export default function IBaseTimePicker(props: IBaseTimePickerProps) {
+  const t = useTranslations("components.picker");
   const {
     value,
     defaultValue,
     onChange,
+    allowClear = true,
     format = DEFAULT_FORMAT,
     timezone = SYSTEM_TIMEZONE,
     showNow = true,
@@ -96,6 +107,12 @@ export default function IBaseTimePicker(props: IBaseTimePickerProps) {
     const text = draftText.trim();
 
     if (!text) {
+      if (!allowClear) {
+        // Prevent clearing: revert to last committed value
+        setDraftText(committedText);
+        setIsDraftInvalid(false);
+        return true;
+      }
       setIsDraftInvalid(false);
 
       if (value === undefined) setUncontrolledValue(null);
@@ -120,7 +137,7 @@ export default function IBaseTimePicker(props: IBaseTimePickerProps) {
     onChange?.(out);
 
     return true;
-  }, [draftText, format, onChange, timezone, value]);
+  }, [allowClear, committedText, draftText, format, onChange, timezone, value]);
 
   const close = useCallback(() => setIsOpen(false), []);
   const commitAndClose = useCallback(() => {
@@ -167,22 +184,68 @@ export default function IBaseTimePicker(props: IBaseTimePickerProps) {
 
   const times = useMemo(() => buildTimes(minuteStep), [minuteStep]);
   const now = useMemo(() => nowInTz(timezone), [timezone]);
+  const showClearIcon = allowClear && Boolean(draftText.trim());
+  const resolvedPlaceholder = useMemo(() => {
+    if (rest.placeholder) return rest.placeholder;
+    return t("time.placeholder", { format });
+  }, [format, rest.placeholder, t]);
+
+  const handleClear = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (isDisabled) return;
+
+      setDraftText("");
+      setIsDraftInvalid(false);
+      if (value === undefined) setUncontrolledValue(null);
+      onChange?.(null);
+      setIsOpen(false);
+      requestAnimationFrame(() => inputRef.current?.focus());
+    },
+    [isDisabled, onChange, value]
+  );
 
   return (
-    <Popover isOpen={isOpen} placement="bottom" onOpenChange={handleOpenChange}>
+    <Popover
+      isOpen={isOpen}
+      placement="bottom"
+      classNames={{
+        // Prevent HeroUI Popover trigger from shrinking/fading when open
+        trigger: "aria-expanded:!scale-100 aria-expanded:!opacity-100",
+      }}
+      onOpenChange={handleOpenChange}
+    >
       <PopoverTrigger>
         <div className={clsx("w-full", className)}>
           <IBaseInput
             {...rest}
             ref={inputRef}
+            placeholder={resolvedPlaceholder}
             endContent={
-              endContent ?? (
-                <Clock
-                  aria-hidden="true"
-                  className="text-default-400"
-                  size={16}
-                />
-              )
+              <div className="flex items-center gap-1 cursor-pointer">
+                {showClearIcon ? (
+                  <button
+                    aria-label={t("time.clearAriaLabel")}
+                    className="cursor-pointer rounded-small p-1 text-default-400 transition-colors hover:text-danger-500"
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    onClick={handleClear}
+                  >
+                    <X className="size-4" />
+                  </button>
+                ) : null}
+                {endContent ?? (
+                  <Clock
+                    aria-hidden="true"
+                    className="text-default-400"
+                    size={16}
+                  />
+                )}
+              </div>
             }
             isDisabled={isDisabled}
             isInvalid={rest.isInvalid || isDraftInvalid}
@@ -190,6 +253,12 @@ export default function IBaseTimePicker(props: IBaseTimePickerProps) {
             onChange={(e) => {
               const next = e.target.value;
 
+              if (!allowClear && !next.trim()) {
+                // Prevent clearing: revert to last committed value
+                setDraftText(committedText);
+                setIsDraftInvalid(false);
+                return;
+              }
               setDraftText(next);
               if (!next.trim()) {
                 setIsDraftInvalid(false);
@@ -206,20 +275,17 @@ export default function IBaseTimePicker(props: IBaseTimePickerProps) {
       <PopoverContent className="p-2">
         <div className="flex flex-col gap-2">
           {showNow ? (
-            <div className="flex justify-end">
-              <Button
-                size="sm"
-                variant="flat"
-                onPress={() => {
-                  const out = formatDayjs(now, format, timezone);
+            <ButtonFastChoose
+              align="end"
+              wrapperClassName="pt-0"
+              label={t("time.now")}
+              onPress={() => {
+                const out = formatDayjs(now, format, timezone);
 
-                  setDraftText(out);
-                  setIsDraftInvalid(false);
-                }}
-              >
-                Now
-              </Button>
-            </div>
+                setDraftText(out);
+                setIsDraftInvalid(false);
+              }}
+            />
           ) : null}
           <div className="max-h-64 w-56 overflow-auto">
             <div className="grid grid-cols-2 gap-1">

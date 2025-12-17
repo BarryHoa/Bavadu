@@ -3,16 +3,17 @@
 import type { EmployeeFormValues } from "../../validation/employeeValidation";
 
 import {
+  IBaseDatePicker,
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseSingleSelectAsync,
 } from "@base/client/components";
+import { Button } from "@heroui/button";
+import { Card, CardBody } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/react";
 
 import { createEmployeeValidation } from "../../validation/employeeValidation";
 
@@ -250,14 +251,14 @@ export default function EmployeeForm({
               control={control}
               name="hireDate"
               render={({ field, fieldState }) => (
-                <IBaseInput
-                  {...field}
+                <IBaseDatePicker
                   isRequired
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={tLabels("hireDate")}
                   size="sm"
-                  type="date"
+                  value={field.value ?? ""}
+                  onChange={(value) => field.onChange(value ?? "")}
                 />
               )}
             />
@@ -305,13 +306,13 @@ export default function EmployeeForm({
               control={control}
               name="dateOfBirth"
               render={({ field, fieldState }) => (
-                <IBaseInput
-                  {...field}
+                <IBaseDatePicker
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={tLabels("dateOfBirth")}
                   size="sm"
-                  type="date"
+                  value={field.value ?? ""}
+                  onChange={(value) => field.onChange(value ?? "")}
                 />
               )}
             />

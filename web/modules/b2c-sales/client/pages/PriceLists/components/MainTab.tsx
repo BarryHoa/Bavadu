@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  IBaseDatePicker,
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseInputNumber,
@@ -182,15 +183,14 @@ export default function MainTab({
             control={control}
             name="validFrom"
             render={({ field, fieldState }) => (
-              <IBaseInput
+              <IBaseDatePicker
                 isRequired
                 errorMessage={fieldState.error?.message}
                 isInvalid={fieldState.invalid}
                 label="Valid From"
                 size="sm"
-                type="date"
-                value={field.value}
-                onChange={field.onChange}
+                value={field.value ?? ""}
+                onChange={(value) => field.onChange(value ?? "")}
               />
             )}
           />
@@ -198,14 +198,13 @@ export default function MainTab({
             control={control}
             name="validTo"
             render={({ field, fieldState }) => (
-              <IBaseInput
+              <IBaseDatePicker
                 errorMessage={fieldState.error?.message}
                 isInvalid={fieldState.invalid}
                 label="Valid To (leave empty for forever - standard only)"
                 size="sm"
-                type="date"
-                value={field.value}
-                onChange={field.onChange}
+                value={field.value ?? ""}
+                onChange={(value) => field.onChange(value ?? "")}
               />
             )}
           />
@@ -228,9 +227,7 @@ export default function MainTab({
                 selectedKeys={
                   field.value
                     ? new Set(
-                        Array.isArray(field.value)
-                          ? field.value
-                          : [field.value],
+                        Array.isArray(field.value) ? field.value : [field.value]
                       )
                     : new Set()
                 }
@@ -240,7 +237,7 @@ export default function MainTab({
                   const selectedArray = Array.from(keys);
 
                   field.onChange(
-                    selectedArray.length > 0 ? selectedArray : undefined,
+                    selectedArray.length > 0 ? selectedArray : undefined
                   );
                 }}
               >
@@ -272,9 +269,7 @@ export default function MainTab({
                 selectedKeys={
                   field.value
                     ? new Set(
-                        Array.isArray(field.value)
-                          ? field.value
-                          : [field.value],
+                        Array.isArray(field.value) ? field.value : [field.value]
                       )
                     : new Set()
                 }
@@ -284,7 +279,7 @@ export default function MainTab({
                   const selectedArray = Array.from(keys);
 
                   field.onChange(
-                    selectedArray.length > 0 ? selectedArray : undefined,
+                    selectedArray.length > 0 ? selectedArray : undefined
                   );
                 }}
               >
@@ -316,9 +311,7 @@ export default function MainTab({
                 selectedKeys={
                   field.value
                     ? new Set(
-                        Array.isArray(field.value)
-                          ? field.value
-                          : [field.value],
+                        Array.isArray(field.value) ? field.value : [field.value]
                       )
                     : new Set()
                 }
@@ -328,7 +321,7 @@ export default function MainTab({
                   const selectedArray = Array.from(keys);
 
                   field.onChange(
-                    selectedArray.length > 0 ? selectedArray : undefined,
+                    selectedArray.length > 0 ? selectedArray : undefined
                   );
                 }}
               >
@@ -360,9 +353,7 @@ export default function MainTab({
                 selectedKeys={
                   field.value
                     ? new Set(
-                        Array.isArray(field.value)
-                          ? field.value
-                          : [field.value],
+                        Array.isArray(field.value) ? field.value : [field.value]
                       )
                     : new Set()
                 }
@@ -372,7 +363,7 @@ export default function MainTab({
                   const selectedArray = Array.from(keys);
 
                   field.onChange(
-                    selectedArray.length > 0 ? selectedArray : undefined,
+                    selectedArray.length > 0 ? selectedArray : undefined
                   );
                 }}
               >
@@ -404,9 +395,7 @@ export default function MainTab({
                 selectedKeys={
                   field.value
                     ? new Set(
-                        Array.isArray(field.value)
-                          ? field.value
-                          : [field.value],
+                        Array.isArray(field.value) ? field.value : [field.value]
                       )
                     : new Set()
                 }
@@ -416,7 +405,7 @@ export default function MainTab({
                   const selectedArray = Array.from(keys);
 
                   field.onChange(
-                    selectedArray.length > 0 ? selectedArray : undefined,
+                    selectedArray.length > 0 ? selectedArray : undefined
                   );
                 }}
               >

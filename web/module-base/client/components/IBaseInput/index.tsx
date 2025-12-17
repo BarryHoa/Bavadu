@@ -5,7 +5,12 @@ import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import React from "react";
 
-type IBaseInputProps = InputProps & {};
+export type IBaseInputProps = Omit<InputProps, "type"> & {
+  /**
+   * `type="date"` is intentionally disallowed. Use `IBaseDatePicker` instead.
+   */
+  type?: Exclude<InputProps["type"], "date">;
+};
 const IBaseInput = React.forwardRef<HTMLInputElement, IBaseInputProps>(
   (props, ref) => {
     const t = useTranslations("components.input");
@@ -26,7 +31,7 @@ const IBaseInput = React.forwardRef<HTMLInputElement, IBaseInputProps>(
           label: "text-small text-default-600",
           mainWrapper: clsx(
             "cursor-not-allowed",
-            isDisabled ? "bg-default-200" : "",
+            isDisabled ? "bg-default-200" : ""
           ),
           input: "placeholder:text-default-400 italic text-sm",
         }}
@@ -38,7 +43,7 @@ const IBaseInput = React.forwardRef<HTMLInputElement, IBaseInputProps>(
         isDisabled={isDisabled}
       />
     );
-  },
+  }
 );
 
 IBaseInput.displayName = "IBaseInput";

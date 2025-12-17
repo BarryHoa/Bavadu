@@ -23,6 +23,9 @@ import IBaseYearPicker, {
   type IBaseYearPickerProps,
   type IBaseYearPickerValue,
 } from "./IBaseYearPicker";
+import ButtonFastChoose, {
+  type ButtonFastChooseProps,
+} from "./components/ButtonFastChoose";
 
 export type IBasePickerDateProps = IBaseDatePickerProps;
 export type IBasePickerRangeProps = IBaseDateRangePickerProps;
@@ -32,6 +35,7 @@ export type IBasePickerYearProps = IBaseYearPickerProps;
 
 // Re-export canonical component names/types for `@base/client/components` barrel.
 export {
+  ButtonFastChoose,
   IBaseDatePicker,
   IBaseDateRangePicker,
   IBaseMonthPicker,
@@ -39,6 +43,7 @@ export {
   IBaseYearPicker,
 };
 export type {
+  ButtonFastChooseProps,
   IBaseDatePickerProps,
   IBaseDatePickerValue,
   IBaseDateRangePickerProps,
