@@ -1,17 +1,8 @@
 "use client";
 
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { Avatar } from "@heroui/avatar";
 import { Badge } from "@heroui/badge";
 import { Button } from "@heroui/button";
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from "@heroui/dropdown";
 import {
   Navbar as HeroNavbar,
   NavbarBrand,
@@ -19,8 +10,13 @@ import {
   NavbarItem,
 } from "@heroui/navbar";
 import { Bell, LogOut, User } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { siteConfig } from "@/config/site";
+import type { IBaseDropdownItem } from "@base/client/components";
+import { IBaseDropdown } from "@base/client/components";
 
 const DEFAULT_AVATAR = "/favicon/favicon-32x32.png";
 
@@ -105,34 +101,34 @@ export default function Nav() {
           </Badge>
         </NavbarItem>
         <NavbarItem>
-          <Dropdown placement="bottom-end">
-            <DropdownTrigger>
-              <Avatar
-                className="cursor-pointer transition-transform hover:scale-105"
-                fallback={
-                  <User
-                    className="text-default-500"
-                    size={16}
-                    strokeWidth={2}
-                  />
-                }
-                size="sm"
-                src={displayAvatar}
-                onError={() => setAvatarError(true)}
-              />
-            </DropdownTrigger>
-            <DropdownMenu aria-label="User menu" variant="flat">
-              <DropdownItem
-                key="logout"
-                color="danger"
-                isDisabled={isLoggingOut}
-                startContent={<LogOut size={16} />}
-                onPress={handleLogout}
-              >
-                {isLoggingOut ? "Logging out..." : "Logout"}
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
+          <IBaseDropdown
+            placement="bottom-end"
+            items={[
+              {
+                key: "logout",
+                color: "danger",
+                isDisabled: isLoggingOut,
+                startContent: <LogOut size={16} />,
+                textValue: "Logout",
+                onPress: handleLogout,
+                children: isLoggingOut ? "Logging out..." : "Logout",
+              } satisfies IBaseDropdownItem,
+            ]}
+            menu={{
+              "aria-label": "User menu",
+              variant: "flat",
+            }}
+          >
+            <Avatar
+              className="cursor-pointer transition-transform hover:scale-105"
+              fallback={
+                <User className="text-default-500" size={16} strokeWidth={2} />
+              }
+              size="sm"
+              src={displayAvatar}
+              onError={() => setAvatarError(true)}
+            />
+          </IBaseDropdown>
         </NavbarItem>
       </NavbarContent>
     </HeroNavbar>

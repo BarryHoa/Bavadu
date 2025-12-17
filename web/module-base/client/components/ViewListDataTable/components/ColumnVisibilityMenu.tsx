@@ -1,14 +1,8 @@
 "use client";
 
-import { IBaseInputSearch } from "@base/client/components";
+import { IBaseDropdown, IBaseInputSearch } from "@base/client/components";
 import { Button } from "@heroui/button";
 import { Checkbox } from "@heroui/checkbox";
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from "@heroui/dropdown";
 import { Table } from "lucide-react";
 import MiniSearch from "minisearch";
 import { useMemo, useState } from "react";
@@ -42,7 +36,7 @@ export default function ColumnVisibilityMenu<T = any>({
           .map((item) =>
             typeof item === "string" || typeof item === "number"
               ? String(item)
-              : "",
+              : ""
           )
           .filter(Boolean)
           .join(" ");
@@ -87,17 +81,51 @@ export default function ColumnVisibilityMenu<T = any>({
     return results
       .map((result) => columnMap.get(result.id))
       .filter((column): column is IBaseTableColumnDefinition<T> =>
-        Boolean(column),
+        Boolean(column)
       );
   }, [columns, columnMap, miniSearch, searchTerm]);
 
-  const handleToggleColumn = (key: string | number) => {
-    if (key === "__search__") return;
-    onToggleColumn(String(key));
-  };
+  const dropdownItems = useMemo(() => {
+    return [
+      {
+        key: "__search__",
+        hideSelectedIcon: true,
+        isReadOnly: true,
+        className:
+          "sticky top-0 z-10 pointer-events-auto data-[hover=true]:bg-transparent bg-content1",
+        textValue: "Search columns",
+        children: (
+          <IBaseInputSearch
+            // Avoid autoFocus for better accessibility; focus can be managed by parent if needed
+            placeholder="Search columns..."
+            showClearButton={false}
+            value={searchTerm}
+            onValueChange={setSearchTerm}
+          />
+        ),
+      },
+      ...filteredColumns.map((col) => ({
+        key: String(col.key),
+        textValue:
+          typeof col.label === "string"
+            ? col.label
+            : String(col.label ?? col.title ?? col.key),
+        onPress: () => onToggleColumn(String(col.key)),
+        children: (
+          <Checkbox
+            isReadOnly
+            className="pointer-events-none"
+            isSelected={visibleColumns.has(String(col.key))}
+          >
+            {col.label ?? col.title ?? col.key}
+          </Checkbox>
+        ),
+      })),
+    ];
+  }, [filteredColumns, onToggleColumn, searchTerm, visibleColumns]);
 
   return (
-    <Dropdown
+    <IBaseDropdown
       closeOnSelect={false}
       isOpen={isOpen}
       shouldCloseOnInteractOutside={() => true}
@@ -107,61 +135,23 @@ export default function ColumnVisibilityMenu<T = any>({
           setSearchTerm("");
         }
       }}
-    >
-      <DropdownTrigger>
-        <Button
-          isIconOnly
-          size="sm"
-          startContent={<Table size={16} />}
-          title="Column visibility"
-          variant="bordered"
-        />
-      </DropdownTrigger>
-      <DropdownMenu
-        aria-label="Column visibility"
-        className="min-w-[220px] text-[12px] max-h-[500px] overflow-y-auto"
-        itemClasses={{
+      items={dropdownItems}
+      menu={{
+        "aria-label": "Column visibility",
+        className: "min-w-[220px] text-[12px] max-h-[500px] overflow-y-auto",
+        itemClasses: {
           base: "py-1 px-2",
           title: "text-[12px]",
-        }}
-      >
-        <DropdownItem
-          key="__search__"
-          hideSelectedIcon
-          isReadOnly
-          className="sticky top-0 z-10 pointer-events-auto data-[hover=true]:bg-transparent bg-content1"
-          textValue="Search columns"
-        >
-          <IBaseInputSearch
-            // Avoid autoFocus for better accessibility; focus can be managed by parent if needed
-            placeholder="Search columns..."
-            showClearButton={false}
-            value={searchTerm}
-            onValueChange={setSearchTerm}
-          />
-        </DropdownItem>
-        {
-          filteredColumns.map((col) => (
-            <DropdownItem
-              key={col.key}
-              textValue={
-                typeof col.label === "string"
-                  ? col.label
-                  : String(col.label ?? col.title ?? col.key)
-              }
-              onPress={() => handleToggleColumn(col.key)}
-            >
-              <Checkbox
-                isReadOnly
-                className="pointer-events-none"
-                isSelected={visibleColumns.has(col.key)}
-              >
-                {col.label ?? col.title ?? col.key}
-              </Checkbox>
-            </DropdownItem>
-          )) as any
-        }
-      </DropdownMenu>
-    </Dropdown>
+        },
+      }}
+    >
+      <Button
+        isIconOnly
+        size="sm"
+        startContent={<Table size={16} />}
+        title="Column visibility"
+        variant="bordered"
+      />
+    </IBaseDropdown>
   );
 }

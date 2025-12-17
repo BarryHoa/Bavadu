@@ -1,12 +1,8 @@
 import { Button } from "@heroui/button";
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from "@heroui/dropdown";
 import { cn } from "@heroui/react";
 import { Ellipsis, Link } from "lucide-react";
+
+import { IBaseDropdown } from "@base/client/components";
 
 type ButtonVariant = "solid" | "flat" | "bordered" | "light";
 
@@ -87,53 +83,38 @@ const ActionMenu = ({
       })}
 
       {menuActions.length > 0 && (
-        <Dropdown>
-          <DropdownTrigger>
-            <Button
-              isIconOnly
-              className="min-w-unit-8 h-6"
-              radius="full"
-              variant="faded"
-            >
-              <Ellipsis className="size-4" />
-            </Button>
-          </DropdownTrigger>
-          <DropdownMenu>
-            {menuActions.map((action) => {
-              if (isLink(action)) {
-                return (
-                  <DropdownItem
-                    key={action.key}
-                    href={action.href}
-                    isReadOnly={action.disabled}
-                    rel={action.as}
-                    target={action.target}
-                    textValue={action.label}
-                  >
-                    <div className="flex items-center gap-2">
-                      {action.startContent}
-                      <span>{action.label}</span>
-                    </div>
-                  </DropdownItem>
-                );
-              }
-
-              return (
-                <DropdownItem
-                  key={action.key}
-                  isDisabled={action.disabled}
-                  textValue={action.label}
-                  onPress={action.onPress}
-                >
-                  <div className="flex items-center gap-2">
-                    {action.startContent}
-                    <span>{action.label}</span>
-                  </div>
-                </DropdownItem>
-              );
-            })}
-          </DropdownMenu>
-        </Dropdown>
+        <IBaseDropdown
+          items={menuActions.map((action) => ({
+            key: action.key,
+            textValue: action.label,
+            ...(isLink(action)
+              ? {
+                  href: action.href,
+                  isReadOnly: action.disabled,
+                  rel: action.as,
+                  target: action.target,
+                }
+              : {
+                  isDisabled: action.disabled,
+                  onPress: action.onPress,
+                }),
+            children: (
+              <div className="flex items-center gap-2">
+                {action.startContent}
+                <span>{action.label}</span>
+              </div>
+            ),
+          }))}
+        >
+          <Button
+            isIconOnly
+            className="min-w-unit-8 h-6"
+            radius="full"
+            variant="faded"
+          >
+            <Ellipsis className="size-4" />
+          </Button>
+        </IBaseDropdown>
       )}
     </div>
   );

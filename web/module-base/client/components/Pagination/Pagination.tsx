@@ -1,15 +1,11 @@
 import type { Key, SVGProps } from "react";
 
 import { Button } from "@heroui/button";
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from "@heroui/dropdown";
 import { Pagination } from "@heroui/pagination";
 import clsx from "clsx";
 import { useCallback, useMemo } from "react";
+
+import { IBaseDropdown } from "@base/client/components";
 
 import { PAGINATION_PAGE_SIZE_OPTIONS } from "./paginationConsts";
 
@@ -73,7 +69,7 @@ export default function PaginationComponent({
         onPageSizeChange(selectedValue);
       }
     },
-    [onPageSizeChange],
+    [onPageSizeChange]
   );
 
   return (
@@ -87,15 +83,15 @@ export default function PaginationComponent({
           base: "items-center p-0 overflow-hidden",
           item: clsx(
             paginationItemBase,
-            "bg-transparent text-primary data-[hover=true]:bg-primary-50 data-[hover=true]:text-primary",
+            "bg-transparent text-primary data-[hover=true]:bg-primary-50 data-[hover=true]:text-primary"
           ),
           next: clsx(
             paginationItemBase,
-            "border border-transparent text-default-500 data-[hover=true]:border-primary data-[hover=true]:text-primary",
+            "border border-transparent text-default-500 data-[hover=true]:border-primary data-[hover=true]:text-primary"
           ),
           prev: clsx(
             paginationItemBase,
-            "border border-transparent text-default-500 data-[hover=true]:border-primary data-[hover=true]:text-primary",
+            "border border-transparent text-default-500 data-[hover=true]:border-primary data-[hover=true]:text-primary"
           ),
           cursor: clsx(paginationItemBase, "bg-primary-500 text-white"),
         }}
@@ -104,37 +100,36 @@ export default function PaginationComponent({
         total={pages}
         onChange={onChange}
       />
-      <Dropdown placement="top">
-        <DropdownTrigger>
-          <Button
-            className="text-small font-medium px-2 h-6"
-            endContent={<ChevronIcon className="text-small rotate-90" />}
-            size="sm"
-            // variant=""
-          >
-            {pageSize}
-          </Button>
-        </DropdownTrigger>
-        <DropdownMenu
-          aria-label="Page size selection"
-          className="min-w-[60px]"
-          selectedKeys={selectedKeys}
-          selectionMode="single"
-          onSelectionChange={(keys) => {
+      <IBaseDropdown
+        placement="top"
+        items={options.map((item) => ({
+          key: String(item),
+          textValue: String(item),
+          children: String(item),
+        }))}
+        menu={{
+          "aria-label": "Page size selection",
+          className: "min-w-[60px]",
+          selectedKeys,
+          selectionMode: "single",
+          onSelectionChange: (keys) => {
             const [selectedKey] = Array.from(keys);
 
             if (selectedKey != null) {
               handlePageSizeChange(selectedKey);
             }
-          }}
+          },
+        }}
+      >
+        <Button
+          className="text-small font-medium px-2 h-6"
+          endContent={<ChevronIcon className="text-small rotate-90" />}
+          size="sm"
+          // variant=""
         >
-          {options.map((item) => (
-            <DropdownItem key={String(item)} textValue={String(item)}>
-              {item}
-            </DropdownItem>
-          ))}
-        </DropdownMenu>
-      </Dropdown>
+          {pageSize}
+        </Button>
+      </IBaseDropdown>
     </div>
   );
 }

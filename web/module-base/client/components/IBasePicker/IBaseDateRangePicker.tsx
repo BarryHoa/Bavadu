@@ -4,27 +4,34 @@ import IBaseInput from "@base/client/components/IBaseInput";
 import { SYSTEM_TIMEZONE } from "@base/shared/constants";
 import { Button } from "@heroui/button";
 import { RangeCalendar } from "@heroui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
 import type { InputProps } from "@heroui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
 import type { DateValue } from "@react-types/calendar";
 import type { RangeValue } from "@react-types/shared";
 import clsx from "clsx";
 import { Calendar as CalendarIcon } from "lucide-react";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import type { Dayjs } from "dayjs";
 import {
   calendarDateToDayjs,
   dayjsToCalendarDate,
   formatDayjs,
+  nowInTz,
   toDayjs,
   type DateLike,
 } from "../../utils/date/parseDateInput";
-import { nowInTz } from "../../utils/date/parseDateInput";
 
-export type IBaseDateRangePickerValue =
-  | { start: string | Dayjs | null; end: string | Dayjs | null }
-  | null;
+export type IBaseDateRangePickerValue = {
+  start: string | Dayjs | null;
+  end: string | Dayjs | null;
+} | null;
 
 export interface RangePreset {
   key: string;
@@ -32,20 +39,20 @@ export interface RangePreset {
   range: (now: Dayjs) => { start: Dayjs; end: Dayjs };
 }
 
-export interface IBaseDateRangePickerProps
-  extends Omit<
-    InputProps,
-    | "value"
-    | "defaultValue"
-    | "onChange"
-    | "onValueChange"
-    | "type"
-    | "startContent"
-    | "endContent"
-  > {
+export interface IBaseDateRangePickerProps extends Omit<
+  InputProps,
+  | "value"
+  | "defaultValue"
+  | "onChange"
+  | "onValueChange"
+  | "type"
+  | "startContent"
+> {
   value?: IBaseDateRangePickerValue;
   defaultValue?: IBaseDateRangePickerValue;
-  onChange?: (value: { start: string | null; end: string | null } | null) => void;
+  onChange?: (
+    value: { start: string | null; end: string | null } | null
+  ) => void;
   format?: string;
   minDate?: string | Dayjs;
   maxDate?: string | Dayjs;
@@ -61,7 +68,7 @@ export interface IBaseDateRangePickerProps
 const DEFAULT_FORMAT = "YYYY-MM-DD";
 
 function defaultPresets(tz: string): RangePreset[] {
-  return [
+  const presets: RangePreset[] = [
     {
       key: "today",
       label: "Today",
@@ -89,7 +96,10 @@ function defaultPresets(tz: string): RangePreset[] {
     {
       key: "this_month",
       label: "Tháng này",
-      range: (now) => ({ start: now.startOf("month"), end: now.endOf("month") }),
+      range: (now) => ({
+        start: now.startOf("month"),
+        end: now.endOf("month"),
+      }),
     },
     {
       key: "last_month",
@@ -152,16 +162,22 @@ function defaultPresets(tz: string): RangePreset[] {
         end: now.endOf("year"),
       }),
     },
-  ].map((p) => ({
+  ];
+
+  return presets.map((p) => ({
     ...p,
-    range: (now) => {
+    range: (now: Dayjs) => {
       const n = now.tz(tz);
       return p.range(n);
     },
   }));
 }
 
-function toDayjsSafe(value: DateLike, format: string, tz: string): Dayjs | null {
+function toDayjsSafe(
+  value: DateLike,
+  format: string,
+  tz: string
+): Dayjs | null {
   return toDayjs(value, format, tz);
 }
 
@@ -200,29 +216,29 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
 
   const committedStart = useMemo(
     () => toDayjsSafe(committedValue?.start, format, timezone),
-    [committedValue?.start, format, timezone],
+    [committedValue?.start, format, timezone]
   );
   const committedEnd = useMemo(
     () => toDayjsSafe(committedValue?.end, format, timezone),
-    [committedValue?.end, format, timezone],
+    [committedValue?.end, format, timezone]
   );
 
   const committedStartText = useMemo(
     () => (committedStart ? formatDayjs(committedStart, format, timezone) : ""),
-    [committedStart, format, timezone],
+    [committedStart, format, timezone]
   );
   const committedEndText = useMemo(
     () => (committedEnd ? formatDayjs(committedEnd, format, timezone) : ""),
-    [committedEnd, format, timezone],
+    [committedEnd, format, timezone]
   );
 
   const minDayjs = useMemo(
     () => (minDate ? toDayjs(minDate, format, timezone) : null),
-    [minDate, format, timezone],
+    [minDate, format, timezone]
   );
   const maxDayjs = useMemo(
     () => (maxDate ? toDayjs(maxDate, format, timezone) : null),
-    [maxDate, format, timezone],
+    [maxDate, format, timezone]
   );
 
   const minValue = useMemo(() => {
@@ -247,7 +263,13 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
     setDraftStart(committedStart);
     setDraftEnd(committedEnd);
     setIsDraftInvalid(false);
-  }, [committedEnd, committedEndText, committedStart, committedStartText, isOpen]);
+  }, [
+    committedEnd,
+    committedEndText,
+    committedStart,
+    committedStartText,
+    isOpen,
+  ]);
 
   const validateMinMax = useCallback(
     (d: Dayjs) => {
@@ -262,7 +284,7 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
       }
       return true;
     },
-    [hasTime, maxDayjs, minDayjs],
+    [hasTime, maxDayjs, minDayjs]
   );
 
   const commit = useCallback(() => {
@@ -337,7 +359,7 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
       }
       open();
     },
-    [commitAndClose, isDisabled, open],
+    [commitAndClose, isDisabled, open]
   );
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
@@ -362,7 +384,9 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
       const s = nextStartText.trim()
         ? toDayjs(nextStartText, format, timezone)
         : null;
-      const e = nextEndText.trim() ? toDayjs(nextEndText, format, timezone) : null;
+      const e = nextEndText.trim()
+        ? toDayjs(nextEndText, format, timezone)
+        : null;
       setDraftStart(s);
       setDraftEnd(e);
 
@@ -373,7 +397,7 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
         (e ? !validateMinMax(e) : false);
       setIsDraftInvalid(invalid);
     },
-    [format, timezone, validateMinMax],
+    [format, timezone, validateMinMax]
   );
 
   const handleStartChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -405,7 +429,7 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
       setDraftEndText(formatDayjs(e, format, timezone));
       setIsDraftInvalid(false);
     },
-    [format, timezone],
+    [format, timezone]
   );
 
   const selectedValue = useMemo(() => {
@@ -419,7 +443,7 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
   const now = useMemo(() => nowInTz(timezone), [timezone]);
   const presetList = useMemo(
     () => presets ?? defaultPresets(timezone),
-    [presets, timezone],
+    [presets, timezone]
   );
 
   const content = (
@@ -502,5 +526,3 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
     </Popover>
   );
 }
-
-

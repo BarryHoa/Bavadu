@@ -89,13 +89,6 @@ body {
 }
 
 /* HeroUI dropdown hover override */
-[data-slot="list"] [data-hover="true"] {
-  background-color: var(--dropdown-hover, #e7f3ff) !important;
-  color: var(--heroui-foreground);
-}
-[data-slot="list"] [data-hover="true"] [data-slot="title"] {
-  color: var(--heroui-foreground);
-}
 
 /* Global placeholder color */
 input::placeholder,

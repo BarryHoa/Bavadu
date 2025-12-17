@@ -1,14 +1,10 @@
 "use client";
 
 import { Button } from "@heroui/button";
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from "@heroui/dropdown";
 import { Checkbox } from "@heroui/checkbox";
 import { Filter } from "lucide-react";
+
+import { IBaseDropdown } from "@base/client/components";
 
 export interface FilterOption<T = any> {
   label: string;
@@ -31,27 +27,30 @@ export default function FilterMenu<T = any>({
   }
 
   return (
-    <Dropdown>
-      <DropdownTrigger>
-        <Button
-          size="sm"
-          startContent={<Filter size={16} />}
-          title="Filter"
-          variant="bordered"
-        />
-      </DropdownTrigger>
-      <DropdownMenu aria-label="Filter options" className="min-w-[150px]">
-        {filterOptions.map((option) => (
-          <DropdownItem key={option.label} textValue={option.label}>
-            <Checkbox
-              isSelected={activeFilters.has(option.label)}
-              onValueChange={() => onToggleFilter(option.label)}
-            >
-              {option.label}
-            </Checkbox>
-          </DropdownItem>
-        ))}
-      </DropdownMenu>
-    </Dropdown>
+    <IBaseDropdown
+      items={filterOptions.map((option) => ({
+        key: option.label,
+        textValue: option.label,
+        children: (
+          <Checkbox
+            isSelected={activeFilters.has(option.label)}
+            onValueChange={() => onToggleFilter(option.label)}
+          >
+            {option.label}
+          </Checkbox>
+        ),
+      }))}
+      menu={{
+        "aria-label": "Filter options",
+        className: "min-w-[150px]",
+      }}
+    >
+      <Button
+        size="sm"
+        startContent={<Filter size={16} />}
+        title="Filter"
+        variant="bordered"
+      />
+    </IBaseDropdown>
   );
 }

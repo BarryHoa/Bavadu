@@ -55,6 +55,7 @@ const config = {
             content2: "#F4F4F5",
             content3: "#E4E4E7",
             content4: "#D4D4D8",
+            foregroundHover: "#e7f3ff",
             default: {
               50: "#FAFAFA",
               100: "#F4F4F5",
