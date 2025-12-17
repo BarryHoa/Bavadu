@@ -66,7 +66,7 @@ async function startServer(): Promise<void> {
       const sizeInKB = (sizeInBytes / 1024).toFixed(2);
 
       console.log(
-        `> 📊 Environment size: ${sizeInKB} KB (${sizeInBytes} bytes)`,
+        `> 📊 Environment size: ${sizeInKB} KB (${sizeInBytes} bytes)`
       );
     } catch (error) {
       console.log(`> ⚠️  Could not calculate environment size:`, error);

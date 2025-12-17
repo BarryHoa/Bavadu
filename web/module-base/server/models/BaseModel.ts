@@ -13,20 +13,35 @@ export class BaseModel<TTable extends PgTable = PgTable> {
   private _db: PostgresJsDatabase<Record<string, never>> | null = null;
 
   constructor(table: TTable) {
-    RuntimeContext.getDbConnect()
-      .then((db) => {
-        this._db = db;
-      })
-      .catch((error) => {
-        console.error("Error getting database connection:", error);
-        throw error;
-      });
     this.table = table;
   }
 
   public get db(): PostgresJsDatabase<Record<string, never>> {
     if (!this._db) {
-      throw new Error("Database connection not initialized");
+      // Try to grab a ready connection synchronously if RuntimeContext is already initialized.
+      // This avoids a race where the constructor kicks off async init but methods access `db`
+      // immediately (same tick) before the Promise resolves.
+      try {
+        const ctx = RuntimeContext.getInstance();
+        const db = ctx.getConnectionPool().getConnection();
+
+        this._db = db;
+
+        return db;
+      } catch {
+        console.log("Error getting database connection:");
+        // Best-effort warm-up in background (do not block a sync getter)
+        void RuntimeContext.getDbConnect()
+          .then((db) => {
+            this._db = db;
+          })
+          .catch((error) => {
+            // eslint-disable-next-line no-console
+            console.error("Error getting database connection:", error);
+          });
+
+        throw new Error("Database connection not initialized");
+      }
     }
 
     return this._db;

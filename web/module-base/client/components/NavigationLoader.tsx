@@ -104,6 +104,16 @@ function NavigationLoaderContent({
 }
 
 export function NavigationLoader(props: NavigationLoaderContentProps) {
+  // Ensure SSR + initial hydration render the same markup (null),
+  // then enable the loader after mount to avoid hydration mismatches.
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
     <Suspense fallback={null}>
       <NavigationLoaderContent {...props} />

@@ -18,7 +18,19 @@ export class RuntimeContext {
   // ---------------------------------------------------------------------------
   // Static singleton + convenience helpers
   // ---------------------------------------------------------------------------
-  private static instance: RuntimeContext | null = null;
+  /**
+   * NOTE:
+   * In Next.js (especially dev/Turbopack) the same source file can be loaded
+   * multiple times from different module graphs (e.g. TS source via `tsx/bun`
+   * for `server.ts` and compiled output under `.next/` for route handlers).
+   *
+   * If we keep the singleton only as a static field, we'll accidentally create
+   * multiple "singletons" and lose initialization state across graphs.
+   *
+   * Storing the singleton on `globalThis` makes it truly process-wide.
+   */
+  private static readonly LEGACY_GLOBAL_KEY = "__BAVADU_RUNTIME_CONTEXT__";
+  private static readonly GLOBAL_SYMBOL = Symbol.for("bavadu.RuntimeContext");
   private initPromise: Promise<void> | null = null;
   private isInitialized = false;
   private state: RuntimeContextState | null = null;
@@ -33,11 +45,46 @@ export class RuntimeContext {
    * Safe to call many times from anywhere in the server process.
    */
   static getInstance(projectRoot?: string): RuntimeContext {
-    if (!this.instance) {
-      this.instance = new RuntimeContext(projectRoot);
+    const g = globalThis as unknown as Record<PropertyKey, unknown>;
+    const existingSymbol = g[this.GLOBAL_SYMBOL] as RuntimeContext | undefined;
+
+    if (existingSymbol) {
+      return existingSymbol;
     }
 
-    return this.instance;
+    // Backward compatibility: reuse instance stored under legacy string key
+    const existingLegacy = g[this.LEGACY_GLOBAL_KEY] as
+      | RuntimeContext
+      | undefined;
+
+    if (existingLegacy) {
+      Object.defineProperty(g, this.GLOBAL_SYMBOL, {
+        value: existingLegacy,
+        writable: false,
+        enumerable: false,
+        configurable: false,
+      });
+
+      return existingLegacy;
+    }
+
+    const created = new RuntimeContext(projectRoot);
+
+    // Define as non-writable/non-configurable to prevent accidental overwrite
+    Object.defineProperty(g, this.GLOBAL_SYMBOL, {
+      value: created,
+      writable: false,
+      enumerable: false,
+      configurable: false,
+    });
+    Object.defineProperty(g, this.LEGACY_GLOBAL_KEY, {
+      value: created,
+      writable: false,
+      enumerable: false,
+      configurable: false,
+    });
+
+    return created;
   }
 
   /**
@@ -45,7 +92,7 @@ export class RuntimeContext {
    * Ensures the runtime is initialized before accessing the pool.
    */
   static async getDbConnect(
-    key: string = "primary",
+    key: string = "primary"
   ): Promise<PostgresJsDatabase<Record<string, never>>> {
     const context = await this.getInstance();
 
@@ -64,7 +111,7 @@ export class RuntimeContext {
   }
 
   static async getModelInstanceBy<T extends object>(
-    modelId: string,
+    modelId: string
   ): Promise<T | undefined> {
     const context = this.getInstance();
 
@@ -115,6 +162,7 @@ export class RuntimeContext {
     const isDev = process.env.NODE_ENV !== "production";
     const debugLog = (...args: any[]) => {
       if (isDev) {
+        // eslint-disable-next-line no-console
         console.log("[RuntimeContext]", ...args);
       }
     };
@@ -155,10 +203,12 @@ export class RuntimeContext {
         hasModelInstance: !!this.state?.modelInstance,
       });
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("[RuntimeContext] Error during initialization:", error);
+      // eslint-disable-next-line no-console
       console.error(
         "[RuntimeContext] Error stack:",
-        error instanceof Error ? error.stack : "No stack",
+        error instanceof Error ? error.stack : "No stack"
       );
       throw error;
     }
@@ -167,7 +217,7 @@ export class RuntimeContext {
   private _ensureState(): RuntimeContextState {
     if (!this.isInitialized || !this.state) {
       throw new Error(
-        "Runtime not initialized. Call ensureInitialized() first.",
+        "Runtime not initialized. Call ensureInitialized() first."
       );
     }
 

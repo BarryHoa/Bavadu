@@ -88,7 +88,7 @@ export function useViewListDataTableQueries<T = any>({
   useEffect(() => {
     if (!modelKey) return;
     fetchMutation.mutate(undefined); // undefined = dùng params từ state
-  }, [modelKey, fetchMutation]);
+  }, [modelKey]);
 
   const refresh = () => {
     if (!modelKey) return;

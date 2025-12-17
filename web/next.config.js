@@ -63,8 +63,6 @@ const nextConfig = {
   experimental: {
     // Allow importing from modules directory
     externalDir: true,
-    // Explicitly enable instrumentation hook
-    instrumentationHook: true,
   },
 };
 

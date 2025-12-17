@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
           .from(base_tb_users_login)
           .where(eq(base_tb_users_login.username, username))
           .limit(1)
-          .then((result) => result[0] || null),
+          .then((result) => result[0] || null)
       );
       queries.push(
         db
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
           .from(base_tb_users_login)
           .where(eq(base_tb_users_login.email, username))
           .limit(1)
-          .then((result) => result[0] || null),
+          .then((result) => result[0] || null)
       );
       queries.push(
         db
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
           .from(base_tb_users_login)
           .where(eq(base_tb_users_login.phone, username))
           .limit(1)
-          .then((result) => result[0] || null),
+          .then((result) => result[0] || null)
       );
     }
 
