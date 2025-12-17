@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  DatePicker,
+  IBaseDatePicker,
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseSingleSelectAsync,
@@ -9,7 +9,6 @@ import {
 import { Button } from "@heroui/button";
 import { Card, CardBody, Checkbox } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { parseDate } from "@internationalized/date";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
@@ -154,21 +153,13 @@ export default function CertificateForm({
               control={control}
               name="issueDate"
               render={({ field, fieldState }) => (
-                <DatePicker
+                <IBaseDatePicker
                   isRequired
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={t("labels.issueDate")}
-                  value={
-                    field.value
-                      ? typeof field.value === "string"
-                        ? parseDate(field.value)
-                        : field.value
-                      : null
-                  }
-                  onChange={(val) =>
-                    field.onChange(val ? val.toString() : null)
-                  }
+                  value={field.value ? String(field.value) : null}
+                  onChange={(val) => field.onChange(val)}
                 />
               )}
             />
@@ -176,20 +167,12 @@ export default function CertificateForm({
               control={control}
               name="expiryDate"
               render={({ field, fieldState }) => (
-                <DatePicker
+                <IBaseDatePicker
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={t("labels.expiryDate")}
-                  value={
-                    field.value
-                      ? typeof field.value === "string"
-                        ? parseDate(field.value)
-                        : field.value
-                      : null
-                  }
-                  onChange={(val) =>
-                    field.onChange(val ? val.toString() : null)
-                  }
+                  value={field.value ? String(field.value) : null}
+                  onChange={(val) => field.onChange(val)}
                 />
               )}
             />

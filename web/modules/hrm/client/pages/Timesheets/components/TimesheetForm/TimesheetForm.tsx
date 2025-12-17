@@ -4,10 +4,9 @@ import {
   IBaseInput,
   IBaseInputNumber,
   IBaseSingleSelectAsync,
-  DatePicker,
+  IBaseDatePicker,
 } from "@base/client/components";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { parseDate } from "@internationalized/date";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
@@ -109,21 +108,13 @@ export default function TimesheetForm({
               control={control}
               name="workDate"
               render={({ field, fieldState }) => (
-                <DatePicker
+                <IBaseDatePicker
                   isRequired
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={t("labels.workDate")}
-                  value={
-                    field.value
-                      ? typeof field.value === "string"
-                        ? parseDate(field.value)
-                        : field.value
-                      : null
-                  }
-                  onChange={(val) =>
-                    field.onChange(val ? val.toString() : null)
-                  }
+                  value={field.value ? String(field.value) : null}
+                  onChange={(val) => field.onChange(val)}
                 />
               )}
             />

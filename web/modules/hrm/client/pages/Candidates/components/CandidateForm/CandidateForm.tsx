@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  DatePicker,
+  IBaseDatePicker,
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseInputNumber,
@@ -10,7 +10,6 @@ import {
 import { Button } from "@heroui/button";
 import { Card, CardBody, Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { parseDate } from "@internationalized/date";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
@@ -186,20 +185,12 @@ export default function CandidateForm({
               control={control}
               name="dateOfBirth"
               render={({ field, fieldState }) => (
-                <DatePicker
+                <IBaseDatePicker
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={t("labels.dateOfBirth")}
-                  value={
-                    field.value
-                      ? typeof field.value === "string"
-                        ? parseDate(field.value)
-                        : field.value
-                      : null
-                  }
-                  onChange={(val) =>
-                    field.onChange(val ? val.toString() : null)
-                  }
+                  value={field.value ? String(field.value) : null}
+                  onChange={(val) => field.onChange(val)}
                 />
               )}
             />
