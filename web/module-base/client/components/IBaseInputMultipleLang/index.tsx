@@ -16,7 +16,7 @@ import {
 
 import TranslateModal from "./TranslateModal";
 
-type IBaseInputMultipleLangProps = Omit<
+export type IBaseInputMultipleLangProps = Omit<
   InputProps,
   "endContent" | "value" | "onValueChange"
 > & {
@@ -28,7 +28,7 @@ type IBaseInputMultipleLangProps = Omit<
 // Helper function outside component to avoid recreation on each render
 const getLangValue = (
   value: LocalizeText | string | undefined,
-  lang: LocalizeTextKey,
+  lang: LocalizeTextKey
 ): string => {
   if (typeof value === "string") {
     return value;
@@ -53,17 +53,17 @@ export const IBaseInputMultipleLang = React.forwardRef<
   // Get current locale value for main input
   const currentLocaleValue = useMemo(
     () => getLangValue(value, locale as LocalizeTextKey),
-    [value, locale],
+    [value, locale]
   );
 
   // Check if should show copy button
   const shouldShowCopyButton = useMemo(() => {
     const currentValue = currentLocaleValue.trim();
     const otherLangs = DEFAULT_SUPPORTED_LANGS.filter(
-      (lang) => lang !== locale,
+      (lang) => lang !== locale
     );
     const otherLangsValues = otherLangs.map((lang) =>
-      getLangValue(value, lang as LocalizeTextKey).trim(),
+      getLangValue(value, lang as LocalizeTextKey).trim()
     );
 
     // Case 1: Current locale is empty but at least one other lang has value
@@ -91,7 +91,7 @@ export const IBaseInputMultipleLang = React.forwardRef<
 
       onValueChange?.(newLocalizeValue);
     },
-    [value, locale, onValueChange],
+    [value, locale, onValueChange]
   );
 
   const handleCopyToAll = useCallback(() => {
@@ -103,7 +103,7 @@ export const IBaseInputMultipleLang = React.forwardRef<
 
         return acc;
       },
-      {} as LocalizeText,
+      {} as LocalizeText
     );
 
     onValueChange?.(newLocalizeValue);
@@ -113,7 +113,7 @@ export const IBaseInputMultipleLang = React.forwardRef<
     (langs: LocalizeText) => {
       onValueChange?.(langs);
     },
-    [onValueChange],
+    [onValueChange]
   );
 
   const handleOpenModal = useCallback(() => {
@@ -152,7 +152,7 @@ export const IBaseInputMultipleLang = React.forwardRef<
         </Button>
       </div>
     ),
-    [shouldShowCopyButton, handleCopyToAll, handleOpenModal],
+    [shouldShowCopyButton, handleCopyToAll, handleOpenModal]
   );
 
   return (

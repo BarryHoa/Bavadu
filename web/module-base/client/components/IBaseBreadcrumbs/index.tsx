@@ -11,8 +11,6 @@ export const IBaseBreadcrumbs: React.FC<IBaseBreadcrumbsProps> = (props) => {
   return <HeroUIBreadcrumbs size={size} {...rest} />;
 };
 
-const IBaseBreadcrumbItem = HeroUIBreadcrumbItem;
-
-export { IBaseBreadcrumbItem };
+export const IBaseBreadcrumbItem = HeroUIBreadcrumbItem;
 
 export default IBaseBreadcrumbs;

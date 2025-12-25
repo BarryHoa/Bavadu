@@ -18,7 +18,7 @@ export interface SelectItemOption extends Record<string, unknown> {
   [key: string]: unknown;
 }
 
-interface IBaseSingleSelectProps extends Omit<
+export interface IBaseSingleSelectProps extends Omit<
   IBaseSelectProps,
   "children" | "selectionMode" | "onSelectionChange" | "selectedKeys"
 > {
@@ -35,7 +35,7 @@ interface IBaseSingleSelectProps extends Omit<
   }[];
 }
 
-const IBaseSingleSelect = React.forwardRef<
+export const IBaseSingleSelect = React.forwardRef<
   HTMLSelectElement,
   IBaseSingleSelectProps
 >((props, ref) => {

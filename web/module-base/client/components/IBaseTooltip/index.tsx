@@ -2,7 +2,7 @@ import { Tooltip, TooltipProps } from "@heroui/tooltip";
 import clsx from "clsx";
 import React from "react";
 
-type IBaseTooltipProps = TooltipProps & {};
+export type IBaseTooltipProps = TooltipProps & {};
 
 export const IBaseTooltip = React.forwardRef<HTMLDivElement, IBaseTooltipProps>(
   (props, ref) => {
@@ -22,7 +22,7 @@ export const IBaseTooltip = React.forwardRef<HTMLDivElement, IBaseTooltipProps>(
         {...rest}
       />
     );
-  },
+  }
 );
 
 IBaseTooltip.displayName = "IBaseTooltip";

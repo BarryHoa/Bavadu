@@ -52,7 +52,7 @@ export interface IBaseSingleSelectAsyncProps extends Omit<
   defaultParams?: Omit<FetchOptionsParams, "limit" | "offset" | "search">;
 }
 
-const IBaseSingleSelectAsync = React.forwardRef<
+export const IBaseSingleSelectAsync = React.forwardRef<
   HTMLSelectElement,
   IBaseSingleSelectAsyncProps
 >((props, ref) => {

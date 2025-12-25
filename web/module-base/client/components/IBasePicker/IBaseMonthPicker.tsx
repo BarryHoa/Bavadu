@@ -19,7 +19,7 @@ export type IBaseMonthPickerProps = Omit<
   showThisMonth?: boolean;
 };
 
-export default function IBaseMonthPicker(props: IBaseMonthPickerProps) {
+export function IBaseMonthPicker(props: IBaseMonthPickerProps) {
   const t = useTranslations("components.picker");
   const {
     placeholder,
@@ -45,3 +45,4 @@ export default function IBaseMonthPicker(props: IBaseMonthPickerProps) {
     />
   );
 }
+export default IBaseMonthPicker;

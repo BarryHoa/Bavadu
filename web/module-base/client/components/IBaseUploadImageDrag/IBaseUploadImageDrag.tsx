@@ -12,7 +12,7 @@ import { ImageUploadItem } from "../../interface/ImageUpdload";
 import ImageUploadItemComponent from "./IBaseUploadImageDragItem";
 import { getFileExtension, normalizeItems, validateFile } from "./utils";
 
-type IBaseUploadImageDragProps = {
+export type IBaseUploadImageDragProps = {
   accept?: string;
   maxSize?: number; // in bytes, default 5MB
   maxCount?: number; // maximum number of images
@@ -54,7 +54,7 @@ export default function IBaseUploadImageDrag({
       setItems(newItems);
       onChange?.(newItems);
     },
-    [onChange],
+    [onChange]
   );
 
   const handleFileSelect = useCallback(
@@ -82,15 +82,15 @@ export default function IBaseUploadImageDrag({
 
       // Separate valid and invalid files
       const invalidFiles = validationResults.filter(
-        (result) => !result.validation.valid,
+        (result) => !result.validation.valid
       );
       const validFiles = validationResults.filter(
-        (result) => result.validation.valid,
+        (result) => result.validation.valid
       );
 
       if (invalidFiles.length > 0) {
         const invalidNotAllowed = invalidFiles.find(
-          (result) => result.validation.type === "FILE_TYPE_NOT_ALLOWED",
+          (result) => result.validation.type === "FILE_TYPE_NOT_ALLOWED"
         );
 
         if (invalidNotAllowed) {
@@ -102,7 +102,7 @@ export default function IBaseUploadImageDrag({
         }
         const invalidFileSizeExceeded = invalidFiles.find(
           (result) =>
-            result.validation.type === "FILE_SIZE_EXCEEDS_MAXIMUM_ALLOWED_SIZE",
+            result.validation.type === "FILE_SIZE_EXCEEDS_MAXIMUM_ALLOWED_SIZE"
         );
 
         if (invalidFileSizeExceeded) {
@@ -227,7 +227,7 @@ export default function IBaseUploadImageDrag({
         setUploadingItems(new Set());
       }
     },
-    [items, maxCount, accept, maxSize, uploadService, handleItemsChange],
+    [items, maxCount, accept, maxSize, uploadService, handleItemsChange]
   );
 
   const handleRemove = useCallback(
@@ -236,7 +236,7 @@ export default function IBaseUploadImageDrag({
 
       handleItemsChange(newItems);
     },
-    [items, handleItemsChange],
+    [items, handleItemsChange]
   );
 
   const canAddMore = items.length < maxCount;
@@ -252,7 +252,7 @@ export default function IBaseUploadImageDrag({
 
       handleFileSelect(files);
     },
-    [isUploadDisabled, handleFileSelect],
+    [isUploadDisabled, handleFileSelect]
   );
 
   const handleDragOver = useCallback(
@@ -260,7 +260,7 @@ export default function IBaseUploadImageDrag({
       e.preventDefault();
       e.stopPropagation();
     },
-    [],
+    []
   );
 
   const handleClick = useCallback(() => {

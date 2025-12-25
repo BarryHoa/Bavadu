@@ -22,7 +22,7 @@ import IBaseTableUI from "./IBaseTableUI";
 import useColumns from "./hooks/useColumns";
 import { useIBaseTablePagination } from "./hooks/useIBaseTablePagination";
 
-export default function IBaseTable<T = any>({
+export function IBaseTable<T = any>({
   columns,
   dataSource,
   total: totalProps = 0,
@@ -237,3 +237,4 @@ export default function IBaseTable<T = any>({
     </div>
   );
 }
+export default IBaseTable;

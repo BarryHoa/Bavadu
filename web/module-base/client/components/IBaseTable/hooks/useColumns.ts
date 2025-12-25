@@ -120,7 +120,7 @@ const buildRenderValue = <T>(
   };
 };
 
-const useColumns = <T>(
+export const useColumns = <T>(
   columns: IBaseTableColumnDefinition<T>[],
 ): ProcessedIBaseTableColumn<T>[] => {
   const t = useTranslations("dataTable");

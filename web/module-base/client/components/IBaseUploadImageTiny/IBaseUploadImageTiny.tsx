@@ -16,7 +16,7 @@ import {
 
 import IBaseUploadImageTinyItem from "./IBaseUploadImageTinyItem";
 
-type IBaseUploadImageTinyProps = {
+export type IBaseUploadImageTinyProps = {
   accept?: string;
   maxSize?: number; // in bytes, default 10MB
   maxCount?: number; // maximum number of images
@@ -62,7 +62,7 @@ export default function IBaseUploadImageTiny({
       setItems(newItems);
       onChange?.(newItems);
     },
-    [onChange],
+    [onChange]
   );
 
   const handleFileSelect = useCallback(
@@ -90,15 +90,15 @@ export default function IBaseUploadImageTiny({
 
       // Separate valid and invalid files
       const invalidFiles = validationResults.filter(
-        (result) => !result.validation.valid,
+        (result) => !result.validation.valid
       );
       const validFiles = validationResults.filter(
-        (result) => result.validation.valid,
+        (result) => result.validation.valid
       );
 
       if (invalidFiles.length > 0) {
         const invalidNotAllowed = invalidFiles.find(
-          (result) => result.validation.type === "FILE_TYPE_NOT_ALLOWED",
+          (result) => result.validation.type === "FILE_TYPE_NOT_ALLOWED"
         );
 
         if (invalidNotAllowed) {
@@ -110,7 +110,7 @@ export default function IBaseUploadImageTiny({
         }
         const invalidFileSizeExceeded = invalidFiles.find(
           (result) =>
-            result.validation.type === "FILE_SIZE_EXCEEDS_MAXIMUM_ALLOWED_SIZE",
+            result.validation.type === "FILE_SIZE_EXCEEDS_MAXIMUM_ALLOWED_SIZE"
         );
 
         if (invalidFileSizeExceeded) {
@@ -230,7 +230,7 @@ export default function IBaseUploadImageTiny({
         setUploadingItems(new Set());
       }
     },
-    [items, maxCount, accept, maxSize, uploadService, handleItemsChange],
+    [items, maxCount, accept, maxSize, uploadService, handleItemsChange]
   );
 
   const handleRemove = useCallback(
@@ -239,7 +239,7 @@ export default function IBaseUploadImageTiny({
 
       handleItemsChange(newItems);
     },
-    [items, handleItemsChange],
+    [items, handleItemsChange]
   );
 
   const canAddMore = items.length < maxCount;
@@ -255,7 +255,7 @@ export default function IBaseUploadImageTiny({
 
       handleFileSelect(files);
     },
-    [isUploadDisabled, handleFileSelect],
+    [isUploadDisabled, handleFileSelect]
   );
 
   const handleDragOver = useCallback(
@@ -263,7 +263,7 @@ export default function IBaseUploadImageTiny({
       e.preventDefault();
       e.stopPropagation();
     },
-    [],
+    []
   );
 
   const handleClick = useCallback(() => {

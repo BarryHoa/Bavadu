@@ -58,7 +58,7 @@ function buildTimes(step: number) {
   return items;
 }
 
-export default function IBaseTimePicker(props: IBaseTimePickerProps) {
+export function IBaseTimePicker(props: IBaseTimePickerProps) {
   const t = useTranslations("components.picker");
   const {
     value,
@@ -310,3 +310,4 @@ export default function IBaseTimePicker(props: IBaseTimePickerProps) {
     </Popover>
   );
 }
+export default IBaseTimePicker;

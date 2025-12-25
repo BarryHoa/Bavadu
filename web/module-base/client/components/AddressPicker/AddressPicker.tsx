@@ -35,7 +35,7 @@ const PickerAddressByCountryVN = dynamic(
   () => import("./PickerAddressByCountryVN"),
 );
 
-interface AddressPickerProps {
+export interface AddressPickerProps {
   value?: Address | null;
   onChange: (value: string) => void;
   isShowPostalCode?: boolean;

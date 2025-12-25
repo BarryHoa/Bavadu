@@ -8,18 +8,11 @@ import IBaseInput from "@base/client/components/IBaseInput";
 import { SYSTEM_TIMEZONE } from "@base/shared/constants";
 import { Button } from "@heroui/button";
 import { RangeCalendar } from "@heroui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
 import { InputProps } from "@heroui/input";
-import clsx from "clsx";
+import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
 import { Calendar as CalendarIcon, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   calendarDateToDayjs,
@@ -27,7 +20,6 @@ import {
   formatDayjs,
   nowInTz,
   toDayjs,
-  type DateLike,
 } from "../../utils/date/parseDateInput";
 
 export type IBaseDateRangePickerValue = {
@@ -112,6 +104,7 @@ function defaultPresets(
       label: labels.lastWeek,
       range: (now) => {
         const start = now.subtract(1, "week").startOf("week");
+
         return { start, end: start.endOf("week") };
       },
     },
@@ -128,6 +121,7 @@ function defaultPresets(
       label: labels.lastMonth,
       range: (now) => {
         const start = now.subtract(1, "month").startOf("month");
+
         return { start, end: start.endOf("month") };
       },
     },
@@ -157,6 +151,7 @@ function defaultPresets(
       label: labels.lastYear,
       range: (now) => {
         const start = now.subtract(1, "year").startOf("year");
+
         return { start, end: start.endOf("year") };
       },
     },
@@ -185,10 +180,11 @@ function defaultPresets(
       }),
     },
   ];
+
   return presets;
 }
 
-export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
+export function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
   const {
     value,
     defaultValue,
@@ -219,7 +215,9 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
   // --- Initial value logic ---
   const initialValue = useMemo(() => {
     const v = value !== undefined ? value : defaultValue;
+
     if (!v) return { start: null, end: null };
+
     return {
       start: toDayjs(v.start, timezone),
       end: toDayjs(v.end, timezone),
@@ -252,6 +250,7 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
   useEffect(() => {
     if (value !== undefined) {
       const v = value || { start: null, end: null };
+
       setSelectedRange({
         start: toDayjs(v.start, timezone),
         end: toDayjs(v.end, timezone),
@@ -264,6 +263,7 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
 
   const presets = useMemo(() => {
     if (customPresets) return customPresets;
+
     return defaultPresets(timezone, {
       today: t("presets.today"),
       thisWeek: t("presets.thisWeek"),
@@ -280,20 +280,16 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
     });
   }, [customPresets, timezone, t]);
 
-  const minCalendarDate = useMemo(
-    () => {
-      const d = toDayjs(minDate, timezone);
-      return d ? dayjsToCalendarDate(d) : undefined;
-    },
-    [minDate, timezone]
-  );
-  const maxCalendarDate = useMemo(
-    () => {
-      const d = toDayjs(maxDate, timezone);
-      return d ? dayjsToCalendarDate(d) : undefined;
-    },
-    [maxDate, timezone]
-  );
+  const minCalendarDate = useMemo(() => {
+    const d = toDayjs(minDate, timezone);
+
+    return d ? dayjsToCalendarDate(d) : undefined;
+  }, [minDate, timezone]);
+  const maxCalendarDate = useMemo(() => {
+    const d = toDayjs(maxDate, timezone);
+
+    return d ? dayjsToCalendarDate(d) : undefined;
+  }, [maxDate, timezone]);
 
   const heroRangeValue: RangeValue<DateValue> | null = useMemo(() => {
     if (selectedRange.start && selectedRange.end) {
@@ -302,18 +298,21 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
         end: dayjsToCalendarDate(selectedRange.end),
       };
     }
+
     return null;
   }, [selectedRange]);
 
   const handleRangeChange = (range: RangeValue<DateValue> | null) => {
     if (!range) {
       const newVal = { start: null, end: null };
+
       setSelectedRange(newVal);
       onChange?.(newVal);
     } else {
       const start = calendarDateToDayjs(range.start, timezone).startOf("day");
       const end = calendarDateToDayjs(range.end, timezone).endOf("day");
       const newVal = { start, end };
+
       setSelectedRange(newVal);
       onChange?.({
         start: start.toISOString(),
@@ -326,6 +325,7 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
     const now = nowInTz(timezone);
     const { start, end } = preset.range(now);
     const newVal = { start, end };
+
     setSelectedRange(newVal);
     onChange?.({
       start: start.toISOString(),
@@ -336,12 +336,16 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
 
   const handleStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
+
     setDraftStartText(val);
     const d = toDayjs(val, timezone, format);
+
     if (d && d.isValid()) {
       const newStart = d.startOf("day");
+
       setSelectedRange((prev) => {
         const newVal = { ...prev, start: newStart };
+
         if (newVal.start && newVal.end && newVal.start.isAfter(newVal.end)) {
           newVal.end = newVal.start.endOf("day");
         }
@@ -349,6 +353,7 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
           start: newVal.start?.toISOString() || null,
           end: newVal.end?.toISOString() || null,
         });
+
         return newVal;
       });
       setIsDraftInvalid(false);
@@ -359,12 +364,16 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
 
   const handleEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
+
     setDraftEndText(val);
     const d = toDayjs(val, timezone, format);
+
     if (d && d.isValid()) {
       const newEnd = d.endOf("day");
+
       setSelectedRange((prev) => {
         const newVal = { ...prev, end: newEnd };
+
         if (newVal.start && newVal.end && newVal.end.isBefore(newVal.start)) {
           newVal.start = newVal.end.startOf("day");
         }
@@ -372,6 +381,7 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
           start: newVal.start?.toISOString() || null,
           end: newVal.end?.toISOString() || null,
         });
+
         return newVal;
       });
       setIsDraftInvalid(false);
@@ -383,6 +393,7 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
   const handleClearStart = (e: React.MouseEvent) => {
     e.stopPropagation();
     const newVal = { ...selectedRange, start: null };
+
     setSelectedRange(newVal);
     onChange?.({
       start: null,
@@ -393,6 +404,7 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
   const handleClearEnd = (e: React.MouseEvent) => {
     e.stopPropagation();
     const newVal = { ...selectedRange, end: null };
+
     setSelectedRange(newVal);
     onChange?.({
       start: newVal.start?.toISOString() || null,
@@ -410,7 +422,9 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
     }
   };
 
-  const allowClearStart = Array.isArray(allowClear) ? allowClear[0] : allowClear;
+  const allowClearStart = Array.isArray(allowClear)
+    ? allowClear[0]
+    : allowClear;
   const allowClearEnd = Array.isArray(allowClear) ? allowClear[1] : allowClear;
 
   const renderedContent = (
@@ -466,6 +480,7 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
               variant="flat"
               onPress={() => {
                 const newVal = { start: null, end: null };
+
                 setSelectedRange(newVal);
                 onChange?.(newVal);
                 setIsOpen(false);
@@ -473,11 +488,7 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
             >
               {t("actions.clear")}
             </Button>
-            <Button
-              color="primary"
-              size="sm"
-              onPress={() => setIsOpen(false)}
-            >
+            <Button color="primary" size="sm" onPress={() => setIsOpen(false)}>
               {t("actions.close")}
             </Button>
           </div>
@@ -487,11 +498,7 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
   );
 
   return (
-    <Popover
-      isOpen={isOpen}
-      placement="bottom-start"
-      onOpenChange={setIsOpen}
-    >
+    <Popover isOpen={isOpen} placement="bottom-start" onOpenChange={setIsOpen}>
       <PopoverTrigger>
         <div className="flex flex-col gap-1.5 w-full">
           {label && (
@@ -589,3 +596,4 @@ export default function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
     </Popover>
   );
 }
+export default IBaseDateRangePicker;

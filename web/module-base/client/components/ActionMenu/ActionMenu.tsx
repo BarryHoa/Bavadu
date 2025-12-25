@@ -33,12 +33,13 @@ export type ActionItemLink = ActionItemBase & {
 
 export type ActionItem = ActionItemButton | ActionItemLink;
 
-interface ActionMenuProps {
+export interface ActionMenuProps {
   actions: ActionItem[];
   className?: string;
 }
 
-const isLink = (action: ActionItem): action is ActionItemLink => "href" in action;
+const isLink = (action: ActionItem): action is ActionItemLink =>
+  "href" in action;
 
 const ActionMenu: React.FC<ActionMenuProps> = ({ actions, className }) => {
   const inlineActions = actions.filter((a) => a.placement !== "menu");
@@ -91,10 +92,7 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ actions, className }) => {
               <Ellipsis className="size-4" />
             </IBaseButton>
           </IBaseDropdownTrigger>
-          <IBaseDropdownMenu
-            aria-label="Actions"
-            items={menuActions}
-          >
+          <IBaseDropdownMenu aria-label="Actions" items={menuActions}>
             {(action) => (
               <IBaseDropdownItem
                 key={action.key}
