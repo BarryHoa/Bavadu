@@ -1,7 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/react";
+import { IBaseButton, IBaseCard, IBaseCardBody } from "@base/client/components";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -42,14 +41,14 @@ export default function EmployeeViewPage(): React.ReactNode {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">{t("title")}</h1>
         <div className="flex gap-2">
-          <Button
+          <IBaseButton
             size="sm"
             variant="light"
             onPress={() => router.push("/workspace/modules/hrm/employees")}
           >
             {t("backToList")}
-          </Button>
-          <Button
+          </IBaseButton>
+          <IBaseButton
             color="primary"
             size="sm"
             onPress={() =>
@@ -57,12 +56,12 @@ export default function EmployeeViewPage(): React.ReactNode {
             }
           >
             {t("edit")}
-          </Button>
+          </IBaseButton>
         </div>
       </div>
 
-      <Card>
-        <CardBody className="p-4">
+      <IBaseCard>
+        <IBaseCardBody className="p-4">
           <h2 className="text-base font-semibold mb-4">{t("basicInfo")}</h2>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
@@ -86,11 +85,11 @@ export default function EmployeeViewPage(): React.ReactNode {
               <div className="text-base">{employee.phone || "—"}</div>
             </div>
           </div>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
 
-      <Card>
-        <CardBody className="p-4">
+      <IBaseCard>
+        <IBaseCardBody className="p-4">
           <h2 className="text-base font-semibold mb-4">
             {t("employmentInfo")}
           </h2>
@@ -120,8 +119,8 @@ export default function EmployeeViewPage(): React.ReactNode {
               </div>
             </div>
           </div>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
     </div>
   );
 }

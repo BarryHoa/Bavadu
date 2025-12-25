@@ -3,16 +3,16 @@
 import type { WarehouseDto } from "../../../services/StockService";
 import type { MovementPayload } from "../types";
 
+import { IBaseButton, IBaseCard } from "@base/client/components";
 import {
+  IBaseCardBody,
   IBaseInput,
   IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/react";
 import { useMemo, useState } from "react";
 
-interface MovementCardProps {
+interface MovementIBaseCardProps {
   title: string;
   description: string;
   actionLabel: string;
@@ -30,7 +30,7 @@ export default function MovementCard({
   requireSecondaryWarehouse,
   submitting = false,
   onSubmit,
-}: MovementCardProps) {
+}: MovementIBaseCardProps) {
   const [formValues, setFormValues] = useState<MovementPayload>({
     productId: "",
     quantity: "",
@@ -79,8 +79,8 @@ export default function MovementCard({
   };
 
   return (
-    <Card className="border border-content3/40">
-      <CardBody className="space-y-3">
+    <IBaseCard className="border border-content3/40">
+      <IBaseCardBody className="space-y-3">
         <div>
           <h3 className="text-base font-semibold">{title}</h3>
           <p className="text-sm text-default-500">{description}</p>
@@ -127,15 +127,15 @@ export default function MovementCard({
           value={formValues.note}
           onValueChange={(value) => handleChange("note", value)}
         />
-        <Button
+        <IBaseButton
           color="primary"
           isLoading={submitting}
           size="sm"
           onPress={handleSubmit}
         >
           {actionLabel}
-        </Button>
-      </CardBody>
-    </Card>
+        </IBaseButton>
+      </IBaseCardBody>
+    </IBaseCard>
   );
 }

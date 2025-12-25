@@ -1,29 +1,10 @@
 "use client";
+import { IBaseDivider, IBaseScrollShadow, IBaseTooltip } from "@base/client/components";
 
-import { IBaseTooltip } from "@base/client/components";
 import { MenuWorkspaceElement } from "@base/client/interface/WorkspaceMenuInterface";
-import { Divider } from "@heroui/divider";
-import { ScrollShadow } from "@heroui/scroll-shadow";
 import clsx from "clsx";
-import {
-  BarChart3,
-  Boxes,
-  Building2,
-  ChevronDown,
-  ChevronRight,
-  Circle,
-  ClipboardList,
-  NewspaperIcon,
-  Package,
-  Pin,
-  PinOff,
-  Settings,
-  ShoppingCart,
-  TrendingUp,
-  User,
-  type LucideIcon,
-} from "lucide-react";
-import Link from "next/link";
+import { BarChart3, Boxes, Building2, ChevronDown, ChevronRight, Circle, ClipboardList, NewspaperIcon, Package, Pin, PinOff, Settings, ShoppingCart, TrendingUp, User, type LucideIcon } from "lucide-react";
+import IBaseLink from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -293,7 +274,7 @@ export default function Menu({
             )}
           </>
         ) : (
-          <Link
+          <IBaseLink
             className="block"
             href={itemPath || "#"}
             onClick={() => {
@@ -316,7 +297,7 @@ export default function Menu({
                 {content}
               </IBaseTooltip>
             )}
-          </Link>
+          </IBaseLink>
         )}
 
         {hasChildren && isExpanded && (
@@ -335,7 +316,7 @@ export default function Menu({
               const isChildActive = activeKey === child.key;
 
               return (
-                <Link
+                <IBaseLink
                   key={child.name}
                   as={childAs || childPath}
                   className={clsx(
@@ -376,7 +357,7 @@ export default function Menu({
                       {child.badge}
                     </span>
                   )}
-                </Link>
+                </IBaseLink>
               );
             })}
           </div>
@@ -406,7 +387,7 @@ export default function Menu({
           }
         }}
       >
-        <ScrollShadow className="flex-1 px-2 pb-4 pt-2">
+        <IBaseScrollShadow className="flex-1 px-2 pb-4 pt-2">
           {/* Header + toggle */}
           <div
             className={clsx(
@@ -445,11 +426,11 @@ export default function Menu({
 
           {moduleMenus.length > 0 && (
             <>
-              <Divider className="my-3 bg-slate-100" />
+              <IBaseDivider className="my-3 bg-slate-100" />
               <div className="space-y-1">{moduleMenus.map(renderMenuItem)}</div>
             </>
           )}
-        </ScrollShadow>
+        </IBaseScrollShadow>
       </aside>
     </>
   );

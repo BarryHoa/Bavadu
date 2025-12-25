@@ -1,8 +1,12 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Chip } from "@heroui/chip";
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBaseCardHeader,
+  IBaseChip,
+} from "@base/client/components";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -35,47 +39,47 @@ export default function RoleViewPage() {
 
   if (loading) {
     return (
-      <Card>
-        <CardBody>
+      <IBaseCard>
+        <IBaseCardBody>
           <p>{t("loading")}</p>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
     );
   }
 
   if (!role) {
     return (
-      <Card>
-        <CardBody>
+      <IBaseCard>
+        <IBaseCardBody>
           <p>{t("notFound")}</p>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
     );
   }
 
   return (
     <div className="flex flex-col gap-4">
-      <Card>
-        <CardHeader className="flex items-center justify-between">
+      <IBaseCard>
+        <IBaseCardHeader className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">{getText(role.name)}</h2>
           <div className="flex gap-2">
-            <Button
+            <IBaseButton
               variant="light"
               onPress={() => router.push("/settings/roles")}
             >
               {actionsT("cancel")}
-            </Button>
+            </IBaseButton>
             {!role.isSystem && (
-              <Button
+              <IBaseButton
                 color="primary"
                 onPress={() => router.push(`/settings/roles/edit/${role.id}`)}
               >
                 {actionsT("edit")}
-              </Button>
+              </IBaseButton>
             )}
           </div>
-        </CardHeader>
-        <CardBody className="flex flex-col gap-4">
+        </IBaseCardHeader>
+        <IBaseCardBody className="flex flex-col gap-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-foreground-500">
@@ -108,13 +112,13 @@ export default function RoleViewPage() {
                 {t("form.status")}
               </label>
               <p className="mt-1">
-                <Chip
+                <IBaseChip
                   color={role.isActive ? "success" : "default"}
                   size="sm"
                   variant="flat"
                 >
                   {role.isActive ? t("form.active") : t("form.inactive")}
-                </Chip>
+                </IBaseChip>
               </p>
             </div>
           </div>
@@ -125,17 +129,17 @@ export default function RoleViewPage() {
             {role.permissions && role.permissions.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {role.permissions.map((permission) => (
-                  <Chip key={permission.id} size="sm" variant="flat">
+                  <IBaseChip key={permission.id} size="sm" variant="flat">
                     {getText(permission.name)} ({permission.key})
-                  </Chip>
+                  </IBaseChip>
                 ))}
               </div>
             ) : (
               <p className="text-foreground-400">{t("form.noPermissions")}</p>
             )}
           </div>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
     </div>
   );
 }

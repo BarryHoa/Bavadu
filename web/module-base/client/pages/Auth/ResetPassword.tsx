@@ -1,9 +1,13 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Input as HeroUIInput } from "@heroui/input";
-import { Link } from "@heroui/link";
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBaseCardHeader,
+  IBaseInput,
+  IBaseLink,
+} from "@base/client/components";
 import { useState } from "react";
 
 export default function ResetPasswordPage() {
@@ -41,40 +45,40 @@ export default function ResetPasswordPage() {
   if (isSubmitted) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-        <Card className="w-full max-w-md">
-          <CardHeader className="flex flex-col gap-1 px-6 pt-6">
+        <IBaseCard className="w-full max-w-md">
+          <IBaseCardHeader className="flex flex-col gap-1 px-6 pt-6">
             <h1 className="text-2xl font-bold">Check your email</h1>
             <p className="text-sm text-gray-500">
               We've sent a password reset link to your email address
             </p>
-          </CardHeader>
-          <CardBody className="px-6 pb-6">
+          </IBaseCardHeader>
+          <IBaseCardBody className="px-6 pb-6">
             <div className="flex flex-col gap-4">
               <p className="text-sm text-gray-600">
                 If an account exists with the email <strong>{email}</strong>,
                 you will receive a password reset link shortly.
               </p>
-              <Link className="text-sm text-primary-600" href="/login">
+              <IBaseLink className="text-sm text-primary-600" href="/login">
                 Back to login
-              </Link>
+              </IBaseLink>
             </div>
-          </CardBody>
-        </Card>
+          </IBaseCardBody>
+        </IBaseCard>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
-        <CardHeader className="flex flex-col gap-1 px-6 pt-6">
+      <IBaseCard className="w-full max-w-md">
+        <IBaseCardHeader className="flex flex-col gap-1 px-6 pt-6">
           <h1 className="text-2xl font-bold">Reset your password</h1>
           <p className="text-sm text-gray-500">
             Enter your email address and we'll send you a link to reset your
             password
           </p>
-        </CardHeader>
-        <CardBody className="px-6 pb-6">
+        </IBaseCardHeader>
+        <IBaseCardBody className="px-6 pb-6">
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             {error && (
               <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">
@@ -82,7 +86,7 @@ export default function ResetPasswordPage() {
               </div>
             )}
 
-            <HeroUIInput
+            <IBaseInput
               required
               autoComplete="email"
               label="Email"
@@ -93,7 +97,7 @@ export default function ResetPasswordPage() {
               onChange={(e) => setEmail(e.target.value)}
             />
 
-            <Button
+            <IBaseButton
               className="w-full"
               color="primary"
               isLoading={isLoading}
@@ -101,19 +105,19 @@ export default function ResetPasswordPage() {
               type="submit"
             >
               Send reset link
-            </Button>
+            </IBaseButton>
 
             <div className="text-center">
-              <Link
+              <IBaseLink
                 className="text-sm text-primary-600 hover:text-primary-500"
                 href="/login"
               >
                 Back to login
-              </Link>
+              </IBaseLink>
             </div>
           </form>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
     </div>
   );
 }

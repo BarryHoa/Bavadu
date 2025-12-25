@@ -5,14 +5,7 @@ import type { Column, HeaderGroup, Row } from "@tanstack/react-table";
 import type { ReactNode } from "react";
 
 import { Spinner } from "@heroui/spinner";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from "@heroui/table";
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/table";
 import { flexRender } from "@tanstack/react-table";
 import clsx from "clsx";
 import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";

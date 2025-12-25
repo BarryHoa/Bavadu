@@ -1,14 +1,10 @@
 "use client";
 
+import { IBaseChip, I_BASE_TABLE_COLUMN_KEY_ACTION, IBaseTableColumnDefinition } from "@base/client/components";
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
-import {
-  DATA_TABLE_COLUMN_KEY_ACTION,
-  DataTableColumn,
-} from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 
@@ -20,9 +16,9 @@ type CustomerIndividualRow = CustomerIndividual & {
 };
 
 export default function CustomerIndividualsListPage(): React.ReactNode {
-  const tDataTable = useTranslations("dataTable");
+  const tIBaseTable = useTranslations("dataTable");
 
-  const columns = useMemo<DataTableColumn<CustomerIndividualRow>[]>(
+  const columns = useMemo<IBaseTableColumnDefinition<CustomerIndividualRow>[]>(
     () => [
       {
         key: "code",
@@ -60,13 +56,13 @@ export default function CustomerIndividualsListPage(): React.ReactNode {
         key: "isActive",
         label: "Status",
         render: (_, row) => (
-          <Chip
+          <IBaseChip
             color={row.isActive ? "success" : "danger"}
             size="sm"
             variant="flat"
           >
             {row.isActive ? "Active" : "Inactive"}
-          </Chip>
+          </IBaseChip>
         ),
       },
       {
@@ -75,8 +71,8 @@ export default function CustomerIndividualsListPage(): React.ReactNode {
         render: (value) => formatDate(value),
       },
       {
-        key: DATA_TABLE_COLUMN_KEY_ACTION,
-        label: tDataTable("columns.action"),
+        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
+        label: tIBaseTable("columns.action"),
         align: "end",
         render: (_, row) => {
           if (!row?.id) return null;
@@ -102,7 +98,7 @@ export default function CustomerIndividualsListPage(): React.ReactNode {
         },
       },
     ],
-    [tDataTable],
+    [tIBaseTable],
   );
 
   return (

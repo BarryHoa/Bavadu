@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-
 import UserPermissionModel from "@base/server/models/UserPermission/UserPermissionModel";
 import { getAuthenticatedUser } from "@base/server/utils/auth-helpers";
 import { JSONResponse } from "@base/server/utils/JSONResponse";
@@ -93,5 +92,3 @@ export async function requireAnyPermission(
 
   return null;
 }
-
-

@@ -2,8 +2,8 @@
 
 import type { MovementResult, StockFilters } from "./types";
 
+import { IBaseButton } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
-import { Button } from "@heroui/button";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
@@ -155,14 +155,14 @@ export default function StockDashboardPage(): React.ReactNode {
   return (
     <div className="space-y-6">
       <div className="flex justify-end">
-        <Button
+        <IBaseButton
           as={LinkAs as any}
           color="primary"
           href="/workspace/modules/stock/warehouses"
           size="sm"
         >
           Manage warehouses
-        </Button>
+        </IBaseButton>
       </div>
 
       <StockSummarySection
@@ -188,21 +188,21 @@ export default function StockDashboardPage(): React.ReactNode {
       />
 
       <div className="flex items-center justify-end">
-        <Button
+        <IBaseButton
           size="sm"
           variant="light"
           onPress={() => router.push("/workspace/modules/purchase")}
         >
           Go to Purchase Orders
-        </Button>
-        <Button
+        </IBaseButton>
+        <IBaseButton
           className="ml-2"
           size="sm"
           variant="light"
           onPress={() => router.push("/workspace/modules/b2b-sales/orders")}
         >
           Go to Sales Orders
-        </Button>
+        </IBaseButton>
       </div>
     </div>
   );

@@ -1,12 +1,16 @@
 "use client";
 
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBaseDigitViewer,
+  LoadingOverlay,
+} from "@base/client/components";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { performanceReviewService } from "@mdl/hrm/client/services/PerformanceReviewService";
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/react";
-import { LoadingOverlay, IBaseDigitViewer } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { formatDate } from "@base/client/utils/date/formatDate";
 
@@ -60,7 +64,7 @@ export default function PerformanceReviewViewPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <div className="sticky top-0 z-10 flex justify-end gap-3 py-2 mb-3 bg-background border-b border-divider -mx-4 px-4">
-        <Button
+        <IBaseButton
           size="sm"
           variant="light"
           onPress={() =>
@@ -68,8 +72,8 @@ export default function PerformanceReviewViewPage(): React.ReactNode {
           }
         >
           {tCommon("actions.backToList")}
-        </Button>
-        <Button
+        </IBaseButton>
+        <IBaseButton
           color="primary"
           size="sm"
           onPress={() =>
@@ -77,11 +81,11 @@ export default function PerformanceReviewViewPage(): React.ReactNode {
           }
         >
           {tCommon("actions.edit")}
-        </Button>
+        </IBaseButton>
       </div>
 
-      <Card>
-        <CardBody className="p-4">
+      <IBaseCard>
+        <IBaseCardBody className="p-4">
           <h2 className="text-base font-semibold mb-2">{t("generalInfo")}</h2>
           <div className="grid gap-2 md:grid-cols-2">
             <IBaseDigitViewer
@@ -151,8 +155,8 @@ export default function PerformanceReviewViewPage(): React.ReactNode {
               />
             </div>
           </div>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
     </div>
   );
 }

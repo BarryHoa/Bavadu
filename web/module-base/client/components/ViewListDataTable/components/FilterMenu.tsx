@@ -1,10 +1,8 @@
 "use client";
+import { IBaseButton, IBaseCheckbox, IBaseDropdown } from "@base/client/components";
 
-import { Button } from "@heroui/button";
-import { Checkbox } from "@heroui/checkbox";
 import { Filter } from "lucide-react";
 
-import { IBaseDropdown } from "@base/client/components";
 
 export interface FilterOption<T = any> {
   label: string;
@@ -32,12 +30,12 @@ export default function FilterMenu<T = any>({
         key: option.label,
         textValue: option.label,
         children: (
-          <Checkbox
+          <IBaseCheckbox
             isSelected={activeFilters.has(option.label)}
             onValueChange={() => onToggleFilter(option.label)}
           >
             {option.label}
-          </Checkbox>
+          </IBaseCheckbox>
         ),
       }))}
       menu={{
@@ -45,7 +43,7 @@ export default function FilterMenu<T = any>({
         className: "min-w-[150px]",
       }}
     >
-      <Button
+      <IBaseButton
         size="sm"
         startContent={<Filter size={16} />}
         title="Filter"

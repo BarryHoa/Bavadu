@@ -2,15 +2,16 @@
 
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
 
+import { IBaseButton, IBaseCard } from "@base/client/components";
 import {
+  IBaseCardBody,
+  IBaseCardHeader,
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseSelect,
-  SelectItem,
+  IBaseSelectItem,
 } from "@base/client/components";
 import roleService from "@base/client/services/RoleService";
-import { Button } from "@heroui/button";
-import { Card, CardBody, CardHeader } from "@heroui/card";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
@@ -147,56 +148,56 @@ export default function RoleEditPage() {
 
   if (roleQuery.isLoading) {
     return (
-      <Card>
-        <CardBody>
+      <IBaseCard>
+        <IBaseCardBody>
           <p>{t("loading")}</p>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
     );
   }
 
   if (!role) {
     return (
-      <Card>
-        <CardBody>
+      <IBaseCard>
+        <IBaseCardBody>
           <p>{t("notFound")}</p>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
     );
   }
 
   if (role.isSystem) {
     return (
-      <Card>
-        <CardBody>
+      <IBaseCard>
+        <IBaseCardBody>
           <p>{t("cannotEditSystemRole")}</p>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
     );
   }
 
   return (
     <div className="flex flex-col gap-4">
-      <Card>
-        <CardHeader className="flex items-center justify-between">
+      <IBaseCard>
+        <IBaseCardHeader className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">{t("edit.title")}</h2>
           <div className="flex gap-2">
-            <Button
+            <IBaseButton
               variant="light"
               onPress={() => router.push("/settings/roles")}
             >
               {actionsT("cancel")}
-            </Button>
-            <Button
+            </IBaseButton>
+            <IBaseButton
               color="primary"
               isLoading={updateRoleMutation.isPending}
               onPress={handleSubmit}
             >
               {actionsT("save")}
-            </Button>
+            </IBaseButton>
           </div>
-        </CardHeader>
-        <CardBody className="flex flex-col gap-4">
+        </IBaseCardHeader>
+        <IBaseCardBody className="flex flex-col gap-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <IBaseInput
               isRequired
@@ -236,16 +237,16 @@ export default function RoleEditPage() {
                 }}
               >
                 {permissions.map((permission) => (
-                  <SelectItem key={permission.id} textValue={permission.key}>
+                  <IBaseSelectItem key={permission.id} textValue={permission.key}>
                     {permission.key} - {permission.module}.{permission.resource}
                     .{permission.action}
-                  </SelectItem>
+                  </IBaseSelectItem>
                 ))}
               </IBaseSelect>
             </div>
           </div>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
       {toast && (
         <div className="fixed right-4 top-4 z-50 flex max-w-sm flex-col gap-2">
           <div

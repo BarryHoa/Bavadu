@@ -137,8 +137,8 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
         base_tb_permissions,
         eq(
           base_tb_role_permissions_default.permissionId,
-          base_tb_permissions.id
-        )
+          base_tb_permissions.id,
+        ),
       )
       .where(eq(base_tb_role_permissions_default.roleId, id));
 
@@ -184,9 +184,9 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
         .from(base_tb_permissions)
         .where(
           and(
-            eq(base_tb_permissions.isActive, true)
+            eq(base_tb_permissions.isActive, true),
             // Note: We'd need to filter by keys, but for now we'll handle this differently
-          )
+          ),
         );
 
       // For now, we'll need to match permission keys to IDs
@@ -220,7 +220,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
 
   updateRole = async (
     id: string,
-    payload: Partial<RoleInput>
+    payload: Partial<RoleInput>,
   ): Promise<RoleRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -271,8 +271,8 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
           .where(
             and(
               eq(base_tb_role_permissions_default.roleId, id),
-              eq(base_tb_role_permissions_default.permissionId, permissionId)
-            )
+              eq(base_tb_role_permissions_default.permissionId, permissionId),
+            ),
           )
           .limit(1);
 
@@ -376,7 +376,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
   }
 
   private async mapToRoleRow(
-    row: typeof base_tb_roles.$inferSelect
+    row: typeof base_tb_roles.$inferSelect,
   ): Promise<RoleRow> {
     // Get permissions for this role
     const db = await this.db;
@@ -389,15 +389,15 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
         base_tb_permissions,
         eq(
           base_tb_role_permissions_default.permissionId,
-          base_tb_permissions.id
-        )
+          base_tb_permissions.id,
+        ),
       )
       .where(
         and(
           eq(base_tb_role_permissions_default.roleId, row.id),
           eq(base_tb_role_permissions_default.isActive, true),
-          eq(base_tb_permissions.isActive, true)
-        )
+          eq(base_tb_permissions.isActive, true),
+        ),
       );
 
     return {

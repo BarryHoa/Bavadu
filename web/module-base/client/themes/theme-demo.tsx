@@ -1,11 +1,14 @@
-"use client";
-
-import { Button } from "@heroui/button";
-import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Chip } from "@heroui/chip";
-import { Progress } from "@heroui/progress";
-import { Badge } from "@heroui/badge";
-import { Divider } from "@heroui/divider";
+import {
+  IBaseBadge,
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBaseCardHeader,
+  IBaseChip,
+  IBaseDivider,
+  IBaseProgress,
+} from "@base/client/components";
+("use client");
 
 export default function ThemeDemo() {
   return (
@@ -20,11 +23,11 @@ export default function ThemeDemo() {
       </div>
 
       {/* Color Palette Demo */}
-      <Card>
-        <CardHeader>
+      <IBaseCard>
+        <IBaseCardHeader>
           <h2 className="text-2xl font-semibold">Color Palette</h2>
-        </CardHeader>
-        <CardBody className="space-y-4">
+        </IBaseCardHeader>
+        <IBaseCardBody className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="space-y-2">
               <h3 className="font-medium">Primary</h3>
@@ -70,146 +73,146 @@ export default function ThemeDemo() {
               </div>
             </div>
           </div>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
 
       {/* Buttons Demo */}
-      <Card>
-        <CardHeader>
+      <IBaseCard>
+        <IBaseCardHeader>
           <h2 className="text-2xl font-semibold">Buttons</h2>
-        </CardHeader>
-        <CardBody>
+        </IBaseCardHeader>
+        <IBaseCardBody>
           <div className="flex flex-wrap gap-4">
-            <Button color="primary">Primary</Button>
-            <Button color="secondary">Secondary</Button>
-            <Button color="success">Success</Button>
-            <Button color="warning">Warning</Button>
-            <Button color="danger">Danger</Button>
-            <Button color="primary" variant="bordered">
+            <IBaseButton color="primary">Primary</IBaseButton>
+            <IBaseButton color="secondary">Secondary</IBaseButton>
+            <IBaseButton color="success">Success</IBaseButton>
+            <IBaseButton color="warning">Warning</IBaseButton>
+            <IBaseButton color="danger">Danger</IBaseButton>
+            <IBaseButton color="primary" variant="bordered">
               Bordered
-            </Button>
-            <Button color="primary" variant="light">
+            </IBaseButton>
+            <IBaseButton color="primary" variant="light">
               Light
-            </Button>
-            <Button color="primary" variant="flat">
+            </IBaseButton>
+            <IBaseButton color="primary" variant="flat">
               Flat
-            </Button>
-            <Button color="primary" variant="faded">
+            </IBaseButton>
+            <IBaseButton color="primary" variant="faded">
               Faded
-            </Button>
-            <Button color="primary" variant="shadow">
+            </IBaseButton>
+            <IBaseButton color="primary" variant="shadow">
               Shadow
-            </Button>
-            <Button color="primary" variant="ghost">
+            </IBaseButton>
+            <IBaseButton color="primary" variant="ghost">
               Ghost
-            </Button>
+            </IBaseButton>
           </div>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
 
       {/* Chips Demo */}
-      <Card>
-        <CardHeader>
+      <IBaseCard>
+        <IBaseCardHeader>
           <h2 className="text-2xl font-semibold">Chips</h2>
-        </CardHeader>
-        <CardBody>
+        </IBaseCardHeader>
+        <IBaseCardBody>
           <div className="flex flex-wrap gap-4">
-            <Chip color="primary">Primary</Chip>
-            <Chip color="secondary">Secondary</Chip>
-            <Chip color="success">Success</Chip>
-            <Chip color="warning">Warning</Chip>
-            <Chip color="danger">Danger</Chip>
-            <Chip color="primary" variant="bordered">
+            <IBaseChip color="primary">Primary</IBaseChip>
+            <IBaseChip color="secondary">Secondary</IBaseChip>
+            <IBaseChip color="success">Success</IBaseChip>
+            <IBaseChip color="warning">Warning</IBaseChip>
+            <IBaseChip color="danger">Danger</IBaseChip>
+            <IBaseChip color="primary" variant="bordered">
               Bordered
-            </Chip>
-            <Chip color="primary" variant="flat">
+            </IBaseChip>
+            <IBaseChip color="primary" variant="flat">
               Flat
-            </Chip>
-            <Chip color="primary" variant="dot">
+            </IBaseChip>
+            <IBaseChip color="primary" variant="dot">
               Dot
-            </Chip>
+            </IBaseChip>
           </div>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
 
-      {/* Progress Demo */}
-      <Card>
-        <CardHeader>
-          <h2 className="text-2xl font-semibold">Progress</h2>
-        </CardHeader>
-        <CardBody className="space-y-4">
+      {/* IBaseProgress Demo */}
+      <IBaseCard>
+        <IBaseCardHeader>
+          <h2 className="text-2xl font-semibold">IBaseProgress</h2>
+        </IBaseCardHeader>
+        <IBaseCardBody className="space-y-4">
           <div className="space-y-2">
-            <Progress color="primary" value={60} />
-            <Progress color="secondary" value={40} />
-            <Progress color="success" value={80} />
-            <Progress color="warning" value={30} />
-            <Progress color="danger" value={90} />
+            <IBaseProgress color="primary" value={60} />
+            <IBaseProgress color="secondary" value={40} />
+            <IBaseProgress color="success" value={80} />
+            <IBaseProgress color="warning" value={30} />
+            <IBaseProgress color="danger" value={90} />
           </div>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
 
       {/* Badges Demo */}
-      <Card>
-        <CardHeader>
+      <IBaseCard>
+        <IBaseCardHeader>
           <h2 className="text-2xl font-semibold">Badges</h2>
-        </CardHeader>
-        <CardBody>
+        </IBaseCardHeader>
+        <IBaseCardBody>
           <div className="flex flex-wrap gap-4">
-            <Badge color="primary" content="5">
-              <Button>Primary Badge</Button>
-            </Badge>
-            <Badge color="secondary" content="3">
-              <Button>Secondary Badge</Button>
-            </Badge>
-            <Badge color="success" content="New">
-              <Button>Success Badge</Button>
-            </Badge>
-            <Badge color="warning" content="!">
-              <Button>Warning Badge</Button>
-            </Badge>
-            <Badge color="danger" content="X">
-              <Button>Danger Badge</Button>
-            </Badge>
+            <IBaseBadge color="primary" content="5">
+              <IBaseButton>Primary IBaseBadge</IBaseButton>
+            </IBaseBadge>
+            <IBaseBadge color="secondary" content="3">
+              <IBaseButton>Secondary IBaseBadge</IBaseButton>
+            </IBaseBadge>
+            <IBaseBadge color="success" content="New">
+              <IBaseButton>Success IBaseBadge</IBaseButton>
+            </IBaseBadge>
+            <IBaseBadge color="warning" content="!">
+              <IBaseButton>Warning IBaseBadge</IBaseButton>
+            </IBaseBadge>
+            <IBaseBadge color="danger" content="X">
+              <IBaseButton>Danger IBaseBadge</IBaseButton>
+            </IBaseBadge>
           </div>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
 
       {/* Layout Demo */}
-      <Card>
-        <CardHeader>
+      <IBaseCard>
+        <IBaseCardHeader>
           <h2 className="text-2xl font-semibold">Layout & Spacing</h2>
-        </CardHeader>
-        <CardBody className="space-y-4">
+        </IBaseCardHeader>
+        <IBaseCardBody className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-content1">
-              <CardBody>
+            <IBaseCard className="bg-content1">
+              <IBaseCardBody>
                 <h3 className="font-semibold mb-2">Content 1</h3>
                 <p className="text-small text-default-600">
                   Background sử dụng content1 color
                 </p>
-              </CardBody>
-            </Card>
+              </IBaseCardBody>
+            </IBaseCard>
 
-            <Card className="bg-content2">
-              <CardBody>
+            <IBaseCard className="bg-content2">
+              <IBaseCardBody>
                 <h3 className="font-semibold mb-2">Content 2</h3>
                 <p className="text-small text-default-600">
                   Background sử dụng content2 color
                 </p>
-              </CardBody>
-            </Card>
+              </IBaseCardBody>
+            </IBaseCard>
 
-            <Card className="bg-content3">
-              <CardBody>
+            <IBaseCard className="bg-content3">
+              <IBaseCardBody>
                 <h3 className="font-semibold mb-2">Content 3</h3>
                 <p className="text-small text-default-600">
                   Background sử dụng content3 color
                 </p>
-              </CardBody>
-            </Card>
+              </IBaseCardBody>
+            </IBaseCard>
           </div>
 
-          <Divider />
+          <IBaseDivider />
 
           <div className="text-center">
             <p className="text-default-600">
@@ -217,8 +220,8 @@ export default function ThemeDemo() {
               component đều sử dụng light theme với màu sắc tùy chỉnh.
             </p>
           </div>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
     </div>
   );
 }

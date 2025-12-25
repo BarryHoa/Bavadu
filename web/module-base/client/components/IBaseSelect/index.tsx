@@ -1,5 +1,6 @@
-export { SelectItem } from "@heroui/select";
-export { default, default as IBaseSelect } from "./IBaseSelect";
-export type { IBaseSelectProps } from "./IBaseSelect";
+export * from "./IBaseSelect";
+export { default as IBaseSelect } from "./IBaseSelect";
 export { default as IBaseSingleSelect } from "./IBaseSingleSelect";
+export { default as IBaseSingleSelectAsync } from "./IBaseSingleSelectAsync";
 export type { SelectItemOption } from "./IBaseSingleSelect";
+export type { IBaseSingleSelectAsyncProps } from "./IBaseSingleSelectAsync";

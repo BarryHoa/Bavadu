@@ -1,24 +1,20 @@
 "use client";
 
+import { IBaseButton, IBaseModal, IBaseModalHeader } from "@base/client/components";
 import {
   IBaseInputNumber,
   IBaseSingleSelect,
+  IBaseModalBody,
+  IBaseModalContent,
+  IBaseModalFooter,
   SelectItemOption,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { Button } from "@heroui/button";
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-} from "@heroui/react";
 import { AlertCircle } from "lucide-react";
 import { useMemo } from "react";
 import { Control, Controller, UseFormSetValue } from "react-hook-form";
 
-interface PriceItemEditModalProps {
+interface PriceItemEditIBaseModalProps {
   isOpen: boolean;
   onClose: () => void;
   index: number;
@@ -44,7 +40,7 @@ export default function PriceItemEditModal({
   getAvailableUomsForVariant,
   watchedPriceItems,
   isLoading = false,
-}: PriceItemEditModalProps) {
+}: PriceItemEditIBaseModalProps) {
   const getLocalizedText = useLocalizedText();
   const currentItem = watchedPriceItems?.[index];
   const variantId = currentItem?.variantId;
@@ -116,18 +112,18 @@ export default function PriceItemEditModal({
   };
 
   return (
-    <Modal
+    <IBaseModal
       isOpen={isOpen}
       placement="center"
       scrollBehavior="inside"
       size="2xl"
       onClose={onClose}
     >
-      <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
+      <IBaseModalContent>
+        <IBaseModalHeader className="flex flex-col gap-1">
           <h3 className="text-lg font-semibold">Edit Price Item</h3>
-        </ModalHeader>
-        <ModalBody className="py-4">
+        </IBaseModalHeader>
+        <IBaseModalBody className="py-4">
           <div className="space-y-4">
             {/* Alerts */}
             {isDuplicate && (
@@ -280,16 +276,16 @@ export default function PriceItemEditModal({
               </div>
             </div>
           </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button variant="light" onPress={onClose}>
+        </IBaseModalBody>
+        <IBaseModalFooter>
+          <IBaseButton variant="light" onPress={onClose}>
             Cancel
-          </Button>
-          <Button color="primary" onPress={onClose}>
+          </IBaseButton>
+          <IBaseButton color="primary" onPress={onClose}>
             Save
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+          </IBaseButton>
+        </IBaseModalFooter>
+      </IBaseModalContent>
+    </IBaseModal>
   );
 }

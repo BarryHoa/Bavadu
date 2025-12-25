@@ -1,10 +1,9 @@
 "use client";
+import { IBaseButton, IBaseDropdown } from "@base/client/components";
 
-import { Button } from "@heroui/button";
 import { Group } from "lucide-react";
 import { useMemo } from "react";
 
-import { IBaseDropdown } from "@base/client/components";
 
 export interface GroupOption {
   key: string;
@@ -54,7 +53,7 @@ export default function GroupByMenu({
         },
       }}
     >
-      <Button
+      <IBaseButton
         size="sm"
         startContent={<Group size={16} />}
         title="Group by"

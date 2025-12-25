@@ -1,14 +1,10 @@
 "use client";
 
+import { IBaseChip, I_BASE_TABLE_COLUMN_KEY_ACTION, IBaseTableColumnDefinition } from "@base/client/components";
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
-import {
-  DATA_TABLE_COLUMN_KEY_ACTION,
-  DataTableColumn,
-} from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 
@@ -21,9 +17,9 @@ type SalesOrderB2BRow = SalesOrderB2B & {
 
 export default function SalesOrdersB2BListPage(): React.ReactNode {
   const t = useTranslations("sale.ordersB2B.list");
-  const tDataTable = useTranslations("dataTable");
+  const tIBaseTable = useTranslations("dataTable");
 
-  const columns = useMemo<DataTableColumn<SalesOrderB2BRow>[]>(
+  const columns = useMemo<IBaseTableColumnDefinition<SalesOrderB2BRow>[]>(
     () => [
       {
         key: "code",
@@ -46,9 +42,9 @@ export default function SalesOrdersB2BListPage(): React.ReactNode {
         key: "status",
         label: "Status",
         render: (value) => (
-          <Chip className="capitalize" size="sm" variant="flat">
+          <IBaseChip className="capitalize" size="sm" variant="flat">
             {value || "draft"}
-          </Chip>
+          </IBaseChip>
         ),
       },
       {
@@ -66,8 +62,8 @@ export default function SalesOrdersB2BListPage(): React.ReactNode {
           }).format(Number(row.grandTotal ?? 0)),
       },
       {
-        key: DATA_TABLE_COLUMN_KEY_ACTION,
-        label: tDataTable("columns.action"),
+        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
+        label: tIBaseTable("columns.action"),
         align: "end",
         render: (_, row) => {
           if (!row?.id) return null;
@@ -87,7 +83,7 @@ export default function SalesOrdersB2BListPage(): React.ReactNode {
         },
       },
     ],
-    [tDataTable],
+    [tIBaseTable],
   );
 
   return (

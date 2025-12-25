@@ -26,6 +26,7 @@ import {
   nowInTz,
   toDayjs,
 } from "../../utils/date/parseDateInput";
+
 import ButtonFastChoose from "./components/ButtonFastChoose";
 
 export type IBaseDatePickerValue = string | Dayjs | null;
@@ -184,6 +185,7 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
         setDraftText(committedText);
         setDraftDayjs(committedDayjs);
         setIsDraftInvalid(false);
+
         return true;
       }
       setIsDraftInvalid(false);
@@ -298,6 +300,7 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
         setDraftText(committedText);
         setDraftDayjs(committedDayjs);
         setIsDraftInvalid(false);
+
         return;
       }
       setDraftDayjs(null);
@@ -339,6 +342,7 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
           setDraftDayjs(committedDayjs);
           setIsDraftInvalid(false);
           close();
+
           return;
         }
         setDraftDayjs(null);
@@ -409,11 +413,6 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
     <div className="flex flex-col gap-2 ">
       <Calendar
         {...calendarProps}
-        focusedValue={calendarProps?.focusedValue ?? focusedValue}
-        onFocusChange={(date) => {
-          setFocusedValue(date);
-          calendarProps?.onFocusChange?.(date);
-        }}
         bottomContent={
           resolvedQuickSelect ? (
             <ButtonFastChoose
@@ -438,6 +437,7 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
             />
           ) : null
         }
+        focusedValue={calendarProps?.focusedValue ?? focusedValue}
         maxValue={maxValue}
         minValue={minValue}
         showHelper={false}
@@ -445,6 +445,10 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
         onChange={(val) => {
           handleCalendarChange(val);
           if (val) setFocusedValue(val);
+        }}
+        onFocusChange={(date) => {
+          setFocusedValue(date);
+          calendarProps?.onFocusChange?.(date);
         }}
       />
     </div>
@@ -457,6 +461,7 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
   const showClearIcon = allowClear && Boolean(draftText.trim());
   const resolvedPlaceholder = useMemo(() => {
     if (rest.placeholder) return rest.placeholder;
+
     return hasTime
       ? t("date.placeholderDateTime", { format })
       : t("date.placeholder", { format });
@@ -484,12 +489,12 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
 
   return (
     <Popover
-      isOpen={isOpen}
-      placement="bottom"
       classNames={{
         // Prevent HeroUI Popover trigger from shrinking/fading when open
         trigger: "aria-expanded:!scale-100 aria-expanded:!opacity-100",
       }}
+      isOpen={isOpen}
+      placement="bottom"
       onOpenChange={handleOpenChange}
     >
       <PopoverTrigger>
@@ -497,7 +502,6 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
           <IBaseInput
             {...rest}
             ref={inputRef}
-            placeholder={resolvedPlaceholder}
             endContent={
               <div className="flex items-center gap-1 cursor-pointer">
                 {showClearIcon ? (
@@ -505,12 +509,12 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
                     aria-label={t("date.clearAriaLabel")}
                     className="cursor-pointer rounded-small p-1 text-default-400 transition-colors hover:text-danger-500"
                     type="button"
+                    onClick={handleClear}
                     onMouseDown={(e) => {
                       // keep input focused
                       e.preventDefault();
                       e.stopPropagation();
                     }}
-                    onClick={handleClear}
                   >
                     <X className="size-4" />
                   </button>
@@ -526,6 +530,7 @@ export default function IBaseDatePicker(props: IBaseDatePickerProps) {
             }
             isDisabled={isDisabled}
             isInvalid={rest.isInvalid || isDraftInvalid}
+            placeholder={resolvedPlaceholder}
             value={draftText}
             onChange={handleTextChange}
             onClick={handleInputClick}

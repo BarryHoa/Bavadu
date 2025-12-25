@@ -1,9 +1,10 @@
-import { SYSTEM_TIMEZONE } from "@base/shared/constants";
-import { CalendarDate } from "@internationalized/date";
 import type { DateValue } from "@react-types/calendar";
 import type { RangeValue } from "@react-types/shared";
-import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
+
+import { SYSTEM_TIMEZONE } from "@base/shared/constants";
+import { CalendarDate } from "@internationalized/date";
+import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import isoWeek from "dayjs/plugin/isoWeek";
 import timezone from "dayjs/plugin/timezone";
@@ -42,8 +43,10 @@ function splitFormat(format: string): FormatPart[] {
   const parts: FormatPart[] = [];
   let lastIdx = 0;
   let m: RegExpExecArray | null;
+
   while ((m = tokenRe.exec(format))) {
     const idx = m.index;
+
     if (idx > lastIdx) {
       parts.push({ type: "literal", value: format.slice(lastIdx, idx) });
     }
@@ -53,6 +56,7 @@ function splitFormat(format: string): FormatPart[] {
   if (lastIdx < format.length) {
     parts.push({ type: "literal", value: format.slice(lastIdx) });
   }
+
   return parts;
 }
 
@@ -85,6 +89,7 @@ export function normalizeDigitsToFormat(
     Extract<FormatPart, { type: "token" }>
   >;
   const expectedLen = tokens.reduce((sum, t) => sum + tokenLen(t.token), 0);
+
   if (digits.length !== expectedLen) return null;
   if (!isDigitsOnly(digits)) return null;
 
@@ -102,6 +107,7 @@ export function normalizeDigitsToFormat(
   for (const t of tokens) {
     const len = tokenLen(t.token);
     const slice = digits.slice(cursor, cursor + len);
+
     tokenValues[t.token].push(slice);
     cursor += len;
   }
@@ -118,6 +124,7 @@ export function normalizeDigitsToFormat(
   };
 
   let out = "";
+
   for (const p of parts) {
     if (p.type === "literal") {
       out += p.value;
@@ -125,9 +132,11 @@ export function normalizeDigitsToFormat(
     }
     const i = consumed[p.token]++;
     const v = tokenValues[p.token][i];
+
     if (v == null) return null;
     out += v;
   }
+
   return out;
 }
 
@@ -153,6 +162,7 @@ export function parseStrictInTz(
   tz: string = SYSTEM_TIMEZONE,
 ): Dayjs | null {
   const parsed = dayjs(text, format, true);
+
   if (!parsed.isValid()) return null;
 
   const hasTime = /H|m|s/.test(format);
@@ -166,6 +176,7 @@ export function parseStrictInTz(
 
   const iso = `${y}-${pad2(mo)}-${pad2(d)} ${pad2(hh)}:${pad2(mm)}:${pad2(ss)}`;
   const tzParsed = dayjs.tz(iso, "YYYY-MM-DD HH:mm:ss", tz);
+
   return tzParsed.isValid() ? tzParsed : null;
 }
 
@@ -178,31 +189,38 @@ export function toDayjs(
   if (dayjs.isDayjs(value)) return value.tz(tz);
   if (typeof value === "number") {
     const d = dayjs(value).tz(tz);
+
     return d.isValid() ? d : null;
   }
   if (value instanceof Date) {
     const d = dayjs(value).tz(tz);
+
     return d.isValid() ? d : null;
   }
 
   const text = value.trim();
+
   if (!text) return null;
 
   // Strict parse by format first.
   const strict = parseStrictInTz(text, format, tz);
+
   if (strict) return strict;
 
   // Allow digits-only input (ddmmyyyy etc.) and normalize.
   if (isDigitsOnly(text)) {
     const normalized = normalizeDigitsToFormat(text, format);
+
     if (normalized) {
       const strict2 = parseStrictInTz(normalized, format, tz);
+
       if (strict2) return strict2;
     }
   }
 
   // Fallback: try dayjs parser (ISO, timestamps, etc.) then tz.
   const fallback = dayjs(text);
+
   if (fallback.isValid()) return fallback.tz(tz);
 
   return null;
@@ -213,6 +231,7 @@ export function dayjsToCalendarDate(
   tz: string = SYSTEM_TIMEZONE,
 ): CalendarDate {
   const d = value.tz(tz);
+
   return new CalendarDate(d.year(), d.month() + 1, d.date());
 }
 
@@ -222,6 +241,7 @@ export function calendarDateToDayjs(
 ): Dayjs {
   // CalendarDate.toString() => YYYY-MM-DD
   const iso = value.toString();
+
   return dayjs.tz(iso, "YYYY-MM-DD", tz);
 }
 
@@ -231,6 +251,7 @@ export function toCalendarDateValue(
   tz: string = SYSTEM_TIMEZONE,
 ): CalendarDate | null {
   const d = toDayjs(value, format, tz);
+
   return d ? dayjsToCalendarDate(d, tz) : null;
 }
 
@@ -242,8 +263,8 @@ export function toRangeCalendarValue(
   if (!value) return null;
   const start = toCalendarDateValue(value.start, format, tz);
   const end = toCalendarDateValue(value.end, format, tz);
+
   if (!start || !end) return null;
+
   return { start, end };
 }
-
-

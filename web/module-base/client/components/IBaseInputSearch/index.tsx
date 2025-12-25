@@ -10,7 +10,7 @@ export type IBaseInputSearchProps = InputProps & {
   showClearButton?: boolean;
 };
 
-const IBaseInputSearch = React.forwardRef<
+export const IBaseInputSearch = React.forwardRef<
   HTMLInputElement,
   IBaseInputSearchProps
 >((props, ref) => {

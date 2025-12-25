@@ -1,13 +1,13 @@
 "use client";
 
-import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import {
-  DATA_TABLE_COLUMN_KEY_ACTION,
-  DataTableColumn,
+  IBaseChip,
+  I_BASE_TABLE_COLUMN_KEY_ACTION,
+  IBaseTableColumnDefinition,
   ViewListDataTable,
 } from "@base/client/components";
+import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import LinkAs from "@base/client/components/LinkAs";
-import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { PayrollDto } from "@mdl/hrm/client/interface/Payroll";
@@ -19,11 +19,11 @@ type PayrollRow = PayrollDto & {
 };
 
 export default function PayrollListPage(): React.ReactNode {
-  const tDataTable = useTranslations("dataTable");
+  const tIBaseTable = useTranslations("dataTable");
   const t = useTranslations("hrm.payroll");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<DataTableColumn<PayrollRow>[]>(
+  const columns = useMemo<IBaseTableColumnDefinition<PayrollRow>[]>(
     () => [
       {
         key: "employee",
@@ -64,14 +64,14 @@ export default function PayrollListPage(): React.ReactNode {
         key: "status",
         label: t("labels.status"),
         render: (value) => (
-          <Chip className="capitalize" size="sm" variant="flat">
+          <IBaseChip className="capitalize" size="sm" variant="flat">
             {value || "draft"}
-          </Chip>
+          </IBaseChip>
         ),
       },
       {
-        key: DATA_TABLE_COLUMN_KEY_ACTION,
-        label: tDataTable("columns.action"),
+        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
+        label: tIBaseTable("columns.action"),
         align: "end",
         render: (_, row) => {
           if (!row?.id) return null;
@@ -82,7 +82,7 @@ export default function PayrollListPage(): React.ReactNode {
               actions={[
                 {
                   key: "view",
-                  label: tDataTable("columns.view"),
+                  label: tIBaseTable("columns.view"),
                   href: viewLink,
                 },
               ]}
@@ -91,7 +91,7 @@ export default function PayrollListPage(): React.ReactNode {
         },
       },
     ],
-    [tDataTable, t, getLocalizedText],
+    [tIBaseTable, t, getLocalizedText],
   );
 
   return (

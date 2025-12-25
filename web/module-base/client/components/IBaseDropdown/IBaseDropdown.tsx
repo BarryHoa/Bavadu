@@ -1,11 +1,4 @@
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  type DropdownItemProps,
-  type DropdownMenuProps,
-} from "@heroui/dropdown";
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, type DropdownItemProps, type DropdownMenuProps } from "@heroui/dropdown";
 import clsx from "clsx";
 import React from "react";
 

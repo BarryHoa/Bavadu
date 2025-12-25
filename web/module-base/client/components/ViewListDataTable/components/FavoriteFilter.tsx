@@ -1,6 +1,6 @@
 "use client";
+import { IBaseButton } from "@base/client/components";
 
-import { Button } from "@heroui/button";
 import { Star } from "lucide-react";
 
 interface FavoriteFilterProps {
@@ -13,7 +13,7 @@ export default function FavoriteFilter({
   onToggle,
 }: FavoriteFilterProps) {
   return (
-    <Button
+    <IBaseButton
       aria-label="Show favorites"
       color={isActive ? "warning" : "default"}
       title="Show favorites"
@@ -21,6 +21,6 @@ export default function FavoriteFilter({
       onPress={onToggle}
     >
       <Star className={isActive ? "fill-current" : ""} />
-    </Button>
+    </IBaseButton>
   );
 }

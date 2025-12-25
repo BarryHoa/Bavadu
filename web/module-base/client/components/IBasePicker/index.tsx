@@ -70,7 +70,7 @@ export type IBasePickerComponent = ComponentType<IBaseDatePickerProps> & {
  * - default export: IBaseDatePicker
  * - static: Date / Range / Time / Month / Year
  */
-const IBasePicker = Object.assign(IBaseDatePicker, {
+export const IBasePicker = Object.assign(IBaseDatePicker, {
   Date: IBaseDatePicker,
   Range: IBaseDateRangePicker,
   Time: IBaseTimePicker,
@@ -81,10 +81,4 @@ const IBasePicker = Object.assign(IBaseDatePicker, {
 export default IBasePicker;
 
 // Named exports (optional convenience)
-export {
-  IBaseDatePicker as Date,
-  IBaseMonthPicker as Month,
-  IBaseDateRangePicker as Range,
-  IBaseTimePicker as Time,
-  IBaseYearPicker as Year,
-};
+

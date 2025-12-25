@@ -40,7 +40,7 @@ const getLangValue = (
   return "";
 };
 
-const IBaseInputMultipleLang = React.forwardRef<
+export const IBaseInputMultipleLang = React.forwardRef<
   HTMLInputElement,
   IBaseInputMultipleLangProps
 >((props, ref) => {

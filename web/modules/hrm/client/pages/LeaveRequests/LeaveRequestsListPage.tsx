@@ -1,14 +1,14 @@
 "use client";
 
-import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import {
-  DATA_TABLE_COLUMN_KEY_ACTION,
-  DataTableColumn,
+  IBaseChip,
+  I_BASE_TABLE_COLUMN_KEY_ACTION,
+  IBaseTableColumnDefinition,
   ViewListDataTable,
 } from "@base/client/components";
+import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import LinkAs from "@base/client/components/LinkAs";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { LeaveRequestDto } from "@mdl/hrm/client/interface/LeaveRequest";
@@ -20,11 +20,11 @@ type LeaveRequestRow = LeaveRequestDto & {
 };
 
 export default function LeaveRequestsListPage(): React.ReactNode {
-  const tDataTable = useTranslations("dataTable");
+  const tIBaseTable = useTranslations("dataTable");
   const t = useTranslations("hrm.leaveRequests");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<DataTableColumn<LeaveRequestRow>[]>(
+  const columns = useMemo<IBaseTableColumnDefinition<LeaveRequestRow>[]>(
     () => [
       {
         key: "employee",
@@ -67,14 +67,14 @@ export default function LeaveRequestsListPage(): React.ReactNode {
         key: "status",
         label: t("labels.status"),
         render: (value) => (
-          <Chip className="capitalize" size="sm" variant="flat">
+          <IBaseChip className="capitalize" size="sm" variant="flat">
             {value || "pending"}
-          </Chip>
+          </IBaseChip>
         ),
       },
       {
-        key: DATA_TABLE_COLUMN_KEY_ACTION,
-        label: tDataTable("columns.action"),
+        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
+        label: tIBaseTable("columns.action"),
         align: "end",
         render: (_, row) => {
           if (!row?.id) return null;
@@ -85,7 +85,7 @@ export default function LeaveRequestsListPage(): React.ReactNode {
               actions={[
                 {
                   key: "view",
-                  label: tDataTable("columns.view"),
+                  label: tIBaseTable("columns.view"),
                   href: viewLink,
                 },
               ]}
@@ -94,7 +94,7 @@ export default function LeaveRequestsListPage(): React.ReactNode {
         },
       },
     ],
-    [tDataTable, t, getLocalizedText],
+    [tIBaseTable, t, getLocalizedText],
   );
 
   return (

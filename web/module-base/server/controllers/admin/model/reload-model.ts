@@ -13,7 +13,10 @@ const REQUIRED_PERMISSIONS = ["system.models.reload"];
 
 export async function POST(request: NextRequest) {
   try {
-    const authzResponse = await requirePermissions(request, REQUIRED_PERMISSIONS);
+    const authzResponse = await requirePermissions(
+      request,
+      REQUIRED_PERMISSIONS,
+    );
 
     if (authzResponse) {
       return authzResponse;

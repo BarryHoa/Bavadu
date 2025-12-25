@@ -1,21 +1,20 @@
 "use client";
 
+import { IBaseButton, IBaseChip } from "@base/client/components";
 import {
-  DATA_TABLE_COLUMN_KEY_ACTION,
-  DataTableColumn,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
+  I_BASE_TABLE_COLUMN_KEY_ACTION,
+  IBaseTableColumnDefinition,
+  IBaseModal,
+  IBaseModalBody,
+  IBaseModalContent,
+  IBaseModalFooter,
+  IBaseModalHeader,
 } from "@base/client/components";
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import roleService, { type Role } from "@base/client/services/RoleService";
-import { Button } from "@heroui/button";
-import { Chip } from "@heroui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useCallback, useMemo, useState } from "react";
@@ -29,7 +28,7 @@ type RoleRow = Role & {
 };
 
 export default function RolesListPage() {
-  const tDataTable = useTranslations("dataTable");
+  const tIBaseTable = useTranslations("dataTable");
   const t = useTranslations("settings.roles");
   const actionsT = useTranslations("common.actions");
   const queryClient = useQueryClient();
@@ -97,7 +96,7 @@ export default function RolesListPage() {
     [actionsT, handleDelete, deleteRoleMutation.isPending],
   );
 
-  const columns = useMemo<DataTableColumn<RoleRow>[]>(
+  const columns = useMemo<IBaseTableColumnDefinition<RoleRow>[]>(
     () => [
       {
         key: "code",
@@ -125,31 +124,31 @@ export default function RolesListPage() {
         key: "isSystem",
         label: t("table.columns.type"),
         render: (value) => (
-          <Chip className="capitalize" size="sm" variant="flat">
+          <IBaseChip className="capitalize" size="sm" variant="flat">
             {value
               ? t("table.columns.systemRole")
               : t("table.columns.customRole")}
-          </Chip>
+          </IBaseChip>
         ),
       },
       {
         key: "isActive",
         label: t("table.columns.status"),
         render: (value) => (
-          <Chip className="capitalize" size="sm" variant="flat">
+          <IBaseChip className="capitalize" size="sm" variant="flat">
             {value ? t("table.columns.active") : t("table.columns.inactive")}
-          </Chip>
+          </IBaseChip>
         ),
       },
       {
-        key: DATA_TABLE_COLUMN_KEY_ACTION,
-        label: tDataTable("columns.action"),
+        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
+        label: tIBaseTable("columns.action"),
         align: "end",
         render: (_, row) =>
           row?.id ? <ActionMenu actions={getActionMenuItems(row)} /> : null,
       },
     ],
-    [t, tDataTable, getText, getActionMenuItems],
+    [t, tIBaseTable, getText, getActionMenuItems],
   );
 
   return (
@@ -168,34 +167,34 @@ export default function RolesListPage() {
         isDummyData={false}
         model="role.list"
       />
-      <Modal isOpen={!!deleteConfirm} onClose={handleCloseModal}>
-        <ModalContent>
+      <IBaseModal isOpen={!!deleteConfirm} onClose={handleCloseModal}>
+        <IBaseModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>{t("deleteConfirm.title")}</ModalHeader>
-              <ModalBody>
+              <IBaseModalHeader>{t("deleteConfirm.title")}</IBaseModalHeader>
+              <IBaseModalBody>
                 <p>{t("deleteConfirm.message")}</p>
-              </ModalBody>
-              <ModalFooter>
-                <Button
+              </IBaseModalBody>
+              <IBaseModalFooter>
+                <IBaseButton
                   isDisabled={deleteRoleMutation.isPending}
                   variant="light"
                   onPress={onClose}
                 >
                   {actionsT("cancel")}
-                </Button>
-                <Button
+                </IBaseButton>
+                <IBaseButton
                   color="danger"
                   isLoading={deleteRoleMutation.isPending}
                   onPress={handleConfirmDelete}
                 >
                   {actionsT("delete")}
-                </Button>
-              </ModalFooter>
+                </IBaseButton>
+              </IBaseModalFooter>
             </>
           )}
-        </ModalContent>
-      </Modal>
+        </IBaseModalContent>
+      </IBaseModal>
     </div>
   );
 }

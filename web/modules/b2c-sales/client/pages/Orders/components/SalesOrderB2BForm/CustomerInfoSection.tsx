@@ -1,17 +1,16 @@
 "use client";
 
+import { IBaseButton, IBaseCheckbox, IBaseModalHeader } from "@base/client/components";
 import {
-  DataTable,
-  DataTableColumn,
+  IBaseTable,
+  IBaseTableColumnDefinition,
   IBaseInput,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
+  IBaseModal,
+  IBaseModalBody,
+  IBaseModalContent,
+  IBaseModalFooter,
 } from "@base/client/components";
-import { Button } from "@heroui/button";
-import { Checkbox, useDisclosure } from "@heroui/react";
+import { useDisclosure } from "@heroui/use-disclosure";
 import { useQuery } from "@tanstack/react-query";
 import { RefreshCwIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -76,7 +75,7 @@ export default function CustomerInfoSection({
     [setValue, setSelectedCustomer, onCustomerModalClose],
   );
 
-  const customerColumns = useMemo<DataTableColumn<CustomerIndividualDto>[]>(
+  const customerColumns = useMemo<IBaseTableColumnDefinition<CustomerIndividualDto>[]>(
     () => [
       {
         key: "code",
@@ -95,13 +94,13 @@ export default function CustomerInfoSection({
         key: "actions",
         label: t("actions"),
         render: (_, row) => (
-          <Button
+          <IBaseButton
             color="primary"
             size="sm"
             onPress={() => handleSelectCustomer(row)}
           >
             Chọn
-          </Button>
+          </IBaseButton>
         ),
       },
     ],
@@ -118,13 +117,13 @@ export default function CustomerInfoSection({
               control={control}
               name="requireInvoice"
               render={({ field }) => (
-                <Checkbox
+                <IBaseCheckbox
                   isSelected={field.value}
                   size="sm"
                   onValueChange={field.onChange}
                 >
                   {t("requireInvoice")}
-                </Checkbox>
+                </IBaseCheckbox>
               )}
             />
           </div>
@@ -167,43 +166,43 @@ export default function CustomerInfoSection({
                 </p>
               )}
             </div>
-            <Button
+            <IBaseButton
               color="primary"
               size="sm"
               variant="solid"
               onPress={onCustomerModalOpen}
             >
               {t("selectCustomer")}
-            </Button>
+            </IBaseButton>
           </div>
         </div>
       </div>
 
-      {/* Customer Selection Modal */}
-      <Modal
+      {/* Customer Selection IBaseModal */}
+      <IBaseModal
         isOpen={isCustomerModalOpen}
         scrollBehavior="inside"
         size="3xl"
         onClose={onCustomerModalClose}
       >
-        <ModalContent>
-          <ModalHeader>{t("selectCustomer")}</ModalHeader>
-          <ModalBody>
-            <DataTable
+        <IBaseModalContent>
+          <IBaseModalHeader>{t("selectCustomer")}</IBaseModalHeader>
+          <IBaseModalBody>
+            <IBaseTable
               columns={customerColumns}
               dataSource={customersQuery.data ?? []}
               loading={customersQuery.isLoading}
               pagination={{ pageSize: 10, page: 1 }}
               rowKey="id"
             />
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="light" onPress={onCustomerModalClose}>
+          </IBaseModalBody>
+          <IBaseModalFooter>
+            <IBaseButton variant="light" onPress={onCustomerModalClose}>
               {t("close")}
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+            </IBaseButton>
+          </IBaseModalFooter>
+        </IBaseModalContent>
+      </IBaseModal>
     </>
   );
 }

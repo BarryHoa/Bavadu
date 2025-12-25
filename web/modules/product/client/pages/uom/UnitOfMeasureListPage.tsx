@@ -4,13 +4,14 @@ import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import type { LocaleDataType } from "@base/server/interfaces/Locale";
 
 import {
-  DATA_TABLE_COLUMN_KEY_ACTION,
-  type DataTableColumn,
+  IBaseButton,
+  IBaseChip,
+  I_BASE_TABLE_COLUMN_KEY_ACTION,
+  type IBaseTableColumnDefinition,
 } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { Button, Chip } from "@heroui/react";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
@@ -26,7 +27,7 @@ const UnitOfMeasureListPage = (): React.ReactNode => {
   const localized = useLocalizedText();
   const t = useTranslations("dataTable");
 
-  const columns = useMemo<DataTableColumn<UnitOfMeasureRow>[]>(() => {
+  const columns = useMemo<IBaseTableColumnDefinition<UnitOfMeasureRow>[]>(() => {
     return [
       {
         key: "name",
@@ -44,18 +45,18 @@ const UnitOfMeasureListPage = (): React.ReactNode => {
         label: "Status",
         align: "center",
         render: (_, row) => (
-          <Chip
+          <IBaseChip
             className="capitalize"
             color={row.isActive ? "success" : "default"}
             size="sm"
             variant="flat"
           >
             {row.isActive ? "active" : "inactive"}
-          </Chip>
+          </IBaseChip>
         ),
       },
       {
-        key: DATA_TABLE_COLUMN_KEY_ACTION,
+        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
         label: t("columns.action"),
         align: "end",
         render: (_, row) => {
@@ -66,9 +67,9 @@ const UnitOfMeasureListPage = (): React.ReactNode => {
           });
 
           return (
-            <Button as={LinkAs as any} href={as} size="sm" variant="light">
+            <IBaseButton as={LinkAs as any} href={as} size="sm" variant="light">
               View
-            </Button>
+            </IBaseButton>
           );
         },
       },

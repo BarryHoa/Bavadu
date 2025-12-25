@@ -1,11 +1,9 @@
+import { IBaseButton, IBaseDropdown, IBasePagination } from "@base/client/components";
 import type { Key, SVGProps } from "react";
 
-import { Button } from "@heroui/button";
-import { Pagination } from "@heroui/pagination";
 import clsx from "clsx";
 import { useCallback, useMemo } from "react";
 
-import { IBaseDropdown } from "@base/client/components";
 
 import { PAGINATION_PAGE_SIZE_OPTIONS } from "./paginationConsts";
 
@@ -74,7 +72,7 @@ export default function PaginationComponent({
 
   return (
     <div className="flex items-center gap-4">
-      <Pagination
+      <IBasePagination
         disableAnimation
         disableCursorAnimation
         isCompact
@@ -121,14 +119,14 @@ export default function PaginationComponent({
           },
         }}
       >
-        <Button
+        <IBaseButton
           className="text-small font-medium px-2 h-6"
           endContent={<ChevronIcon className="text-small rotate-90" />}
           size="sm"
           // variant=""
         >
           {pageSize}
-        </Button>
+        </IBaseButton>
       </IBaseDropdown>
     </div>
   );

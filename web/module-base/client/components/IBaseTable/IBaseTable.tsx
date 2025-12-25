@@ -1,7 +1,7 @@
 "use client";
 
 import type { IBaseTableCoreColumn } from "@base/client/components";
-import type { Selection } from "@heroui/react";
+import type { Selection } from "@heroui/table";
 import type { TableProps } from "@heroui/table";
 
 import { RefreshCw } from "lucide-react";

@@ -1,7 +1,8 @@
+import { IBaseButtonProps } from "@base/client/components";
 import type { IBaseTableProps } from "../IBaseTable/IBaseTableInterface";
 
+import { LinkProps } from "@heroui/link";
 import { LocaleDataType } from "@base/server";
-import { ButtonProps, LinkProps } from "@heroui/react";
 import { ReactNode } from "react";
 
 import { FilterOption } from "./components/FilterMenu";
@@ -11,11 +12,11 @@ export type ActionElm = {
   key: string;
   title: ReactNode;
   type: "button" | "link";
-  color?: ButtonProps["color"];
-  variant?: ButtonProps["variant"];
-  size?: ButtonProps["size"];
+  color?: IBaseButtonProps["color"];
+  variant?: IBaseButtonProps["variant"];
+  size?: IBaseButtonProps["size"];
   props?:
-    | Omit<ButtonProps, "color" | "variant" | "size">
+    | Omit<IBaseButtonProps, "color" | "variant" | "size">
     | (Omit<LinkProps, "as"> & { hrefAs?: any });
 };
 export type ViewListDataTableProps<T = any> = Omit<

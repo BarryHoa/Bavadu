@@ -114,7 +114,7 @@ function clampValue(
   return result;
 }
 
-const IBaseInputNumber = React.forwardRef<
+export const IBaseInputNumber = React.forwardRef<
   HTMLInputElement,
   IBaseInputNumberProps
 >((props, ref) => {

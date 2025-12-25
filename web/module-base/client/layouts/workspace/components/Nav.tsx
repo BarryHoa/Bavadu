@@ -1,22 +1,21 @@
 "use client";
+import { IBaseAvatar, IBaseBadge, IBaseButton } from "@base/client/components";
 
-import { Avatar } from "@heroui/avatar";
-import { Badge } from "@heroui/badge";
-import { Button } from "@heroui/button";
+import type { IBaseDropdownItem } from "@base/client/components";
+
 import {
-  Navbar as HeroNavbar,
-  NavbarBrand,
-  NavbarContent,
-  NavbarItem,
-} from "@heroui/navbar";
+  IBaseNavbar,
+  IBaseDropdown,
+  IBaseNavbarBrand,
+  IBaseNavbarContent,
+  IBaseNavbarItem,
+} from "@base/client/components";
 import { Bell, LogOut, User } from "lucide-react";
-import Image from "next/image";
+import IBaseImage from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { siteConfig } from "@/config/site";
-import type { IBaseDropdownItem } from "@base/client/components";
-import { IBaseDropdown } from "@base/client/components";
 
 const DEFAULT_AVATAR = "/favicon/favicon-32x32.png";
 
@@ -56,7 +55,7 @@ export default function Nav() {
   };
 
   return (
-    <HeroNavbar
+    <IBaseNavbar
       shouldHideOnScroll
       className="border-b border-gray-200 bg-white"
       classNames={{
@@ -65,9 +64,9 @@ export default function Nav() {
       height="48px"
       maxWidth="full"
     >
-      <NavbarBrand as="li" className="gap-3 max-w-fit">
+      <IBaseNavbarBrand as="li" className="gap-3 max-w-fit">
         <div className="flex items-center">
-          <Image
+          <IBaseImage
             priority
             alt={siteConfig.name}
             className="mr-3 rounded-lg bg-white"
@@ -79,30 +78,29 @@ export default function Nav() {
             {siteConfig.name}
           </h1>
         </div>
-      </NavbarBrand>
+      </IBaseNavbarBrand>
 
-      <NavbarContent className="hidden md:flex" justify="end">
-        {/* <NavbarItem className="hidden sm:flex">
-          <Button isIconOnly size="sm" variant="light">
+      <IBaseNavbarContent className="hidden md:flex" justify="end">
+        {/* <IBaseNavbarItem className="hidden sm:flex">
+          <IBaseButton isIconOnly size="sm" variant="light">
             <Sun size={20} />
-          </Button>
-        </NavbarItem> */}
-        <NavbarItem>
-          <Badge
+          </IBaseButton>
+        </IBaseNavbarItem> */}
+        <IBaseNavbarItem>
+          <IBaseBadge
             color="danger"
             content=""
             isInvisible={false}
             placement="top-right"
             shape="circle"
           >
-            <Button isIconOnly size="sm" variant="light">
+            <IBaseButton isIconOnly size="sm" variant="light">
               <Bell size={20} />
-            </Button>
-          </Badge>
-        </NavbarItem>
-        <NavbarItem>
+            </IBaseButton>
+          </IBaseBadge>
+        </IBaseNavbarItem>
+        <IBaseNavbarItem>
           <IBaseDropdown
-            placement="bottom-end"
             items={[
               {
                 key: "logout",
@@ -118,8 +116,9 @@ export default function Nav() {
               "aria-label": "User menu",
               variant: "flat",
             }}
+            placement="bottom-end"
           >
-            <Avatar
+            <IBaseAvatar
               className="cursor-pointer transition-transform hover:scale-105"
               fallback={
                 <User className="text-default-500" size={16} strokeWidth={2} />
@@ -129,8 +128,8 @@ export default function Nav() {
               onError={() => setAvatarError(true)}
             />
           </IBaseDropdown>
-        </NavbarItem>
-      </NavbarContent>
-    </HeroNavbar>
+        </IBaseNavbarItem>
+      </IBaseNavbarContent>
+    </IBaseNavbar>
   );
 }

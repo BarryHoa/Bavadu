@@ -1,8 +1,11 @@
 "use client";
 
-import { IBaseInput } from "@base/client/components";
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/card";
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBaseInput,
+} from "@base/client/components";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import MiniSearch from "minisearch";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -159,7 +162,7 @@ export default function ModelsListPage() {
         label: actionsT("action"),
         align: "end",
         render: (_, record) => (
-          <Button
+          <IBaseButton
             color="primary"
             isDisabled={
               loading ||
@@ -172,7 +175,7 @@ export default function ModelsListPage() {
             onPress={() => handleReload(record.key)}
           >
             {actionsT("reload")}
-          </Button>
+          </IBaseButton>
         ),
       },
     ],
@@ -194,8 +197,8 @@ export default function ModelsListPage() {
       : t("table.empty.default"));
 
   return (
-    <Card>
-      <CardBody className="flex flex-col gap-4">
+    <IBaseCard>
+      <IBaseCardBody className="flex flex-col gap-4">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <IBaseInput
@@ -231,7 +234,7 @@ export default function ModelsListPage() {
             </div>
           </div>
         )}
-      </CardBody>
-    </Card>
+      </IBaseCardBody>
+    </IBaseCard>
   );
 }

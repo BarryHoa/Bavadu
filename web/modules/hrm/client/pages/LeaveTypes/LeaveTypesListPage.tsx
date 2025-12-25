@@ -1,13 +1,13 @@
 "use client";
 
-import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import {
-  DATA_TABLE_COLUMN_KEY_ACTION,
-  DataTableColumn,
+  IBaseChip,
+  I_BASE_TABLE_COLUMN_KEY_ACTION,
+  IBaseTableColumnDefinition,
   ViewListDataTable,
 } from "@base/client/components";
+import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import LinkAs from "@base/client/components/LinkAs";
-import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { LeaveTypeDto } from "@mdl/hrm/client/interface/LeaveType";
@@ -19,11 +19,11 @@ type LeaveTypeRow = LeaveTypeDto & {
 };
 
 export default function LeaveTypesListPage(): React.ReactNode {
-  const tDataTable = useTranslations("dataTable");
+  const tIBaseTable = useTranslations("dataTable");
   const t = useTranslations("hrm.leaveTypes");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<DataTableColumn<LeaveTypeRow>[]>(
+  const columns = useMemo<IBaseTableColumnDefinition<LeaveTypeRow>[]>(
     () => [
       {
         key: "code",
@@ -57,14 +57,14 @@ export default function LeaveTypesListPage(): React.ReactNode {
         key: "isActive",
         label: t("labels.isActive"),
         render: (value) => (
-          <Chip color={value ? "success" : "default"} size="sm" variant="flat">
+          <IBaseChip color={value ? "success" : "default"} size="sm" variant="flat">
             {value ? "Active" : "Inactive"}
-          </Chip>
+          </IBaseChip>
         ),
       },
       {
-        key: DATA_TABLE_COLUMN_KEY_ACTION,
-        label: tDataTable("columns.action"),
+        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
+        label: tIBaseTable("columns.action"),
         align: "end",
         render: (_, row) => {
           if (!row?.id) return null;
@@ -75,7 +75,7 @@ export default function LeaveTypesListPage(): React.ReactNode {
               actions={[
                 {
                   key: "view",
-                  label: tDataTable("columns.view"),
+                  label: tIBaseTable("columns.view"),
                   href: viewLink,
                 },
               ]}
@@ -84,7 +84,7 @@ export default function LeaveTypesListPage(): React.ReactNode {
         },
       },
     ],
-    [tDataTable, t, getLocalizedText],
+    [tIBaseTable, t, getLocalizedText],
   );
 
   return (

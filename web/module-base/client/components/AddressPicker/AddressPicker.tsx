@@ -1,5 +1,14 @@
 "use client";
+import { IBaseButton } from "@base/client/components";
 
+import {
+  IBaseModal,
+  IBaseModalBody,
+  IBaseModalContent,
+  IBaseModalFooter,
+  IBaseModalHeader,
+  IBaseTooltip,
+} from "@base/client/components";
 import type { Address, countryCode } from "@base/client/interface/Address";
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
 
@@ -11,16 +20,7 @@ import {
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import locationService from "@base/client/services/LocationService";
 import { buildAddressString } from "@base/client/utils/address/addressUtils";
-import { Button } from "@heroui/button";
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Tooltip,
-  useDisclosure,
-} from "@heroui/react";
+import { useDisclosure } from "@heroui/use-disclosure";
 import { useQuery } from "@tanstack/react-query";
 import { MapPin } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -196,11 +196,11 @@ export default function AddressPicker({
   return (
     <>
       <div className="flex flex-col gap-2">
-        <Tooltip
+        <IBaseTooltip
           content={isChangeAddress ? t("tooltip.change") : t("tooltip.select")}
           placement="top"
         >
-          <Button
+          <IBaseButton
             isIconOnly
             color="primary"
             size="sm"
@@ -209,22 +209,22 @@ export default function AddressPicker({
             variant="bordered"
             onPress={handleOpen}
           />
-        </Tooltip>
+        </IBaseTooltip>
       </div>
 
-      <Modal
+      <IBaseModal
         isOpen={isOpen}
         scrollBehavior="inside"
         size="2xl"
         onClose={handleClose}
       >
-        <ModalContent>
+        <IBaseModalContent>
           {() => (
             <>
-              <ModalHeader className="flex flex-col gap-1">
+              <IBaseModalHeader className="flex flex-col gap-1">
                 {t("modal.title")}
-              </ModalHeader>
-              <ModalBody>
+              </IBaseModalHeader>
+              <IBaseModalBody>
                 <div className="flex flex-col gap-4">
                   <IBaseSingleSelect
                     disallowEmptySelection
@@ -266,24 +266,24 @@ export default function AddressPicker({
                     {fullAddress as string}
                   </div>
                 </div>
-              </ModalBody>
-              <ModalFooter>
-                <Button size="sm" variant="bordered" onPress={handleCancel}>
+              </IBaseModalBody>
+              <IBaseModalFooter>
+                <IBaseButton size="sm" variant="bordered" onPress={handleCancel}>
                   {tCommon("modal.buttons.cancel")}
-                </Button>
-                <Button
+                </IBaseButton>
+                <IBaseButton
                   color="primary"
                   isDisabled={!selectedCountryCode}
                   size="sm"
                   onPress={handleSave}
                 >
                   {tCommon("modal.buttons.apply")}
-                </Button>
-              </ModalFooter>
+                </IBaseButton>
+              </IBaseModalFooter>
             </>
           )}
-        </ModalContent>
-      </Modal>
+        </IBaseModalContent>
+      </IBaseModal>
     </>
   );
 }

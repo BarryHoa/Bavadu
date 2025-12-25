@@ -1,24 +1,21 @@
 "use client";
 
+import { IBaseBreadcrumbItem, IBaseBreadcrumbs } from "@base/client/components";
 import { useBreadcrumbs } from "@base/client/contexts/workspace";
-import {
-  BreadcrumbItem as HeroBreadcrumbItem,
-  Breadcrumbs as HeroBreadcrumbs,
-} from "@heroui/breadcrumbs";
 import { ChevronRight } from "lucide-react";
 
-export type BreadcrumbItem = {
+export type IBaseBreadcrumbItem = {
   label: string;
   href: string;
   icon?: React.ComponentType<{ size?: number; className?: string }>;
 };
 
-export default function Breadcrumb({ items }: { items?: BreadcrumbItem[] }) {
+export default function Breadcrumb({ items }: { items?: IBaseBreadcrumbItem[] }) {
   const ctx = useBreadcrumbs();
   const data = items ?? ctx.breadcrumbs;
 
   return (
-    <HeroBreadcrumbs
+    <IBaseBreadcrumbs
       itemClasses={{
         base: "gap-1 ",
         separator: "text-default-400",
@@ -27,7 +24,7 @@ export default function Breadcrumb({ items }: { items?: BreadcrumbItem[] }) {
       separator={<ChevronRight className="text-gray-400 mx-0" size={12} />}
     >
       {data.map((item) => (
-        <HeroBreadcrumbItem
+        <IBaseBreadcrumbItem
           key={item.href}
           className={`${item.href ? "hover:red" : ""} ${data[data.length - 1] !== item ? "italic" : ""}`}
           href={item.href}
@@ -36,8 +33,8 @@ export default function Breadcrumb({ items }: { items?: BreadcrumbItem[] }) {
           }
         >
           {item.label}
-        </HeroBreadcrumbItem>
+        </IBaseBreadcrumbItem>
       ))}
-    </HeroBreadcrumbs>
+    </IBaseBreadcrumbs>
   );
 }

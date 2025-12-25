@@ -3,9 +3,14 @@
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import type { ProductDetail } from "../../interface/Product";
 
-import { Button } from "@heroui/button";
-import { Card, CardBody, Chip, Divider } from "@heroui/react";
-import { Spinner } from "@heroui/spinner";
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBaseChip,
+  IBaseDivider,
+  IBaseSpinner,
+} from "@base/client/components";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -63,9 +68,9 @@ export default function ProductsViewPage(): React.ReactNode {
   if (!productId) {
     return (
       <div className="space-y-4">
-        <Button size="sm" variant="light" onPress={() => router.back()}>
+        <IBaseButton size="sm" variant="light" onPress={() => router.back()}>
           Back
-        </Button>
+        </IBaseButton>
         <p className="text-default-500">No product selected.</p>
       </div>
     );
@@ -73,7 +78,7 @@ export default function ProductsViewPage(): React.ReactNode {
 
   const renderLoading = (
     <div className="flex items-center gap-2 text-default-500">
-      <Spinner size="sm" />
+      <IBaseSpinner size="sm" />
       <span>Loading product...</span>
     </div>
   );
@@ -89,16 +94,16 @@ export default function ProductsViewPage(): React.ReactNode {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <Button
+        <IBaseButton
           size="sm"
           startContent={<ArrowLeft size={14} />}
           variant="light"
           onPress={() => router.back()}
         >
           Back to products
-        </Button>
+        </IBaseButton>
         {editLink ? (
-          <Button
+          <IBaseButton
             as={LinkAs as any}
             className="ml-2"
             color="primary"
@@ -106,16 +111,16 @@ export default function ProductsViewPage(): React.ReactNode {
             size="sm"
           >
             Edit product
-          </Button>
+          </IBaseButton>
         ) : null}
       </div>
 
-      <Card>
-        <CardBody className="space-y-4">
+      <IBaseCard>
+        <IBaseCardBody className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
-            <Chip size="sm" variant="flat">
+            <IBaseChip size="sm" variant="flat">
               Product ID: {productId}
-            </Chip>
+            </IBaseChip>
           </div>
 
           {productQuery.isLoading ? (
@@ -125,8 +130,8 @@ export default function ProductsViewPage(): React.ReactNode {
           ) : productQuery.data ? (
             <ProductDetailContent detail={productQuery.data} />
           ) : null}
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
     </div>
   );
 }
@@ -182,16 +187,16 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
               <span className="text-small text-default-500">None</span>
             ) : (
               features.map(([key]) => (
-                <Chip key={key} size="sm" variant="flat">
+                <IBaseChip key={key} size="sm" variant="flat">
                   {key}
-                </Chip>
+                </IBaseChip>
               ))
             )}
           </div>
         </div>
       </section>
 
-      <Divider />
+      <IBaseDivider />
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Variant</h2>
@@ -231,7 +236,7 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
         />
       </section>
 
-      <Divider />
+      <IBaseDivider />
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Packings</h2>
@@ -240,28 +245,28 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
         ) : (
           <div className="space-y-3">
             {detail.packings.map((packing) => (
-              <Card
+              <IBaseCard
                 key={
                   packing.id ??
                   localized(packing.name as LocalizeText) ??
                   Math.random()
                 }
               >
-                <CardBody className="space-y-2">
+                <IBaseCardBody className="space-y-2">
                   <span className="font-medium">
                     {localized(packing.name as LocalizeText) ?? packing.id}
                   </span>
                   <p className="text-small text-default-500">
                     {localized(packing.description as LocalizeText) ?? "-"}
                   </p>
-                </CardBody>
-              </Card>
+                </IBaseCardBody>
+              </IBaseCard>
             ))}
           </div>
         )}
       </section>
 
-      <Divider />
+      <IBaseDivider />
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Attributes</h2>
@@ -270,8 +275,8 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
         ) : (
           <div className="space-y-3">
             {detail.attributes.map((attribute) => (
-              <Card key={attribute.id ?? attribute.code}>
-                <CardBody className="space-y-1">
+              <IBaseCard key={attribute.id ?? attribute.code}>
+                <IBaseCardBody className="space-y-1">
                   <div className="flex items-center justify-between">
                     <span className="font-medium">{attribute.code}</span>
                   </div>
@@ -282,8 +287,8 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
                   <p className="text-small text-default-600">
                     {attribute.value}
                   </p>
-                </CardBody>
-              </Card>
+                </IBaseCardBody>
+              </IBaseCard>
             ))}
           </div>
         )}

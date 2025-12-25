@@ -1,13 +1,17 @@
 "use client";
 
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBaseCardHeader,
+  IBaseSpinner,
+} from "@base/client/components";
 import newsService from "@base/client/services/NewsService";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { Button } from "@heroui/button";
-import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Spinner } from "@heroui/spinner";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Calendar, ChevronDown, Eye, User } from "lucide-react";
-import Image from "next/image";
+import IBaseImage from "next/image";
 import { useMemo } from "react";
 
 const ITEMS_PER_PAGE = 12;
@@ -42,7 +46,7 @@ export default function NewsListPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <Spinner color="primary" size="lg" />
+        <IBaseSpinner color="primary" size="lg" />
       </div>
     );
   }
@@ -50,13 +54,13 @@ export default function NewsListPage() {
   if (error) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <Card className="border-danger-200 bg-danger-50">
-          <CardBody>
+        <IBaseCard className="border-danger-200 bg-danger-50">
+          <IBaseCardBody>
             <p className="text-center text-danger-600">
               Failed to load news. Please try again later.
             </p>
-          </CardBody>
-        </Card>
+          </IBaseCardBody>
+        </IBaseCard>
       </div>
     );
   }
@@ -64,16 +68,16 @@ export default function NewsListPage() {
   if (!news || news.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <Card className="border-gray-200">
-          <CardBody className="py-12">
+        <IBaseCard className="border-gray-200">
+          <IBaseCardBody className="py-12">
             <div className="text-center">
               <p className="text-gray-500">No news available yet.</p>
               <p className="mt-2 text-sm text-gray-400">
                 Check back later for updates
               </p>
             </div>
-          </CardBody>
-        </Card>
+          </IBaseCardBody>
+        </IBaseCard>
       </div>
     );
   }
@@ -85,14 +89,14 @@ export default function NewsListPage() {
       {/* News Grid */}
       <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {news.map((item) => (
-          <Card
+          <IBaseCard
             key={item.id}
             isPressable
             className="group cursor-pointer border border-gray-200 transition-all hover:border-primary-300 hover:shadow-lg"
           >
             {item.imageUrl && (
               <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
-                <Image
+                <IBaseImage
                   fill
                   alt={item.title}
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -101,7 +105,7 @@ export default function NewsListPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
               </div>
             )}
-            <CardHeader className="flex flex-col items-start gap-2 px-4 pt-4">
+            <IBaseCardHeader className="flex flex-col items-start gap-2 px-4 pt-4">
               <h2 className="line-clamp-2 text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
                 {item.title}
               </h2>
@@ -110,8 +114,8 @@ export default function NewsListPage() {
                   {item.summary}
                 </p>
               )}
-            </CardHeader>
-            <CardBody className="px-4 pb-4">
+            </IBaseCardHeader>
+            <IBaseCardBody className="px-4 pb-4">
               <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
                 <div className="flex items-center gap-1.5">
                   <Calendar className="text-gray-400" size={14} />
@@ -151,15 +155,15 @@ export default function NewsListPage() {
                   )}
                 </div>
               )}
-            </CardBody>
-          </Card>
+            </IBaseCardBody>
+          </IBaseCard>
         ))}
       </div>
 
-      {/* Load More Button */}
+      {/* Load More IBaseButton */}
       {hasNextPage && (
         <div className="mt-8 flex justify-center">
-          <Button
+          <IBaseButton
             className="min-w-[140px]"
             color="primary"
             endContent={
@@ -171,7 +175,7 @@ export default function NewsListPage() {
             onPress={() => fetchNextPage()}
           >
             {isFetchingNextPage ? "Loading..." : "Load More"}
-          </Button>
+          </IBaseButton>
         </div>
       )}
 

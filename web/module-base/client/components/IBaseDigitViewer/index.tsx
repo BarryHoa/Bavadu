@@ -19,7 +19,7 @@ export interface IBaseDigitViewerProps extends React.HTMLAttributes<HTMLDivEleme
   variant?: "default" | "mono" | "bold";
 }
 
-const IBaseDigitViewer = React.forwardRef<
+export const IBaseDigitViewer = React.forwardRef<
   HTMLDivElement,
   IBaseDigitViewerProps
 >((props, ref) => {

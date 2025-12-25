@@ -71,8 +71,8 @@ export class BaseModel<TTable extends PgTable = PgTable> {
         Boolean(
           this.table[columnName as keyof typeof this.table] as
             | Column
-            | undefined
-        )
+            | undefined,
+        ),
       );
 
       if (ignoredColumnsInTable.length !== ignoredColumns.length) {
@@ -90,12 +90,12 @@ export class BaseModel<TTable extends PgTable = PgTable> {
 
             if (!ignoreColumn) {
               throw new Error(
-                `Ignored column ${key} not found in table definition.`
+                `Ignored column ${key} not found in table definition.`,
               );
             }
 
             return eq(ignoreColumn, value);
-          })
+          }),
         )
       : eq(column, value);
 

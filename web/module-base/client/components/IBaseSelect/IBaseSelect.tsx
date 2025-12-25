@@ -1,13 +1,9 @@
-import {
-  SelectItem,
-  Select as SelectPrimitive,
-  SelectProps,
-} from "@heroui/select";
+import { SelectItem, Select as SelectPrimitive, SelectProps } from "@heroui/select";
 import clsx from "clsx";
 import React from "react";
 
 export type IBaseSelectProps = SelectProps & {};
-const IBaseSelect = React.forwardRef<HTMLSelectElement, IBaseSelectProps>(
+export const IBaseSelect = React.forwardRef<HTMLSelectElement, IBaseSelectProps>(
   (props, ref) => {
     const { isDisabled, classNames, ...rest } = props;
 
@@ -57,5 +53,6 @@ const IBaseSelect = React.forwardRef<HTMLSelectElement, IBaseSelectProps>(
 
 IBaseSelect.displayName = "IBaseSelect";
 
+export const IBaseSelectItem = SelectItem;
+
 export default IBaseSelect;
-export { SelectItem };

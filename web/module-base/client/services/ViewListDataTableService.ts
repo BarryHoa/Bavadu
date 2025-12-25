@@ -2,7 +2,7 @@ import { ListParamsResponse } from "@base/server/models/interfaces/ListInterface
 
 import JsonRpcClientService from "./JsonRpcClientService";
 
-type DataTableParams = {
+type IBaseTableParams = {
   model: string;
   params: any;
 };
@@ -15,7 +15,7 @@ class ViewListDataTableService extends JsonRpcClientService {
 
     return `${modelId}.list`;
   };
-  getData = async (req: DataTableParams) => {
+  getData = async (req: IBaseTableParams) => {
     try {
       const baseModelId = this.getBaseModelIdForList(req.model);
       const response = await this.call<ListParamsResponse<any>>(
@@ -34,7 +34,7 @@ class ViewListDataTableService extends JsonRpcClientService {
     }
   };
 
-  getFilter = async (req: DataTableParams) => {
+  getFilter = async (req: IBaseTableParams) => {
     const baseModelId = this.getBaseModelIdForList(req.model);
 
     return this.call<{ success: boolean; data: any[] }>(
@@ -43,7 +43,7 @@ class ViewListDataTableService extends JsonRpcClientService {
     );
   };
 
-  getFavoriteFilter = async (req: DataTableParams) => {
+  getFavoriteFilter = async (req: IBaseTableParams) => {
     const baseModelId = this.getBaseModelIdForList(req.model);
 
     return this.call<{ success: boolean; data: any[] }>(
@@ -52,7 +52,7 @@ class ViewListDataTableService extends JsonRpcClientService {
     );
   };
 
-  getGroupBy = async (req: DataTableParams) => {
+  getGroupBy = async (req: IBaseTableParams) => {
     const baseModelId = this.getBaseModelIdForList(req.model);
 
     return this.call<{ success: boolean; data: any[] }>(
@@ -61,7 +61,7 @@ class ViewListDataTableService extends JsonRpcClientService {
     );
   };
 
-  updateFavoriteFilter = async (req: DataTableParams) => {
+  updateFavoriteFilter = async (req: IBaseTableParams) => {
     const baseModelId = this.getBaseModelIdForList(req.model);
 
     return this.call<{ success: boolean; data: any[] }>(

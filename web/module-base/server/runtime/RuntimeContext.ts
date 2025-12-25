@@ -92,7 +92,7 @@ export class RuntimeContext {
    * Ensures the runtime is initialized before accessing the pool.
    */
   static async getDbConnect(
-    key: string = "primary"
+    key: string = "primary",
   ): Promise<PostgresJsDatabase<Record<string, never>>> {
     const context = await this.getInstance();
 
@@ -111,7 +111,7 @@ export class RuntimeContext {
   }
 
   static async getModelInstanceBy<T extends object>(
-    modelId: string
+    modelId: string,
   ): Promise<T | undefined> {
     const context = this.getInstance();
 
@@ -208,7 +208,7 @@ export class RuntimeContext {
       // eslint-disable-next-line no-console
       console.error(
         "[RuntimeContext] Error stack:",
-        error instanceof Error ? error.stack : "No stack"
+        error instanceof Error ? error.stack : "No stack",
       );
       throw error;
     }
@@ -217,7 +217,7 @@ export class RuntimeContext {
   private _ensureState(): RuntimeContextState {
     if (!this.isInitialized || !this.state) {
       throw new Error(
-        "Runtime not initialized. Call ensureInitialized() first."
+        "Runtime not initialized. Call ensureInitialized() first.",
       );
     }
 

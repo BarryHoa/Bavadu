@@ -1,16 +1,18 @@
 "use client";
+import { IBaseButton, IBaseCard, IBaseCardBody } from "@base/client/components";
 
 import type { FilterOption } from "./components/FilterMenu";
 import type { GroupOption } from "./components/GroupByMenu";
+import type { LinkProps } from "@heroui/link";
 
 import { useCallback, useMemo } from "react";
-import { Button, Card, CardBody, Divider, LinkProps } from "@heroui/react";
+import { Divider } from "@heroui/divider";
 
 import { IBaseTable } from "../IBaseTable";
 import { useLocalizedText } from "../../hooks/useLocalizedText";
 import { IBaseTablePagination } from "../IBaseTable/IBaseTableInterface";
 import LinkAs from "../LinkAs";
-import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
+import { PAGINATION_DEFAULT_PAGE_SIZE } from "../IBasePagination/paginationConsts";
 
 import ColumnVisibilityMenu from "./components/ColumnVisibilityMenu";
 import FilterMenu from "./components/FilterMenu";
@@ -18,7 +20,7 @@ import GroupByMenu from "./components/GroupByMenu";
 import SearchBar from "./components/SearchBar";
 import { useViewListDataTableQueries } from "./useViewListDataTableQueries";
 import { useViewListDataTableStore } from "./useViewListDataTableStore";
-import { ActionElm, ViewListDataTableProps } from "./VieListDataTableInterface";
+import { ActionElm, ViewListDataTableProps } from "./ViewListDataTableInterface";
 
 export default function ViewListDataTable<T = any>(
   props: ViewListDataTableProps<T>,
@@ -101,7 +103,7 @@ export default function ViewListDataTable<T = any>(
         switch (action.type) {
           case "button":
             return (
-              <Button
+              <IBaseButton
                 key={action.key}
                 isIconOnly
                 color={color}
@@ -110,7 +112,7 @@ export default function ViewListDataTable<T = any>(
                 {...(action.props as any)}
               >
                 {action.title}
-              </Button>
+              </IBaseButton>
             );
           case "link":
             const linkProps = action.props as Omit<LinkProps, "as"> & {
@@ -118,7 +120,7 @@ export default function ViewListDataTable<T = any>(
             };
 
             return (
-              <Button
+              <IBaseButton
                 key={action.key}
                 as={LinkAs as any}
                 color={color}
@@ -129,7 +131,7 @@ export default function ViewListDataTable<T = any>(
                 // {...(linkProps as any)}
               >
                 {action.title}
-              </Button>
+              </IBaseButton>
             );
           default:
             return null;
@@ -141,7 +143,7 @@ export default function ViewListDataTable<T = any>(
 
   // Render
   return (
-    <Card>
+    <IBaseCard>
       {/* Actions Bar */}
       {title && (
         <div className="flex gap-2 flex-wrap flex-col px-3 py-2">
@@ -150,7 +152,7 @@ export default function ViewListDataTable<T = any>(
         </div>
       )}
 
-      <CardBody className={`${title ? "pt-0" : ""}`}>
+      <IBaseCardBody className={`${title ? "pt-0" : ""}`}>
         <div className="flex gap-2 items-center mb-4 flex-wrap">
           <div className="flex gap-2 flex-1 justify-start">
             {renderActions(actionsLeft ?? [])}
@@ -190,7 +192,7 @@ export default function ViewListDataTable<T = any>(
           </div>
         </div>
 
-        {/* Table */}
+        {/* IBaseTablePrimitive */}
         <IBaseTable
           {...dataTableProps}
           columns={displayColumns}
@@ -201,7 +203,7 @@ export default function ViewListDataTable<T = any>(
           onChangeTable={onChangeTable}
           onRefresh={refresh}
         />
-      </CardBody>
-    </Card>
+      </IBaseCardBody>
+    </IBaseCard>
   );
 }

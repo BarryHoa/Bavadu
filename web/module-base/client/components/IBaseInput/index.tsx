@@ -11,7 +11,7 @@ export type IBaseInputProps = Omit<InputProps, "type"> & {
    */
   type?: Exclude<InputProps["type"], "date">;
 };
-const IBaseInput = React.forwardRef<HTMLInputElement, IBaseInputProps>(
+export const IBaseInput = React.forwardRef<HTMLInputElement, IBaseInputProps>(
   (props, ref) => {
     const t = useTranslations("components.input");
     const {

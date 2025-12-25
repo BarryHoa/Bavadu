@@ -1,8 +1,11 @@
 "use client";
+import {
+  IBaseButton,
+  IBaseCheckbox,
+  IBaseDropdown,
+  IBaseInputSearch,
+} from "@base/client/components";
 
-import { IBaseDropdown, IBaseInputSearch } from "@base/client/components";
-import { Button } from "@heroui/button";
-import { Checkbox } from "@heroui/checkbox";
 import { Table } from "lucide-react";
 import MiniSearch from "minisearch";
 import { useMemo, useState } from "react";
@@ -112,13 +115,13 @@ export default function ColumnVisibilityMenu<T = any>({
             : String(col.label ?? col.title ?? col.key),
         onPress: () => onToggleColumn(String(col.key)),
         children: (
-          <Checkbox
+          <IBaseCheckbox
             isReadOnly
             className="pointer-events-none"
             isSelected={visibleColumns.has(String(col.key))}
           >
             {col.label ?? col.title ?? col.key}
-          </Checkbox>
+          </IBaseCheckbox>
         ),
       })),
     ];
@@ -145,10 +148,10 @@ export default function ColumnVisibilityMenu<T = any>({
         },
       }}
     >
-      <Button
+      <IBaseButton
         isIconOnly
         size="sm"
-        startContent={<Table size={16} />}
+        startContent={<IBaseTable size={16} />}
         title="Column visibility"
         variant="bordered"
       />

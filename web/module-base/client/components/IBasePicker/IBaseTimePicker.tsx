@@ -86,12 +86,12 @@ export default function IBaseTimePicker(props: IBaseTimePickerProps) {
 
   const committedDayjs = useMemo(
     () => toDayjs(committedValue, format, timezone),
-    [committedValue, format, timezone]
+    [committedValue, format, timezone],
   );
 
   const committedText = useMemo(
     () => (committedDayjs ? formatDayjs(committedDayjs, format, timezone) : ""),
-    [committedDayjs, format, timezone]
+    [committedDayjs, format, timezone],
   );
 
   const [draftText, setDraftText] = useState(committedText);
@@ -162,7 +162,7 @@ export default function IBaseTimePicker(props: IBaseTimePickerProps) {
       }
       open();
     },
-    [commitAndClose, isDisabled, open]
+    [commitAndClose, isDisabled, open],
   );
 
   const handleKey: React.KeyboardEventHandler<HTMLInputElement> = (e) => {

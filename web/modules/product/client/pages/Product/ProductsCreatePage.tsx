@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
+import { IBaseButton } from "@base/client/components";
 import { addToast } from "@heroui/toast";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
@@ -111,7 +111,7 @@ const ProductsCreatePage = (): React.ReactNode => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
-        <Button
+        <IBaseButton
           isDisabled={createMutation.isPending}
           size="sm"
           startContent={<ArrowLeft size={14} />}
@@ -119,7 +119,7 @@ const ProductsCreatePage = (): React.ReactNode => {
           onPress={navigateToList}
         >
           Back
-        </Button>
+        </IBaseButton>
       </div>
 
       <ProductForm

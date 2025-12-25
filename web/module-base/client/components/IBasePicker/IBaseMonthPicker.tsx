@@ -1,6 +1,7 @@
 "use client";
 
 import type { Dayjs } from "dayjs";
+
 import { useTranslations } from "next-intl";
 
 import IBaseDatePicker, {
@@ -30,9 +31,9 @@ export default function IBaseMonthPicker(props: IBaseMonthPickerProps) {
   return (
     <IBaseDatePicker
       {...rest}
-      placeholder={placeholder ?? t("month.placeholder", { format })}
       calendarProps={{ showMonthAndYearPickers: true, ...rest.calendarProps }}
       format={format}
+      placeholder={placeholder ?? t("month.placeholder", { format })}
       quickSelect={
         showThisMonth
           ? ({

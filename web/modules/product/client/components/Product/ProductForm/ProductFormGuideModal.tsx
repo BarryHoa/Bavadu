@@ -3,16 +3,16 @@
 import { MarkdownContent } from "@base/client/components";
 import guidelineService from "@base/client/services/GuidelineService";
 import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalHeader,
+  IBaseModal,
+  IBaseModalBody,
+  IBaseModalContent,
+  IBaseModalHeader,
 } from "@base/client/components";
 import { useQuery } from "@tanstack/react-query";
 import { HelpCircle, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-interface ProductFormGuideModalProps {
+interface ProductFormGuideIBaseModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
@@ -20,7 +20,7 @@ interface ProductFormGuideModalProps {
 export default function ProductFormGuideModal({
   isOpen,
   onClose,
-}: ProductFormGuideModalProps) {
+}: ProductFormGuideIBaseModalProps) {
   const t = useTranslations("guidelines");
   const {
     data: guideContent,
@@ -34,20 +34,20 @@ export default function ProductFormGuideModal({
   });
 
   return (
-    <Modal
+    <IBaseModal
       isOpen={isOpen}
       placement="center"
       scrollBehavior="inside"
       size="5xl"
       onClose={onClose}
     >
-      <ModalContent className="max-h-[90vh]">
+      <IBaseModalContent className="max-h-[90vh]">
         <>
-          <ModalHeader className="flex items-center gap-2 pb-3">
+          <IBaseModalHeader className="flex items-center gap-2 pb-3">
             <HelpCircle size={18} />
             <span className="text-base">{t("title")}</span>
-          </ModalHeader>
-          <ModalBody className="pb-4 pt-2">
+          </IBaseModalHeader>
+          <IBaseModalBody className="pb-4 pt-2">
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin text-default-500" />
@@ -63,9 +63,9 @@ export default function ProductFormGuideModal({
                 {t("notFound")}
               </div>
             )}
-          </ModalBody>
+          </IBaseModalBody>
         </>
-      </ModalContent>
-    </Modal>
+      </IBaseModalContent>
+    </IBaseModal>
   );
 }

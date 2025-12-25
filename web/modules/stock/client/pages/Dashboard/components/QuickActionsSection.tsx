@@ -3,7 +3,7 @@
 import type { WarehouseDto } from "../../../services/StockService";
 import type { MovementResult, MovementPayload } from "../types";
 
-import { Card, CardBody } from "@heroui/react";
+import { IBaseCard, IBaseCardBody } from "@base/client/components";
 
 import MovementCard from "./MovementCard";
 
@@ -33,8 +33,8 @@ export default function QuickActionsSection({
   onTransfer,
 }: QuickActionsSectionProps) {
   return (
-    <Card>
-      <CardBody className="space-y-4">
+    <IBaseCard>
+      <IBaseCardBody className="space-y-4">
         <h2 className="text-lg font-semibold">Quick Actions</h2>
         <p className="text-default-500">
           Use these forms to adjust inventory levels quickly.
@@ -90,7 +90,7 @@ export default function QuickActionsSection({
             onSubmit={onTransfer}
           />
         </div>
-      </CardBody>
-    </Card>
+      </IBaseCardBody>
+    </IBaseCard>
   );
 }

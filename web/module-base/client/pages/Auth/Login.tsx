@@ -1,12 +1,16 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Checkbox } from "@heroui/checkbox";
-import { Input as HeroUIInput } from "@heroui/input";
-import { Link } from "@heroui/link";
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBaseCardHeader,
+  IBaseCheckbox,
+  IBaseInput,
+  IBaseLink,
+} from "@base/client/components";
 import { Eye, EyeOff } from "lucide-react";
-import Image from "next/image";
+import IBaseImage from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -60,11 +64,11 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
-        <CardHeader className="flex flex-col gap-1 px-6 pt-6">
+      <IBaseCard className="w-full max-w-md">
+        <IBaseCardHeader className="flex flex-col gap-1 px-6 pt-6">
           <div className="flex flex-col items-center gap-3 mb-2">
             <div className="flex items-center gap-3">
-              <Image
+              <IBaseImage
                 alt="BAVADU Logo"
                 className="object-contain"
                 height={48}
@@ -78,8 +82,8 @@ export default function LoginPage() {
           <p className="text-sm text-gray-500">
             Enter your credentials to access your account
           </p>
-        </CardHeader>
-        <CardBody className="px-6 pb-6">
+        </IBaseCardHeader>
+        <IBaseCardBody className="px-6 pb-6">
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             {error && (
               <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">
@@ -87,7 +91,7 @@ export default function LoginPage() {
               </div>
             )}
 
-            <HeroUIInput
+            <IBaseInput
               required
               autoComplete="username"
               label="Username"
@@ -97,7 +101,7 @@ export default function LoginPage() {
               onChange={(e) => setUsername(e.target.value)}
             />
 
-            <HeroUIInput
+            <IBaseInput
               required
               autoComplete="current-password"
               endContent={
@@ -131,22 +135,22 @@ export default function LoginPage() {
             />
 
             <div className="flex items-center justify-between">
-              <Checkbox
+              <IBaseCheckbox
                 isSelected={rememberMe}
                 size="sm"
                 onValueChange={setRememberMe}
               >
                 <span className="text-sm">Remember me</span>
-              </Checkbox>
-              <Link
+              </IBaseCheckbox>
+              <IBaseLink
                 className="text-sm text-primary-600 hover:text-primary-500"
                 href="/reset-password"
               >
                 Forgot password?
-              </Link>
+              </IBaseLink>
             </div>
 
-            <Button
+            <IBaseButton
               className="w-full"
               color="primary"
               isLoading={isLoading}
@@ -154,10 +158,10 @@ export default function LoginPage() {
               type="submit"
             >
               Sign in
-            </Button>
+            </IBaseButton>
           </form>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
     </div>
   );
 }

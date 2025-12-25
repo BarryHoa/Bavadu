@@ -27,7 +27,7 @@ import IBaseSelect, { IBaseSelectProps } from "./IBaseSelect";
 export interface FetchOptionsParams extends DropdownOptionsParams {}
 
 export type ServiceFetch = (
-  params: FetchOptionsParams
+  params: FetchOptionsParams,
 ) => Promise<DropdownOptionsResponse>;
 
 export interface IBaseSingleSelectAsyncProps extends Omit<
@@ -164,20 +164,20 @@ const IBaseSingleSelectAsync = React.forwardRef<
       onTheFirstFetchSuccess,
       onFetching,
       onFinishFetch,
-    ]
+    ],
   );
 
   // Memoize getNextPageParam to prevent recreation
   const getNextPageParam = useCallback(
     (
       lastPage: DropdownOptionsResponse,
-      allPages: DropdownOptionsResponse[]
+      allPages: DropdownOptionsResponse[],
     ) => {
       const currentTotal = lastPage.total || 0;
       // Calculate current offset: sum of all items loaded so far
       const currentOffset = allPages.reduce(
         (sum, page) => sum + (page.data?.length || 0),
-        0
+        0,
       );
 
       // If current offset is less than total, return next offset
@@ -188,7 +188,7 @@ const IBaseSingleSelectAsync = React.forwardRef<
       // No more pages
       return undefined;
     },
-    []
+    [],
   );
 
   // Memoize query key to prevent unnecessary refetches
@@ -200,7 +200,7 @@ const IBaseSingleSelectAsync = React.forwardRef<
       defaultLimit,
       stableDefaultParams,
     ],
-    [model, debouncedSearchTerm, defaultLimit, stableDefaultParams]
+    [model, debouncedSearchTerm, defaultLimit, stableDefaultParams],
   );
 
   // Fetch data using useInfiniteQuery
@@ -230,7 +230,7 @@ const IBaseSingleSelectAsync = React.forwardRef<
         ...item,
         value: item.value,
         label: item.label,
-      }))
+      })),
     );
   }, [data?.pages]);
 
@@ -259,7 +259,7 @@ const IBaseSingleSelectAsync = React.forwardRef<
         fetchNextPage();
       }
     },
-    [hasNextPage, isFetchingNextPage, isLoading, isFetching, fetchNextPage]
+    [hasNextPage, isFetchingNextPage, isLoading, isFetching, fetchNextPage],
   );
 
   // Focus search input when dropdown opens
@@ -287,13 +287,13 @@ const IBaseSingleSelectAsync = React.forwardRef<
         rest.onOpenChange(open);
       }
     },
-    [rest.isDisabled, rest.onOpenChange, setIsOpen]
+    [rest.isDisabled, rest.onOpenChange, setIsOpen],
   );
 
   // Memoize selection change handler to prevent recreation
   const handleSelectionChange = useCallback(
     (
-      keys: Parameters<NonNullable<IBaseSelectProps["onSelectionChange"]>>[0]
+      keys: Parameters<NonNullable<IBaseSelectProps["onSelectionChange"]>>[0],
     ) => {
       if (typeof keys === "string") return;
       const keySet = keys as Set<string>;
@@ -321,19 +321,19 @@ const IBaseSingleSelectAsync = React.forwardRef<
         onSelectionChange(selected, selectedItem);
       }
     },
-    [allItems, onSelectionChange]
+    [allItems, onSelectionChange],
   );
 
   // Memoize loading state
   const isLoadingData = useMemo(
     () => isLoading || isFetching,
-    [isLoading, isFetching]
+    [isLoading, isFetching],
   );
 
   // Memoize selectedKeys to prevent creating new Set on every render
   const selectedKeysSet = useMemo(
     () => (selectedKey ? new Set([selectedKey]) : undefined),
-    [selectedKey]
+    [selectedKey],
   );
 
   // Memoize listboxProps to prevent object recreation
@@ -342,7 +342,7 @@ const IBaseSingleSelectAsync = React.forwardRef<
       onScroll: handleScroll,
       ...rest.listboxProps,
     }),
-    [handleScroll, rest.listboxProps]
+    [handleScroll, rest.listboxProps],
   );
 
   // Memoize search input classNames
@@ -351,7 +351,7 @@ const IBaseSingleSelectAsync = React.forwardRef<
       base: "w-full",
       input: "text-sm",
     }),
-    []
+    [],
   );
 
   // Memoize search input keydown handler
@@ -365,7 +365,7 @@ const IBaseSingleSelectAsync = React.forwardRef<
         setSearchTerm("");
       }
     },
-    []
+    [],
   );
 
   return (

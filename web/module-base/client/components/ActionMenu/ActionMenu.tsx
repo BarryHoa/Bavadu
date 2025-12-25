@@ -1,8 +1,13 @@
-import { Button } from "@heroui/button";
-import { cn } from "@heroui/react";
-import { Ellipsis, Link } from "lucide-react";
-
-import { IBaseDropdown } from "@base/client/components";
+import {
+  IBaseButton,
+  IBaseDropdown,
+  IBaseDropdownItem,
+  IBaseDropdownMenu,
+  IBaseDropdownTrigger,
+  IBaseLink,
+} from "@base/client/components";
+import { cn } from "@heroui/theme";
+import { Ellipsis } from "lucide-react";
 
 type ButtonVariant = "solid" | "flat" | "bordered" | "light";
 
@@ -21,40 +26,32 @@ export type ActionItemButton = ActionItemBase & {
 
 export type ActionItemLink = ActionItemBase & {
   href: string;
-  target?: string;
   as?: string;
+  target?: string;
   variant?: ButtonVariant;
 };
 
 export type ActionItem = ActionItemButton | ActionItemLink;
 
-export interface ActionMenuProps {
+interface ActionMenuProps {
   actions: ActionItem[];
   className?: string;
-  inlineCount?: number;
-  menuLabel?: React.ReactNode;
 }
 
-const isLink = (action: ActionItem): action is ActionItemLink =>
-  "href" in action;
+const isLink = (action: ActionItem): action is ActionItemLink => "href" in action;
 
-const ActionMenu = ({
-  actions,
-  className,
-  menuLabel = <span>...</span>,
-}: ActionMenuProps) => {
-  if (!actions || actions.length === 0) return null;
-  const inlineActions = actions.filter((a) => a.placement === "inline");
-  const menuActions = actions.filter((a) => a.placement !== "inline");
+const ActionMenu: React.FC<ActionMenuProps> = ({ actions, className }) => {
+  const inlineActions = actions.filter((a) => a.placement !== "menu");
+  const menuActions = actions.filter((a) => a.placement === "menu");
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
       {inlineActions.map((action) => {
         if (isLink(action)) {
           return (
-            <Button
+            <IBaseButton
               key={action.key}
-              as={Link}
+              as={IBaseLink}
               disabled={action.disabled}
               href={action.href}
               rel={action.as}
@@ -64,12 +61,12 @@ const ActionMenu = ({
               variant={action.variant ?? "bordered"}
             >
               {action.label}
-            </Button>
+            </IBaseButton>
           );
         }
 
         return (
-          <Button
+          <IBaseButton
             key={action.key}
             disabled={action.disabled}
             size="sm"
@@ -78,42 +75,45 @@ const ActionMenu = ({
             onPress={action.onPress}
           >
             {action.label}
-          </Button>
+          </IBaseButton>
         );
       })}
 
       {menuActions.length > 0 && (
-        <IBaseDropdown
-          items={menuActions.map((action) => ({
-            key: action.key,
-            textValue: action.label,
-            ...(isLink(action)
-              ? {
-                  href: action.href,
-                  isReadOnly: action.disabled,
-                  rel: action.as,
-                  target: action.target,
-                }
-              : {
-                  isDisabled: action.disabled,
-                  onPress: action.onPress,
-                }),
-            children: (
-              <div className="flex items-center gap-2">
-                {action.startContent}
-                <span>{action.label}</span>
-              </div>
-            ),
-          }))}
-        >
-          <Button
-            isIconOnly
-            className="min-w-unit-8 h-6"
-            radius="full"
-            variant="faded"
+        <IBaseDropdown>
+          <IBaseDropdownTrigger>
+            <IBaseButton
+              isIconOnly
+              className="min-w-unit-8 h-6"
+              radius="full"
+              variant="faded"
+            >
+              <Ellipsis className="size-4" />
+            </IBaseButton>
+          </IBaseDropdownTrigger>
+          <IBaseDropdownMenu
+            aria-label="Actions"
+            items={menuActions}
           >
-            <Ellipsis className="size-4" />
-          </Button>
+            {(action) => (
+              <IBaseDropdownItem
+                key={action.key}
+                isDisabled={action.disabled}
+                startContent={action.startContent}
+                textValue={action.label}
+                onPress={isLink(action) ? undefined : action.onPress}
+                {...(isLink(action)
+                  ? {
+                      href: action.href,
+                      target: action.target,
+                      rel: action.as,
+                    }
+                  : {})}
+              >
+                {action.label}
+              </IBaseDropdownItem>
+            )}
+          </IBaseDropdownMenu>
         </IBaseDropdown>
       )}
     </div>

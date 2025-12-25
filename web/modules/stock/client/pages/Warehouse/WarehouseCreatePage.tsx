@@ -5,8 +5,8 @@ import type {
   WarehousePayload,
 } from "../../services/StockService";
 
+import { IBaseButton } from "@base/client/components";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
-import { Button } from "@heroui/button";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 
@@ -47,13 +47,13 @@ export default function WarehouseCreatePage(): React.ReactNode {
     <div className="w-full space-y-6">
       <WarehouseForm
         secondaryAction={
-          <Button
+          <IBaseButton
             size="sm"
             variant="light"
             onPress={() => router.push("/workspace/modules/stock/warehouses")}
           >
             Cancel
-          </Button>
+          </IBaseButton>
         }
         submitError={error}
         submitLabel="Create warehouse"

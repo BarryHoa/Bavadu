@@ -2,9 +2,9 @@ import { Tab, Tabs as TabsPrimitive, TabsProps } from "@heroui/tabs";
 import clsx from "clsx";
 import React from "react";
 
-export type { TabsProps as IBaseTabsProps };
+export type IBaseTabsProps = TabsProps;
 
-const IBaseTabs = React.forwardRef<HTMLDivElement, TabsProps>((props, ref) => {
+export const IBaseTabs = React.forwardRef<HTMLDivElement, TabsProps>((props, ref) => {
   const { classNames, size = "sm", variant = "bordered", ...rest } = props;
 
   return (
@@ -27,5 +27,6 @@ const IBaseTabs = React.forwardRef<HTMLDivElement, TabsProps>((props, ref) => {
 
 IBaseTabs.displayName = "IBaseTabs";
 
+export const IBaseTab = Tab;
+
 export default IBaseTabs;
-export { Tab };

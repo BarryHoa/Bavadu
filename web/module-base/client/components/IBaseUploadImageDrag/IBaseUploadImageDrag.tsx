@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardBody } from "@heroui/react";
+import { Card, CardBody } from "@heroui/card";
 import { addToast } from "@heroui/toast";
 import { chunk } from "lodash";
 import { Upload } from "lucide-react";
@@ -257,9 +257,11 @@ export default function IBaseUploadImageDrag({
 
   const handleDragOver = useCallback(
     (e: React.DragEvent<HTMLDivElement | HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-  }, []);
+      e.preventDefault();
+      e.stopPropagation();
+    },
+    [],
+  );
 
   const handleClick = useCallback(() => {
     if (!isUploadDisabled) {

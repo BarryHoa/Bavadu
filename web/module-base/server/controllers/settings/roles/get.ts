@@ -8,7 +8,10 @@ const REQUIRED_PERMISSIONS = ["settings.roles.read"];
 
 export async function GET(request: NextRequest) {
   try {
-    const authzResponse = await requirePermissions(request, REQUIRED_PERMISSIONS);
+    const authzResponse = await requirePermissions(
+      request,
+      REQUIRED_PERMISSIONS,
+    );
 
     if (authzResponse) {
       return authzResponse;

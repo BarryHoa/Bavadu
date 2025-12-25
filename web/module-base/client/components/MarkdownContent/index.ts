@@ -1,1 +1,4 @@
-export { default, default as MarkdownContent } from "./MarkdownContent";
+import MarkdownContent from "./MarkdownContent";
+
+export { MarkdownContent };
+export default MarkdownContent;

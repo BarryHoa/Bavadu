@@ -1,13 +1,13 @@
 "use client";
 
-import { IBaseInput } from "@base/client/components";
-import { Button } from "@heroui/button";
 import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
+  IBaseButton,
+  IBaseInput,
+  IBaseModal,
+  IBaseModalBody,
+  IBaseModalContent,
+  IBaseModalFooter,
+  IBaseModalHeader,
 } from "@base/client/components";
 import { Languages } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -69,15 +69,15 @@ export default function TranslateModal({
   };
 
   return (
-    <Modal isOpen={isOpen} placement="center" size="md" onClose={onClose}>
-      <ModalContent>
+    <IBaseModal isOpen={isOpen} placement="center" size="md" onClose={onClose}>
+      <IBaseModalContent>
         {() => (
           <>
-            <ModalHeader className="flex items-center gap-2">
+            <IBaseModalHeader className="flex items-center gap-2">
               <Languages size={20} />
               {t("title")}
-            </ModalHeader>
-            <ModalBody className="space-y-4">
+            </IBaseModalHeader>
+            <IBaseModalBody className="space-y-4">
               {DEFAULT_SUPPORTED_LANGS.filter(
                 (lang) => lang !== curentLocale,
               ).map((lang) => (
@@ -94,18 +94,18 @@ export default function TranslateModal({
                   />
                 </div>
               ))}
-            </ModalBody>
-            <ModalFooter>
-              <Button variant="light" onPress={onClose}>
+            </IBaseModalBody>
+            <IBaseModalFooter>
+              <IBaseButton variant="light" onPress={onClose}>
                 {tCommon("cancel")}
-              </Button>
-              <Button color="primary" onPress={handleSave}>
+              </IBaseButton>
+              <IBaseButton color="primary" onPress={handleSave}>
                 {tCommon("save")}
-              </Button>
-            </ModalFooter>
+              </IBaseButton>
+            </IBaseModalFooter>
           </>
         )}
-      </ModalContent>
-    </Modal>
+      </IBaseModalContent>
+    </IBaseModal>
   );
 }

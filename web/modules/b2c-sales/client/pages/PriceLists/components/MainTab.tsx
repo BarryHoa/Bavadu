@@ -1,5 +1,6 @@
 "use client";
 
+import { IBaseCheckbox, IBaseTextarea } from "@base/client/components";
 import {
   IBaseDatePicker,
   IBaseInput,
@@ -7,14 +8,13 @@ import {
   IBaseInputNumber,
   IBaseSelect,
   IBaseSingleSelect,
-  SelectItem,
+  IBaseSelectItem,
   SelectItemOption,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { Checkbox, Textarea } from "@heroui/react";
 import { Control, Controller } from "react-hook-form";
 
-interface MainTabProps {
+interface MainIBaseTabProps {
   control: Control<any>;
   errors?: any;
   typeOptions: SelectItemOption[];
@@ -38,7 +38,7 @@ export default function MainTab({
   locationOptions = [],
   regionOptions = [],
   customerGroupOptions = [],
-}: MainTabProps) {
+}: MainIBaseTabProps) {
   const getLocalizedText = useLocalizedText();
 
   return (
@@ -102,7 +102,7 @@ export default function MainTab({
             control={control}
             name="description"
             render={({ field, fieldState }) => (
-              <Textarea
+              <IBaseTextarea
                 errorMessage={fieldState.error?.message}
                 isInvalid={fieldState.invalid}
                 label="Description"
@@ -160,7 +160,7 @@ export default function MainTab({
               control={control}
               name="isDefault"
               render={({ field }) => (
-                <Checkbox
+                <IBaseCheckbox
                   isSelected={field.value === "true" || field.value === true}
                   size="sm"
                   onValueChange={(checked) =>
@@ -168,7 +168,7 @@ export default function MainTab({
                   }
                 >
                   Is Default
-                </Checkbox>
+                </IBaseCheckbox>
               )}
             />
           </div>
@@ -242,7 +242,7 @@ export default function MainTab({
                 }}
               >
                 {channelOptions.map((option) => (
-                  <SelectItem
+                  <IBaseSelectItem
                     key={option.value}
                     textValue={
                       typeof option.label === "string"
@@ -253,7 +253,7 @@ export default function MainTab({
                     {typeof option.label === "string"
                       ? option.label
                       : getLocalizedText(option.label)}
-                  </SelectItem>
+                  </IBaseSelectItem>
                 ))}
               </IBaseSelect>
             )}
@@ -284,7 +284,7 @@ export default function MainTab({
                 }}
               >
                 {storeOptions.map((option) => (
-                  <SelectItem
+                  <IBaseSelectItem
                     key={option.value}
                     textValue={
                       typeof option.label === "string"
@@ -295,7 +295,7 @@ export default function MainTab({
                     {typeof option.label === "string"
                       ? option.label
                       : getLocalizedText(option.label)}
-                  </SelectItem>
+                  </IBaseSelectItem>
                 ))}
               </IBaseSelect>
             )}
@@ -326,7 +326,7 @@ export default function MainTab({
                 }}
               >
                 {locationOptions.map((option) => (
-                  <SelectItem
+                  <IBaseSelectItem
                     key={option.value}
                     textValue={
                       typeof option.label === "string"
@@ -337,7 +337,7 @@ export default function MainTab({
                     {typeof option.label === "string"
                       ? option.label
                       : getLocalizedText(option.label)}
-                  </SelectItem>
+                  </IBaseSelectItem>
                 ))}
               </IBaseSelect>
             )}
@@ -368,7 +368,7 @@ export default function MainTab({
                 }}
               >
                 {regionOptions.map((option) => (
-                  <SelectItem
+                  <IBaseSelectItem
                     key={option.value}
                     textValue={
                       typeof option.label === "string"
@@ -379,7 +379,7 @@ export default function MainTab({
                     {typeof option.label === "string"
                       ? option.label
                       : getLocalizedText(option.label)}
-                  </SelectItem>
+                  </IBaseSelectItem>
                 ))}
               </IBaseSelect>
             )}
@@ -410,7 +410,7 @@ export default function MainTab({
                 }}
               >
                 {customerGroupOptions.map((option) => (
-                  <SelectItem
+                  <IBaseSelectItem
                     key={option.value}
                     textValue={
                       typeof option.label === "string"
@@ -421,7 +421,7 @@ export default function MainTab({
                     {typeof option.label === "string"
                       ? option.label
                       : getLocalizedText(option.label)}
-                  </SelectItem>
+                  </IBaseSelectItem>
                 ))}
               </IBaseSelect>
             )}

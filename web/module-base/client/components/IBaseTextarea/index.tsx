@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import React from "react";
 
 export type IBaseTextareaProps = TextAreaProps & {};
-const IBaseTextarea = React.forwardRef<HTMLTextAreaElement, IBaseTextareaProps>(
+export const IBaseTextarea = React.forwardRef<HTMLTextAreaElement, IBaseTextareaProps>(
   (props, ref) => {
     const t = useTranslations("components.textarea");
     const {

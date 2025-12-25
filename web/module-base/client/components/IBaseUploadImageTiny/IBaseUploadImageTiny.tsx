@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardBody } from "@heroui/react";
+import { Card, CardBody } from "@heroui/card";
 import { addToast } from "@heroui/toast";
 import { chunk } from "lodash";
 import { Upload } from "lucide-react";

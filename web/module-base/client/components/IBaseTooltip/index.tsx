@@ -4,7 +4,7 @@ import React from "react";
 
 type IBaseTooltipProps = TooltipProps & {};
 
-const IBaseTooltip = React.forwardRef<HTMLDivElement, IBaseTooltipProps>(
+export const IBaseTooltip = React.forwardRef<HTMLDivElement, IBaseTooltipProps>(
   (props, ref) => {
     const { placement = "top", showArrow = true, classNames, ...rest } = props;
 
