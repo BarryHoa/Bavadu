@@ -1,14 +1,15 @@
 "use client";
+
+import { Table } from "lucide-react";
+import MiniSearch from "minisearch";
+import { useMemo, useState } from "react";
+
 import {
   IBaseButton,
   IBaseCheckbox,
   IBaseDropdown,
   IBaseInputSearch,
 } from "@base/client/components";
-
-import { Table } from "lucide-react";
-import MiniSearch from "minisearch";
-import { useMemo, useState } from "react";
 
 import { IBaseTableColumnDefinition } from "../../IBaseTable/IBaseTableInterface";
 
@@ -131,13 +132,6 @@ export default function ColumnVisibilityMenu<T = any>({
     <IBaseDropdown
       closeOnSelect={false}
       isOpen={isOpen}
-      shouldCloseOnInteractOutside={() => true}
-      onOpenChange={(open) => {
-        setIsOpen(open);
-        if (!open) {
-          setSearchTerm("");
-        }
-      }}
       items={dropdownItems}
       menu={{
         "aria-label": "Column visibility",
@@ -147,11 +141,18 @@ export default function ColumnVisibilityMenu<T = any>({
           title: "text-[12px]",
         },
       }}
+      shouldCloseOnInteractOutside={() => true}
+      onOpenChange={(open) => {
+        setIsOpen(open);
+        if (!open) {
+          setSearchTerm("");
+        }
+      }}
     >
       <IBaseButton
         isIconOnly
         size="sm"
-        startContent={<IBaseTable size={16} />}
+        startContent={<Table size={16} />}
         title="Column visibility"
         variant="bordered"
       />

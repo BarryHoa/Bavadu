@@ -1,4 +1,4 @@
-import { LocaleDataType } from "@base/server/interfaces/Locale";
+import { LocaleDataType } from "@base/shared/interface/Locale";
 import { User } from "@base/server/interfaces/User";
 
 export type ProductCategoryId = string; // uuid v7

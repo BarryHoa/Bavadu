@@ -1,7 +1,7 @@
 import type {
   ListParamsRequest,
   ListParamsResponse,
-} from "@base/server/models/interfaces/ListInterface";
+} from "@base/shared/interface/ListInterface";
 import type { Column } from "drizzle-orm";
 
 import {
@@ -11,7 +11,7 @@ import {
 import { asc, eq, inArray } from "drizzle-orm";
 
 import { base_tb_payment_methods } from "../../schemas/base.payment-method";
-import { ParamFilter } from "../interfaces/FilterInterface";
+import { ParamFilter } from "@base/shared/interface/FilterInterface";
 
 type PaymentMethodDropdownOption = {
   label: string;

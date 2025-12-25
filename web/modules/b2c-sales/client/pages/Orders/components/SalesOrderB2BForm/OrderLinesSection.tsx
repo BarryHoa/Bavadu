@@ -14,7 +14,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useMemo } from "react";
 import { Control, Controller, UseFormSetValue } from "react-hook-form";
 
-import { ProductMasterFeaturesEnum } from "@/modules/product/server/models/interfaces/ProductMaster";
+import { ProductMasterFeatures } from "@mdl/product/client/interface/Product";
 
 interface OrderLinesSectionProps {
   control: Control<any>;
@@ -178,7 +178,7 @@ export default function OrderLinesSection({
                         defaultParams={{
                           filters: {
                             isActive: true,
-                            features: [ProductMasterFeaturesEnum.SALE],
+                            features: [ProductMasterFeatures.SALE],
                           },
                         }}
                         errorMessage={fieldState.error?.message}

@@ -2,7 +2,7 @@ import type { Column } from "drizzle-orm";
 import type {
   ListParamsRequest,
   ListParamsResponse,
-} from "@base/server/models/interfaces/ListInterface";
+} from "@base/shared/interface/ListInterface";
 
 import { eq, ilike, sql } from "drizzle-orm";
 import { ParamFilter } from "@base/server";

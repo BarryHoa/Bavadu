@@ -1,6 +1,7 @@
-import { LocaleDataType } from "@base/server/interfaces/Locale";
-import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
+
+import { BaseModel } from "@base/server/models/BaseModel";
+import { LocaleDataType } from "@base/shared/interface/Locale";
 
 import { NewHrmTbCourse, hrm_tb_courses } from "../../schemas";
 
@@ -107,7 +108,7 @@ export default class CourseModel extends BaseModel<typeof hrm_tb_courses> {
 
   updateCourse = async (
     id: string,
-    payload: Partial<CourseInput>,
+    payload: Partial<CourseInput>
   ): Promise<CourseRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
       updatedAt: new Date(),
@@ -153,7 +154,7 @@ export default class CourseModel extends BaseModel<typeof hrm_tb_courses> {
     }
     if (payload.description !== undefined) {
       normalizedPayload.description = this.normalizeLocaleInput(
-        payload.description,
+        payload.description
       );
     }
     if (payload.category !== undefined) {

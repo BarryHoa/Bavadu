@@ -34,7 +34,7 @@ export default function TranslateModal({
 }: TranslateModalProps) {
   const t = useTranslations("components.translate");
   const tCommon = useTranslations("common.actions");
-  const curentLocale = useLocale();
+  const currentLocale = useLocale();
   const [langValues, setLangValues] = useState<LocalizeText>(() => {
     if (typeof value === "object" && value !== null) {
       return value as LocalizeText;
@@ -79,7 +79,7 @@ export default function TranslateModal({
             </IBaseModalHeader>
             <IBaseModalBody className="space-y-4">
               {DEFAULT_SUPPORTED_LANGS.filter(
-                (lang) => lang !== curentLocale,
+                (lang) => lang !== currentLocale
               ).map((lang) => (
                 <div key={lang} className="flex flex-col gap-2">
                   <label className="text-sm font-medium">

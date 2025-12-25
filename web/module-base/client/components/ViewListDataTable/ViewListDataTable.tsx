@@ -1,18 +1,19 @@
 "use client";
-import { IBaseButton, IBaseCard, IBaseCardBody } from "@base/client/components";
 
+import type { LinkProps } from "@heroui/link";
 import type { FilterOption } from "./components/FilterMenu";
 import type { GroupOption } from "./components/GroupByMenu";
-import type { LinkProps } from "@heroui/link";
 
-import { useCallback, useMemo } from "react";
 import { Divider } from "@heroui/divider";
+import { useCallback, useMemo } from "react";
 
-import { IBaseTable } from "../IBaseTable";
+import { IBaseButton, IBaseCard, IBaseCardBody } from "@base/client/components";
+
 import { useLocalizedText } from "../../hooks/useLocalizedText";
+import { IBaseTable } from "../IBaseTable";
 import { IBaseTablePagination } from "../IBaseTable/IBaseTableInterface";
 import LinkAs from "../LinkAs";
-import { PAGINATION_DEFAULT_PAGE_SIZE } from "../IBasePagination/paginationConsts";
+import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 
 import ColumnVisibilityMenu from "./components/ColumnVisibilityMenu";
 import FilterMenu from "./components/FilterMenu";
@@ -20,10 +21,13 @@ import GroupByMenu from "./components/GroupByMenu";
 import SearchBar from "./components/SearchBar";
 import { useViewListDataTableQueries } from "./useViewListDataTableQueries";
 import { useViewListDataTableStore } from "./useViewListDataTableStore";
-import { ActionElm, ViewListDataTableProps } from "./ViewListDataTableInterface";
+import {
+  ActionElm,
+  ViewListDataTableProps,
+} from "./ViewListDataTableInterface";
 
 export default function ViewListDataTable<T = any>(
-  props: ViewListDataTableProps<T>,
+  props: ViewListDataTableProps<T>
 ) {
   const {
     columns,
@@ -80,7 +84,7 @@ export default function ViewListDataTable<T = any>(
   // Prepare columns list with only visible columns
   const displayColumns = useMemo(() => {
     const cols = columns.filter((col: any) =>
-      store.visibleColumns.has(col.key),
+      store.visibleColumns.has(col.key)
     );
 
     if (isDataDummy) {
@@ -127,7 +131,7 @@ export default function ViewListDataTable<T = any>(
                 href={linkProps.href as string}
                 size={size}
                 variant={variant}
-                hrefAs={linkProps.hrefAs as any}
+                {...(linkProps as any)}
                 // {...(linkProps as any)}
               >
                 {action.title}
@@ -138,7 +142,7 @@ export default function ViewListDataTable<T = any>(
         }
       });
     },
-    [actionsLeft, actionsRight],
+    [actionsLeft, actionsRight]
   );
 
   // Render

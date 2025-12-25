@@ -1,7 +1,7 @@
 "use client";
 
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
-import type { LocaleDataType } from "@base/server/interfaces/Locale";
+import type { LocaleDataType } from "@base/shared/interface/Locale";
 
 import {
   IBaseButton,

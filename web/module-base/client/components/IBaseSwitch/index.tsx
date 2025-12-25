@@ -10,7 +10,7 @@ export const IBaseSwitch = React.forwardRef<HTMLInputElement, IBaseSwitchProps>(
     const { size = "sm", ...rest } = props;
 
     return <HeroUISwitch ref={ref} size={size} {...rest} />;
-  },
+  }
 );
 
 IBaseSwitch.displayName = "IBaseSwitch";

@@ -89,6 +89,13 @@ export default defineConfig([
       react: {
         version: "detect",
       },
+      "import/resolver": {
+        typescript: {
+          alwaysTryTypes: true,
+          project: path.join(__dirname, "tsconfig.json"),
+        },
+        node: true,
+      },
     },
 
     files: ["**/*.ts", "**/*.tsx"],
@@ -188,6 +195,44 @@ export default defineConfig([
           blankLine: "any",
           prev: ["const", "let", "var"],
           next: ["const", "let", "var"],
+        },
+      ],
+    },
+  },
+  {
+    files: ["**/client/**"],
+    ignores: ["**/layouts/**/WorkspaceLayout.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "**/server/**",
+                "@serv/**",
+                "@base/server",
+                "@mdl/*/server/**",
+              ],
+              message: "Client code cannot import server code.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["**/server/**", "server.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["**/client/**", "@base/client/**", "@mdl/*/client/**"],
+              message: "Server code cannot import client code.",
+            },
+          ],
         },
       ],
     },

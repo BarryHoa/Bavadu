@@ -1,7 +1,13 @@
 "use client";
 
-import { Table as HeroUITable, TableBody as HeroUITableBody, TableCell as HeroUITableCell, TableColumn as HeroUITableColumn, TableHeader as HeroUITableHeader, TableRow as HeroUITableRow } from "@heroui/table";
-import React from "react";
+import {
+  Table as HeroUITable,
+  TableBody as HeroUITableBody,
+  TableCell as HeroUITableCell,
+  TableColumn as HeroUITableColumn,
+  TableHeader as HeroUITableHeader,
+  TableRow as HeroUITableRow,
+} from "@heroui/table";
 
 export const IBaseTablePrimitive = HeroUITable;
 export const IBaseTableHeader = HeroUITableHeader;

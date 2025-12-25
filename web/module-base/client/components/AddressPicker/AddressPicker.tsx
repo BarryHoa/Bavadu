@@ -1,20 +1,17 @@
 "use client";
-import { IBaseButton } from "@base/client/components";
+import type { Address, countryCode } from "@base/client/interface/Address";
+import type { LocalizeText } from "@base/client/interface/LocalizeText";
 
 import {
+  IBaseButton,
+  IBaseInput,
   IBaseModal,
   IBaseModalBody,
   IBaseModalContent,
   IBaseModalFooter,
   IBaseModalHeader,
-  IBaseTooltip,
-} from "@base/client/components";
-import type { Address, countryCode } from "@base/client/interface/Address";
-import type { LocalizeText } from "@base/client/interface/LocalizeText";
-
-import {
-  IBaseInput,
   IBaseSingleSelect,
+  IBaseTooltip,
   SelectItemOption,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
@@ -29,10 +26,10 @@ import { useMemo, useState } from "react";
 // @ts-ignore
 // dynamic import PickerAddressByCountryUS
 const PickerAddressByCountryUS = dynamic(
-  () => import("./PickerAddressByCountryUS"),
+  () => import("./PickerAddressByCountryUS")
 );
 const PickerAddressByCountryVN = dynamic(
-  () => import("./PickerAddressByCountryVN"),
+  () => import("./PickerAddressByCountryVN")
 );
 
 export interface AddressPickerProps {
@@ -78,7 +75,7 @@ export default function AddressPicker({
   }, [countries, getLocalizedName]);
 
   const [selectedCountryCode, setSelectedCountryCode] = useState<countryCode>(
-    value?.country?.code ?? "VN",
+    value?.country?.code ?? "VN"
   );
 
   const [tempAddress, setTempAddress] = useState<Address>({
@@ -268,7 +265,11 @@ export default function AddressPicker({
                 </div>
               </IBaseModalBody>
               <IBaseModalFooter>
-                <IBaseButton size="sm" variant="bordered" onPress={handleCancel}>
+                <IBaseButton
+                  size="sm"
+                  variant="bordered"
+                  onPress={handleCancel}
+                >
                   {tCommon("modal.buttons.cancel")}
                 </IBaseButton>
                 <IBaseButton

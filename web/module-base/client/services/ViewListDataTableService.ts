@@ -1,4 +1,4 @@
-import { ListParamsResponse } from "@base/server/models/interfaces/ListInterface";
+import { ListParamsResponse } from "@base/shared/interface/ListInterface";
 
 import JsonRpcClientService from "./JsonRpcClientService";
 

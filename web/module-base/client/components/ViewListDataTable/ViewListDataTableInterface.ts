@@ -2,7 +2,7 @@ import { IBaseButtonProps } from "@base/client/components";
 import type { IBaseTableProps } from "../IBaseTable/IBaseTableInterface";
 
 import { LinkProps } from "@heroui/link";
-import { LocaleDataType } from "@base/server";
+import { LocaleDataType } from "@base/shared/interface/Locale";
 import { ReactNode } from "react";
 
 import { FilterOption } from "./components/FilterMenu";

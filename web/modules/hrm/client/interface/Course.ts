@@ -1,4 +1,4 @@
-import type { LocaleDataType } from "@base/server/interfaces/Locale";
+import type { LocaleDataType } from "@base/shared/interface/Locale";
 
 export interface CourseDto {
   id: string;

@@ -1,4 +1,4 @@
-import type { ListParamsResponse } from "@base/server/models/interfaces/ListInterface";
+import type { ListParamsResponse } from "@base/shared/interface/ListInterface";
 
 import {
   ProductMasterEnum,

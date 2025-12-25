@@ -2,8 +2,8 @@ import type { Column } from "drizzle-orm";
 import type {
   ListParamsRequest,
   ListParamsResponse,
-} from "@base/server/models/interfaces/ListInterface";
-import type { ParamFilter } from "@base/server/models/interfaces/FilterInterface";
+} from "@base/shared/interface/ListInterface";
+import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 
 import { ilike } from "drizzle-orm";
 import {

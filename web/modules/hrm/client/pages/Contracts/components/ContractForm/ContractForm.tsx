@@ -1,29 +1,24 @@
+import { useTranslations } from "next-intl";
+import { useForm } from "react-hook-form";
+
 import {
   IBaseButton,
   IBaseCard,
   IBaseCardBody,
-  IBaseCardFooter,
-  IBaseCardHeader,
-  IBaseCheckbox,
   IBaseDatePicker,
   IBaseInput,
   IBaseSingleSelect,
   IBaseSingleSelectAsync,
-  IBaseTabs,
-  IBaseTab,
   IBaseTextarea,
 } from "@base/client/components";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { useTranslations } from "next-intl";
-import { useMemo } from "react";
-import { useForm } from "react-hook-form";
 
-import { ContractDto } from "../../../../server/models/Contract";
+import { Contract } from "../../../../interface/Contract";
 
 export interface ContractFormProps {
   id?: string;
-  initialData?: ContractDto;
+  initialData?: Contract;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
@@ -36,14 +31,14 @@ export default function ContractForm({
 }: ContractFormProps) {
   const t = useTranslations("hrm.contracts");
   const tCommon = useTranslations("common.actions");
-  const { getLocalizedText } = useLocalizedText();
+  const getLocalizedText = useLocalizedText();
 
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<ContractDto>({
+  } = useForm<Contract>({
     defaultValues: initialData || {
       status: "draft",
     },
@@ -55,7 +50,7 @@ export default function ContractForm({
     onSuccess,
   });
 
-  const onSubmit = (data: ContractDto) => {
+  const onSubmit = (data: Contract) => {
     save(data);
   };
 

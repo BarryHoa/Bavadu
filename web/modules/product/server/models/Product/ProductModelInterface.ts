@@ -1,5 +1,5 @@
 import { ParamFilter } from "@base/server";
-import { LocaleDataType } from "@base/server/interfaces/Locale";
+import { LocaleDataType } from "@base/shared/interface/Locale";
 
 import { ProductAttribute } from "../interfaces/ProductAttribute";
 import {

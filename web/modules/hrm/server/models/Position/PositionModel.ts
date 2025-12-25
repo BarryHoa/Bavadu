@@ -1,4 +1,4 @@
-import { LocaleDataType } from "@base/server/interfaces/Locale";
+import { LocaleDataType } from "@base/shared/interface/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";

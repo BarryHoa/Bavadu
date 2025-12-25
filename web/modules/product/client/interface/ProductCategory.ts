@@ -1,4 +1,4 @@
-import { LocaleDataType } from "@base/server/interfaces/Locale";
+import { LocaleDataType } from "@base/shared/interface/Locale";
 
 export type ProductCategoryRow = {
   id: string;

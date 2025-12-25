@@ -1,7 +1,7 @@
 import type {
   ListParamsRequest,
   ListParamsResponse,
-} from "@base/server/models/interfaces/ListInterface";
+} from "@base/shared/interface/ListInterface";
 
 import { ProductMasterFeaturesEnum } from "../interfaces/ProductMaster";
 

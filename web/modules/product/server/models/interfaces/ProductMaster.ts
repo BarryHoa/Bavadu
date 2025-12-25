@@ -2,7 +2,7 @@
 // Product Master Type
 // ========================================
 
-import { LocaleDataType } from "@base/server/interfaces/Locale";
+import { LocaleDataType } from "@base/shared/interface/Locale";
 import { User } from "@base/server/interfaces/User";
 
 import { ProductAttribute } from "./ProductAttribute";

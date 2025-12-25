@@ -1,7 +1,7 @@
 import type {
   ListParamsRequest,
   ListParamsResponse,
-} from "@base/server/models/interfaces/ListInterface";
+} from "@base/shared/interface/ListInterface";
 import type { RoleRow } from "./RoleModel";
 
 import {
@@ -13,7 +13,7 @@ import {
 import { eq, ilike, sql } from "drizzle-orm";
 
 import { base_tb_roles } from "../../schemas/base.role";
-import { ParamFilter } from "../interfaces/FilterInterface";
+import { ParamFilter } from "@base/shared/interface/FilterInterface";
 
 class RoleViewListModel extends BaseViewListModel<
   typeof base_tb_roles,

@@ -1,3 +1,6 @@
+import { useTranslations } from "next-intl";
+import { useForm } from "react-hook-form";
+
 import {
   IBaseButton,
   IBaseCard,
@@ -6,20 +9,17 @@ import {
   IBaseInput,
   IBaseSingleSelect,
   IBaseSingleSelectAsync,
-  IBaseTabs,
   IBaseTab,
+  IBaseTabs,
 } from "@base/client/components";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { useTranslations } from "next-intl";
-import { useMemo } from "react";
-import { useForm } from "react-hook-form";
 
-import { EmployeeDto } from "../../../../server/models/Employee";
+import { Employee } from "../../../../interface/Employee";
 
 export interface EmployeeFormProps {
   id?: string;
-  initialData?: EmployeeDto;
+  initialData?: Employee;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
@@ -32,14 +32,14 @@ export default function EmployeeForm({
 }: EmployeeFormProps) {
   const t = useTranslations("hrm.employees");
   const tCommon = useTranslations("common.actions");
-  const { getLocalizedText } = useLocalizedText();
+  const getLocalizedText = useLocalizedText();
 
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<EmployeeDto>({
+  } = useForm<Employee>({
     defaultValues: initialData || {
       status: "active",
     },
@@ -51,7 +51,7 @@ export default function EmployeeForm({
     onSuccess,
   });
 
-  const onSubmit = (data: EmployeeDto) => {
+  const onSubmit = (data: Employee) => {
     save(data);
   };
 
@@ -83,10 +83,7 @@ export default function EmployeeForm({
                   label={t("fields.email")}
                   type="email"
                 />
-                <IBaseInput
-                  {...register("phone")}
-                  label={t("fields.phone")}
-                />
+                <IBaseInput {...register("phone")} label={t("fields.phone")} />
               </div>
               <IBaseDatePicker
                 control={control}
