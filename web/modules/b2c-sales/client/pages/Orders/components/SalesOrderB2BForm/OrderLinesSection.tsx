@@ -1,14 +1,14 @@
 "use client";
-import { IBaseButton, IBaseCard, IBaseDivider } from "@base/client/components";
 
 import {
-  IBaseCardBody,
   IBaseInputNumber,
   IBaseSingleSelect,
   IBaseSingleSelectAsync,
   SelectItemOption,
 } from "@base/client/components";
 import ClientHttpService from "@base/client/services/ClientHttpService";
+import { Button } from "@heroui/button";
+import { Card, CardBody, Divider } from "@heroui/react";
 import { Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo } from "react";
@@ -144,14 +144,14 @@ export default function OrderLinesSection({
         };
 
         return (
-          <IBaseCard key={fieldItem.id} className="border border-content3/40">
-            <IBaseCardBody className="p-3 space-y-2">
+          <Card key={fieldItem.id} className="border border-content3/40">
+            <CardBody className="p-3 space-y-2">
               {/* Header with line number and remove button */}
               <div className="flex items-center justify-between pb-1">
                 <h3 className="text-xs font-medium text-default-500">
                   {t("line")} {index + 1}
                 </h3>
-                <IBaseButton
+                <Button
                   isIconOnly
                   aria-label={t("removeLine")}
                   className="min-w-6 h-6"
@@ -162,10 +162,10 @@ export default function OrderLinesSection({
                   onPress={() => remove(index)}
                 >
                   <Trash2 size={14} />
-                </IBaseButton>
+                </Button>
               </div>
 
-              {/* IBaseInput Fields */}
+              {/* Input Fields */}
               <div className="grid gap-2 grid-cols-1 md:grid-cols-3 lg:flex">
                 {/* Product - flex-grow on lg, full width on md */}
                 <div className="md:col-span-3 lg:flex-1 lg:min-w-[200px]">
@@ -317,7 +317,7 @@ export default function OrderLinesSection({
                 </div>
               </div>
 
-              <IBaseDivider className="my-1" />
+              <Divider className="my-1" />
 
               {/* Line Summary */}
               <div className="bg-content2 rounded-lg py-1 px-2">
@@ -356,20 +356,20 @@ export default function OrderLinesSection({
                   </div>
                 </div>
               </div>
-            </IBaseCardBody>
-          </IBaseCard>
+            </CardBody>
+          </Card>
         );
       })}
 
       <div className="flex justify-end">
-        <IBaseButton
+        <Button
           color="primary"
           size="sm"
           variant="solid"
           onPress={() => append(defaultLine)}
         >
           {t("addLine")}
-        </IBaseButton>
+        </Button>
       </div>
 
       {errors?.lines?.message ? (

@@ -1,24 +1,22 @@
 "use client";
 
-import {
-  IBaseTable,
-  IBaseTableBody,
-  IBaseTableCell,
-  IBaseTableColumn,
-  IBaseTableHeader,
-  IBaseTableRow,
-} from "@base/client/components";
-import {
-  IBaseButton,
-  IBaseCard,
-  IBaseCardBody,
-  IBaseChip,
-  IBaseDivider,
-  IBaseInput,
-  IBaseSpinner,
-} from "@base/client/components";
+import { IBaseInput } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { Button } from "@heroui/button";
+import {
+  Card,
+  CardBody,
+  Chip,
+  Divider,
+  Spinner,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+} from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -142,14 +140,14 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
         <div className="rounded-medium border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-600">
           Purchase order identifier is missing.
         </div>
-        <IBaseButton
+        <Button
           as={LinkAs as any}
           href="/workspace/modules/purchase"
           size="sm"
           variant="light"
         >
           Back to list
-        </IBaseButton>
+        </Button>
       </div>
     );
   }
@@ -157,7 +155,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
   if (orderQuery.isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <IBaseSpinner label="Loading purchase order..." />
+        <Spinner label="Loading purchase order..." />
       </div>
     );
   }
@@ -170,14 +168,14 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
             ? orderQuery.error.message
             : "Failed to fetch purchase order."}
         </div>
-        <IBaseButton
+        <Button
           as={LinkAs as any}
           href="/workspace/modules/purchase"
           size="sm"
           variant="light"
         >
           Back to list
-        </IBaseButton>
+        </Button>
       </div>
     );
   }
@@ -186,14 +184,14 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
     return (
       <div className="space-y-4">
         <p className="text-default-500">Purchase order not found.</p>
-        <IBaseButton
+        <Button
           as={LinkAs as any}
           href="/workspace/modules/purchase"
           size="sm"
           variant="light"
         >
           Back to list
-        </IBaseButton>
+        </Button>
       </div>
     );
   }
@@ -201,14 +199,14 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
   return (
     <div className="space-y-6">
       <div className="flex justify-end">
-        <IBaseButton
+        <Button
           as={LinkAs as any}
           href="/workspace/modules/purchase"
           size="sm"
           variant="light"
         >
           Back to list
-        </IBaseButton>
+        </Button>
       </div>
 
       {actionError ? (
@@ -217,70 +215,70 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
         </div>
       ) : null}
 
-      <IBaseCard>
-        <IBaseCardBody className="space-y-3">
+      <Card>
+        <CardBody className="space-y-3">
           <div className="flex flex-wrap items-center gap-3">
-            <IBaseChip color="primary" variant="flat">
+            <Chip color="primary" variant="flat">
               Status: {order.status}
-            </IBaseChip>
-            <IBaseChip variant="flat">
+            </Chip>
+            <Chip variant="flat">
               Expected:{" "}
               {order.expectedDate
                 ? new Date(order.expectedDate).toLocaleDateString()
                 : "—"}
-            </IBaseChip>
-            <IBaseChip variant="flat">
+            </Chip>
+            <Chip variant="flat">
               Total:{" "}
               {Number(order.totalAmount || 0).toLocaleString(undefined, {
                 style: "currency",
                 currency: order.currency || "USD",
               })}
-            </IBaseChip>
-            <IBaseChip variant="flat">Vendor: {order.vendorName}</IBaseChip>
+            </Chip>
+            <Chip variant="flat">Vendor: {order.vendorName}</Chip>
           </div>
           {order.notes ? (
             <p className="text-default-500">Notes: {order.notes}</p>
           ) : null}
-        </IBaseCardBody>
-      </IBaseCard>
+        </CardBody>
+      </Card>
 
-      <IBaseCard>
-        <IBaseCardBody className="space-y-3">
+      <Card>
+        <CardBody className="space-y-3">
           <h2 className="text-lg font-semibold">Lines</h2>
-          <IBaseTable removeWrapper aria-label="Purchase order lines">
-            <IBaseTableHeader>
-              <IBaseTableColumn>Product</IBaseTableColumn>
-              <IBaseTableColumn>Description</IBaseTableColumn>
-              <IBaseTableColumn>Ordered</IBaseTableColumn>
-              <IBaseTableColumn>Received</IBaseTableColumn>
-              <IBaseTableColumn>Unit Price</IBaseTableColumn>
-            </IBaseTableHeader>
-            <IBaseTableBody>
+          <Table removeWrapper aria-label="Purchase order lines">
+            <TableHeader>
+              <TableColumn>Product</TableColumn>
+              <TableColumn>Description</TableColumn>
+              <TableColumn>Ordered</TableColumn>
+              <TableColumn>Received</TableColumn>
+              <TableColumn>Unit Price</TableColumn>
+            </TableHeader>
+            <TableBody>
               {lines.map((line) => (
-                <IBaseTableRow key={line.id}>
-                  <IBaseTableCell>{line.productId}</IBaseTableCell>
-                  <IBaseTableCell>{line.description || "—"}</IBaseTableCell>
-                  <IBaseTableCell>
+                <TableRow key={line.id}>
+                  <TableCell>{line.productId}</TableCell>
+                  <TableCell>{line.description || "—"}</TableCell>
+                  <TableCell>
                     {Number(line.quantityOrdered).toFixed(2)}
-                  </IBaseTableCell>
-                  <IBaseTableCell>
+                  </TableCell>
+                  <TableCell>
                     {Number(line.quantityReceived).toFixed(2)}
-                  </IBaseTableCell>
-                  <IBaseTableCell>
+                  </TableCell>
+                  <TableCell>
                     {Number(line.unitPrice).toLocaleString(undefined, {
                       style: "currency",
                       currency: order.currency || "USD",
                     })}
-                  </IBaseTableCell>
-                </IBaseTableRow>
+                  </TableCell>
+                </TableRow>
               ))}
-            </IBaseTableBody>
-          </IBaseTable>
-        </IBaseCardBody>
-      </IBaseCard>
+            </TableBody>
+          </Table>
+        </CardBody>
+      </Card>
 
       <div className="flex items-center gap-3">
-        <IBaseButton
+        <Button
           color="primary"
           isDisabled={order.status !== "draft"}
           isLoading={isConfirming}
@@ -288,20 +286,20 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
           onPress={() => confirmOrder(orderId)}
         >
           Confirm order
-        </IBaseButton>
-        <IBaseButton
+        </Button>
+        <Button
           size="sm"
           variant="light"
           onPress={() => router.push("/workspace/modules/stock")}
         >
           Go to stock dashboard
-        </IBaseButton>
+        </Button>
       </div>
 
-      <IBaseDivider />
+      <Divider />
 
-      <IBaseCard>
-        <IBaseCardBody className="space-y-4">
+      <Card>
+        <CardBody className="space-y-4">
           <div>
             <h2 className="text-lg font-semibold">Receive products</h2>
             <p className="text-default-500">
@@ -376,7 +374,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
             </div>
           )}
 
-          <IBaseButton
+          <Button
             color="primary"
             isDisabled={pendingLines.length === 0}
             isLoading={isReceiving}
@@ -405,9 +403,9 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
             }}
           >
             Receive selected quantities
-          </IBaseButton>
-        </IBaseCardBody>
-      </IBaseCard>
+          </Button>
+        </CardBody>
+      </Card>
     </div>
   );
 }

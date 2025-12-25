@@ -1,7 +1,8 @@
 "use client";
 
-import { IBaseButton, IBaseCard, IBaseCardBody } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { Button } from "@heroui/button";
+import { Card, CardBody } from "@heroui/react";
 import { contractService } from "@mdl/hrm/client/services/ContractService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -41,14 +42,14 @@ export default function ContractViewPage(): React.ReactNode {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">{t("title")}</h1>
         <div className="flex gap-2">
-          <IBaseButton
+          <Button
             size="sm"
             variant="light"
             onPress={() => router.push("/workspace/modules/hrm/contracts")}
           >
             {t("backToList")}
-          </IBaseButton>
-          <IBaseButton
+          </Button>
+          <Button
             color="primary"
             size="sm"
             onPress={() =>
@@ -56,12 +57,12 @@ export default function ContractViewPage(): React.ReactNode {
             }
           >
             {t("edit")}
-          </IBaseButton>
+          </Button>
         </div>
       </div>
 
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
+      <Card>
+        <CardBody className="p-4">
           <h2 className="text-base font-semibold mb-4">{t("basicInfo")}</h2>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
@@ -106,8 +107,8 @@ export default function ContractViewPage(): React.ReactNode {
               </div>
             </div>
           </div>
-        </IBaseCardBody>
-      </IBaseCard>
+        </CardBody>
+      </Card>
     </div>
   );
 }

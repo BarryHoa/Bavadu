@@ -2,7 +2,7 @@
 
 import type { ProductCategoryRow } from "../../interface/ProductCategory";
 
-import { IBaseButton } from "@base/client/components";
+import { Button } from "@heroui/button";
 import { addToast } from "@heroui/toast";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
@@ -108,7 +108,7 @@ const ProductCategoryCreatePage = (): React.ReactNode => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
-        <IBaseButton
+        <Button
           isDisabled={createMutation.isPending}
           size="sm"
           startContent={<ArrowLeft size={14} />}
@@ -116,7 +116,7 @@ const ProductCategoryCreatePage = (): React.ReactNode => {
           onPress={navigateToList}
         >
           Back
-        </IBaseButton>
+        </Button>
       </div>
 
       <ProductCategoryForm

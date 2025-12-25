@@ -1,14 +1,14 @@
 "use client";
 
+import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import {
-  IBaseChip,
-  I_BASE_TABLE_COLUMN_KEY_ACTION,
-  IBaseTableColumnDefinition,
+  DATA_TABLE_COLUMN_KEY_ACTION,
+  DataTableColumn,
   ViewListDataTable,
 } from "@base/client/components";
-import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import LinkAs from "@base/client/components/LinkAs";
 import { formatDate } from "@base/client/utils/date/formatDate";
+import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { CandidateDto } from "@mdl/hrm/client/interface/Candidate";
@@ -21,11 +21,11 @@ type CandidateRow = CandidateDto & {
 };
 
 export default function CandidatesListPage(): React.ReactNode {
-  const tIBaseTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("dataTable");
   const t = useTranslations("hrm.candidates");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<IBaseTableColumnDefinition<CandidateRow>[]>(
+  const columns = useMemo<DataTableColumn<CandidateRow>[]>(
     () => [
       {
         key: "fullName",
@@ -57,9 +57,9 @@ export default function CandidatesListPage(): React.ReactNode {
         key: "status",
         label: t("labels.status"),
         render: (value) => (
-          <IBaseChip className="capitalize" size="sm" variant="flat">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value || "applied"}
-          </IBaseChip>
+          </Chip>
         ),
       },
       {
@@ -78,8 +78,8 @@ export default function CandidatesListPage(): React.ReactNode {
         render: (value) => formatDate(value),
       },
       {
-        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
-        label: tIBaseTable("columns.action"),
+        key: DATA_TABLE_COLUMN_KEY_ACTION,
+        label: tDataTable("columns.action"),
         align: "end",
         render: (_, row) => {
           if (!row?.id) return null;
@@ -90,7 +90,7 @@ export default function CandidatesListPage(): React.ReactNode {
               actions={[
                 {
                   key: "view",
-                  label: tIBaseTable("columns.view"),
+                  label: tDataTable("columns.view"),
                   href: viewLink,
                 },
               ]}
@@ -99,7 +99,7 @@ export default function CandidatesListPage(): React.ReactNode {
         },
       },
     ],
-    [tIBaseTable, t, getLocalizedText],
+    [tDataTable, t, getLocalizedText],
   );
 
   return (

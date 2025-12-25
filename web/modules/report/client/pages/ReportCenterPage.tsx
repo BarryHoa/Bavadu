@@ -1,6 +1,7 @@
 "use client";
 
-import { IBaseCard, IBaseTabs, IBaseTab } from "@base/client/components";
+import { IBaseTabs, Tab } from "@base/client/components";
+import { Card } from "@heroui/card";
 import ReactECharts from "echarts-for-react";
 
 const overviewOption: echarts.EChartsOption = {
@@ -44,8 +45,8 @@ export default function ReportCenterPage() {
       </div>
 
       <IBaseTabs aria-label="Report groups" color="primary">
-        <IBaseTab key="overview" title="Overview">
-          <IBaseCard className="p-4">
+        <Tab key="overview" title="Overview">
+          <Card className="p-4">
             <div className="mb-3 text-sm font-medium text-slate-700">
               Sales over time (sample)
             </div>
@@ -55,16 +56,16 @@ export default function ReportCenterPage() {
               option={overviewOption}
               style={{ width: "100%", height: 360 }}
             />
-          </IBaseCard>
-        </IBaseTab>
+          </Card>
+        </Tab>
 
-        <IBaseTab key="inventory" title="Inventory">
-          <IBaseCard className="p-4">
+        <Tab key="inventory" title="Inventory">
+          <Card className="p-4">
             <div className="text-sm text-slate-500">
               Bạn có thể thêm biểu đồ tồn kho, vòng quay kho, v.v. ở đây.
             </div>
-          </IBaseCard>
-        </IBaseTab>
+          </Card>
+        </Tab>
       </IBaseTabs>
     </div>
   );

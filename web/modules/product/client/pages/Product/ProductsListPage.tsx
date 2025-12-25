@@ -1,13 +1,17 @@
 "use client";
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
 
-import { IBaseChip, I_BASE_TABLE_COLUMN_KEY_ACTION, IBaseTableColumnDefinition } from "@base/client/components";
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
+import {
+  DATA_TABLE_COLUMN_KEY_ACTION,
+  DataTableColumn,
+} from "@base/client/components";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
 import LinkAs from "@base/client/components/LinkAs";
+import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import React, { useMemo } from "react";
 
@@ -19,7 +23,7 @@ export default function ProductsListPage(): React.ReactNode {
   const localized = useLocalizedText();
   const t = useTranslations("dataTable");
   const tProduct = useTranslations("mdl-product");
-  const columns = useMemo<IBaseTableColumnDefinition<ProductRow>[]>(() => {
+  const columns = useMemo<DataTableColumn<ProductRow>[]>(() => {
     return [
       {
         key: "name",
@@ -92,13 +96,13 @@ export default function ProductsListPage(): React.ReactNode {
         maxWidth: 120,
         render: (_, row) => {
           return (
-            <IBaseChip
+            <Chip
               color={row.isActive ? "success" : "danger"}
               size="sm"
               variant="flat"
             >
               {row.isActive ? "Active" : "Inactive"}
-            </IBaseChip>
+            </Chip>
           );
         },
       },
@@ -147,7 +151,7 @@ export default function ProductsListPage(): React.ReactNode {
         render: (_, row) => formatDate(row.updatedAt),
       },
       {
-        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
+        key: DATA_TABLE_COLUMN_KEY_ACTION,
         label: t("columns.action"),
         align: "end",
         minWidth: 80,

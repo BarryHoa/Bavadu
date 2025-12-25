@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  IBaseDatePicker,
   IBaseInput,
   IBaseInputNumber,
   IBaseSingleSelectAsync,
@@ -51,7 +50,7 @@ export default function DeliveryInfoSection({
                   if (!field.value && data?.data?.length > 0) {
                     // Prefer payment method with value 'CASH' if present; else fallback
                     const cashItem = data.data.find(
-                      (item: any) => item.code === "CASH"
+                      (item: any) => item.code === "CASH",
                     );
 
                     if (cashItem) {
@@ -87,7 +86,7 @@ export default function DeliveryInfoSection({
                   if (!field.value && data?.data?.length > 0) {
                     // find pickup value in data.data
                     const pickupValue = data.data.find(
-                      (item: any) => item.code === "pickup"
+                      (item: any) => item.code === "pickup",
                     );
 
                     if (pickupValue) {
@@ -155,13 +154,15 @@ export default function DeliveryInfoSection({
               control={control}
               name="expectedDate"
               render={({ field, fieldState }) => (
-                <IBaseDatePicker
+                <IBaseInput
+                  {...field}
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={t("deliveryDate")}
                   size="sm"
+                  type="date"
                   value={field.value ?? ""}
-                  onChange={(value) => field.onChange(value ?? "")}
+                  onValueChange={field.onChange}
                 />
               )}
             />

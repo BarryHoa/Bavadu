@@ -1,17 +1,18 @@
 "use client";
 
-import { IBaseButton, IBaseCard, IBaseTextarea } from "@base/client/components";
 import {
-  IBaseCardBody,
-  IBaseDatePicker,
   IBaseInput,
   IBaseInputNumber,
   IBaseSingleSelectAsync,
+  DatePicker,
 } from "@base/client/components";
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { parseDate } from "@internationalized/date";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+import { Button } from "@heroui/button";
+import { Card, CardBody, Textarea } from "@heroui/react";
 
 import {
   createPerformanceReviewValidation,
@@ -68,11 +69,11 @@ export default function PerformanceReviewForm({
 
       <div className="sticky top-0 z-10 flex justify-end gap-3 py-2 mb-3 bg-background border-b border-divider -mx-4 px-4">
         {onCancel && (
-          <IBaseButton size="sm" variant="light" onPress={onCancel}>
+          <Button size="sm" variant="light" onPress={onCancel}>
             {tCommon("actions.cancel")}
-          </IBaseButton>
+          </Button>
         )}
-        <IBaseButton
+        <Button
           color="primary"
           disabled={isSubmitting}
           isLoading={isSubmitting}
@@ -80,11 +81,11 @@ export default function PerformanceReviewForm({
           type="submit"
         >
           {tCommon("actions.save")}
-        </IBaseButton>
+        </Button>
       </div>
 
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
+      <Card>
+        <CardBody className="p-4">
           <h2 className="text-base font-semibold mb-2">{t("generalInfo")}</h2>
           <div className="grid gap-2 md:grid-cols-2">
             <Controller
@@ -142,13 +143,21 @@ export default function PerformanceReviewForm({
               control={control}
               name="reviewDate"
               render={({ field, fieldState }) => (
-                <IBaseDatePicker
+                <DatePicker
                   isRequired
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={t("labels.reviewDate")}
-                  value={field.value ? String(field.value) : null}
-                  onChange={(val) => field.onChange(val)}
+                  value={
+                    field.value
+                      ? typeof field.value === "string"
+                        ? parseDate(field.value)
+                        : field.value
+                      : null
+                  }
+                  onChange={(val) =>
+                    field.onChange(val ? val.toString() : null)
+                  }
                 />
               )}
             />
@@ -209,7 +218,7 @@ export default function PerformanceReviewForm({
               name="strengths"
               render={({ field, fieldState }) => (
                 <div className="md:col-span-2">
-                  <IBaseTextarea
+                  <Textarea
                     {...field}
                     errorMessage={fieldState.error?.message}
                     isInvalid={fieldState.invalid}
@@ -226,7 +235,7 @@ export default function PerformanceReviewForm({
               name="areasForImprovement"
               render={({ field, fieldState }) => (
                 <div className="md:col-span-2">
-                  <IBaseTextarea
+                  <Textarea
                     {...field}
                     errorMessage={fieldState.error?.message}
                     isInvalid={fieldState.invalid}
@@ -243,7 +252,7 @@ export default function PerformanceReviewForm({
               name="feedback"
               render={({ field, fieldState }) => (
                 <div className="md:col-span-2">
-                  <IBaseTextarea
+                  <Textarea
                     {...field}
                     errorMessage={fieldState.error?.message}
                     isInvalid={fieldState.invalid}
@@ -260,7 +269,7 @@ export default function PerformanceReviewForm({
               name="employeeComments"
               render={({ field, fieldState }) => (
                 <div className="md:col-span-2">
-                  <IBaseTextarea
+                  <Textarea
                     {...field}
                     errorMessage={fieldState.error?.message}
                     isInvalid={fieldState.invalid}
@@ -273,8 +282,8 @@ export default function PerformanceReviewForm({
               )}
             />
           </div>
-        </IBaseCardBody>
-      </IBaseCard>
+        </CardBody>
+      </Card>
     </form>
   );
 }

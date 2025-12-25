@@ -2,9 +2,7 @@
 
 import type { MasterFieldValue } from "./types";
 
-import { IBaseCheckbox } from "@base/client/components";
 import {
-  IBaseCheckboxGroup,
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseSingleSelect,
@@ -15,6 +13,7 @@ import {
   SelectItemOption,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { Checkbox, CheckboxGroup } from "@heroui/react";
 import { HelpCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
@@ -28,7 +27,7 @@ import {
   REQUIRED_FEATURES_BY_TYPE,
 } from "../../../utils/product-features-validator";
 
-type MasterIBaseTabProps = {
+type MasterTabProps = {
   value: MasterFieldValue;
   categoryOptions: SelectItemOption[];
   featureOptions: { value: string; label: string }[];
@@ -54,7 +53,7 @@ export default function MasterTab({
   isBusy,
   categoryQueryLoading,
   onUpdate,
-}: MasterIBaseTabProps) {
+}: MasterTabProps) {
   const t = useTranslations("common");
   const tProduct = useTranslations("mdl-product");
   const getLocalizedText = useLocalizedText();
@@ -179,7 +178,7 @@ export default function MasterTab({
             />
           </IBaseTooltip>
         </div>
-        <IBaseCheckboxGroup
+        <CheckboxGroup
           classNames={{ wrapper: "flex flex-wrap gap-3" }}
           isDisabled={isBusy}
           orientation="horizontal"
@@ -232,7 +231,7 @@ export default function MasterTab({
             );
 
             return (
-              <IBaseCheckbox
+              <Checkbox
                 key={feature.value}
                 classNames={{
                   label: isRequired ? "text-danger font-medium" : "",
@@ -248,10 +247,10 @@ export default function MasterTab({
                 value={feature.value as ProductMasterFeatures}
               >
                 {feature.label}
-              </IBaseCheckbox>
+              </Checkbox>
             );
           })}
-        </IBaseCheckboxGroup>
+        </CheckboxGroup>
       </div>
 
       <IBaseTextarea

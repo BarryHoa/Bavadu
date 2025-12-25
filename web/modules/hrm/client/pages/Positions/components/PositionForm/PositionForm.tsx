@@ -2,9 +2,7 @@
 
 import type { PositionFormValues } from "../../validation/positionValidation";
 
-import { IBaseButton, IBaseCard } from "@base/client/components";
 import {
-  IBaseCardBody,
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseSingleSelectAsync,
@@ -13,6 +11,8 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+import { Button } from "@heroui/button";
+import { Card, CardBody } from "@heroui/react";
 
 import { createPositionValidation } from "../../validation/positionValidation";
 
@@ -64,11 +64,11 @@ export default function PositionForm({
 
       <div className="sticky top-0 z-10 flex justify-end gap-3 py-2 mb-3 bg-background border-b border-divider -mx-4 px-4">
         {onCancel && (
-          <IBaseButton size="sm" variant="light" onPress={onCancel}>
+          <Button size="sm" variant="light" onPress={onCancel}>
             {tLabels("cancel")}
-          </IBaseButton>
+          </Button>
         )}
-        <IBaseButton
+        <Button
           color="primary"
           disabled={isSubmitting}
           isLoading={isSubmitting}
@@ -76,11 +76,11 @@ export default function PositionForm({
           type="submit"
         >
           {tLabels("save")}
-        </IBaseButton>
+        </Button>
       </div>
 
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
+      <Card>
+        <CardBody className="p-4">
           <h2 className="text-base font-semibold mb-4">
             {tLabels("basicInfo")}
           </h2>
@@ -212,8 +212,8 @@ export default function PositionForm({
               )}
             />
           </div>
-        </IBaseCardBody>
-      </IBaseCard>
+        </CardBody>
+      </Card>
     </form>
   );
 }

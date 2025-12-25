@@ -1,6 +1,7 @@
 "use client";
 
-import { IBaseDivider, IBaseInputNumber } from "@base/client/components";
+import { IBaseInputNumber } from "@base/client/components";
+import { Divider } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { Control, Controller } from "react-hook-form";
 
@@ -117,7 +118,7 @@ export default function OrderTotalsSection({
                 <span>{formatCurrency(calculatedTotals.shipping)}</span>
               </div>
             )}
-            <IBaseDivider />
+            <Divider />
             <div className="flex justify-between items-center">
               <span className="text-base font-semibold">
                 {t("grandTotal")}:

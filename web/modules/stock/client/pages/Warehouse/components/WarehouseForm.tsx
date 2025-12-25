@@ -1,11 +1,11 @@
 import {
-  IBaseButton,
   IBaseInput,
   IBaseSingleSelect,
   SelectItemOption,
-  IBaseTextarea,
 } from "@base/client/components";
 import AddressPicker from "@base/client/components/AddressPicker/AddressPicker";
+import { Button } from "@heroui/button";
+import { Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { type Key, type ReactNode, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -541,7 +541,7 @@ export default function WarehouseForm({
           control={control}
           name="notes"
           render={({ field, fieldState }) => (
-            <IBaseTextarea
+            <Textarea
               {...field}
               errorMessage={fieldState.error?.message}
               isInvalid={fieldState.invalid}
@@ -556,14 +556,14 @@ export default function WarehouseForm({
         <div className="flex flex-col-reverse gap-3 md:flex-row md:items-center md:justify-between">
           {secondaryAction && <div>{secondaryAction}</div>}
           <div className="flex gap-3">
-            <IBaseButton
+            <Button
               color="primary"
               disabled={isSubmitting}
               isLoading={isSubmitting}
               type="submit"
             >
               {submitLabel}
-            </IBaseButton>
+            </Button>
           </div>
         </div>
       </form>

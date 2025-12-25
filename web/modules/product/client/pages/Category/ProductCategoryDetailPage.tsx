@@ -3,13 +3,9 @@
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import type { ProductCategoryRow } from "../../interface/ProductCategory";
 
-import {
-  IBaseButton,
-  IBaseCard,
-  IBaseCardBody,
-  IBaseDivider,
-  IBaseSpinner,
-} from "@base/client/components";
+import { Button } from "@heroui/button";
+import { Card, CardBody, Divider } from "@heroui/react";
+import { Spinner } from "@heroui/spinner";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -80,23 +76,23 @@ const ProductCategoryDetailPage = (): React.ReactNode => {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <IBaseButton
+        <Button
           size="sm"
           startContent={<ArrowLeft size={14} />}
           variant="light"
           onPress={() => router.back()}
         >
           Back to categories
-        </IBaseButton>
+        </Button>
       </div>
 
-      <IBaseCard>
-        <IBaseCardBody className="space-y-4">
+      <Card>
+        <CardBody className="space-y-4">
           {!categoryId ? (
             <p className="text-default-500">No category selected.</p>
           ) : isLoading ? (
             <div className="flex items-center gap-2 text-default-500">
-              <IBaseSpinner size="sm" />
+              <Spinner size="sm" />
               <span>Loading category details...</span>
             </div>
           ) : isError ? (
@@ -106,9 +102,9 @@ const ProductCategoryDetailPage = (): React.ReactNode => {
                   ? error.message
                   : "Failed to load category."}
               </p>
-              <IBaseButton size="sm" variant="bordered" onPress={() => refetch()}>
+              <Button size="sm" variant="bordered" onPress={() => refetch()}>
                 Retry
-              </IBaseButton>
+              </Button>
             </div>
           ) : (
             <>
@@ -127,7 +123,7 @@ const ProductCategoryDetailPage = (): React.ReactNode => {
 
               {category?.description ? (
                 <>
-                  <IBaseDivider />
+                  <Divider />
                   <div>
                     <p className="text-xs uppercase text-default-400">
                       Description
@@ -140,8 +136,8 @@ const ProductCategoryDetailPage = (): React.ReactNode => {
               ) : null}
             </>
           )}
-        </IBaseCardBody>
-      </IBaseCard>
+        </CardBody>
+      </Card>
     </div>
   );
 };

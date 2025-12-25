@@ -1,9 +1,13 @@
 "use client";
 
-import { IBaseChip, I_BASE_TABLE_COLUMN_KEY_ACTION, IBaseTableColumnDefinition } from "@base/client/components";
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
+import {
+  DATA_TABLE_COLUMN_KEY_ACTION,
+  DataTableColumn,
+} from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
+import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Contract } from "@mdl/hrm/client/interface/Contract";
@@ -15,11 +19,11 @@ type ContractRow = Contract & {
 };
 
 export default function ContractsListPage(): React.ReactNode {
-  const tIBaseTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("dataTable");
   const t = useTranslations("hrm.contract.list");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<IBaseTableColumnDefinition<ContractRow>[]>(
+  const columns = useMemo<DataTableColumn<ContractRow>[]>(
     () => [
       {
         key: "contractNumber",
@@ -50,9 +54,9 @@ export default function ContractsListPage(): React.ReactNode {
         key: "status",
         label: t("status"),
         render: (value) => (
-          <IBaseChip className="capitalize" size="sm" variant="flat">
+          <Chip className="capitalize" size="sm" variant="flat">
             {value || "draft"}
-          </IBaseChip>
+          </Chip>
         ),
       },
       {
@@ -70,8 +74,8 @@ export default function ContractsListPage(): React.ReactNode {
           }).format(row.baseSalary),
       },
       {
-        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
-        label: tIBaseTable("columns.action"),
+        key: DATA_TABLE_COLUMN_KEY_ACTION,
+        label: tDataTable("columns.action"),
         align: "end",
         render: (_, row) => {
           if (!row?.id) return null;
@@ -96,7 +100,7 @@ export default function ContractsListPage(): React.ReactNode {
         },
       },
     ],
-    [t, tIBaseTable, getLocalizedText],
+    [t, tDataTable, getLocalizedText],
   );
 
   return (

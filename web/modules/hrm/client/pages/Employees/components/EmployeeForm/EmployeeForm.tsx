@@ -1,180 +1,337 @@
-import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
+"use client";
+
+import type { EmployeeFormValues } from "../../validation/employeeValidation";
 
 import {
-  IBaseButton,
-  IBaseCard,
-  IBaseCardBody,
-  IBaseDatePicker,
   IBaseInput,
-  IBaseSingleSelect,
+  IBaseInputMultipleLang,
   IBaseSingleSelectAsync,
-  IBaseTab,
-  IBaseTabs,
 } from "@base/client/components";
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { useTranslations } from "next-intl";
+import { useMemo } from "react";
+import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+import { Button } from "@heroui/button";
+import { Card, CardBody } from "@heroui/react";
 
-import { Employee } from "../../../../interface/Employee";
+import { createEmployeeValidation } from "../../validation/employeeValidation";
 
-export interface EmployeeFormProps {
-  id?: string;
-  initialData?: Employee;
-  onSuccess?: () => void;
+export type { EmployeeFormValues };
+
+interface EmployeeFormProps {
+  onSubmit: (values: EmployeeFormValues) => Promise<void>;
   onCancel?: () => void;
+  submitError?: string | null;
+  isSubmitting?: boolean;
+  defaultValues?: Partial<EmployeeFormValues>;
 }
 
 export default function EmployeeForm({
-  id,
-  initialData,
-  onSuccess,
+  onSubmit,
   onCancel,
+  submitError,
+  isSubmitting = false,
+  defaultValues,
 }: EmployeeFormProps) {
-  const t = useTranslations("hrm.employees");
-  const tCommon = useTranslations("common.actions");
-  const getLocalizedText = useLocalizedText();
+  const t = useTranslations("hrm.employee.create.validation");
+  const tLabels = useTranslations("hrm.employee.create.labels");
+
+  // Create validation schemas with translation
+  const validation = useMemo(() => createEmployeeValidation(t), [t]);
 
   const {
-    register,
-    handleSubmit,
     control,
+    handleSubmit,
     formState: { errors },
-  } = useForm<Employee>({
-    defaultValues: initialData || {
-      status: "active",
+  } = useForm<EmployeeFormValues>({
+    resolver: valibotResolver(validation.employeeFormSchema) as any,
+    defaultValues: {
+      isActive: true,
+      employmentStatus: "active",
+      currency: "VND",
+      ...defaultValues,
     },
   });
 
-  const { mutate: save, isPending } = useCreateUpdate({
-    resource: "hrm/employees",
-    id,
-    onSuccess,
-  });
-
-  const onSubmit = (data: Employee) => {
-    save(data);
+  const onSubmitForm: SubmitHandler<EmployeeFormValues> = async (values) => {
+    await onSubmit(values);
   };
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-      <IBaseTabs aria-label="Employee Form Tabs" variant="underlined">
-        <IBaseTab key="personal" title={t("tabs.personal")}>
-          <IBaseCard>
-            <IBaseCardBody className="space-y-4 p-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form className="space-y-3" onSubmit={handleSubmit(onSubmitForm)}>
+      {submitError ? (
+        <div className="mb-3 rounded-large border border-danger-200 bg-danger-50 px-3 py-2 text-sm text-danger-600">
+          {submitError}
+        </div>
+      ) : null}
+
+      {/* Action Buttons - Sticky */}
+      <div className="sticky top-0 z-10 flex justify-end gap-3 py-2 mb-3 bg-background border-b border-divider -mx-4 px-4">
+        {onCancel && (
+          <Button size="sm" variant="light" onPress={onCancel}>
+            {tLabels("cancel")}
+          </Button>
+        )}
+        <Button
+          color="primary"
+          disabled={isSubmitting}
+          isLoading={isSubmitting}
+          size="sm"
+          type="submit"
+        >
+          {tLabels("save")}
+        </Button>
+      </div>
+
+      {/* Basic Information */}
+      <Card>
+        <CardBody className="p-4">
+          <h2 className="text-base font-semibold mb-4">
+            {tLabels("basicInfo")}
+          </h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Controller
+              control={control}
+              name="employeeCode"
+              render={({ field, fieldState }) => (
                 <IBaseInput
-                  {...register("firstName", { required: true })}
-                  errorMessage={errors.firstName?.message}
-                  isInvalid={!!errors.firstName}
-                  label={t("fields.firstName")}
+                  {...field}
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={tLabels("employeeCode")}
+                  size="sm"
                 />
-                <IBaseInput
-                  {...register("lastName", { required: true })}
-                  errorMessage={errors.lastName?.message}
-                  isInvalid={!!errors.lastName}
-                  label={t("fields.lastName")}
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="fullName"
+              render={({ field, fieldState }) => (
+                <IBaseInputMultipleLang
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={tLabels("fullName")}
+                  size="sm"
+                  value={field.value || { vi: "", en: "" }}
+                  onChange={field.onChange}
                 />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="firstName"
+              render={({ field, fieldState }) => (
                 <IBaseInput
-                  {...register("email", { required: true })}
-                  errorMessage={errors.email?.message}
-                  isInvalid={!!errors.email}
-                  label={t("fields.email")}
+                  {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={tLabels("firstName")}
+                  size="sm"
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="lastName"
+              render={({ field, fieldState }) => (
+                <IBaseInput
+                  {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={tLabels("lastName")}
+                  size="sm"
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="email"
+              render={({ field, fieldState }) => (
+                <IBaseInput
+                  {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={tLabels("email")}
+                  size="sm"
                   type="email"
                 />
-                <IBaseInput {...register("phone")} label={t("fields.phone")} />
-              </div>
-              <IBaseDatePicker
-                control={control}
-                label={t("fields.birthDate")}
-                name="birthDate"
-              />
-              <IBaseSingleSelect
-                control={control}
-                label={t("fields.gender")}
-                name="gender"
-                options={[
-                  { label: t("gender.male"), value: "male" },
-                  { label: t("gender.female"), value: "female" },
-                  { label: t("gender.other"), value: "other" },
-                ]}
-              />
-            </IBaseCardBody>
-          </IBaseCard>
-        </IBaseTab>
+              )}
+            />
 
-        <IBaseTab key="employment" title={t("tabs.employment")}>
-          <IBaseCard>
-            <IBaseCardBody className="space-y-4 p-4">
-              <IBaseInput
-                {...register("employeeId", { required: true })}
-                errorMessage={errors.employeeId?.message}
-                isInvalid={!!errors.employeeId}
-                label={t("fields.employeeId")}
-              />
-              <IBaseSingleSelectAsync
-                control={control}
-                label={t("fields.department")}
-                name="departmentId"
-                resource="hrm/departments"
-              />
-              <IBaseSingleSelectAsync
-                control={control}
-                label={t("fields.position")}
-                name="positionId"
-                resource="hrm/positions"
-              />
-              <IBaseDatePicker
-                control={control}
-                label={t("fields.joinDate")}
-                name="joinDate"
-                rules={{ required: true }}
-              />
-              <IBaseSingleSelect
-                control={control}
-                label={t("fields.status")}
-                name="status"
-                options={[
-                  { label: t("status.active"), value: "active" },
-                  { label: t("status.inactive"), value: "inactive" },
-                  { label: t("status.on-leave"), value: "on-leave" },
-                  { label: t("status.terminated"), value: "terminated" },
-                ]}
-                rules={{ required: true }}
-              />
-            </IBaseCardBody>
-          </IBaseCard>
-        </IBaseTab>
+            <Controller
+              control={control}
+              name="phone"
+              render={({ field, fieldState }) => (
+                <IBaseInput
+                  {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={tLabels("phone")}
+                  size="sm"
+                />
+              )}
+            />
+          </div>
+        </CardBody>
+      </Card>
 
-        <IBaseTab key="bank" title={t("tabs.bank")}>
-          <IBaseCard>
-            <IBaseCardBody className="space-y-4 p-4">
-              <IBaseInput
-                {...register("bankName")}
-                label={t("fields.bankName")}
-              />
-              <IBaseInput
-                {...register("bankAccountName")}
-                label={t("fields.bankAccountName")}
-              />
-              <IBaseInput
-                {...register("bankAccountNumber")}
-                label={t("fields.bankAccountNumber")}
-              />
-            </IBaseCardBody>
-          </IBaseCard>
-        </IBaseTab>
-      </IBaseTabs>
+      {/* Employment Information */}
+      <Card>
+        <CardBody className="p-4">
+          <h2 className="text-base font-semibold mb-4">
+            {tLabels("employmentInfo")}
+          </h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Controller
+              control={control}
+              name="departmentId"
+              render={({ field, fieldState }) => (
+                <IBaseSingleSelectAsync
+                  isRequired
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={tLabels("department")}
+                  model="department.dropdown"
+                  selectedKey={field.value}
+                  size="sm"
+                  onSelectionChange={(key) => {
+                    field.onChange(key || undefined);
+                  }}
+                />
+              )}
+            />
 
-      <div className="flex justify-end gap-3">
-        <IBaseButton variant="light" onPress={onCancel}>
-          {tCommon("cancel")}
-        </IBaseButton>
-        <IBaseButton color="primary" isLoading={isPending} type="submit">
-          {tCommon("save")}
-        </IBaseButton>
-      </div>
+            <Controller
+              control={control}
+              name="positionId"
+              render={({ field, fieldState }) => (
+                <IBaseSingleSelectAsync
+                  isRequired
+                  callWhen="mount"
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={tLabels("position")}
+                  model="position.dropdown"
+                  selectedKey={field.value}
+                  size="sm"
+                  onSelectionChange={(key) => {
+                    field.onChange(key || undefined);
+                  }}
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="managerId"
+              render={({ field, fieldState }) => (
+                <IBaseSingleSelectAsync
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={tLabels("manager")}
+                  model="employee.dropdown"
+                  selectedKey={field.value}
+                  size="sm"
+                  onSelectionChange={(key) => {
+                    field.onChange(key || undefined);
+                  }}
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="hireDate"
+              render={({ field, fieldState }) => (
+                <IBaseInput
+                  {...field}
+                  isRequired
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={tLabels("hireDate")}
+                  size="sm"
+                  type="date"
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="employmentStatus"
+              render={({ field, fieldState }) => (
+                <IBaseInput
+                  {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={tLabels("employmentStatus")}
+                  size="sm"
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="baseSalary"
+              render={({ field, fieldState }) => (
+                <IBaseInput
+                  {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={tLabels("baseSalary")}
+                  size="sm"
+                  type="number"
+                />
+              )}
+            />
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Additional Information */}
+      <Card>
+        <CardBody className="p-4">
+          <h2 className="text-base font-semibold mb-4">
+            {tLabels("additionalInfo")}
+          </h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Controller
+              control={control}
+              name="dateOfBirth"
+              render={({ field, fieldState }) => (
+                <IBaseInput
+                  {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={tLabels("dateOfBirth")}
+                  size="sm"
+                  type="date"
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="gender"
+              render={({ field, fieldState }) => (
+                <IBaseInput
+                  {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={tLabels("gender")}
+                  size="sm"
+                />
+              )}
+            />
+          </div>
+        </CardBody>
+      </Card>
     </form>
   );
 }

@@ -3,7 +3,7 @@
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import type { ProductCategoryRow } from "../../interface/ProductCategory";
 
-import { IBaseButton } from "@base/client/components";
+import { Button } from "@heroui/button";
 import { addToast } from "@heroui/toast";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
@@ -130,7 +130,7 @@ const ProductCategoryEditPage = (): React.ReactNode => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
-        <IBaseButton
+        <Button
           isDisabled={updateMutation.isPending}
           size="sm"
           startContent={<ArrowLeft size={14} />}
@@ -138,7 +138,7 @@ const ProductCategoryEditPage = (): React.ReactNode => {
           onPress={() => router.back()}
         >
           Back
-        </IBaseButton>
+        </Button>
         {categoryId && (
           <span className="text-small text-default-500">
             Editing category #{categoryId}

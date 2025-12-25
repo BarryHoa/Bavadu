@@ -1,15 +1,15 @@
 "use client";
 
-import type { IBaseTableColumnDefinition } from "@base/client/components";
+import type { DataTableColumnDefinition } from "@base/client/components";
 
-import { IBaseButton, IBaseCard } from "@base/client/components";
 import {
-  IBaseCardBody,
-  I_BASE_TABLE_COLUMN_KEY_ACTION,
-  IBaseTable,
+  DATA_TABLE_COLUMN_KEY_ACTION,
+  DataTable,
   IBaseInputSearch,
   SelectItemOption,
 } from "@base/client/components";
+import { Button } from "@heroui/button";
+import { Card, CardBody } from "@heroui/react";
 import ProductService from "@mdl/product/client/services/ProductService";
 import UnitOfMeasureService from "@mdl/product/client/services/UnitOfMeasureService";
 import { useQuery } from "@tanstack/react-query";
@@ -25,7 +25,7 @@ import {
 
 import PriceItemEditModal from "./PriceItemEditModal";
 
-interface ExplicitPricingIBaseTabProps {
+interface ExplicitPricingTabProps {
   control: Control<any>;
   setValue: UseFormSetValue<any>;
   errors?: any;
@@ -56,7 +56,7 @@ export default function ExplicitPricingTab({
   control,
   setValue,
   errors,
-}: ExplicitPricingIBaseTabProps) {
+}: ExplicitPricingTabProps) {
   const { setError } = useFormContext();
   const {
     fields: priceItemFields,
@@ -288,7 +288,7 @@ export default function ExplicitPricingTab({
   );
 
   // Columns definition
-  const columns = useMemo<IBaseTableColumnDefinition<PriceItemRow>[]>(
+  const columns = useMemo<DataTableColumnDefinition<PriceItemRow>[]>(
     () => [
       {
         key: "variantName",
@@ -334,7 +334,7 @@ export default function ExplicitPricingTab({
         ),
       },
       {
-        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
+        key: DATA_TABLE_COLUMN_KEY_ACTION,
         label: "Actions",
         align: "end",
         minWidth: 100,
@@ -348,15 +348,15 @@ export default function ExplicitPricingTab({
                   {tiers.length} tier{tiers.length > 1 ? "s" : ""}
                 </div>
               )}
-              <IBaseButton
+              <Button
                 isIconOnly
                 size="sm"
                 variant="light"
                 onPress={() => setEditingIndex(row.index)}
               >
                 <Edit2 size={16} />
-              </IBaseButton>
-              <IBaseButton
+              </Button>
+              <Button
                 isIconOnly
                 color="danger"
                 size="sm"
@@ -364,7 +364,7 @@ export default function ExplicitPricingTab({
                 onPress={() => removePriceItem(row.index)}
               >
                 <Trash2 size={16} />
-              </IBaseButton>
+              </Button>
             </div>
           );
         },
@@ -384,7 +384,7 @@ export default function ExplicitPricingTab({
             onValueChange={setSearchTerm}
           />
         </div>
-        <IBaseButton
+        <Button
           color="primary"
           size="sm"
           startContent={<Plus size={16} />}
@@ -400,18 +400,18 @@ export default function ExplicitPricingTab({
           }}
         >
           Add Product
-        </IBaseButton>
+        </Button>
       </div>
 
-      {/* IBaseTable */}
+      {/* DataTable */}
       {priceItemFields.length === 0 ? (
         <div className="text-sm text-default-500 py-8 text-center">
           No explicit pricing items. Click "Add Product" to add one.
         </div>
       ) : (
-        <IBaseCard>
-          <IBaseCardBody className="p-0">
-            <IBaseTable<PriceItemRow>
+        <Card>
+          <CardBody className="p-0">
+            <DataTable<PriceItemRow>
               columns={columns}
               dataSource={tableRows}
               emptyContent={
@@ -423,11 +423,11 @@ export default function ExplicitPricingTab({
               pagination={false}
               rowKey="id"
             />
-          </IBaseCardBody>
-        </IBaseCard>
+          </CardBody>
+        </Card>
       )}
 
-      {/* Edit IBaseModal */}
+      {/* Edit Modal */}
       {editingIndex !== null && (
         <PriceItemEditModal
           control={control}

@@ -1,16 +1,12 @@
 "use client";
 
-import {
-  IBaseButton,
-  IBaseCard,
-  IBaseCardBody,
-  IBaseDigitViewer,
-  LoadingOverlay,
-} from "@base/client/components";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { certificateService } from "@mdl/hrm/client/services/CertificateService";
+import { Button } from "@heroui/button";
+import { Card, CardBody } from "@heroui/react";
+import { LoadingOverlay, IBaseDigitViewer } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { formatDate } from "@base/client/utils/date/formatDate";
 
@@ -64,14 +60,14 @@ export default function CertificateViewPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <div className="sticky top-0 z-10 flex justify-end gap-3 py-2 mb-3 bg-background border-b border-divider -mx-4 px-4">
-        <IBaseButton
+        <Button
           size="sm"
           variant="light"
           onPress={() => router.push("/workspace/modules/hrm/certificates")}
         >
           {tCommon("actions.backToList")}
-        </IBaseButton>
-        <IBaseButton
+        </Button>
+        <Button
           color="primary"
           size="sm"
           onPress={() =>
@@ -79,11 +75,11 @@ export default function CertificateViewPage(): React.ReactNode {
           }
         >
           {tCommon("actions.edit")}
-        </IBaseButton>
+        </Button>
       </div>
 
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
+      <Card>
+        <CardBody className="p-4">
           <h2 className="text-base font-semibold mb-2">{t("generalInfo")}</h2>
           <div className="grid gap-2 md:grid-cols-2">
             <IBaseDigitViewer
@@ -126,8 +122,8 @@ export default function CertificateViewPage(): React.ReactNode {
               }
             />
           </div>
-        </IBaseCardBody>
-      </IBaseCard>
+        </CardBody>
+      </Card>
     </div>
   );
 }

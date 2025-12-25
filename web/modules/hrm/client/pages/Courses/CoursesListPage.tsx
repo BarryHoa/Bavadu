@@ -1,13 +1,13 @@
 "use client";
 
+import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import {
-  IBaseChip,
-  I_BASE_TABLE_COLUMN_KEY_ACTION,
-  IBaseTableColumnDefinition,
+  DATA_TABLE_COLUMN_KEY_ACTION,
+  DataTableColumn,
   ViewListDataTable,
 } from "@base/client/components";
-import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import LinkAs from "@base/client/components/LinkAs";
+import { Chip } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { CourseDto } from "@mdl/hrm/client/interface/Course";
@@ -19,11 +19,11 @@ type CourseRow = CourseDto & {
 };
 
 export default function CoursesListPage(): React.ReactNode {
-  const tIBaseTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("dataTable");
   const t = useTranslations("hrm.courses");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<IBaseTableColumnDefinition<CourseRow>[]>(
+  const columns = useMemo<DataTableColumn<CourseRow>[]>(
     () => [
       {
         key: "code",
@@ -62,14 +62,14 @@ export default function CoursesListPage(): React.ReactNode {
         key: "isActive",
         label: t("labels.isActive"),
         render: (value) => (
-          <IBaseChip color={value ? "success" : "default"} size="sm" variant="flat">
+          <Chip color={value ? "success" : "default"} size="sm" variant="flat">
             {value ? "Active" : "Inactive"}
-          </IBaseChip>
+          </Chip>
         ),
       },
       {
-        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
-        label: tIBaseTable("columns.action"),
+        key: DATA_TABLE_COLUMN_KEY_ACTION,
+        label: tDataTable("columns.action"),
         align: "end",
         render: (_, row) => {
           if (!row?.id) return null;
@@ -80,7 +80,7 @@ export default function CoursesListPage(): React.ReactNode {
               actions={[
                 {
                   key: "view",
-                  label: tIBaseTable("columns.view"),
+                  label: tDataTable("columns.view"),
                   href: viewLink,
                 },
               ]}
@@ -89,7 +89,7 @@ export default function CoursesListPage(): React.ReactNode {
         },
       },
     ],
-    [tIBaseTable, t, getLocalizedText],
+    [tDataTable, t, getLocalizedText],
   );
 
   return (

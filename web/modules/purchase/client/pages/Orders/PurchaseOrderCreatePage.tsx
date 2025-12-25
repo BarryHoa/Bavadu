@@ -1,19 +1,15 @@
 "use client";
 
 import {
-  IBaseButton,
-  IBaseCard,
-  IBaseCardBody,
-  IBaseDatePicker,
   IBaseInput,
   IBaseSingleSelect,
   SelectItemOption,
-  IBaseTextarea,
 } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { Button } from "@heroui/button";
+import { Card, CardBody, Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import StockService from "@mdl/stock/client/services/StockService";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
@@ -33,6 +29,7 @@ import {
   string,
   trim,
 } from "valibot";
+import StockService from "@mdl/stock/client/services/StockService";
 
 import { purchaseOrderService } from "../../services/PurchaseOrderService";
 
@@ -42,8 +39,8 @@ const quantitySchema = pipe(
   minLength(1, "Quantity is required"),
   custom(
     (value) => !Number.isNaN(Number(value)) && Number(value) > 0,
-    "Quantity must be a positive number"
-  )
+    "Quantity must be a positive number",
+  ),
 );
 
 const unitPriceSchema = pipe(
@@ -52,8 +49,8 @@ const unitPriceSchema = pipe(
   custom(
     (value) =>
       value === "" || (!Number.isNaN(Number(value)) && Number(value) >= 0),
-    "Unit price must be a number greater than or equal to 0"
-  )
+    "Unit price must be a number greater than or equal to 0",
+  ),
 );
 
 const orderLineSchema = object({
@@ -71,7 +68,7 @@ const purchaseOrderFormSchema = object({
   notes: optional(pipe(string(), trim())),
   lines: pipe(
     array(orderLineSchema),
-    minLength(1, "At least one order line is required")
+    minLength(1, "At least one order line is required"),
   ),
 });
 
@@ -188,24 +185,24 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
         value: warehouse.id,
         label: `${warehouse.code} — ${warehouse.name}`,
       })),
-    [warehousesQuery.data]
+    [warehousesQuery.data],
   );
 
   return (
     <div className="space-y-6">
       <div className="flex justify-end">
-        <IBaseButton
+        <Button
           as={LinkAs as any}
           href="/workspace/modules/purchase"
           size="sm"
           variant="light"
         >
           Back to list
-        </IBaseButton>
+        </Button>
       </div>
 
-      <IBaseCard>
-        <IBaseCardBody>
+      <Card>
+        <CardBody>
           {submitError ? (
             <div className="mb-4 rounded-large border border-danger-200 bg-danger-50 px-3 py-2 text-sm text-danger-600">
               {submitError}
@@ -256,12 +253,14 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
                 control={control}
                 name="expectedDate"
                 render={({ field, fieldState }) => (
-                  <IBaseDatePicker
+                  <IBaseInput
+                    {...field}
                     errorMessage={fieldState.error?.message}
                     isInvalid={fieldState.invalid}
                     label="Expected date"
+                    type="date"
                     value={field.value ?? ""}
-                    onChange={(value) => field.onChange(value ?? "")}
+                    onValueChange={field.onChange}
                   />
                 )}
               />
@@ -285,7 +284,7 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
               control={control}
               name="notes"
               render={({ field, fieldState }) => (
-                <IBaseTextarea
+                <Textarea
                   {...field}
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
@@ -299,18 +298,18 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold">Order lines</h2>
-                <IBaseButton
+                <Button
                   size="sm"
                   variant="bordered"
                   onPress={() => append(defaultLine)}
                 >
                   Add line
-                </IBaseButton>
+                </Button>
               </div>
 
               {fields.map((fieldItem, index) => (
-                <IBaseCard key={fieldItem.id} className="border border-content3/40">
-                  <IBaseCardBody className="space-y-3">
+                <Card key={fieldItem.id} className="border border-content3/40">
+                  <CardBody className="space-y-3">
                     <div className="grid gap-3 md:grid-cols-4">
                       <Controller
                         control={control}
@@ -375,17 +374,17 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
                     </div>
                     {fields.length > 1 ? (
                       <div className="flex justify-end">
-                        <IBaseButton
+                        <Button
                           size="sm"
                           variant="light"
                           onPress={() => remove(index)}
                         >
                           Remove
-                        </IBaseButton>
+                        </Button>
                       </div>
                     ) : null}
-                  </IBaseCardBody>
-                </IBaseCard>
+                  </CardBody>
+                </Card>
               ))}
               {errors.lines?.message ? (
                 <p className="text-sm text-danger-600">
@@ -394,17 +393,17 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
               ) : null}
             </div>
 
-            <IBaseButton
+            <Button
               color="primary"
               disabled={isSubmitting}
               isLoading={isSubmitting}
               type="submit"
             >
               Create purchase order
-            </IBaseButton>
+            </Button>
           </form>
-        </IBaseCardBody>
-      </IBaseCard>
+        </CardBody>
+      </Card>
     </div>
   );
 }

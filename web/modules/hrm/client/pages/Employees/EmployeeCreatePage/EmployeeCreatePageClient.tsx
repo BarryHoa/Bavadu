@@ -1,14 +1,13 @@
 "use client";
 
-import type { EmployeeFormValues } from "../validation/employeeValidation";
-
+import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { employeeService } from "@mdl/hrm/client/services/EmployeeService";
 
-import EmployeeForm from "../components/EmployeeForm/EmployeeForm";
+import EmployeeForm, {
+  type EmployeeFormValues,
+} from "../components/EmployeeForm/EmployeeForm";
 
 export default function EmployeeCreatePageClient(): React.ReactNode {
   const router = useRouter();
@@ -68,10 +67,10 @@ export default function EmployeeCreatePageClient(): React.ReactNode {
 
   return (
     <EmployeeForm
+      isSubmitting={isPending}
+      submitError={submitError}
       onCancel={() => router.push("/workspace/modules/hrm/employees")}
-      onSuccess={() => router.push(`/workspace/modules/hrm/employees/view/${data.id}`)}
-      // onSubmit={handleSubmit}
-      />
-    );
-  }
+      onSubmit={handleSubmit}
+    />
+  );
 }

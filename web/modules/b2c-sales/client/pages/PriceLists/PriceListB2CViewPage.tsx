@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  IBaseCard,
-  IBaseCardBody,
-  IBaseTab,
-  IBaseTabs,
-} from "@base/client/components";
+import { Card, CardBody, Tab, Tabs } from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 
@@ -42,10 +37,10 @@ export default function PriceListB2CViewPage(): React.ReactNode {
       <h1 className="text-2xl font-bold">
         {name.vi || name.en || priceList.code}
       </h1>
-      <IBaseTabs>
-        <IBaseTab key="info" title="Information">
-          <IBaseCard>
-            <IBaseCardBody className="space-y-4">
+      <Tabs>
+        <Tab key="info" title="Information">
+          <Card>
+            <CardBody className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <label className="text-sm font-semibold">Code</label>
@@ -123,28 +118,28 @@ export default function PriceListB2CViewPage(): React.ReactNode {
                     )}
                 </div>
               </div>
-            </IBaseCardBody>
-          </IBaseCard>
-        </IBaseTab>
-        <IBaseTab key="items" title="Price List Items">
-          <IBaseCard>
-            <IBaseCardBody>
+            </CardBody>
+          </Card>
+        </Tab>
+        <Tab key="items" title="Price List Items">
+          <Card>
+            <CardBody>
               <p className="text-gray-500">
                 Price list items management will be implemented here.
               </p>
-            </IBaseCardBody>
-          </IBaseCard>
-        </IBaseTab>
-        <IBaseTab key="rules" title="Pricing Rules">
-          <IBaseCard>
-            <IBaseCardBody>
+            </CardBody>
+          </Card>
+        </Tab>
+        <Tab key="rules" title="Pricing Rules">
+          <Card>
+            <CardBody>
               <p className="text-gray-500">
                 Pricing rules management will be implemented here.
               </p>
-            </IBaseCardBody>
-          </IBaseCard>
-        </IBaseTab>
-      </IBaseTabs>
+            </CardBody>
+          </Card>
+        </Tab>
+      </Tabs>
     </div>
   );
 }

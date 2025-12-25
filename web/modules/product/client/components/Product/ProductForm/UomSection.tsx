@@ -1,20 +1,21 @@
 "use client";
 
-import { IBaseButton, IBaseModalHeader } from "@base/client/components";
 import {
-  I_BASE_TABLE_COLUMN_KEY_ACTION,
-  IBaseTable,
+  DATA_TABLE_COLUMN_KEY_ACTION,
+  DataTable,
   IBaseInputNumber,
   IBaseSingleSelect,
   IBaseSingleSelectAsync,
-  IBaseModal,
-  IBaseModalBody,
-  IBaseModalContent,
-  IBaseModalFooter,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   SelectItemOption,
-  type IBaseTableColumnDefinition,
+  type DataTableColumnDefinition,
 } from "@base/client/components";
-import { addToast } from "@heroui/toast";
+import { Button } from "@heroui/button";
+import { addToast } from "@heroui/react";
 import { Plus, Trash } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useMemo, useState } from "react";
@@ -379,7 +380,7 @@ export default function UomSection({
   );
 
   // Build table columns
-  const tableColumns: IBaseTableColumnDefinition<UomConversions>[] = useMemo(
+  const tableColumns: DataTableColumnDefinition<UomConversions>[] = useMemo(
     () => [
       {
         key: "uom",
@@ -425,12 +426,12 @@ export default function UomSection({
         ),
       },
       {
-        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
+        key: DATA_TABLE_COLUMN_KEY_ACTION,
         title: t("actions.action"),
         width: 80,
         align: "end",
         render: (_, record) => (
-          <IBaseButton
+          <Button
             isIconOnly
             aria-label={tProductForm("deleteUom")}
             color="danger"
@@ -440,7 +441,7 @@ export default function UomSection({
             onPress={() => handleDeleteUom(record.uuid)}
           >
             <Trash size={14} />
-          </IBaseButton>
+          </Button>
         ),
       },
     ],
@@ -550,7 +551,7 @@ export default function UomSection({
           <>
             <div className="flex gap-4">
               <div className="max-w-[900px] overflow-auto">
-                <IBaseTable
+                <DataTable
                   columns={tableColumns}
                   dataSource={uomConversions}
                   emptyContent={tProductForm("noOtherUoms")}
@@ -562,7 +563,7 @@ export default function UomSection({
                 />
               </div>
               {canAddOtherUom && (
-                <IBaseButton
+                <Button
                   color="primary"
                   isDisabled={isBusy || !baseUomId}
                   size="sm"
@@ -571,7 +572,7 @@ export default function UomSection({
                   onPress={handleAddNewUom}
                 >
                   {tProductForm("addOtherUom")}
-                </IBaseButton>
+                </Button>
               )}
             </div>
 
@@ -617,35 +618,35 @@ export default function UomSection({
         )}
       </div>
 
-      {/* Delete Confirm IBaseModal */}
-      <IBaseModal
+      {/* Delete Confirm Modal */}
+      <Modal
         isOpen={deleteConfirmModal.isOpen}
         placement="center"
         onClose={() => setDeleteConfirmModal({ isOpen: false })}
       >
-        <IBaseModalContent>
-          <IBaseModalHeader>
+        <ModalContent>
+          <ModalHeader>
             {tProductForm("uom-section.confirmDeleteUom")}
-          </IBaseModalHeader>
-          <IBaseModalBody>
+          </ModalHeader>
+          <ModalBody>
             <p>
               {tProductForm("uom-section.confirmDeleteUomMessage")}
               {deleteConfirmModal.uomName && ` (${deleteConfirmModal.uomName})`}
             </p>
-          </IBaseModalBody>
-          <IBaseModalFooter>
-            <IBaseButton
+          </ModalBody>
+          <ModalFooter>
+            <Button
               variant="light"
               onPress={() => setDeleteConfirmModal({ isOpen: false })}
             >
               {t("actions.cancel")}
-            </IBaseButton>
-            <IBaseButton color="danger" onPress={confirmDelete}>
+            </Button>
+            <Button color="danger" onPress={confirmDelete}>
               {t("actions.delete")}
-            </IBaseButton>
-          </IBaseModalFooter>
-        </IBaseModalContent>
-      </IBaseModal>
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 }

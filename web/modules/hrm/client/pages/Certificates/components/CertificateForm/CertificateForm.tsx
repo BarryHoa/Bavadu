@@ -1,14 +1,15 @@
 "use client";
 
-import { IBaseButton, IBaseCard, IBaseCheckbox } from "@base/client/components";
 import {
-  IBaseCardBody,
-  IBaseDatePicker,
+  DatePicker,
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseSingleSelectAsync,
 } from "@base/client/components";
+import { Button } from "@heroui/button";
+import { Card, CardBody, Checkbox } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { parseDate } from "@internationalized/date";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
@@ -66,11 +67,11 @@ export default function CertificateForm({
 
       <div className="sticky top-0 z-10 flex justify-end gap-3 py-2 mb-3 bg-background border-b border-divider -mx-4 px-4">
         {onCancel && (
-          <IBaseButton size="sm" variant="light" onPress={onCancel}>
+          <Button size="sm" variant="light" onPress={onCancel}>
             {tCommon("actions.cancel")}
-          </IBaseButton>
+          </Button>
         )}
-        <IBaseButton
+        <Button
           color="primary"
           disabled={isSubmitting}
           isLoading={isSubmitting}
@@ -78,11 +79,11 @@ export default function CertificateForm({
           type="submit"
         >
           {tCommon("actions.save")}
-        </IBaseButton>
+        </Button>
       </div>
 
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
+      <Card>
+        <CardBody className="p-4">
           <h2 className="text-base font-semibold mb-2">{t("generalInfo")}</h2>
           <div className="grid gap-2 md:grid-cols-2">
             <Controller
@@ -153,13 +154,21 @@ export default function CertificateForm({
               control={control}
               name="issueDate"
               render={({ field, fieldState }) => (
-                <IBaseDatePicker
+                <DatePicker
                   isRequired
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={t("labels.issueDate")}
-                  value={field.value ? String(field.value) : null}
-                  onChange={(val) => field.onChange(val)}
+                  value={
+                    field.value
+                      ? typeof field.value === "string"
+                        ? parseDate(field.value)
+                        : field.value
+                      : null
+                  }
+                  onChange={(val) =>
+                    field.onChange(val ? val.toString() : null)
+                  }
                 />
               )}
             />
@@ -167,12 +176,20 @@ export default function CertificateForm({
               control={control}
               name="expiryDate"
               render={({ field, fieldState }) => (
-                <IBaseDatePicker
+                <DatePicker
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={t("labels.expiryDate")}
-                  value={field.value ? String(field.value) : null}
-                  onChange={(val) => field.onChange(val)}
+                  value={
+                    field.value
+                      ? typeof field.value === "string"
+                        ? parseDate(field.value)
+                        : field.value
+                      : null
+                  }
+                  onChange={(val) =>
+                    field.onChange(val ? val.toString() : null)
+                  }
                 />
               )}
             />
@@ -195,19 +212,19 @@ export default function CertificateForm({
               control={control}
               name="isActive"
               render={({ field }) => (
-                <IBaseCheckbox
+                <Checkbox
                   isSelected={field.value === "true"}
                   onValueChange={(val) =>
                     field.onChange(val ? "true" : "false")
                   }
                 >
                   {t("labels.isActive")}
-                </IBaseCheckbox>
+                </Checkbox>
               )}
             />
           </div>
-        </IBaseCardBody>
-      </IBaseCard>
+        </CardBody>
+      </Card>
     </form>
   );
 }

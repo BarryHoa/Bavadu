@@ -1,6 +1,7 @@
 "use client";
 
-import { IBaseButton, IBaseSpinner } from "@base/client/components";
+import { Button } from "@heroui/button";
+import { Spinner } from "@heroui/spinner";
 import { addToast } from "@heroui/toast";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
@@ -121,9 +122,9 @@ export default function ProductsEditPage(): React.ReactNode {
   if (!productId) {
     return (
       <div className="space-y-4">
-        <IBaseButton size="sm" variant="light" onPress={navigateToList}>
+        <Button size="sm" variant="light" onPress={navigateToList}>
           Back to products
-        </IBaseButton>
+        </Button>
         <p className="text-default-500">No product selected.</p>
       </div>
     );
@@ -132,7 +133,7 @@ export default function ProductsEditPage(): React.ReactNode {
   if (productQuery.isLoading) {
     return (
       <div className="flex items-center gap-2 text-default-500">
-        <IBaseSpinner size="sm" />
+        <Spinner size="sm" />
         <span>Loading product...</span>
       </div>
     );
@@ -141,9 +142,9 @@ export default function ProductsEditPage(): React.ReactNode {
   if (productQuery.isError) {
     return (
       <div className="space-y-4">
-        <IBaseButton size="sm" variant="light" onPress={navigateToList}>
+        <Button size="sm" variant="light" onPress={navigateToList}>
           Back to products
-        </IBaseButton>
+        </Button>
         <div className="rounded-medium border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-500">
           {productQuery.error instanceof Error
             ? productQuery.error.message
@@ -158,9 +159,9 @@ export default function ProductsEditPage(): React.ReactNode {
   if (!productDetail) {
     return (
       <div className="space-y-4">
-        <IBaseButton size="sm" variant="light" onPress={navigateToList}>
+        <Button size="sm" variant="light" onPress={navigateToList}>
           Back to products
-        </IBaseButton>
+        </Button>
         <p className="text-default-500">Product not found.</p>
       </div>
     );
@@ -171,7 +172,7 @@ export default function ProductsEditPage(): React.ReactNode {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
-        <IBaseButton
+        <Button
           isDisabled={updateMutation.isPending}
           size="sm"
           startContent={<ArrowLeft size={14} />}
@@ -179,7 +180,7 @@ export default function ProductsEditPage(): React.ReactNode {
           onPress={() => router.back()}
         >
           Back
-        </IBaseButton>
+        </Button>
         <span className="text-small text-default-500">
           Editing product #{productId}
         </span>

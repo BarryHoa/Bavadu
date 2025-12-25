@@ -3,14 +3,15 @@
 import type { Resolver, SubmitHandler } from "react-hook-form";
 import type { VariantFieldValue } from "./types";
 
-import { IBaseButton, IBaseCard, IBaseTab } from "@base/client/components";
 import {
-  IBaseCardBody,
   IBaseTabs,
   IBaseTooltip,
   SelectItemOption,
+  Tab,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { Button } from "@heroui/button";
+import { Card, CardBody } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
 import { HelpCircle, Plus } from "lucide-react";
@@ -196,7 +197,7 @@ export default function ProductForm({
     const newIndex = variantFields.length;
 
     appendVariant(createDefaultVariant());
-    // IBaseSwitch to the new variant tab
+    // Switch to the new variant tab
     setSelectedTab(`variant-${newIndex}`);
   }, [variantFields.length, appendVariant]);
 
@@ -333,7 +334,7 @@ export default function ProductForm({
       const firstErrorPath = findFirstErrorField(submitErrors);
 
       if (firstErrorPath) {
-        // IBaseSwitch to appropriate tab if error is in variant
+        // Switch to appropriate tab if error is in variant
         if (firstErrorPath.startsWith("variants.")) {
           const variantMatch = firstErrorPath.match(/variants\.(\d+)/);
 
@@ -353,7 +354,7 @@ export default function ProductForm({
             return;
           }
         } else if (firstErrorPath.startsWith("master.")) {
-          // IBaseSwitch to master tab if error is in master
+          // Switch to master tab if error is in master
           setSelectedTab("master");
         }
         // Focus on the first error field
@@ -434,11 +435,11 @@ export default function ProductForm({
 
   return (
     <form className="flex flex-col gap-4" onSubmit={submitForm}>
-      <IBaseCard>
-        <IBaseCardBody className="space-y-4">
+      <Card>
+        <CardBody className="space-y-4">
           <div className="flex gap-2 justify-between">
             <div className="justify-start">
-              <IBaseButton
+              <Button
                 color="primary"
                 isDisabled={isBusy || variantFields.length >= 20}
                 size="sm"
@@ -447,11 +448,11 @@ export default function ProductForm({
                 onPress={addVariant}
               >
                 {t("actions.add")} {t("variant")}
-              </IBaseButton>
+              </Button>
             </div>
             <div className="justify-end flex items-center gap-2">
               <IBaseTooltip content={tProduct("guideTooltip")} placement="top">
-                <IBaseButton
+                <Button
                   isIconOnly
                   aria-label={tProduct("guideAriaLabel")}
                   isDisabled={isBusy}
@@ -460,21 +461,21 @@ export default function ProductForm({
                   onPress={() => setIsGuideModalOpen(true)}
                 >
                   <HelpCircle className="text-default-500" size={18} />
-                </IBaseButton>
+                </Button>
               </IBaseTooltip>
               {onCancel ? (
-                <IBaseButton
+                <Button
                   isDisabled={isBusy}
                   size="sm"
                   variant="light"
                   onPress={onCancel}
                 >
                   {t("actions.cancel")}
-                </IBaseButton>
+                </Button>
               ) : null}
 
               {onSubmitAndContinue && submitAndContinueForm ? (
-                <IBaseButton
+                <Button
                   isDisabled={isBusy}
                   size="sm"
                   type="button"
@@ -485,10 +486,10 @@ export default function ProductForm({
                 >
                   {secondarySubmitLabel ??
                     `${t("actions.save")} & ${t("actions.add")} ${t("another")}`}
-                </IBaseButton>
+                </Button>
               ) : null}
 
-              <IBaseButton
+              <Button
                 color="primary"
                 isDisabled={isBusy}
                 isLoading={isBusy}
@@ -499,7 +500,7 @@ export default function ProductForm({
                 }}
               >
                 {submitLabel ?? t("actions.save")}
-              </IBaseButton>
+              </Button>
             </div>
           </div>
 
@@ -518,7 +519,7 @@ export default function ProductForm({
                 setSelectedTab(key as string)
               }
             >
-              <IBaseTab key="master" title={t("master")}>
+              <Tab key="master" title={t("master")}>
                 <MasterTab
                   categoryOptions={categoryOptions}
                   categoryQueryLoading={categoryQuery.isLoading}
@@ -579,7 +580,7 @@ export default function ProductForm({
                     }
                   }}
                 />
-              </IBaseTab>
+              </Tab>
 
               {useMemo(
                 () =>
@@ -597,7 +598,7 @@ export default function ProductForm({
                     const tabKey = `variant-${variantIndex}`;
 
                     return (
-                      <IBaseTab key={tabKey} title={truncatedTitle}>
+                      <Tab key={tabKey} title={truncatedTitle}>
                         <VariantTab
                           canRemove={variantFields.length > 1}
                           isBusy={isBusy}
@@ -610,7 +611,7 @@ export default function ProductForm({
                             updateVariant(variantIndex, updater)
                           }
                         />
-                      </IBaseTab>
+                      </Tab>
                     );
                   }),
                 [
@@ -626,8 +627,8 @@ export default function ProductForm({
               )}
             </IBaseTabs>
           </FormProvider>
-        </IBaseCardBody>
-      </IBaseCard>
+        </CardBody>
+      </Card>
 
       <ProductFormGuideModal
         isOpen={isGuideModalOpen}

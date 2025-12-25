@@ -1,20 +1,19 @@
 "use client";
 
-import { IBaseCheckbox, IBaseTextarea } from "@base/client/components";
 import {
-  IBaseDatePicker,
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseInputNumber,
   IBaseSelect,
   IBaseSingleSelect,
-  IBaseSelectItem,
+  SelectItem,
   SelectItemOption,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { Checkbox, Textarea } from "@heroui/react";
 import { Control, Controller } from "react-hook-form";
 
-interface MainIBaseTabProps {
+interface MainTabProps {
   control: Control<any>;
   errors?: any;
   typeOptions: SelectItemOption[];
@@ -38,7 +37,7 @@ export default function MainTab({
   locationOptions = [],
   regionOptions = [],
   customerGroupOptions = [],
-}: MainIBaseTabProps) {
+}: MainTabProps) {
   const getLocalizedText = useLocalizedText();
 
   return (
@@ -102,7 +101,7 @@ export default function MainTab({
             control={control}
             name="description"
             render={({ field, fieldState }) => (
-              <IBaseTextarea
+              <Textarea
                 errorMessage={fieldState.error?.message}
                 isInvalid={fieldState.invalid}
                 label="Description"
@@ -160,7 +159,7 @@ export default function MainTab({
               control={control}
               name="isDefault"
               render={({ field }) => (
-                <IBaseCheckbox
+                <Checkbox
                   isSelected={field.value === "true" || field.value === true}
                   size="sm"
                   onValueChange={(checked) =>
@@ -168,7 +167,7 @@ export default function MainTab({
                   }
                 >
                   Is Default
-                </IBaseCheckbox>
+                </Checkbox>
               )}
             />
           </div>
@@ -183,14 +182,15 @@ export default function MainTab({
             control={control}
             name="validFrom"
             render={({ field, fieldState }) => (
-              <IBaseDatePicker
+              <IBaseInput
                 isRequired
                 errorMessage={fieldState.error?.message}
                 isInvalid={fieldState.invalid}
                 label="Valid From"
                 size="sm"
-                value={field.value ?? ""}
-                onChange={(value) => field.onChange(value ?? "")}
+                type="date"
+                value={field.value}
+                onChange={field.onChange}
               />
             )}
           />
@@ -198,13 +198,14 @@ export default function MainTab({
             control={control}
             name="validTo"
             render={({ field, fieldState }) => (
-              <IBaseDatePicker
+              <IBaseInput
                 errorMessage={fieldState.error?.message}
                 isInvalid={fieldState.invalid}
                 label="Valid To (leave empty for forever - standard only)"
                 size="sm"
-                value={field.value ?? ""}
-                onChange={(value) => field.onChange(value ?? "")}
+                type="date"
+                value={field.value}
+                onChange={field.onChange}
               />
             )}
           />
@@ -227,7 +228,9 @@ export default function MainTab({
                 selectedKeys={
                   field.value
                     ? new Set(
-                        Array.isArray(field.value) ? field.value : [field.value]
+                        Array.isArray(field.value)
+                          ? field.value
+                          : [field.value],
                       )
                     : new Set()
                 }
@@ -237,12 +240,12 @@ export default function MainTab({
                   const selectedArray = Array.from(keys);
 
                   field.onChange(
-                    selectedArray.length > 0 ? selectedArray : undefined
+                    selectedArray.length > 0 ? selectedArray : undefined,
                   );
                 }}
               >
                 {channelOptions.map((option) => (
-                  <IBaseSelectItem
+                  <SelectItem
                     key={option.value}
                     textValue={
                       typeof option.label === "string"
@@ -253,7 +256,7 @@ export default function MainTab({
                     {typeof option.label === "string"
                       ? option.label
                       : getLocalizedText(option.label)}
-                  </IBaseSelectItem>
+                  </SelectItem>
                 ))}
               </IBaseSelect>
             )}
@@ -269,7 +272,9 @@ export default function MainTab({
                 selectedKeys={
                   field.value
                     ? new Set(
-                        Array.isArray(field.value) ? field.value : [field.value]
+                        Array.isArray(field.value)
+                          ? field.value
+                          : [field.value],
                       )
                     : new Set()
                 }
@@ -279,12 +284,12 @@ export default function MainTab({
                   const selectedArray = Array.from(keys);
 
                   field.onChange(
-                    selectedArray.length > 0 ? selectedArray : undefined
+                    selectedArray.length > 0 ? selectedArray : undefined,
                   );
                 }}
               >
                 {storeOptions.map((option) => (
-                  <IBaseSelectItem
+                  <SelectItem
                     key={option.value}
                     textValue={
                       typeof option.label === "string"
@@ -295,7 +300,7 @@ export default function MainTab({
                     {typeof option.label === "string"
                       ? option.label
                       : getLocalizedText(option.label)}
-                  </IBaseSelectItem>
+                  </SelectItem>
                 ))}
               </IBaseSelect>
             )}
@@ -311,7 +316,9 @@ export default function MainTab({
                 selectedKeys={
                   field.value
                     ? new Set(
-                        Array.isArray(field.value) ? field.value : [field.value]
+                        Array.isArray(field.value)
+                          ? field.value
+                          : [field.value],
                       )
                     : new Set()
                 }
@@ -321,12 +328,12 @@ export default function MainTab({
                   const selectedArray = Array.from(keys);
 
                   field.onChange(
-                    selectedArray.length > 0 ? selectedArray : undefined
+                    selectedArray.length > 0 ? selectedArray : undefined,
                   );
                 }}
               >
                 {locationOptions.map((option) => (
-                  <IBaseSelectItem
+                  <SelectItem
                     key={option.value}
                     textValue={
                       typeof option.label === "string"
@@ -337,7 +344,7 @@ export default function MainTab({
                     {typeof option.label === "string"
                       ? option.label
                       : getLocalizedText(option.label)}
-                  </IBaseSelectItem>
+                  </SelectItem>
                 ))}
               </IBaseSelect>
             )}
@@ -353,7 +360,9 @@ export default function MainTab({
                 selectedKeys={
                   field.value
                     ? new Set(
-                        Array.isArray(field.value) ? field.value : [field.value]
+                        Array.isArray(field.value)
+                          ? field.value
+                          : [field.value],
                       )
                     : new Set()
                 }
@@ -363,12 +372,12 @@ export default function MainTab({
                   const selectedArray = Array.from(keys);
 
                   field.onChange(
-                    selectedArray.length > 0 ? selectedArray : undefined
+                    selectedArray.length > 0 ? selectedArray : undefined,
                   );
                 }}
               >
                 {regionOptions.map((option) => (
-                  <IBaseSelectItem
+                  <SelectItem
                     key={option.value}
                     textValue={
                       typeof option.label === "string"
@@ -379,7 +388,7 @@ export default function MainTab({
                     {typeof option.label === "string"
                       ? option.label
                       : getLocalizedText(option.label)}
-                  </IBaseSelectItem>
+                  </SelectItem>
                 ))}
               </IBaseSelect>
             )}
@@ -395,7 +404,9 @@ export default function MainTab({
                 selectedKeys={
                   field.value
                     ? new Set(
-                        Array.isArray(field.value) ? field.value : [field.value]
+                        Array.isArray(field.value)
+                          ? field.value
+                          : [field.value],
                       )
                     : new Set()
                 }
@@ -405,12 +416,12 @@ export default function MainTab({
                   const selectedArray = Array.from(keys);
 
                   field.onChange(
-                    selectedArray.length > 0 ? selectedArray : undefined
+                    selectedArray.length > 0 ? selectedArray : undefined,
                   );
                 }}
               >
                 {customerGroupOptions.map((option) => (
-                  <IBaseSelectItem
+                  <SelectItem
                     key={option.value}
                     textValue={
                       typeof option.label === "string"
@@ -421,7 +432,7 @@ export default function MainTab({
                     {typeof option.label === "string"
                       ? option.label
                       : getLocalizedText(option.label)}
-                  </IBaseSelectItem>
+                  </SelectItem>
                 ))}
               </IBaseSelect>
             )}

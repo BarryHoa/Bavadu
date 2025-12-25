@@ -3,15 +3,13 @@
 import type { LocaleFieldValue, VariantFieldValue } from "./types";
 
 import {
-  IBaseButton,
-  IBaseCard,
-  IBaseCardBody,
-  IBaseDivider,
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseTextarea,
   IBaseUploadImageTiny,
 } from "@base/client/components";
+import { Button } from "@heroui/button";
+import { Card, CardBody, Divider } from "@heroui/react";
 import { Plus, Trash } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -20,7 +18,7 @@ import { ProductMasterFeaturesType } from "../../../interface/Product";
 import { updateLocaleValue } from "./types";
 import UomSection from "./UomSection";
 
-type VariantIBaseTabProps = {
+type VariantTabProps = {
   value: VariantFieldValue;
   masterFeatures: Record<ProductMasterFeaturesType, boolean>;
   variantIndex: number;
@@ -40,7 +38,7 @@ type VariantIBaseTabProps = {
   canRemove: boolean;
   onRemove: () => void;
   onUpdate: (
-    updater: (current: VariantFieldValue) => VariantFieldValue
+    updater: (current: VariantFieldValue) => VariantFieldValue,
   ) => void;
 };
 
@@ -53,7 +51,7 @@ export default function VariantTab({
   canRemove,
   onRemove,
   onUpdate,
-}: VariantIBaseTabProps) {
+}: VariantTabProps) {
   const t = useTranslations("common");
   const tProductForm = useTranslations("mdl-product.product-create");
 
@@ -63,7 +61,7 @@ export default function VariantTab({
         <h2 className="text-lg font-semibold">
           {t("variant")} {variantIndex + 1}
         </h2>
-        <IBaseButton
+        <Button
           isDisabled={isBusy || !canRemove}
           size="sm"
           startContent={<Trash size={14} />}
@@ -71,7 +69,7 @@ export default function VariantTab({
           onPress={onRemove}
         >
           {tProductForm("removeVariant")}
-        </IBaseButton>
+        </Button>
       </div>
 
       <IBaseInputMultipleLang
@@ -136,7 +134,7 @@ export default function VariantTab({
           }
         />
       </div>
-      <IBaseDivider />
+      <Divider />
       <UomSection
         error={variantErrors?.baseUom}
         isBusy={isBusy}
@@ -144,7 +142,7 @@ export default function VariantTab({
         variantIndex={variantIndex}
       />
 
-      <IBaseDivider />
+      <Divider />
 
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
@@ -156,7 +154,7 @@ export default function VariantTab({
               {tProductForm("definePackaging")}
             </p>
           </div>
-          <IBaseButton
+          <Button
             isDisabled={isBusy}
             size="sm"
             startContent={<Plus size={14} />}
@@ -176,7 +174,7 @@ export default function VariantTab({
             }
           >
             {tProductForm("addPacking")}
-          </IBaseButton>
+          </Button>
         </div>
 
         {!value.packings || value.packings.length === 0 ? (
@@ -186,13 +184,13 @@ export default function VariantTab({
         ) : (
           <div className="flex flex-col gap-3">
             {value.packings.map((packing, packingIndex) => (
-              <IBaseCard key={packingIndex} className="border border-default-200">
-                <IBaseCardBody className="flex flex-col gap-3">
+              <Card key={packingIndex} className="border border-default-200">
+                <CardBody className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <h5 className="text-small font-medium">
                       Packing #{packingIndex + 1}
                     </h5>
-                    <IBaseButton
+                    <Button
                       isDisabled={isBusy}
                       size="sm"
                       startContent={<Trash size={14} />}
@@ -201,13 +199,13 @@ export default function VariantTab({
                         onUpdate((current) => ({
                           ...current,
                           packings: current.packings.filter(
-                            (_, idx) => idx !== packingIndex
+                            (_, idx) => idx !== packingIndex,
                           ),
                         }))
                       }
                     >
                       {t("actions.remove")}
-                    </IBaseButton>
+                    </Button>
                   </div>
                   <div className="grid gap-3 md:grid-cols-2">
                     <IBaseInput
@@ -223,7 +221,7 @@ export default function VariantTab({
                                   ...p,
                                   name: updateLocaleValue(p.name, "en", next),
                                 }
-                              : p
+                              : p,
                           ),
                         }))
                       }
@@ -241,7 +239,7 @@ export default function VariantTab({
                                   ...p,
                                   name: updateLocaleValue(p.name, "vi", next),
                                 }
-                              : p
+                              : p,
                           ),
                         }))
                       }
@@ -260,19 +258,19 @@ export default function VariantTab({
                                 ...p,
                                 description: next,
                               }
-                            : p
+                            : p,
                         ),
                       }))
                     }
                   />
-                </IBaseCardBody>
-              </IBaseCard>
+                </CardBody>
+              </Card>
             ))}
           </div>
         )}
       </div>
 
-      <IBaseDivider />
+      <Divider />
 
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
@@ -284,7 +282,7 @@ export default function VariantTab({
               {tProductForm("captureAttributes")}
             </p>
           </div>
-          <IBaseButton
+          <Button
             isDisabled={isBusy}
             size="sm"
             startContent={<Plus size={14} />}
@@ -304,7 +302,7 @@ export default function VariantTab({
             }
           >
             {tProductForm("addAttribute")}
-          </IBaseButton>
+          </Button>
         </div>
 
         {!value.attributes || value.attributes.length === 0 ? (
@@ -314,13 +312,13 @@ export default function VariantTab({
         ) : (
           <div className="flex flex-col gap-3">
             {value.attributes.map((attribute, attributeIndex) => (
-              <IBaseCard key={attributeIndex} className="border border-default-200">
-                <IBaseCardBody className="flex flex-col gap-3">
+              <Card key={attributeIndex} className="border border-default-200">
+                <CardBody className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <h5 className="text-small font-medium">
                       Attribute #{attributeIndex + 1}
                     </h5>
-                    <IBaseButton
+                    <Button
                       isDisabled={isBusy}
                       size="sm"
                       startContent={<Trash size={14} />}
@@ -329,13 +327,13 @@ export default function VariantTab({
                         onUpdate((current) => ({
                           ...current,
                           attributes: current.attributes.filter(
-                            (_, idx) => idx !== attributeIndex
+                            (_, idx) => idx !== attributeIndex,
                           ),
                         }))
                       }
                     >
                       {t("actions.remove")}
-                    </IBaseButton>
+                    </Button>
                   </div>
                   <IBaseInput
                     errorMessage={
@@ -343,7 +341,7 @@ export default function VariantTab({
                     }
                     isDisabled={isBusy}
                     isInvalid={Boolean(
-                      variantErrors?.attributes?.[attributeIndex]?.code
+                      variantErrors?.attributes?.[attributeIndex]?.code,
                     )}
                     label={t("code")}
                     value={attribute.code}
@@ -351,7 +349,7 @@ export default function VariantTab({
                       onUpdate((current) => ({
                         ...current,
                         attributes: current.attributes.map((a, idx) =>
-                          idx === attributeIndex ? { ...a, code: next } : a
+                          idx === attributeIndex ? { ...a, code: next } : a,
                         ),
                       }))
                     }
@@ -370,7 +368,7 @@ export default function VariantTab({
                                   ...a,
                                   name: updateLocaleValue(a.name, "en", next),
                                 }
-                              : a
+                              : a,
                           ),
                         }))
                       }
@@ -388,7 +386,7 @@ export default function VariantTab({
                                   ...a,
                                   name: updateLocaleValue(a.name, "vi", next),
                                 }
-                              : a
+                              : a,
                           ),
                         }))
                       }
@@ -401,7 +399,7 @@ export default function VariantTab({
                     }
                     isDisabled={isBusy}
                     isInvalid={Boolean(
-                      variantErrors?.attributes?.[attributeIndex]?.value
+                      variantErrors?.attributes?.[attributeIndex]?.value,
                     )}
                     label={t("value")}
                     value={attribute.value}
@@ -409,13 +407,13 @@ export default function VariantTab({
                       onUpdate((current) => ({
                         ...current,
                         attributes: current.attributes.map((a, idx) =>
-                          idx === attributeIndex ? { ...a, value: next } : a
+                          idx === attributeIndex ? { ...a, value: next } : a,
                         ),
                       }))
                     }
                   />
-                </IBaseCardBody>
-              </IBaseCard>
+                </CardBody>
+              </Card>
             ))}
           </div>
         )}
