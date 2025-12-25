@@ -3,8 +3,6 @@
 import type { InputProps } from "@heroui/input";
 import type { Dayjs } from "dayjs";
 
-import IBaseInput from "@base/client/components/IBaseInput";
-import { SYSTEM_TIMEZONE } from "@base/shared/constants";
 import { Button } from "@heroui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
 import clsx from "clsx";
@@ -18,7 +16,11 @@ import React, {
   useState,
 } from "react";
 
+import IBaseInput from "@base/client/components/IBaseInput";
+import { SYSTEM_TIMEZONE } from "@base/shared/constants";
+
 import { formatDayjs, nowInTz, toDayjs } from "../../utils/date/parseDateInput";
+
 import ButtonFastChoose from "./components/ButtonFastChoose";
 
 export type IBaseTimePickerValue = string | Dayjs | null;
@@ -86,12 +88,12 @@ export function IBaseTimePicker(props: IBaseTimePickerProps) {
 
   const committedDayjs = useMemo(
     () => toDayjs(committedValue, format, timezone),
-    [committedValue, format, timezone],
+    [committedValue, format, timezone]
   );
 
   const committedText = useMemo(
     () => (committedDayjs ? formatDayjs(committedDayjs, format, timezone) : ""),
-    [committedDayjs, format, timezone],
+    [committedDayjs, format, timezone]
   );
 
   const [draftText, setDraftText] = useState(committedText);
@@ -111,6 +113,7 @@ export function IBaseTimePicker(props: IBaseTimePickerProps) {
         // Prevent clearing: revert to last committed value
         setDraftText(committedText);
         setIsDraftInvalid(false);
+
         return true;
       }
       setIsDraftInvalid(false);
@@ -162,7 +165,7 @@ export function IBaseTimePicker(props: IBaseTimePickerProps) {
       }
       open();
     },
-    [commitAndClose, isDisabled, open],
+    [commitAndClose, isDisabled, open]
   );
 
   const handleKey: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
@@ -187,6 +190,7 @@ export function IBaseTimePicker(props: IBaseTimePickerProps) {
   const showClearIcon = allowClear && Boolean(draftText.trim());
   const resolvedPlaceholder = useMemo(() => {
     if (rest.placeholder) return rest.placeholder;
+
     return t("time.placeholder", { format });
   }, [format, rest.placeholder, t]);
 
@@ -208,12 +212,12 @@ export function IBaseTimePicker(props: IBaseTimePickerProps) {
 
   return (
     <Popover
-      isOpen={isOpen}
-      placement="bottom"
       classNames={{
         // Prevent HeroUI Popover trigger from shrinking/fading when open
         trigger: "aria-expanded:!scale-100 aria-expanded:!opacity-100",
       }}
+      isOpen={isOpen}
+      placement="bottom"
       onOpenChange={handleOpenChange}
     >
       <PopoverTrigger>
@@ -221,7 +225,6 @@ export function IBaseTimePicker(props: IBaseTimePickerProps) {
           <IBaseInput
             {...rest}
             ref={inputRef}
-            placeholder={resolvedPlaceholder}
             endContent={
               <div className="flex items-center gap-1 cursor-pointer">
                 {showClearIcon ? (
@@ -229,11 +232,11 @@ export function IBaseTimePicker(props: IBaseTimePickerProps) {
                     aria-label={t("time.clearAriaLabel")}
                     className="cursor-pointer rounded-small p-1 text-default-400 transition-colors hover:text-danger-500"
                     type="button"
+                    onClick={handleClear}
                     onMouseDown={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
                     }}
-                    onClick={handleClear}
                   >
                     <X className="size-4" />
                   </button>
@@ -249,6 +252,7 @@ export function IBaseTimePicker(props: IBaseTimePickerProps) {
             }
             isDisabled={isDisabled}
             isInvalid={rest.isInvalid || isDraftInvalid}
+            placeholder={resolvedPlaceholder}
             value={draftText}
             onChange={(e) => {
               const next = e.target.value;
@@ -257,6 +261,7 @@ export function IBaseTimePicker(props: IBaseTimePickerProps) {
                 // Prevent clearing: revert to last committed value
                 setDraftText(committedText);
                 setIsDraftInvalid(false);
+
                 return;
               }
               setDraftText(next);
@@ -277,8 +282,8 @@ export function IBaseTimePicker(props: IBaseTimePickerProps) {
           {showNow ? (
             <ButtonFastChoose
               align="end"
-              wrapperClassName="pt-0"
               label={t("time.now")}
+              wrapperClassName="pt-0"
               onPress={() => {
                 const out = formatDayjs(now, format, timezone);
 

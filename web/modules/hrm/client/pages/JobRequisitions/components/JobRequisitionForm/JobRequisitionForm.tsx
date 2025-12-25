@@ -1,19 +1,25 @@
 "use client";
 
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { useTranslations } from "next-intl";
+import { useMemo } from "react";
+import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+
 import {
-  DatePicker,
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBaseTextarea,
+  toDayjs,
+} from "@base/client";
+import {
+  IBaseDatePicker,
+  IBaseDatePickerValue,
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseInputNumber,
   IBaseSingleSelectAsync,
 } from "@base/client/components";
-import { IBaseButton } from "@base/client";
-import { IBaseCard, IBaseCardBody, IBaseTextarea } from "@base/client";
-import { valibotResolver } from "@hookform/resolvers/valibot";
-import { parseDate } from "@internationalized/date";
-import { useTranslations } from "next-intl";
-import { useMemo } from "react";
-import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 
 import {
   createJobRequisitionValidation,
@@ -58,7 +64,7 @@ export default function JobRequisitionForm({
   });
 
   const onSubmitForm: SubmitHandler<JobRequisitionFormValues> = async (
-    values,
+    values
   ) => {
     await onSubmit(values);
   };
@@ -279,16 +285,14 @@ export default function JobRequisitionForm({
               control={control}
               name="openedDate"
               render={({ field, fieldState }) => (
-                <DatePicker
+                <IBaseDatePicker
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={t("labels.openedDate")}
                   value={
                     field.value
-                      ? typeof field.value === "string"
-                        ? parseDate(field.value)
-                        : field.value
-                      : null
+                      ? toDayjs(field.value)
+                      : (undefined as unknown as IBaseDatePickerValue)
                   }
                   onChange={(val) =>
                     field.onChange(val ? val.toString() : null)
@@ -300,16 +304,16 @@ export default function JobRequisitionForm({
               control={control}
               name="closedDate"
               render={({ field, fieldState }) => (
-                <DatePicker
+                <IBaseDatePicker
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={t("labels.closedDate")}
                   value={
                     field.value
-                      ? typeof field.value === "string"
-                        ? parseDate(field.value)
-                        : field.value
-                      : null
+                      ? (toDayjs(
+                          field.value
+                        ) as unknown as IBaseDatePickerValue)
+                      : undefined
                   }
                   onChange={(val) =>
                     field.onChange(val ? val.toString() : null)

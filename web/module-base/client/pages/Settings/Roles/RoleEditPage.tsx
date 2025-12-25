@@ -2,20 +2,22 @@
 
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
 
-import { IBaseButton, IBaseCard } from "@base/client/components";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { useParams, useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+
+import IBaseSelectItem from "@/module-base/client/components/IBaseSelect/IBaseSelectItem";
 import {
+  IBaseButton,
+  IBaseCard,
   IBaseCardBody,
   IBaseCardHeader,
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseSelect,
-  IBaseSelectItem,
 } from "@base/client/components";
 import roleService from "@base/client/services/RoleService";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
 
 const PERMISSIONS_QUERY_KEY = ["settings", "permissions", "list"] as const;
 const ROLE_QUERY_KEY = (id: string) =>
@@ -38,7 +40,7 @@ export default function RoleEditPage() {
   });
   const [description, setDescription] = useState("");
   const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>(
-    [],
+    []
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{
@@ -73,7 +75,7 @@ export default function RoleEditPage() {
       setName(role.name);
       setDescription(role.description || "");
       setSelectedPermissionIds(
-        role.permissions ? role.permissions.map((p) => p.id) : [],
+        role.permissions ? role.permissions.map((p) => p.id) : []
       );
     }
   }, [roleQuery.data]);
@@ -237,7 +239,10 @@ export default function RoleEditPage() {
                 }}
               >
                 {permissions.map((permission) => (
-                  <IBaseSelectItem key={permission.id} textValue={permission.key}>
+                  <IBaseSelectItem
+                    key={permission.id}
+                    textValue={permission.key}
+                  >
                     {permission.key} - {permission.module}.{permission.resource}
                     .{permission.action}
                   </IBaseSelectItem>

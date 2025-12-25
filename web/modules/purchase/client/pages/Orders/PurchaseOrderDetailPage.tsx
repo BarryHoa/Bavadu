@@ -1,13 +1,20 @@
 "use client";
 
-import { IBaseInput } from "@base/client/components";
-import LinkAs from "@base/client/components/LinkAs";
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
-import { IBaseButton } from "@base/client";
-import { IBaseCard, IBaseCardBody, IBaseChip, IBaseDivider, IBaseSpinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow,  } from "@base/client";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBaseChip,
+  IBaseDivider,
+  IBaseSpinner,
+} from "@base/client";
+import { IBaseInput } from "@base/client/components";
+import LinkAs from "@base/client/components/LinkAs";
+import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 
 import {
   PurchaseOrderDto,
@@ -57,7 +64,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
         acc[line.id] = "0";
 
         return acc;
-      }, {}),
+      }, {})
     );
   }, [order?.id, order?.warehouseId, lines]);
 
@@ -65,9 +72,9 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
     () =>
       lines.filter(
         (line) =>
-          Number(line.quantityOrdered) - Number(line.quantityReceived) > 0.0001,
+          Number(line.quantityOrdered) - Number(line.quantityReceived) > 0.0001
       ),
-    [lines],
+    [lines]
   );
 
   const {
@@ -233,35 +240,6 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
       <IBaseCard>
         <IBaseCardBody className="space-y-3">
           <h2 className="text-lg font-semibold">Lines</h2>
-          <Table removeWrapper aria-label="Purchase order lines">
-            <TableHeader>
-              <TableColumn>Product</TableColumn>
-              <TableColumn>Description</TableColumn>
-              <TableColumn>Ordered</TableColumn>
-              <TableColumn>Received</TableColumn>
-              <TableColumn>Unit Price</TableColumn>
-            </TableHeader>
-            <TableBody>
-              {lines.map((line) => (
-                <TableRow key={line.id}>
-                  <TableCell>{line.productId}</TableCell>
-                  <TableCell>{line.description || "—"}</TableCell>
-                  <TableCell>
-                    {Number(line.quantityOrdered).toFixed(2)}
-                  </TableCell>
-                  <TableCell>
-                    {Number(line.quantityReceived).toFixed(2)}
-                  </TableCell>
-                  <TableCell>
-                    {Number(line.unitPrice).toLocaleString(undefined, {
-                      style: "currency",
-                      currency: order.currency || "USD",
-                    })}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
         </IBaseCardBody>
       </IBaseCard>
 
@@ -353,7 +331,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
                       isReadOnly
                       label="Ordered / Received"
                       value={`${Number(line.quantityOrdered).toFixed(
-                        2,
+                        2
                       )} / ${Number(line.quantityReceived).toFixed(2)}`}
                     />
                   </div>

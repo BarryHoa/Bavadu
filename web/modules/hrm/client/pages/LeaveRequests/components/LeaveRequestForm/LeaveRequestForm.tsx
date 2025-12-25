@@ -1,17 +1,23 @@
 "use client";
 
-import {
-  DatePicker,
-  IBaseInputNumber,
-  IBaseSingleSelectAsync,
-} from "@base/client/components";
-import { IBaseButton } from "@base/client";
-import { IBaseCard, IBaseCardBody, IBaseTextarea } from "@base/client";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { parseDate } from "@internationalized/date";
 import { useTranslations } from "next-intl";
 import { useCallback, useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBaseTextarea,
+  toDayjs,
+} from "@base/client";
+import {
+  IBaseDatePicker,
+  IBaseDatePickerValue,
+  IBaseInputNumber,
+  IBaseSingleSelectAsync,
+} from "@base/client/components";
 
 import {
   createLeaveRequestValidation,
@@ -72,7 +78,7 @@ export default function LeaveRequestForm({
   }, [startDate, endDate, setValue]);
 
   const onSubmitForm: SubmitHandler<LeaveRequestFormValues> = async (
-    values,
+    values
   ) => {
     await onSubmit(values);
   };
@@ -146,17 +152,15 @@ export default function LeaveRequestForm({
               control={control}
               name="startDate"
               render={({ field, fieldState }) => (
-                <DatePicker
+                <IBaseDatePicker
                   isRequired
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={t("labels.startDate")}
                   value={
                     field.value
-                      ? typeof field.value === "string"
-                        ? parseDate(field.value)
-                        : field.value
-                      : null
+                      ? toDayjs(field.value)
+                      : (undefined as unknown as IBaseDatePickerValue)
                   }
                   onChange={(val) => {
                     field.onChange(val ? val.toString() : null);
@@ -169,17 +173,15 @@ export default function LeaveRequestForm({
               control={control}
               name="endDate"
               render={({ field, fieldState }) => (
-                <DatePicker
+                <IBaseDatePicker
                   isRequired
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={t("labels.endDate")}
                   value={
                     field.value
-                      ? typeof field.value === "string"
-                        ? parseDate(field.value)
-                        : field.value
-                      : null
+                      ? toDayjs(field.value)
+                      : (undefined as unknown as IBaseDatePickerValue)
                   }
                   onChange={(val) => {
                     field.onChange(val ? val.toString() : null);

@@ -1,18 +1,23 @@
 "use client";
 
-import {
-  IBaseInput,
-  IBaseInputNumber,
-  IBaseSingleSelectAsync,
-  DatePicker,
-} from "@base/client/components";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { parseDate } from "@internationalized/date";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
-import { IBaseButton } from "@base/client";
-import { IBaseCard, IBaseCardBody, IBaseTextarea } from "@base/client";
+
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBaseTextarea,
+  toDayjs,
+} from "@base/client";
+import {
+  IBaseDatePicker,
+  IBaseInput,
+  IBaseInputNumber,
+  IBaseSingleSelectAsync,
+} from "@base/client/components";
 
 import {
   createPerformanceReviewValidation,
@@ -54,7 +59,7 @@ export default function PerformanceReviewForm({
   });
 
   const onSubmitForm: SubmitHandler<PerformanceReviewFormValues> = async (
-    values,
+    values
   ) => {
     await onSubmit(values);
   };
@@ -143,18 +148,12 @@ export default function PerformanceReviewForm({
               control={control}
               name="reviewDate"
               render={({ field, fieldState }) => (
-                <DatePicker
+                <IBaseDatePicker
                   isRequired
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={t("labels.reviewDate")}
-                  value={
-                    field.value
-                      ? typeof field.value === "string"
-                        ? parseDate(field.value)
-                        : field.value
-                      : null
-                  }
+                  value={field.value ? toDayjs(field.value) : undefined}
                   onChange={(val) =>
                     field.onChange(val ? val.toString() : null)
                   }

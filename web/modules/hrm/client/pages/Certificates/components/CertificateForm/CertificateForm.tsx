@@ -1,18 +1,23 @@
 "use client";
 
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { useTranslations } from "next-intl";
+import { useMemo } from "react";
+import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+
 import {
-  DatePicker,
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBaseCheckbox,
+  toDayjs,
+} from "@base/client";
+import {
+  IBaseDatePicker,
   IBaseInput,
   IBaseInputMultipleLang,
   IBaseSingleSelectAsync,
 } from "@base/client/components";
-import { IBaseButton } from "@base/client";
-import { IBaseCard, IBaseCardBody, IBaseCheckbox } from "@base/client";
-import { valibotResolver } from "@hookform/resolvers/valibot";
-import { parseDate } from "@internationalized/date";
-import { useTranslations } from "next-intl";
-import { useMemo } from "react";
-import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 
 import {
   createCertificateValidation,
@@ -154,18 +159,12 @@ export default function CertificateForm({
               control={control}
               name="issueDate"
               render={({ field, fieldState }) => (
-                <DatePicker
+                <IBaseDatePicker
                   isRequired
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={t("labels.issueDate")}
-                  value={
-                    field.value
-                      ? typeof field.value === "string"
-                        ? parseDate(field.value)
-                        : field.value
-                      : null
-                  }
+                  value={field.value ? toDayjs(field.value) : undefined}
                   onChange={(val) =>
                     field.onChange(val ? val.toString() : null)
                   }
@@ -176,17 +175,11 @@ export default function CertificateForm({
               control={control}
               name="expiryDate"
               render={({ field, fieldState }) => (
-                <DatePicker
+                <IBaseDatePicker
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
                   label={t("labels.expiryDate")}
-                  value={
-                    field.value
-                      ? typeof field.value === "string"
-                        ? parseDate(field.value)
-                        : field.value
-                      : null
-                  }
+                  value={field.value ? toDayjs(field.value) : undefined}
                   onChange={(val) =>
                     field.onChange(val ? val.toString() : null)
                   }

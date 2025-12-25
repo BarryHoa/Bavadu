@@ -79,6 +79,3 @@ export const IBasePicker = Object.assign(IBaseDatePicker, {
 }) as IBasePickerComponent;
 
 export default IBasePicker;
-
-// Named exports (optional convenience)
-

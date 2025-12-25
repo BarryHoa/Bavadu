@@ -42,8 +42,8 @@ class MediaService extends ClientHttpService {
         // Don't set Content-Type for FormData, browser will set it with boundary
         ...Object.fromEntries(
           Object.entries(headers).filter(
-            ([key]) => key.toLowerCase() !== "content-type",
-          ),
+            ([key]) => key.toLowerCase() !== "content-type"
+          )
         ),
       },
     });
@@ -54,7 +54,7 @@ class MediaService extends ClientHttpService {
       throw new Error(
         errorData.message ||
           errorData.error ||
-          `Upload failed: ${response.status} ${response.statusText}`,
+          `Upload failed: ${response.status} ${response.statusText}`
       );
     }
 
@@ -73,7 +73,7 @@ class MediaService extends ClientHttpService {
    */
   async uploadImageItems(items: ImageUploadItem[]): Promise<ImageUploadItem[]> {
     const itemsToUpload = items.filter(
-      (item) => item.blob && item.status !== "done",
+      (item) => item.blob && item.status !== "done"
     );
 
     if (itemsToUpload.length === 0) {

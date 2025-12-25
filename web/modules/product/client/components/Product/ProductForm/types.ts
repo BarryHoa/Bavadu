@@ -1,4 +1,4 @@
-import type { ImageUploadItem } from "@base/client/components";
+import type { ImageUploadItem } from "@/module-base/client/interface/ImageUpdload";
 import type {
   ProductMasterFeatures,
   ProductMasterFeaturesType,
@@ -63,7 +63,7 @@ export type MasterFieldValue = {
 export const updateLocaleValue = (
   value: LocaleFieldValue,
   locale: keyof LocaleFieldValue,
-  next: string,
+  next: string
 ): LocaleFieldValue => ({
   ...value,
   [locale]: next,
