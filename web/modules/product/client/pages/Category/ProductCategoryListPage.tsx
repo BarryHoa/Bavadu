@@ -4,13 +4,13 @@ import type { LocalizeText } from "@base/client/interface/LocalizeText";
 
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import {
-  DATA_TABLE_COLUMN_KEY_ACTION,
-  DataTableColumn,
+  I_BASE_TABLE_COLUMN_KEY_ACTION,
+  IBaseTableColumnDefinition,
 } from "@base/client/components";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { Chip } from "@base/client";
+import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
 import React, { useMemo } from "react";
 import LinkAs from "@base/client/components/LinkAs";
@@ -22,7 +22,7 @@ const ProductCategoryListPage = (): React.ReactNode => {
   const localized = useLocalizedText();
   const t = useTranslations("dataTable");
 
-  const columns = useMemo<DataTableColumn<ProductCategoryRow>[]>(() => {
+  const columns = useMemo<IBaseTableColumnDefinition<ProductCategoryRow>[]>(() => {
     return [
       {
         key: "name",
@@ -69,13 +69,13 @@ const ProductCategoryListPage = (): React.ReactNode => {
         align: "center",
         sortable: true,
         render: (_, row) => (
-          <Chip
+          <IBaseChip
             color={row.isActive ? "success" : "danger"}
             size="sm"
             variant="flat"
           >
             {row.isActive ? "Active" : "Inactive"}
-          </Chip>
+          </IBaseChip>
         ),
       },
       {
@@ -91,7 +91,7 @@ const ProductCategoryListPage = (): React.ReactNode => {
         render: (_, row) => (row.updatedAt ? formatDate(row.updatedAt) : "-"),
       },
       {
-        key: DATA_TABLE_COLUMN_KEY_ACTION,
+        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
         label: t("columns.action"),
         align: "end",
         render: (_, row) => {

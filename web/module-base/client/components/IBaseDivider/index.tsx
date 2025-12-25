@@ -13,6 +13,4 @@ export const IBaseDivider = React.forwardRef<HTMLElement, IBaseDividerProps>(
 
 IBaseDivider.displayName = "IBaseDivider";
 
-export const Divider = IBaseDivider;
-
 export default IBaseDivider;

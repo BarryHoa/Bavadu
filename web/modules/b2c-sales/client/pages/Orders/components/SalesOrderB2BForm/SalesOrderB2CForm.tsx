@@ -19,8 +19,8 @@ import {
   shippingTermService,
   taxRateService,
 } from "@base/client/services";
-import { Button } from "@base/client";
-import { Card, CardBody, Textarea } from "@base/client";
+import { IBaseButton } from "@base/client";
+import { IBaseCard, IBaseCardBody, IBaseTextarea } from "@base/client";
 import UnitOfMeasureService from "@mdl/product/client/services/UnitOfMeasureService";
 import StockService from "@mdl/stock/client/services/StockService";
 
@@ -295,11 +295,11 @@ export default function SalesOrderB2CForm({
       {/* Action Buttons - Sticky */}
       <div className="sticky top-0 z-10 flex justify-end gap-3 py-2 mb-3 bg-background border-b border-divider -mx-4 px-4">
         {onCancel && (
-          <Button size="sm" variant="light" onPress={onCancel}>
+          <IBaseButton size="sm" variant="light" onPress={onCancel}>
             {tLabels("cancel")}
-          </Button>
+          </IBaseButton>
         )}
-        <Button
+        <IBaseButton
           color="primary"
           disabled={isSubmitting}
           isLoading={isSubmitting}
@@ -307,23 +307,23 @@ export default function SalesOrderB2CForm({
           type="submit"
         >
           {tLabels("createOrder")}
-        </Button>
+        </IBaseButton>
       </div>
 
       {/* Section: Thông tin chung */}
-      <Card>
-        <CardBody className="p-4">
+      <IBaseCard>
+        <IBaseCardBody className="p-4">
           <GeneralInfoSection
             control={control}
             createdAt={formattedCreatedAt}
             currency={watchedCurrency}
           />
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
 
       {/* Section: Order Lines */}
-      <Card>
-        <CardBody className="p-4">
+      <IBaseCard>
+        <IBaseCardBody className="p-4">
           <OrderLinesSection
             append={append}
             control={control}
@@ -339,23 +339,23 @@ export default function SalesOrderB2CForm({
             watchedLines={watchedLines}
             watchedPriceListId={watchedPriceListId}
           />
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
 
       {/* Section: Thông tin giao hàng */}
-      <Card>
-        <CardBody className="p-4">
+      <IBaseCard>
+        <IBaseCardBody className="p-4">
           <DeliveryInfoSection
             control={control}
             errors={errors}
             isShippingOtherThanPickup={isShippingOtherThanPickup}
           />
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
 
       {/* Order Totals */}
-      <Card>
-        <CardBody className="p-4">
+      <IBaseCard>
+        <IBaseCardBody className="p-4">
           <OrderTotalsSection
             calculatedTotals={calculatedTotals}
             control={control}
@@ -363,12 +363,12 @@ export default function SalesOrderB2CForm({
             isShippingOtherThanPickup={isShippingOtherThanPickup}
             watchedCurrency={watchedCurrency}
           />
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
 
       {/* Section: Thông tin khách hàng */}
-      <Card>
-        <CardBody className="p-4">
+      <IBaseCard>
+        <IBaseCardBody className="p-4">
           <CustomerInfoSection
             control={control}
             errors={errors}
@@ -376,17 +376,17 @@ export default function SalesOrderB2CForm({
             setSelectedCustomer={setSelectedCustomer}
             setValue={setValue}
           />
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
 
       {/* Notes */}
-      <Card>
-        <CardBody className="p-4">
+      <IBaseCard>
+        <IBaseCardBody className="p-4">
           <Controller
             control={control}
             name="notes"
             render={({ field, fieldState }) => (
-              <Textarea
+              <IBaseTextarea
                 {...field}
                 errorMessage={fieldState.error?.message}
                 isInvalid={fieldState.invalid}
@@ -398,8 +398,8 @@ export default function SalesOrderB2CForm({
               />
             )}
           />
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
     </form>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import type { DataTableColumn } from "@base/client/components";
+import type { IBaseTableColumnDefinition } from "@base/client/components";
 import type {
   StockSummaryItem,
   WarehouseDto,
@@ -15,8 +15,8 @@ import {
 } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
-import { Button } from "@base/client";
-import { Card, CardBody, Divider } from "@base/client";
+import { IBaseButton } from "@base/client";
+import { IBaseCard, IBaseCardBody, IBaseDivider } from "@base/client";
 import { useMemo } from "react";
 
 interface StockSummarySectionProps {
@@ -45,7 +45,7 @@ export default function StockSummarySection({
     [warehouses],
   );
 
-  const columns = useMemo<DataTableColumn<StockSummaryItem>[]>(() => {
+  const columns = useMemo<IBaseTableColumnDefinition<StockSummaryItem>[]>(() => {
     return [
       {
         key: "productCode",
@@ -105,8 +105,8 @@ export default function StockSummarySection({
   }, []);
 
   return (
-    <Card>
-      <CardBody className="space-y-4">
+    <IBaseCard>
+      <IBaseCardBody className="space-y-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-end">
           <IBaseInput
             label="Product ID"
@@ -133,20 +133,20 @@ export default function StockSummarySection({
             }}
           />
           <div className="flex items-center gap-2">
-            <Button
+            <IBaseButton
               color="primary"
               size="sm"
               onPress={() => onFilterChange(filters)}
             >
               Apply
-            </Button>
-            <Button size="sm" variant="light" onPress={onResetFilters}>
+            </IBaseButton>
+            <IBaseButton size="sm" variant="light" onPress={onResetFilters}>
               Reset
-            </Button>
+            </IBaseButton>
           </div>
         </div>
 
-        <Divider />
+        <IBaseDivider />
 
         <ViewListDataTable<StockSummaryItem & { id: string }>
           columnVisibility={{ hidden: true }}
@@ -159,7 +159,7 @@ export default function StockSummarySection({
           rowKey="id"
           search={{ hidden: true }}
         />
-      </CardBody>
-    </Card>
+      </IBaseCardBody>
+    </IBaseCard>
   );
 }

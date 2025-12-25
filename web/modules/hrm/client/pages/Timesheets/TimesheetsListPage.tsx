@@ -2,13 +2,13 @@
 
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import {
-  DATA_TABLE_COLUMN_KEY_ACTION,
-  DataTableColumn,
+  I_BASE_TABLE_COLUMN_KEY_ACTION,
+  IBaseTableColumnDefinition,
   ViewListDataTable,
 } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { Chip } from "@base/client";
+import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { TimesheetDto } from "@mdl/hrm/client/interface/Timesheet";
@@ -25,7 +25,7 @@ export default function TimesheetsListPage(): React.ReactNode {
   const t = useTranslations("hrm.timesheets");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<DataTableColumn<TimesheetRow>[]>(
+  const columns = useMemo<IBaseTableColumnDefinition<TimesheetRow>[]>(
     () => [
       {
         key: "employee",
@@ -71,13 +71,13 @@ export default function TimesheetsListPage(): React.ReactNode {
         key: "status",
         label: t("labels.status"),
         render: (value) => (
-          <Chip className="capitalize" size="sm" variant="flat">
+          <IBaseChip className="capitalize" size="sm" variant="flat">
             {value || "pending"}
-          </Chip>
+          </IBaseChip>
         ),
       },
       {
-        key: DATA_TABLE_COLUMN_KEY_ACTION,
+        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
         label: tDataTable("columns.action"),
         align: "end",
         render: (_, row) => {

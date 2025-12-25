@@ -29,9 +29,4 @@ export const IBaseCardFooter: React.FC<any> = (props) => (
   <HeroUICardFooter {...props} />
 );
 
-export const Card = IBaseCard;
-export const CardHeader = IBaseCardHeader;
-export const CardBody = IBaseCardBody;
-export const CardFooter = IBaseCardFooter;
-
 export default IBaseCard;

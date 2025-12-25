@@ -15,7 +15,4 @@ export const IBaseLink = React.forwardRef<HTMLAnchorElement, IBaseLinkProps>(
 
 IBaseLink.displayName = "IBaseLink";
 
-export type { LinkProps };
-export const Link = IBaseLink;
-
 export default IBaseLink;

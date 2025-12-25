@@ -6,14 +6,8 @@ import {
   SelectItemOption,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { Button } from "@base/client";
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-} from "@base/client";
+import { IBaseButton } from "@base/client";
+import { IBaseModal, IBaseModalBody, IBaseModalContent, IBaseModalFooter, IBaseModalHeader,  } from "@base/client";
 import { AlertCircle } from "lucide-react";
 import { useMemo } from "react";
 import { Control, Controller, UseFormSetValue } from "react-hook-form";
@@ -116,18 +110,18 @@ export default function PriceItemEditModal({
   };
 
   return (
-    <Modal
+    <IBaseModal
       isOpen={isOpen}
       placement="center"
       scrollBehavior="inside"
       size="2xl"
       onClose={onClose}
     >
-      <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
+      <IBaseModalContent>
+        <IBaseModalHeader className="flex flex-col gap-1">
           <h3 className="text-lg font-semibold">Edit Price Item</h3>
-        </ModalHeader>
-        <ModalBody className="py-4">
+        </IBaseModalHeader>
+        <IBaseModalBody className="py-4">
           <div className="space-y-4">
             {/* Alerts */}
             {isDuplicate && (
@@ -280,16 +274,16 @@ export default function PriceItemEditModal({
               </div>
             </div>
           </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button variant="light" onPress={onClose}>
+        </IBaseModalBody>
+        <IBaseModalFooter>
+          <IBaseButton variant="light" onPress={onClose}>
             Cancel
-          </Button>
-          <Button color="primary" onPress={onClose}>
+          </IBaseButton>
+          <IBaseButton color="primary" onPress={onClose}>
             Save
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+          </IBaseButton>
+        </IBaseModalFooter>
+      </IBaseModalContent>
+    </IBaseModal>
   );
 }

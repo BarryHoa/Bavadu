@@ -16,6 +16,4 @@ export const IBaseButton = React.forwardRef<
 
 IBaseButton.displayName = "IBaseButton";
 
-export const Button = IBaseButton;
-
 export default IBaseButton;

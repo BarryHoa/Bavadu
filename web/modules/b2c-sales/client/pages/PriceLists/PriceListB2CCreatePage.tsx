@@ -2,8 +2,8 @@
 
 import { SelectItemOption } from "@base/client/components";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
-import { Button } from "@base/client";
-import { Card, CardBody } from "@base/client";
+import { IBaseButton } from "@base/client";
+import { IBaseCard, IBaseCardBody } from "@base/client";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useRouter } from "next/navigation";
 import { useForm, FormProvider } from "react-hook-form";
@@ -209,8 +209,8 @@ export default function PriceListB2CCreatePage(): React.ReactNode {
 
   return (
     <div className="space-y-4">
-      <Card>
-        <CardBody>
+      <IBaseCard>
+        <IBaseCardBody>
           <FormProvider {...methods}>
             <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
               <PriceListForm
@@ -229,21 +229,21 @@ export default function PriceListB2CCreatePage(): React.ReactNode {
                 typeOptions={typeOptions}
               />
               <div className="flex gap-2 justify-end pt-4">
-                <Button
+                <IBaseButton
                   type="button"
                   variant="light"
                   onPress={() => router.back()}
                 >
                   Cancel
-                </Button>
-                <Button color="primary" isLoading={isPending} type="submit">
+                </IBaseButton>
+                <IBaseButton color="primary" isLoading={isPending} type="submit">
                   Create
-                </Button>
+                </IBaseButton>
               </div>
             </form>
           </FormProvider>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
     </div>
   );
 }

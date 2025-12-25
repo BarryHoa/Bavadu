@@ -2,7 +2,7 @@
 
 import type { BreadcrumbItem } from "../layouts/workspace/components/Breadcrumb";
 
-import React, { createContext, useContext, useState, useMemo } from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 
 export interface WorkspaceState {
   currentModule: string | null;
@@ -36,7 +36,7 @@ const defaultWorkspaceState: WorkspaceState = {
 };
 
 const WorkspaceContext = createContext<WorkspaceContextValue | undefined>(
-  undefined,
+  undefined
 );
 
 export function WorkspaceProvider({
@@ -98,7 +98,7 @@ export function WorkspaceProvider({
       resetWorkspace,
       resetBreadcrumbs,
     }),
-    [state, initialBreadcrumbs],
+    [state, initialBreadcrumbs]
   );
 
   return (

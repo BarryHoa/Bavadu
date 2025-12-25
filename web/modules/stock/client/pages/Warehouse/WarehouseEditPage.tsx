@@ -6,8 +6,8 @@ import type {
 } from "../../services/StockService";
 
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
-import { Button } from "@base/client";
-import { Card, CardBody, Spinner } from "@base/client";
+import { IBaseButton } from "@base/client";
+import { IBaseCard, IBaseCardBody, IBaseSpinner } from "@base/client";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
@@ -79,48 +79,48 @@ export default function WarehouseEditPage(): React.ReactNode {
   return (
     <div className="w-full space-y-6">
       <div className="flex justify-end">
-        <Button
+        <IBaseButton
           size="sm"
           variant="light"
           onPress={() => router.push("/workspace/modules/stock/warehouses")}
         >
           Back to list
-        </Button>
+        </IBaseButton>
       </div>
 
       {warehouseQuery.isLoading ? (
-        <Card>
-          <CardBody className="flex items-center justify-center py-10">
-            <Spinner label="Loading warehouse..." />
-          </CardBody>
-        </Card>
+        <IBaseCard>
+          <IBaseCardBody className="flex items-center justify-center py-10">
+            <IBaseSpinner label="Loading warehouse..." />
+          </IBaseCardBody>
+        </IBaseCard>
       ) : warehouseQuery.isError ? (
-        <Card>
-          <CardBody className="space-y-3">
+        <IBaseCard>
+          <IBaseCardBody className="space-y-3">
             <p className="text-default-500">
               {warehouseQuery.error instanceof Error
                 ? warehouseQuery.error.message
                 : "Failed to load warehouse."}
             </p>
-            <Button
+            <IBaseButton
               size="sm"
               onPress={() => router.push("/workspace/modules/stock/warehouses")}
             >
               Back to list
-            </Button>
-          </CardBody>
-        </Card>
+            </IBaseButton>
+          </IBaseCardBody>
+        </IBaseCard>
       ) : warehouseQuery.data ? (
         <WarehouseForm
           initialData={warehouseQuery.data}
           secondaryAction={
-            <Button
+            <IBaseButton
               size="sm"
               variant="light"
               onPress={() => router.push("/workspace/modules/stock/warehouses")}
             >
               Cancel
-            </Button>
+            </IBaseButton>
           }
           submitError={error}
           submitLabel="Save changes"

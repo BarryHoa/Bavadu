@@ -2,12 +2,12 @@
 
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import {
-  DATA_TABLE_COLUMN_KEY_ACTION,
-  DataTableColumn,
+  I_BASE_TABLE_COLUMN_KEY_ACTION,
+  IBaseTableColumnDefinition,
   ViewListDataTable,
 } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
-import { Chip } from "@base/client";
+import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { PayrollDto } from "@mdl/hrm/client/interface/Payroll";
@@ -23,7 +23,7 @@ export default function PayrollListPage(): React.ReactNode {
   const t = useTranslations("hrm.payroll");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<DataTableColumn<PayrollRow>[]>(
+  const columns = useMemo<IBaseTableColumnDefinition<PayrollRow>[]>(
     () => [
       {
         key: "employee",
@@ -64,13 +64,13 @@ export default function PayrollListPage(): React.ReactNode {
         key: "status",
         label: t("labels.status"),
         render: (value) => (
-          <Chip className="capitalize" size="sm" variant="flat">
+          <IBaseChip className="capitalize" size="sm" variant="flat">
             {value || "draft"}
-          </Chip>
+          </IBaseChip>
         ),
       },
       {
-        key: DATA_TABLE_COLUMN_KEY_ACTION,
+        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
         label: tDataTable("columns.action"),
         align: "end",
         render: (_, row) => {

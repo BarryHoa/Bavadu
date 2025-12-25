@@ -25,7 +25,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 
-// Column Definition Type (compatible with DataTableColumnDefinition)
+// Column Definition Type (compatible with IBaseTableColumnDefinition)
 export interface IBaseTableCoreColumn<T = any> {
   key: string;
   title?: ReactNode;

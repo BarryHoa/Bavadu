@@ -13,7 +13,7 @@ import {
   SelectItemOption,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { Checkbox, CheckboxGroup } from "@base/client";
+import { IBaseCheckbox, IBaseCheckboxGroup } from "@base/client";
 import { HelpCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
@@ -178,7 +178,7 @@ export default function MasterTab({
             />
           </IBaseTooltip>
         </div>
-        <CheckboxGroup
+        <IBaseCheckboxGroup
           classNames={{ wrapper: "flex flex-wrap gap-3" }}
           isDisabled={isBusy}
           orientation="horizontal"
@@ -231,7 +231,7 @@ export default function MasterTab({
             );
 
             return (
-              <Checkbox
+              <IBaseCheckbox
                 key={feature.value}
                 classNames={{
                   label: isRequired ? "text-danger font-medium" : "",
@@ -247,10 +247,10 @@ export default function MasterTab({
                 value={feature.value as ProductMasterFeatures}
               >
                 {feature.label}
-              </Checkbox>
+              </IBaseCheckbox>
             );
           })}
-        </CheckboxGroup>
+        </IBaseCheckboxGroup>
       </div>
 
       <IBaseTextarea

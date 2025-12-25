@@ -4,8 +4,8 @@ import type { Resolver, SubmitHandler } from "react-hook-form";
 import type { ProductCategoryRow } from "../../interface/ProductCategory";
 
 import { IBaseInput } from "@base/client/components";
-import { Button } from "@base/client";
-import { Card, CardBody, Switch, Textarea } from "@base/client";
+import { IBaseButton } from "@base/client";
+import { IBaseCard, IBaseCardBody, IBaseSwitch, IBaseTextarea } from "@base/client";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
 import { Save } from "lucide-react";
@@ -254,8 +254,8 @@ export default function ProductCategoryForm({
 
   return (
     <form className="flex flex-col gap-4" onSubmit={onSubmitForm}>
-      <Card>
-        <CardBody className="space-y-4">
+      <IBaseCard>
+        <IBaseCardBody className="space-y-4">
           <div>
             <h1 className="text-xl font-semibold">{title}</h1>
             {subtitle ? (
@@ -353,7 +353,7 @@ export default function ProductCategoryForm({
             control={control}
             name="description"
             render={({ field }) => (
-              <Textarea
+              <IBaseTextarea
                 {...field}
                 isDisabled={isBusy}
                 label="Description"
@@ -370,30 +370,30 @@ export default function ProductCategoryForm({
             control={control}
             name="isActive"
             render={({ field }) => (
-              <Switch
+              <IBaseSwitch
                 isDisabled={isBusy}
                 isSelected={field.value}
                 onValueChange={field.onChange}
               >
                 Active
-              </Switch>
+              </IBaseSwitch>
             )}
           />
 
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
             {onCancel ? (
-              <Button
+              <IBaseButton
                 isDisabled={isBusy}
                 size="sm"
                 variant="light"
                 onPress={onCancel}
               >
                 Cancel
-              </Button>
+              </IBaseButton>
             ) : null}
 
             {onSubmitAndContinue ? (
-              <Button
+              <IBaseButton
                 isDisabled={isBusy || !isLevelValid}
                 size="sm"
                 type="button"
@@ -407,10 +407,10 @@ export default function ProductCategoryForm({
                 }
               >
                 {secondarySubmitLabel}
-              </Button>
+              </IBaseButton>
             ) : null}
 
-            <Button
+            <IBaseButton
               color="primary"
               endContent={<Save size={16} />}
               isDisabled={!isLevelValid}
@@ -419,10 +419,10 @@ export default function ProductCategoryForm({
               type="submit"
             >
               {submitLabel}
-            </Button>
+            </IBaseButton>
           </div>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
     </form>
   );
 }

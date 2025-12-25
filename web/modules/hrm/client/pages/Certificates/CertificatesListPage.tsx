@@ -2,13 +2,13 @@
 
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import {
-  DATA_TABLE_COLUMN_KEY_ACTION,
-  DataTableColumn,
+  I_BASE_TABLE_COLUMN_KEY_ACTION,
+  IBaseTableColumnDefinition,
   ViewListDataTable,
 } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { Chip } from "@base/client";
+import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { CertificateDto } from "@mdl/hrm/client/interface/Certificate";
@@ -24,7 +24,7 @@ export default function CertificatesListPage(): React.ReactNode {
   const t = useTranslations("hrm.certificates");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<DataTableColumn<CertificateRow>[]>(
+  const columns = useMemo<IBaseTableColumnDefinition<CertificateRow>[]>(
     () => [
       {
         key: "employee",
@@ -69,13 +69,13 @@ export default function CertificatesListPage(): React.ReactNode {
         key: "isActive",
         label: t("labels.isActive"),
         render: (value) => (
-          <Chip color={value ? "success" : "default"} size="sm" variant="flat">
+          <IBaseChip color={value ? "success" : "default"} size="sm" variant="flat">
             {value ? "Active" : "Inactive"}
-          </Chip>
+          </IBaseChip>
         ),
       },
       {
-        key: DATA_TABLE_COLUMN_KEY_ACTION,
+        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
         label: tDataTable("columns.action"),
         align: "end",
         render: (_, row) => {

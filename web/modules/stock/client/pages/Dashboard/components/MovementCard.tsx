@@ -8,8 +8,8 @@ import {
   IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
-import { Button } from "@base/client";
-import { Card, CardBody } from "@base/client";
+import { IBaseButton } from "@base/client";
+import { IBaseCard, IBaseCardBody } from "@base/client";
 import { useMemo, useState } from "react";
 
 interface MovementCardProps {
@@ -79,8 +79,8 @@ export default function MovementCard({
   };
 
   return (
-    <Card className="border border-content3/40">
-      <CardBody className="space-y-3">
+    <IBaseCard className="border border-content3/40">
+      <IBaseCardBody className="space-y-3">
         <div>
           <h3 className="text-base font-semibold">{title}</h3>
           <p className="text-sm text-default-500">{description}</p>
@@ -127,15 +127,15 @@ export default function MovementCard({
           value={formValues.note}
           onValueChange={(value) => handleChange("note", value)}
         />
-        <Button
+        <IBaseButton
           color="primary"
           isLoading={submitting}
           size="sm"
           onPress={handleSubmit}
         >
           {actionLabel}
-        </Button>
-      </CardBody>
-    </Card>
+        </IBaseButton>
+      </IBaseCardBody>
+    </IBaseCard>
   );
 }

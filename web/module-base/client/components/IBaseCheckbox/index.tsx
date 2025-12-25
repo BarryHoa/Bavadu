@@ -32,7 +32,4 @@ export const IBaseCheckboxGroup = React.forwardRef<
 
 IBaseCheckboxGroup.displayName = "IBaseCheckboxGroup";
 
-export const Checkbox = IBaseCheckbox;
-export const CheckboxGroup = IBaseCheckboxGroup;
-
 export default IBaseCheckbox;

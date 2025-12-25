@@ -1,14 +1,14 @@
 "use client";
 
 import {
-  DATA_TABLE_COLUMN_KEY_ACTION,
-  DataTableColumn,
+  I_BASE_TABLE_COLUMN_KEY_ACTION,
+  IBaseTableColumnDefinition,
 } from "@base/client/components";
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { Chip } from "@base/client";
+import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 
@@ -22,7 +22,7 @@ type CustomerCompanyRow = CustomerCompany & {
 export default function CustomerCompaniesListPage(): React.ReactNode {
   const tDataTable = useTranslations("dataTable");
 
-  const columns = useMemo<DataTableColumn<CustomerCompanyRow>[]>(
+  const columns = useMemo<IBaseTableColumnDefinition<CustomerCompanyRow>[]>(
     () => [
       {
         key: "code",
@@ -59,13 +59,13 @@ export default function CustomerCompaniesListPage(): React.ReactNode {
         key: "isActive",
         label: "Status",
         render: (_, row) => (
-          <Chip
+          <IBaseChip
             color={row.isActive ? "success" : "danger"}
             size="sm"
             variant="flat"
           >
             {row.isActive ? "Active" : "Inactive"}
-          </Chip>
+          </IBaseChip>
         ),
       },
       {
@@ -74,7 +74,7 @@ export default function CustomerCompaniesListPage(): React.ReactNode {
         render: (value) => formatDate(value),
       },
       {
-        key: DATA_TABLE_COLUMN_KEY_ACTION,
+        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
         label: tDataTable("columns.action"),
         align: "end",
         render: (_, row) => {

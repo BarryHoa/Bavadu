@@ -1,6 +1,6 @@
 "use client";
 
-import { IBaseTabs, SelectItemOption, Tab } from "@base/client/components";
+import { IBaseTabs, SelectItemOption, IBaseTab } from "@base/client/components";
 import { Control, UseFormSetValue } from "react-hook-form";
 
 import ExplicitPricingTab from "./ExplicitPricingTab";
@@ -52,7 +52,7 @@ export default function PriceListForm({
       }}
       color="primary"
     >
-      <Tab key="main" title="Main">
+      <IBaseTab key="main" title="Main">
         <MainTab
           channelOptions={channelOptions}
           control={control}
@@ -65,24 +65,24 @@ export default function PriceListForm({
           storeOptions={storeOptions}
           typeOptions={typeOptions}
         />
-      </Tab>
+      </IBaseTab>
 
-      <Tab key="rules" title="Rules and Conditions">
+      <IBaseTab key="rules" title="Rules and Conditions">
         <RulesAndConditionsTab
           brandOptions={brandOptions}
           categoryOptions={categoryOptions}
           control={control}
           errors={errors}
         />
-      </Tab>
+      </IBaseTab>
 
-      <Tab key="pricing" title="Explicit Pricing">
+      <IBaseTab key="pricing" title="Explicit Pricing">
         <ExplicitPricingTab
           control={control}
           errors={errors}
           setValue={setValue}
         />
-      </Tab>
+      </IBaseTab>
     </IBaseTabs>
   );
 }

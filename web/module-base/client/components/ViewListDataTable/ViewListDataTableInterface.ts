@@ -1,7 +1,7 @@
 import { IBaseButtonProps } from "@base/client/components";
 import type { IBaseTableProps } from "../IBaseTable/IBaseTableInterface";
 
-import { LinkProps } from "@base/client";
+import { IBaseLinkProps } from "@base/client";
 import { LocaleDataType } from "@base/shared/interface/Locale";
 import { ReactNode } from "react";
 
@@ -17,7 +17,7 @@ export type ActionElm = {
   size?: IBaseButtonProps["size"];
   props?:
     | Omit<IBaseButtonProps, "color" | "variant" | "size">
-    | (Omit<LinkProps, "as"> & { hrefAs?: any });
+    | (Omit<IBaseLinkProps, "as"> & { hrefAs?: any });
 };
 export type ViewListDataTableProps<T = any> = Omit<
   IBaseTableProps<T>,

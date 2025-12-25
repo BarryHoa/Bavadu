@@ -8,8 +8,8 @@ import {
   IBaseTextarea,
   IBaseUploadImageTiny,
 } from "@base/client/components";
-import { Button } from "@base/client";
-import { Card, CardBody, Divider } from "@base/client";
+import { IBaseButton } from "@base/client";
+import { IBaseCard, IBaseCardBody, IBaseDivider } from "@base/client";
 import { Plus, Trash } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -61,7 +61,7 @@ export default function VariantTab({
         <h2 className="text-lg font-semibold">
           {t("variant")} {variantIndex + 1}
         </h2>
-        <Button
+        <IBaseButton
           isDisabled={isBusy || !canRemove}
           size="sm"
           startContent={<Trash size={14} />}
@@ -69,7 +69,7 @@ export default function VariantTab({
           onPress={onRemove}
         >
           {tProductForm("removeVariant")}
-        </Button>
+        </IBaseButton>
       </div>
 
       <IBaseInputMultipleLang
@@ -134,7 +134,7 @@ export default function VariantTab({
           }
         />
       </div>
-      <Divider />
+      <IBaseDivider />
       <UomSection
         error={variantErrors?.baseUom}
         isBusy={isBusy}
@@ -142,7 +142,7 @@ export default function VariantTab({
         variantIndex={variantIndex}
       />
 
-      <Divider />
+      <IBaseDivider />
 
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
@@ -154,7 +154,7 @@ export default function VariantTab({
               {tProductForm("definePackaging")}
             </p>
           </div>
-          <Button
+          <IBaseButton
             isDisabled={isBusy}
             size="sm"
             startContent={<Plus size={14} />}
@@ -174,7 +174,7 @@ export default function VariantTab({
             }
           >
             {tProductForm("addPacking")}
-          </Button>
+          </IBaseButton>
         </div>
 
         {!value.packings || value.packings.length === 0 ? (
@@ -184,13 +184,13 @@ export default function VariantTab({
         ) : (
           <div className="flex flex-col gap-3">
             {value.packings.map((packing, packingIndex) => (
-              <Card key={packingIndex} className="border border-default-200">
-                <CardBody className="flex flex-col gap-3">
+              <IBaseCard key={packingIndex} className="border border-default-200">
+                <IBaseCardBody className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <h5 className="text-small font-medium">
                       Packing #{packingIndex + 1}
                     </h5>
-                    <Button
+                    <IBaseButton
                       isDisabled={isBusy}
                       size="sm"
                       startContent={<Trash size={14} />}
@@ -205,7 +205,7 @@ export default function VariantTab({
                       }
                     >
                       {t("actions.remove")}
-                    </Button>
+                    </IBaseButton>
                   </div>
                   <div className="grid gap-3 md:grid-cols-2">
                     <IBaseInput
@@ -263,14 +263,14 @@ export default function VariantTab({
                       }))
                     }
                   />
-                </CardBody>
-              </Card>
+                </IBaseCardBody>
+              </IBaseCard>
             ))}
           </div>
         )}
       </div>
 
-      <Divider />
+      <IBaseDivider />
 
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
@@ -282,7 +282,7 @@ export default function VariantTab({
               {tProductForm("captureAttributes")}
             </p>
           </div>
-          <Button
+          <IBaseButton
             isDisabled={isBusy}
             size="sm"
             startContent={<Plus size={14} />}
@@ -302,7 +302,7 @@ export default function VariantTab({
             }
           >
             {tProductForm("addAttribute")}
-          </Button>
+          </IBaseButton>
         </div>
 
         {!value.attributes || value.attributes.length === 0 ? (
@@ -312,13 +312,13 @@ export default function VariantTab({
         ) : (
           <div className="flex flex-col gap-3">
             {value.attributes.map((attribute, attributeIndex) => (
-              <Card key={attributeIndex} className="border border-default-200">
-                <CardBody className="flex flex-col gap-3">
+              <IBaseCard key={attributeIndex} className="border border-default-200">
+                <IBaseCardBody className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <h5 className="text-small font-medium">
                       Attribute #{attributeIndex + 1}
                     </h5>
-                    <Button
+                    <IBaseButton
                       isDisabled={isBusy}
                       size="sm"
                       startContent={<Trash size={14} />}
@@ -333,7 +333,7 @@ export default function VariantTab({
                       }
                     >
                       {t("actions.remove")}
-                    </Button>
+                    </IBaseButton>
                   </div>
                   <IBaseInput
                     errorMessage={
@@ -412,8 +412,8 @@ export default function VariantTab({
                       }))
                     }
                   />
-                </CardBody>
-              </Card>
+                </IBaseCardBody>
+              </IBaseCard>
             ))}
           </div>
         )}

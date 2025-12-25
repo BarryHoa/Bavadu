@@ -3,20 +3,8 @@
 import { IBaseInput } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
-import { Button } from "@base/client";
-import {
-  Card,
-  CardBody,
-  Chip,
-  Divider,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from "@base/client";
+import { IBaseButton } from "@base/client";
+import { IBaseCard, IBaseCardBody, IBaseChip, IBaseDivider, IBaseSpinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow,  } from "@base/client";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -140,14 +128,14 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
         <div className="rounded-medium border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-600">
           Purchase order identifier is missing.
         </div>
-        <Button
+        <IBaseButton
           as={LinkAs as any}
           href="/workspace/modules/purchase"
           size="sm"
           variant="light"
         >
           Back to list
-        </Button>
+        </IBaseButton>
       </div>
     );
   }
@@ -155,7 +143,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
   if (orderQuery.isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <Spinner label="Loading purchase order..." />
+        <IBaseSpinner label="Loading purchase order..." />
       </div>
     );
   }
@@ -168,14 +156,14 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
             ? orderQuery.error.message
             : "Failed to fetch purchase order."}
         </div>
-        <Button
+        <IBaseButton
           as={LinkAs as any}
           href="/workspace/modules/purchase"
           size="sm"
           variant="light"
         >
           Back to list
-        </Button>
+        </IBaseButton>
       </div>
     );
   }
@@ -184,14 +172,14 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
     return (
       <div className="space-y-4">
         <p className="text-default-500">Purchase order not found.</p>
-        <Button
+        <IBaseButton
           as={LinkAs as any}
           href="/workspace/modules/purchase"
           size="sm"
           variant="light"
         >
           Back to list
-        </Button>
+        </IBaseButton>
       </div>
     );
   }
@@ -199,14 +187,14 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
   return (
     <div className="space-y-6">
       <div className="flex justify-end">
-        <Button
+        <IBaseButton
           as={LinkAs as any}
           href="/workspace/modules/purchase"
           size="sm"
           variant="light"
         >
           Back to list
-        </Button>
+        </IBaseButton>
       </div>
 
       {actionError ? (
@@ -215,35 +203,35 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
         </div>
       ) : null}
 
-      <Card>
-        <CardBody className="space-y-3">
+      <IBaseCard>
+        <IBaseCardBody className="space-y-3">
           <div className="flex flex-wrap items-center gap-3">
-            <Chip color="primary" variant="flat">
+            <IBaseChip color="primary" variant="flat">
               Status: {order.status}
-            </Chip>
-            <Chip variant="flat">
+            </IBaseChip>
+            <IBaseChip variant="flat">
               Expected:{" "}
               {order.expectedDate
                 ? new Date(order.expectedDate).toLocaleDateString()
                 : "—"}
-            </Chip>
-            <Chip variant="flat">
+            </IBaseChip>
+            <IBaseChip variant="flat">
               Total:{" "}
               {Number(order.totalAmount || 0).toLocaleString(undefined, {
                 style: "currency",
                 currency: order.currency || "USD",
               })}
-            </Chip>
-            <Chip variant="flat">Vendor: {order.vendorName}</Chip>
+            </IBaseChip>
+            <IBaseChip variant="flat">Vendor: {order.vendorName}</IBaseChip>
           </div>
           {order.notes ? (
             <p className="text-default-500">Notes: {order.notes}</p>
           ) : null}
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
 
-      <Card>
-        <CardBody className="space-y-3">
+      <IBaseCard>
+        <IBaseCardBody className="space-y-3">
           <h2 className="text-lg font-semibold">Lines</h2>
           <Table removeWrapper aria-label="Purchase order lines">
             <TableHeader>
@@ -274,11 +262,11 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
               ))}
             </TableBody>
           </Table>
-        </CardBody>
-      </Card>
+        </IBaseCardBody>
+      </IBaseCard>
 
       <div className="flex items-center gap-3">
-        <Button
+        <IBaseButton
           color="primary"
           isDisabled={order.status !== "draft"}
           isLoading={isConfirming}
@@ -286,20 +274,20 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
           onPress={() => confirmOrder(orderId)}
         >
           Confirm order
-        </Button>
-        <Button
+        </IBaseButton>
+        <IBaseButton
           size="sm"
           variant="light"
           onPress={() => router.push("/workspace/modules/stock")}
         >
           Go to stock dashboard
-        </Button>
+        </IBaseButton>
       </div>
 
-      <Divider />
+      <IBaseDivider />
 
-      <Card>
-        <CardBody className="space-y-4">
+      <IBaseCard>
+        <IBaseCardBody className="space-y-4">
           <div>
             <h2 className="text-lg font-semibold">Receive products</h2>
             <p className="text-default-500">
@@ -374,7 +362,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
             </div>
           )}
 
-          <Button
+          <IBaseButton
             color="primary"
             isDisabled={pendingLines.length === 0}
             isLoading={isReceiving}
@@ -403,9 +391,9 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
             }}
           >
             Receive selected quantities
-          </Button>
-        </CardBody>
-      </Card>
+          </IBaseButton>
+        </IBaseCardBody>
+      </IBaseCard>
     </div>
   );
 }

@@ -6,8 +6,6 @@ import type {
 } from "@base/client/services/DropdownOptionsService";
 import type { SelectItemOption } from "./IBaseSingleSelect";
 
-import { dropdownOptionsService } from "@base/client/services/DropdownOptionsService";
-import { SelectItem } from "@heroui/select";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import React, {
@@ -19,15 +17,18 @@ import React, {
   useState,
 } from "react";
 
+import { dropdownOptionsService } from "@base/client/services/DropdownOptionsService";
+
 import { useLocalizedText } from "../../hooks/useLocalizedText";
 import IBaseInputSearch from "../IBaseInputSearch";
 
 import IBaseSelect, { IBaseSelectProps } from "./IBaseSelect";
+import IBaseSelectItem from "./IBaseSelectItem";
 
 export interface FetchOptionsParams extends DropdownOptionsParams {}
 
 export type ServiceFetch = (
-  params: FetchOptionsParams,
+  params: FetchOptionsParams
 ) => Promise<DropdownOptionsResponse>;
 
 export interface IBaseSingleSelectAsyncProps extends Omit<
@@ -164,20 +165,20 @@ export const IBaseSingleSelectAsync = React.forwardRef<
       onTheFirstFetchSuccess,
       onFetching,
       onFinishFetch,
-    ],
+    ]
   );
 
   // Memoize getNextPageParam to prevent recreation
   const getNextPageParam = useCallback(
     (
       lastPage: DropdownOptionsResponse,
-      allPages: DropdownOptionsResponse[],
+      allPages: DropdownOptionsResponse[]
     ) => {
       const currentTotal = lastPage.total || 0;
       // Calculate current offset: sum of all items loaded so far
       const currentOffset = allPages.reduce(
         (sum, page) => sum + (page.data?.length || 0),
-        0,
+        0
       );
 
       // If current offset is less than total, return next offset
@@ -188,7 +189,7 @@ export const IBaseSingleSelectAsync = React.forwardRef<
       // No more pages
       return undefined;
     },
-    [],
+    []
   );
 
   // Memoize query key to prevent unnecessary refetches
@@ -200,7 +201,7 @@ export const IBaseSingleSelectAsync = React.forwardRef<
       defaultLimit,
       stableDefaultParams,
     ],
-    [model, debouncedSearchTerm, defaultLimit, stableDefaultParams],
+    [model, debouncedSearchTerm, defaultLimit, stableDefaultParams]
   );
 
   // Fetch data using useInfiniteQuery
@@ -230,7 +231,7 @@ export const IBaseSingleSelectAsync = React.forwardRef<
         ...item,
         value: item.value,
         label: item.label,
-      })),
+      }))
     );
   }, [data?.pages]);
 
@@ -259,7 +260,7 @@ export const IBaseSingleSelectAsync = React.forwardRef<
         fetchNextPage();
       }
     },
-    [hasNextPage, isFetchingNextPage, isLoading, isFetching, fetchNextPage],
+    [hasNextPage, isFetchingNextPage, isLoading, isFetching, fetchNextPage]
   );
 
   // Focus search input when dropdown opens
@@ -287,13 +288,13 @@ export const IBaseSingleSelectAsync = React.forwardRef<
         rest.onOpenChange(open);
       }
     },
-    [rest.isDisabled, rest.onOpenChange, setIsOpen],
+    [rest.isDisabled, rest.onOpenChange, setIsOpen]
   );
 
   // Memoize selection change handler to prevent recreation
   const handleSelectionChange = useCallback(
     (
-      keys: Parameters<NonNullable<IBaseSelectProps["onSelectionChange"]>>[0],
+      keys: Parameters<NonNullable<IBaseSelectProps["onSelectionChange"]>>[0]
     ) => {
       if (typeof keys === "string") return;
       const keySet = keys as Set<string>;
@@ -321,19 +322,19 @@ export const IBaseSingleSelectAsync = React.forwardRef<
         onSelectionChange(selected, selectedItem);
       }
     },
-    [allItems, onSelectionChange],
+    [allItems, onSelectionChange]
   );
 
   // Memoize loading state
   const isLoadingData = useMemo(
     () => isLoading || isFetching,
-    [isLoading, isFetching],
+    [isLoading, isFetching]
   );
 
   // Memoize selectedKeys to prevent creating new Set on every render
   const selectedKeysSet = useMemo(
     () => (selectedKey ? new Set([selectedKey]) : undefined),
-    [selectedKey],
+    [selectedKey]
   );
 
   // Memoize listboxProps to prevent object recreation
@@ -342,7 +343,7 @@ export const IBaseSingleSelectAsync = React.forwardRef<
       onScroll: handleScroll,
       ...rest.listboxProps,
     }),
-    [handleScroll, rest.listboxProps],
+    [handleScroll, rest.listboxProps]
   );
 
   // Memoize search input classNames
@@ -351,7 +352,7 @@ export const IBaseSingleSelectAsync = React.forwardRef<
       base: "w-full",
       input: "text-sm",
     }),
-    [],
+    []
   );
 
   // Memoize search input keydown handler
@@ -365,7 +366,7 @@ export const IBaseSingleSelectAsync = React.forwardRef<
         setSearchTerm("");
       }
     },
-    [],
+    []
   );
 
   return (
@@ -383,7 +384,7 @@ export const IBaseSingleSelectAsync = React.forwardRef<
     >
       <>
         {isShowSearch && (
-          <SelectItem
+          <IBaseSelectItem
             key="__search__"
             hideSelectedIcon
             isReadOnly
@@ -401,11 +402,11 @@ export const IBaseSingleSelectAsync = React.forwardRef<
               onKeyDown={handleSearchKeyDown}
               onValueChange={setSearchTerm}
             />
-          </SelectItem>
+          </IBaseSelectItem>
         )}
 
         {error && (
-          <SelectItem
+          <IBaseSelectItem
             key="__error__"
             hideSelectedIcon
             isReadOnly
@@ -413,55 +414,55 @@ export const IBaseSingleSelectAsync = React.forwardRef<
             textValue={tSelectAsync("error")}
           >
             {tSelectAsync("error")}
-          </SelectItem>
+          </IBaseSelectItem>
         )}
 
         {isLoadingData && allItems.length === 0 && (
-          <SelectItem
+          <IBaseSelectItem
             key="__loading__"
             hideSelectedIcon
             isReadOnly
             textValue={tSelectAsync("loading")}
           >
             {tSelectAsync("loading")}
-          </SelectItem>
+          </IBaseSelectItem>
         )}
 
         {allItems.length === 0 && !isLoadingData && !error && (
-          <SelectItem
+          <IBaseSelectItem
             key="__empty__"
             hideSelectedIcon
             isReadOnly
             textValue={tSelectAsync("noResults")}
           >
             {tSelectAsync("noResults")}
-          </SelectItem>
+          </IBaseSelectItem>
         )}
 
         {allItems.map((item) => {
           const localizedLabel = localizedText(item.label);
 
           return (
-            <SelectItem key={item.value} textValue={localizedLabel}>
+            <IBaseSelectItem key={item.value} textValue={localizedLabel}>
               {onRenderOption
                 ? onRenderOption({
                     ...item,
                     localizedLabel,
                   })
                 : localizedLabel}
-            </SelectItem>
+            </IBaseSelectItem>
           );
         })}
 
         {isFetchingNextPage && (
-          <SelectItem
+          <IBaseSelectItem
             key="__loading_more__"
             hideSelectedIcon
             isReadOnly
             textValue={tSelectAsync("loadingMore")}
           >
             {tSelectAsync("loadingMore")}
-          </SelectItem>
+          </IBaseSelectItem>
         )}
       </>
     </IBaseSelect>

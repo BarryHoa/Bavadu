@@ -1,8 +1,4 @@
-import {
-  SelectItem,
-  Select as SelectPrimitive,
-  SelectProps,
-} from "@heroui/select";
+import { Select as SelectPrimitive, SelectProps } from "@heroui/select";
 import clsx from "clsx";
 import React from "react";
 
@@ -57,7 +53,5 @@ export const IBaseSelect = React.forwardRef<
 });
 
 IBaseSelect.displayName = "IBaseSelect";
-
-export const IBaseSelectItem = SelectItem;
 
 export default IBaseSelect;

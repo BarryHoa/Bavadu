@@ -12,13 +12,7 @@ import {
   trim,
 } from "valibot";
 
-import {
-  Button,
-  IBaseInput,
-  IBaseSingleSelect,
-  SelectItemOption,
-  Textarea,
-} from "@base/client";
+import { IBaseButton, IBaseInput, IBaseSingleSelect, SelectItemOption, IBaseTextarea,  } from "@base/client";
 import AddressPicker from "@base/client/components/AddressPicker/AddressPicker";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { Address } from "@base/client/interface/Address";
@@ -542,7 +536,7 @@ export default function WarehouseForm({
           control={control}
           name="notes"
           render={({ field, fieldState }) => (
-            <Textarea
+            <IBaseTextarea
               {...field}
               errorMessage={fieldState.error?.message}
               isInvalid={fieldState.invalid}
@@ -557,14 +551,14 @@ export default function WarehouseForm({
         <div className="flex flex-col-reverse gap-3 md:flex-row md:items-center md:justify-between">
           {secondaryAction && <div>{secondaryAction}</div>}
           <div className="flex gap-3">
-            <Button
+            <IBaseButton
               color="primary"
               disabled={isSubmitting}
               isLoading={isSubmitting}
               type="submit"
             >
               {submitLabel}
-            </Button>
+            </IBaseButton>
           </div>
         </div>
       </form>

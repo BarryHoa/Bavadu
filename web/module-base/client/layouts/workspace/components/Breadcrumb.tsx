@@ -1,16 +1,17 @@
 "use client";
 
-import { IBaseBreadcrumbItem, IBaseBreadcrumbs } from "@base/client/components";
-import { useBreadcrumbs } from "@base/client/contexts/workspace";
 import { ChevronRight } from "lucide-react";
 
-export type IBaseBreadcrumbItem = {
+import { IBaseBreadcrumbItem, IBaseBreadcrumbs } from "@base/client/components";
+import { useBreadcrumbs } from "@base/client/contexts/workspace";
+
+export type BreadcrumbItem = {
   label: string;
   href: string;
   icon?: React.ComponentType<{ size?: number; className?: string }>;
 };
 
-export default function Breadcrumb({ items }: { items?: IBaseBreadcrumbItem[] }) {
+export default function Breadcrumb({ items }: { items?: BreadcrumbItem[] }) {
   const ctx = useBreadcrumbs();
   const data = items ?? ctx.breadcrumbs;
 

@@ -5,8 +5,8 @@ import {
   IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
-import { Button } from "@base/client";
-import { Card, CardBody, Checkbox } from "@base/client";
+import { IBaseButton } from "@base/client";
+import { IBaseCard, IBaseCardBody, IBaseCheckbox } from "@base/client";
 import { Control, Controller, useFieldArray } from "react-hook-form";
 import { Plus, Trash2 } from "lucide-react";
 
@@ -43,7 +43,7 @@ export default function RulesAndConditionsTab({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold">Pricing Rules</h3>
-        <Button
+        <IBaseButton
           color="primary"
           size="sm"
           startContent={<Plus size={16} />}
@@ -59,7 +59,7 @@ export default function RulesAndConditionsTab({
           }
         >
           Add Rule
-        </Button>
+        </IBaseButton>
       </div>
 
       {ruleFields.length === 0 ? (
@@ -69,8 +69,8 @@ export default function RulesAndConditionsTab({
       ) : (
         <div className="space-y-3">
           {ruleFields.map((field, index) => (
-            <Card key={field.id} className="p-4">
-              <CardBody className="p-0 space-y-4">
+            <IBaseCard key={field.id} className="p-4">
+              <IBaseCardBody className="p-0 space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
                   <Controller
                     control={control}
@@ -130,13 +130,13 @@ export default function RulesAndConditionsTab({
                       control={control}
                       name={`pricingRules.${index}.applyToExceptions`}
                       render={({ field }) => (
-                        <Checkbox
+                        <IBaseCheckbox
                           isSelected={field.value === true}
                           size="sm"
                           onValueChange={field.onChange}
                         >
                           Apply to Exceptions
-                        </Checkbox>
+                        </IBaseCheckbox>
                       )}
                     />
                   </div>
@@ -179,7 +179,7 @@ export default function RulesAndConditionsTab({
                 </div>
 
                 <div className="flex justify-end">
-                  <Button
+                  <IBaseButton
                     color="danger"
                     size="sm"
                     startContent={<Trash2 size={16} />}
@@ -187,10 +187,10 @@ export default function RulesAndConditionsTab({
                     onPress={() => removeRule(index)}
                   >
                     Remove
-                  </Button>
+                  </IBaseButton>
                 </div>
-              </CardBody>
-            </Card>
+              </IBaseCardBody>
+            </IBaseCard>
           ))}
         </div>
       )}

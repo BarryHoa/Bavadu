@@ -2,12 +2,12 @@
 
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import {
-  DATA_TABLE_COLUMN_KEY_ACTION,
-  DataTableColumn,
+  I_BASE_TABLE_COLUMN_KEY_ACTION,
+  IBaseTableColumnDefinition,
 } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
-import { Chip } from "@base/client";
+import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Department } from "@mdl/hrm/client/interface/Department";
@@ -22,7 +22,7 @@ export default function DepartmentsListPage(): React.ReactNode {
   const t = useTranslations("hrm.department.list");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<DataTableColumn<DepartmentRow>[]>(
+  const columns = useMemo<IBaseTableColumnDefinition<DepartmentRow>[]>(
     () => [
       {
         key: "code",
@@ -50,13 +50,13 @@ export default function DepartmentsListPage(): React.ReactNode {
         key: "isActive",
         label: t("status"),
         render: (value) => (
-          <Chip className="capitalize" size="sm" variant="flat">
+          <IBaseChip className="capitalize" size="sm" variant="flat">
             {value ? "active" : "inactive"}
-          </Chip>
+          </IBaseChip>
         ),
       },
       {
-        key: DATA_TABLE_COLUMN_KEY_ACTION,
+        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
         label: tDataTable("columns.action"),
         align: "end",
         render: (_, row) => {

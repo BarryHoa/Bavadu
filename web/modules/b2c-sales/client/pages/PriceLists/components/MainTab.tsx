@@ -10,7 +10,7 @@ import {
   SelectItemOption,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { Checkbox, Textarea } from "@base/client";
+import { IBaseCheckbox, IBaseTextarea } from "@base/client";
 import { Control, Controller } from "react-hook-form";
 
 interface MainTabProps {
@@ -101,7 +101,7 @@ export default function MainTab({
             control={control}
             name="description"
             render={({ field, fieldState }) => (
-              <Textarea
+              <IBaseTextarea
                 errorMessage={fieldState.error?.message}
                 isInvalid={fieldState.invalid}
                 label="Description"
@@ -159,7 +159,7 @@ export default function MainTab({
               control={control}
               name="isDefault"
               render={({ field }) => (
-                <Checkbox
+                <IBaseCheckbox
                   isSelected={field.value === "true" || field.value === true}
                   size="sm"
                   onValueChange={(checked) =>
@@ -167,7 +167,7 @@ export default function MainTab({
                   }
                 >
                   Is Default
-                </Checkbox>
+                </IBaseCheckbox>
               )}
             />
           </div>

@@ -15,6 +15,4 @@ export const IBaseChip = React.forwardRef<HTMLDivElement, IBaseChipProps>(
 
 IBaseChip.displayName = "IBaseChip";
 
-export const Chip = IBaseChip;
-
 export default IBaseChip;

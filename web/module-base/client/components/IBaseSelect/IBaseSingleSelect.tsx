@@ -1,6 +1,4 @@
 "use client";
-
-import { SelectItem } from "@heroui/select";
 import MiniSearch from "minisearch";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
@@ -9,6 +7,7 @@ import { LocalizeText } from "../../interface/LocalizeText";
 import IBaseInputSearch from "../IBaseInputSearch";
 
 import IBaseSelect, { IBaseSelectProps } from "./IBaseSelect";
+import IBaseSelectItem from "./IBaseSelectItem";
 
 export interface SelectItemOption extends Record<string, unknown> {
   value: string | number;
@@ -62,7 +61,7 @@ export const IBaseSingleSelect = React.forwardRef<
     // Filter out items with invalid values and ensure value is a string
     const validItems = items.filter(
       (item) =>
-        item.value !== undefined && item.value !== null && item.value !== "",
+        item.value !== undefined && item.value !== null && item.value !== ""
     );
 
     if (validItems.length === 0) {
@@ -120,7 +119,7 @@ export const IBaseSingleSelect = React.forwardRef<
       // Also filter by exact phrase match in fullPhrase
       if (results.length > 0) {
         results = results.filter((result) =>
-          result.fullPhrase?.includes(cleanTerm),
+          result.fullPhrase?.includes(cleanTerm)
         );
       }
     } else {
@@ -137,12 +136,12 @@ export const IBaseSingleSelect = React.forwardRef<
 
         // Boost results that contain the full phrase
         const phraseResults = results.filter((result) =>
-          result.fullPhrase?.includes(cleanTerm),
+          result.fullPhrase?.includes(cleanTerm)
         );
 
         // Combine: phrase matches first, then word matches
         const otherResults = results.filter(
-          (result) => !phraseResults.some((pr) => pr.id === result.id),
+          (result) => !phraseResults.some((pr) => pr.id === result.id)
         );
 
         results = [...phraseResults, ...otherResults];
@@ -192,7 +191,7 @@ export const IBaseSingleSelect = React.forwardRef<
   };
 
   const handleSelectionChange = (
-    keys: Parameters<NonNullable<IBaseSelectProps["onSelectionChange"]>>[0],
+    keys: Parameters<NonNullable<IBaseSelectProps["onSelectionChange"]>>[0]
   ) => {
     // Prevent selection of the search input item
     if (typeof keys === "string") return;
@@ -238,7 +237,7 @@ export const IBaseSingleSelect = React.forwardRef<
     >
       <>
         {items && items.length > searchShowMaxResults && (
-          <SelectItem
+          <IBaseSelectItem
             key="__search__"
             hideSelectedIcon
             isReadOnly
@@ -267,21 +266,21 @@ export const IBaseSingleSelect = React.forwardRef<
               }}
               onValueChange={setSearchTerm}
             />
-          </SelectItem>
+          </IBaseSelectItem>
         )}
 
         {filteredItems.map((item) => {
           const localizedLabel = localizedText(item.label);
 
           return (
-            <SelectItem key={item.value} textValue={localizedLabel}>
+            <IBaseSelectItem key={item.value} textValue={localizedLabel}>
               {onRenderOption
                 ? onRenderOption({
                     ...item,
                     localizedLabel,
                   })
                 : localizedLabel}
-            </SelectItem>
+            </IBaseSelectItem>
           );
         })}
       </>

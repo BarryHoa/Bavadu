@@ -2,13 +2,13 @@
 
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import {
-  DATA_TABLE_COLUMN_KEY_ACTION,
-  DataTableColumn,
+  I_BASE_TABLE_COLUMN_KEY_ACTION,
+  IBaseTableColumnDefinition,
   ViewListDataTable,
 } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { Chip } from "@base/client";
+import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { LeaveRequestDto } from "@mdl/hrm/client/interface/LeaveRequest";
@@ -24,7 +24,7 @@ export default function LeaveRequestsListPage(): React.ReactNode {
   const t = useTranslations("hrm.leaveRequests");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<DataTableColumn<LeaveRequestRow>[]>(
+  const columns = useMemo<IBaseTableColumnDefinition<LeaveRequestRow>[]>(
     () => [
       {
         key: "employee",
@@ -67,13 +67,13 @@ export default function LeaveRequestsListPage(): React.ReactNode {
         key: "status",
         label: t("labels.status"),
         render: (value) => (
-          <Chip className="capitalize" size="sm" variant="flat">
+          <IBaseChip className="capitalize" size="sm" variant="flat">
             {value || "pending"}
-          </Chip>
+          </IBaseChip>
         ),
       },
       {
-        key: DATA_TABLE_COLUMN_KEY_ACTION,
+        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
         label: tDataTable("columns.action"),
         align: "end",
         render: (_, row) => {

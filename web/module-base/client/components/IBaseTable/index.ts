@@ -10,6 +10,4 @@ export * from "./IBaseTableUI";
 
 export { IBaseTable };
 
-export const DataTable = IBaseTable;
-
 export default IBaseTable;

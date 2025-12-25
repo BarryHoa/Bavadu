@@ -1,12 +1,12 @@
 "use client";
 
-import type { LinkProps } from "@base/client";
+import type { IBaseLinkProps } from "@base/client";
 import type { FilterOption } from "./components/FilterMenu";
 import type { GroupOption } from "./components/GroupByMenu";
 
 import { useCallback, useMemo } from "react";
 
-import { IBaseButton, IBaseCard, IBaseCardBody, Divider } from "@base/client/components";
+import { IBaseButton, IBaseCard, IBaseCardBody, IBaseDivider } from "@base/client/components";
 
 import { useLocalizedText } from "../../hooks/useLocalizedText";
 import { IBaseTable } from "../IBaseTable";
@@ -118,7 +118,7 @@ export default function ViewListDataTable<T = any>(
               </IBaseButton>
             );
           case "link":
-            const linkProps = action.props as Omit<LinkProps, "as"> & {
+            const linkProps = action.props as Omit<IBaseLinkProps, "as"> & {
               hrefAs?: any;
             };
 
@@ -151,7 +151,7 @@ export default function ViewListDataTable<T = any>(
       {title && (
         <div className="flex gap-2 flex-wrap flex-col px-3 py-2">
           <h4 className="text-medium font-medium">{getLocalizedText(title)}</h4>
-          <Divider className="my-0" />
+          <IBaseDivider className="my-0" />
         </div>
       )}
 

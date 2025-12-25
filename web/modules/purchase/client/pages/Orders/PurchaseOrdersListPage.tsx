@@ -2,13 +2,13 @@
 
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import {
-  DATA_TABLE_COLUMN_KEY_ACTION,
-  DataTableColumn,
+  I_BASE_TABLE_COLUMN_KEY_ACTION,
+  IBaseTableColumnDefinition,
 } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { Chip } from "@base/client";
+import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 
@@ -23,7 +23,7 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
   const t = useTranslations("purchase.orders.list");
   const tDataTable = useTranslations("dataTable");
 
-  const columns = useMemo<DataTableColumn<PurchaseOrderRow>[]>(
+  const columns = useMemo<IBaseTableColumnDefinition<PurchaseOrderRow>[]>(
     () => [
       {
         key: "code",
@@ -46,9 +46,9 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
         key: "status",
         label: t("columns.status"),
         render: (value) => (
-          <Chip className="capitalize" size="sm" variant="flat">
+          <IBaseChip className="capitalize" size="sm" variant="flat">
             {t(`status.${value || "draft"}`)}
-          </Chip>
+          </IBaseChip>
         ),
       },
       {
@@ -66,7 +66,7 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
           }).format(Number(row.totalAmount ?? 0)),
       },
       {
-        key: DATA_TABLE_COLUMN_KEY_ACTION,
+        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
         label: tDataTable("columns.action"),
         align: "end",
         render: (_, row) => {

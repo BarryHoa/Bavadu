@@ -3,12 +3,12 @@
 import type { WarehouseDto } from "../../services/StockService";
 
 import {
-  DATA_TABLE_COLUMN_KEY_ACTION,
-  type DataTableColumn,
+  I_BASE_TABLE_COLUMN_KEY_ACTION,
+  type IBaseTableColumnDefinition,
 } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
-import { Chip } from "@base/client";
+import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 
@@ -57,7 +57,7 @@ export default function WarehouseListPage(): React.ReactNode {
   const t = useTranslations("stock.warehouse.list");
   const tDataTable = useTranslations("dataTable");
 
-  const columns = useMemo<DataTableColumn<WarehouseDto>[]>(
+  const columns = useMemo<IBaseTableColumnDefinition<WarehouseDto>[]>(
     () => [
       {
         key: "code",
@@ -90,17 +90,17 @@ export default function WarehouseListPage(): React.ReactNode {
         key: "status",
         label: t("columns.status"),
         render: (_, row) => (
-          <Chip
+          <IBaseChip
             color={statusColorMap[row.status] ?? "warning"}
             size="sm"
             variant="flat"
           >
             {t(`status.${row.status}`)}
-          </Chip>
+          </IBaseChip>
         ),
       },
       {
-        key: DATA_TABLE_COLUMN_KEY_ACTION,
+        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
         label: tDataTable("columns.action"),
         align: "end",
         render: (_, row) => (
