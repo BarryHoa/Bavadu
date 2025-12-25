@@ -1,13 +1,12 @@
 "use client";
 
-import type { LinkProps } from "@heroui/link";
+import type { LinkProps } from "@base/client";
 import type { FilterOption } from "./components/FilterMenu";
 import type { GroupOption } from "./components/GroupByMenu";
 
-import { Divider } from "@heroui/divider";
 import { useCallback, useMemo } from "react";
 
-import { IBaseButton, IBaseCard, IBaseCardBody } from "@base/client/components";
+import { IBaseButton, IBaseCard, IBaseCardBody, Divider } from "@base/client/components";
 
 import { useLocalizedText } from "../../hooks/useLocalizedText";
 import { IBaseTable } from "../IBaseTable";

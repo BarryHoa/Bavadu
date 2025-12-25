@@ -4,8 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { courseService } from "@mdl/hrm/client/services/CourseService";
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody } from "@base/client";
 import { LoadingOverlay, IBaseDigitViewer } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 

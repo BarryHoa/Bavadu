@@ -10,7 +10,7 @@ import {
   SelectItemOption,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { Checkbox, Textarea } from "@heroui/react";
+import { Checkbox, Textarea } from "@base/client";
 import { Control, Controller } from "react-hook-form";
 
 interface MainTabProps {

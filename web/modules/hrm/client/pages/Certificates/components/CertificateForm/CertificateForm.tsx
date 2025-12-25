@@ -6,8 +6,8 @@ import {
   IBaseInputMultipleLang,
   IBaseSingleSelectAsync,
 } from "@base/client/components";
-import { Button } from "@heroui/button";
-import { Card, CardBody, Checkbox } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody, Checkbox } from "@base/client";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { parseDate } from "@internationalized/date";
 import { useTranslations } from "next-intl";

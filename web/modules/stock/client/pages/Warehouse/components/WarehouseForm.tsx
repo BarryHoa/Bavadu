@@ -1,11 +1,3 @@
-import {
-  IBaseInput,
-  IBaseSingleSelect,
-  SelectItemOption,
-} from "@base/client/components";
-import AddressPicker from "@base/client/components/AddressPicker/AddressPicker";
-import { Button } from "@heroui/button";
-import { Textarea } from "@heroui/react";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { type Key, type ReactNode, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -19,6 +11,15 @@ import {
   string,
   trim,
 } from "valibot";
+
+import {
+  Button,
+  IBaseInput,
+  IBaseSingleSelect,
+  SelectItemOption,
+  Textarea,
+} from "@base/client";
+import AddressPicker from "@base/client/components/AddressPicker/AddressPicker";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { Address } from "@base/client/interface/Address";
 
@@ -35,7 +36,7 @@ const warehouseFormSchema = object({
   status: pipe(
     string(),
     trim(),
-    picklist(warehouseStatuses, "Invalid warehouse status"),
+    picklist(warehouseStatuses, "Invalid warehouse status")
   ),
   companyId: optional(pipe(string(), trim())),
   managerId: optional(pipe(string(), trim())),
@@ -45,7 +46,7 @@ const warehouseFormSchema = object({
   valuationMethod: pipe(
     string(),
     trim(),
-    picklist(warehouseValuationMethods, "Invalid valuation method"),
+    picklist(warehouseValuationMethods, "Invalid valuation method")
   ),
   minStock: optional(pipe(string(), trim())),
   maxStock: optional(pipe(string(), trim())),
@@ -81,7 +82,7 @@ const valuationOptions: SelectItemOption[] = warehouseValuationMethods.map(
   (method) => ({
     value: method,
     label: method,
-  }),
+  })
 );
 
 const toNullableString = (value?: string) => {
@@ -165,7 +166,7 @@ export default function WarehouseForm({
       accountAdjustment: initialData?.accountAdjustment ?? "",
       notes: initialData?.notes ?? "",
     }),
-    [initialData],
+    [initialData]
   );
 
   const {
@@ -237,7 +238,7 @@ export default function WarehouseForm({
       managerId: toNullableString(values.managerId) ?? null,
       contactId: toNullableString(values.contactId) ?? null,
       address: [values.address1, values.address2].filter(
-        (x) => x !== undefined,
+        (x) => x !== undefined
       ) as Address[],
       valuationMethod: values.valuationMethod.trim().toUpperCase(),
       minStock,
@@ -441,7 +442,7 @@ export default function WarehouseForm({
                       label="Secondary"
                       placeholder="Please select address"
                       value={getLocalizedName(
-                        field.value?.formattedAddress ?? "",
+                        field.value?.formattedAddress ?? ""
                       )}
                     />
                   </div>

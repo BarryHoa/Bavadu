@@ -1,4 +1,5 @@
 import type { SortDescriptor, TableProps } from "@heroui/table";
+export type { SortDescriptor, TableProps };
 import type { CSSProperties, ReactNode } from "react";
 
 export type RowSelectionMode = "single" | "multiple";

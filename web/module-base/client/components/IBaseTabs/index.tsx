@@ -31,4 +31,7 @@ IBaseTabs.displayName = "IBaseTabs";
 
 export const IBaseTab = Tab;
 
+export const Tabs = IBaseTabs;
+export const Tab = IBaseTab;
+
 export default IBaseTabs;

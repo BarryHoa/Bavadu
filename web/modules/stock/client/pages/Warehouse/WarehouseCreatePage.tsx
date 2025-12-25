@@ -6,7 +6,7 @@ import type {
 } from "../../services/StockService";
 
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
-import { Button } from "@heroui/button";
+import { Button } from "@base/client";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 

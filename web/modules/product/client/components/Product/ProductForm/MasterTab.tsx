@@ -13,7 +13,7 @@ import {
   SelectItemOption,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { Checkbox, CheckboxGroup } from "@heroui/react";
+import { Checkbox, CheckboxGroup } from "@base/client";
 import { HelpCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";

@@ -6,14 +6,14 @@ import {
   SelectItemOption,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { Button } from "@heroui/button";
+import { Button } from "@base/client";
 import {
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
-} from "@heroui/react";
+} from "@base/client";
 import { AlertCircle } from "lucide-react";
 import { useMemo } from "react";
 import { Control, Controller, UseFormSetValue } from "react-hook-form";

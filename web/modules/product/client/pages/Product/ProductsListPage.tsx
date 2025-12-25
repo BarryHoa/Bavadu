@@ -11,7 +11,7 @@ import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
 import LinkAs from "@base/client/components/LinkAs";
-import { Chip } from "@heroui/react";
+import { Chip } from "@base/client";
 import { useTranslations } from "next-intl";
 import React, { useMemo } from "react";
 

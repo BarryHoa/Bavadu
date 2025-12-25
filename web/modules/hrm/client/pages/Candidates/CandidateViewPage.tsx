@@ -3,8 +3,8 @@
 import { IBaseDigitViewer, LoadingOverlay } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody } from "@base/client";
 import { candidateService } from "@mdl/hrm/client/services/CandidateService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";

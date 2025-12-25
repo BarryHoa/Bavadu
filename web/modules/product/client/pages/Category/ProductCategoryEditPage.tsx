@@ -3,8 +3,8 @@
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import type { ProductCategoryRow } from "../../interface/ProductCategory";
 
-import { Button } from "@heroui/button";
-import { addToast } from "@heroui/toast";
+import { Button } from "@base/client";
+import { addToast } from "@base/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";

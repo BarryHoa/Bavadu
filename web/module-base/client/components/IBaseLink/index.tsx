@@ -10,9 +10,12 @@ export const IBaseLink = React.forwardRef<HTMLAnchorElement, IBaseLinkProps>(
     const { size = "sm", ...rest } = props;
 
     return <HeroUILink ref={ref} size={size} {...rest} />;
-  },
+  }
 );
 
 IBaseLink.displayName = "IBaseLink";
+
+export type { LinkProps };
+export const Link = IBaseLink;
 
 export default IBaseLink;

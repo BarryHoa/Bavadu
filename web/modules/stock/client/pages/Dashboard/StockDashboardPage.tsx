@@ -3,7 +3,7 @@
 import type { MovementResult, StockFilters } from "./types";
 
 import LinkAs from "@base/client/components/LinkAs";
-import { Button } from "@heroui/button";
+import { Button } from "@base/client";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";

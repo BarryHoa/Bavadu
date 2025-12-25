@@ -8,7 +8,7 @@ import {
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { Chip } from "@heroui/react";
+import { Chip } from "@base/client";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 

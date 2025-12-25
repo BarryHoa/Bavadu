@@ -65,7 +65,11 @@ IBaseModalFooter.displayName = "IBaseModalFooter";
 // Export all components
 
 // Also export with shorter names for convenience
-
+export const Modal = IBaseModal;
+export const ModalContent = IBaseModalContent;
+export const ModalHeader = IBaseModalHeader;
+export const ModalBody = IBaseModalBody;
+export const ModalFooter = IBaseModalFooter;
 
 // Default export
 export default IBaseModal;

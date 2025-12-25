@@ -11,8 +11,8 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody } from "@base/client";
 
 import { createEmployeeValidation } from "../../validation/employeeValidation";
 

@@ -7,8 +7,8 @@ import {
 } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
-import { Button } from "@heroui/button";
-import { Card, CardBody, Textarea } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody, Textarea } from "@base/client";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";

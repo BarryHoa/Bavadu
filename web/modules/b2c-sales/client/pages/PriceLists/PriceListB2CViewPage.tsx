@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardBody, Tab, Tabs } from "@heroui/react";
+import { Card, CardBody, Tab, Tabs } from "@base/client";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 

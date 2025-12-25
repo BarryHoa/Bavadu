@@ -15,4 +15,6 @@ export const IBaseSwitch = React.forwardRef<HTMLInputElement, IBaseSwitchProps>(
 
 IBaseSwitch.displayName = "IBaseSwitch";
 
+export const Switch = IBaseSwitch;
+
 export default IBaseSwitch;

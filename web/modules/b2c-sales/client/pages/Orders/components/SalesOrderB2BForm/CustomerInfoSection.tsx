@@ -10,8 +10,8 @@ import {
   ModalFooter,
   ModalHeader,
 } from "@base/client/components";
-import { Button } from "@heroui/button";
-import { Checkbox, useDisclosure } from "@heroui/react";
+import { Button } from "@base/client";
+import { Checkbox, useDisclosure } from "@base/client";
 import { useQuery } from "@tanstack/react-query";
 import { RefreshCwIcon } from "lucide-react";
 import { useTranslations } from "next-intl";

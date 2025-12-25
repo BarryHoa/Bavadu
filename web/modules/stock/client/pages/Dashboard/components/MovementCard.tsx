@@ -8,8 +8,8 @@ import {
   IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody } from "@base/client";
 import { useMemo, useState } from "react";
 
 interface MovementCardProps {

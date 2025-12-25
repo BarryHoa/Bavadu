@@ -3,7 +3,7 @@
 import type { WarehouseDto } from "../../../services/StockService";
 import type { MovementResult, MovementPayload } from "../types";
 
-import { Card, CardBody } from "@heroui/react";
+import { Card, CardBody } from "@base/client";
 
 import MovementCard from "./MovementCard";
 

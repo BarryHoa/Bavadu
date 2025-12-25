@@ -4,8 +4,8 @@ import {
   IBaseInputNumber,
   IBaseSingleSelectAsync,
 } from "@base/client/components";
-import { Button } from "@heroui/button";
-import { Card, CardBody, Textarea } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody, Textarea } from "@base/client";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";

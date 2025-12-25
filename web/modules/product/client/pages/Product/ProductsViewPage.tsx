@@ -3,9 +3,9 @@
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import type { ProductDetail } from "../../interface/Product";
 
-import { Button } from "@heroui/button";
-import { Card, CardBody, Chip, Divider } from "@heroui/react";
-import { Spinner } from "@heroui/spinner";
+import { Button } from "@base/client";
+import { Card, CardBody, Chip, Divider } from "@base/client";
+import { Spinner } from "@base/client";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";

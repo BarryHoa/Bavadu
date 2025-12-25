@@ -11,8 +11,8 @@ import { parseDate } from "@internationalized/date";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
-import { Button } from "@heroui/button";
-import { Card, CardBody, Textarea } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody, Textarea } from "@base/client";
 
 import {
   createTimesheetValidation,

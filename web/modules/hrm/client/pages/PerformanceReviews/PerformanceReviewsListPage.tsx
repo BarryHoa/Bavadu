@@ -8,7 +8,7 @@ import {
 } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { Chip } from "@heroui/react";
+import { Chip } from "@base/client";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { PerformanceReviewDto } from "@mdl/hrm/client/interface/PerformanceReview";

@@ -6,8 +6,8 @@ import type {
 } from "../../services/StockService";
 
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
-import { Button } from "@heroui/button";
-import { Card, CardBody, Spinner } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody, Spinner } from "@base/client";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";

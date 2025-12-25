@@ -1,6 +1,6 @@
 "use client";
 
-import { SortDescriptor } from "@heroui/table";
+import { SortDescriptor } from "@base/client";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 

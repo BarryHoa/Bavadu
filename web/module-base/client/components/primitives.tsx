@@ -1,4 +1,4 @@
-import { tv, type VariantProps } from "@heroui/theme";
+import { tv, type VariantProps } from "@base/client";
 
 export const title = tv({
   base: "tracking-tight inline font-semibold",

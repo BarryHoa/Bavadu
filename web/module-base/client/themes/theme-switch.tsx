@@ -3,7 +3,7 @@
 import { IBaseSwitchProps } from "@base/client/components";
 import { FC } from "react";
 import { VisuallyHidden } from "@react-aria/visually-hidden";
-import { useSwitch } from "@heroui/switch";
+import { useSwitch } from "@base/client";
 import { useTheme } from "next-themes";
 import { useIsSSR } from "@react-aria/ssr";
 import clsx from "clsx";

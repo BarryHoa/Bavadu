@@ -10,7 +10,7 @@ import {
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { Chip } from "@heroui/react";
+import { Chip } from "@base/client";
 import { useTranslations } from "next-intl";
 import React, { useMemo } from "react";
 import LinkAs from "@base/client/components/LinkAs";

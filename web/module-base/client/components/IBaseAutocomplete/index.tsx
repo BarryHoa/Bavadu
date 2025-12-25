@@ -22,4 +22,8 @@ export const IBaseAutocompleteItem = HeroUIAutocompleteItem;
 export const IBaseAutocompleteSection = HeroUIAutocompleteSection;
 
 
+export const Autocomplete = IBaseAutocomplete;
+export const AutocompleteItem = IBaseAutocompleteItem;
+export const AutocompleteSection = IBaseAutocompleteSection;
+
 export default IBaseAutocomplete;

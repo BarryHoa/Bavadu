@@ -1,3 +1,6 @@
+import { Ellipsis } from "lucide-react";
+
+import { cn } from "@base/client";
 import {
   IBaseButton,
   IBaseDropdown,
@@ -6,8 +9,6 @@ import {
   IBaseDropdownTrigger,
   IBaseLink,
 } from "@base/client/components";
-import { cn } from "@heroui/theme";
-import { Ellipsis } from "lucide-react";
 
 type ButtonVariant = "solid" | "flat" | "bordered" | "light";
 

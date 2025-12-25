@@ -45,4 +45,6 @@ export const IBaseTextarea = React.forwardRef<HTMLTextAreaElement, IBaseTextarea
 
 IBaseTextarea.displayName = "IBaseTextarea";
 
+export const Textarea = IBaseTextarea;
+
 export default IBaseTextarea;

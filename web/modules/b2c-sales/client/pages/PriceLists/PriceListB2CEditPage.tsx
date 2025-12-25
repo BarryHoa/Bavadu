@@ -2,8 +2,8 @@
 
 import { SelectItemOption } from "@base/client/components";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody } from "@base/client";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";

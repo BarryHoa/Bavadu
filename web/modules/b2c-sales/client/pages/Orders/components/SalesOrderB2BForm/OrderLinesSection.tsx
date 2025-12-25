@@ -7,8 +7,8 @@ import {
   SelectItemOption,
 } from "@base/client/components";
 import ClientHttpService from "@base/client/services/ClientHttpService";
-import { Button } from "@heroui/button";
-import { Card, CardBody, Divider } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody, Divider } from "@base/client";
 import { Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo } from "react";

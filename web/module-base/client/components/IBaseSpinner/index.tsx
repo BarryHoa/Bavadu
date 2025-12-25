@@ -15,4 +15,6 @@ export const IBaseSpinner = React.forwardRef<HTMLDivElement, IBaseSpinnerProps>(
 
 IBaseSpinner.displayName = "IBaseSpinner";
 
+export const Spinner = IBaseSpinner;
+
 export default IBaseSpinner;

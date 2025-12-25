@@ -8,8 +8,8 @@ import {
   IBaseInputSearch,
   SelectItemOption,
 } from "@base/client/components";
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody } from "@base/client";
 import ProductService from "@mdl/product/client/services/ProductService";
 import UnitOfMeasureService from "@mdl/product/client/services/UnitOfMeasureService";
 import { useQuery } from "@tanstack/react-query";

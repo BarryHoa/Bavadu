@@ -4,8 +4,8 @@ import type { Resolver, SubmitHandler } from "react-hook-form";
 import type { ProductCategoryRow } from "../../interface/ProductCategory";
 
 import { IBaseInput } from "@base/client/components";
-import { Button } from "@heroui/button";
-import { Card, CardBody, Switch, Textarea } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody, Switch, Textarea } from "@base/client";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
 import { Save } from "lucide-react";

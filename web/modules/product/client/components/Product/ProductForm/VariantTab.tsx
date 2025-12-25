@@ -8,8 +8,8 @@ import {
   IBaseTextarea,
   IBaseUploadImageTiny,
 } from "@base/client/components";
-import { Button } from "@heroui/button";
-import { Card, CardBody, Divider } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody, Divider } from "@base/client";
 import { Plus, Trash } from "lucide-react";
 import { useTranslations } from "next-intl";
 

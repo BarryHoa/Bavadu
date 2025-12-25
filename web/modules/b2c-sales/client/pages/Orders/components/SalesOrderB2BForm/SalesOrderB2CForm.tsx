@@ -19,8 +19,8 @@ import {
   shippingTermService,
   taxRateService,
 } from "@base/client/services";
-import { Button } from "@heroui/button";
-import { Card, CardBody, Textarea } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody, Textarea } from "@base/client";
 import UnitOfMeasureService from "@mdl/product/client/services/UnitOfMeasureService";
 import StockService from "@mdl/stock/client/services/StockService";
 

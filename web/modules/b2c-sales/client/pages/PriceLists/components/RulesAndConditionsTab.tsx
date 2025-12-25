@@ -5,8 +5,8 @@ import {
   IBaseSingleSelect,
   SelectItemOption,
 } from "@base/client/components";
-import { Button } from "@heroui/button";
-import { Card, CardBody, Checkbox } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody, Checkbox } from "@base/client";
 import { Control, Controller, useFieldArray } from "react-hook-form";
 import { Plus, Trash2 } from "lucide-react";
 

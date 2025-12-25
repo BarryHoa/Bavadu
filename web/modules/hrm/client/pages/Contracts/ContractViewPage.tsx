@@ -1,8 +1,8 @@
 "use client";
 
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody } from "@base/client";
 import { contractService } from "@mdl/hrm/client/services/ContractService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";

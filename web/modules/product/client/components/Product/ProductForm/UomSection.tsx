@@ -14,8 +14,8 @@ import {
   SelectItemOption,
   type DataTableColumnDefinition,
 } from "@base/client/components";
-import { Button } from "@heroui/button";
-import { addToast } from "@heroui/react";
+import { Button } from "@base/client";
+import { addToast } from "@base/client";
 import { Plus, Trash } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useMemo, useState } from "react";

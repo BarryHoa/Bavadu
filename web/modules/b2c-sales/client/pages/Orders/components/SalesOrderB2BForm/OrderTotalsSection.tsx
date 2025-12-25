@@ -1,7 +1,7 @@
 "use client";
 
 import { IBaseInputNumber } from "@base/client/components";
-import { Divider } from "@heroui/react";
+import { Divider } from "@base/client";
 import { useTranslations } from "next-intl";
 import { Control, Controller } from "react-hook-form";
 

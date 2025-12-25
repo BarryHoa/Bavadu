@@ -3,7 +3,7 @@
 import { IBaseInput } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
-import { Button } from "@heroui/button";
+import { Button } from "@base/client";
 import {
   Card,
   CardBody,
@@ -16,7 +16,7 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-} from "@heroui/react";
+} from "@base/client";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";

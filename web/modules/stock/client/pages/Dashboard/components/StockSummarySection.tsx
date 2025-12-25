@@ -15,8 +15,8 @@ import {
 } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
-import { Button } from "@heroui/button";
-import { Card, CardBody, Divider } from "@heroui/react";
+import { Button } from "@base/client";
+import { Card, CardBody, Divider } from "@base/client";
 import { useMemo } from "react";
 
 interface StockSummarySectionProps {

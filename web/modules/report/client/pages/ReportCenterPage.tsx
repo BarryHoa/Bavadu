@@ -1,7 +1,7 @@
 "use client";
 
 import { IBaseTabs, Tab } from "@base/client/components";
-import { Card } from "@heroui/card";
+import { Card } from "@base/client";
 import ReactECharts from "echarts-for-react";
 
 const overviewOption: echarts.EChartsOption = {

@@ -7,7 +7,7 @@ import {
   ViewListDataTable,
 } from "@base/client/components";
 import LinkAs from "@base/client/components/LinkAs";
-import { Chip } from "@heroui/react";
+import { Chip } from "@base/client";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { LeaveTypeDto } from "@mdl/hrm/client/interface/LeaveType";
