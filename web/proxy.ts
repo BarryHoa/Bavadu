@@ -33,7 +33,7 @@ const EXCLUDED_PATHS = ["/_next", "/static", "/favicon"];
  */
 function isPublicRoute(pathname: string): boolean {
   return PUBLIC_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(route + "/"),
+    (route) => pathname === route || pathname.startsWith(route + "/")
   );
 }
 
@@ -74,7 +74,7 @@ function isPageRoute(pathname: string): boolean {
 async function handleApiRoute(
   req: NextRequest,
   pathname: string,
-  nextHeaders: Headers,
+  nextHeaders: Headers
 ): Promise<NextResponse | null> {
   // 1. Rate Limiting
   const rateLimitResponse = await checkRateLimit(req, pathname);
@@ -125,7 +125,7 @@ async function handleApiRoute(
 async function handlePageRoute(
   req: NextRequest,
   pathname: string,
-  nextHeaders: Headers,
+  nextHeaders: Headers
 ): Promise<NextResponse | null> {
   // Check authentication for protected routes
   if (isProtectedRoute(pathname) && !isPublicRoute(pathname)) {

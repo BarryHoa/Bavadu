@@ -90,9 +90,7 @@ class SessionStore {
    * Validate session token with Redis cache
    * Falls back to database if Redis is not available
    */
-  async validateSession(
-    sessionToken: string
-  ): Promise<ValidateSessionResult> {
+  async validateSession(sessionToken: string): Promise<ValidateSessionResult> {
     // Try Redis cache first
     if (this.useRedis) {
       const cache = await this.getRedisCache();
@@ -286,4 +284,3 @@ export const sessionStore = new SessionStore();
 
 // Export class for testing
 export { SessionStore };
-
