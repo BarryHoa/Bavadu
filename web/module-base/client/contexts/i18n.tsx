@@ -3,7 +3,7 @@
 import { useMessagesStore } from "@base/client/stores/messages-store";
 import { SYSTEM_TIMEZONE } from "@base/shared/constants";
 import { NextIntlClientProvider } from "next-intl";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 
 export default function ModuleI18nProvider({
   locale,
@@ -32,18 +32,17 @@ export default function ModuleI18nProvider({
   }, [initialMessages, setCommonMessages, setModuleMessages]);
 
   // Get combined messages from store (subscribe to changes)
-  const combinedMessages = useMemo(() => {
-    const init = Object.values(initialMessages).reduce(
-      (acc, msg) => ({ ...acc, ...msg }),
-      {},
-    );
+  // React Compiler will automatically optimize this computation
+  const init = Object.values(initialMessages).reduce(
+    (acc, msg) => ({ ...acc, ...msg }),
+    {},
+  );
 
-    // Combine all messages: common first, then modules (later modules override earlier ones)
-    return Object.values(messages).reduce(
-      (acc, moduleMsg) => ({ ...acc, ...moduleMsg }),
-      init,
-    );
-  }, [messages, initialMessages]);
+  // Combine all messages: common first, then modules (later modules override earlier ones)
+  const combinedMessages = Object.values(messages).reduce(
+    (acc, moduleMsg) => ({ ...acc, ...moduleMsg }),
+    init,
+  );
 
   return (
     <NextIntlClientProvider

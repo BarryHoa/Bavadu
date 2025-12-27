@@ -3,7 +3,7 @@ import {
   useQueryClient,
   type QueryKey,
 } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
 interface UseCreateUpdateOptions<TPayload, TResult> {
   mutationFn: (payload: TPayload) => Promise<TResult>;
@@ -46,16 +46,14 @@ export function useCreateUpdate<TPayload, TResult>({
     },
   });
 
-  const handleSubmit = useCallback(
-    async (payload: TPayload) => {
-      await mutation.mutateAsync(payload);
-    },
-    [mutation],
-  );
+  // React Compiler will automatically optimize these callbacks
+  const handleSubmit = async (payload: TPayload) => {
+    await mutation.mutateAsync(payload);
+  };
 
-  const resetError = useCallback(() => {
+  const resetError = () => {
     setErrorMessage(null);
-  }, []);
+  };
 
   return {
     handleSubmit,

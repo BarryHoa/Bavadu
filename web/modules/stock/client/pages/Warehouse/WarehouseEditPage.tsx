@@ -10,7 +10,7 @@ import { IBaseButton } from "@base/client";
 import { IBaseCard, IBaseCardBody, IBaseSpinner } from "@base/client";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import React from "react";
 
 import StockService from "../../services/StockService";
 
@@ -20,13 +20,9 @@ export default function WarehouseEditPage(): React.ReactNode {
   const router = useRouter();
   const params = useParams<{ id: string }>();
 
-  const warehouseId = useMemo(() => {
-    const value = params?.id;
-
-    if (!value) return undefined;
-
-    return Array.isArray(value) ? value[0] : value;
-  }, [params]);
+  // React Compiler will automatically optimize this computation
+  const value = params?.id;
+  const warehouseId = !value ? undefined : Array.isArray(value) ? value[0] : value;
 
   const warehouseQuery = useQuery({
     queryKey: ["warehouses", warehouseId],
@@ -65,16 +61,14 @@ export default function WarehouseEditPage(): React.ReactNode {
     },
   });
 
-  const handleFormSubmit = useCallback(
-    async (payload: WarehousePayload) => {
-      if (!warehouseId) {
-        return;
-      }
+  // React Compiler will automatically optimize this callback
+  const handleFormSubmit = async (payload: WarehousePayload) => {
+    if (!warehouseId) {
+      return;
+    }
 
-      await handleSubmit({ ...payload, id: warehouseId });
-    },
-    [handleSubmit, warehouseId],
-  );
+    await handleSubmit({ ...payload, id: warehouseId });
+  };
 
   return (
     <div className="w-full space-y-6">

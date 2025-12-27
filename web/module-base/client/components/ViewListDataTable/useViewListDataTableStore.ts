@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 
 import { IBaseTableColumnDefinition } from "../IBaseTable/IBaseTableInterface";
 
@@ -88,8 +88,8 @@ export function useViewListDataTableStore<T = any>(
   const [showFavorite, setShowFavorite] =
     useState<boolean>(initialShowFavorite);
 
-  // Toggle column visibility
-  const toggleColumn = useCallback((key: string) => {
+  // React Compiler will automatically optimize these callbacks
+  const toggleColumn = (key: string) => {
     setVisibleColumns((prev) => {
       const next = new Set(prev);
 
@@ -101,10 +101,10 @@ export function useViewListDataTableStore<T = any>(
 
       return next;
     });
-  }, []);
+  };
 
   // Toggle filter
-  const toggleFilter = useCallback((label: string) => {
+  const toggleFilter = (label: string) => {
     setActiveFilters((prev) => {
       const newSet = new Set(prev);
 
@@ -116,20 +116,20 @@ export function useViewListDataTableStore<T = any>(
 
       return newSet;
     });
-  }, []);
+  };
 
   // Clear all filters
-  const clearFilters = useCallback(() => {
+  const clearFilters = () => {
     setActiveFilters(new Set());
-  }, []);
+  };
 
   // Toggle favorite
-  const toggleFavorite = useCallback(() => {
+  const toggleFavorite = () => {
     setShowFavorite((prev) => !prev);
-  }, []);
+  };
 
   // Reset all state
-  const reset = useCallback(() => {
+  const reset = () => {
     setSearch(initialSearch);
     setVisibleColumns(
       initialVisibleColumns || getDefaultVisibleColumns(columns),
@@ -137,48 +137,27 @@ export function useViewListDataTableStore<T = any>(
     setActiveFilters(initialActiveFilters || new Set());
     setGroupBy(initialGroupBy);
     setShowFavorite(initialShowFavorite);
-  }, [
-    columns,
-    initialSearch,
-    initialVisibleColumns,
-    initialActiveFilters,
-    initialGroupBy,
-    initialShowFavorite,
-  ]);
+  };
 
-  // Return store object
-  return useMemo(
-    () => ({
-      // State
-      search,
-      visibleColumns,
-      activeFilters,
-      groupBy,
-      showFavorite,
+  // React Compiler will automatically optimize this object creation
+  return {
+    // State
+    search,
+    visibleColumns,
+    activeFilters,
+    groupBy,
+    showFavorite,
 
-      // Actions
-      setSearch,
-      setVisibleColumns,
-      toggleColumn,
-      setActiveFilters,
-      toggleFilter,
-      clearFilters,
-      setGroupBy,
-      setShowFavorite,
-      toggleFavorite,
-      reset,
-    }),
-    [
-      search,
-      visibleColumns,
-      activeFilters,
-      groupBy,
-      showFavorite,
-      toggleColumn,
-      toggleFilter,
-      clearFilters,
-      toggleFavorite,
-      reset,
-    ],
-  );
+    // Actions
+    setSearch,
+    setVisibleColumns,
+    toggleColumn,
+    setActiveFilters,
+    toggleFilter,
+    clearFilters,
+    setGroupBy,
+    setShowFavorite,
+    toggleFavorite,
+    reset,
+  };
 }

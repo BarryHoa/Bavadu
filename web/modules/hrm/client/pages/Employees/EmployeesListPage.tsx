@@ -10,7 +10,7 @@ import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 import { Employee } from "@mdl/hrm/client/interface/Employee";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
@@ -24,8 +24,8 @@ export default function EmployeesListPage(): React.ReactNode {
   const t = useTranslations("hrm.employee.list");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<IBaseTableColumnDefinition<EmployeeRow>[]>(
-    () => [
+  // React Compiler will automatically optimize this array creation
+  const columns: IBaseTableColumnDefinition<EmployeeRow>[] = [
       {
         key: "employeeCode",
         label: t("employeeCode"),
@@ -92,9 +92,7 @@ export default function EmployeesListPage(): React.ReactNode {
           );
         },
       },
-    ],
-    [t, tDataTable, getLocalizedText],
-  );
+    ];
 
   return (
     <div className="space-y-4">

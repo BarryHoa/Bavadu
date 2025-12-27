@@ -5,7 +5,7 @@ import type { Selection } from "@heroui/table";
 import type { TableProps } from "@heroui/table";
 
 import { RefreshCw } from "lucide-react";
-import { useMemo } from "react";
+import React from "react";
 import { IBaseTooltip } from "@base/client/components";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
@@ -46,9 +46,8 @@ export function IBaseTable<T = any>({
 
   const processedColumns = useColumns(columns);
 
-  // Convert ProcessedIBaseTableColumn to IBaseTableCoreColumn
-  const iBaseTableColumns = useMemo<IBaseTableCoreColumn<T>[]>(() => {
-    return processedColumns.map((col) => ({
+  // React Compiler will automatically optimize this computation
+  const iBaseTableColumns: IBaseTableCoreColumn<T>[] = processedColumns.map((col) => ({
       key: col.key,
       title: col.title,
       label: col.label,
@@ -74,7 +73,6 @@ export function IBaseTable<T = any>({
         isRowNumber: col.key === I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
       },
     }));
-  }, [processedColumns]);
 
   // Core table logic - all logic is now in useIBaseTableCore
   const core = useIBaseTableCore<T>({

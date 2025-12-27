@@ -2,7 +2,6 @@
 import { IBaseButton, IBaseDropdown } from "@base/client/components";
 
 import { Group } from "lucide-react";
-import { useMemo } from "react";
 
 
 export interface GroupOption {
@@ -25,10 +24,8 @@ export default function GroupByMenu({
     return null;
   }
 
-  const menuItems = useMemo(
-    () => [{ key: "__none__", label: "(None)" }, ...groupByOptions],
-    [groupByOptions]
-  );
+  // React Compiler will automatically optimize this array creation
+  const menuItems = [{ key: "__none__", label: "(None)" }, ...groupByOptions];
 
   return (
     <IBaseDropdown

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useMemo } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 export interface GlobalSettings {
   theme: "light" | "dark" | "system";
@@ -48,14 +48,12 @@ export function GlobalSettingsProvider({
     setSettings(defaultSettings);
   };
 
-  const value = useMemo(
-    () => ({
-      settings,
-      updateSettings,
-      resetSettings,
-    }),
-    [settings],
-  );
+  // React Compiler will automatically optimize this object creation
+  const value = {
+    settings,
+    updateSettings,
+    resetSettings,
+  };
 
   return (
     <GlobalSettingsContext.Provider value={value}>

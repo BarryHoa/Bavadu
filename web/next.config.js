@@ -63,6 +63,8 @@ const nextConfig = {
   experimental: {
     // Allow importing from modules directory
     externalDir: true,
+    // Enable React Compiler for automatic memoization
+    reactCompiler: true,
   },
 };
 

@@ -4,7 +4,7 @@ import type { IBaseLinkProps } from "@base/client";
 import type { FilterOption } from "./components/FilterMenu";
 import type { GroupOption } from "./components/GroupByMenu";
 
-import { useCallback, useMemo } from "react";
+import React from "react";
 
 import { IBaseButton, IBaseCard, IBaseCardBody, IBaseDivider } from "@base/client/components";
 
@@ -73,76 +73,63 @@ export default function ViewListDataTable<T = any>(
     // enabled: !propDataSource, // Only fetch if dataSource is not provided as prop
   });
 
-  const filterOptions = useMemo<FilterOption<T>[]>(() => {
-    return [];
-  }, []);
-  const groupByOptions = useMemo<GroupOption[]>(() => {
-    return [];
-  }, []);
+  // React Compiler will automatically optimize these computations
+  const filterOptions: FilterOption<T>[] = [];
+  const groupByOptions: GroupOption[] = [];
 
   // Prepare columns list with only visible columns
-  const displayColumns = useMemo(() => {
-    const cols = columns.filter((col: any) =>
-      store.visibleColumns.has(col.key)
-    );
-
-    if (isDataDummy) {
-      return cols.map((col: any) => ({
+  const cols = columns.filter((col: any) => store.visibleColumns.has(col.key));
+  const displayColumns = isDataDummy
+    ? cols.map((col: any) => ({
         ...col,
         render: () => null,
-      }));
-    }
+      }))
+    : cols;
 
-    return cols;
-  }, [columns, store.visibleColumns, isDataDummy]);
+  // React Compiler will automatically optimize this callback
+  const renderActions = (acts: ActionElm[]) => {
+    return acts?.map((action) => {
+      const size = action.size ?? "sm";
+      const variant = action.variant ?? "solid";
+      const color = action.color ?? "default";
 
-  const renderActions = useCallback(
-    (acts: ActionElm[]) => {
-      return acts?.map((action) => {
-        const size = action.size ?? "sm";
-        const variant = action.variant ?? "solid";
-        const color = action.color ?? "default";
+      switch (action.type) {
+        case "button":
+          return (
+            <IBaseButton
+              key={action.key}
+              isIconOnly
+              color={color}
+              size={size}
+              variant={variant}
+              {...(action.props as any)}
+            >
+              {action.title}
+            </IBaseButton>
+          );
+        case "link":
+          const linkProps = action.props as Omit<IBaseLinkProps, "as"> & {
+            hrefAs?: any;
+          };
 
-        switch (action.type) {
-          case "button":
-            return (
-              <IBaseButton
-                key={action.key}
-                isIconOnly
-                color={color}
-                size={size}
-                variant={variant}
-                {...(action.props as any)}
-              >
-                {action.title}
-              </IBaseButton>
-            );
-          case "link":
-            const linkProps = action.props as Omit<IBaseLinkProps, "as"> & {
-              hrefAs?: any;
-            };
-
-            return (
-              <IBaseButton
-                key={action.key}
-                as={LinkAs as any}
-                color={color}
-                href={linkProps.href as string}
-                size={size}
-                variant={variant}
-                {...(linkProps as any)}
-                // {...(linkProps as any)}
-              >
-                {action.title}
-              </IBaseButton>
-            );
-          default:
-            return null;
-        }
-      });
-    },
-    [actionsLeft, actionsRight]
-  );
+          return (
+            <IBaseButton
+              key={action.key}
+              as={LinkAs as any}
+              color={color}
+              href={linkProps.href as string}
+              size={size}
+              variant={variant}
+              {...(linkProps as any)}
+            >
+              {action.title}
+            </IBaseButton>
+          );
+        default:
+          return null;
+      }
+    });
+  };
 
   // Render
   return (

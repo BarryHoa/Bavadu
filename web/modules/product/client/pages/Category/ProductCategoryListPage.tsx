@@ -12,7 +12,7 @@ import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
-import React, { useMemo } from "react";
+import React from "react";
 import LinkAs from "@base/client/components/LinkAs";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
 
@@ -22,8 +22,8 @@ const ProductCategoryListPage = (): React.ReactNode => {
   const localized = useLocalizedText();
   const t = useTranslations("dataTable");
 
-  const columns = useMemo<IBaseTableColumnDefinition<ProductCategoryRow>[]>(() => {
-    return [
+  // React Compiler will automatically optimize this array creation
+  const columns: IBaseTableColumnDefinition<ProductCategoryRow>[] = [
       {
         key: "name",
         label: "Category Name",
@@ -127,7 +127,6 @@ const ProductCategoryListPage = (): React.ReactNode => {
         },
       },
     ];
-  }, [localized, t]);
 
   const createLink = getClientLink({
     mdl: "product",

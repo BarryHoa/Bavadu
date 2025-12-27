@@ -9,7 +9,7 @@ import {
 } from "@base/client/components";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import { IBaseButton } from "@base/client";
 import { IBaseCard, IBaseCardBody } from "@base/client";
@@ -36,8 +36,8 @@ export default function EmployeeForm({
   const t = useTranslations("hrm.employee.create.validation");
   const tLabels = useTranslations("hrm.employee.create.labels");
 
-  // Create validation schemas with translation
-  const validation = useMemo(() => createEmployeeValidation(t), [t]);
+  // React Compiler will automatically optimize this computation
+  const validation = createEmployeeValidation(t);
 
   const {
     control,

@@ -2,7 +2,7 @@
 
 import type { BreadcrumbItem } from "../layouts/workspace/components/Breadcrumb";
 
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 export interface WorkspaceState {
   currentModule: string | null;
@@ -86,20 +86,18 @@ export function WorkspaceProvider({
     setState((prev) => ({ ...prev, breadcrumbs: initialBreadcrumbs || [] }));
   };
 
-  const value = useMemo(
-    () => ({
-      ...state,
-      setCurrentModule,
-      setActiveMenu,
-      setSidebarOpen,
-      setLoading,
-      setError,
-      setBreadcrumbs,
-      resetWorkspace,
-      resetBreadcrumbs,
-    }),
-    [state, initialBreadcrumbs]
-  );
+  // React Compiler will automatically optimize this object creation
+  const value = {
+    ...state,
+    setCurrentModule,
+    setActiveMenu,
+    setSidebarOpen,
+    setLoading,
+    setError,
+    setBreadcrumbs,
+    resetWorkspace,
+    resetBreadcrumbs,
+  };
 
   return (
     <WorkspaceContext.Provider value={value}>

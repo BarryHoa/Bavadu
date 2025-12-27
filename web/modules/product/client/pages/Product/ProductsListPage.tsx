@@ -13,7 +13,7 @@ import { getClientLink } from "@base/client/utils/link/getClientLink";
 import LinkAs from "@base/client/components/LinkAs";
 import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
-import React, { useMemo } from "react";
+import React from "react";
 
 import { ProductRow } from "../../interface/Product";
 import { convertProductMasterFeaturesToArrayKey } from "../../utils/getNameProductFeatures";
@@ -23,8 +23,8 @@ export default function ProductsListPage(): React.ReactNode {
   const localized = useLocalizedText();
   const t = useTranslations("dataTable");
   const tProduct = useTranslations("mdl-product");
-  const columns = useMemo<IBaseTableColumnDefinition<ProductRow>[]>(() => {
-    return [
+  // React Compiler will automatically optimize this array creation
+  const columns: IBaseTableColumnDefinition<ProductRow>[] = [
       {
         key: "name",
         label: "Name",
@@ -189,7 +189,6 @@ export default function ProductsListPage(): React.ReactNode {
         },
       },
     ];
-  }, [t]);
 
   const createLink = getClientLink({
     mdl: "product",

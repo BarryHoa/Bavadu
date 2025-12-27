@@ -2,7 +2,7 @@ import { IBaseButton, IBaseDropdown, IBasePagination } from "@base/client/compon
 import type { Key, SVGProps } from "react";
 
 import clsx from "clsx";
-import { useCallback, useMemo } from "react";
+import React from "react";
 
 
 import { PAGINATION_PAGE_SIZE_OPTIONS } from "./paginationConsts";
@@ -45,30 +45,26 @@ export default function PaginationComponent({
   onChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
 }) {
-  const options = useMemo(() => {
-    const baseOptions =
-      Array.isArray(pageSizeOptions) && pageSizeOptions.length > 0
-        ? pageSizeOptions
-        : PAGINATION_PAGE_SIZE_OPTIONS;
-
-    return baseOptions.filter((option) => option > 0).sort((a, b) => a - b);
-  }, [pageSizeOptions]);
+  // React Compiler will automatically optimize these computations
+  const baseOptions =
+    Array.isArray(pageSizeOptions) && pageSizeOptions.length > 0
+      ? pageSizeOptions
+      : PAGINATION_PAGE_SIZE_OPTIONS;
+  const options = baseOptions.filter((option) => option > 0).sort((a, b) => a - b);
 
   const paginationItemBase =
     "flex h-6 w-8 items-center justify-center rounded-full text-small font-medium transition-colors cursor-pointer";
 
-  const selectedKeys = useMemo(() => new Set([String(pageSize)]), [pageSize]);
+  const selectedKeys = new Set([String(pageSize)]);
 
-  const handlePageSizeChange = useCallback(
-    (key: Key) => {
-      const selectedValue = Number(key);
+  // React Compiler will automatically optimize this callback
+  const handlePageSizeChange = (key: Key) => {
+    const selectedValue = Number(key);
 
-      if (!Number.isNaN(selectedValue)) {
-        onPageSizeChange(selectedValue);
-      }
-    },
-    [onPageSizeChange]
-  );
+    if (!Number.isNaN(selectedValue)) {
+      onPageSizeChange(selectedValue);
+    }
+  };
 
   return (
     <div className="flex items-center gap-4">

@@ -10,9 +10,7 @@ import clsx from "clsx";
 import { Calendar as CalendarIcon, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React, {
-  useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -102,7 +100,8 @@ export function IBaseDatePicker(props: IBaseDatePickerProps) {
     ...rest
   } = props;
 
-  const hasTime = useMemo(() => /H|m|s/.test(format), [format]);
+  // React Compiler will automatically optimize these computations
+  const hasTime = /H|m|s/.test(format);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -112,36 +111,21 @@ export function IBaseDatePicker(props: IBaseDatePickerProps) {
   const committedValue: IBaseDatePickerValue =
     value !== undefined ? value : uncontrolledValue;
 
-  const committedDayjs = useMemo(
-    () => toDayjs(committedValue, format, timezone),
-    [committedValue, format, timezone]
-  );
+  const committedDayjs = toDayjs(committedValue, format, timezone);
 
-  const committedText = useMemo(() => {
-    if (!committedDayjs) return "";
+  const committedText = !committedDayjs
+    ? ""
+    : formatDayjs(committedDayjs, format, timezone);
 
-    return formatDayjs(committedDayjs, format, timezone);
-  }, [committedDayjs, format, timezone]);
+  const minDayjs = minDate ? toDayjs(minDate, format, timezone) : null;
+  const maxDayjs = maxDate ? toDayjs(maxDate, format, timezone) : null;
 
-  const minDayjs = useMemo(
-    () => (minDate ? toDayjs(minDate, format, timezone) : null),
-    [minDate, format, timezone]
-  );
-  const maxDayjs = useMemo(
-    () => (maxDate ? toDayjs(maxDate, format, timezone) : null),
-    [maxDate, format, timezone]
-  );
-
-  const minValue = useMemo(() => {
-    if (!minDayjs) return undefined;
-
-    return dayjsToCalendarDate(minDayjs, timezone);
-  }, [minDayjs, timezone]);
-  const maxValue = useMemo(() => {
-    if (!maxDayjs) return undefined;
-
-    return dayjsToCalendarDate(maxDayjs, timezone);
-  }, [maxDayjs, timezone]);
+  const minValue = !minDayjs
+    ? undefined
+    : dayjsToCalendarDate(minDayjs, timezone);
+  const maxValue = !maxDayjs
+    ? undefined
+    : dayjsToCalendarDate(maxDayjs, timezone);
 
   // Draft state while popover is open / typing
   const [draftText, setDraftText] = useState(committedText);
@@ -156,28 +140,27 @@ export function IBaseDatePicker(props: IBaseDatePickerProps) {
     setIsDraftInvalid(false);
   }, [committedText, committedDayjs, isOpen]);
 
-  const validateAgainstMinMax = useCallback(
-    (d: Dayjs) => {
-      const candidate = hasTime ? d : d.startOf("day");
+  // React Compiler will automatically optimize this callback
+  const validateAgainstMinMax = (d: Dayjs) => {
+    const candidate = hasTime ? d : d.startOf("day");
 
-      if (minDayjs) {
-        const minC = hasTime ? minDayjs : minDayjs.startOf("day");
+    if (minDayjs) {
+      const minC = hasTime ? minDayjs : minDayjs.startOf("day");
 
-        if (candidate.isBefore(minC)) return false;
-      }
+      if (candidate.isBefore(minC)) return false;
+    }
 
-      if (maxDayjs) {
-        const maxC = hasTime ? maxDayjs : maxDayjs.endOf("day");
+    if (maxDayjs) {
+      const maxC = hasTime ? maxDayjs : maxDayjs.endOf("day");
 
-        if (candidate.isAfter(maxC)) return false;
-      }
+      if (candidate.isAfter(maxC)) return false;
+    }
 
-      return true;
-    },
-    [hasTime, maxDayjs, minDayjs]
-  );
+    return true;
+  };
 
-  const commit = useCallback(() => {
+  // React Compiler will automatically optimize this callback
+  const commit = () => {
     const text = draftText.trim();
 
     if (!text) {
@@ -219,49 +202,37 @@ export function IBaseDatePicker(props: IBaseDatePickerProps) {
     onChange?.(out);
 
     return true;
-  }, [
-    allowClear,
-    committedDayjs,
-    committedText,
-    draftText,
-    format,
-    onChange,
-    timezone,
-    validateAgainstMinMax,
-    value,
-  ]);
+  };
 
-  const close = useCallback(() => {
+  // React Compiler will automatically optimize these callbacks
+  const close = () => {
     setIsOpen(false);
-  }, []);
+  };
 
-  const commitAndClose = useCallback(() => {
+  const commitAndClose = () => {
     commit();
     close();
-  }, [close, commit]);
+  };
 
-  const open = useCallback(() => {
+  const open = () => {
     if (isDisabled) return;
 
     setIsOpen(true);
     // focus input for immediate typing
     requestAnimationFrame(() => inputRef.current?.focus());
-  }, [isDisabled]);
+  };
 
-  const handleOpenChange = useCallback(
-    (openState: boolean) => {
-      if (isDisabled) return;
+  const handleOpenChange = (openState: boolean) => {
+    if (isDisabled) return;
 
-      if (!openState) {
-        commitAndClose();
+    if (!openState) {
+      commitAndClose();
 
-        return;
-      }
+      return;
+    }
 
-      open();
-    },
-    [commitAndClose, isDisabled, open]
-  );
+    open();
+  };
 
   const handleInputClick: React.MouseEventHandler<HTMLInputElement> = (e) => {
     onClick?.(e);
@@ -328,13 +299,12 @@ export function IBaseDatePicker(props: IBaseDatePickerProps) {
     setIsDraftInvalid(false);
   };
 
-  const today = useMemo(() => nowInTz(timezone), [timezone]);
-  const todayCalendarValue = useMemo(
-    () => dayjsToCalendarDate(today, timezone),
-    [today, timezone]
-  );
+  // React Compiler will automatically optimize these computations
+  const today = nowInTz(timezone);
+  const todayCalendarValue = dayjsToCalendarDate(today, timezone);
 
-  const handleCalendarChange = useCallback(
+  // React Compiler will automatically optimize this callback
+  const handleCalendarChange = (
     (val: DateValue | null) => {
       if (!val) {
         if (!allowClear) {
@@ -369,25 +339,12 @@ export function IBaseDatePicker(props: IBaseDatePickerProps) {
       if (value === undefined) setUncontrolledValue(out);
       onChange?.(out);
       close();
-    },
-    [
-      allowClear,
-      close,
-      committedDayjs,
-      committedText,
-      format,
-      onChange,
-      timezone,
-      todayCalendarValue,
-      value,
-    ]
-  );
+    };
 
-  const selectedValue = useMemo(() => {
-    if (!draftDayjs) return null;
-
-    return dayjsToCalendarDate(draftDayjs, timezone);
-  }, [draftDayjs, timezone]);
+  // React Compiler will automatically optimize this computation
+  const selectedValue = !draftDayjs
+    ? null
+    : dayjsToCalendarDate(draftDayjs, timezone);
 
   // Control the calendar focus so we can programmatically "jump" the view
   // (e.g. when clicking ButtonFastChoose).

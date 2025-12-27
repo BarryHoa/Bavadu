@@ -2,7 +2,7 @@
 
 import { Table } from "lucide-react";
 import MiniSearch from "minisearch";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import {
   IBaseButton,
@@ -27,69 +27,65 @@ export default function ColumnVisibilityMenu<T = any>({
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
-  const { miniSearch, columnMap } = useMemo(() => {
-    const toLabel = (column: IBaseTableColumnDefinition<T>) => {
-      const source = column.label ?? column.title ?? column.key;
+  // React Compiler will automatically optimize these expensive computations
+  const toLabel = (column: IBaseTableColumnDefinition<T>) => {
+    const source = column.label ?? column.title ?? column.key;
 
-      if (typeof source === "string") return source;
-      if (typeof source === "number" || typeof source === "boolean") {
-        return String(source);
-      }
-      if (Array.isArray(source)) {
-        return source
-          .map((item) =>
-            typeof item === "string" || typeof item === "number"
-              ? String(item)
-              : ""
-          )
-          .filter(Boolean)
-          .join(" ");
-      }
+    if (typeof source === "string") return source;
+    if (typeof source === "number" || typeof source === "boolean") {
+      return String(source);
+    }
+    if (Array.isArray(source)) {
+      return source
+        .map((item) =>
+          typeof item === "string" || typeof item === "number"
+            ? String(item)
+            : ""
+        )
+        .filter(Boolean)
+        .join(" ");
+    }
 
-      return column.key.toString();
-    };
+    return column.key.toString();
+  };
 
-    const docs = columns.map((column) => ({
-      id: column.key.toString(),
-      label: toLabel(column),
-    }));
+  const docs = columns.map((column) => ({
+    id: column.key.toString(),
+    label: toLabel(column),
+  }));
 
-    const ms = new MiniSearch({
-      fields: ["label"],
-      storeFields: ["id", "label"],
-    });
+  const miniSearch = new MiniSearch({
+    fields: ["label"],
+    storeFields: ["id", "label"],
+  });
 
-    ms.addAll(docs);
+  miniSearch.addAll(docs);
 
-    const map = new Map<string, IBaseTableColumnDefinition<T>>();
+  const columnMap = new Map<string, IBaseTableColumnDefinition<T>>();
+  columns.forEach((column) => {
+    columnMap.set(column.key.toString(), column);
+  });
 
-    columns.forEach((column) => {
-      map.set(column.key.toString(), column);
-    });
+  const term = searchTerm.trim();
+  const filteredColumns = !term
+    ? columns
+    : (() => {
+        const results = miniSearch.search(term, {
+          prefix: true,
+          fuzzy: 0.2,
+        });
 
-    return { miniSearch: ms, columnMap: map };
-  }, [columns]);
+        if (results.length === 0) return [];
 
-  const filteredColumns = useMemo(() => {
-    const term = searchTerm.trim();
+        return results
+          .map((result) => columnMap.get(result.id))
+          .filter((column): column is IBaseTableColumnDefinition<T> =>
+            Boolean(column)
+          );
+      })();
 
-    if (!term) return columns;
-
-    const results = miniSearch.search(term, {
-      prefix: true,
-      fuzzy: 0.2,
-    });
-
-    if (results.length === 0) return [];
-
-    return results
-      .map((result) => columnMap.get(result.id))
-      .filter((column): column is IBaseTableColumnDefinition<T> =>
-        Boolean(column)
-      );
-  }, [columns, columnMap, miniSearch, searchTerm]);
-
-  const dropdownItems = useMemo(() => {
+  // React Compiler will automatically optimize this array creation
+  const dropdownItems = [
     return [
       {
         key: "__search__",
@@ -125,8 +121,7 @@ export default function ColumnVisibilityMenu<T = any>({
           </IBaseCheckbox>
         ),
       })),
-    ];
-  }, [filteredColumns, onToggleColumn, searchTerm, visibleColumns]);
+  ];
 
   return (
     <IBaseDropdown
