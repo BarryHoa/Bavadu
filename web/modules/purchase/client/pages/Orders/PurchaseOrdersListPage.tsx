@@ -10,7 +10,7 @@ import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 
 import { PurchaseOrder } from "../../interface/PurchaseOrder";
 
@@ -23,8 +23,8 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
   const t = useTranslations("purchase.orders.list");
   const tDataTable = useTranslations("dataTable");
 
-  const columns = useMemo<IBaseTableColumnDefinition<PurchaseOrderRow>[]>(
-    () => [
+  // React Compiler will automatically optimize this array creation
+  const columns: IBaseTableColumnDefinition<PurchaseOrderRow>[] = [
       {
         key: "code",
         label: t("columns.code"),
@@ -86,9 +86,7 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
           );
         },
       },
-    ],
-    [t, tDataTable],
-  );
+    ];
 
   return (
     <div className="space-y-4">

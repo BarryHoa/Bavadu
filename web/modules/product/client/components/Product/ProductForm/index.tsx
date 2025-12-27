@@ -11,7 +11,7 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
 import { HelpCircle, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FormProvider,
   useFieldArray,
@@ -66,38 +66,31 @@ export default function ProductForm({
   const tProduct = useTranslations("mdl-product");
   const tProductForm = useTranslations("mdl-product.product-create");
 
+  // React Compiler will automatically optimize this callback
   // Helper to format messages with variables
   // next-intl's useTranslations supports variables as second parameter
-  const formatMessage = useCallback(
-    (key: string, values: Record<string, string | number>) => {
-      // Type assertion to allow passing variables to next-intl translation function
-      const tWithVars = tProductForm as unknown as (
-        key: string,
-        values?: Record<string, string | number>,
-      ) => string;
+  const formatMessage = (key: string, values: Record<string, string | number>) => {
+    // Type assertion to allow passing variables to next-intl translation function
+    const tWithVars = tProductForm as unknown as (
+      key: string,
+      values?: Record<string, string | number>,
+    ) => string;
 
-      return tWithVars(key, values);
-    },
-    [tProductForm],
-  );
+    return tWithVars(key, values);
+  };
 
   const productFeaturesQuery = useQuery({
     queryKey: ["product-features"],
     queryFn: () => ProductService.getProductFeatures(),
   });
 
-  const featureOptions = useMemo(() => {
-    if (!productFeaturesQuery.data?.data) {
-      return [];
-    }
-
-    return productFeaturesQuery.data.data.map((option: any) => {
-      return {
+  // React Compiler will automatically optimize this computation
+  const featureOptions = !productFeaturesQuery.data?.data
+    ? []
+    : productFeaturesQuery.data.data.map((option: any) => ({
         value: option.value as ProductMasterFeatures,
         label: getLocalizedText(option.label as any) as string,
-      };
-    });
-  }, [productFeaturesQuery.data]);
+      }));
 
   const form = useForm<ProductFormFieldValues>({
     defaultValues: mapToFieldValues(initialValues, featureOptions),

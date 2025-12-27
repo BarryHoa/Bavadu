@@ -9,7 +9,7 @@ import { IBaseSpinner } from "@base/client";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useMemo } from "react";
+import React from "react";
 import LinkAs from "@base/client/components/LinkAs";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
@@ -25,23 +25,17 @@ export default function ProductsViewPage(): React.ReactNode {
   const router = useRouter();
   const localized = useLocalizedText();
 
-  const productId = useMemo(() => {
-    const rawId = (params?.id ?? undefined) as string | string[] | undefined;
+  // React Compiler will automatically optimize these computations
+  const rawId = (params?.id ?? undefined) as string | string[] | undefined;
+  const productId = getParamValue(rawId);
 
-    return getParamValue(rawId);
-  }, [params]);
-
-  const editLink = useMemo(() => {
-    if (!productId) {
-      return null;
-    }
-
-    return getClientLink({
-      mdl: "product",
-      path: "edit/[id]",
-      as: `edit/${productId}`,
-    });
-  }, [productId]);
+  const editLink = !productId
+    ? null
+    : getClientLink({
+        mdl: "product",
+        path: "edit/[id]",
+        as: `edit/${productId}`,
+      });
 
   const productQuery = useQuery({
     queryKey: ["product-detail", productId],

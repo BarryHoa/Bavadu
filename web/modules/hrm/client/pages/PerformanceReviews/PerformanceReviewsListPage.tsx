@@ -10,7 +10,7 @@ import LinkAs from "@base/client/components/LinkAs";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 import { PerformanceReviewDto } from "@mdl/hrm/client/interface/PerformanceReview";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
@@ -24,8 +24,8 @@ export default function PerformanceReviewsListPage(): React.ReactNode {
   const t = useTranslations("hrm.performanceReviews");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<IBaseTableColumnDefinition<PerformanceReviewRow>[]>(
-    () => [
+  // React Compiler will automatically optimize this array creation
+  const columns: IBaseTableColumnDefinition<PerformanceReviewRow>[] = [
       {
         key: "employee",
         label: t("labels.employee"),
@@ -101,9 +101,7 @@ export default function PerformanceReviewsListPage(): React.ReactNode {
           );
         },
       },
-    ],
-    [tDataTable, t, getLocalizedText],
-  );
+    ];
 
   return (
     <div className="space-y-4">

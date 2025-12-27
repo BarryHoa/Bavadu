@@ -9,7 +9,7 @@ import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 import { Position } from "@mdl/hrm/client/interface/Position";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
@@ -22,8 +22,8 @@ export default function PositionsListPage(): React.ReactNode {
   const t = useTranslations("hrm.position.list");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<IBaseTableColumnDefinition<PositionRow>[]>(
-    () => [
+  // React Compiler will automatically optimize this array creation
+  const columns: IBaseTableColumnDefinition<PositionRow>[] = [
       {
         key: "code",
         label: t("code"),
@@ -83,9 +83,7 @@ export default function PositionsListPage(): React.ReactNode {
           );
         },
       },
-    ],
-    [t, tDataTable, getLocalizedText],
-  );
+    ];
 
   return (
     <div className="space-y-4">

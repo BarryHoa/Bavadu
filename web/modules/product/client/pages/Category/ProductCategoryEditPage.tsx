@@ -8,7 +8,7 @@ import { addToast } from "@base/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import React from "react";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
 
@@ -26,28 +26,22 @@ const ProductCategoryEditPage = (): React.ReactNode => {
   const router = useRouter();
   const localized = useLocalizedText();
 
-  const listLink = useMemo(
-    () =>
-      getClientLink({
-        mdl: "product",
-        path: "category",
-      }),
-    [],
-  );
+  // React Compiler will automatically optimize these computations
+  const listLink = getClientLink({
+    mdl: "product",
+    path: "category",
+  });
 
-  const getCategoryViewLink = useCallback(
-    (id: string) =>
-      getClientLink({
-        mdl: "product",
-        path: "category/view/[id]",
-        as: `category/view/${id}`,
-      }),
-    [],
-  );
+  const getCategoryViewLink = (id: string) =>
+    getClientLink({
+      mdl: "product",
+      path: "category/view/[id]",
+      as: `category/view/${id}`,
+    });
 
-  const navigateToList = useCallback(() => {
+  const navigateToList = () => {
     router.push(listLink.as ?? listLink.path);
-  }, [listLink.as, listLink.path, router]);
+  };
 
   const categoryId = useMemo(() => {
     const rawId = (params?.id ?? undefined) as string | string[] | undefined;

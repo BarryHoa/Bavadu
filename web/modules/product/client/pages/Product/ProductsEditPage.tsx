@@ -6,7 +6,7 @@ import { addToast } from "@base/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import React from "react";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
 
 import ProductForm from "../../components/Product/ProductForm";
@@ -25,28 +25,22 @@ export default function ProductsEditPage(): React.ReactNode {
   const params = useParams();
   const router = useRouter();
 
-  const productId = useMemo(() => {
-    const rawId = (params?.id ?? undefined) as string | string[] | undefined;
+  // React Compiler will automatically optimize these computations
+  const rawId = (params?.id ?? undefined) as string | string[] | undefined;
+  const productId = getParamValue(rawId);
 
-    return getParamValue(rawId);
-  }, [params]);
+  const listLink = getClientLink({
+    mdl: "product",
+    path: "",
+  });
 
-  const listLink = useMemo(
-    () =>
-      getClientLink({
-        mdl: "product",
-        path: "",
-      }),
-    [],
-  );
-
-  const getViewLink = useCallback((id: string) => {
+  const getViewLink = (id: string) => {
     return getClientLink({
       mdl: "product",
       path: "view/[id]",
       as: `view/${id}`,
     });
-  }, []);
+  };
 
   const productQuery = useQuery({
     queryKey: ["product-detail", productId],

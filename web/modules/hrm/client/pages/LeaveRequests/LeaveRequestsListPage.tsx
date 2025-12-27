@@ -10,7 +10,7 @@ import LinkAs from "@base/client/components/LinkAs";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 import { LeaveRequestDto } from "@mdl/hrm/client/interface/LeaveRequest";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
@@ -24,8 +24,8 @@ export default function LeaveRequestsListPage(): React.ReactNode {
   const t = useTranslations("hrm.leaveRequests");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<IBaseTableColumnDefinition<LeaveRequestRow>[]>(
-    () => [
+  // React Compiler will automatically optimize this array creation
+  const columns: IBaseTableColumnDefinition<LeaveRequestRow>[] = [
       {
         key: "employee",
         label: t("labels.employee"),
@@ -93,9 +93,7 @@ export default function LeaveRequestsListPage(): React.ReactNode {
           );
         },
       },
-    ],
-    [tDataTable, t, getLocalizedText],
-  );
+    ];
 
   return (
     <div className="space-y-4">

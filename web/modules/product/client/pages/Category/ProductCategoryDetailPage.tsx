@@ -9,7 +9,7 @@ import { IBaseSpinner } from "@base/client";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useMemo } from "react";
+import React from "react";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { formatDate } from "@base/client/utils/date/formatDate";
 
@@ -24,11 +24,9 @@ const ProductCategoryDetailPage = (): React.ReactNode => {
   const router = useRouter();
   const localized = useLocalizedText();
 
-  const categoryId = useMemo(() => {
-    const rawId = (params?.id ?? undefined) as string | string[] | undefined;
-
-    return getParamValue(rawId);
-  }, [params]);
+  // React Compiler will automatically optimize this computation
+  const rawId = (params?.id ?? undefined) as string | string[] | undefined;
+  const categoryId = getParamValue(rawId);
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["product-category-detail", categoryId],

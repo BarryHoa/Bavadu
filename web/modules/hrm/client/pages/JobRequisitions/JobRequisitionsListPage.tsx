@@ -10,7 +10,7 @@ import LinkAs from "@base/client/components/LinkAs";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 import { JobRequisitionDto } from "@mdl/hrm/client/interface/JobRequisition";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
@@ -24,8 +24,8 @@ export default function JobRequisitionsListPage(): React.ReactNode {
   const t = useTranslations("hrm.jobRequisitions");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<IBaseTableColumnDefinition<JobRequisitionRow>[]>(
-    () => [
+  // React Compiler will automatically optimize this array creation
+  const columns: IBaseTableColumnDefinition<JobRequisitionRow>[] = [
       {
         key: "requisitionNumber",
         label: t("labels.requisitionNumber"),
@@ -104,9 +104,7 @@ export default function JobRequisitionsListPage(): React.ReactNode {
           );
         },
       },
-    ],
-    [tDataTable, t, getLocalizedText],
-  );
+    ];
 
   return (
     <div className="space-y-4">

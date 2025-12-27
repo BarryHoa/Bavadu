@@ -10,7 +10,7 @@ import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 
 import { PriceListB2CDto } from "../../services/PriceListB2CService";
 
@@ -24,8 +24,8 @@ type PriceListB2CRow = PriceListB2CDto & {
 export default function PriceListsB2CListPage(): React.ReactNode {
   const tDataTable = useTranslations("dataTable");
 
-  const columns = useMemo<IBaseTableColumnDefinition<PriceListB2CRow>[]>(
-    () => [
+  // React Compiler will automatically optimize this array creation
+  const columns: IBaseTableColumnDefinition<PriceListB2CRow>[] = [
       {
         key: "code",
         label: "Code",
@@ -116,9 +116,7 @@ export default function PriceListsB2CListPage(): React.ReactNode {
           );
         },
       },
-    ],
-    [tDataTable],
-  );
+    ];
 
   return (
     <div className="space-y-4">

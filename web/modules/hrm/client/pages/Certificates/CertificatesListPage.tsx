@@ -10,7 +10,7 @@ import LinkAs from "@base/client/components/LinkAs";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 import { CertificateDto } from "@mdl/hrm/client/interface/Certificate";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
@@ -24,8 +24,8 @@ export default function CertificatesListPage(): React.ReactNode {
   const t = useTranslations("hrm.certificates");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<IBaseTableColumnDefinition<CertificateRow>[]>(
-    () => [
+  // React Compiler will automatically optimize this array creation
+  const columns: IBaseTableColumnDefinition<CertificateRow>[] = [
       {
         key: "employee",
         label: t("labels.employee"),
@@ -95,9 +95,7 @@ export default function CertificatesListPage(): React.ReactNode {
           );
         },
       },
-    ],
-    [tDataTable, t, getLocalizedText],
-  );
+    ];
 
   return (
     <div className="space-y-4">

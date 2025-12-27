@@ -2,7 +2,7 @@
 
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
-import { useCallback, useMemo } from "react";
+import React from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 
 import {
@@ -44,7 +44,8 @@ export default function LeaveRequestForm({
   const t = useTranslations("hrm.leaveRequests");
   const tCommon = useTranslations("common");
 
-  const validation = useMemo(() => createLeaveRequestValidation(t), [t]);
+  // React Compiler will automatically optimize this computation
+  const validation = createLeaveRequestValidation(t);
 
   const {
     control,

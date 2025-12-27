@@ -2,7 +2,7 @@
 
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 
 import {
@@ -45,7 +45,8 @@ export default function CandidateForm({
   const t = useTranslations("hrm.candidates");
   const tCommon = useTranslations("common");
 
-  const validation = useMemo(() => createCandidateValidation(t), [t]);
+  // React Compiler will automatically optimize this computation
+  const validation = createCandidateValidation(t);
 
   const {
     control,

@@ -11,7 +11,7 @@ import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { IBaseButton, IBaseChip } from "@base/client";
-import { useMemo } from "react";
+import React from "react";
 import { useTranslations } from "next-intl";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
 
@@ -26,8 +26,8 @@ const UnitOfMeasureListPage = (): React.ReactNode => {
   const localized = useLocalizedText();
   const t = useTranslations("dataTable");
 
-  const columns = useMemo<IBaseTableColumnDefinition<UnitOfMeasureRow>[]>(() => {
-    return [
+  // React Compiler will automatically optimize this array creation
+  const columns: IBaseTableColumnDefinition<UnitOfMeasureRow>[] = [
       {
         key: "name",
         label: "Unit name",
@@ -73,7 +73,6 @@ const UnitOfMeasureListPage = (): React.ReactNode => {
         },
       },
     ];
-  }, [localized, t]);
 
   const createLink = getClientLink({
     mdl: "product",

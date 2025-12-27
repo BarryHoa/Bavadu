@@ -10,7 +10,7 @@ import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 
 const statusColorMap: Record<string, "success" | "warning" | "danger"> = {
   ACTIVE: "success",
@@ -57,8 +57,8 @@ export default function WarehouseListPage(): React.ReactNode {
   const t = useTranslations("stock.warehouse.list");
   const tDataTable = useTranslations("dataTable");
 
-  const columns = useMemo<IBaseTableColumnDefinition<WarehouseDto>[]>(
-    () => [
+  // React Compiler will automatically optimize this array creation
+  const columns: IBaseTableColumnDefinition<WarehouseDto>[] = [
       {
         key: "code",
         label: t("columns.code"),
@@ -109,9 +109,7 @@ export default function WarehouseListPage(): React.ReactNode {
           </LinkAs>
         ),
       },
-    ],
-    [t, tDataTable],
-  );
+    ];
 
   return (
     <div className="space-y-4">

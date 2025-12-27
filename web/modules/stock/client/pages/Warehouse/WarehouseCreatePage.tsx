@@ -5,10 +5,10 @@ import type {
   WarehousePayload,
 } from "../../services/StockService";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { IBaseButton } from "@base/client";
+import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import { useRouter } from "next/navigation";
-import { useCallback } from "react";
+import React from "react";
 
 import StockService from "../../services/StockService";
 
@@ -36,12 +36,10 @@ export default function WarehouseCreatePage(): React.ReactNode {
     },
   });
 
-  const handleFormSubmit = useCallback(
-    async (payload: WarehousePayload) => {
-      await handleSubmit(payload);
-    },
-    [handleSubmit],
-  );
+  // React Compiler will automatically optimize this callback
+  const handleFormSubmit = async (payload: WarehousePayload) => {
+    await handleSubmit(payload);
+  };
 
   return (
     <div className="w-full space-y-6">

@@ -9,7 +9,7 @@ import {
 import LinkAs from "@base/client/components/LinkAs";
 import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 import { CourseDto } from "@mdl/hrm/client/interface/Course";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
@@ -23,8 +23,8 @@ export default function CoursesListPage(): React.ReactNode {
   const t = useTranslations("hrm.courses");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<IBaseTableColumnDefinition<CourseRow>[]>(
-    () => [
+  // React Compiler will automatically optimize this array creation
+  const columns: IBaseTableColumnDefinition<CourseRow>[] = [
       {
         key: "code",
         label: t("labels.code"),
@@ -88,9 +88,7 @@ export default function CoursesListPage(): React.ReactNode {
           );
         },
       },
-    ],
-    [tDataTable, t, getLocalizedText],
-  );
+    ];
 
   return (
     <div className="space-y-4">

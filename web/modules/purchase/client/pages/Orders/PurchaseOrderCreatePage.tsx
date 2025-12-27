@@ -179,14 +179,11 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
     await submitOrder(payload);
   };
 
-  const warehouseOptions = useMemo<SelectItemOption[]>(
-    () =>
-      (warehousesQuery.data ?? []).map((warehouse) => ({
-        value: warehouse.id,
-        label: `${warehouse.code} — ${warehouse.name}`,
-      })),
-    [warehousesQuery.data],
-  );
+  // React Compiler will automatically optimize this computation
+  const warehouseOptions: SelectItemOption[] = (warehousesQuery.data ?? []).map((warehouse) => ({
+    value: warehouse.id,
+    label: `${warehouse.code} — ${warehouse.name}`,
+  }));
 
   return (
     <div className="space-y-6">

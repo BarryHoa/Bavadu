@@ -7,7 +7,7 @@ import { IBaseButton } from "@base/client";
 import { IBaseCard, IBaseCardBody, IBaseTextarea } from "@base/client";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 
 import { createContractValidation } from "../../validation/contractValidation";
@@ -32,7 +32,8 @@ export default function ContractForm({
   const t = useTranslations("hrm.contract.create.validation");
   const tLabels = useTranslations("hrm.contract.create.labels");
 
-  const validation = useMemo(() => createContractValidation(t), [t]);
+  // React Compiler will automatically optimize this computation
+  const validation = createContractValidation(t);
 
   const {
     control,

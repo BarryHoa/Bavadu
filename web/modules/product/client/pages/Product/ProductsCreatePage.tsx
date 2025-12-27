@@ -5,7 +5,7 @@ import { addToast } from "@base/client";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import React from "react";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
 
 import ProductForm from "../../components/Product/ProductForm";
@@ -16,26 +16,23 @@ import { mapFormValuesToPayload } from "../../utils/productMapper";
 const ProductsCreatePage = (): React.ReactNode => {
   const router = useRouter();
 
-  const listLink = useMemo(
-    () =>
-      getClientLink({
-        mdl: "product",
-        path: "",
-      }),
-    [],
-  );
+  // React Compiler will automatically optimize these computations
+  const listLink = getClientLink({
+    mdl: "product",
+    path: "",
+  });
 
-  const getViewLink = useCallback((id: string) => {
+  const getViewLink = (id: string) => {
     return getClientLink({
       mdl: "product",
       path: "view/[id]",
       as: `view/${id}`,
     });
-  }, []);
+  };
 
-  const navigateToList = useCallback(() => {
+  const navigateToList = () => {
     router.push(listLink.as ?? listLink.path);
-  }, [listLink.as, listLink.path, router]);
+  };
 
   const createMutation = useMutation({
     mutationFn: async (payload: ProductFormPayload) => {

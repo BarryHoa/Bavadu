@@ -11,7 +11,7 @@ import { IBaseButton } from "@base/client";
 import { IBaseCard, IBaseCardBody } from "@base/client";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 
 import { createDepartmentValidation } from "../../validation/departmentValidation";
@@ -36,7 +36,8 @@ export default function DepartmentForm({
   const t = useTranslations("hrm.department.create.validation");
   const tLabels = useTranslations("hrm.department.create.labels");
 
-  const validation = useMemo(() => createDepartmentValidation(t), [t]);
+  // React Compiler will automatically optimize this computation
+  const validation = createDepartmentValidation(t);
 
   const {
     control,

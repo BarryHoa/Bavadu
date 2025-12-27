@@ -10,7 +10,7 @@ import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 
 type DeliveryRow = {
   id: string;
@@ -26,8 +26,8 @@ type DeliveryRow = {
 export default function DeliveriesListPage(): React.ReactNode {
   const tDataTable = useTranslations("dataTable");
 
-  const columns = useMemo<IBaseTableColumnDefinition<DeliveryRow>[]>(
-    () => [
+  // React Compiler will automatically optimize this array creation
+  const columns: IBaseTableColumnDefinition<DeliveryRow>[] = [
       {
         key: "reference",
         label: "Reference",
@@ -92,9 +92,7 @@ export default function DeliveriesListPage(): React.ReactNode {
           );
         },
       },
-    ],
-    [tDataTable],
-  );
+    ];
 
   return (
     <div className="space-y-4">

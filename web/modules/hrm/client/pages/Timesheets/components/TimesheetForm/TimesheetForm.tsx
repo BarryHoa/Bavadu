@@ -2,7 +2,7 @@
 
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 
 import {
@@ -44,7 +44,8 @@ export default function TimesheetForm({
   const t = useTranslations("hrm.timesheets");
   const tCommon = useTranslations("common");
 
-  const validation = useMemo(() => createTimesheetValidation(t), [t]);
+  // React Compiler will automatically optimize this computation
+  const validation = createTimesheetValidation(t);
 
   const {
     control,

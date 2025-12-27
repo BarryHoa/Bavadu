@@ -10,7 +10,7 @@ import { IBaseButton } from "@base/client";
 import { IBaseCard, IBaseCardBody, IBaseCheckbox, IBaseTextarea } from "@base/client";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 
 import {
@@ -38,7 +38,8 @@ export default function CourseForm({
   const t = useTranslations("hrm.courses");
   const tCommon = useTranslations("common");
 
-  const validation = useMemo(() => createCourseValidation(t), [t]);
+  // React Compiler will automatically optimize this computation
+  const validation = createCourseValidation(t);
 
   const {
     control,

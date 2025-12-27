@@ -10,7 +10,7 @@ import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 
 import { CustomerIndividual } from "../../interface/Customer";
 
@@ -22,8 +22,8 @@ type CustomerIndividualRow = CustomerIndividual & {
 export default function CustomerIndividualsListPage(): React.ReactNode {
   const tDataTable = useTranslations("dataTable");
 
-  const columns = useMemo<IBaseTableColumnDefinition<CustomerIndividualRow>[]>(
-    () => [
+  // React Compiler will automatically optimize this array creation
+  const columns: IBaseTableColumnDefinition<CustomerIndividualRow>[] = [
       {
         key: "code",
         label: "Code",
@@ -101,9 +101,7 @@ export default function CustomerIndividualsListPage(): React.ReactNode {
           );
         },
       },
-    ],
-    [tDataTable],
-  );
+    ];
 
   return (
     <div className="space-y-4">

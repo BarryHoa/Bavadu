@@ -10,7 +10,7 @@ import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 
 import { SalesOrderB2B } from "../../interface/SalesOrderB2B";
 
@@ -23,8 +23,8 @@ export default function SalesOrdersB2BListPage(): React.ReactNode {
   const t = useTranslations("sale.ordersB2B.list");
   const tDataTable = useTranslations("dataTable");
 
-  const columns = useMemo<IBaseTableColumnDefinition<SalesOrderB2BRow>[]>(
-    () => [
+  // React Compiler will automatically optimize this array creation
+  const columns: IBaseTableColumnDefinition<SalesOrderB2BRow>[] = [
       {
         key: "code",
         label: "Code",
@@ -86,9 +86,7 @@ export default function SalesOrdersB2BListPage(): React.ReactNode {
           );
         },
       },
-    ],
-    [tDataTable],
-  );
+    ];
 
   return (
     <div className="space-y-4">

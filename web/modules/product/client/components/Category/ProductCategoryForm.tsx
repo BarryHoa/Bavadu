@@ -9,7 +9,7 @@ import { IBaseCard, IBaseCardBody, IBaseSwitch, IBaseTextarea } from "@base/clie
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
 import { Save } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   boolean,
@@ -175,19 +175,14 @@ export default function ProductCategoryForm({
     reset(normalizeValues(initialValues));
   }, [initialValues, reset]);
 
-  const categoryNodes = useMemo(() => {
-    if (!categoriesQuery.data) return [];
-
-    return buildHierarchyOptions(categoriesQuery.data, categoryId);
-  }, [categoriesQuery.data, categoryId]);
+  // React Compiler will automatically optimize these computations
+  const categoryNodes = !categoriesQuery.data
+    ? []
+    : buildHierarchyOptions(categoriesQuery.data, categoryId);
 
   const parentId = watch("parentId");
-  const computedLevel = useMemo(() => {
-    if (!parentId) return 1;
-    const parentNode = categoryNodes.find((node) => node.id === parentId);
-
-    return parentNode ? parentNode.level + 1 : 1;
-  }, [parentId, categoryNodes]);
+  const parentNode = parentId ? categoryNodes.find((node) => node.id === parentId) : null;
+  const computedLevel = !parentId ? 1 : parentNode ? parentNode.level + 1 : 1;
 
   const isLevelValid = computedLevel <= MAX_LEVEL;
 

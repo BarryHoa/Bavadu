@@ -17,7 +17,7 @@ import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { IBaseButton } from "@base/client";
 import { IBaseCard, IBaseCardBody, IBaseDivider } from "@base/client";
-import { useMemo } from "react";
+import React from "react";
 
 interface StockSummarySectionProps {
   filters: StockFilters;
@@ -36,17 +36,13 @@ export default function StockSummarySection({
   warehouses,
   warehousesLoading,
 }: StockSummarySectionProps) {
-  const warehouseItems = useMemo<SelectItemOption[]>(
-    () =>
-      warehouses.map((warehouse) => ({
-        value: warehouse.id,
-        label: `${warehouse.code} — ${warehouse.name}`,
-      })),
-    [warehouses],
-  );
+  // React Compiler will automatically optimize these computations
+  const warehouseItems: SelectItemOption[] = warehouses.map((warehouse) => ({
+    value: warehouse.id,
+    label: `${warehouse.code} — ${warehouse.name}`,
+  }));
 
-  const columns = useMemo<IBaseTableColumnDefinition<StockSummaryItem>[]>(() => {
-    return [
+  const columns: IBaseTableColumnDefinition<StockSummaryItem>[] = [
       {
         key: "productCode",
         label: "Product Code",
@@ -102,7 +98,6 @@ export default function StockSummarySection({
         render: (_, row) => <IBaseDigitViewer value={row.reservedQuantity} />,
       },
     ];
-  }, []);
 
   return (
     <IBaseCard>

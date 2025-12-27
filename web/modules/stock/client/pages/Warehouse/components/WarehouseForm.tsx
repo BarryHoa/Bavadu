@@ -126,8 +126,8 @@ export default function WarehouseForm({
   submitError,
 }: WarehouseFormProps) {
   const getLocalizedName = useLocalizedText();
-  const defaultValues: WarehouseFormValues = useMemo(
-    () => ({
+  // React Compiler will automatically optimize this computation
+  const defaultValues: WarehouseFormValues = {
       code: initialData?.code ?? "",
       name: initialData?.name ?? "",
       typeCode: initialData?.typeCode ?? "",
@@ -159,9 +159,7 @@ export default function WarehouseForm({
       accountInventory: initialData?.accountInventory ?? "",
       accountAdjustment: initialData?.accountAdjustment ?? "",
       notes: initialData?.notes ?? "",
-    }),
-    [initialData]
-  );
+    };
 
   const {
     control,

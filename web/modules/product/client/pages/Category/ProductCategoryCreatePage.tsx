@@ -7,7 +7,7 @@ import { addToast } from "@base/client";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import React from "react";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
 
 import ProductCategoryForm, {
@@ -18,28 +18,22 @@ import ProductCategoryService from "../../services/ProductCategoryService";
 const ProductCategoryCreatePage = (): React.ReactNode => {
   const router = useRouter();
 
-  const listLink = useMemo(
-    () =>
-      getClientLink({
-        mdl: "product",
-        path: "category",
-      }),
-    [],
-  );
+  // React Compiler will automatically optimize these computations
+  const listLink = getClientLink({
+    mdl: "product",
+    path: "category",
+  });
 
-  const getCategoryViewLink = useCallback(
-    (id: string) =>
-      getClientLink({
-        mdl: "product",
-        path: "category/view/[id]",
-        as: `category/view/${id}`,
-      }),
-    [],
-  );
+  const getCategoryViewLink = (id: string) =>
+    getClientLink({
+      mdl: "product",
+      path: "category/view/[id]",
+      as: `category/view/${id}`,
+    });
 
-  const navigateToList = useCallback(() => {
+  const navigateToList = () => {
     router.push(listLink.as ?? listLink.path);
-  }, [listLink.as, listLink.path, router]);
+  };
 
   const createMutation = useMutation<
     ProductCategoryRow,

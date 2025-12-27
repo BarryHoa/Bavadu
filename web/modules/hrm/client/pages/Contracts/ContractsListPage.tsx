@@ -9,7 +9,7 @@ import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React from "react";
 import { Contract } from "@mdl/hrm/client/interface/Contract";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 
@@ -23,8 +23,8 @@ export default function ContractsListPage(): React.ReactNode {
   const t = useTranslations("hrm.contract.list");
   const getLocalizedText = useLocalizedText();
 
-  const columns = useMemo<IBaseTableColumnDefinition<ContractRow>[]>(
-    () => [
+  // React Compiler will automatically optimize this array creation
+  const columns: IBaseTableColumnDefinition<ContractRow>[] = [
       {
         key: "contractNumber",
         label: t("contractNumber"),
@@ -99,9 +99,7 @@ export default function ContractsListPage(): React.ReactNode {
           );
         },
       },
-    ],
-    [t, tDataTable, getLocalizedText],
-  );
+    ];
 
   return (
     <div className="space-y-4">
