@@ -86,41 +86,40 @@ export default function ColumnVisibilityMenu<T = any>({
 
   // React Compiler will automatically optimize this array creation
   const dropdownItems = [
-    return [
-      {
-        key: "__search__",
-        hideSelectedIcon: true,
-        isReadOnly: true,
-        className:
-          "sticky top-0 z-10 pointer-events-auto data-[hover=true]:bg-transparent bg-content1",
-        textValue: "Search columns",
-        children: (
-          <IBaseInputSearch
-            // Avoid autoFocus for better accessibility; focus can be managed by parent if needed
-            placeholder="Search columns..."
-            showClearButton={false}
-            value={searchTerm}
-            onValueChange={setSearchTerm}
-          />
-        ),
-      },
-      ...filteredColumns.map((col) => ({
-        key: String(col.key),
-        textValue:
-          typeof col.label === "string"
-            ? col.label
-            : String(col.label ?? col.title ?? col.key),
-        onPress: () => onToggleColumn(String(col.key)),
-        children: (
-          <IBaseCheckbox
-            isReadOnly
-            className="pointer-events-none"
-            isSelected={visibleColumns.has(String(col.key))}
-          >
-            {col.label ?? col.title ?? col.key}
-          </IBaseCheckbox>
-        ),
-      })),
+    {
+      key: "__search__",
+      hideSelectedIcon: true,
+      isReadOnly: true,
+      className:
+        "sticky top-0 z-10 pointer-events-auto data-[hover=true]:bg-transparent bg-content1",
+      textValue: "Search columns",
+      children: (
+        <IBaseInputSearch
+          // Avoid autoFocus for better accessibility; focus can be managed by parent if needed
+          placeholder="Search columns..."
+          showClearButton={false}
+          value={searchTerm}
+          onValueChange={setSearchTerm}
+        />
+      ),
+    },
+    ...filteredColumns.map((col) => ({
+      key: String(col.key),
+      textValue:
+        typeof col.label === "string"
+          ? col.label
+          : String(col.label ?? col.title ?? col.key),
+      onPress: () => onToggleColumn(String(col.key)),
+      children: (
+        <IBaseCheckbox
+          isReadOnly
+          className="pointer-events-none"
+          isSelected={visibleColumns.has(String(col.key))}
+        >
+          {col.label ?? col.title ?? col.key}
+        </IBaseCheckbox>
+      ),
+    })),
   ];
 
   return (

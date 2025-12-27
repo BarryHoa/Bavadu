@@ -6,7 +6,7 @@ import { addToast } from "@base/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import React from "react";
+import React, { useCallback } from "react";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
 
 import ProductForm from "../../components/Product/ProductForm";

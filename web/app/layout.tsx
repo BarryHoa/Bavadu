@@ -2,6 +2,7 @@ import "@base/client/styles/fonts.css";
 import "@base/client/styles/globals.css";
 import { Metadata, Viewport } from "next";
 
+import ModuleI18nProvider from "@base/client/contexts/i18n";
 import { Providers } from "./providers";
 
 import { siteConfig } from "@/config/site";
@@ -43,21 +44,32 @@ export default async function RootLayout({
   // Load messages for the default locale
   const locale = "en";
 
+  // Load common messages for root layout
+  const commonMessages = await import(`@base/client/messages/${locale}.json`)
+    .then((module) => module.default)
+    .catch(() => ({}));
+
+  const initialMessages = {
+    common: commonMessages,
+  };
+
   return (
     <html suppressHydrationWarning className="light" lang={locale}>
       <head />
       <body>
         <Providers>
-          <div className="relative flex flex-col h-screen">
-            {/* <Navbar /> */}
-            <main
-              className="container mx-auto p-0 flex-1"
-              style={{ maxWidth: "1920px" }}
-            >
-              {children}
-            </main>
-          </div>
-          {/* <ScrollbarReveal /> */}
+          <ModuleI18nProvider initialMessages={initialMessages} locale={locale}>
+            <div className="relative flex flex-col h-screen">
+              {/* <Navbar /> */}
+              <main
+                className="container mx-auto p-0 flex-1"
+                style={{ maxWidth: "1920px" }}
+              >
+                {children}
+              </main>
+            </div>
+            {/* <ScrollbarReveal /> */}
+          </ModuleI18nProvider>
         </Providers>
       </body>
     </html>

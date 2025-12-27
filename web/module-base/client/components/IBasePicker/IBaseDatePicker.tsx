@@ -9,11 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
 import clsx from "clsx";
 import { Calendar as CalendarIcon, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import React, {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import IBaseInput from "@base/client/components/IBaseInput";
 import { SYSTEM_TIMEZONE } from "@base/shared/constants";
@@ -304,42 +300,41 @@ export function IBaseDatePicker(props: IBaseDatePickerProps) {
   const todayCalendarValue = dayjsToCalendarDate(today, timezone);
 
   // React Compiler will automatically optimize this callback
-  const handleCalendarChange = (
-    (val: DateValue | null) => {
-      if (!val) {
-        if (!allowClear) {
-          // Prevent clearing: revert to last committed value
-          setDraftText(committedText);
-          setDraftDayjs(committedDayjs);
-          setIsDraftInvalid(false);
-          close();
-
-          return;
-        }
-        setDraftDayjs(null);
-        setDraftText("");
+  const handleCalendarChange = (val: DateValue | null) => {
+    if (!val) {
+      if (!allowClear) {
+        // Prevent clearing: revert to last committed value
+        setDraftText(committedText);
+        setDraftDayjs(committedDayjs);
         setIsDraftInvalid(false);
-        setFocusedValue(todayCalendarValue);
-
-        if (value === undefined) setUncontrolledValue(null);
-        onChange?.(null);
         close();
 
         return;
       }
-      const d = calendarDateToDayjs(val, timezone);
-      const out = formatDayjs(d, format, timezone);
-
-      setDraftDayjs(d);
-      setDraftText(out);
+      setDraftDayjs(null);
+      setDraftText("");
       setIsDraftInvalid(false);
-      setFocusedValue(val);
+      setFocusedValue(todayCalendarValue);
 
-      // Apply immediately then close
-      if (value === undefined) setUncontrolledValue(out);
-      onChange?.(out);
+      if (value === undefined) setUncontrolledValue(null);
+      onChange?.(null);
       close();
-    };
+
+      return;
+    }
+    const d = calendarDateToDayjs(val, timezone);
+    const out = formatDayjs(d, format, timezone);
+
+    setDraftDayjs(d);
+    setDraftText(out);
+    setIsDraftInvalid(false);
+    setFocusedValue(val);
+
+    // Apply immediately then close
+    if (value === undefined) setUncontrolledValue(out);
+    onChange?.(out);
+    close();
+  };
 
   // React Compiler will automatically optimize this computation
   const selectedValue = !draftDayjs
@@ -425,25 +420,22 @@ export function IBaseDatePicker(props: IBaseDatePickerProps) {
       : t("date.placeholder", { format });
   }, [format, hasTime, rest.placeholder, t]);
 
-  const handleClear = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (isDisabled) return;
+  const handleClear = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isDisabled) return;
 
-      setDraftText("");
-      setDraftDayjs(null);
-      setIsDraftInvalid(false);
-      setFocusedValue(todayCalendarValue);
+    setDraftText("");
+    setDraftDayjs(null);
+    setIsDraftInvalid(false);
+    setFocusedValue(todayCalendarValue);
 
-      if (value === undefined) setUncontrolledValue(null);
-      onChange?.(null);
-      close();
+    if (value === undefined) setUncontrolledValue(null);
+    onChange?.(null);
+    close();
 
-      requestAnimationFrame(() => inputRef.current?.focus());
-    },
-    [close, isDisabled, onChange, todayCalendarValue, value]
-  );
+    requestAnimationFrame(() => inputRef.current?.focus());
+  };
 
   return (
     <Popover

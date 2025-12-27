@@ -1,6 +1,4 @@
-import ViewListDataTable from "./ViewListDataTable";
-
+export * from "./ViewListDataTable";
 export * from "./ViewListDataTableInterface";
 
-export { ViewListDataTable };
-export default ViewListDataTable;
+export { default, default as ViewListDataTable } from "./ViewListDataTable";

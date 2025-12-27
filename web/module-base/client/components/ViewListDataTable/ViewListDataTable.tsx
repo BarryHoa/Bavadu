@@ -4,9 +4,12 @@ import type { IBaseLinkProps } from "@base/client";
 import type { FilterOption } from "./components/FilterMenu";
 import type { GroupOption } from "./components/GroupByMenu";
 
-import React from "react";
-
-import { IBaseButton, IBaseCard, IBaseCardBody, IBaseDivider } from "@base/client/components";
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBaseDivider,
+} from "@base/client/components";
 
 import { useLocalizedText } from "../../hooks/useLocalizedText";
 import { IBaseTable } from "../IBaseTable";
@@ -46,6 +49,7 @@ export default function ViewListDataTable<T = any>(
     },
     ...dataTableProps
   } = props;
+  console.log(props, favorite);
   // Use the store hook - each instance gets its own store
   const store = useViewListDataTableStore({
     columns,
@@ -112,6 +116,9 @@ export default function ViewListDataTable<T = any>(
             hrefAs?: any;
           };
 
+          // Extract only valid props for IBaseButton, excluding 'as' and 'href' which are handled separately
+          const { as, href, hrefAs, ...restLinkProps } = linkProps as any;
+
           return (
             <IBaseButton
               key={action.key}
@@ -120,7 +127,7 @@ export default function ViewListDataTable<T = any>(
               href={linkProps.href as string}
               size={size}
               variant={variant}
-              {...(linkProps as any)}
+              {...restLinkProps}
             >
               {action.title}
             </IBaseButton>

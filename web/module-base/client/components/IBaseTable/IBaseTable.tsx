@@ -5,7 +5,7 @@ import type { Selection } from "@heroui/table";
 import type { TableProps } from "@heroui/table";
 
 import { RefreshCw } from "lucide-react";
-import React from "react";
+import React, { useMemo } from "react";
 import { IBaseTooltip } from "@base/client/components";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";

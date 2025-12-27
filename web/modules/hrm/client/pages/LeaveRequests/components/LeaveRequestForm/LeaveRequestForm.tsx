@@ -2,7 +2,7 @@
 
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useTranslations } from "next-intl";
-import React from "react";
+import React, { useCallback } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 
 import {
