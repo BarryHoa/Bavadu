@@ -1,6 +1,6 @@
 import { createClient } from "redis";
 
-import { DEBUG_CONFIG } from "../../config/debug";
+import { Debug } from "../Debug";
 import { RedisClientManager, RedisStatus } from "./RedisClientManager";
 
 export const CACHE_NOT_FOUND = Symbol("CACHE_NOT_FOUND");
@@ -31,10 +31,7 @@ export class RedisCache {
 
   private getKey(key: string, prefix?: string): string {
     const keyPrefix = prefix || this.defaultPrefix;
-    DEBUG_CONFIG.enabled &&
-      console.log(
-        `[RedisCache] Getting key "${key}" with prefix "${keyPrefix}"`
-      );
+    Debug.log(`[RedisCache] Getting key "${key}" with prefix "${keyPrefix}"`);
     return `${keyPrefix}${key}`;
   }
 
@@ -43,7 +40,7 @@ export class RedisCache {
       return false;
     }
 
-    DEBUG_CONFIG.enabled && console.log(`[RedisCache] Checking status`);
+    Debug.log(`[RedisCache] Checking status`);
     this.client = this.manager.getClient();
     return this.client !== null;
   }
@@ -56,10 +53,9 @@ export class RedisCache {
     key: string,
     options?: CacheOptions
   ): Promise<CacheResult<T>> {
-    DEBUG_CONFIG.enabled &&
-      console.log(
-        `[RedisCache] Getting value for key "${key}" with prefix "${options?.prefix}"`
-      );
+    Debug.log(
+      `[RedisCache] Getting value for key "${key}" with prefix "${options?.prefix}"`
+    );
     if (!this.checkStatus()) {
       return CACHE_NOT_FOUND;
     }
@@ -74,7 +70,7 @@ export class RedisCache {
 
       return JSON.parse(value) as T;
     } catch (error) {
-      console.error(`[RedisCache] Get error for key "${key}":`, error);
+      Debug.error(`[RedisCache] Get error for key "${key}":`, error);
       return CACHE_NOT_FOUND;
     }
   }
@@ -87,10 +83,9 @@ export class RedisCache {
     value: T,
     options?: CacheOptions
   ): Promise<boolean> {
-    DEBUG_CONFIG.enabled &&
-      console.log(
-        `[RedisCache] Setting value for key "${key}" with prefix "${options?.prefix}"`
-      );
+    Debug.log(
+      `[RedisCache] Setting value for key "${key}" with prefix "${options?.prefix}"`
+    );
     if (!this.checkStatus()) {
       return false;
     }
@@ -108,7 +103,7 @@ export class RedisCache {
 
       return true;
     } catch (error) {
-      console.error(`[RedisCache] Set error for key "${key}":`, error);
+      Debug.error(`[RedisCache] Set error for key "${key}":`, error);
       return false;
     }
   }
@@ -117,10 +112,9 @@ export class RedisCache {
    * Delete key from cache
    */
   async delete(key: string, options?: CacheOptions): Promise<boolean> {
-    DEBUG_CONFIG.enabled &&
-      console.log(
-        `[RedisCache] Deleting key "${key}" with prefix "${options?.prefix}"`
-      );
+    Debug.log(
+      `[RedisCache] Deleting key "${key}" with prefix "${options?.prefix}"`
+    );
     if (!this.checkStatus()) {
       return false;
     }
@@ -130,7 +124,7 @@ export class RedisCache {
       const result = await this.client!.del(fullKey);
       return result > 0;
     } catch (error) {
-      console.error(`[RedisCache] Delete error for key "${key}":`, error);
+      Debug.error(`[RedisCache] Delete error for key "${key}":`, error);
       return false;
     }
   }
@@ -139,10 +133,9 @@ export class RedisCache {
    * Delete multiple keys
    */
   async deleteMany(keys: string[], options?: CacheOptions): Promise<number> {
-    DEBUG_CONFIG.enabled &&
-      console.log(
-        `[RedisCache] Deleting multiple keys with prefix "${options?.prefix}"`
-      );
+    Debug.log(
+      `[RedisCache] Deleting multiple keys with prefix "${options?.prefix}"`
+    );
     if (!this.checkStatus() || keys.length === 0) {
       return 0;
     }
@@ -153,7 +146,7 @@ export class RedisCache {
       const result = await (this.client!.del as any)(fullKeys);
       return result;
     } catch (error) {
-      console.error(`[RedisCache] DeleteMany error:`, error);
+      Debug.error(`[RedisCache] DeleteMany error:`, error);
       return 0;
     }
   }
@@ -162,10 +155,9 @@ export class RedisCache {
    * Check if key exists
    */
   async exists(key: string, options?: CacheOptions): Promise<boolean> {
-    DEBUG_CONFIG.enabled &&
-      console.log(
-        `[RedisCache] Checking if key "${key}" with prefix "${options?.prefix}" exists`
-      );
+    Debug.log(
+      `[RedisCache] Checking if key "${key}" with prefix "${options?.prefix}" exists`
+    );
     if (!this.checkStatus()) {
       return false;
     }
@@ -175,7 +167,7 @@ export class RedisCache {
       const result = await this.client!.exists(fullKey);
       return result > 0;
     } catch (error) {
-      console.error(`[RedisCache] Exists error for key "${key}":`, error);
+      Debug.error(`[RedisCache] Exists error for key "${key}":`, error);
       return false;
     }
   }
@@ -184,10 +176,9 @@ export class RedisCache {
    * Get TTL of a key
    */
   async getTtl(key: string, options?: CacheOptions): Promise<number> {
-    DEBUG_CONFIG.enabled &&
-      console.log(
-        `[RedisCache] Getting TTL for key "${key}" with prefix "${options?.prefix}"`
-      );
+    Debug.log(
+      `[RedisCache] Getting TTL for key "${key}" with prefix "${options?.prefix}"`
+    );
     if (!this.checkStatus()) {
       return -1;
     }
@@ -196,7 +187,7 @@ export class RedisCache {
       const fullKey = this.getKey(key, options?.prefix);
       return await this.client!.ttl(fullKey);
     } catch (error) {
-      console.error(`[RedisCache] TTL error for key "${key}":`, error);
+      Debug.error(`[RedisCache] TTL error for key "${key}":`, error);
       return -1;
     }
   }
@@ -209,10 +200,9 @@ export class RedisCache {
     by: number = 1,
     options?: CacheOptions
   ): Promise<number | null> {
-    DEBUG_CONFIG.enabled &&
-      console.log(
-        `[RedisCache] Incrementing key "${key}" with prefix "${options?.prefix}" by ${by}`
-      );
+    Debug.log(
+      `[RedisCache] Incrementing key "${key}" with prefix "${options?.prefix}" by ${by}`
+    );
     if (!this.checkStatus()) {
       return null;
     }
@@ -221,7 +211,7 @@ export class RedisCache {
       const fullKey = this.getKey(key, options?.prefix);
       return await this.client!.incrBy(fullKey, by);
     } catch (error) {
-      console.error(`[RedisCache] Increment error for key "${key}":`, error);
+      Debug.error(`[RedisCache] Increment error for key "${key}":`, error);
       return null;
     }
   }
@@ -234,10 +224,9 @@ export class RedisCache {
     status: RedisStatus;
     connected: boolean;
   } {
-    DEBUG_CONFIG.enabled &&
-      console.log(
-        `[RedisCache] Getting status: ${this.manager.getStatus()} ${this.manager.isConnected()}`
-      );
+    Debug.log(
+      `[RedisCache] Getting status: ${this.manager.getStatus()} ${this.manager.isConnected()}`
+    );
     return {
       enabled: this.manager.getStatus() !== RedisStatus.DISABLED,
       status: this.manager.getStatus(),
@@ -249,10 +238,9 @@ export class RedisCache {
    * Clear cache by pattern
    */
   async clearPattern(pattern: string, options?: CacheOptions): Promise<number> {
-    DEBUG_CONFIG.enabled &&
-      console.log(
-        `[RedisCache] Clearing pattern "${pattern}" with prefix "${options?.prefix}"`
-      );
+    Debug.log(
+      `[RedisCache] Clearing pattern "${pattern}" with prefix "${options?.prefix}"`
+    );
     if (!this.checkStatus()) {
       return 0;
     }
@@ -280,7 +268,7 @@ export class RedisCache {
 
       return 0;
     } catch (error) {
-      console.error(
+      Debug.error(
         `[RedisCache] ClearPattern error for pattern "${pattern}":`,
         error
       );
@@ -292,7 +280,7 @@ export class RedisCache {
    * Cleanup resources
    */
   destroy(): void {
-    DEBUG_CONFIG.enabled && console.log(`[RedisCache] Destroying cache`);
+    Debug.log(`[RedisCache] Destroying cache`);
     if (this.clientCheckInterval) {
       clearInterval(this.clientCheckInterval);
       this.clientCheckInterval = null;

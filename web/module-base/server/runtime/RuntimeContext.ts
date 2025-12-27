@@ -7,6 +7,7 @@ import { getLogModel } from "../models/Logs/LogModel";
 
 import { ConfigManager } from "./ConfigManager";
 import { ConnectionPool } from "./ConnectionPool";
+import { Debug } from "./Debug";
 import { ModelInstance } from "./ModelInstance";
 import { RedisCache } from "./cache/RedisCache";
 import { RedisClientManager } from "./cache/RedisClientManager";
@@ -165,55 +166,47 @@ export class RuntimeContext {
   // ---------------------------------------------------------------------------
 
   private async _initialize(): Promise<void> {
-    const isDev = process.env.NODE_ENV !== "production";
-    const debugLog = (...args: any[]) => {
-      if (isDev) {
-        // eslint-disable-next-line no-console
-        console.log("[RuntimeContext]", ...args);
-      }
-    };
-
     try {
       getLogModel();
-      debugLog("Logging system initialized");
+      Debug.log("[RuntimeContext] Logging system initialized");
 
-      debugLog("Creating connection pool...");
+      Debug.log("[RuntimeContext] Creating connection pool...");
       const connectionPool = new ConnectionPool(this.projectRoot);
 
-      debugLog("Connection pool created, initializing...");
+      Debug.log("[RuntimeContext] Connection pool created, initializing...");
       await connectionPool.initialize();
-      debugLog("Connection pool initialized");
+      Debug.log("[RuntimeContext] Connection pool initialized");
 
-      debugLog("Creating model instance...");
+      Debug.log("[RuntimeContext] Creating model instance...");
       const modelInstance = await ModelInstance.create({
         projectRoot: this.projectRoot,
       });
 
-      debugLog("Model instance created");
+      Debug.log("[RuntimeContext] Model instance created");
 
-      debugLog("Loading configuration...");
+      Debug.log("[RuntimeContext] Loading configuration...");
       const configManager = ConfigManager.getInstance();
 
       await configManager.load();
-      debugLog("Configuration loaded");
+      Debug.log("[RuntimeContext] Configuration loaded");
 
       // Initialize Redis if enabled
       let redisCache: RedisCache | undefined;
       const redisEnabled = process.env.REDIS_ENABLED === "true";
       if (redisEnabled) {
-        debugLog("Initializing Redis...");
+        Debug.log("[RuntimeContext] Initializing Redis...");
         try {
           const redisManager = new RedisClientManager();
           redisCache = new RedisCache(redisManager);
-          debugLog("Redis initialized");
+          Debug.log("[RuntimeContext] Redis initialized");
         } catch (error) {
-          console.warn(
+          Debug.warn(
             "[RuntimeContext] Redis initialization failed, continuing without cache:",
             error
           );
         }
       } else {
-        debugLog("Redis is disabled");
+        Debug.log("[RuntimeContext] Redis is disabled");
       }
 
       this.state = {
@@ -223,16 +216,14 @@ export class RuntimeContext {
         initializedAt: dayjs().format("YYYY-MM-DD HH:mm:ss"),
       };
 
-      debugLog("Initialization completed", {
+      Debug.log("[RuntimeContext] Initialization completed", {
         hasState: !!this.state,
         hasConnectionPool: !!this.state?.connectionPool,
         hasModelInstance: !!this.state?.modelInstance,
       });
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("[RuntimeContext] Error during initialization:", error);
-      // eslint-disable-next-line no-console
-      console.error(
+      Debug.forceError("[RuntimeContext] Error during initialization:", error);
+      Debug.forceError(
         "[RuntimeContext] Error stack:",
         error instanceof Error ? error.stack : "No stack"
       );

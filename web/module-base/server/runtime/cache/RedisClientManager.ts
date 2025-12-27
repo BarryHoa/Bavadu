@@ -1,6 +1,7 @@
 import { createClient } from "redis";
 
 import { REDIS_CONFIG, type RedisConfig } from "../../config/redis";
+import { Debug } from "../Debug";
 
 export enum RedisStatus {
   DISABLED = "DISABLED",
@@ -35,7 +36,7 @@ export class RedisClientManager {
     try {
       await this.connectWithRetry();
     } catch (error) {
-      console.error("[RedisClientManager] Failed to initialize Redis:", error);
+      Debug.error("[RedisClientManager] Failed to initialize Redis:", error);
       this.status = RedisStatus.ERROR;
       this.scheduleReconnect();
     }
@@ -50,11 +51,11 @@ export class RedisClientManager {
         await this.connect();
         this.status = RedisStatus.CONNECTED;
         this.reconnectAttempts = 0;
-        console.log("[RedisClientManager] ✅ Redis connected successfully");
+        Debug.log("[RedisClientManager] ✅ Redis connected successfully");
         return;
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
-        console.warn(
+        Debug.warn(
           `[RedisClientManager] Connection attempt ${attempt}/${maxAttempts} failed:`,
           lastError.message
         );
@@ -99,23 +100,23 @@ export class RedisClientManager {
     const client = createClient(clientOptions);
 
     client.on("error", (err) => {
-      console.error("[RedisClientManager] Redis client error:", err);
+      Debug.error("[RedisClientManager] Redis client error:", err);
       this.status = RedisStatus.ERROR;
       this.scheduleReconnect();
     });
 
     client.on("connect", () => {
-      console.log("[RedisClientManager] Redis client connecting...");
+      Debug.log("[RedisClientManager] Redis client connecting...");
     });
 
     client.on("ready", () => {
-      console.log("[RedisClientManager] Redis client ready");
+      Debug.log("[RedisClientManager] Redis client ready");
       this.status = RedisStatus.CONNECTED;
       this.reconnectAttempts = 0;
     });
 
     client.on("end", () => {
-      console.log("[RedisClientManager] Redis client connection ended");
+      Debug.log("[RedisClientManager] Redis client connection ended");
       this.status = RedisStatus.DISCONNECTED;
     });
 
@@ -137,7 +138,7 @@ export class RedisClientManager {
         try {
           await this.connectWithRetry();
         } catch (error) {
-          console.error(
+          Debug.error(
             "[RedisClientManager] Reconnection failed, will retry later:",
             error
           );

@@ -7,6 +7,8 @@ import { join, relative } from "path";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
+import { Debug } from "./Debug";
+
 type SchemaRegistry = Record<string, unknown>;
 
 /**
@@ -93,7 +95,7 @@ export class ConnectionPool implements IConnectionPool {
   }
 
   private async registerPrimaryDatabase(): Promise<void> {
-    console.log("Connecting to primary database (PostgreSQL)...");
+    Debug.log("Connecting to primary database (PostgreSQL)...");
 
     const isProduction = process.env.NODE_ENV === "production";
     const schemas: SchemaRegistry = {};
@@ -105,7 +107,7 @@ export class ConnectionPool implements IConnectionPool {
 
         Object.assign(schemas, schemaModule);
       } catch (error) {
-        console.error(`Failed to load schema from ${schemaPath}:`, error);
+        Debug.error(`Failed to load schema from ${schemaPath}:`, error);
       }
     }
 
@@ -126,9 +128,9 @@ export class ConnectionPool implements IConnectionPool {
       this.connections.set("primary", connection);
       this.primaryConnectionName = "primary";
 
-      console.log("✅ Primary database (PostgreSQL) connected with schema");
+      Debug.log("✅ Primary database (PostgreSQL) connected with schema");
     } catch (error) {
-      console.error("❌ Primary database connection failed:", error);
+      Debug.forceError("❌ Primary database connection failed:", error);
       throw error;
     }
   }
@@ -253,7 +255,7 @@ export class ConnectionPool implements IConnectionPool {
     schemas?: SchemaRegistry,
   ): Promise<void> {
     if (this.connections.has(name)) {
-      console.warn(`Database connection "${name}" already exists`);
+      Debug.warn(`Database connection "${name}" already exists`);
 
       return;
     }
@@ -261,12 +263,12 @@ export class ConnectionPool implements IConnectionPool {
     const isProduction = process.env.NODE_ENV === "production";
 
     if (isProduction && config) {
-      console.warn(
+      Debug.warn(
         `⚠️  Config parameters are ignored in production. Using environment variables only for database "${name}".`,
       );
     }
 
-    console.log(`Connecting to database "${name}" (${type})...`);
+    Debug.log(`Connecting to database "${name}" (${type})...`);
 
     try {
       let db: any;
@@ -299,9 +301,9 @@ export class ConnectionPool implements IConnectionPool {
       };
 
       this.connections.set(name, connection);
-      console.log(`✅ Database "${name}" (${type}) connected`);
+      Debug.log(`✅ Database "${name}" (${type}) connected`);
     } catch (error) {
-      console.error(`❌ Database "${name}" connection failed:`, error);
+      Debug.forceError(`❌ Database "${name}" connection failed:`, error);
       throw error;
     }
   }

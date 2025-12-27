@@ -8,6 +8,8 @@ import utc from "dayjs/plugin/utc";
 import { MenuFactoryElm } from "../interfaces/Menu";
 import { loadAllMenus } from "../loaders/menu-loader";
 
+import { Debug } from "./Debug";
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Ho_Chi_Minh");
@@ -39,7 +41,7 @@ export class ModelInstance {
   }
 
   static async create(
-    options: ModelInstanceOptions = {},
+    options: ModelInstanceOptions = {}
   ): Promise<ModelInstance> {
     const instance = new ModelInstance(options.projectRoot ?? process.cwd());
 
@@ -56,11 +58,11 @@ export class ModelInstance {
     }
 
     try {
-      console.log(
+      Debug.log(
         "Log load model: ",
         modelId,
         "created at: ",
-        factoryElm.timestamp,
+        factoryElm.timestamp
       );
       const instance = factoryElm.instance();
 
@@ -68,9 +70,9 @@ export class ModelInstance {
         return instance as T;
       }
     } catch (error) {
-      console.error(
+      Debug.error(
         `Failed to instantiate model "${modelId}"${factoryElm.path ? ` from ${factoryElm.path}` : ""}:`,
-        error,
+        error
       );
     }
 
@@ -89,7 +91,7 @@ export class ModelInstance {
     const factoryElm = this.modelFactories.get(modelId);
 
     if (!factoryElm) {
-      console.warn(`Model "${modelId}" is not registered.`);
+      Debug.warn(`Model "${modelId}" is not registered.`);
 
       return false;
     }
@@ -118,8 +120,8 @@ export class ModelInstance {
     }
 
     if (!modelPath) {
-      console.error(
-        `Failed to find model file for "${modelId}" in module "${factoryElm.module}"`,
+      Debug.error(
+        `Failed to find model file for "${modelId}" in module "${factoryElm.module}"`
       );
 
       return false;
@@ -139,9 +141,9 @@ export class ModelInstance {
 
       return true;
     } catch (error) {
-      console.error(
+      Debug.error(
         `Failed to reload model "${modelId}"${factoryElm.path ? ` from ${factoryElm.path}` : ""}:`,
-        error,
+        error
       );
 
       return false;
@@ -154,7 +156,7 @@ export class ModelInstance {
   }
 
   private async registerModels(): Promise<void> {
-    console.log("Registering models...");
+    Debug.log("Registering models...");
 
     const moduleJsonPaths = this.collectModuleJsonPaths();
     let loadedCount = 0;
@@ -192,16 +194,16 @@ export class ModelInstance {
           loadedCount++;
         } catch (error) {
           errorCount++;
-          console.error(
+          Debug.error(
             `Failed to load model "${modelId}" from ${modelPath}:`,
-            error,
+            error
           );
         }
       }
     }
 
-    console.log(
-      `Model registry: ${loadedCount} loaded${errorCount ? `, ${errorCount} errors` : ""}`,
+    Debug.log(
+      `Model registry: ${loadedCount} loaded${errorCount ? `, ${errorCount} errors` : ""}`
     );
   }
 
@@ -241,7 +243,7 @@ export class ModelInstance {
 
       return JSON.parse(raw) as T;
     } catch (error) {
-      console.error(`Failed to parse JSON from ${filePath}:`, error);
+      Debug.error(`Failed to parse JSON from ${filePath}:`, error);
 
       return null;
     }
@@ -250,7 +252,7 @@ export class ModelInstance {
   private toImportPath(targetPath: string): string {
     const relativePath = relative(this.projectRoot, targetPath).replace(
       /\\/g,
-      "/",
+      "/"
     );
 
     return `@/${relativePath}`;
@@ -260,7 +262,7 @@ export class ModelInstance {
     modelId: string,
     moduleName: string,
     factory: () => object,
-    sourcePath: string,
+    sourcePath: string
   ): void {
     const entry: ModelFactoryElm = {
       instance: factory,
@@ -275,9 +277,9 @@ export class ModelInstance {
     try {
       factory();
     } catch (error) {
-      console.error(
+      Debug.error(
         `Model "${modelId}" threw during initialization${sourcePath ? ` from ${sourcePath}` : ""}:`,
-        error,
+        error
       );
       throw error;
     }
@@ -287,7 +289,7 @@ export class ModelInstance {
     const moduleDir = dirname(moduleJsonPath);
     const relativeModuleDir = relative(this.projectRoot, moduleDir).replace(
       /\\/g,
-      "/",
+      "/"
     );
 
     if (!relativeModuleDir || relativeModuleDir === ".") {
@@ -300,7 +302,7 @@ export class ModelInstance {
   }
 
   private registerMenuStatic(): void {
-    console.log("Registering menus...");
+    Debug.log("Registering menus...");
     const menus = loadAllMenus();
 
     for (const menu of menus) {
