@@ -77,7 +77,7 @@ async function handleApiRoute(
   nextHeaders: Headers,
 ): Promise<NextResponse | null> {
   // 1. Rate Limiting
-  const rateLimitResponse = checkRateLimit(req, pathname);
+  const rateLimitResponse = await checkRateLimit(req, pathname);
 
   if (rateLimitResponse) {
     return addSecurityHeaders(rateLimitResponse);

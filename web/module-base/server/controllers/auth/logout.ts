@@ -2,7 +2,7 @@ import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { NextRequest } from "next/server";
 
 import { SESSION_CONFIG } from "@base/server/config/session";
-import SessionModel from "@base/server/models/Sessions/SessionModel";
+import { sessionStore } from "@base/server/stores";
 
 /**
  * POST /api/base/auth/logout
@@ -13,9 +13,7 @@ export async function POST(request: NextRequest) {
     const sessionToken = request.cookies.get(SESSION_CONFIG.cookie.name)?.value;
 
     if (sessionToken) {
-      const sessionModel = new SessionModel();
-
-      await sessionModel.destroySession(sessionToken);
+      await sessionStore.destroySession(sessionToken);
     }
 
     // Create response

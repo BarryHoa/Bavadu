@@ -10,22 +10,21 @@ import { NextRequest, NextResponse } from "next/server";
  * Check rate limit for request
  * Returns error response if rate limit exceeded, null otherwise
  */
-export function checkRateLimit(
+export async function checkRateLimit(
   request: NextRequest,
   pathname: string
-): NextResponse | null {
+): Promise<NextResponse | null> {
   const ip = getClientIp(request);
   const isAuthRoute = pathname.startsWith("/api/base/auth/");
   const config = isAuthRoute ? RATE_LIMIT_CONFIG.auth : RATE_LIMIT_CONFIG.api;
 
-  const key = `rate-limit:${ip}`;
-  const count = rateLimitStore.increment(key, config.windowMs);
+  const key = ip;
+  const count = await rateLimitStore.increment(key, config.windowMs);
 
   if (count > config.max) {
-    const resetTime = Math.ceil(
-      (rateLimitStore.getTimeUntilReset(key) + Date.now()) / 1000
-    );
-    const retryAfter = Math.ceil(rateLimitStore.getTimeUntilReset(key) / 1000);
+    const timeUntilReset = await rateLimitStore.getTimeUntilReset(key);
+    const resetTime = Math.ceil((timeUntilReset + Date.now()) / 1000);
+    const retryAfter = Math.ceil(timeUntilReset / 1000);
 
     // Log rate limit violation
     logRateLimitViolation({

@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 
 import { SESSION_CONFIG } from "@base/server/config/session";
 import { setCsrfTokenCookie } from "../../middleware/csrf";
-import SessionModel from "../../models/Sessions/SessionModel";
+import { sessionStore } from "../../stores";
 import { RuntimeContext } from "../../runtime/RuntimeContext";
 import { base_tb_users, base_tb_users_login } from "../../schemas/base.user";
 import { JSONResponse } from "../../utils/JSONResponse";
@@ -138,14 +138,13 @@ export async function POST(request: NextRequest) {
     // Create session
     const ipAddress = getClientIp(request);
     const userAgent = getUserAgent(request);
-    const sessionModel = new SessionModel();
 
     // Set session expiration: 30 days if remember me, 7 days otherwise
     const expiresIn = rememberMe
       ? SESSION_CONFIG.expiration.rememberMe
       : SESSION_CONFIG.expiration.default;
 
-    const session = await sessionModel.createSession({
+    const session = await sessionStore.createSession({
       userId: user.id,
       ipAddress,
       userAgent,

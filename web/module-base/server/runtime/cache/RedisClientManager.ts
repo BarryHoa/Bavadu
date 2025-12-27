@@ -70,10 +70,13 @@ export class RedisClientManager {
   }
 
   private async connect(): Promise<void> {
-    const client = createClient({
-      url: this.config.url || `redis://${this.config.host}:${this.config.port}`,
-      password: this.config.password,
-      database: this.config.db,
+    // If URL is provided, use it directly (includes all connection info)
+    // Otherwise, construct URL from individual config
+    const url =
+      this.config.url || `redis://${this.config.host}:${this.config.port}`;
+
+    const clientOptions: Parameters<typeof createClient>[0] = {
+      url,
       socket: {
         connectTimeout: this.config.connectionTimeout,
         reconnectStrategy: (retries) => {
@@ -83,7 +86,17 @@ export class RedisClientManager {
           return Math.min(retries * 100, 3000);
         },
       },
-    });
+    };
+
+    // Only add password and database if not using URL (URL already contains them)
+    if (!this.config.url) {
+      if (this.config.password) {
+        clientOptions.password = this.config.password;
+      }
+      clientOptions.database = this.config.db;
+    }
+
+    const client = createClient(clientOptions);
 
     client.on("error", (err) => {
       console.error("[RedisClientManager] Redis client error:", err);

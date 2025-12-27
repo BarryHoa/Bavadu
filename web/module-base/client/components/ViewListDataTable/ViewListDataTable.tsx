@@ -49,7 +49,7 @@ export default function ViewListDataTable<T = any>(
     },
     ...dataTableProps
   } = props;
-  console.log(props, favorite);
+
   // Use the store hook - each instance gets its own store
   const store = useViewListDataTableStore({
     columns,
@@ -58,7 +58,7 @@ export default function ViewListDataTable<T = any>(
   const isFilterHidden = filter?.hidden === true;
   const isSearchHidden = search?.hidden === true;
   const isGroupByHidden = groupBy?.hidden === true;
-  const isFavoriteHidden = favorite?.hidden === true;
+  // const isFavoriteHidden = favorite?.hidden === true;
   const isColumnVisibilityHidden = columnVisibility?.hidden === true;
   // Fetch data using react-query
   const {

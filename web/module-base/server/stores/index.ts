@@ -2,8 +2,13 @@
  * Stores - State management and singleton instances
  *
  * This directory contains stores for managing application state:
- * - Rate limit store: In-memory store for rate limiting
- * - Future stores: Session store, cache store, etc.
+ * - Rate limit store: Redis-backed store with in-memory fallback
+ * - Session store: Redis-cached session store with database fallback
  */
 
-export { rateLimitStore, RateLimitStore } from "./rate-limit-store";
+export {
+  InMemoryRateLimitStore,
+  RateLimitStore,
+  rateLimitStore,
+} from "./rate-limit-store";
+export { SessionStore, sessionStore } from "./session-store";

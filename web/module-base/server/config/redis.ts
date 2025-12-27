@@ -29,8 +29,10 @@ export const REDIS_CONFIG = {
    */
   enabled: process.env.REDIS_ENABLED === "true",
   /**
-   * Redis connection URL (optional, takes precedence over host/port)
+   * Redis connection URL (optional, takes precedence over host/port/password/db)
+   * Supports both redis:// (non-SSL) and rediss:// (SSL/TLS) protocols
    * @example redis://localhost:6379
+   * @example rediss://default:password@host:6379
    */
   url: process.env.REDIS_URL,
   /**
