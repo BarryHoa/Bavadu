@@ -15,7 +15,7 @@ import { dirname, join } from "path";
 
 import dayjs from "dayjs";
 
-import { LOG_CONFIG } from "../../config";
+import { LOG_CONFIG } from "@base/server/config/log";
 
 import { LogGroup, LogSeverity, LogType, LogTypesToGroups } from "./LogTypes";
 
@@ -96,7 +96,7 @@ class LogModel {
   private getLogFilePath(
     logType: LogType,
     date: dayjs.Dayjs,
-    chunkNumber: number = 0,
+    chunkNumber: number = 0
   ): string {
     const dateStr = date.format("DD_MM_YYYY");
     const groupDir = this.ensureGroupDirectory(logType);

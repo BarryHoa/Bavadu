@@ -1,6 +1,7 @@
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import type { ConnectionPool } from "./ConnectionPool";
 import type { ModelInstance } from "./ModelInstance";
+import type { RedisCache } from "./cache/RedisCache";
 
 /**
  * Runtime context configuration options
@@ -17,6 +18,8 @@ export interface RuntimeContextState {
   connectionPool: ConnectionPool;
   /** Model instance containing models, menus, etc. */
   modelInstance: ModelInstance;
+  /** Redis cache instance (optional, only if Redis is enabled) */
+  redisCache?: RedisCache;
   /** Initialization timestamp */
   initializedAt: string;
 }

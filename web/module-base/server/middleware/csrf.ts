@@ -1,4 +1,4 @@
-import { CSRF_CONFIG } from "@base/server/config";
+import { CSRF_CONFIG } from "@base/server/config/csrf";
 import {
   createSignedCsrfToken,
   verifyCsrfToken,
@@ -50,7 +50,7 @@ export function checkCsrfProtection(request: NextRequest): NextResponse | null {
         error: "CSRF token validation failed",
         message: "CSRF token is required in both cookie and header",
       },
-      { status: 403 },
+      { status: 403 }
     );
   }
 
@@ -78,7 +78,7 @@ export function checkCsrfProtection(request: NextRequest): NextResponse | null {
         error: "CSRF token validation failed",
         message,
       },
-      { status: 403 },
+      { status: 403 }
     );
   }
 
@@ -101,7 +101,7 @@ export function checkCsrfProtection(request: NextRequest): NextResponse | null {
         error: "CSRF token validation failed",
         message: "CSRF token mismatch between cookie and header",
       },
-      { status: 403 },
+      { status: 403 }
     );
   }
 

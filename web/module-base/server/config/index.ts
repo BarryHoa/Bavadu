@@ -1,53 +1,22 @@
-/**
- * Centralized configuration for server-side settings
- * All configuration values are imported from separate config files
- */
+import { AUTH_CONFIG, AuthConfig } from "./auth";
+import { CSRF_CONFIG, CsrfConfig } from "./csrf";
+import { DATABASE_CONFIG, DatabaseConfig } from "./database";
+import { LOG_CONFIG, LogConfig } from "./log";
+import { RATE_LIMIT_CONFIG, RateLimitConfig } from "./rate-limit";
+import { REDIS_CONFIG, RedisConfig } from "./redis";
+import { SESSION_CONFIG, SessionConfig } from "./session";
+import { SYSTEM_CONFIG, SystemConfig } from "./system";
 
-// ============================================================================
-// RATE LIMITING CONFIGURATION
-// ============================================================================
-export { RATE_LIMIT_CONFIG } from "./rate-limit";
-
-// ============================================================================
-// CSRF TOKEN CONFIGURATION
-// ============================================================================
-export { CSRF_CONFIG } from "./csrf";
-
-// ============================================================================
-// SESSION CONFIGURATION
-// ============================================================================
-export { SESSION_CONFIG } from "./session";
-
-// ============================================================================
-// AUTHENTICATION CONFIGURATION
-// ============================================================================
-export { AUTH_CONFIG } from "./auth";
-
-// ============================================================================
-// DATABASE CONFIGURATION
-// ============================================================================
-export { DATABASE_CONFIG } from "./database";
-
-// ============================================================================
-// SYSTEM CONFIGURATION
-// ============================================================================
-export { SYSTEM_CONFIG } from "./system";
-
-// ============================================================================
-// LOGGING CONFIGURATION
-// ============================================================================
-export { LOG_CONFIG } from "./log";
-
-// ============================================================================
-// EXPORT ALL CONFIG
-// ============================================================================
-import { AUTH_CONFIG } from "./auth";
-import { CSRF_CONFIG } from "./csrf";
-import { DATABASE_CONFIG } from "./database";
-import { LOG_CONFIG } from "./log";
-import { RATE_LIMIT_CONFIG } from "./rate-limit";
-import { SESSION_CONFIG } from "./session";
-import { SYSTEM_CONFIG } from "./system";
+export type Config = {
+  rateLimit: RateLimitConfig;
+  csrf: CsrfConfig;
+  session: SessionConfig;
+  auth: AuthConfig;
+  database: DatabaseConfig;
+  system: SystemConfig;
+  log: LogConfig;
+  redis: RedisConfig;
+};
 
 export const CONFIG = {
   rateLimit: RATE_LIMIT_CONFIG,
@@ -57,4 +26,5 @@ export const CONFIG = {
   database: DATABASE_CONFIG,
   system: SYSTEM_CONFIG,
   log: LOG_CONFIG,
-} as const;
+  redis: REDIS_CONFIG,
+} as const satisfies Config;

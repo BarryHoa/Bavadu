@@ -1,4 +1,4 @@
-import { AUTH_CONFIG } from "@base/server/config";
+import { AUTH_CONFIG } from "@base/server/config/auth";
 import { NextRequest } from "next/server";
 
 /**
@@ -10,7 +10,7 @@ import { NextRequest } from "next/server";
 export function addPageHeaders(
   request: NextRequest,
   nextHeaders: Headers,
-  pathname: string,
+  pathname: string
 ): void {
   // Get locale from cookie and set it to x-locale header
   const cookie = request.headers.get("cookie");
@@ -43,7 +43,7 @@ export function addPageHeaders(
 
   // Optionally inject session token for pages (if authenticated)
   const sessionToken = request.cookies.get(
-    AUTH_CONFIG.sessionCookieName,
+    AUTH_CONFIG.sessionCookieName
   )?.value;
 
   if (sessionToken) {

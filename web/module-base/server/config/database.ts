@@ -2,6 +2,26 @@
  * Database Configuration
  */
 
+export type DatabaseConfig = {
+  /**
+   * Default connection pool settings
+   */
+  pool: {
+    /**
+     * Maximum number of connections in the pool
+     */
+    max: number;
+    /**
+     * Idle timeout in seconds
+     */
+    idleTimeout: number;
+    /**
+     * Connection timeout in seconds
+     */
+    connectTimeout: number;
+  };
+};
+
 export const DATABASE_CONFIG = {
   /**
    * Default connection pool settings
@@ -11,4 +31,4 @@ export const DATABASE_CONFIG = {
     idleTimeout: 20, // seconds
     connectTimeout: 10, // seconds
   },
-} as const;
+} as const satisfies DatabaseConfig;

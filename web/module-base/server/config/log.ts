@@ -2,6 +2,64 @@
  * Logging Configuration
  */
 
+export type LogConfig = {
+  /**
+   * Enable or disable logging
+   */
+  enabled: boolean;
+  /**
+   * Log destination type
+   */
+  destination: "file" | "webhook";
+  /**
+   * File logging configuration
+   */
+  file: {
+    /**
+     * Base directory for log files
+     */
+    directory: string;
+    /**
+     * Maximum file size in bytes before rotation
+     */
+    maxSizeBytes: number;
+    /**
+     * Compression configuration
+     */
+    compression: {
+      /**
+       * Enable log compression
+       */
+      enabled: boolean;
+      /**
+       * Compress logs older than this many days
+       */
+      compressAfterDays: number;
+      /**
+       * Compression format
+       */
+      format: "gzip" | "zip";
+      /**
+       * Delete original files after compression
+       */
+      deleteOriginal: boolean;
+    };
+  };
+  /**
+   * Webhook logging configuration
+   */
+  webhook: {
+    /**
+     * Webhook URL
+     */
+    url: string;
+    /**
+     * Request headers
+     */
+    headers: Record<string, string>;
+  };
+};
+
 export const LOG_CONFIG = {
   /**
    * Enable or disable logging
@@ -71,4 +129,4 @@ export const LOG_CONFIG = {
       "Content-Type": "application/json",
     },
   },
-} as const;
+} as const satisfies LogConfig;

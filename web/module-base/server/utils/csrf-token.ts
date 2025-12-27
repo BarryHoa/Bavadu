@@ -1,6 +1,6 @@
 import { createHmac, randomBytes } from "crypto";
 
-import { CSRF_CONFIG } from "@base/server/config";
+import { CSRF_CONFIG } from "@base/server/config/csrf";
 
 /**
  * CSRF token configuration
@@ -74,7 +74,7 @@ export function createSignedCsrfToken(config: CsrfTokenConfig = {}): {
  */
 export function verifyCsrfToken(
   signedToken: string,
-  config: CsrfTokenConfig = {},
+  config: CsrfTokenConfig = {}
 ): {
   valid: boolean;
   expired: boolean;

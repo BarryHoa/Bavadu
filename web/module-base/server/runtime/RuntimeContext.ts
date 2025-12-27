@@ -8,6 +8,8 @@ import { getLogModel } from "../models/Logs/LogModel";
 import { ConfigManager } from "./ConfigManager";
 import { ConnectionPool } from "./ConnectionPool";
 import { ModelInstance } from "./ModelInstance";
+import { RedisCache } from "./cache/RedisCache";
+import { RedisClientManager } from "./cache/RedisClientManager";
 
 /**
  * Runtime Context Manager
@@ -92,7 +94,7 @@ export class RuntimeContext {
    * Ensures the runtime is initialized before accessing the pool.
    */
   static async getDbConnect(
-    key: string = "primary",
+    key: string = "primary"
   ): Promise<PostgresJsDatabase<Record<string, never>>> {
     const context = await this.getInstance();
 
@@ -111,7 +113,7 @@ export class RuntimeContext {
   }
 
   static async getModelInstanceBy<T extends object>(
-    modelId: string,
+    modelId: string
   ): Promise<T | undefined> {
     const context = this.getInstance();
 
@@ -154,6 +156,10 @@ export class RuntimeContext {
     return this._ensureState().modelInstance;
   }
 
+  getRedisCache(): RedisCache | undefined {
+    return this._ensureState().redisCache;
+  }
+
   // ---------------------------------------------------------------------------
   // Private helpers
   // ---------------------------------------------------------------------------
@@ -191,9 +197,29 @@ export class RuntimeContext {
       await configManager.load();
       debugLog("Configuration loaded");
 
+      // Initialize Redis if enabled
+      let redisCache: RedisCache | undefined;
+      const redisEnabled = process.env.REDIS_ENABLED === "true";
+      if (redisEnabled) {
+        debugLog("Initializing Redis...");
+        try {
+          const redisManager = new RedisClientManager();
+          redisCache = new RedisCache(redisManager);
+          debugLog("Redis initialized");
+        } catch (error) {
+          console.warn(
+            "[RuntimeContext] Redis initialization failed, continuing without cache:",
+            error
+          );
+        }
+      } else {
+        debugLog("Redis is disabled");
+      }
+
       this.state = {
         connectionPool,
         modelInstance,
+        redisCache,
         initializedAt: dayjs().format("YYYY-MM-DD HH:mm:ss"),
       };
 
@@ -208,7 +234,7 @@ export class RuntimeContext {
       // eslint-disable-next-line no-console
       console.error(
         "[RuntimeContext] Error stack:",
-        error instanceof Error ? error.stack : "No stack",
+        error instanceof Error ? error.stack : "No stack"
       );
       throw error;
     }
@@ -217,7 +243,7 @@ export class RuntimeContext {
   private _ensureState(): RuntimeContextState {
     if (!this.isInitialized || !this.state) {
       throw new Error(
-        "Runtime not initialized. Call ensureInitialized() first.",
+        "Runtime not initialized. Call ensureInitialized() first."
       );
     }
 

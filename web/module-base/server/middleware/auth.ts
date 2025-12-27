@@ -1,4 +1,4 @@
-import { AUTH_CONFIG } from "@base/server/config";
+import { AUTH_CONFIG } from "@base/server/config/auth";
 import SessionModel from "@base/server/models/Sessions/SessionModel";
 import {
   getClientIp,
@@ -13,10 +13,10 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export async function authenticateRequest(
   request: NextRequest,
-  nextHeaders: Headers,
+  nextHeaders: Headers
 ): Promise<NextResponse | null> {
   const sessionToken = request.cookies.get(
-    AUTH_CONFIG.sessionCookieName,
+    AUTH_CONFIG.sessionCookieName
   )?.value;
 
   if (!sessionToken) {
@@ -33,7 +33,7 @@ export async function authenticateRequest(
         error: "Authentication required",
         message: "Session token is required",
       },
-      { status: 401 },
+      { status: 401 }
     );
   }
 
@@ -58,7 +58,7 @@ export async function authenticateRequest(
           error: "Authentication failed",
           message: "Invalid or expired session",
         },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -89,7 +89,7 @@ export async function authenticateRequest(
         error: "Authentication failed",
         message: "Failed to validate session",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

@@ -3,7 +3,7 @@
  * Similar to Laravel's Kernel.php - defines scheduled tasks
  */
 
-import { SYSTEM_CONFIG } from "@base/server/config";
+import { SYSTEM_CONFIG } from "@base/server/config/system";
 import { getTasks, ScheduledTask as NodeCronTask, schedule } from "node-cron";
 
 export interface ScheduledTask {
@@ -26,12 +26,12 @@ export class Kernel {
   protected makeACronTask(
     expression: string,
     name: string,
-    task: () => Promise<void> | void,
+    task: () => Promise<void> | void
   ): void {
     // Check if task name already exists
     if (this.tasks.has(name)) {
       throw new Error(
-        `Task with name "${name}" already exists. Each task must have a unique name.`,
+        `Task with name "${name}" already exists. Each task must have a unique name.`
       );
     }
 
@@ -54,7 +54,7 @@ export class Kernel {
   protected everySeconds(
     seconds: number,
     name: string,
-    task: () => Promise<void> | void,
+    task: () => Promise<void> | void
   ): void {
     if (seconds < 1 || seconds > 59) {
       throw new Error("Seconds must be between 1 and 59");
@@ -72,7 +72,7 @@ export class Kernel {
 
         // Clear after 60 seconds
         setTimeout(() => clearInterval(interval), 60000);
-      },
+      }
     );
   }
 
@@ -85,7 +85,7 @@ export class Kernel {
   protected everyMinutes(
     minutes: number,
     name: string,
-    task: () => Promise<void> | void,
+    task: () => Promise<void> | void
   ): void {
     this.makeACronTask(`*/${minutes} * * * *`, name, task);
   }
@@ -99,7 +99,7 @@ export class Kernel {
   protected hourly(
     name: string,
     task: () => Promise<void> | void,
-    minute: number = 0,
+    minute: number = 0
   ): void {
     this.makeACronTask(`${minute} * * * *`, name, task);
   }
@@ -115,7 +115,7 @@ export class Kernel {
     hours: number,
     name: string,
     task: () => Promise<void> | void,
-    minute: number = 0,
+    minute: number = 0
   ): void {
     this.makeACronTask(`${minute} */${hours} * * *`, name, task);
   }
@@ -129,7 +129,7 @@ export class Kernel {
   protected dailyAt(
     name: string,
     time: string,
-    task: () => Promise<void> | void,
+    task: () => Promise<void> | void
   ): void {
     const [hours, minutes] = time.split(":").map(Number);
     const cronExpression = `${minutes} ${hours} * * *`;
@@ -146,7 +146,7 @@ export class Kernel {
   protected daily(
     name: string,
     task: () => Promise<void> | void,
-    time: string = "00:00",
+    time: string = "00:00"
   ): void {
     this.dailyAt(name, time, task);
   }
@@ -162,7 +162,7 @@ export class Kernel {
     name: string,
     task: () => Promise<void> | void,
     day: number = 1,
-    time: string = "00:00",
+    time: string = "00:00"
   ): void {
     const [hours, minutes] = time.split(":").map(Number);
     const cronExpression = `${minutes} ${hours} ${day} * *`;
@@ -183,7 +183,7 @@ export class Kernel {
     task: () => Promise<void> | void,
     month: number = 1,
     day: number = 1,
-    time: string = "00:00",
+    time: string = "00:00"
   ): void {
     const [hours, minutes] = time.split(":").map(Number);
     const cronExpression = `${minutes} ${hours} ${day} ${month} *`;
@@ -231,7 +231,7 @@ export class Kernel {
               const duration = Date.now() - startTime;
 
               console.log(
-                `[Cron] Task "${taskName}" completed in ${duration}ms`,
+                `[Cron] Task "${taskName}" completed in ${duration}ms`
               );
             } catch (error) {
               console.error(`[Cron] Task "${taskName}" failed:`, error);
@@ -240,11 +240,11 @@ export class Kernel {
           {
             timezone: this.getTimezone(),
             name: taskName,
-          },
+          }
         );
 
         console.log(
-          `[Cron] Scheduled task: ${taskName} - ${scheduledTask.schedule}`,
+          `[Cron] Scheduled task: ${taskName} - ${scheduledTask.schedule}`
         );
       }
     });

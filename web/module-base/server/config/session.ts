@@ -2,6 +2,60 @@
  * Session Configuration
  */
 
+export type SessionConfig = {
+  /**
+   * Session expiration time in milliseconds
+   */
+  expiration: {
+    /**
+     * Default session expiration
+     */
+    default: number;
+    /**
+     * Remember me session expiration
+     */
+    rememberMe: number;
+  };
+  /**
+   * Cookie configuration
+   */
+  cookie: {
+    /**
+     * Cookie name
+     */
+    name: string;
+    /**
+     * HTTP only flag
+     */
+    httpOnly: boolean;
+    /**
+     * Secure flag (HTTPS only)
+     */
+    secure: boolean;
+    /**
+     * SameSite attribute
+     */
+    sameSite: "lax" | "strict" | "none";
+    /**
+     * Cookie path
+     */
+    path: string;
+    /**
+     * Cookie max age in seconds
+     */
+    maxAge: {
+      /**
+       * Default max age
+       */
+      default: number;
+      /**
+       * Remember me max age
+       */
+      rememberMe: number;
+    };
+  };
+};
+
 export const SESSION_CONFIG = {
   /**
    * Session expiration time in milliseconds
@@ -33,4 +87,4 @@ export const SESSION_CONFIG = {
       rememberMe: 30 * 24 * 60 * 60, // 30 days in seconds
     },
   },
-} as const;
+} as const satisfies SessionConfig;

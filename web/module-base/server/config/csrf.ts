@@ -2,6 +2,21 @@
  * CSRF Token Configuration
  */
 
+export type CsrfConfig = {
+  /**
+   * Secret key for token generation
+   */
+  secret: string;
+  /**
+   * Token length in bytes
+   */
+  tokenLength: number;
+  /**
+   * Token expiration time in milliseconds
+   */
+  expirationMs: number;
+};
+
 export const CSRF_CONFIG = {
   /**
    * Secret key for token generation
@@ -16,4 +31,4 @@ export const CSRF_CONFIG = {
    * Token expiration time in milliseconds
    */
   expirationMs: 24 * 60 * 60 * 1000, // 24 hours
-} as const;
+} as const satisfies CsrfConfig;

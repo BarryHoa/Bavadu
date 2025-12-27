@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { join } from "path";
 
-import { SYSTEM_TIMEZONE } from "@base/shared/constants";
+import { SYSTEM_TIMEZONE } from "@base/server/config/system";
 import { getRequestConfig, GetRequestConfigParams } from "next-intl/server";
 import { notFound } from "next/navigation";
 
@@ -35,7 +35,7 @@ const moduleBaseMessageLoaders: Record<SupportedLocale, Loader> = {
  * Dynamically load messages from all modules
  */
 const loadModuleMessages = async (
-  locale: SupportedLocale,
+  locale: SupportedLocale
 ): Promise<Record<string, unknown>> => {
   const modulesDir = join(process.cwd(), "modules");
 
@@ -55,7 +55,7 @@ const loadModuleMessages = async (
       moduleDir,
       "client",
       "messages",
-      `${locale}.json`,
+      `${locale}.json`
     );
 
     let fileToRead = messageFile;
@@ -67,7 +67,7 @@ const loadModuleMessages = async (
         moduleDir,
         "client",
         "messages",
-        `${FALLBACK_LOCALE}.json`,
+        `${FALLBACK_LOCALE}.json`
       );
 
       if (existsSync(fallbackFile)) {
@@ -85,7 +85,7 @@ const loadModuleMessages = async (
     } catch (error) {
       console.error(
         `Error loading messages from ${fileToRead}:`,
-        error instanceof Error ? error.message : String(error),
+        error instanceof Error ? error.message : String(error)
       );
     }
   }

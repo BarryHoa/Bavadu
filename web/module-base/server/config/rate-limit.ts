@@ -2,6 +2,35 @@
  * Rate Limiting Configuration
  */
 
+export type RateLimitConfig = {
+  /**
+   * Authentication endpoints - stricter limits
+   */
+  auth: {
+    /**
+     * Maximum number of requests
+     */
+    max: number;
+    /**
+     * Time window in milliseconds
+     */
+    windowMs: number;
+  };
+  /**
+   * General API endpoints
+   */
+  api: {
+    /**
+     * Maximum number of requests
+     */
+    max: number;
+    /**
+     * Time window in milliseconds
+     */
+    windowMs: number;
+  };
+};
+
 export const RATE_LIMIT_CONFIG = {
   // Authentication endpoints - stricter limits
   auth: {
@@ -13,4 +42,4 @@ export const RATE_LIMIT_CONFIG = {
     max: 100,
     windowMs: 60 * 1000, // 1 minute
   },
-} as const;
+} as const satisfies RateLimitConfig;

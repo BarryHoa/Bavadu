@@ -4,6 +4,8 @@
  * Handles compression of log files older than specified days into monthly archives
  */
 
+import { LOG_CONFIG } from "@base/server/config/log";
+import dayjs from "dayjs";
 import {
   createReadStream,
   createWriteStream,
@@ -16,10 +18,6 @@ import {
 import { basename, extname, join } from "path";
 import { pipeline } from "stream/promises";
 import { createGzip } from "zlib";
-
-import dayjs from "dayjs";
-
-import { LOG_CONFIG } from "../../config";
 
 export interface CompressionResult {
   compressed: number;
@@ -70,7 +68,7 @@ class LogCompressionModel {
    */
   private async compressFile(
     filePath: string,
-    outputDir: string,
+    outputDir: string
   ): Promise<{
     success: boolean;
     originalSize: number;
@@ -128,7 +126,7 @@ class LogCompressionModel {
    * Compress all log files in a directory that are older than specified days
    */
   private async compressLogDirectory(
-    logTypeDir: string,
+    logTypeDir: string
   ): Promise<CompressionResult> {
     const result: CompressionResult = {
       compressed: 0,
@@ -159,7 +157,7 @@ class LogCompressionModel {
       if (this.shouldCompress(filePath)) {
         const compressionResult = await this.compressFile(
           filePath,
-          logTypeDir, // Compress into same directory, organized by month
+          logTypeDir // Compress into same directory, organized by month
         );
 
         if (compressionResult.success) {
@@ -168,7 +166,7 @@ class LogCompressionModel {
           result.compressedSize += compressionResult.compressedSize;
         } else {
           result.errors.push(
-            `${filePath}: ${compressionResult.error || "Unknown error"}`,
+            `${filePath}: ${compressionResult.error || "Unknown error"}`
           );
         }
       }

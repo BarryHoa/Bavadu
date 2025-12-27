@@ -1,8 +1,8 @@
 import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { NextRequest } from "next/server";
 
-import { SESSION_CONFIG } from "../../config";
-import SessionModel from "../../models/Sessions/SessionModel";
+import { SESSION_CONFIG } from "@base/server/config/session";
+import SessionModel from "@base/server/models/Sessions/SessionModel";
 
 /**
  * POST /api/base/auth/logout
