@@ -1,4 +1,7 @@
 "use client";
+
+import { memo } from "react";
+
 import { IBaseInputSearch } from "@base/client/components";
 
 interface SearchBarProps {
@@ -7,7 +10,7 @@ interface SearchBarProps {
   placeholder?: string;
 }
 
-export default function SearchBar({
+function SearchBar({
   value,
   onChange,
   placeholder = "Search",
@@ -21,3 +24,5 @@ export default function SearchBar({
     />
   );
 }
+
+export default memo(SearchBar);

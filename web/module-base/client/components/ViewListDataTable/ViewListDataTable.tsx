@@ -4,6 +4,8 @@ import type { IBaseLinkProps } from "@base/client";
 import type { FilterOption } from "./components/FilterMenu";
 import type { GroupOption } from "./components/GroupByMenu";
 
+import { memo, useMemo } from "react";
+
 import {
   IBaseButton,
   IBaseCard,
@@ -27,6 +29,63 @@ import {
   ActionElm,
   ViewListDataTableProps,
 } from "./ViewListDataTableInterface";
+
+// Memoized Table component to prevent re-renders when search/filter changes
+const MemoizedTable = memo(
+  ({
+    dataTableProps,
+    columns,
+    dataSource,
+    loading,
+    pagination,
+    total,
+    onChangeTable,
+    onRefresh,
+  }: {
+    dataTableProps: any;
+    columns: any[];
+    dataSource: any[];
+    loading: boolean | undefined;
+    pagination: IBaseTablePagination | false;
+    total: number;
+    onChangeTable: any;
+    onRefresh: any;
+  }) => {
+    return (
+      <IBaseTable
+        {...dataTableProps}
+        columns={columns}
+        dataSource={dataSource}
+        loading={loading}
+        pagination={pagination}
+        total={total}
+        onChangeTable={onChangeTable}
+        onRefresh={onRefresh}
+      />
+    );
+  },
+  (prevProps, nextProps) => {
+    // Custom comparison function - only compare data-related props
+    // Callbacks (onChangeTable, onRefresh) are intentionally excluded as they may change reference
+    // but their behavior remains the same
+    const paginationEqual =
+      prevProps.pagination === nextProps.pagination ||
+      (prevProps.pagination !== false &&
+        nextProps.pagination !== false &&
+        prevProps.pagination.page === nextProps.pagination.page &&
+        prevProps.pagination.pageSize === nextProps.pagination.pageSize);
+
+    return (
+      prevProps.columns === nextProps.columns &&
+      prevProps.dataSource === nextProps.dataSource &&
+      prevProps.loading === nextProps.loading &&
+      prevProps.total === nextProps.total &&
+      paginationEqual
+    );
+  }
+);
+
+MemoizedTable.displayName = "MemoizedTable";
 
 export default function ViewListDataTable<T = any>(
   props: ViewListDataTableProps<T>
@@ -77,66 +136,94 @@ export default function ViewListDataTable<T = any>(
     // enabled: !propDataSource, // Only fetch if dataSource is not provided as prop
   });
 
-  // React Compiler will automatically optimize these computations
-  const filterOptions: FilterOption<T>[] = [];
-  const groupByOptions: GroupOption[] = [];
+  // Memoize loading state
+  const tableLoading = useMemo(
+    () => isLoading || isFetching || dataTableProps.loading,
+    [isLoading, isFetching, dataTableProps.loading]
+  );
 
-  // Prepare columns list with only visible columns
-  const cols = columns.filter((col: any) => store.visibleColumns.has(col.key));
-  const displayColumns = isDataDummy
-    ? cols.map((col: any) => ({
-        ...col,
-        render: () => null,
-      }))
-    : cols;
+  // Memoize pagination object to ensure stable reference
+  const memoizedPagination = useMemo(
+    () => _pagination,
+    [
+      _pagination === false
+        ? false
+        : `${_pagination.page ?? 1}-${_pagination.pageSize ?? PAGINATION_DEFAULT_PAGE_SIZE}`,
+    ]
+  );
 
-  // React Compiler will automatically optimize this callback
-  const renderActions = (acts: ActionElm[]) => {
-    return acts?.map((action) => {
-      const size = action.size ?? "sm";
-      const variant = action.variant ?? "solid";
-      const color = action.color ?? "default";
+  // Memoize filter and groupBy options
+  const filterOptions: FilterOption<T>[] = useMemo(() => [], []);
+  const groupByOptions: GroupOption[] = useMemo(() => [], []);
 
-      switch (action.type) {
-        case "button":
-          return (
-            <IBaseButton
-              key={action.key}
-              isIconOnly
-              color={color}
-              size={size}
-              variant={variant}
-              {...(action.props as any)}
-            >
-              {action.title}
-            </IBaseButton>
-          );
-        case "link":
-          const linkProps = action.props as Omit<IBaseLinkProps, "as"> & {
-            hrefAs?: any;
-          };
+  // Memoize visible columns filtering
+  const cols = useMemo(
+    () => columns.filter((col: any) => store.visibleColumns.has(col.key)),
+    [columns, store.visibleColumns]
+  );
 
-          // Extract only valid props for IBaseButton, excluding 'as' and 'href' which are handled separately
-          const { as, href, hrefAs, ...restLinkProps } = linkProps as any;
+  // Memoize display columns (with dummy render if needed)
+  const displayColumns = useMemo(
+    () =>
+      isDataDummy
+        ? cols.map((col: any) => ({
+            ...col,
+            render: () => null,
+          }))
+        : cols,
+    [cols, isDataDummy]
+  );
 
-          return (
-            <IBaseButton
-              key={action.key}
-              as={LinkAs as any}
-              color={color}
-              href={linkProps.href as string}
-              size={size}
-              variant={variant}
-              {...restLinkProps}
-            >
-              {action.title}
-            </IBaseButton>
-          );
-        default:
-          return null;
-      }
-    });
-  };
+  // Memoize renderActions callback
+  const renderActions = useMemo(
+    () => (acts: ActionElm[]) => {
+      return acts?.map((action) => {
+        const size = action.size ?? "sm";
+        const variant = action.variant ?? "solid";
+        const color = action.color ?? "default";
+
+        switch (action.type) {
+          case "button":
+            return (
+              <IBaseButton
+                key={action.key}
+                isIconOnly
+                color={color}
+                size={size}
+                variant={variant}
+                {...(action.props as any)}
+              >
+                {action.title}
+              </IBaseButton>
+            );
+          case "link":
+            const linkProps = action.props as Omit<IBaseLinkProps, "as"> & {
+              hrefAs?: any;
+            };
+
+            // Extract only valid props for IBaseButton, excluding 'as' and 'href' which are handled separately
+            const { as, href, hrefAs, ...restLinkProps } = linkProps as any;
+
+            return (
+              <IBaseButton
+                key={action.key}
+                as={LinkAs as any}
+                color={color}
+                href={linkProps.href as string}
+                size={size}
+                variant={variant}
+                {...restLinkProps}
+              >
+                {action.title}
+              </IBaseButton>
+            );
+          default:
+            return null;
+        }
+      });
+    },
+    [actionsLeft, actionsRight]
+  );
 
   // Render
   return (
@@ -150,52 +237,60 @@ export default function ViewListDataTable<T = any>(
       )}
 
       <IBaseCardBody className={`${title ? "pt-0" : ""}`}>
-        <div className="flex gap-2 items-center mb-4 flex-wrap">
-          <div className="flex gap-2 flex-1 justify-start">
+        <div className="flex gap-2 items-center mb-2 flex-wrap">
+          {/* <div className="flex gap-2 flex-1 justify-start">
             {renderActions(actionsLeft ?? [])}
-          </div>
+          </div> */}
+          <div className="flex flex-col gap-2 flex-1">
+            <div className="flex gap-2 flex-1 justify-end">
+              {!isSearchHidden && (
+                <SearchBar
+                  placeholder={search?.placeholder}
+                  value={store.search}
+                  onChange={store.setSearch}
+                />
+              )}
+            </div>
+            <div className="flex gap-2 flex-1 ">
+              <div className="flex gap-2 flex-1 justify-start">
+                {renderActions(actionsLeft ?? [])}
+              </div>
+              <div className="flex gap-2 flex-1 justify-end">
+                {renderActions(actionsRight ?? [])}
+                {!isFilterHidden && (
+                  <FilterMenu
+                    activeFilters={store.activeFilters}
+                    filterOptions={filterOptions}
+                    onToggleFilter={store.toggleFilter}
+                  />
+                )}
+                {!isGroupByHidden && (
+                  <GroupByMenu
+                    currentGroupBy={store.groupBy}
+                    groupByOptions={groupByOptions}
+                    onSelectGroupBy={store.setGroupBy}
+                  />
+                )}
 
-          <div className="flex gap-2 flex-1 justify-end">
-            {!isSearchHidden && (
-              <SearchBar
-                placeholder={search?.placeholder}
-                value={store.search}
-                onChange={store.setSearch}
-              />
-            )}
-            {!isFilterHidden && (
-              <FilterMenu
-                activeFilters={store.activeFilters}
-                filterOptions={filterOptions}
-                onToggleFilter={store.toggleFilter}
-              />
-            )}
-            {!isGroupByHidden && (
-              <GroupByMenu
-                currentGroupBy={store.groupBy}
-                groupByOptions={groupByOptions}
-                onSelectGroupBy={store.setGroupBy}
-              />
-            )}
-            {renderActions(actionsRight ?? [])}
-
-            {!isColumnVisibilityHidden && (
-              <ColumnVisibilityMenu
-                columns={columns}
-                visibleColumns={store.visibleColumns}
-                onToggleColumn={store.toggleColumn}
-              />
-            )}
+                {!isColumnVisibilityHidden && (
+                  <ColumnVisibilityMenu
+                    columns={columns}
+                    visibleColumns={store.visibleColumns}
+                    onToggleColumn={store.toggleColumn}
+                  />
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* IBaseTablePrimitive */}
-        <IBaseTable
-          {...dataTableProps}
+        {/* IBaseTablePrimitive - Memoized to prevent unnecessary re-renders */}
+        <MemoizedTable
+          dataTableProps={dataTableProps}
           columns={displayColumns}
           dataSource={dataSource}
-          loading={isLoading || isFetching || dataTableProps.loading}
-          pagination={_pagination}
+          loading={tableLoading}
+          pagination={memoizedPagination}
           total={total}
           onChangeTable={onChangeTable}
           onRefresh={refresh}
