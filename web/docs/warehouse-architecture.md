@@ -985,7 +985,209 @@ Kho `SPECIAL` sử dụng attribute `specialType` để phân biệt:
 
 ---
 
-## 5. Kiến Trúc Đề Xuất
+## 5. Phân Loại Ưu Tiên Quy Trình
+
+### 5.1. Tổng Quan
+
+Để triển khai hệ thống kho một cách hiệu quả, cần phân loại các quy trình theo mức độ ưu tiên để xác định quy trình nào cần implement trước (cốt lõi) và quy trình nào có thể implement sau (phụ).
+
+### 5.2. Phân Loại Theo Phase
+
+#### **PHASE 1: CỐT LÕI - Bắt Buộc Implement Trước** ✅
+
+**Nhập Kho (Inbound):**
+
+1. **Nhập từ Mua Hàng (Purchase Receipt)** - `INBOUND_PURCHASE`
+   - **Lý do**: Quy trình cốt lõi để nhập hàng vào kho
+   - **Phụ thuộc**: Purchase Module
+   - **Tần suất**: Rất cao (hàng ngày)
+   - **Hệ quả nếu không có**: Không thể nhập hàng từ nhà cung cấp
+
+2. **Nhập từ Điều Chỉnh (Adjustment Increase)** - `INBOUND_ADJUSTMENT`
+   - **Lý do**: Cần thiết để xử lý chênh lệch tồn kho
+   - **Phụ thuộc**: Không (thuộc Stock Module)
+   - **Tần suất**: Trung bình (khi kiểm kê)
+   - **Hệ quả nếu không có**: Không thể điều chỉnh tăng tồn kho
+
+**Xuất Kho (Outbound):**
+
+3. **Xuất cho Bán B2B (Sales Order Fulfillment)** - `OUTBOUND_SALES_B2B`
+   - **Lý do**: Cốt lõi cho bán hàng B2B
+   - **Phụ thuộc**: B2B Sales Module
+   - **Tần suất**: Rất cao (hàng ngày)
+   - **Hệ quả nếu không có**: Không thể xuất hàng bán B2B
+
+4. **Xuất cho Bán B2C Online** - `OUTBOUND_SALES_B2C` (nếu có B2C)
+   - **Lý do**: Cốt lõi cho e-commerce
+   - **Phụ thuộc**: B2C Sales Module
+   - **Tần suất**: Rất cao
+   - **Hệ quả nếu không có**: Không thể xuất hàng bán online
+
+5. **Xuất Điều Chỉnh (Adjustment Decrease)** - `OUTBOUND_ADJUSTMENT`
+   - **Lý do**: Cần thiết để điều chỉnh giảm tồn kho
+   - **Phụ thuộc**: Không (thuộc Stock Module)
+   - **Tần suất**: Trung bình
+   - **Hệ quả nếu không có**: Không thể điều chỉnh giảm tồn kho
+
+---
+
+#### **PHASE 2: QUAN TRỌNG - Implement Sớm** ⚠️
+
+**Nhập Kho:**
+
+6. **Nhập từ Điều Chuyển (Transfer Receipt)** - `INBOUND_TRANSFER`
+   - **Lý do**: Cần thiết cho multi-warehouse
+   - **Phụ thuộc**: Cần có quy trình điều chuyển kho (Phase 2)
+   - **Tần suất**: Trung bình-cao (nếu có nhiều kho)
+   - **Ghi chú**: Chỉ cần implement khi có nhiều kho
+
+7. **Nhập từ Trả Hàng (Return Receipt)** - `INBOUND_RETURN`
+   - **Lý do**: Cần thiết để xử lý đổi/trả hàng
+   - **Phụ thuộc**: Sales Module
+   - **Tần suất**: Trung bình
+   - **Ghi chú**: Có thể làm thủ công ban đầu
+
+**Xuất Kho:**
+
+8. **Xuất Điều Chuyển (Transfer Outbound)** - `OUTBOUND_TRANSFER`
+   - **Lý do**: Cần thiết cho multi-warehouse
+   - **Phụ thuộc**: Không (thuộc Stock Module)
+   - **Tần suất**: Trung bình-cao (nếu có nhiều kho)
+   - **Ghi chú**: Chỉ cần implement khi có nhiều kho
+
+9. **Xuất Hao Hụt (Loss)** - `OUTBOUND_LOSS`
+   - **Lý do**: Cần thiết để xử lý hao hụt, hủy hàng
+   - **Phụ thuộc**: Không (thuộc Stock Module)
+   - **Tần suất**: Thấp-trung bình
+   - **Ghi chú**: Có thể dùng Adjustment tạm thời
+
+10. **Xuất Bán Lẻ POS** - `OUTBOUND_RETAIL` (nếu có cửa hàng)
+    - **Lý do**: Cần thiết cho POS (Point of Sale)
+    - **Phụ thuộc**: B2C Sales Module (POS)
+    - **Tần suất**: Rất cao (nếu có POS)
+    - **Ghi chú**: Chỉ cần implement khi có hệ thống POS
+
+---
+
+#### **PHASE 3: TÙY CHỌN - Implement Sau** 🔄
+
+**Nhập Kho:**
+
+11. **Nhập từ Sản Xuất (Production Receipt)** - `INBOUND_PRODUCTION`
+    - **Lý do**: Chỉ cần khi có Manufacturing
+    - **Phụ thuộc**: Manufacturing Module
+    - **Tần suất**: Trung bình (nếu có sản xuất)
+    - **Ghi chú**: Chỉ cần implement khi có module Manufacturing
+
+**Xuất Kho:**
+
+12. **Xuất cho Sản Xuất (Production Issue)** - `OUTBOUND_PRODUCTION`
+    - **Lý do**: Chỉ cần khi có Manufacturing
+    - **Phụ thuộc**: Manufacturing Module
+    - **Tần suất**: Trung bình (nếu có sản xuất)
+    - **Ghi chú**: Chỉ cần implement khi có module Manufacturing
+
+13. **Xuất cho Đại Lý (Dealer)** - `OUTBOUND_DEALER`
+    - **Lý do**: Chỉ cần khi có consignment
+    - **Phụ thuộc**: B2C Sales Module (Dealer Management)
+    - **Tần suất**: Thấp
+    - **Ghi chú**: Có thể dùng Sales Order bình thường tạm thời
+
+---
+
+#### **PHASE 4: PHỤ - Có Thể Không Cần** ❌
+
+14. **Xuất cho Sự Kiện/Khuyến Mãi** - `OUTBOUND_EVENT`
+    - **Lý do**: Tính năng phụ, không ảnh hưởng đến core business
+    - **Phụ thuộc**: Marketing Module
+    - **Tần suất**: Rất thấp
+    - **Ghi chú**: Có thể dùng Sales Order hoặc Adjustment thay thế
+
+---
+
+### 5.3. Roadmap Implementation
+
+#### **MVP (Minimum Viable Product) - Phase 1:**
+
+```
+✅ INBOUND_PURCHASE      - Nhập từ mua hàng
+✅ OUTBOUND_SALES_B2B    - Xuất bán B2B
+✅ INBOUND_ADJUSTMENT    - Điều chỉnh tăng
+✅ OUTBOUND_ADJUSTMENT   - Điều chỉnh giảm
+✅ OUTBOUND_SALES_B2C    - Xuất bán B2C (nếu có B2C)
+```
+
+**Kết quả**: Hệ thống có thể nhập hàng, xuất hàng bán, và điều chỉnh tồn kho cơ bản.
+
+---
+
+#### **Version 1.0 - Phase 1 + 2:**
+
+```
+✅ Tất cả Phase 1
+✅ INBOUND_TRANSFER      - Nhập từ điều chuyển
+✅ OUTBOUND_TRANSFER     - Xuất điều chuyển
+✅ INBOUND_RETURN        - Nhập từ trả hàng
+✅ OUTBOUND_LOSS         - Xuất hao hụt
+✅ OUTBOUND_RETAIL       - Xuất POS (nếu có)
+```
+
+**Kết quả**: Hệ thống hỗ trợ đầy đủ multi-warehouse, đổi/trả, hao hụt, và POS.
+
+---
+
+#### **Version 2.0 - Phase 3:**
+
+```
+✅ Tất cả Phase 1 + 2
+✅ INBOUND_PRODUCTION    - Nhập từ sản xuất
+✅ OUTBOUND_PRODUCTION   - Xuất cho sản xuất
+✅ OUTBOUND_DEALER       - Xuất đại lý (nếu cần)
+```
+
+**Kết quả**: Hệ thống hỗ trợ đầy đủ các quy trình nghiệp vụ chính.
+
+---
+
+#### **Version 2.1+ - Phase 4:**
+
+```
+✅ Tất cả Phase 1 + 2 + 3
+✅ OUTBOUND_EVENT        - Xuất sự kiện (optional)
+```
+
+**Kết quả**: Đầy đủ tính năng.
+
+---
+
+### 5.4. Bảng Tổng Hợp Ưu Tiên
+
+| Quy Trình                  | Phase | Ưu Tiên      | Lý Do                        | Tần Suất            |
+| -------------------------- | ----- | ------------ | ---------------------------- | ------------------- |
+| **Nhập từ mua hàng**       | 1     | 🔴 CRITICAL  | Cốt lõi, không thể thiếu     | Rất cao             |
+| **Xuất bán B2B**           | 1     | 🔴 CRITICAL  | Cốt lõi, không thể thiếu     | Rất cao             |
+| **Xuất bán B2C**           | 1     | 🔴 CRITICAL  | Cốt lõi nếu có B2C           | Rất cao             |
+| **Điều chỉnh (tăng/giảm)** | 1     | 🔴 CRITICAL  | Cần thiết cho quản lý kho    | Trung bình          |
+| **Nhập/Xuất điều chuyển**  | 2     | 🟡 IMPORTANT | Cần cho multi-warehouse      | Trung bình-Cao      |
+| **Nhập từ trả hàng**       | 2     | 🟡 IMPORTANT | Cần cho đổi/trả              | Trung bình          |
+| **Xuất hao hụt**           | 2     | 🟡 IMPORTANT | Cần cho quản lý tồn kho      | Thấp-Trung bình     |
+| **Xuất POS**               | 2     | 🟡 IMPORTANT | Cần nếu có cửa hàng          | Rất cao (nếu có)    |
+| **Nhập/Xuất sản xuất**     | 3     | 🟢 OPTIONAL  | Chỉ cần khi có Manufacturing | Trung bình (nếu có) |
+| **Xuất đại lý**            | 3     | 🟢 OPTIONAL  | Chỉ cần khi có consignment   | Thấp                |
+| **Xuất sự kiện**           | 4     | ⚪ LOW       | Tính năng phụ, có thể bỏ qua | Rất thấp            |
+
+---
+
+### 5.5. Khuyến Nghị Triển Khai
+
+1. **Bắt đầu với Phase 1 (MVP)**: Để có hệ thống hoạt động cơ bản, đáp ứng nhu cầu tối thiểu.
+2. **Triển khai Phase 2**: Sau khi MVP ổn định và đã có nhiều kho hoặc cần xử lý đổi/trả.
+3. **Triển khai Phase 3**: Chỉ khi có nhu cầu cụ thể (Manufacturing, Dealer Management).
+4. **Phase 4**: Có thể bỏ qua hoặc implement khi có thời gian và yêu cầu cụ thể.
+
+---
+
+## 6. Kiến Trúc Đề Xuất
 
 ### 5.1. Unified Architecture
 
@@ -1035,7 +1237,7 @@ Kho `SPECIAL` sử dụng attribute `specialType` để phân biệt:
 
 ---
 
-## 6. Best Practices
+## 7. Best Practices
 
 ### 6.1. Nguyên Tắc Quản Lý Kho
 
@@ -1111,11 +1313,12 @@ Kho `SPECIAL` sử dụng attribute `specialType` để phân biệt:
 
 Tài liệu này mô tả tổng quan về kiến trúc hệ thống kho, bao gồm:
 
-1. ✅ **Các loại kho và mục đích sử dụng**: 10 loại kho phục vụ B2B, B2C, hoặc cả hai
+1. ✅ **Các loại kho và mục đích sử dụng**: 5 loại kho chính (CENTRAL, PRODUCTION, RETAIL, WHOLESALE, SPECIAL) với attributes để mở rộng, phục vụ B2B, B2C, hoặc cả hai
 2. ✅ **Quy trình nghiệp vụ đầy đủ**: Nhập, xuất, điều chuyển, điều chỉnh, hao hụt
-3. ✅ **Quy trình chuẩn**: Mô tả chi tiết từng bước cho mỗi quy trình
-4. ✅ **Kiến trúc unified**: Một kiến trúc kho duy nhất, không tách B2B/B2C
-5. ✅ **Best practices**: Nguyên tắc quản lý kho, xử lý đặc biệt
+3. ✅ **Quy trình chuẩn**: Mô tả chi tiết từng bước cho mỗi quy trình, kèm thông tin module quản lý và documents/phiếu liên quan
+4. ✅ **Phân loại ưu tiên**: Phân loại quy trình theo 4 phase (CRITICAL, IMPORTANT, OPTIONAL, LOW) với roadmap implementation rõ ràng
+5. ✅ **Kiến trúc unified**: Một kiến trúc kho duy nhất, không tách B2B/B2C
+6. ✅ **Best practices**: Nguyên tắc quản lý kho, xử lý đặc biệt
 
 Kiến trúc này đảm bảo:
 

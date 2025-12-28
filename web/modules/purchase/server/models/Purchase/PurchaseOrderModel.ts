@@ -3,7 +3,8 @@ import type {
   PurchaseTbPurchaseOrder,
   PurchaseTbPurchaseOrderLine,
 } from "../../schemas";
-import type StockModel from "@mdl/stock/server/models/Stock/StockModel";
+import type { InventoryCoreManagement } from "@mdl/stock/server/models/Inventory";
+import { StockMoveFrom } from "@mdl/stock/server/types";
 
 import { desc, eq, sql } from "drizzle-orm";
 import { BaseModel } from "@base/server/models/BaseModel";
@@ -173,11 +174,11 @@ export default class PurchaseOrderModel extends BaseModel<
   };
 
   receive = async (input: ReceivePurchaseOrderInput) => {
-    const stockModel =
-      await RuntimeContext.getModelInstanceBy<StockModel>("stock");
+    const inventoryCore =
+      await RuntimeContext.getModelInstanceBy<InventoryCoreManagement>("inventory-core");
 
-    if (!stockModel) {
-      throw new Error("Stock model is not registered");
+    if (!inventoryCore) {
+      throw new Error("Inventory core management is not registered");
     }
 
     const orderData = await this.getById(input.orderId);
@@ -236,10 +237,11 @@ export default class PurchaseOrderModel extends BaseModel<
           })
           .where(eq(purchase_tb_purchase_orders_line.id, line.id));
 
-        await stockModel.receiveStock({
+        await inventoryCore.receiveStock({
           productId: line.productId,
           warehouseId: defaultWarehouseId,
           quantity: receiveQty,
+          from: StockMoveFrom.PURCHASE,
           reference: `PO:${order.code}`,
           note: input.note,
           userId: input.userId,

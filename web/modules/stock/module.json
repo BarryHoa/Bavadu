@@ -7,6 +7,7 @@
   "icon": "Boxes",
   "models": {
     "stock.curd": "Stock/StockModel",
+    "inventory-core": "Inventory/InventoryCoreManagement",
     "stock-warehouse.curd": "Warehouse/WarehouseModel",
     "stock-warehouse.list": "Warehouse/WarehouseViewListModel",
     "stock-summary.list": "Stock/StockSummaryViewListModel"

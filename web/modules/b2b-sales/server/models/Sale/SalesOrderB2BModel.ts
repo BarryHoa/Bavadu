@@ -1,4 +1,5 @@
-import type StockModel from "@mdl/stock/server/models/Stock/StockModel";
+import type { InventoryCoreManagement } from "@mdl/stock/server/models/Inventory";
+import { StockMoveFrom } from "@mdl/stock/server/types";
 import type {
   CreateSalesOrderB2BInput,
   DeliverSalesOrderB2BInput,
@@ -376,11 +377,11 @@ export default class SalesOrderB2BModel extends BaseModel<
   };
 
   deliver = async (input: DeliverSalesOrderB2BInput) => {
-    const stockModel =
-      await RuntimeContext.getModelInstanceBy<StockModel>("stock");
+    const inventoryCore =
+      await RuntimeContext.getModelInstanceBy<InventoryCoreManagement>("inventory-core");
 
-    if (!stockModel) {
-      throw new Error("Stock model is not registered");
+    if (!inventoryCore) {
+      throw new Error("Inventory core management is not registered");
     }
 
     const orderData = await this.getById(input.orderId);
@@ -435,10 +436,11 @@ export default class SalesOrderB2BModel extends BaseModel<
           })
           .where(eq(sale_b2b_tb_order_lines.id, line.id));
 
-        await stockModel.issueStock({
+        await inventoryCore.issueStock({
           productId: line.productId,
           warehouseId: defaultWarehouseId,
           quantity,
+          from: StockMoveFrom.SALES_B2B,
           reference: `SO-B2B:${order.code}`,
           note: input.note,
           userId: input.userId,
