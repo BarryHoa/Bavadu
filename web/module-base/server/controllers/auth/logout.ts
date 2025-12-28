@@ -2,7 +2,8 @@ import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { NextRequest } from "next/server";
 
 import { SESSION_CONFIG } from "@base/server/config/session";
-import { sessionStore } from "@base/server/stores";
+import SessionModel from "@base/server/models/Sessions/SessionModel";
+import { Debug } from "@base/server/runtime/Debug";
 
 /**
  * POST /api/base/auth/logout
@@ -13,7 +14,8 @@ export async function POST(request: NextRequest) {
     const sessionToken = request.cookies.get(SESSION_CONFIG.cookie.name)?.value;
 
     if (sessionToken) {
-      await sessionStore.destroySession(sessionToken);
+      const sessionModel = new SessionModel();
+      await sessionModel.destroySession(sessionToken);
     }
 
     // Create response
@@ -30,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error("Logout error:", error);
+    Debug.forceError("Logout error:", error);
 
     return JSONResponse({
       error: "Logout failed",

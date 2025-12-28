@@ -1,6 +1,8 @@
 import { BaseModel } from "@base/server/models/BaseModel";
 import { and, eq, inArray } from "drizzle-orm";
 
+import { RuntimeContext } from "../../runtime/RuntimeContext";
+import { CACHE_NOT_FOUND, RedisCache } from "../../runtime/cache/RedisCache";
 import {
   base_tb_permissions,
   base_tb_role_permissions_default,
@@ -18,11 +20,40 @@ export interface UserPermissionResult {
   }>;
 }
 
+// Interface cho cache data (Set không thể serialize, nên dùng Array)
+interface CachedUserPermissionResult {
+  permissions: string[]; // Array thay vì Set để có thể serialize
+  roles: Array<{
+    id: string;
+    code: string;
+    name: unknown;
+  }>;
+  cachedAt: number;
+}
+
 export default class UserPermissionModel extends BaseModel<
   typeof base_tb_user_permissions
 > {
+  private cachePrefix = "permissions:";
+  private cacheTTL = 1800; // 30 phút
+
   constructor() {
     super(base_tb_user_permissions);
+  }
+
+  /**
+   * Lấy RedisCache instance
+   */
+  private getCache(): RedisCache | undefined {
+    const context = RuntimeContext.getInstance();
+    return context.getRedisCache();
+  }
+
+  /**
+   * Lấy cache key cho user
+   */
+  private getCacheKey(userId: string): string {
+    return `${userId}`;
   }
 
   /**
@@ -40,12 +71,58 @@ export default class UserPermissionModel extends BaseModel<
 
   /**
    * Get user's final permissions (role permissions + overrides)
-   * Logic:
-   * 1. Get all permissions from user's roles
-   * 2. Apply granted permissions from overrides
-   * 3. Remove revoked permissions from overrides
+   * Với cache support
+   * @param userId - User ID
+   * @param forceRefresh - Force refresh từ database, bỏ qua cache
    */
-  async getPermissionsByUser(userId: string): Promise<UserPermissionResult> {
+  async getPermissionsByUser(
+    userId: string,
+    forceRefresh = false
+  ): Promise<UserPermissionResult> {
+    const cache = this.getCache();
+    const cacheKey = this.getCacheKey(userId);
+
+    // Nếu không force refresh và có cache, lấy từ cache
+    if (!forceRefresh && cache) {
+      const cached = await cache.get<CachedUserPermissionResult>(cacheKey, {
+        prefix: this.cachePrefix,
+      });
+
+      if (cached !== CACHE_NOT_FOUND) {
+        // Convert Array back to Set
+        return {
+          permissions: new Set(cached.permissions),
+          roles: cached.roles,
+        };
+      }
+    }
+
+    // Lấy từ database
+    const result = await this._getPermissionsByUserFromDB(userId);
+
+    // Cache lại
+    if (cache) {
+      const cacheData: CachedUserPermissionResult = {
+        permissions: Array.from(result.permissions), // Convert Set to Array
+        roles: result.roles,
+        cachedAt: Date.now(),
+      };
+
+      await cache.set(cacheKey, cacheData, {
+        prefix: this.cachePrefix,
+        ttl: this.cacheTTL,
+      });
+    }
+
+    return result;
+  }
+
+  /**
+   * Lấy permissions từ database (private method)
+   */
+  private async _getPermissionsByUserFromDB(
+    userId: string
+  ): Promise<UserPermissionResult> {
     // 1. Get user's roles
     const userRoles = await this.db
       .select({
@@ -61,8 +138,8 @@ export default class UserPermissionModel extends BaseModel<
         and(
           eq(base_tb_user_roles.userId, userId),
           eq(base_tb_user_roles.isActive, true),
-          eq(base_tb_roles.isActive, true),
-        ),
+          eq(base_tb_roles.isActive, true)
+        )
       );
 
     const roles = userRoles.map((r) => ({
@@ -85,15 +162,15 @@ export default class UserPermissionModel extends BaseModel<
           base_tb_permissions,
           eq(
             base_tb_role_permissions_default.permissionId,
-            base_tb_permissions.id,
-          ),
+            base_tb_permissions.id
+          )
         )
         .where(
           and(
             inArray(base_tb_role_permissions_default.roleId, roleIds),
             eq(base_tb_role_permissions_default.isActive, true),
-            eq(base_tb_permissions.isActive, true),
-          ),
+            eq(base_tb_permissions.isActive, true)
+          )
         );
 
       for (const rp of rolePerms) {
@@ -109,14 +186,14 @@ export default class UserPermissionModel extends BaseModel<
       .from(base_tb_user_permissions)
       .innerJoin(
         base_tb_permissions,
-        eq(base_tb_user_permissions.permissionId, base_tb_permissions.id),
+        eq(base_tb_user_permissions.permissionId, base_tb_permissions.id)
       )
       .where(
         and(
           eq(base_tb_user_permissions.userId, userId),
           eq(base_tb_user_permissions.isActive, true),
-          eq(base_tb_permissions.isActive, true),
-        ),
+          eq(base_tb_permissions.isActive, true)
+        )
       );
 
     // 4. Combine role permissions and user permissions
@@ -155,7 +232,7 @@ export default class UserPermissionModel extends BaseModel<
    */
   async hasAnyPermission(
     userId: string,
-    permissions: string[],
+    permissions: string[]
   ): Promise<boolean> {
     const result = await this.getPermissionsByUser(userId);
 
@@ -167,7 +244,7 @@ export default class UserPermissionModel extends BaseModel<
    */
   async hasAllPermissions(
     userId: string,
-    permissions: string[],
+    permissions: string[]
   ): Promise<boolean> {
     const result = await this.getPermissionsByUser(userId);
 
@@ -176,11 +253,12 @@ export default class UserPermissionModel extends BaseModel<
 
   /**
    * Add permission to user
+   * Xóa cache sau khi thêm
    */
   async addPermissionToUser(
     userId: string,
     permissionId: string,
-    createdBy?: string,
+    createdBy?: string
   ) {
     const now = new Date();
 
@@ -191,8 +269,8 @@ export default class UserPermissionModel extends BaseModel<
       .where(
         and(
           eq(this.table.userId, userId),
-          eq(this.table.permissionId, permissionId),
-        ),
+          eq(this.table.permissionId, permissionId)
+        )
       )
       .limit(1);
 
@@ -206,6 +284,9 @@ export default class UserPermissionModel extends BaseModel<
           })
           .where(eq(this.table.id, existing[0].id));
       }
+
+      // Invalidate cache
+      await this.invalidateCache(userId);
 
       return existing[0];
     }
@@ -222,11 +303,15 @@ export default class UserPermissionModel extends BaseModel<
       })
       .returning();
 
+    // Invalidate cache
+    await this.invalidateCache(userId);
+
     return created;
   }
 
   /**
    * Remove permission from user (soft delete)
+   * Xóa cache sau khi xóa
    */
   async removePermissionFromUser(userId: string, permissionId: string) {
     const result = await this.db
@@ -238,11 +323,44 @@ export default class UserPermissionModel extends BaseModel<
         and(
           eq(this.table.userId, userId),
           eq(this.table.permissionId, permissionId),
-          eq(this.table.isActive, true),
-        ),
+          eq(this.table.isActive, true)
+        )
       )
       .returning();
 
-    return result.length > 0;
+    const success = result.length > 0;
+
+    // Invalidate cache nếu thành công
+    if (success) {
+      await this.invalidateCache(userId);
+    }
+
+    return success;
+  }
+
+  /**
+   * Xóa cache permissions của user (khi có thay đổi role/permission)
+   */
+  async invalidateCache(userId: string): Promise<void> {
+    const cache = this.getCache();
+    if (cache) {
+      const cacheKey = this.getCacheKey(userId);
+      await cache.delete(cacheKey, { prefix: this.cachePrefix });
+    }
+  }
+
+  /**
+   * Xóa cache permissions của nhiều users
+   */
+  async invalidateCacheMany(userIds: string[]): Promise<void> {
+    if (userIds.length === 0) {
+      return;
+    }
+
+    const cache = this.getCache();
+    if (cache) {
+      const cacheKeys = userIds.map((id) => this.getCacheKey(id));
+      await cache.deleteMany(cacheKeys, { prefix: this.cachePrefix });
+    }
   }
 }

@@ -5,6 +5,7 @@
  */
 
 import { CACHE_NOT_FOUND } from "@base/server/runtime/cache";
+import { Debug } from "@base/server/runtime/Debug";
 import { RuntimeContext } from "@base/server/runtime/RuntimeContext";
 
 interface RateLimitEntry {
@@ -75,16 +76,10 @@ class InMemoryRateLimitStore {
 
   private cleanup(): void {
     const now = Date.now();
-    const keysToDelete: string[] = [];
-
     this.store.forEach((entry, key) => {
       if (now > entry.resetTime) {
-        keysToDelete.push(key);
+        this.store.delete(key);
       }
-    });
-
-    keysToDelete.forEach((key) => {
-      this.store.delete(key);
     });
   }
 
@@ -102,167 +97,137 @@ class InMemoryRateLimitStore {
 }
 
 class RateLimitStore {
-  private memoryStore: InMemoryRateLimitStore;
-  private useRedis: boolean = false;
+  private readonly memoryStore: InMemoryRateLimitStore;
+  private readonly useRedis: boolean;
+  private readonly cachePrefix = "rate-limit:";
 
   constructor() {
     this.memoryStore = new InMemoryRateLimitStore();
-    this.initializeRedis();
-  }
-
-  private async initializeRedis(): Promise<void> {
-    try {
-      const context = RuntimeContext.getInstance();
-      await context.ensureInitialized();
-      const redisCache = context.getRedisCache();
-
-      if (redisCache && redisCache.getStatus().connected) {
-        this.useRedis = true;
-        console.log("[RateLimitStore] Using Redis for rate limiting");
-      } else {
-        console.log(
-          "[RateLimitStore] Using in-memory store (Redis not available)"
-        );
-      }
-    } catch (error) {
-      console.warn(
-        "[RateLimitStore] Failed to initialize Redis, using in-memory store:",
-        error
-      );
-      this.useRedis = false;
+    this.useRedis = this.shouldUseRedis();
+    if (this.useRedis) {
+      Debug.log("[RateLimitStore] Using Redis for rate limiting");
+    } else {
+      Debug.log("[RateLimitStore] Using in-memory store");
     }
   }
 
-  private async getRedisCache() {
+  private shouldUseRedis(): boolean {
+    if (process.env.RATE_LIMIT_USE_REDIS !== "true") {
+      return false;
+    }
     try {
-      const context = RuntimeContext.getInstance();
-      await context.ensureInitialized();
-      return context.getRedisCache();
+      const redisCache = RuntimeContext.getInstance().getRedisCache();
+      return redisCache?.getStatus().connected ?? false;
+    } catch {
+      return false;
+    }
+  }
+
+  private getRedisCache() {
+    try {
+      return RuntimeContext.getInstance().getRedisCache();
     } catch {
       return undefined;
     }
   }
 
-  /**
-   * Get current count for a key
-   */
   async get(key: string): Promise<number> {
-    if (this.useRedis) {
-      const cache = await this.getRedisCache();
-      if (cache) {
-        const cached = await cache.get<RateLimitEntry>(key, {
-          prefix: "rate-limit:",
-        });
-        if (cached !== CACHE_NOT_FOUND) {
-          // Check if expired
-          if (Date.now() > cached.resetTime) {
-            await this.reset(key);
-            return 0;
-          }
-          return cached.count;
-        }
-      }
+    if (!this.useRedis) {
+      return this.memoryStore.get(key);
     }
 
-    return this.memoryStore.get(key);
+    const cache = this.getRedisCache();
+    if (!cache) {
+      return this.memoryStore.get(key);
+    }
+
+    const cached = await cache.get<RateLimitEntry>(key, {
+      prefix: this.cachePrefix,
+    });
+
+    if (cached === CACHE_NOT_FOUND) {
+      return 0;
+    }
+
+    if (Date.now() > cached.resetTime) {
+      await this.reset(key);
+      return 0;
+    }
+
+    return cached.count;
   }
 
-  /**
-   * Increment count for a key
-   */
   async increment(key: string, windowMs: number): Promise<number> {
-    if (this.useRedis) {
-      const cache = await this.getRedisCache();
-      if (cache) {
-        const now = Date.now();
-        const cached = await cache.get<RateLimitEntry>(key, {
-          prefix: "rate-limit:",
-        });
-
-        if (cached === CACHE_NOT_FOUND || Date.now() > cached.resetTime) {
-          // Create new entry
-          const entry: RateLimitEntry = {
-            count: 1,
-            resetTime: now + windowMs,
-          };
-          const ttl = Math.ceil(windowMs / 1000);
-          await cache.set(key, entry, { prefix: "rate-limit:", ttl });
-          return 1;
-        }
-
-        // Increment existing entry
-        const newEntry: RateLimitEntry = {
-          count: cached.count + 1,
-          resetTime: cached.resetTime,
-        };
-        const ttl = Math.ceil((cached.resetTime - now) / 1000);
-        await cache.set(key, newEntry, { prefix: "rate-limit:", ttl });
-        return newEntry.count;
-      }
+    if (!this.useRedis) {
+      return this.memoryStore.increment(key, windowMs);
     }
 
-    return this.memoryStore.increment(key, windowMs);
+    const cache = this.getRedisCache();
+    if (!cache) {
+      return this.memoryStore.increment(key, windowMs);
+    }
+
+    const now = Date.now();
+    const cached = await cache.get<RateLimitEntry>(key, {
+      prefix: this.cachePrefix,
+    });
+
+    const isExpired = cached === CACHE_NOT_FOUND || now > cached.resetTime;
+    const entry: RateLimitEntry = isExpired
+      ? { count: 1, resetTime: now + windowMs }
+      : { count: cached.count + 1, resetTime: cached.resetTime };
+
+    const ttl = Math.max(1, Math.ceil((entry.resetTime - now) / 1000));
+    await cache.set(key, entry, { prefix: this.cachePrefix, ttl });
+
+    return entry.count;
   }
 
-  /**
-   * Get time until reset (in milliseconds)
-   */
   async getTimeUntilReset(key: string): Promise<number> {
-    if (this.useRedis) {
-      const cache = await this.getRedisCache();
-      if (cache) {
-        const cached = await cache.get<RateLimitEntry>(key, {
-          prefix: "rate-limit:",
-        });
-        if (cached !== CACHE_NOT_FOUND) {
-          const remaining = cached.resetTime - Date.now();
-          return Math.max(0, remaining);
-        }
-      }
+    if (!this.useRedis) {
+      return this.memoryStore.getTimeUntilReset(key);
     }
 
-    return this.memoryStore.getTimeUntilReset(key);
+    const cache = this.getRedisCache();
+    if (!cache) {
+      return this.memoryStore.getTimeUntilReset(key);
+    }
+
+    const cached = await cache.get<RateLimitEntry>(key, {
+      prefix: this.cachePrefix,
+    });
+
+    if (cached === CACHE_NOT_FOUND) {
+      return 0;
+    }
+
+    return Math.max(0, cached.resetTime - Date.now());
   }
 
-  /**
-   * Reset count for a key
-   */
   async reset(key: string): Promise<void> {
     if (this.useRedis) {
-      const cache = await this.getRedisCache();
+      const cache = this.getRedisCache();
       if (cache) {
-        await cache.delete(key, { prefix: "rate-limit:" });
+        await cache.delete(key, { prefix: this.cachePrefix });
       }
     }
-
     this.memoryStore.reset(key);
   }
 
-  /**
-   * Clear all entries
-   */
   async clear(): Promise<void> {
     if (this.useRedis) {
-      const cache = await this.getRedisCache();
+      const cache = this.getRedisCache();
       if (cache) {
-        await cache.clearPattern("*", { prefix: "rate-limit:" });
+        await cache.clearPattern("*", { prefix: this.cachePrefix });
       }
     }
-
     this.memoryStore.clear();
   }
 
-  /**
-   * Get store size (for monitoring)
-   */
   async size(): Promise<number> {
-    // Redis doesn't have a direct size method, return memory store size
     return this.memoryStore.size();
   }
 
-  /**
-   * Destroy the store and cleanup interval
-   */
   destroy(): void {
     this.memoryStore.destroy();
   }

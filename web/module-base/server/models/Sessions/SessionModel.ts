@@ -8,13 +8,105 @@ import { randomBytes } from "crypto";
 
 import { and, eq, gt, lt } from "drizzle-orm";
 
+import { CACHE_NOT_FOUND } from "../../runtime/cache";
+import { RuntimeContext } from "../../runtime/RuntimeContext";
+import { Debug } from "../../runtime/Debug";
 import { base_tb_sessions } from "../../schemas/base.session";
 import { base_tb_users, base_tb_users_login } from "../../schemas/base.user";
 import { BaseModel } from "../BaseModel";
 
 class SessionModel extends BaseModel<typeof base_tb_sessions> {
+  private readonly useRedis: boolean;
+  private readonly cachePrefix = "session:";
+
   constructor() {
     super(base_tb_sessions);
+    this.useRedis = this.shouldUseRedis();
+    if (this.useRedis) {
+      Debug.log("[SessionModel] Using Redis for session caching");
+    }
+  }
+
+  private shouldUseRedis(): boolean {
+    try {
+      const redisCache = RuntimeContext.getInstance().getRedisCache();
+      return redisCache?.getStatus().connected ?? false;
+    } catch {
+      return false;
+    }
+  }
+
+  private getRedisCache() {
+    try {
+      return RuntimeContext.getInstance().getRedisCache();
+    } catch {
+      return undefined;
+    }
+  }
+
+  private normalizeCachedSession(
+    cached: ValidateSessionResult
+  ): ValidateSessionResult {
+    if (cached.valid && cached.session) {
+      const session = {
+        ...cached.session,
+        expiresAt:
+          cached.session.expiresAt instanceof Date
+            ? cached.session.expiresAt
+            : new Date(cached.session.expiresAt),
+        createdAt:
+          cached.session.createdAt instanceof Date
+            ? cached.session.createdAt
+            : new Date(cached.session.createdAt),
+        updatedAt:
+          cached.session.updatedAt instanceof Date
+            ? cached.session.updatedAt
+            : new Date(cached.session.updatedAt),
+      };
+
+      return {
+        ...cached,
+        session,
+      };
+    }
+
+    return cached;
+  }
+
+  private async cacheSession(
+    sessionToken: string,
+    result: ValidateSessionResult
+  ): Promise<void> {
+    if (!this.useRedis || !result.valid || !result.session) {
+      return;
+    }
+
+    const cache = this.getRedisCache();
+    if (!cache) {
+      return;
+    }
+
+    const expiresAt = result.session.expiresAt.getTime();
+    const now = Date.now();
+    const ttl = Math.ceil((expiresAt - now) / 1000);
+
+    if (ttl > 0) {
+      await cache.set(sessionToken, result, {
+        prefix: this.cachePrefix,
+        ttl,
+      });
+    }
+  }
+
+  private async invalidateCache(sessionToken: string): Promise<void> {
+    if (!this.useRedis) {
+      return;
+    }
+
+    const cache = this.getRedisCache();
+    if (cache) {
+      await cache.delete(sessionToken, { prefix: this.cachePrefix });
+    }
   }
 
   /**
@@ -56,7 +148,7 @@ class SessionModel extends BaseModel<typeof base_tb_sessions> {
       throw new Error("Failed to create session");
     }
 
-    return {
+    const sessionData: SessionData = {
       id: session.id,
       userId: session.userId,
       sessionToken: session.sessionToken,
@@ -64,12 +156,68 @@ class SessionModel extends BaseModel<typeof base_tb_sessions> {
       createdAt: session.createdAt!,
       updatedAt: session.updatedAt!,
     };
+
+    // Cache in Redis
+    await this.cacheSession(sessionToken, {
+      valid: true,
+      session: sessionData,
+    });
+
+    return sessionData;
   }
 
   /**
    * Validate a session token and return session data with user info
+   * Checks Redis cache first, falls back to database if not found
    */
   async validateSession(sessionToken: string): Promise<ValidateSessionResult> {
+    // Try Redis cache first
+    if (this.useRedis) {
+      const cache = this.getRedisCache();
+      if (cache) {
+        const cached = await cache.get<ValidateSessionResult>(sessionToken, {
+          prefix: this.cachePrefix,
+        });
+
+        if (cached !== CACHE_NOT_FOUND) {
+          const normalized = this.normalizeCachedSession(cached);
+
+          if (normalized.valid && normalized.session) {
+            const now = Date.now();
+            const expiresAt = normalized.session.expiresAt.getTime();
+
+            if (now < expiresAt) {
+              // Session is valid and not expired
+              return normalized;
+            } else {
+              // Session expired, remove from cache
+              await this.invalidateCache(sessionToken);
+            }
+          } else {
+            // Invalid session, return cached result
+            return normalized;
+          }
+        }
+      }
+    }
+
+    // Fallback to database
+    const result = await this._validateSessionFromDB(sessionToken);
+
+    // Cache the result if valid
+    if (result.valid) {
+      await this.cacheSession(sessionToken, result);
+    }
+
+    return result;
+  }
+
+  /**
+   * Validate session from database (private method)
+   */
+  private async _validateSessionFromDB(
+    sessionToken: string
+  ): Promise<ValidateSessionResult> {
     const now = new Date();
 
     const [session] = await this.db
@@ -129,6 +277,10 @@ class SessionModel extends BaseModel<typeof base_tb_sessions> {
    * Destroy a session by token
    */
   async destroySession(sessionToken: string): Promise<boolean> {
+    // Remove from Redis cache
+    await this.invalidateCache(sessionToken);
+
+    // Remove from database
     const result = await this.db
       .delete(this.table)
       .where(eq(this.table.sessionToken, sessionToken))
@@ -185,7 +337,17 @@ class SessionModel extends BaseModel<typeof base_tb_sessions> {
       .where(eq(this.table.sessionToken, sessionToken))
       .returning();
 
-    return result.length > 0;
+    const success = result.length > 0;
+
+    // Update cache if successful
+    if (success) {
+      const updated = await this._validateSessionFromDB(sessionToken);
+      if (updated.valid) {
+        await this.cacheSession(sessionToken, updated);
+      }
+    }
+
+    return success;
   }
 }
 

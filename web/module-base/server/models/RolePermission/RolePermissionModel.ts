@@ -1,6 +1,8 @@
 import { BaseModel } from "@base/server/models/BaseModel";
 import { and, eq, inArray } from "drizzle-orm";
 
+import UserRoleModel from "../UserRole/UserRoleModel";
+import UserPermissionModel from "../UserPermission/UserPermissionModel";
 import {
   base_tb_permissions,
   base_tb_role_permissions_default,
@@ -21,6 +23,19 @@ export default class RolePermissionModel extends BaseModel<
 > {
   constructor() {
     super(base_tb_role_permissions_default);
+  }
+
+  /**
+   * Invalidate cache permissions của tất cả users có role này
+   */
+  private async invalidateRoleUsersCache(roleId: string): Promise<void> {
+    const userRoleModel = new UserRoleModel();
+    const userIds = await userRoleModel.getUserIdsByRole(roleId);
+
+    if (userIds.length > 0) {
+      const userPermissionModel = new UserPermissionModel();
+      await userPermissionModel.invalidateCacheMany(userIds);
+    }
   }
 
   /**
@@ -135,6 +150,9 @@ export default class RolePermissionModel extends BaseModel<
           .where(eq(this.table.id, existing[0].id));
       }
 
+      // Invalidate cache
+      await this.invalidateRoleUsersCache(roleId);
+
       return {
         id: existing[0].id,
         roleId: existing[0].roleId,
@@ -160,6 +178,9 @@ export default class RolePermissionModel extends BaseModel<
     if (!created) {
       throw new Error("Failed to add permission to role");
     }
+
+    // Invalidate cache
+    await this.invalidateRoleUsersCache(roleId);
 
     return {
       id: created.id,
@@ -193,7 +214,14 @@ export default class RolePermissionModel extends BaseModel<
       )
       .returning();
 
-    return result.length > 0;
+    const success = result.length > 0;
+
+    // Invalidate cache nếu thành công
+    if (success) {
+      await this.invalidateRoleUsersCache(roleId);
+    }
+
+    return success;
   }
 
   /**
@@ -228,6 +256,9 @@ export default class RolePermissionModel extends BaseModel<
         await this.addPermissionToRole(roleId, permissionId, createdBy);
       }
     }
+
+    // Invalidate cache sau khi set permissions (đảm bảo cache được clear)
+    await this.invalidateRoleUsersCache(roleId);
   }
 
   /**

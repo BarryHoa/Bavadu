@@ -2,6 +2,8 @@ import { LocaleDataType } from "@base/shared/interface/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
 import { and, eq } from "drizzle-orm";
 
+import UserRoleModel from "../UserRole/UserRoleModel";
+import UserPermissionModel from "../UserPermission/UserPermissionModel";
 import {
   base_tb_permissions,
   base_tb_role_permissions_default,
@@ -218,6 +220,19 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
     return role;
   };
 
+  /**
+   * Invalidate cache permissions của tất cả users có role này
+   */
+  private async invalidateRoleUsersCache(roleId: string): Promise<void> {
+    const userRoleModel = new UserRoleModel();
+    const userIds = await userRoleModel.getUserIdsByRole(roleId);
+
+    if (userIds.length > 0) {
+      const userPermissionModel = new UserPermissionModel();
+      await userPermissionModel.invalidateCacheMany(userIds);
+    }
+  }
+
   updateRole = async (
     id: string,
     payload: Partial<RoleInput>,
@@ -294,6 +309,11 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
       }
     }
 
+    // Invalidate cache nếu có thay đổi permissions hoặc role info
+    if (payload.permissions !== undefined || payload.isActive !== undefined) {
+      await this.invalidateRoleUsersCache(id);
+    }
+
     return this.getRoleById(id);
   };
 
@@ -362,6 +382,9 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
       .from(base_tb_user_roles)
       .where(eq(base_tb_user_roles.roleId, id))
       .limit(1);
+
+    // Invalidate cache trước khi xóa
+    await this.invalidateRoleUsersCache(id);
 
     // Delete role (cascade will handle related records)
     await db.delete(this.table).where(eq(this.table.id, id));

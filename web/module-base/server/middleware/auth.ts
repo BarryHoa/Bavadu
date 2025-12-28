@@ -1,5 +1,5 @@
 import { AUTH_CONFIG } from "@base/server/config/auth";
-import { sessionStore } from "@base/server/stores";
+import SessionModel from "@base/server/models/Sessions/SessionModel";
 import {
   getClientIp,
   getUserAgent,
@@ -38,7 +38,8 @@ export async function authenticateRequest(
   }
 
   try {
-    const validationResult = await sessionStore.validateSession(sessionToken);
+    const sessionModel = new SessionModel();
+    const validationResult = await sessionModel.validateSession(sessionToken);
 
     if (!validationResult.valid || !validationResult.session) {
       logAuthFailure("Invalid or expired session", {

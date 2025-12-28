@@ -1,6 +1,7 @@
 import { BaseModel } from "@base/server/models/BaseModel";
 import { and, eq, inArray } from "drizzle-orm";
 
+import UserPermissionModel from "../UserPermission/UserPermissionModel";
 import {
   base_tb_permissions,
   base_tb_role_permissions_default,
@@ -105,6 +106,14 @@ export default class UserRoleModel extends BaseModel<
   }
 
   /**
+   * Invalidate permissions cache cho user
+   */
+  private async invalidateUserPermissionsCache(userId: string): Promise<void> {
+    const userPermissionModel = new UserPermissionModel();
+    await userPermissionModel.invalidateCache(userId);
+  }
+
+  /**
    * Assign role to user
    */
   async assignRole(
@@ -131,6 +140,9 @@ export default class UserRoleModel extends BaseModel<
         })
         .where(eq(this.table.id, existing[0].id));
 
+      // Invalidate cache permissions của user
+      await this.invalidateUserPermissionsCache(userId);
+
       return {
         id: existing[0].id,
         userId: existing[0].userId,
@@ -155,6 +167,9 @@ export default class UserRoleModel extends BaseModel<
     if (!created) {
       throw new Error("Failed to assign role");
     }
+
+    // Invalidate cache permissions của user
+    await this.invalidateUserPermissionsCache(userId);
 
     return {
       id: created.id,
@@ -184,7 +199,58 @@ export default class UserRoleModel extends BaseModel<
       )
       .returning();
 
-    return result.length > 0;
+    const success = result.length > 0;
+
+    // Invalidate cache nếu thành công
+    if (success) {
+      await this.invalidateUserPermissionsCache(userId);
+    }
+
+    return success;
+  }
+
+  /**
+   * Lấy tất cả user IDs có role này (để invalidate cache khi role thay đổi)
+   */
+  async getUserIdsByRole(roleId: string): Promise<string[]> {
+    const results = await this.db
+      .select({
+        userId: this.table.userId,
+      })
+      .from(this.table)
+      .where(
+        and(
+          eq(this.table.roleId, roleId),
+          eq(this.table.isActive, true),
+        ),
+      );
+
+    // Remove duplicates
+    return Array.from(new Set(results.map((r) => r.userId)));
+  }
+
+  /**
+   * Lấy tất cả user IDs có một trong các roles
+   */
+  async getUserIdsByRoles(roleIds: string[]): Promise<string[]> {
+    if (roleIds.length === 0) {
+      return [];
+    }
+
+    const results = await this.db
+      .select({
+        userId: this.table.userId,
+      })
+      .from(this.table)
+      .where(
+        and(
+          inArray(this.table.roleId, roleIds),
+          eq(this.table.isActive, true),
+        ),
+      );
+
+    // Remove duplicates
+    return Array.from(new Set(results.map((r) => r.userId)));
   }
 
   /**

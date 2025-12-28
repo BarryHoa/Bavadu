@@ -4,9 +4,11 @@ import { NextRequest } from "next/server";
 
 import { SESSION_CONFIG } from "@base/server/config/session";
 import { setCsrfTokenCookie } from "../../middleware/csrf";
+import UserPermissionModel from "../../models/UserPermission/UserPermissionModel";
+import SessionModel from "../../models/Sessions/SessionModel";
+import { Debug } from "../../runtime/Debug";
 import { RuntimeContext } from "../../runtime/RuntimeContext";
 import { base_tb_users, base_tb_users_login } from "../../schemas/base.user";
-import { sessionStore } from "../../stores";
 import { JSONResponse } from "../../utils/JSONResponse";
 import {
   getClientIp,
@@ -144,12 +146,22 @@ export async function POST(request: NextRequest) {
       ? SESSION_CONFIG.expiration.rememberMe
       : SESSION_CONFIG.expiration.default;
 
-    const session = await sessionStore.createSession({
+    const sessionModel = new SessionModel();
+    const session = await sessionModel.createSession({
       userId: user.id,
       ipAddress,
       userAgent,
       expiresIn,
     });
+
+    // Preload và cache permissions khi login
+    try {
+      const userPermissionModel = new UserPermissionModel();
+      await userPermissionModel.getPermissionsByUser(user.id, true); // Force refresh và cache
+    } catch (error) {
+      // Log error nhưng không fail login nếu cache fail
+      Debug.forceError("Failed to cache user permissions on login:", error);
+    }
 
     // Update last login info
     const now = new Date();
@@ -203,7 +215,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error("Login error:", error);
+    Debug.forceError("Login error:", error);
 
     return JSONResponse({
       error: "Login failed",

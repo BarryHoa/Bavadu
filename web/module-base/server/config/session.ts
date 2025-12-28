@@ -62,9 +62,9 @@ export const SESSION_CONFIG = {
    */
   expiration: {
     /**
-     * Default session expiration (7 days)
+     * Default session expiration (3 days)
      */
-    default: 7 * 24 * 60 * 60 * 1000, // 7 days
+    default: 3 * 24 * 60 * 60 * 1000, // 3 days
     /**
      * Remember me session expiration (30 days)
      */
@@ -83,7 +83,7 @@ export const SESSION_CONFIG = {
      * Cookie max age in seconds
      */
     maxAge: {
-      default: 7 * 24 * 60 * 60, // 7 days in seconds
+      default: 3 * 24 * 60 * 60, // 3 days in seconds
       rememberMe: 30 * 24 * 60 * 60, // 30 days in seconds
     },
   },
