@@ -1,6 +1,7 @@
 "use client";
 
 import type { ButtonProps } from "@heroui/button";
+
 import { Button } from "@heroui/button";
 import clsx from "clsx";
 import React from "react";
@@ -35,8 +36,8 @@ export default function ButtonFastChoose({
   return (
     <div className={clsx("flex py-1", alignClass(align), wrapperClassName)}>
       <Button
-        size="sm"
         color="primary"
+        size="sm"
         variant="flat"
         {...buttonProps}
         onPress={onPress}
