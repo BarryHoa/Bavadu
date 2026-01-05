@@ -1,5 +1,6 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { type Key, type ReactNode, useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { type ReactNode, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   any,
@@ -12,7 +13,13 @@ import {
   trim,
 } from "valibot";
 
-import { IBaseButton, IBaseInput, IBaseSingleSelect, SelectItemOption, IBaseTextarea,  } from "@base/client";
+import {
+  IBaseButton,
+  IBaseInput,
+  IBaseSingleSelect,
+  IBaseTextarea,
+  SelectItemOption,
+} from "@base/client";
 import AddressPicker from "@base/client/components/AddressPicker/AddressPicker";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { Address } from "@base/client/interface/Address";
@@ -23,31 +30,44 @@ import {
 } from "../../../../common/constants";
 import { WarehouseDto, WarehousePayload } from "../../../services/StockService";
 
-const warehouseFormSchema = object({
-  code: pipe(string(), trim(), minLength(1, "Code is required")),
-  name: pipe(string(), trim(), minLength(1, "Name is required")),
-  typeCode: pipe(string(), trim(), minLength(1, "Type code is required")),
-  status: pipe(
-    string(),
-    trim(),
-    picklist(warehouseStatuses, "Invalid warehouse status")
-  ),
-  companyId: optional(pipe(string(), trim())),
-  managerId: optional(pipe(string(), trim())),
-  contactId: optional(pipe(string(), trim())),
-  address1: any(), // Address object, validated manually
-  address2: optional(any()), // Address object, optional
-  valuationMethod: pipe(
-    string(),
-    trim(),
-    picklist(warehouseValuationMethods, "Invalid valuation method")
-  ),
-  minStock: optional(pipe(string(), trim())),
-  maxStock: optional(pipe(string(), trim())),
-  accountInventory: optional(pipe(string(), trim())),
-  accountAdjustment: optional(pipe(string(), trim())),
-  notes: optional(pipe(string(), trim())),
-});
+const createWarehouseFormSchema = (t: any) =>
+  object({
+    code: pipe(
+      string(),
+      trim(),
+      minLength(1, t("fields.code.label") + " is required")
+    ),
+    name: pipe(
+      string(),
+      trim(),
+      minLength(1, t("fields.name.label") + " is required")
+    ),
+    typeCode: pipe(
+      string(),
+      trim(),
+      minLength(1, t("fields.type.label") + " is required")
+    ),
+    status: pipe(
+      string(),
+      trim(),
+      picklist(warehouseStatuses, "Invalid warehouse status")
+    ),
+    companyId: optional(pipe(string(), trim())),
+    managerId: optional(pipe(string(), trim())),
+    contactId: optional(pipe(string(), trim())),
+    address1: any(), // Address object, validated manually
+    address2: optional(any()), // Address object, optional
+    valuationMethod: pipe(
+      string(),
+      trim(),
+      picklist(warehouseValuationMethods, "Invalid valuation method")
+    ),
+    minStock: optional(pipe(string(), trim())),
+    maxStock: optional(pipe(string(), trim())),
+    accountInventory: optional(pipe(string(), trim())),
+    accountAdjustment: optional(pipe(string(), trim())),
+    notes: optional(pipe(string(), trim())),
+  });
 
 type WarehouseFormValues = {
   code: string;
@@ -99,17 +119,6 @@ const toNullableNumber = (value?: string) => {
   return numeric;
 };
 
-type SingleSelection = "all" | Set<Key>;
-
-const getSingleSelectionValue = (selection: SingleSelection) => {
-  if (selection === "all") {
-    return undefined;
-  }
-  const [first] = Array.from(selection);
-
-  return typeof first === "string" ? first : undefined;
-};
-
 interface WarehouseFormProps {
   initialData?: WarehouseDto;
   onSubmit: (payload: WarehousePayload) => Promise<void>;
@@ -126,40 +135,43 @@ export default function WarehouseForm({
   submitError,
 }: WarehouseFormProps) {
   const getLocalizedName = useLocalizedText();
-  // React Compiler will automatically optimize this computation
+  const t = useTranslations("stock.warehouse.form");
+
   const defaultValues: WarehouseFormValues = {
-      code: initialData?.code ?? "",
-      name: initialData?.name ?? "",
-      typeCode: initialData?.typeCode ?? "",
-      status: initialData?.status ?? "ACTIVE",
-      companyId: initialData?.companyId ?? "",
-      managerId: initialData?.managerId ?? "",
-      contactId: initialData?.contactId ?? "",
-      address1: initialData?.address?.[0] ?? {
-        street: "",
-        postalCode: "",
-        country: {
-          id: "VN",
-          name: { vi: "Việt Nam", en: "Vietnam" },
-          code: "VN",
-        },
-        administrativeUnits: [],
-        formattedAddress: "",
+    code: initialData?.code ?? "",
+    name: initialData?.name ?? "",
+    typeCode: initialData?.typeCode ?? "",
+    status: initialData?.status ?? "ACTIVE",
+    companyId: initialData?.companyId ?? "",
+    managerId: initialData?.managerId ?? "",
+    contactId: initialData?.contactId ?? "",
+    address1: initialData?.address?.[0] ?? {
+      street: "",
+      postalCode: "",
+      country: {
+        id: "VN",
+        name: { vi: "Việt Nam", en: "Vietnam" },
+        code: "VN",
       },
-      address2: initialData?.address?.[1],
-      valuationMethod: initialData?.valuationMethod ?? "FIFO",
-      minStock:
-        initialData?.minStock !== undefined
-          ? String(initialData.minStock ?? 0)
-          : "0",
-      maxStock:
-        initialData?.maxStock !== undefined && initialData?.maxStock !== null
-          ? String(initialData.maxStock)
-          : undefined,
-      accountInventory: initialData?.accountInventory ?? "",
-      accountAdjustment: initialData?.accountAdjustment ?? "",
-      notes: initialData?.notes ?? "",
-    };
+      administrativeUnits: [],
+      formattedAddress: "",
+    },
+    address2: initialData?.address?.[1],
+    valuationMethod: initialData?.valuationMethod ?? "FIFO",
+    minStock:
+      initialData?.minStock !== undefined
+        ? String(initialData.minStock ?? 0)
+        : "0",
+    maxStock:
+      initialData?.maxStock !== undefined && initialData?.maxStock !== null
+        ? String(initialData.maxStock)
+        : undefined,
+    accountInventory: initialData?.accountInventory ?? "",
+    accountAdjustment: initialData?.accountAdjustment ?? "",
+    notes: initialData?.notes ?? "",
+  };
+
+  const schema = useMemo(() => createWarehouseFormSchema(t), [t]);
 
   const {
     control,
@@ -167,7 +179,7 @@ export default function WarehouseForm({
     formState: { isSubmitting, errors },
     setError,
   } = useForm<WarehouseFormValues>({
-    resolver: valibotResolver(warehouseFormSchema),
+    resolver: valibotResolver(schema),
     defaultValues,
   });
 
@@ -176,7 +188,7 @@ export default function WarehouseForm({
     if (!values.address1 || !values.address1.formattedAddress) {
       setError("address1", {
         type: "manual",
-        message: "Address 1 is required",
+        message: t("errors.addressRequired"),
       });
 
       return;
@@ -187,10 +199,10 @@ export default function WarehouseForm({
     if (values.minStock !== undefined) {
       try {
         minStock = toNullableNumber(values.minStock) ?? 0;
-      } catch (error) {
+      } catch {
         setError("minStock", {
           type: "manual",
-          message: error instanceof Error ? error.message : "Invalid value",
+          message: t("errors.invalidNumber"),
         });
 
         return;
@@ -202,10 +214,10 @@ export default function WarehouseForm({
     if (values.maxStock !== undefined) {
       try {
         maxStock = toNullableNumber(values.maxStock);
-      } catch (error) {
+      } catch {
         setError("maxStock", {
           type: "manual",
-          message: error instanceof Error ? error.message : "Invalid value",
+          message: t("errors.invalidNumber"),
         });
 
         return;
@@ -215,7 +227,7 @@ export default function WarehouseForm({
     if (maxStock !== null && maxStock < minStock) {
       setError("maxStock", {
         type: "manual",
-        message: "Max stock must be greater than or equal to min stock",
+        message: t("errors.maxStockRange"),
       });
 
       return;
@@ -266,8 +278,8 @@ export default function WarehouseForm({
                 isRequired
                 errorMessage={fieldState.error?.message}
                 isInvalid={fieldState.invalid}
-                label="Code"
-                placeholder="Unique warehouse code"
+                label={t("fields.code.label")}
+                placeholder={t("fields.code.placeholder")}
                 value={field.value}
                 onValueChange={field.onChange}
               />
@@ -282,8 +294,8 @@ export default function WarehouseForm({
                 isRequired
                 errorMessage={fieldState.error?.message}
                 isInvalid={fieldState.invalid}
-                label="Name"
-                placeholder="Warehouse name"
+                label={t("fields.name.label")}
+                placeholder={t("fields.name.placeholder")}
                 value={field.value}
                 onValueChange={field.onChange}
               />
@@ -298,8 +310,8 @@ export default function WarehouseForm({
                 isRequired
                 errorMessage={fieldState.error?.message}
                 isInvalid={fieldState.invalid}
-                label="Type"
-                placeholder="e.g. RAW_MATERIAL, FINISHED_GOODS"
+                label={t("fields.type.label")}
+                placeholder={t("fields.type.placeholder")}
                 value={field.value}
                 onValueChange={field.onChange}
               />
@@ -314,7 +326,7 @@ export default function WarehouseForm({
                 errorMessage={fieldState.error?.message}
                 isInvalid={fieldState.invalid}
                 items={statusOptions}
-                label="Status"
+                label={t("fields.status.label")}
                 selectedKey={field.value}
                 onSelectionChange={(key) => {
                   field.onChange(key);
@@ -331,7 +343,7 @@ export default function WarehouseForm({
                 errorMessage={fieldState.error?.message}
                 isInvalid={fieldState.invalid}
                 items={valuationOptions}
-                label="Valuation method"
+                label={t("fields.valuationMethod.label")}
                 selectedKey={field.value}
                 onSelectionChange={(key) => {
                   field.onChange(key);
@@ -347,8 +359,8 @@ export default function WarehouseForm({
                 {...field}
                 errorMessage={fieldState.error?.message}
                 isInvalid={fieldState.invalid}
-                label="Company ID"
-                placeholder="Optional company relationship"
+                label={t("fields.companyId.label")}
+                placeholder={t("fields.companyId.placeholder")}
                 value={field.value ?? ""}
                 onValueChange={field.onChange}
               />
@@ -362,8 +374,8 @@ export default function WarehouseForm({
                 {...field}
                 errorMessage={fieldState.error?.message}
                 isInvalid={fieldState.invalid}
-                label="Manager (user ID)"
-                placeholder="Optional manager user ID"
+                label={t("fields.managerId.label")}
+                placeholder={t("fields.managerId.placeholder")}
                 value={field.value ?? ""}
                 onValueChange={field.onChange}
               />
@@ -377,8 +389,8 @@ export default function WarehouseForm({
                 {...field}
                 errorMessage={fieldState.error?.message}
                 isInvalid={fieldState.invalid}
-                label="Contact (user ID)"
-                placeholder="Optional contact user ID"
+                label={t("fields.contactId.label")}
+                placeholder={t("fields.contactId.placeholder")}
                 value={field.value ?? ""}
                 onValueChange={field.onChange}
               />
@@ -387,7 +399,9 @@ export default function WarehouseForm({
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold mb-4">Address</h2>
+          <h2 className="text-lg font-semibold mb-4">
+            {t("sections.address")}
+          </h2>
           <div className="space-y-4">
             <Controller
               control={control}
@@ -400,8 +414,8 @@ export default function WarehouseForm({
                       isRequired
                       errorMessage={fieldState.error?.message}
                       isInvalid={fieldState.invalid}
-                      label="Main"
-                      placeholder="Please select address"
+                      label={t("fields.addressMain.label")}
+                      placeholder={t("fields.addressMain.placeholder")}
                       value={getLocalizedName(field.value.formattedAddress)}
                     />
                   </div>
@@ -431,8 +445,8 @@ export default function WarehouseForm({
                       isDisabled
                       errorMessage={fieldState.error?.message}
                       isInvalid={fieldState.invalid}
-                      label="Secondary"
-                      placeholder="Please select address"
+                      label={t("fields.addressSecondary.label")}
+                      placeholder={t("fields.addressSecondary.placeholder")}
                       value={getLocalizedName(
                         field.value?.formattedAddress ?? ""
                       )}
@@ -458,7 +472,9 @@ export default function WarehouseForm({
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold">Inventory Controls</h2>
+          <h2 className="text-lg font-semibold">
+            {t("sections.inventoryControls")}
+          </h2>
           <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
             <Controller
               control={control}
@@ -471,7 +487,7 @@ export default function WarehouseForm({
                     fieldState.error?.message ?? errors.minStock?.message
                   }
                   isInvalid={fieldState.invalid}
-                  label="Minimum stock"
+                  label={t("fields.minStock.label")}
                   type="number"
                   value={field.value ?? ""}
                   onValueChange={(value) =>
@@ -488,7 +504,7 @@ export default function WarehouseForm({
                   {...field}
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
-                  label="Maximum stock"
+                  label={t("fields.maxStock.label")}
                   type="number"
                   value={field.value ?? ""}
                   onValueChange={(value) =>
@@ -505,8 +521,8 @@ export default function WarehouseForm({
                   {...field}
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
-                  label="Inventory account"
-                  placeholder="Optional account code"
+                  label={t("fields.accountInventory.label")}
+                  placeholder={t("fields.accountInventory.placeholder")}
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
                 />
@@ -520,8 +536,8 @@ export default function WarehouseForm({
                   {...field}
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
-                  label="Adjustment account"
-                  placeholder="Optional adjustment account"
+                  label={t("fields.accountAdjustment.label")}
+                  placeholder={t("fields.accountAdjustment.placeholder")}
                   value={field.value ?? ""}
                   onValueChange={field.onChange}
                 />
@@ -538,8 +554,8 @@ export default function WarehouseForm({
               {...field}
               errorMessage={fieldState.error?.message}
               isInvalid={fieldState.invalid}
-              label="Notes"
-              placeholder="Internal notes (optional)"
+              label={t("fields.notes.label")}
+              placeholder={t("fields.notes.placeholder")}
               value={field.value ?? ""}
               onValueChange={field.onChange}
             />

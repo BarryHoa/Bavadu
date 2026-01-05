@@ -4,6 +4,7 @@ import type { WarehouseDto } from "../../../services/StockService";
 import type { MovementResult, MovementPayload } from "../types";
 
 import { IBaseCard, IBaseCardBody } from "@base/client";
+import { useTranslations } from "next-intl";
 
 import MovementCard from "./MovementCard";
 
@@ -32,12 +33,14 @@ export default function QuickActionsSection({
   onIssue,
   onTransfer,
 }: QuickActionsSectionProps) {
+  const t = useTranslations("stock.dashboard.quickActions");
+
   return (
     <IBaseCard>
       <IBaseCardBody className="space-y-4">
-        <h2 className="text-lg font-semibold">Quick Actions</h2>
+        <h2 className="text-lg font-semibold">{t("title")}</h2>
         <p className="text-default-500">
-          Use these forms to adjust inventory levels quickly.
+          {t("description")}
         </p>
 
         {movementResult ? (
@@ -54,38 +57,38 @@ export default function QuickActionsSection({
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <MovementCard
-            actionLabel="Adjust"
-            description="Modify the on-hand quantity for a single warehouse."
+            actionLabel={t("cards.adjust.action")}
+            description={t("cards.adjust.description")}
             submitting={adjustMutationPending}
-            title="Adjust Stock"
+            title={t("cards.adjust.title")}
             warehouses={warehouses}
             onSubmit={onAdjust}
           />
 
           <MovementCard
-            actionLabel="Receive"
-            description="Register incoming inventory for purchase receipts."
+            actionLabel={t("cards.receive.action")}
+            description={t("cards.receive.description")}
             submitting={receiveMutationPending}
-            title="Receive Stock"
+            title={t("cards.receive.title")}
             warehouses={warehouses}
             onSubmit={onReceive}
           />
 
           <MovementCard
-            actionLabel="Issue"
-            description="Deduct inventory for sales or consumption."
+            actionLabel={t("cards.issue.action")}
+            description={t("cards.issue.description")}
             submitting={issueMutationPending}
-            title="Issue Stock"
+            title={t("cards.issue.title")}
             warehouses={warehouses}
             onSubmit={onIssue}
           />
 
           <MovementCard
             requireSecondaryWarehouse
-            actionLabel="Transfer"
-            description="Move inventory between two warehouses."
+            actionLabel={t("cards.transfer.action")}
+            description={t("cards.transfer.description")}
             submitting={transferMutationPending}
-            title="Transfer Stock"
+            title={t("cards.transfer.title")}
             warehouses={warehouses}
             onSubmit={onTransfer}
           />

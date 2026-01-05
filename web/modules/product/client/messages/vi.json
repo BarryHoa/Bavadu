@@ -66,6 +66,45 @@
         "confirmDeleteUomMessage": "Bạn có chắc chắn muốn xóa UOM này không?",
         "deleteUomMessage": "Bạn có chắc chắn muốn xóa UOM này không?"
       }
+    },
+    "product-view": {
+      "masterInformation": "Thông tin master",
+      "variant": "Biến thể",
+      "packings": "Đóng gói",
+      "attributes": "Thuộc tính",
+      "features": "Tính năng",
+      "none": "Không có",
+      "fields": {
+        "code": "Mã",
+        "name": "Tên",
+        "type": "Loại",
+        "brand": "Thương hiệu",
+        "category": "Danh mục",
+        "description": "Mô tả",
+        "manufacturer": "Nhà sản xuất",
+        "baseUom": "UOM cơ bản",
+        "sku": "SKU",
+        "barcode": "Mã vạch"
+      }
+    },
+    "product-category": {
+      "create": "Tạo danh mục",
+      "edit": "Sửa danh mục",
+      "fields": {
+        "name": {
+          "label": "Tên",
+          "placeholder": "Ví dụ: Điện tử"
+        },
+        "code": {
+          "label": "Mã"
+        },
+        "description": {
+          "label": "Mô tả",
+          "placeholder": "Nhập mô tả ngắn"
+        },
+        "parent": "Danh mục cha",
+        "computedLevel": "Cấp độ tính toán"
+      }
     }
   }
 }

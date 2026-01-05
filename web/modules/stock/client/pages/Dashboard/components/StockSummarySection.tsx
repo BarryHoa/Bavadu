@@ -18,6 +18,7 @@ import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { IBaseButton } from "@base/client";
 import { IBaseCard, IBaseCardBody, IBaseDivider } from "@base/client";
 import React from "react";
+import { useTranslations } from "next-intl";
 
 interface StockSummarySectionProps {
   filters: StockFilters;
@@ -36,6 +37,7 @@ export default function StockSummarySection({
   warehouses,
   warehousesLoading,
 }: StockSummarySectionProps) {
+  const t = useTranslations("stock.dashboard.stockSummary");
   // React Compiler will automatically optimize these computations
   const warehouseItems: SelectItemOption[] = warehouses.map((warehouse) => ({
     value: warehouse.id,
@@ -45,7 +47,7 @@ export default function StockSummarySection({
   const columns: IBaseTableColumnDefinition<StockSummaryItem>[] = [
       {
         key: "productCode",
-        label: "Product Code",
+        label: t("columns.productCode"),
         render: (_, row) => (
           <LinkAs href={`/workspace/modules/product/view/${row.productId}`}>
             {row.productCode}
@@ -54,7 +56,7 @@ export default function StockSummarySection({
       },
       {
         key: "productName",
-        label: "Product Name",
+        label: t("columns.productName"),
         render: (_, row) => (
           <LinkAs href={`/workspace/modules/product/view/${row.productId}`}>
             {row.productName}
@@ -63,7 +65,7 @@ export default function StockSummarySection({
       },
       {
         key: "warehouse",
-        label: "Warehouse",
+        label: t("columns.warehouse"),
         render: (_, row) => (
           <LinkAs
             href={`/workspace/modules/stock/warehouses/edit/${row.warehouseId}`}
@@ -74,7 +76,7 @@ export default function StockSummarySection({
       },
       {
         key: "quantity",
-        label: "On Hand",
+        label: t("columns.onHand"),
         render: (_, row) => {
           let colorClass = "";
 
@@ -94,7 +96,7 @@ export default function StockSummarySection({
       },
       {
         key: "reservedQuantity",
-        label: "Reserved",
+        label: t("columns.reserved"),
         render: (_, row) => <IBaseDigitViewer value={row.reservedQuantity} />,
       },
     ];
@@ -104,8 +106,8 @@ export default function StockSummarySection({
       <IBaseCardBody className="space-y-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-end">
           <IBaseInput
-            label="Product ID"
-            placeholder="Optional product ID filter"
+            label={t("filters.productId.label")}
+            placeholder={t("filters.productId.placeholder")}
             value={filters.productId ?? ""}
             onValueChange={(value) =>
               onFilterChange({
@@ -118,7 +120,7 @@ export default function StockSummarySection({
             className="max-w-xs"
             isDisabled={warehousesLoading || warehouseItems.length === 0}
             items={warehouseItems}
-            label="Warehouse"
+            label={t("filters.warehouse.label")}
             selectedKey={filters.warehouseId}
             onSelectionChange={(key) => {
               onFilterChange({
@@ -133,10 +135,10 @@ export default function StockSummarySection({
               size="sm"
               onPress={() => onFilterChange(filters)}
             >
-              Apply
+              {t("filters.apply")}
             </IBaseButton>
             <IBaseButton size="sm" variant="light" onPress={onResetFilters}>
-              Reset
+              {t("filters.reset")}
             </IBaseButton>
           </div>
         </div>

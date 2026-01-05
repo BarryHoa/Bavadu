@@ -21,6 +21,29 @@
           "closed": "Closed",
           "received": "Received"
         }
+      },
+      "form": {
+        "sections": {
+          "orderLines": "Order lines",
+          "receiveProducts": "Receive products",
+          "lines": "Lines"
+        },
+        "fields": {
+          "vendorName": "Vendor name",
+          "expectedDate": "Expected date",
+          "currency": "Currency",
+          "notes": "Notes",
+          "productId": "Product ID",
+          "quantity": "Quantity",
+          "unitPrice": "Unit price",
+          "description": "Description",
+          "warehouse": "Warehouse",
+          "reference": "Reference",
+          "quantityToReceive": "Quantity to receive"
+        },
+        "placeholders": {
+          "reference": "Optional reference"
+        }
       }
     }
   }

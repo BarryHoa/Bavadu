@@ -1,6 +1,10 @@
 {
   "hrm": {
     "title": "Quản lý Nhân sự",
+    "common": {
+      "notFound": "Không tìm thấy {entity}",
+      "backToList": "Quay lại danh sách"
+    },
     "employee": {
       "title": "Nhân viên",
       "list": {

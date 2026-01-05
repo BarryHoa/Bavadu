@@ -103,6 +103,95 @@
           }
         }
       }
+    },
+    "priceList": {
+      "title": "Price List",
+      "form": {
+        "tabs": {
+          "main": "Main",
+          "rules": "Rules and Conditions",
+          "pricing": "Explicit Pricing"
+        },
+        "sections": {
+          "basic": "Basic Information",
+          "validity": "Validity Period",
+          "applicableTo": "Applicable To",
+          "conditions": "Conditions",
+          "pricingRules": "Pricing Rules",
+          "priceItem": "Price Item"
+        },
+        "fields": {
+          "name": {
+            "label": "Name"
+          },
+          "code": {
+            "label": "Code"
+          },
+          "type": {
+            "label": "Type"
+          },
+          "description": {
+            "label": "Description"
+          },
+          "status": {
+            "label": "Status"
+          },
+          "priority": {
+            "label": "Priority"
+          },
+          "validFrom": {
+            "label": "Valid From"
+          },
+          "validTo": {
+            "label": "Valid To"
+          },
+          "channels": {
+            "label": "Channels"
+          },
+          "stores": {
+            "label": "Stores"
+          },
+          "locations": {
+            "label": "Locations"
+          },
+          "regions": {
+            "label": "Regions"
+          },
+          "customerGroups": {
+            "label": "Customer Groups"
+          },
+          "isDefault": {
+            "label": "Is Default"
+          },
+          "ruleName": {
+            "label": "Rule Name"
+          },
+          "method": {
+            "label": "Method"
+          },
+          "value": {
+            "label": "Value",
+            "placeholder": "Enter value or formula"
+          },
+          "categories": {
+            "label": "Categories"
+          },
+          "brands": {
+            "label": "Brands"
+          },
+          "uom": {
+            "label": "UOM"
+          },
+          "minQuantity": {
+            "label": "Minimum Quantity"
+          }
+        },
+        "actions": {
+          "edit": "Edit Price List",
+          "view": "View Price List",
+          "notFound": "Price list not found"
+        }
+      }
     }
   }
 }

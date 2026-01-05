@@ -1,0 +1,14 @@
+{
+  "b2bSales": {
+    "customers": {
+      "company": {
+        "view": "Xem thông tin công ty khách hàng",
+        "edit": "Chỉnh sửa công ty khách hàng",
+        "create": "Tạo mới công ty khách hàng"
+      }
+    },
+    "deliveries": {
+      "create": "Tạo phiếu giao hàng"
+    }
+  }
+}

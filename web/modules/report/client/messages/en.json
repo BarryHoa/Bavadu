@@ -1,0 +1,19 @@
+{
+  "report": {
+    "center": {
+      "title": "Report Center",
+      "description": "Overview of main reports by Sales, Purchasing, Inventory, Product.",
+      "tabs": {
+        "overview": {
+          "title": "Overview",
+          "salesOverTime": "Sales over time (sample)"
+        },
+        "inventory": {
+          "title": "Inventory",
+          "placeholder": "You can add inventory charts, stock turnover, etc. here."
+        }
+      },
+      "ariaLabel": "Report groups"
+    }
+  }
+}

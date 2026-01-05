@@ -103,7 +103,95 @@
           }
         }
       }
+    },
+    "priceList": {
+      "title": "Bảng giá",
+      "form": {
+        "tabs": {
+          "main": "Chính",
+          "rules": "Quy tắc và Điều kiện",
+          "pricing": "Giá cụ thể"
+        },
+        "sections": {
+          "basic": "Thông tin cơ bản",
+          "validity": "Thời hạn hiệu lực",
+          "applicableTo": "Áp dụng cho",
+          "conditions": "Điều kiện",
+          "pricingRules": "Quy tắc định giá",
+          "priceItem": "Mục giá"
+        },
+        "fields": {
+          "name": {
+            "label": "Tên"
+          },
+          "code": {
+            "label": "Mã"
+          },
+          "type": {
+            "label": "Loại"
+          },
+          "description": {
+            "label": "Mô tả"
+          },
+          "status": {
+            "label": "Trạng thái"
+          },
+          "priority": {
+            "label": "Ưu tiên"
+          },
+          "validFrom": {
+            "label": "Có hiệu lực từ"
+          },
+          "validTo": {
+            "label": "Có hiệu lực đến"
+          },
+          "channels": {
+            "label": "Kênh"
+          },
+          "stores": {
+            "label": "Cửa hàng"
+          },
+          "locations": {
+            "label": "Vị trí"
+          },
+          "regions": {
+            "label": "Khu vực"
+          },
+          "customerGroups": {
+            "label": "Nhóm khách hàng"
+          },
+          "isDefault": {
+            "label": "Mặc định"
+          },
+          "ruleName": {
+            "label": "Tên quy tắc"
+          },
+          "method": {
+            "label": "Phương thức"
+          },
+          "value": {
+            "label": "Giá trị",
+            "placeholder": "Nhập giá trị hoặc công thức"
+          },
+          "categories": {
+            "label": "Danh mục"
+          },
+          "brands": {
+            "label": "Thương hiệu"
+          },
+          "uom": {
+            "label": "UOM"
+          },
+          "minQuantity": {
+            "label": "Số lượng tối thiểu"
+          }
+        },
+        "actions": {
+          "edit": "Sửa bảng giá",
+          "view": "Xem bảng giá",
+          "notFound": "Không tìm thấy bảng giá"
+        }
+      }
     }
   }
 }
-

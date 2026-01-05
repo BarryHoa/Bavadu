@@ -3,6 +3,7 @@
 import { IBaseTabs, IBaseTab } from "@base/client/components";
 import { IBaseCard } from "@base/client";
 import ReactECharts from "echarts-for-react";
+import { useTranslations } from "next-intl";
 
 const overviewOption: echarts.EChartsOption = {
   tooltip: { trigger: "axis" },
@@ -31,24 +32,26 @@ const overviewOption: echarts.EChartsOption = {
 };
 
 export default function ReportCenterPage() {
+  const t = useTranslations("report.center");
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-2">
         <div>
           <h1 className="text-xl font-semibold text-slate-900">
-            Report Center
+            {t("title")}
           </h1>
           <p className="text-sm text-slate-500">
-            Tổng quan báo cáo chính theo Sales, Purchasing, Inventory, Product.
+            {t("description")}
           </p>
         </div>
       </div>
 
-      <IBaseTabs aria-label="Report groups" color="primary">
-        <IBaseTab key="overview" title="Overview">
+      <IBaseTabs aria-label={t("ariaLabel")} color="primary">
+        <IBaseTab key="overview" title={t("tabs.overview.title")}>
           <IBaseCard className="p-4">
             <div className="mb-3 text-sm font-medium text-slate-700">
-              Sales over time (sample)
+              {t("tabs.overview.salesOverTime")}
             </div>
             <ReactECharts
               lazyUpdate
@@ -59,10 +62,10 @@ export default function ReportCenterPage() {
           </IBaseCard>
         </IBaseTab>
 
-        <IBaseTab key="inventory" title="Inventory">
+        <IBaseTab key="inventory" title={t("tabs.inventory.title")}>
           <IBaseCard className="p-4">
             <div className="text-sm text-slate-500">
-              Bạn có thể thêm biểu đồ tồn kho, vòng quay kho, v.v. ở đây.
+              {t("tabs.inventory.placeholder")}
             </div>
           </IBaseCard>
         </IBaseTab>

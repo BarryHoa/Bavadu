@@ -21,6 +21,29 @@
           "closed": "Đã đóng",
           "received": "Đã nhận"
         }
+      },
+      "form": {
+        "sections": {
+          "orderLines": "Dòng đơn hàng",
+          "receiveProducts": "Nhận sản phẩm",
+          "lines": "Chi tiết"
+        },
+        "fields": {
+          "vendorName": "Tên nhà cung cấp",
+          "expectedDate": "Ngày dự kiến",
+          "currency": "Tiền tệ",
+          "notes": "Ghi chú",
+          "productId": "ID Sản phẩm",
+          "quantity": "Số lượng",
+          "unitPrice": "Đơn giá",
+          "description": "Mô tả",
+          "warehouse": "Kho hàng",
+          "reference": "Tham chiếu",
+          "quantityToReceive": "Số lượng nhận"
+        },
+        "placeholders": {
+          "reference": "Tham chiếu (tùy chọn)"
+        }
       }
     }
   }

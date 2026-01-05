@@ -21,9 +21,150 @@
           "SUSPENDED": "Tạm dừng",
           "CLOSED": "Đã đóng"
         }
+      },
+      "form": {
+        "sections": {
+          "address": "Địa chỉ",
+          "inventoryControls": "Kiểm soát tồn kho",
+          "basicInfo": "Thông tin cơ bản"
+        },
+        "fields": {
+          "code": {
+            "label": "Mã kho",
+            "placeholder": "Mã kho duy nhất"
+          },
+          "name": {
+            "label": "Tên kho",
+            "placeholder": "Tên kho hàng"
+          },
+          "type": {
+            "label": "Loại",
+            "placeholder": "Ví dụ: NGUYÊN VẬT LIỆU, THÀNH PHẨM"
+          },
+          "status": {
+            "label": "Trạng thái"
+          },
+          "valuationMethod": {
+            "label": "Phương pháp định giá"
+          },
+          "companyId": {
+            "label": "ID Công ty",
+            "placeholder": "Liên kết công ty (tùy chọn)"
+          },
+          "managerId": {
+            "label": "Quản lý (ID người dùng)",
+            "placeholder": "ID người dùng quản lý (tùy chọn)"
+          },
+          "contactId": {
+            "label": "Liên hệ (ID người dùng)",
+            "placeholder": "ID người dùng liên hệ (tùy chọn)"
+          },
+          "addressMain": {
+            "label": "Địa chỉ chính",
+            "placeholder": "Vui lòng chọn địa chỉ"
+          },
+          "addressSecondary": {
+            "label": "Địa chỉ phụ",
+            "placeholder": "Vui lòng chọn địa chỉ"
+          },
+          "minStock": {
+            "label": "Tồn kho tối thiểu"
+          },
+          "maxStock": {
+            "label": "Tồn kho tối đa"
+          },
+          "accountInventory": {
+            "label": "Tài khoản kho",
+            "placeholder": "Mã tài khoản (tùy chọn)"
+          },
+          "accountAdjustment": {
+            "label": "Tài khoản điều chỉnh",
+            "placeholder": "Mã tài khoản điều chỉnh (tùy chọn)"
+          },
+          "notes": {
+            "label": "Ghi chú",
+            "placeholder": "Ghi chú nội bộ (tùy chọn)"
+          }
+        },
+        "errors": {
+          "addressRequired": "Địa chỉ 1 là bắt buộc",
+          "maxStockRange": "Tồn kho tối đa phải lớn hơn hoặc bằng tồn kho tối thiểu",
+          "invalidNumber": "Số không hợp lệ"
+        }
+      }
+    },
+    "dashboard": {
+      "quickActions": {
+        "title": "Thao tác nhanh",
+        "description": "Sử dụng các biểu mẫu này để điều chỉnh mức tồn kho một cách nhanh chóng.",
+        "cards": {
+          "adjust": {
+            "title": "Điều chỉnh kho",
+            "description": "Sửa đổi số lượng hiện có cho một kho duy nhất.",
+            "action": "Điều chỉnh"
+          },
+          "receive": {
+            "title": "Nhập kho",
+            "description": "Đăng ký tồn kho nhập vào từ các phiếu mua hàng.",
+            "action": "Nhập"
+          },
+          "issue": {
+            "title": "Xuất kho",
+            "description": "Trừ tồn kho để bán hàng hoặc tiêu dùng.",
+            "action": "Xuất"
+          },
+          "transfer": {
+            "title": "Điều chuyển kho",
+            "description": "Di chuyển tồn kho giữa hai kho hàng.",
+            "action": "Điều chuyển"
+          }
+        }
+      },
+      "movementCard": {
+        "fields": {
+          "productId": {
+            "label": "ID Sản phẩm",
+            "placeholder": "Định danh sản phẩm"
+          },
+          "quantity": {
+            "label": "Số lượng"
+          },
+          "warehouse": {
+            "label": "Kho hàng"
+          },
+          "targetWarehouse": {
+            "label": "Kho đích"
+          },
+          "reference": {
+            "label": "Tham chiếu",
+            "placeholder": "Tham chiếu (tùy chọn)"
+          },
+          "note": {
+            "label": "Ghi chú",
+            "placeholder": "Ghi chú (tùy chọn)"
+          }
+        }
+      },
+      "stockSummary": {
+        "filters": {
+          "productId": {
+            "label": "ID Sản phẩm",
+            "placeholder": "Lọc theo ID sản phẩm (tùy chọn)"
+          },
+          "warehouse": {
+            "label": "Kho hàng"
+          },
+          "apply": "Áp dụng",
+          "reset": "Đặt lại"
+        },
+        "columns": {
+          "productCode": "Mã sản phẩm",
+          "productName": "Tên sản phẩm",
+          "warehouse": "Kho hàng",
+          "onHand": "Hiện có",
+          "reserved": "Đã đặt chỗ"
+        }
       }
     }
   }
 }
-
-

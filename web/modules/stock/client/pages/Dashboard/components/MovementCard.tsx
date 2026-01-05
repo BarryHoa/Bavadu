@@ -11,6 +11,7 @@ import {
 import { IBaseButton } from "@base/client";
 import { IBaseCard, IBaseCardBody } from "@base/client";
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface MovementCardProps {
   title: string;
@@ -31,6 +32,7 @@ export default function MovementCard({
   submitting = false,
   onSubmit,
 }: MovementCardProps) {
+  const t = useTranslations("stock.dashboard.movementCard");
   const [formValues, setFormValues] = useState<MovementPayload>({
     productId: "",
     quantity: "",
@@ -86,20 +88,20 @@ export default function MovementCard({
           <p className="text-sm text-default-500">{description}</p>
         </div>
         <IBaseInput
-          label="Product ID"
-          placeholder="Product identifier"
+          label={t("fields.productId.label")}
+          placeholder={t("fields.productId.placeholder")}
           value={formValues.productId}
           onValueChange={(value) => handleChange("productId", value)}
         />
         <IBaseInput
-          label="Quantity"
+          label={t("fields.quantity.label")}
           type="number"
           value={formValues.quantity}
           onValueChange={(value) => handleChange("quantity", value)}
         />
         <IBaseSingleSelect
           items={warehouseItems}
-          label="Warehouse"
+          label={t("fields.warehouse.label")}
           selectedKey={formValues.primaryWarehouseId}
           onSelectionChange={(key) => {
             handleChange("primaryWarehouseId", key || "");
@@ -108,7 +110,7 @@ export default function MovementCard({
         {requireSecondaryWarehouse ? (
           <IBaseSingleSelect
             items={warehouseItems}
-            label="Target Warehouse"
+            label={t("fields.targetWarehouse.label")}
             selectedKey={formValues.secondaryWarehouseId}
             onSelectionChange={(key) => {
               handleChange("secondaryWarehouseId", key || "");
@@ -116,14 +118,14 @@ export default function MovementCard({
           />
         ) : null}
         <IBaseInput
-          label="Reference"
-          placeholder="Optional reference"
+          label={t("fields.reference.label")}
+          placeholder={t("fields.reference.placeholder")}
           value={formValues.reference}
           onValueChange={(value) => handleChange("reference", value)}
         />
         <IBaseInput
-          label="Note"
-          placeholder="Optional note"
+          label={t("fields.note.label")}
+          placeholder={t("fields.note.placeholder")}
           value={formValues.note}
           onValueChange={(value) => handleChange("note", value)}
         />

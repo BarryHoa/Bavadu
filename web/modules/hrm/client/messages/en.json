@@ -1,6 +1,10 @@
 {
   "hrm": {
     "title": "Human Resource Management",
+    "common": {
+      "notFound": "{entity} not found",
+      "backToList": "Back to List"
+    },
     "employee": {
       "title": "Employees",
       "list": {

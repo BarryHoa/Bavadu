@@ -2,11 +2,12 @@
 
 import type { MovementResult, StockFilters } from "./types";
 
-import LinkAs from "@base/client/components/LinkAs";
-import { IBaseButton } from "@base/client";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
+
+import { IBaseButton } from "@base/client";
+import LinkAs from "@base/client/components/LinkAs";
 
 import QuickActionsSection from "./components/QuickActionsSection";
 import StockSummarySection from "./components/StockSummarySection";
@@ -17,7 +18,7 @@ export default function StockDashboardPage(): React.ReactNode {
   const [filters, setFilters] = useState<StockFilters>({});
   const [appliedFilters, setAppliedFilters] = useState<StockFilters>({});
   const [movementResult, setMovementResult] = useState<MovementResult | null>(
-    null,
+    null
   );
 
   const {
@@ -73,7 +74,7 @@ export default function StockDashboardPage(): React.ReactNode {
         setMovementResult(result);
       }
     },
-    [handleMovement],
+    [handleMovement]
   );
 
   const handleReceive = useCallback(
@@ -98,7 +99,7 @@ export default function StockDashboardPage(): React.ReactNode {
         setMovementResult(result);
       }
     },
-    [handleMovement],
+    [handleMovement]
   );
 
   const handleIssue = useCallback(
@@ -123,7 +124,7 @@ export default function StockDashboardPage(): React.ReactNode {
         setMovementResult(result);
       }
     },
-    [handleMovement],
+    [handleMovement]
   );
 
   const handleTransfer = useCallback(
@@ -149,7 +150,7 @@ export default function StockDashboardPage(): React.ReactNode {
         setMovementResult(result);
       }
     },
-    [handleMovement],
+    [handleMovement]
   );
 
   return (

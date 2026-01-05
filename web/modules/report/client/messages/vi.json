@@ -1,0 +1,19 @@
+{
+  "report": {
+    "center": {
+      "title": "Trung tâm báo cáo",
+      "description": "Tổng quan báo cáo chính theo Sales, Purchasing, Inventory, Product.",
+      "tabs": {
+        "overview": {
+          "title": "Tổng quan",
+          "salesOverTime": "Doanh số theo thời gian (mẫu)"
+        },
+        "inventory": {
+          "title": "Kho hàng",
+          "placeholder": "Bạn có thể thêm biểu đồ tồn kho, vòng quay kho, v.v. ở đây."
+        }
+      },
+      "ariaLabel": "Nhóm báo cáo"
+    }
+  }
+}

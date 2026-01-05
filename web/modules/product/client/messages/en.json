@@ -67,6 +67,45 @@
         "confirmDeleteUomMessage": "Are you sure you want to delete this UOM?",
         "deleteUomMessage": "Are you sure you want to delete this UOM?"
       }
+    },
+    "product-view": {
+      "masterInformation": "Master information",
+      "variant": "Variant",
+      "packings": "Packings",
+      "attributes": "Attributes",
+      "features": "Features",
+      "none": "None",
+      "fields": {
+        "code": "Code",
+        "name": "Name",
+        "type": "Type",
+        "brand": "Brand",
+        "category": "Category",
+        "description": "Description",
+        "manufacturer": "Manufacturer",
+        "baseUom": "Base UOM",
+        "sku": "SKU",
+        "barcode": "Barcode"
+      }
+    },
+    "product-category": {
+      "create": "Create Category",
+      "edit": "Edit Category",
+      "fields": {
+        "name": {
+          "label": "Name",
+          "placeholder": "Electronics"
+        },
+        "code": {
+          "label": "Code"
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Write a short description"
+        },
+        "parent": "Parent",
+        "computedLevel": "Computed level"
+      }
     }
   }
 }

@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
+import { useTranslations } from "next-intl";
 import LinkAs from "@base/client/components/LinkAs";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
@@ -24,6 +25,7 @@ export default function ProductsViewPage(): React.ReactNode {
   const params = useParams();
   const router = useRouter();
   const localized = useLocalizedText();
+  const t = useTranslations("mdl-product.product-view");
 
   // React Compiler will automatically optimize these computations
   const rawId = (params?.id ?? undefined) as string | string[] | undefined;
@@ -127,6 +129,7 @@ export default function ProductsViewPage(): React.ReactNode {
 
 const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
   const localized = useLocalizedText();
+  const t = useTranslations("mdl-product.product-view");
 
   const features = Object.entries(detail.master.features ?? {}).filter(
     ([, value]) => Boolean(value),
@@ -135,22 +138,22 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
   return (
     <div className="space-y-6">
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Master information</h2>
+        <h2 className="text-lg font-semibold">{t("masterInformation")}</h2>
         <div className="grid gap-3 md:grid-cols-2">
-          <InfoRow label="Code" value={detail.master.code} />
+          <InfoRow label={t("fields.code")} value={detail.master.code} />
           <InfoRow
-            label="Name"
+            label={t("fields.name")}
             value={
               localized(detail.master.name as LocalizeText) ??
               detail.master.code
             }
           />
           <InfoRow
-            label="Type"
+            label={t("fields.type")}
             value={detail.master.type?.replace(/_/g, " ") ?? "-"}
           />
           <InfoRow
-            label="Brand"
+            label={t("fields.brand")}
             value={
               typeof detail.master.brand === "string"
                 ? detail.master.brand
@@ -158,7 +161,7 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
             }
           />
           <InfoRow
-            label="Category"
+            label={t("fields.category")}
             value={
               detail.master.category
                 ? (localized(detail.master.category.name as LocalizeText) ??
@@ -168,12 +171,12 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
             }
           />
         </div>
-        <InfoRow label="Description" value={detail.master.description || "-"} />
+        <InfoRow label={t("fields.description")} value={detail.master.description || "-"} />
         <div className="flex flex-wrap gap-2">
-          <span className="text-xs uppercase text-default-400">Features</span>
+          <span className="text-xs uppercase text-default-400">{t("features")}</span>
           <div className="flex flex-wrap gap-2">
             {features.length === 0 ? (
-              <span className="text-small text-default-500">None</span>
+              <span className="text-small text-default-500">{t("none")}</span>
             ) : (
               features.map(([key]) => (
                 <IBaseChip key={key} size="sm" variant="flat">
@@ -188,19 +191,19 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
       <IBaseDivider />
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Variant</h2>
+        <h2 className="text-lg font-semibold">{t("variant")}</h2>
         <div className="grid gap-3 md:grid-cols-2">
           <InfoRow
-            label="Name"
+            label={t("fields.name")}
             value={
               localized(detail.variant.name as LocalizeText) ??
               detail.master.code
             }
           />
-          <InfoRow label="SKU" value={detail.variant.sku ?? "-"} />
-          <InfoRow label="Barcode" value={detail.variant.barcode ?? "-"} />
+          <InfoRow label={t("fields.sku")} value={detail.variant.sku ?? "-"} />
+          <InfoRow label={t("fields.barcode")} value={detail.variant.barcode ?? "-"} />
           <InfoRow
-            label="Manufacturer"
+            label={t("fields.manufacturer")}
             value={
               detail.variant.manufacturer
                 ? ((typeof detail.variant.manufacturer.name === "string"
@@ -210,7 +213,7 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
             }
           />
           <InfoRow
-            label="Base UOM"
+            label={t("fields.baseUom")}
             value={
               detail.variant.baseUom
                 ? (localized(detail.variant.baseUom.name as LocalizeText) ??
@@ -220,7 +223,7 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
           />
         </div>
         <InfoRow
-          label="Description"
+          label={t("fields.description")}
           value={detail.variant.description || "-"}
         />
       </section>
@@ -228,7 +231,7 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
       <IBaseDivider />
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Packings</h2>
+        <h2 className="text-lg font-semibold">{t("packings")}</h2>
         {detail.packings.length === 0 ? (
           <p className="text-small text-default-500">No packings defined.</p>
         ) : (
@@ -258,7 +261,7 @@ const ProductDetailContent = ({ detail }: { detail: ProductDetail }) => {
       <IBaseDivider />
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Attributes</h2>
+        <h2 className="text-lg font-semibold">{t("attributes")}</h2>
         {detail.attributes.length === 0 ? (
           <p className="text-small text-default-500">No attributes defined.</p>
         ) : (

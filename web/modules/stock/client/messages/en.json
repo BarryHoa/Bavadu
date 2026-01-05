@@ -21,9 +21,150 @@
           "SUSPENDED": "Suspended",
           "CLOSED": "Closed"
         }
+      },
+      "form": {
+        "sections": {
+          "address": "Address",
+          "inventoryControls": "Inventory Controls",
+          "basicInfo": "Basic Information"
+        },
+        "fields": {
+          "code": {
+            "label": "Code",
+            "placeholder": "Unique warehouse code"
+          },
+          "name": {
+            "label": "Name",
+            "placeholder": "Warehouse name"
+          },
+          "type": {
+            "label": "Type",
+            "placeholder": "e.g. RAW_MATERIAL, FINISHED_GOODS"
+          },
+          "status": {
+            "label": "Status"
+          },
+          "valuationMethod": {
+            "label": "Valuation method"
+          },
+          "companyId": {
+            "label": "Company ID",
+            "placeholder": "Optional company relationship"
+          },
+          "managerId": {
+            "label": "Manager (user ID)",
+            "placeholder": "Optional manager user ID"
+          },
+          "contactId": {
+            "label": "Contact (user ID)",
+            "placeholder": "Optional contact user ID"
+          },
+          "addressMain": {
+            "label": "Main",
+            "placeholder": "Please select address"
+          },
+          "addressSecondary": {
+            "label": "Secondary",
+            "placeholder": "Please select address"
+          },
+          "minStock": {
+            "label": "Minimum stock"
+          },
+          "maxStock": {
+            "label": "Maximum stock"
+          },
+          "accountInventory": {
+            "label": "Inventory account",
+            "placeholder": "Optional account code"
+          },
+          "accountAdjustment": {
+            "label": "Adjustment account",
+            "placeholder": "Optional adjustment account"
+          },
+          "notes": {
+            "label": "Notes",
+            "placeholder": "Internal notes (optional)"
+          }
+        },
+        "errors": {
+          "addressRequired": "Address 1 is required",
+          "maxStockRange": "Max stock must be greater than or equal to min stock",
+          "invalidNumber": "Invalid number"
+        }
+      }
+    },
+    "dashboard": {
+      "quickActions": {
+        "title": "Quick Actions",
+        "description": "Use these forms to adjust inventory levels quickly.",
+        "cards": {
+          "adjust": {
+            "title": "Adjust Stock",
+            "description": "Modify the on-hand quantity for a single warehouse.",
+            "action": "Adjust"
+          },
+          "receive": {
+            "title": "Receive Stock",
+            "description": "Register incoming inventory for purchase receipts.",
+            "action": "Receive"
+          },
+          "issue": {
+            "title": "Issue Stock",
+            "description": "Deduct inventory for sales or consumption.",
+            "action": "Issue"
+          },
+          "transfer": {
+            "title": "Transfer Stock",
+            "description": "Move inventory between two warehouses.",
+            "action": "Transfer"
+          }
+        }
+      },
+      "movementCard": {
+        "fields": {
+          "productId": {
+            "label": "Product ID",
+            "placeholder": "Product identifier"
+          },
+          "quantity": {
+            "label": "Quantity"
+          },
+          "warehouse": {
+            "label": "Warehouse"
+          },
+          "targetWarehouse": {
+            "label": "Target Warehouse"
+          },
+          "reference": {
+            "label": "Reference",
+            "placeholder": "Optional reference"
+          },
+          "note": {
+            "label": "Note",
+            "placeholder": "Optional note"
+          }
+        }
+      },
+      "stockSummary": {
+        "filters": {
+          "productId": {
+            "label": "Product ID",
+            "placeholder": "Optional product ID filter"
+          },
+          "warehouse": {
+            "label": "Warehouse"
+          },
+          "apply": "Apply",
+          "reset": "Reset"
+        },
+        "columns": {
+          "productCode": "Product Code",
+          "productName": "Product Name",
+          "warehouse": "Warehouse",
+          "onHand": "On Hand",
+          "reserved": "Reserved"
+        }
       }
     }
   }
 }
-
-

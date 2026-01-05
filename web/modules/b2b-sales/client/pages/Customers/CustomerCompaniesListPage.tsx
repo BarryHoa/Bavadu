@@ -1,5 +1,9 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+import React from "react";
+
+import { IBaseChip } from "@base/client";
 import {
   I_BASE_TABLE_COLUMN_KEY_ACTION,
   IBaseTableColumnDefinition,
@@ -8,9 +12,6 @@ import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import LinkAs from "@base/client/components/LinkAs";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { IBaseChip } from "@base/client";
-import { useTranslations } from "next-intl";
-import React from "react";
 
 import { CustomerCompany } from "../../interface/Customer";
 
@@ -24,83 +25,83 @@ export default function CustomerCompaniesListPage(): React.ReactNode {
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<CustomerCompanyRow>[] = [
-      {
-        key: "code",
-        label: "Code",
-        render: (value, row) => {
-          if (!row?.id) return value;
+    {
+      key: "code",
+      label: "Code",
+      render: (value, row) => {
+        if (!row?.id) return value;
 
-          return (
-            <LinkAs
-              href={`/workspace/modules/b2b-sales/customers/companies/view/${row.id}`}
-            >
-              {row.code}
-            </LinkAs>
-          );
-        },
-      },
-      {
-        key: "name",
-        label: "Company Name",
-      },
-      {
-        key: "taxId",
-        label: "Tax ID",
-      },
-      {
-        key: "phone",
-        label: "Phone",
-      },
-      {
-        key: "email",
-        label: "Email",
-      },
-      {
-        key: "isActive",
-        label: "Status",
-        render: (_, row) => (
-          <IBaseChip
-            color={row.isActive ? "success" : "danger"}
-            size="sm"
-            variant="flat"
+        return (
+          <LinkAs
+            href={`/workspace/modules/b2b-sales/customers/companies/view/${row.id}`}
           >
-            {row.isActive ? "Active" : "Inactive"}
-          </IBaseChip>
-        ),
+            {row.code}
+          </LinkAs>
+        );
       },
-      {
-        key: "createdAt",
-        label: "Created",
-        render: (value) => formatDate(value),
-      },
-      {
-        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
-        label: tDataTable("columns.action"),
-        align: "end",
-        render: (_, row) => {
-          if (!row?.id) return null;
-          const viewLink = `/workspace/modules/b2b-sales/customers/companies/view/${row.id}`;
-          const editLink = `/workspace/modules/b2b-sales/customers/companies/edit/${row.id}`;
+    },
+    {
+      key: "name",
+      label: "Company Name",
+    },
+    {
+      key: "taxId",
+      label: "Tax ID",
+    },
+    {
+      key: "phone",
+      label: "Phone",
+    },
+    {
+      key: "email",
+      label: "Email",
+    },
+    {
+      key: "isActive",
+      label: "Status",
+      render: (_, row) => (
+        <IBaseChip
+          color={row.isActive ? "success" : "danger"}
+          size="sm"
+          variant="flat"
+        >
+          {row.isActive ? "Active" : "Inactive"}
+        </IBaseChip>
+      ),
+    },
+    {
+      key: "createdAt",
+      label: "Created",
+      render: (value) => formatDate(value),
+    },
+    {
+      key: I_BASE_TABLE_COLUMN_KEY_ACTION,
+      label: tDataTable("columns.action"),
+      align: "end",
+      render: (_, row) => {
+        if (!row?.id) return null;
+        const viewLink = `/workspace/modules/b2b-sales/customers/companies/view/${row.id}`;
+        const editLink = `/workspace/modules/b2b-sales/customers/companies/edit/${row.id}`;
 
-          return (
-            <ActionMenu
-              actions={[
-                {
-                  key: "view",
-                  label: "View",
-                  href: viewLink,
-                },
-                {
-                  key: "edit",
-                  label: "Edit",
-                  href: editLink,
-                },
-              ]}
-            />
-          );
-        },
+        return (
+          <ActionMenu
+            actions={[
+              {
+                key: "view",
+                label: "View",
+                href: viewLink,
+              },
+              {
+                key: "edit",
+                label: "Edit",
+                href: editLink,
+              },
+            ]}
+          />
+        );
       },
-    ];
+    },
+  ];
 
   return (
     <div className="space-y-4">

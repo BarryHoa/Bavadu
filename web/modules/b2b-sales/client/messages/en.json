@@ -1,0 +1,14 @@
+{
+  "b2bSales": {
+    "customers": {
+      "company": {
+        "view": "View Customer Company",
+        "edit": "Edit Customer Company",
+        "create": "Create Customer Company"
+      }
+    },
+    "deliveries": {
+      "create": "Create Delivery"
+    }
+  }
+}
