@@ -286,9 +286,9 @@ export default function ViewListDataTable<T = any>(
 
         {/* IBaseTablePrimitive - Memoized to prevent unnecessary re-renders */}
         <MemoizedTable
-          dataTableProps={dataTableProps}
           columns={displayColumns}
           dataSource={dataSource}
+          dataTableProps={dataTableProps}
           loading={tableLoading}
           pagination={memoizedPagination}
           total={total}

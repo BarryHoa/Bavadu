@@ -1,4 +1,4 @@
-import type { ImageUploadItem } from "../../interface/ImageUpdload";
+import type { ImageUploadItem } from "../../interface/ImageUpload";
 
 import { uuidv7 } from "uuidv7";
 
@@ -48,7 +48,7 @@ export const getFileExtension = (filename: string): string => {
 export const validateFile = (
   file: File,
   accept: string,
-  maxSize: number,
+  maxSize: number
 ): { valid: boolean; type?: string; error?: string } => {
   // Check file type
   const acceptedTypes = accept.split(",").map((t) => t.trim());

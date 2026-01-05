@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar as HeroUICalendar, CalendarProps } from "@heroui/calendar";
+import { CalendarProps, Calendar as HeroUICalendar } from "@heroui/calendar";
 import React from "react";
 
 export type IBaseCalendarProps = CalendarProps & {};

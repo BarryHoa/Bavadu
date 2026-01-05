@@ -1,4 +1,4 @@
-import type { ImageUploadItem } from "@/module-base/client/interface/ImageUpdload";
+import type { ImageUploadItem } from "@/module-base/client/interface/ImageUpload";
 import type {
   ProductMasterFeatures,
   ProductMasterFeaturesType,

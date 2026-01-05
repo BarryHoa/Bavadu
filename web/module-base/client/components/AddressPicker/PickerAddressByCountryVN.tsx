@@ -7,6 +7,10 @@ import type {
 } from "@base/client/interface/Address";
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
 
+import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
+
 import {
   IBaseInput,
   IBaseSingleSelect,
@@ -15,9 +19,6 @@ import {
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import locationService from "@base/client/services/LocationService";
 import { createAdministrativeUnit } from "@base/client/utils/address/addressUtils";
-import { useQuery } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import { Dispatch, SetStateAction, useMemo, useState } from "react";
 
 interface PickerAddressByCountryVNProps {
   countryCode?: countryCode;
@@ -44,7 +45,7 @@ const PickerAddressByCountryVN = ({
         {
           parentId: null,
           level: 1,
-        },
+        }
       );
 
       return response.data || [];
@@ -62,7 +63,7 @@ const PickerAddressByCountryVN = ({
       // Get all level 3 units (ward, commune, township) under the selected province
       const response = await locationService.getLocationBy(
         selectedProvinceId,
-        "ward",
+        "ward"
       );
 
       return response.data || [];
@@ -115,8 +116,8 @@ const PickerAddressByCountryVN = ({
           createAdministrativeUnit(
             province.id,
             province.name as Record<string, string>,
-            "province",
-          ),
+            "province"
+          )
         );
       }
     }
@@ -130,8 +131,8 @@ const PickerAddressByCountryVN = ({
           createAdministrativeUnit(
             ward.id,
             ward.name as Record<string, string>,
-            ward.type as "ward" | "commune" | "township",
-          ),
+            ward.type as "ward" | "commune" | "township"
+          )
         );
       }
     }

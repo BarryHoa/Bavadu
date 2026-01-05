@@ -2,11 +2,12 @@
 
 import type { InputProps } from "@heroui/input";
 
-import { IBaseInput } from "@base/client/components";
 import { Button } from "@heroui/button";
 import { ArrowRight, Languages } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import React, { useCallback, useMemo, useState } from "react";
+
+import { IBaseInput } from "@base/client/components";
 
 import {
   DEFAULT_SUPPORTED_LANGS,

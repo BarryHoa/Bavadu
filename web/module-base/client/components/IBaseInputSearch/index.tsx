@@ -31,7 +31,7 @@ export const IBaseInputSearch = React.forwardRef<
   // Memoize search icon to prevent recreation
   const searchIcon = useMemo(
     () => <Search className="text-default-400" size={16} />,
-    [],
+    []
   );
 
   // Handle clear button - show when there's a value and showClearButton is true
@@ -69,7 +69,7 @@ export const IBaseInputSearch = React.forwardRef<
         label: "text-small text-default-600",
         mainWrapper: clsx(
           "cursor-not-allowed",
-          isDisabled ? "bg-default-200" : "",
+          isDisabled ? "bg-default-200" : ""
         ),
         input: "placeholder:text-default-400 italic text-sm",
       }}

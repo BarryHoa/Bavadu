@@ -20,11 +20,11 @@ export const IBaseSelect = React.forwardRef<
         mainWrapper: clsx(
           "cursor-not-allowed",
           isDisabled && "bg-default-200",
-          classNames?.mainWrapper
+          classNames?.mainWrapper,
         ),
         trigger: clsx(
           "placeholder:text-default-400 italic text-sm",
-          classNames?.trigger
+          classNames?.trigger,
         ),
         popoverContent: clsx("p-0", classNames?.popoverContent),
         listbox: clsx("p-0", classNames?.listbox),

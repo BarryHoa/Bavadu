@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge as HeroUIBadge, BadgeProps } from "@heroui/badge";
+import { BadgeProps, Badge as HeroUIBadge } from "@heroui/badge";
 import React from "react";
 
 export type IBaseBadgeProps = BadgeProps & {};

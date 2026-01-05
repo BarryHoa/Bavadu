@@ -62,6 +62,7 @@ export default function ColumnVisibilityMenu<T = any>({
   miniSearch.addAll(docs);
 
   const columnMap = new Map<string, IBaseTableColumnDefinition<T>>();
+
   columns.forEach((column) => {
     columnMap.set(column.key.toString(), column);
   });

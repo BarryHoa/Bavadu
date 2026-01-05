@@ -35,7 +35,7 @@ function formatDisplay(
     thousandSeparator: string;
     decimalSeparator: string;
     fixZero: boolean;
-  },
+  }
 ): string {
   if (num === null || num === undefined) return "";
 
@@ -69,7 +69,7 @@ function parseToNumber(
     decimalSeparator: string;
     allowNegative: boolean;
     decimalPlaces: number;
-  },
+  }
 ): InputNumberValue {
   if (!str?.trim()) return null;
 
@@ -80,7 +80,7 @@ function parseToNumber(
   if (options.decimalSeparator !== ".") {
     cleaned = cleaned.replace(
       new RegExp(`\\${options.decimalSeparator}`, "g"),
-      ".",
+      "."
     );
   }
 
@@ -103,7 +103,7 @@ function parseToNumber(
 function clampValue(
   num: InputNumberValue,
   min?: number,
-  max?: number,
+  max?: number
 ): InputNumberValue {
   if (num === null || num === undefined) return num;
   let result = num;
@@ -162,7 +162,7 @@ export const IBaseInputNumber = React.forwardRef<
   // Get current numeric value
   const currentValue = useMemo(
     () => (isControlled ? controlledValue : inputState.raw),
-    [controlledValue, inputState.raw],
+    [controlledValue, inputState.raw]
   );
 
   const handleChange = useCallback(
@@ -185,7 +185,7 @@ export const IBaseInputNumber = React.forwardRef<
         if (decimalSeparator !== ".") {
           normalized = cleaned.replace(
             new RegExp(`\\${decimalSeparator}`, "g"),
-            ".",
+            "."
           );
         }
 
@@ -256,7 +256,7 @@ export const IBaseInputNumber = React.forwardRef<
       decimalPlaces,
       onValueChange,
       inputState.isFocused,
-    ],
+    ]
   );
 
   const handleFocus = useCallback(
@@ -280,7 +280,7 @@ export const IBaseInputNumber = React.forwardRef<
       e.preventDefault();
       e.stopPropagation();
     },
-    [rest.onFocus, inputState.raw, decimalPlaces],
+    [rest.onFocus, inputState.raw, decimalPlaces]
   );
 
   const handleBlur = useCallback(
@@ -333,7 +333,7 @@ export const IBaseInputNumber = React.forwardRef<
       decimalSeparator,
       allowNegative,
       decimalPlaces,
-    ],
+    ]
   );
 
   // Update display when value changes externally
@@ -432,7 +432,7 @@ export const IBaseInputNumber = React.forwardRef<
           input: clsx(
             rest.classNames?.input,
             hasValue ? "text-right" : "text-left",
-            isInvalid && "text-danger",
+            isInvalid && "text-danger"
           ),
         }}
         inputMode="decimal"

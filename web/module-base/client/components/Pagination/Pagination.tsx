@@ -1,9 +1,12 @@
-import { IBaseButton, IBaseDropdown, IBasePagination } from "@base/client/components";
 import type { Key, SVGProps } from "react";
 
 import clsx from "clsx";
-import React from "react";
 
+import {
+  IBaseButton,
+  IBaseDropdown,
+  IBasePagination,
+} from "@base/client/components";
 
 import { PAGINATION_PAGE_SIZE_OPTIONS } from "./paginationConsts";
 
@@ -50,7 +53,9 @@ export default function PaginationComponent({
     Array.isArray(pageSizeOptions) && pageSizeOptions.length > 0
       ? pageSizeOptions
       : PAGINATION_PAGE_SIZE_OPTIONS;
-  const options = baseOptions.filter((option) => option > 0).sort((a, b) => a - b);
+  const options = baseOptions
+    .filter((option) => option > 0)
+    .sort((a, b) => a - b);
 
   const paginationItemBase =
     "flex h-6 w-8 items-center justify-center rounded-full text-small font-medium transition-colors cursor-pointer";
@@ -95,7 +100,6 @@ export default function PaginationComponent({
         onChange={onChange}
       />
       <IBaseDropdown
-        placement="top"
         items={options.map((item) => ({
           key: String(item),
           textValue: String(item),
@@ -114,6 +118,7 @@ export default function PaginationComponent({
             }
           },
         }}
+        placement="top"
       >
         <IBaseButton
           className="text-small font-medium px-2 h-6"

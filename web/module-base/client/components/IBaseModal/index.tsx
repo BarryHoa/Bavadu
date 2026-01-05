@@ -1,6 +1,17 @@
 "use client";
 
-import { Modal as HeroUIModal, ModalBody as HeroUIModalBody, ModalContent as HeroUIModalContent, ModalFooter as HeroUIModalFooter, ModalHeader as HeroUIModalHeader, type ModalBodyProps as HeroUIModalBodyProps, type ModalContentProps as HeroUIModalContentProps, type ModalFooterProps as HeroUIModalFooterProps, type ModalHeaderProps as HeroUIModalHeaderProps, type ModalProps as HeroUIModalProps } from "@heroui/modal";
+import {
+  Modal as HeroUIModal,
+  ModalBody as HeroUIModalBody,
+  ModalContent as HeroUIModalContent,
+  ModalFooter as HeroUIModalFooter,
+  ModalHeader as HeroUIModalHeader,
+  type ModalBodyProps as HeroUIModalBodyProps,
+  type ModalContentProps as HeroUIModalContentProps,
+  type ModalFooterProps as HeroUIModalFooterProps,
+  type ModalHeaderProps as HeroUIModalHeaderProps,
+  type ModalProps as HeroUIModalProps,
+} from "@heroui/modal";
 import React from "react";
 
 // Export types
@@ -29,7 +40,7 @@ export const IBaseModal = React.forwardRef<HTMLDivElement, IBaseModalProps>(
         {...rest}
       />
     );
-  },
+  }
 );
 
 IBaseModal.displayName = "IBaseModal";

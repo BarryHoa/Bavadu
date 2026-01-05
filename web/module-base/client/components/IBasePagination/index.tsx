@@ -1,6 +1,9 @@
 "use client";
 
-import { Pagination as HeroUIPagination, PaginationProps } from "@heroui/pagination";
+import {
+  Pagination as HeroUIPagination,
+  PaginationProps,
+} from "@heroui/pagination";
 import React from "react";
 
 export type IBasePaginationProps = PaginationProps & {};

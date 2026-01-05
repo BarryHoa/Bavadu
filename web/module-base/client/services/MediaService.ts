@@ -1,4 +1,4 @@
-import type { ImageUploadItem } from "../interface/ImageUpdload";
+import type { ImageUploadItem } from "../interface/ImageUpload";
 
 import ClientHttpService from "./ClientHttpService";
 

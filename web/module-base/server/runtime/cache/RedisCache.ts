@@ -1,6 +1,7 @@
 import { createClient } from "redis";
 
 import { Debug } from "../Debug";
+
 import { RedisClientManager, RedisStatus } from "./RedisClientManager";
 
 export const CACHE_NOT_FOUND = Symbol("CACHE_NOT_FOUND");
@@ -31,7 +32,9 @@ export class RedisCache {
 
   private getKey(key: string, prefix?: string): string {
     const keyPrefix = prefix || this.defaultPrefix;
+
     Debug.log(`[RedisCache] Getting key "${key}" with prefix "${keyPrefix}"`);
+
     return `${keyPrefix}${key}`;
   }
 
@@ -42,6 +45,7 @@ export class RedisCache {
 
     Debug.log(`[RedisCache] Checking status`);
     this.client = this.manager.getClient();
+
     return this.client !== null;
   }
 
@@ -71,6 +75,7 @@ export class RedisCache {
       return JSON.parse(value) as T;
     } catch (error) {
       Debug.error(`[RedisCache] Get error for key "${key}":`, error);
+
       return CACHE_NOT_FOUND;
     }
   }
@@ -104,6 +109,7 @@ export class RedisCache {
       return true;
     } catch (error) {
       Debug.error(`[RedisCache] Set error for key "${key}":`, error);
+
       return false;
     }
   }
@@ -122,9 +128,11 @@ export class RedisCache {
     try {
       const fullKey = this.getKey(key, options?.prefix);
       const result = await this.client!.del(fullKey);
+
       return result > 0;
     } catch (error) {
       Debug.error(`[RedisCache] Delete error for key "${key}":`, error);
+
       return false;
     }
   }
@@ -144,9 +152,11 @@ export class RedisCache {
       const fullKeys = keys.map((key) => this.getKey(key, options?.prefix));
       // Redis del accepts multiple keys - use array as argument
       const result = await (this.client!.del as any)(fullKeys);
+
       return result;
     } catch (error) {
       Debug.error(`[RedisCache] DeleteMany error:`, error);
+
       return 0;
     }
   }
@@ -165,9 +175,11 @@ export class RedisCache {
     try {
       const fullKey = this.getKey(key, options?.prefix);
       const result = await this.client!.exists(fullKey);
+
       return result > 0;
     } catch (error) {
       Debug.error(`[RedisCache] Exists error for key "${key}":`, error);
+
       return false;
     }
   }
@@ -185,9 +197,11 @@ export class RedisCache {
 
     try {
       const fullKey = this.getKey(key, options?.prefix);
+
       return await this.client!.ttl(fullKey);
     } catch (error) {
       Debug.error(`[RedisCache] TTL error for key "${key}":`, error);
+
       return -1;
     }
   }
@@ -209,9 +223,11 @@ export class RedisCache {
 
     try {
       const fullKey = this.getKey(key, options?.prefix);
+
       return await this.client!.incrBy(fullKey, by);
     } catch (error) {
       Debug.error(`[RedisCache] Increment error for key "${key}":`, error);
+
       return null;
     }
   }
@@ -227,6 +243,7 @@ export class RedisCache {
     Debug.log(
       `[RedisCache] Getting status: ${this.manager.getStatus()} ${this.manager.isConnected()}`
     );
+
     return {
       enabled: this.manager.getStatus() !== RedisStatus.DISABLED,
       status: this.manager.getStatus(),
@@ -259,10 +276,13 @@ export class RedisCache {
       if (keys.length > 0) {
         // Delete keys one by one or use pipeline for better performance
         let deleted = 0;
+
         for (const key of keys) {
           const result = await this.client!.del(key);
+
           deleted += result;
         }
+
         return deleted;
       }
 
@@ -272,6 +292,7 @@ export class RedisCache {
         `[RedisCache] ClearPattern error for pattern "${pattern}":`,
         error
       );
+
       return 0;
     }
   }

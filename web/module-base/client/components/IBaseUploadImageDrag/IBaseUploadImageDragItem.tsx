@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useRef, useState } from "react";
 
-import { ImageUploadItem } from "../../interface/ImageUpdload";
+import { ImageUploadItem } from "../../interface/ImageUpload";
 
 type ImageUploadItemComponentProps = {
   item: ImageUploadItem;

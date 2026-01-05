@@ -28,6 +28,7 @@ export class RedisClientManager {
   private async initialize(): Promise<void> {
     if (!this.config.enabled) {
       this.status = RedisStatus.DISABLED;
+
       return;
     }
 
@@ -52,6 +53,7 @@ export class RedisClientManager {
         this.status = RedisStatus.CONNECTED;
         this.reconnectAttempts = 0;
         Debug.log("[RedisClientManager] ✅ Redis connected successfully");
+
         return;
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
@@ -62,6 +64,7 @@ export class RedisClientManager {
 
         if (attempt < maxAttempts) {
           const delay = delayMs * Math.pow(backoffMultiplier, attempt - 1);
+
           await this.sleep(delay);
         }
       }
@@ -84,6 +87,7 @@ export class RedisClientManager {
           if (retries > 10) {
             return new Error("Too many reconnection attempts");
           }
+
           return Math.min(retries * 100, 3000);
         },
       },
@@ -130,6 +134,7 @@ export class RedisClientManager {
     }
 
     const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+
     this.reconnectAttempts++;
 
     this.reconnectTimer = setTimeout(async () => {

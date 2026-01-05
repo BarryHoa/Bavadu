@@ -7,7 +7,7 @@ import { Upload } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useRef, useState } from "react";
 
-import { ImageUploadItem } from "../../interface/ImageUpdload";
+import { ImageUploadItem } from "../../interface/ImageUpload";
 import {
   getFileExtension,
   normalizeItems,

@@ -1,6 +1,10 @@
 "use client";
 
-import { BreadcrumbItem as HeroUIBreadcrumbItem, Breadcrumbs as HeroUIBreadcrumbs, BreadcrumbsProps } from "@heroui/breadcrumbs";
+import {
+  BreadcrumbsProps,
+  BreadcrumbItem as HeroUIBreadcrumbItem,
+  Breadcrumbs as HeroUIBreadcrumbs,
+} from "@heroui/breadcrumbs";
 import React from "react";
 
 export type IBaseBreadcrumbsProps = BreadcrumbsProps & {};

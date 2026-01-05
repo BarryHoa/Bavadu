@@ -4,7 +4,7 @@ import type {
   VariantFieldValue,
 } from "./types";
 
-import { ImageUploadItem } from "@/module-base/client/interface/ImageUpdload";
+import { ImageUploadItem } from "@/module-base/client/interface/ImageUpload";
 
 import {
   ProductFormValues,

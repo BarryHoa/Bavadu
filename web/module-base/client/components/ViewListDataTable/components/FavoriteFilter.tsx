@@ -1,7 +1,7 @@
 "use client";
-import { IBaseButton } from "@base/client/components";
-
 import { Star } from "lucide-react";
+
+import { IBaseButton } from "@base/client/components";
 
 interface FavoriteFilterProps {
   isActive: boolean;

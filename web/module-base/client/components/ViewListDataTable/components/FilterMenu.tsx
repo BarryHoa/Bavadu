@@ -1,8 +1,11 @@
 "use client";
-import { IBaseButton, IBaseCheckbox, IBaseDropdown } from "@base/client/components";
-
 import { Filter } from "lucide-react";
 
+import {
+  IBaseButton,
+  IBaseCheckbox,
+  IBaseDropdown,
+} from "@base/client/components";
 
 export interface FilterOption<T = any> {
   label: string;

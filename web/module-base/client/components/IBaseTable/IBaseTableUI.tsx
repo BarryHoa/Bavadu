@@ -5,7 +5,14 @@ import type { Column, HeaderGroup, Row } from "@tanstack/react-table";
 import type { ReactNode } from "react";
 
 import { Spinner } from "@heroui/spinner";
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+} from "@heroui/table";
 import { flexRender } from "@tanstack/react-table";
 import clsx from "clsx";
 import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";
@@ -49,11 +56,11 @@ export interface IBaseTableUIProps<T = any> {
   renderCell?: (
     column: Column<T, unknown>,
     row: Row<T>,
-    value: any,
+    value: any
   ) => ReactNode;
   renderHeader?: (
     header: HeaderGroup<T>,
-    column: Column<T, unknown>,
+    column: Column<T, unknown>
   ) => ReactNode;
 }
 
@@ -96,7 +103,7 @@ export default function IBaseTableUI<T = any>({
         ? sortIcons.ascending
         : sortIcons.descending;
     },
-    [sortDescriptor],
+    [sortDescriptor]
   );
 
   // Memoize header click handler
@@ -116,7 +123,7 @@ export default function IBaseTableUI<T = any>({
         direction: nextDirection,
       });
     },
-    [sortDescriptor, onSortChange],
+    [sortDescriptor, onSortChange]
   );
 
   // Memoize classNames to prevent object recreation
@@ -127,18 +134,18 @@ export default function IBaseTableUI<T = any>({
       wrapper: clsx("rounded-none p-0", classNames.wrapper),
       th: clsx(
         "px-0 bg-primary-600 text-white hover:bg-primary-700/80",
-        classNames.th,
+        classNames.th
       ),
       tr: clsx("hover:bg-primary-700/10", classNames.tr),
       td: clsx("rounded-none py-1 px-2", classNames.td),
     }),
-    [classNames],
+    [classNames]
   );
 
   // Create column lookup map for O(1) access - memoize to prevent recreation
   const columnMap = useMemo(
     () => new Map(visibleColumns.map((col) => [col.id, col])),
-    [visibleColumns],
+    [visibleColumns]
   );
 
   return (
@@ -178,7 +185,7 @@ export default function IBaseTableUI<T = any>({
                 className={clsx(
                   isPinned && "frozen-column",
                   isPinned === "left" && "frozen-left",
-                  isPinned === "right" && "frozen-right",
+                  isPinned === "right" && "frozen-right"
                 )}
                 maxWidth={column?.columnDef.maxSize}
                 minWidth={column?.columnDef.minSize}
@@ -191,7 +198,7 @@ export default function IBaseTableUI<T = any>({
                   <div
                     className={clsx(
                       "inline-flex h-full w-full items-center",
-                      isSortable && "cursor-pointer select-none",
+                      isSortable && "cursor-pointer select-none"
                     )}
                     role={isSortable ? "button" : undefined}
                     tabIndex={isSortable ? 0 : -1}
@@ -204,12 +211,12 @@ export default function IBaseTableUI<T = any>({
                           ? "justify-end"
                           : meta.align === "center"
                             ? "justify-center"
-                            : "justify-start",
+                            : "justify-start"
                       )}
                     >
                       {flexRender(
                         header.column.columnDef.header,
-                        header.getContext(),
+                        header.getContext()
                       )}
                       {isSortable && (
                         <span className="ml-2 inline-flex items-center justify-end">
@@ -221,7 +228,7 @@ export default function IBaseTableUI<T = any>({
                 )}
               </TableColumn>
             );
-          }),
+          })
         )}
       </TableHeader>
       <TableBody
@@ -234,7 +241,7 @@ export default function IBaseTableUI<T = any>({
               original: row.original,
               index: row.index,
             })),
-          [rows],
+          [rows]
         )}
         loadingContent={<Spinner label="Loading..." />}
       >
@@ -271,14 +278,14 @@ export default function IBaseTableUI<T = any>({
                     className={clsx(
                       isPinned && "frozen-column",
                       isPinned === "left" && "frozen-left",
-                      isPinned === "right" && "frozen-right",
+                      isPinned === "right" && "frozen-right"
                     )}
                     style={pinStyle}
                   >
                     <div
                       className={clsx(
                         "flex",
-                        `justify-${meta.align || "start"}`,
+                        `justify-${meta.align || "start"}`
                       )}
                     >
                       {renderCell
@@ -286,7 +293,7 @@ export default function IBaseTableUI<T = any>({
                             const customRender = renderCell(
                               column!,
                               row,
-                              cell.getValue(),
+                              cell.getValue()
                             );
 
                             return customRender !== null &&
@@ -294,12 +301,12 @@ export default function IBaseTableUI<T = any>({
                               ? customRender
                               : flexRender(
                                   cell.column.columnDef.cell,
-                                  cell.getContext(),
+                                  cell.getContext()
                                 );
                           })()
                         : flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                     </div>
                   </TableCell>

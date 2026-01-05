@@ -89,7 +89,7 @@ export const IBaseDigitViewer = React.forwardRef<
           sizeClasses[size],
           !hasColorClass && variantClasses[variant],
           "opacity-100",
-          className,
+          className
         )}
       >
         {getDisplayValue()}

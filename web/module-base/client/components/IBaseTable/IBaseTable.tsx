@@ -1,19 +1,17 @@
 "use client";
 
-import type { IBaseTableCoreColumn } from "@base/client/components";
-import type { Selection } from "@heroui/table";
-import type { TableProps } from "@heroui/table";
+import type { Selection, TableProps } from "@heroui/table";
 
-import { RefreshCw } from "lucide-react";
-import React, { useMemo } from "react";
-import { IBaseTooltip } from "@base/client/components";
 import clsx from "clsx";
+import { RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useMemo } from "react";
 
+import IBaseTooltip from "../IBaseTooltip";
 import PaginationComponent from "../Pagination/Pagination";
 import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 
-import { useIBaseTableCore } from "./IBaseTableCore";
+import { IBaseTableCoreColumn, useIBaseTableCore } from "./IBaseTableCore";
 import {
   I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
   type IBaseTableProps as IBaseTablePropsType,
@@ -47,7 +45,8 @@ export function IBaseTable<T = any>({
   const processedColumns = useColumns(columns);
 
   // React Compiler will automatically optimize this computation
-  const iBaseTableColumns: IBaseTableCoreColumn<T>[] = processedColumns.map((col) => ({
+  const iBaseTableColumns: IBaseTableCoreColumn<T>[] = processedColumns.map(
+    (col) => ({
       key: col.key,
       title: col.title,
       label: col.label,
@@ -72,7 +71,8 @@ export function IBaseTable<T = any>({
         frozenClassName: col.frozenClassName,
         isRowNumber: col.key === I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
       },
-    }));
+    })
+  );
 
   // Core table logic - all logic is now in useIBaseTableCore
   const core = useIBaseTableCore<T>({
@@ -197,7 +197,7 @@ export function IBaseTable<T = any>({
         <div
           className={clsx(
             "flex flex-col items-center justify-between px-2 sm:flex-row",
-            classNames.pagination,
+            classNames.pagination
           )}
         >
           <div className="flex items-center py-2 text-small text-default-500">

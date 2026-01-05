@@ -1,6 +1,11 @@
 "use client";
 
-import { Autocomplete as HeroUIAutocomplete, AutocompleteItem as HeroUIAutocompleteItem, AutocompleteSection as HeroUIAutocompleteSection, AutocompleteProps } from "@heroui/autocomplete";
+import {
+  AutocompleteProps,
+  Autocomplete as HeroUIAutocomplete,
+  AutocompleteItem as HeroUIAutocompleteItem,
+  AutocompleteSection as HeroUIAutocompleteSection,
+} from "@heroui/autocomplete";
 import React from "react";
 
 export type IBaseAutocompleteProps = AutocompleteProps & {};

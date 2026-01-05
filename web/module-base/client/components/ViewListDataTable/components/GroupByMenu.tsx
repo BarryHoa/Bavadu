@@ -1,8 +1,7 @@
 "use client";
-import { IBaseButton, IBaseDropdown } from "@base/client/components";
-
 import { Group } from "lucide-react";
 
+import { IBaseButton, IBaseDropdown } from "@base/client/components";
 
 export interface GroupOption {
   key: string;
