@@ -1,23 +1,27 @@
 "use client";
 
-import { IBaseButton, IBaseChip } from "@base/client/components";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { useCallback, useMemo, useState } from "react";
+
 import {
   I_BASE_TABLE_COLUMN_KEY_ACTION,
-  IBaseTableColumnDefinition,
+  IBaseButton,
+  IBaseChip,
+  IBaseLink,
   IBaseModal,
   IBaseModalBody,
   IBaseModalContent,
   IBaseModalFooter,
   IBaseModalHeader,
+  IBaseTableColumnDefinition,
 } from "@base/client/components";
-import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
-import LinkAs from "@base/client/components/LinkAs";
+import ActionMenu, {
+  ActionItem,
+} from "@base/client/components/ActionMenu/ActionMenu";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import roleService, { type Role } from "@base/client/services/RoleService";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import { useCallback, useMemo, useState } from "react";
 
 const ROLES_LIST_QUERY_KEY = ["settings", "roles", "list"] as const;
 const BASE_PATH = "/settings/roles";
@@ -59,16 +63,9 @@ export default function RolesListPage() {
 
   const getActionMenuItems = useCallback(
     (row: RoleRow) => {
-      const baseActions: Array<
-        | { key: string; label: string; href: string }
-        | {
-            key: string;
-            label: string;
-            onPress: () => void;
-            disabled?: boolean;
-          }
-      > = [
+      const baseActions: ActionItem[] = [
         {
+          placement: "menu",
           key: "view",
           label: actionsT("view"),
           href: `${BASE_PATH}/view/${row.id}`,
@@ -78,22 +75,24 @@ export default function RolesListPage() {
       if (!row.isSystem) {
         baseActions.push(
           {
+            placement: "menu",
             key: "edit",
             label: actionsT("edit"),
             href: `${BASE_PATH}/edit/${row.id}`,
           },
           {
+            placement: "menu",
             key: "delete",
             label: actionsT("delete"),
             onPress: () => handleDelete(row),
             disabled: deleteRoleMutation.isPending,
-          },
+          }
         );
       }
 
       return baseActions;
     },
-    [actionsT, handleDelete, deleteRoleMutation.isPending],
+    [actionsT, handleDelete, deleteRoleMutation.isPending]
   );
 
   const columns = useMemo<IBaseTableColumnDefinition<RoleRow>[]>(
@@ -103,9 +102,9 @@ export default function RolesListPage() {
         label: t("table.columns.code"),
         render: (value, row) =>
           row?.id ? (
-            <LinkAs href={`${BASE_PATH}/view/${row.id}`}>
+            <IBaseLink href={`${BASE_PATH}/view/${row.id}`}>
               {value as string}
-            </LinkAs>
+            </IBaseLink>
           ) : (
             value
           ),
@@ -148,7 +147,7 @@ export default function RolesListPage() {
           row?.id ? <ActionMenu actions={getActionMenuItems(row)} /> : null,
       },
     ],
-    [t, tIBaseTable, getText, getActionMenuItems],
+    [t, tIBaseTable, getText, getActionMenuItems]
   );
 
   return (

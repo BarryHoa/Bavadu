@@ -1,16 +1,17 @@
 "use client";
 
-import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
+import { useTranslations } from "next-intl";
+import React from "react";
+
+import { IBaseChip } from "@base/client";
 import {
   I_BASE_TABLE_COLUMN_KEY_ACTION,
   IBaseTableColumnDefinition,
 } from "@base/client/components";
-import LinkAs from "@base/client/components/LinkAs";
+import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
+import IBaseLink from "@base/client/components/IBaseLink";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { IBaseChip } from "@base/client";
-import { useTranslations } from "next-intl";
-import React from "react";
 
 import { PurchaseOrder } from "../../interface/PurchaseOrder";
 
@@ -25,68 +26,68 @@ export default function PurchaseOrdersListPage(): React.ReactNode {
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<PurchaseOrderRow>[] = [
-      {
-        key: "code",
-        label: t("columns.code"),
-        render: (value, row) => {
-          if (!row?.id) return value;
+    {
+      key: "code",
+      label: t("columns.code"),
+      render: (value, row) => {
+        if (!row?.id) return value;
 
-          return (
-            <LinkAs href={`/workspace/modules/purchase/view/${row.id}`}>
-              {row.code}
-            </LinkAs>
-          );
-        },
+        return (
+          <IBaseLink href={`/workspace/modules/purchase/view/${row.id}`}>
+            {row.code}
+          </IBaseLink>
+        );
       },
-      {
-        key: "vendorName",
-        label: t("columns.vendor"),
-      },
-      {
-        key: "status",
-        label: t("columns.status"),
-        render: (value) => (
-          <IBaseChip className="capitalize" size="sm" variant="flat">
-            {t(`status.${value || "draft"}`)}
-          </IBaseChip>
-        ),
-      },
-      {
-        key: "expectedDate",
-        label: t("columns.expectedDate"),
-        render: (value) => formatDate(value),
-      },
-      {
-        key: "totalAmount",
-        label: t("columns.totalAmount"),
-        render: (_, row) =>
-          new Intl.NumberFormat(undefined, {
-            style: "currency",
-            currency: row.currency || "USD",
-          }).format(Number(row.totalAmount ?? 0)),
-      },
-      {
-        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
-        label: tDataTable("columns.action"),
-        align: "end",
-        render: (_, row) => {
-          if (!row?.id) return null;
-          const viewLink = `/workspace/modules/purchase/view/${row.id}`;
+    },
+    {
+      key: "vendorName",
+      label: t("columns.vendor"),
+    },
+    {
+      key: "status",
+      label: t("columns.status"),
+      render: (value) => (
+        <IBaseChip className="capitalize" size="sm" variant="flat">
+          {t(`status.${value || "draft"}`)}
+        </IBaseChip>
+      ),
+    },
+    {
+      key: "expectedDate",
+      label: t("columns.expectedDate"),
+      render: (value) => formatDate(value),
+    },
+    {
+      key: "totalAmount",
+      label: t("columns.totalAmount"),
+      render: (_, row) =>
+        new Intl.NumberFormat(undefined, {
+          style: "currency",
+          currency: row.currency || "USD",
+        }).format(Number(row.totalAmount ?? 0)),
+    },
+    {
+      key: I_BASE_TABLE_COLUMN_KEY_ACTION,
+      label: tDataTable("columns.action"),
+      align: "end",
+      render: (_, row) => {
+        if (!row?.id) return null;
+        const viewLink = `/workspace/modules/purchase/view/${row.id}`;
 
-          return (
-            <ActionMenu
-              actions={[
-                {
-                  key: "view",
-                  label: t("actions.view"),
-                  href: viewLink,
-                },
-              ]}
-            />
-          );
-        },
+        return (
+          <ActionMenu
+            actions={[
+              {
+                key: "view",
+                label: t("actions.view"),
+                href: viewLink,
+              },
+            ]}
+          />
+        );
       },
-    ];
+    },
+  ];
 
   return (
     <div className="space-y-4">

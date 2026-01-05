@@ -2,15 +2,16 @@
 
 import type { WarehouseDto } from "../../services/StockService";
 
-import {
-  I_BASE_TABLE_COLUMN_KEY_ACTION,
-  type IBaseTableColumnDefinition,
-} from "@base/client/components";
-import LinkAs from "@base/client/components/LinkAs";
-import ViewListDataTable from "@base/client/components/ViewListDataTable";
-import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
 import React from "react";
+
+import { IBaseChip } from "@base/client";
+import {
+  I_BASE_TABLE_COLUMN_KEY_ACTION,
+  IBaseLink,
+  type IBaseTableColumnDefinition,
+} from "@base/client/components";
+import ViewListDataTable from "@base/client/components/ViewListDataTable";
 
 const statusColorMap: Record<string, "success" | "warning" | "danger"> = {
   ACTIVE: "success",
@@ -33,13 +34,13 @@ const formatLocation = (warehouse: WarehouseDto) => {
   const parts = [
     address.administrativeUnits?.find((u) => u.level === 2)
       ? getLocalizedName(
-          address.administrativeUnits.find((u) => u.level === 2)?.name,
+          address.administrativeUnits.find((u) => u.level === 2)?.name
         )
       : undefined,
     address.country ? getLocalizedName(address.country.name) : undefined,
   ].filter(
     (value): value is string =>
-      Boolean(value) && typeof value === "string" && value.trim().length > 0,
+      Boolean(value) && typeof value === "string" && value.trim().length > 0
   );
 
   return parts.length ? parts.join(", ") : "—";
@@ -59,57 +60,57 @@ export default function WarehouseListPage(): React.ReactNode {
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<WarehouseDto>[] = [
-      {
-        key: "code",
-        label: t("columns.code"),
-        render: (_, row) => (
-          <LinkAs href={`/workspace/modules/stock/warehouses/edit/${row.id}`}>
-            {row.code}
-          </LinkAs>
-        ),
-      },
-      {
-        key: "name",
-        label: t("columns.name"),
-      },
-      {
-        key: "typeCode",
-        label: t("columns.type"),
-      },
-      {
-        key: "address",
-        label: t("columns.location"),
-        render: (_, row) => formatLocation(row),
-      },
-      {
-        key: "stockRange",
-        label: t("columns.stockRange"),
-        render: (_, row) => formatStockRange(row),
-      },
-      {
-        key: "status",
-        label: t("columns.status"),
-        render: (_, row) => (
-          <IBaseChip
-            color={statusColorMap[row.status] ?? "warning"}
-            size="sm"
-            variant="flat"
-          >
-            {t(`status.${row.status}`)}
-          </IBaseChip>
-        ),
-      },
-      {
-        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
-        label: tDataTable("columns.action"),
-        align: "end",
-        render: (_, row) => (
-          <LinkAs href={`/workspace/modules/stock/warehouses/edit/${row.id}`}>
-            {t("actions.edit")}
-          </LinkAs>
-        ),
-      },
-    ];
+    {
+      key: "code",
+      label: t("columns.code"),
+      render: (_, row) => (
+        <IBaseLink href={`/workspace/modules/stock/warehouses/edit/${row.id}`}>
+          {row.code}
+        </IBaseLink>
+      ),
+    },
+    {
+      key: "name",
+      label: t("columns.name"),
+    },
+    {
+      key: "typeCode",
+      label: t("columns.type"),
+    },
+    {
+      key: "address",
+      label: t("columns.location"),
+      render: (_, row) => formatLocation(row),
+    },
+    {
+      key: "stockRange",
+      label: t("columns.stockRange"),
+      render: (_, row) => formatStockRange(row),
+    },
+    {
+      key: "status",
+      label: t("columns.status"),
+      render: (_, row) => (
+        <IBaseChip
+          color={statusColorMap[row.status] ?? "warning"}
+          size="sm"
+          variant="flat"
+        >
+          {t(`status.${row.status}`)}
+        </IBaseChip>
+      ),
+    },
+    {
+      key: I_BASE_TABLE_COLUMN_KEY_ACTION,
+      label: tDataTable("columns.action"),
+      align: "end",
+      render: (_, row) => (
+        <IBaseLink href={`/workspace/modules/stock/warehouses/edit/${row.id}`}>
+          {t("actions.edit")}
+        </IBaseLink>
+      ),
+    },
+  ];
 
   return (
     <div className="space-y-4">

@@ -1,19 +1,20 @@
 "use client";
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
 
-import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
+import { useTranslations } from "next-intl";
+import React from "react";
+
+import { IBaseChip } from "@base/client";
 import {
   I_BASE_TABLE_COLUMN_KEY_ACTION,
   IBaseTableColumnDefinition,
 } from "@base/client/components";
+import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
+import IBaseLink from "@base/client/components/IBaseLink";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
-import LinkAs from "@base/client/components/LinkAs";
-import { IBaseChip } from "@base/client";
-import { useTranslations } from "next-intl";
-import React from "react";
 
 import { ProductRow } from "../../interface/Product";
 import { convertProductMasterFeaturesToArrayKey } from "../../utils/getNameProductFeatures";
@@ -25,170 +26,168 @@ export default function ProductsListPage(): React.ReactNode {
   const tProduct = useTranslations("mdl-product");
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<ProductRow>[] = [
-      {
-        key: "name",
-        label: "Name",
-        sortable: true,
-        minWidth: 150,
-        maxWidth: 300,
-        render: (_, row) => {
-          const { path, as } = getClientLink({
-            mdl: "product",
-            path: "view/[id]",
-            as: `view/${row.id}`,
-          });
+    {
+      key: "name",
+      label: "Name",
+      sortable: true,
+      minWidth: 150,
+      maxWidth: 300,
+      render: (_, row) => {
+        const { path, as } = getClientLink({
+          mdl: "product",
+          path: "view/[id]",
+          as: `view/${row.id}`,
+        });
 
-          return (
-            <LinkAs as={as} href={path}>
-              {localized(row.name as LocalizeText) || row.id}
-            </LinkAs>
-          );
-        },
+        return (
+          <IBaseLink as={as} href={path}>
+            {localized(row.name as LocalizeText) || row.id}
+          </IBaseLink>
+        );
       },
-      {
-        key: "sku",
-        label: "SKU",
-        minWidth: 100,
-        maxWidth: 150,
-        render: (value) => value,
-      },
-      {
-        key: "barcode",
-        label: "Barcode",
-        minWidth: 120,
-        maxWidth: 200,
-        render: (value) => value,
-      },
-      {
-        key: "baseUom.name",
-        label: "Base UOM",
-        minWidth: 100,
-        maxWidth: 150,
-        render: (_, row) => localized(row.baseUom?.name as LocalizeText),
-      },
-      {
-        key: "productMaster.type",
-        label: "Type",
-        minWidth: 100,
-        maxWidth: 150,
-        render: (_, row) => getNameProductType(row.productMaster?.type),
-      },
-      {
-        key: "productMaster.features",
-        label: "Features",
-        minWidth: 150,
-        maxWidth: 250,
-        render: (_, row) => {
-          const features = convertProductMasterFeaturesToArrayKey(
-            row.productMaster?.features,
-          );
+    },
+    {
+      key: "sku",
+      label: "SKU",
+      minWidth: 100,
+      maxWidth: 150,
+      render: (value) => value,
+    },
+    {
+      key: "barcode",
+      label: "Barcode",
+      minWidth: 120,
+      maxWidth: 200,
+      render: (value) => value,
+    },
+    {
+      key: "baseUom.name",
+      label: "Base UOM",
+      minWidth: 100,
+      maxWidth: 150,
+      render: (_, row) => localized(row.baseUom?.name as LocalizeText),
+    },
+    {
+      key: "productMaster.type",
+      label: "Type",
+      minWidth: 100,
+      maxWidth: 150,
+      render: (_, row) => getNameProductType(row.productMaster?.type),
+    },
+    {
+      key: "productMaster.features",
+      label: "Features",
+      minWidth: 150,
+      maxWidth: 250,
+      render: (_, row) => {
+        const features = convertProductMasterFeaturesToArrayKey(
+          row.productMaster?.features
+        );
 
-          return features.map((feature) =>
-            tProduct(`productFeature.${feature}`),
-          );
-        },
+        return features.map((feature) => tProduct(`productFeature.${feature}`));
       },
-      {
-        key: "status",
-        label: "Status",
-        align: "center",
-        minWidth: 100,
-        maxWidth: 120,
-        render: (_, row) => {
-          return (
-            <IBaseChip
-              color={row.isActive ? "success" : "danger"}
-              size="sm"
-              variant="flat"
-            >
-              {row.isActive ? "Active" : "Inactive"}
-            </IBaseChip>
-          );
-        },
+    },
+    {
+      key: "status",
+      label: "Status",
+      align: "center",
+      minWidth: 100,
+      maxWidth: 120,
+      render: (_, row) => {
+        return (
+          <IBaseChip
+            color={row.isActive ? "success" : "danger"}
+            size="sm"
+            variant="flat"
+          >
+            {row.isActive ? "Active" : "Inactive"}
+          </IBaseChip>
+        );
       },
-      {
-        key: "productMaster.category.name",
-        label: "Category",
-        minWidth: 120,
-        maxWidth: 200,
-        render: (_, row) =>
-          localized(row.productMaster?.category?.name as LocalizeText) ||
-          row.productMaster?.category?.code,
-      },
-      {
-        key: "manufacturer.name",
-        label: "Manufacturer",
-        minWidth: 120,
-        maxWidth: 200,
-        render: (_, row) =>
-          typeof row.manufacturer?.name === "string"
-            ? row.manufacturer.name
-            : (row.manufacturer?.code ?? "-"),
-      },
-      {
-        key: "productMaster.brand",
-        label: "Brand",
-        minWidth: 100,
-        maxWidth: 180,
-        render: (_, row) =>
-          typeof row.productMaster?.brand === "string"
-            ? row.productMaster.brand
-            : "-",
-      },
+    },
+    {
+      key: "productMaster.category.name",
+      label: "Category",
+      minWidth: 120,
+      maxWidth: 200,
+      render: (_, row) =>
+        localized(row.productMaster?.category?.name as LocalizeText) ||
+        row.productMaster?.category?.code,
+    },
+    {
+      key: "manufacturer.name",
+      label: "Manufacturer",
+      minWidth: 120,
+      maxWidth: 200,
+      render: (_, row) =>
+        typeof row.manufacturer?.name === "string"
+          ? row.manufacturer.name
+          : (row.manufacturer?.code ?? "-"),
+    },
+    {
+      key: "productMaster.brand",
+      label: "Brand",
+      minWidth: 100,
+      maxWidth: 180,
+      render: (_, row) =>
+        typeof row.productMaster?.brand === "string"
+          ? row.productMaster.brand
+          : "-",
+    },
 
-      {
-        key: "createdAt",
-        label: "Created At",
-        minWidth: 120,
-        maxWidth: 150,
-        render: (_, row) => formatDate(row.createdAt),
-      },
-      {
-        key: "updatedAt",
-        label: "Updated At",
-        minWidth: 120,
-        maxWidth: 150,
-        render: (_, row) => formatDate(row.updatedAt),
-      },
-      {
-        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
-        label: t("columns.action"),
-        align: "end",
-        minWidth: 80,
-        maxWidth: 100,
-        render: (_, row) => {
-          const viewLink = getClientLink({
-            mdl: "product",
-            path: "view/[id]",
-            as: `view/${row.id}`,
-          });
-          const editLink = getClientLink({
-            mdl: "product",
-            path: "edit/[id]",
-            as: `edit/${row.id}`,
-          });
+    {
+      key: "createdAt",
+      label: "Created At",
+      minWidth: 120,
+      maxWidth: 150,
+      render: (_, row) => formatDate(row.createdAt),
+    },
+    {
+      key: "updatedAt",
+      label: "Updated At",
+      minWidth: 120,
+      maxWidth: 150,
+      render: (_, row) => formatDate(row.updatedAt),
+    },
+    {
+      key: I_BASE_TABLE_COLUMN_KEY_ACTION,
+      label: t("columns.action"),
+      align: "end",
+      minWidth: 80,
+      maxWidth: 100,
+      render: (_, row) => {
+        const viewLink = getClientLink({
+          mdl: "product",
+          path: "view/[id]",
+          as: `view/${row.id}`,
+        });
+        const editLink = getClientLink({
+          mdl: "product",
+          path: "edit/[id]",
+          as: `edit/${row.id}`,
+        });
 
-          return (
-            <ActionMenu
-              actions={[
-                {
-                  key: "view",
-                  label: "View",
-                  href: viewLink.path,
-                  as: viewLink.as,
-                },
-                {
-                  key: "edit",
-                  label: "Edit",
-                  href: editLink.path,
-                  as: editLink.as,
-                },
-              ]}
-            />
-          );
-        },
+        return (
+          <ActionMenu
+            actions={[
+              {
+                key: "view",
+                label: "View",
+                href: viewLink.path,
+                as: viewLink.as,
+              },
+              {
+                key: "edit",
+                label: "Edit",
+                href: editLink.path,
+                as: editLink.as,
+              },
+            ]}
+          />
+        );
       },
-    ];
+    },
+  ];
 
   const createLink = getClientLink({
     mdl: "product",

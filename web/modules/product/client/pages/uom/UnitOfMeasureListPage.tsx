@@ -3,16 +3,17 @@
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import type { LocaleDataType } from "@base/shared/interface/Locale";
 
+import { useTranslations } from "next-intl";
+import React from "react";
+
+import { IBaseButton, IBaseChip } from "@base/client";
 import {
   I_BASE_TABLE_COLUMN_KEY_ACTION,
   type IBaseTableColumnDefinition,
 } from "@base/client/components";
-import LinkAs from "@base/client/components/LinkAs";
+import IBaseLink from "@base/client/components/IBaseLink";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { IBaseButton, IBaseChip } from "@base/client";
-import React from "react";
-import { useTranslations } from "next-intl";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
 
 interface UnitOfMeasureRow {
@@ -28,51 +29,56 @@ const UnitOfMeasureListPage = (): React.ReactNode => {
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<UnitOfMeasureRow>[] = [
-      {
-        key: "name",
-        label: "Unit name",
-        render: (_, row) =>
-          localized((row.name ?? row.id) as LocalizeText) || row.id,
-      },
-      {
-        key: "symbol",
-        label: "Symbol",
-        render: (value) => value ?? "—",
-      },
-      {
-        key: "isActive",
-        label: "Status",
-        align: "center",
-        render: (_, row) => (
-          <IBaseChip
-            className="capitalize"
-            color={row.isActive ? "success" : "default"}
-            size="sm"
-            variant="flat"
-          >
-            {row.isActive ? "active" : "inactive"}
-          </IBaseChip>
-        ),
-      },
-      {
-        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
-        label: t("columns.action"),
-        align: "end",
-        render: (_, row) => {
-          const { as } = getClientLink({
-            mdl: "product",
-            path: "uom/view/[id]",
-            as: `uom/view/${row.id}`,
-          });
+    {
+      key: "name",
+      label: "Unit name",
+      render: (_, row) =>
+        localized((row.name ?? row.id) as LocalizeText) || row.id,
+    },
+    {
+      key: "symbol",
+      label: "Symbol",
+      render: (value) => value ?? "—",
+    },
+    {
+      key: "isActive",
+      label: "Status",
+      align: "center",
+      render: (_, row) => (
+        <IBaseChip
+          className="capitalize"
+          color={row.isActive ? "success" : "default"}
+          size="sm"
+          variant="flat"
+        >
+          {row.isActive ? "active" : "inactive"}
+        </IBaseChip>
+      ),
+    },
+    {
+      key: I_BASE_TABLE_COLUMN_KEY_ACTION,
+      label: t("columns.action"),
+      align: "end",
+      render: (_, row) => {
+        const { as } = getClientLink({
+          mdl: "product",
+          path: "uom/view/[id]",
+          as: `uom/view/${row.id}`,
+        });
 
-          return (
-            <IBaseButton as={LinkAs as any} href={as} size="sm" variant="light">
-              View
-            </IBaseButton>
-          );
-        },
+        return (
+          <IBaseButton
+            as={IBaseLink as any}
+            href={as}
+            size="sm"
+            variant="light"
+          >
+            View
+          </IBaseButton>
+        );
       },
-    ];
+    },
+  ];
 
   const createLink = getClientLink({
     mdl: "product",

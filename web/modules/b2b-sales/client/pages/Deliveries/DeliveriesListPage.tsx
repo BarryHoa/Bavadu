@@ -1,14 +1,14 @@
 "use client";
 
-import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
+import { IBaseChip } from "@base/client";
 import {
   I_BASE_TABLE_COLUMN_KEY_ACTION,
   IBaseTableColumnDefinition,
 } from "@base/client/components";
-import LinkAs from "@base/client/components/LinkAs";
+import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
+import IBaseLink from "@base/client/components/IBaseLink";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { IBaseChip } from "@base/client";
 import { useTranslations } from "next-intl";
 import React from "react";
 
@@ -28,71 +28,71 @@ export default function DeliveriesListPage(): React.ReactNode {
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<DeliveryRow>[] = [
-      {
-        key: "reference",
-        label: "Reference",
-        render: (value, row) => {
-          if (!row?.id) return value || "-";
+    {
+      key: "reference",
+      label: "Reference",
+      render: (value, row) => {
+        if (!row?.id) return value || "-";
 
-          return (
-            <LinkAs
-              href={`/workspace/modules/b2b-sales/deliveries/view/${row.id}`}
-            >
-              {value || row.id.substring(0, 8)}
-            </LinkAs>
-          );
-        },
+        return (
+          <IBaseLink
+            href={`/workspace/modules/b2b-sales/deliveries/view/${row.id}`}
+          >
+            {value || row.id.substring(0, 8)}
+          </IBaseLink>
+        );
       },
-      {
-        key: "orderType",
-        label: "Order Type",
-        render: (value) => (
-          <IBaseChip className="capitalize" size="sm" variant="flat">
-            {value || "B2B"}
-          </IBaseChip>
-        ),
-      },
-      {
-        key: "deliveryDate",
-        label: "Delivery Date",
-        render: (value) => formatDate(value),
-      },
-      {
-        key: "status",
-        label: "Status",
-        render: (value) => (
-          <IBaseChip className="capitalize" size="sm" variant="flat">
-            {value || "draft"}
-          </IBaseChip>
-        ),
-      },
-      {
-        key: "createdAt",
-        label: "Created",
-        render: (value) => formatDate(value),
-      },
-      {
-        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
-        label: tDataTable("columns.action"),
-        align: "end",
-        render: (_, row) => {
-          if (!row?.id) return null;
-          const viewLink = `/workspace/modules/b2b-sales/deliveries/view/${row.id}`;
+    },
+    {
+      key: "orderType",
+      label: "Order Type",
+      render: (value) => (
+        <IBaseChip className="capitalize" size="sm" variant="flat">
+          {value || "B2B"}
+        </IBaseChip>
+      ),
+    },
+    {
+      key: "deliveryDate",
+      label: "Delivery Date",
+      render: (value) => formatDate(value),
+    },
+    {
+      key: "status",
+      label: "Status",
+      render: (value) => (
+        <IBaseChip className="capitalize" size="sm" variant="flat">
+          {value || "draft"}
+        </IBaseChip>
+      ),
+    },
+    {
+      key: "createdAt",
+      label: "Created",
+      render: (value) => formatDate(value),
+    },
+    {
+      key: I_BASE_TABLE_COLUMN_KEY_ACTION,
+      label: tDataTable("columns.action"),
+      align: "end",
+      render: (_, row) => {
+        if (!row?.id) return null;
+        const viewLink = `/workspace/modules/b2b-sales/deliveries/view/${row.id}`;
 
-          return (
-            <ActionMenu
-              actions={[
-                {
-                  key: "view",
-                  label: "View",
-                  href: viewLink,
-                },
-              ]}
-            />
-          );
-        },
+        return (
+          <ActionMenu
+            actions={[
+              {
+                key: "view",
+                label: "View",
+                href: viewLink,
+              },
+            ]}
+          />
+        );
       },
-    ];
+    },
+  ];
 
   return (
     <div className="space-y-4">

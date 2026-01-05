@@ -9,7 +9,7 @@ import {
   IBaseTableColumnDefinition,
 } from "@base/client/components";
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
-import LinkAs from "@base/client/components/LinkAs";
+import IBaseLink from "@base/client/components/IBaseLink";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
 
@@ -32,11 +32,11 @@ export default function CustomerCompaniesListPage(): React.ReactNode {
         if (!row?.id) return value;
 
         return (
-          <LinkAs
+          <IBaseLink
             href={`/workspace/modules/b2b-sales/customers/companies/view/${row.id}`}
           >
             {row.code}
-          </LinkAs>
+          </IBaseLink>
         );
       },
     },

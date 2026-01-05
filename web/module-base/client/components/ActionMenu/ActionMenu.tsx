@@ -43,8 +43,10 @@ const isLink = (action: ActionItem): action is ActionItemLink =>
   "href" in action;
 
 const ActionMenu: React.FC<ActionMenuProps> = ({ actions, className }) => {
-  const inlineActions = actions.filter((a) => a.placement !== "menu");
-  const menuActions = actions.filter((a) => a.placement === "menu");
+  const inlineActions = actions.filter((a) => a.placement === "inline");
+  const menuActions = actions.filter(
+    (a) => a.placement === "menu" || !a.placement
+  );
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
@@ -109,7 +111,17 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ actions, className }) => {
                     }
                   : {})}
               >
-                {action.label}
+                {isLink(action) ? (
+                  <IBaseLink
+                    href={action.href}
+                    rel={action.as}
+                    target={action.target}
+                  >
+                    {action.label}
+                  </IBaseLink>
+                ) : (
+                  action.label
+                )}
               </IBaseDropdownItem>
             )}
           </IBaseDropdownMenu>

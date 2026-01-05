@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import {
   IBaseButton,
   IBaseCard,
@@ -8,7 +10,6 @@ import {
   IBaseInput,
   IBaseLink,
 } from "@base/client/components";
-import { useState } from "react";
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState("");

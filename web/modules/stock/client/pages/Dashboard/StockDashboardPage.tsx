@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
 import { IBaseButton } from "@base/client";
-import LinkAs from "@base/client/components/LinkAs";
+import { IBaseLink } from "@base/client/components";
 
 import QuickActionsSection from "./components/QuickActionsSection";
 import StockSummarySection from "./components/StockSummarySection";
@@ -157,7 +157,7 @@ export default function StockDashboardPage(): React.ReactNode {
     <div className="space-y-6">
       <div className="flex justify-end">
         <IBaseButton
-          as={LinkAs as any}
+          as={IBaseLink as any}
           color="primary"
           href="/workspace/modules/stock/warehouses"
           size="sm"

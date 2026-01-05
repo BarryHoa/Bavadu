@@ -13,7 +13,7 @@ import {
   IBaseSpinner,
 } from "@base/client";
 import { IBaseInput } from "@base/client/components";
-import LinkAs from "@base/client/components/LinkAs";
+import IBaseLink from "@base/client/components/IBaseLink";
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 
 import {
@@ -136,7 +136,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
           Purchase order identifier is missing.
         </div>
         <IBaseButton
-          as={LinkAs as any}
+          as={IBaseLink as any}
           href="/workspace/modules/purchase"
           size="sm"
           variant="light"
@@ -164,7 +164,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
             : "Failed to fetch purchase order."}
         </div>
         <IBaseButton
-          as={LinkAs as any}
+          as={IBaseLink as any}
           href="/workspace/modules/purchase"
           size="sm"
           variant="light"
@@ -180,7 +180,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
       <div className="space-y-4">
         <p className="text-default-500">Purchase order not found.</p>
         <IBaseButton
-          as={LinkAs as any}
+          as={IBaseLink as any}
           href="/workspace/modules/purchase"
           size="sm"
           variant="light"
@@ -195,7 +195,7 @@ export default function PurchaseOrderDetailPage(): React.ReactNode {
     <div className="space-y-6">
       <div className="flex justify-end">
         <IBaseButton
-          as={LinkAs as any}
+          as={IBaseLink as any}
           href="/workspace/modules/purchase"
           size="sm"
           variant="light"

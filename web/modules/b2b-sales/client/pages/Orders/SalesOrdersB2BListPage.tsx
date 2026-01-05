@@ -1,16 +1,17 @@
 "use client";
 
-import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
+import { useTranslations } from "next-intl";
+import React from "react";
+
+import { IBaseChip } from "@base/client";
 import {
   I_BASE_TABLE_COLUMN_KEY_ACTION,
   IBaseTableColumnDefinition,
 } from "@base/client/components";
-import LinkAs from "@base/client/components/LinkAs";
+import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
+import IBaseLink from "@base/client/components/IBaseLink";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { formatDate } from "@base/client/utils/date/formatDate";
-import { IBaseChip } from "@base/client";
-import { useTranslations } from "next-intl";
-import React from "react";
 
 import { SalesOrderB2B } from "../../interface/SalesOrderB2B";
 
@@ -25,68 +26,68 @@ export default function SalesOrdersB2BListPage(): React.ReactNode {
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<SalesOrderB2BRow>[] = [
-      {
-        key: "code",
-        label: "Code",
-        render: (value, row) => {
-          if (!row?.id) return value;
+    {
+      key: "code",
+      label: "Code",
+      render: (value, row) => {
+        if (!row?.id) return value;
 
-          return (
-            <LinkAs href={`/workspace/modules/b2b-sales/view/${row.id}`}>
-              {row.code}
-            </LinkAs>
-          );
-        },
+        return (
+          <IBaseLink href={`/workspace/modules/b2b-sales/view/${row.id}`}>
+            {row.code}
+          </IBaseLink>
+        );
       },
-      {
-        key: "companyName",
-        label: "Company Name",
-      },
-      {
-        key: "status",
-        label: "Status",
-        render: (value) => (
-          <IBaseChip className="capitalize" size="sm" variant="flat">
-            {value || "draft"}
-          </IBaseChip>
-        ),
-      },
-      {
-        key: "expectedDate",
-        label: "Expected Date",
-        render: (value) => formatDate(value),
-      },
-      {
-        key: "grandTotal",
-        label: "Total Amount",
-        render: (_, row) =>
-          new Intl.NumberFormat(undefined, {
-            style: "currency",
-            currency: row.currency || "USD",
-          }).format(Number(row.grandTotal ?? 0)),
-      },
-      {
-        key: I_BASE_TABLE_COLUMN_KEY_ACTION,
-        label: tDataTable("columns.action"),
-        align: "end",
-        render: (_, row) => {
-          if (!row?.id) return null;
-          const viewLink = `/workspace/modules/b2b-sales/view/${row.id}`;
+    },
+    {
+      key: "companyName",
+      label: "Company Name",
+    },
+    {
+      key: "status",
+      label: "Status",
+      render: (value) => (
+        <IBaseChip className="capitalize" size="sm" variant="flat">
+          {value || "draft"}
+        </IBaseChip>
+      ),
+    },
+    {
+      key: "expectedDate",
+      label: "Expected Date",
+      render: (value) => formatDate(value),
+    },
+    {
+      key: "grandTotal",
+      label: "Total Amount",
+      render: (_, row) =>
+        new Intl.NumberFormat(undefined, {
+          style: "currency",
+          currency: row.currency || "USD",
+        }).format(Number(row.grandTotal ?? 0)),
+    },
+    {
+      key: I_BASE_TABLE_COLUMN_KEY_ACTION,
+      label: tDataTable("columns.action"),
+      align: "end",
+      render: (_, row) => {
+        if (!row?.id) return null;
+        const viewLink = `/workspace/modules/b2b-sales/view/${row.id}`;
 
-          return (
-            <ActionMenu
-              actions={[
-                {
-                  key: "view",
-                  label: "View",
-                  href: viewLink,
-                },
-              ]}
-            />
-          );
-        },
+        return (
+          <ActionMenu
+            actions={[
+              {
+                key: "view",
+                label: "View",
+                href: viewLink,
+              },
+            ]}
+          />
+        );
       },
-    ];
+    },
+  ];
 
   return (
     <div className="space-y-4">

@@ -1,5 +1,10 @@
 "use client";
 
+import { Eye, EyeOff } from "lucide-react";
+import IBaseImage from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
 import {
   IBaseButton,
   IBaseCard,
@@ -9,10 +14,6 @@ import {
   IBaseInput,
   IBaseLink,
 } from "@base/client/components";
-import { Eye, EyeOff } from "lucide-react";
-import IBaseImage from "next/image";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 export default function LoginPage() {
   const router = useRouter();

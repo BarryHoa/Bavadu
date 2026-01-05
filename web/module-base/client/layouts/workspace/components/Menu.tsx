@@ -1,12 +1,34 @@
 "use client";
-import { IBaseDivider, IBaseScrollShadow, IBaseTooltip } from "@base/client/components";
 
-import { MenuWorkspaceElement } from "@base/client/interface/WorkspaceMenuInterface";
 import clsx from "clsx";
-import { BarChart3, Boxes, Building2, ChevronDown, ChevronRight, Circle, ClipboardList, NewspaperIcon, Package, Pin, PinOff, Settings, ShoppingCart, TrendingUp, User, type LucideIcon } from "lucide-react";
-import IBaseLink from "next/link";
+import {
+  BarChart3,
+  Boxes,
+  Building2,
+  ChevronDown,
+  ChevronRight,
+  Circle,
+  ClipboardList,
+  NewspaperIcon,
+  Package,
+  Pin,
+  PinOff,
+  Settings,
+  ShoppingCart,
+  TrendingUp,
+  User,
+  type LucideIcon,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+
+import {
+  IBaseDivider,
+  IBaseLink,
+  IBaseScrollShadow,
+  IBaseTooltip,
+} from "@base/client/components";
+import { MenuWorkspaceElement } from "@base/client/interface/WorkspaceMenuInterface";
 
 const KEY_WORKSPACE_LAST_MENU_PATH = "last_menu_key";
 
@@ -71,7 +93,7 @@ export default function Menu({
     setExpandedItems((prev) =>
       prev.includes(itemName)
         ? prev.filter((name) => name !== itemName)
-        : [...prev, itemName],
+        : [...prev, itemName]
     );
   };
 
@@ -87,7 +109,7 @@ export default function Menu({
   // Tìm tất cả các item cha cần expand theo một đường dẫn bất kỳ
   const findParentItemsToExpandByPath = (
     items: MenuWorkspaceElement[],
-    path: string,
+    path: string
   ): string[] => {
     const parentsToExpand: string[] = [];
 
@@ -121,7 +143,7 @@ export default function Menu({
 
   const findKeyByPath = (
     items: MenuWorkspaceElement[],
-    path: string,
+    path: string
   ): string | null => {
     const normalized = normalizePath(path);
     let foundKey: string | null = null;
@@ -151,12 +173,12 @@ export default function Menu({
 
   const hasActiveChildByKey = (
     item: MenuWorkspaceElement,
-    key: string | null,
+    key: string | null
   ): boolean => {
     if (!key || !item.children) return false;
 
     return item.children.some(
-      (child) => child.key === key || hasActiveChildByKey(child, key),
+      (child) => child.key === key || hasActiveChildByKey(child, key)
     );
   };
 
@@ -164,20 +186,20 @@ export default function Menu({
   useEffect(() => {
     const parentsToExpand: string[] = findParentItemsToExpandByPath(
       flattenedMenus,
-      pathname,
+      pathname
     );
 
     const normalizedPathName = normalizePath(pathname);
     const keyToSet: string | null =
       flattenedMenus.find(
-        (item) => normalizePath(item.path || "") === normalizedPathName,
+        (item) => normalizePath(item.path || "") === normalizedPathName
       )?.key || null;
 
     setActiveKey(keyToSet);
 
     if (parentsToExpand.length > 0) {
       setExpandedItems((prev) =>
-        Array.from(new Set([...prev, ...parentsToExpand])),
+        Array.from(new Set([...prev, ...parentsToExpand]))
       );
     }
   }, [pathname, menuItems]);
@@ -191,7 +213,7 @@ export default function Menu({
           "inline-flex h-7 w-7 items-center justify-center rounded-lg border text-[11px] flex-shrink-0",
           isHighlighted
             ? "bg-blue-600 border-blue-600 text-white shadow-sm"
-            : "bg-slate-50 border-slate-200 text-slate-500 group-hover:bg-blue-50 group-hover:border-blue-200 group-hover:text-blue-500",
+            : "bg-slate-50 border-slate-200 text-slate-500 group-hover:bg-blue-50 group-hover:border-blue-200 group-hover:text-blue-500"
         )}
       >
         <IconComponent className="h-4 w-4" />
@@ -219,7 +241,7 @@ export default function Menu({
           "border border-transparent",
           isHighlighted
             ? "bg-blue-50 text-blue-700 border-blue-100 shadow-[0_0_0_1px_rgba(59,130,246,0.15)]"
-            : "text-slate-700 hover:bg-slate-50 hover:text-blue-600",
+            : "text-slate-700 hover:bg-slate-50 hover:text-blue-600"
         )}
         type="button"
         onClick={() => {
@@ -237,7 +259,7 @@ export default function Menu({
               "transition-all duration-300",
               effectiveOpen
                 ? "opacity-100 translate-x-0 max-w-[160px]"
-                : "opacity-0 -translate-x-1 max-w-0",
+                : "opacity-0 -translate-x-1 max-w-0"
             )}
           >
             {item.name}
@@ -248,7 +270,7 @@ export default function Menu({
           <div
             className={clsx(
               "transition-all duration-200",
-              effectiveOpen ? "opacity-100" : "opacity-0 hidden",
+              effectiveOpen ? "opacity-100" : "opacity-0 hidden"
             )}
           >
             {isExpanded ? (
@@ -281,7 +303,7 @@ export default function Menu({
               if (typeof window !== "undefined" && item.key) {
                 window.localStorage.setItem(
                   KEY_WORKSPACE_LAST_MENU_PATH,
-                  item.key,
+                  item.key
                 );
               }
 
@@ -307,7 +329,7 @@ export default function Menu({
               "transition-all duration-200",
               effectiveOpen
                 ? "opacity-100"
-                : "opacity-0 max-h-0 overflow-hidden",
+                : "opacity-0 max-h-0 overflow-hidden"
             )}
           >
             {item.children?.map((child) => {
@@ -323,14 +345,14 @@ export default function Menu({
                     "flex items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-all duration-150",
                     isChildActive
                       ? "bg-blue-100 text-blue-700 font-medium"
-                      : "text-slate-600 hover:bg-slate-50 hover:text-blue-600",
+                      : "text-slate-600 hover:bg-slate-50 hover:text-blue-600"
                   )}
                   href={childPath || "#"}
                   onClick={() => {
                     if (typeof window !== "undefined" && child.key) {
                       window.localStorage.setItem(
                         KEY_WORKSPACE_LAST_MENU_PATH,
-                        child.key,
+                        child.key
                       );
                     }
 
@@ -345,7 +367,7 @@ export default function Menu({
                         "transition-all duration-300 whitespace-nowrap overflow-hidden text-ellipsis",
                         effectiveOpen
                           ? "opacity-100 translate-x-0 max-w-[160px]"
-                          : "opacity-0 -translate-x-1 max-w-0",
+                          : "opacity-0 -translate-x-1 max-w-0"
                       )}
                     >
                       {child.name}
@@ -374,7 +396,7 @@ export default function Menu({
         className={clsx(
           "hidden lg:flex lg:flex-col flex-shrink-0 transition-all duration-300 ease-in-out",
           "bg-white/90 backdrop-blur border-r border-slate-100 shadow-sm",
-          effectiveOpen ? "w-64" : "w-[4.25rem]",
+          effectiveOpen ? "w-64" : "w-[4.25rem]"
         )}
         onMouseEnter={() => {
           if (!isOpen) {
@@ -393,7 +415,7 @@ export default function Menu({
             className={clsx(
               "mb-2 flex items-center gap-2 rounded-xl px-2 py-1.5",
               "bg-slate-50/80 border border-slate-100",
-              effectiveOpen ? "justify-between" : "justify-center",
+              effectiveOpen ? "justify-between" : "justify-center"
             )}
           >
             <div
@@ -402,7 +424,7 @@ export default function Menu({
                 "transition-all duration-300 whitespace-nowrap overflow-hidden",
                 effectiveOpen
                   ? "opacity-100 translate-x-0 max-w-[160px]"
-                  : "opacity-0 -translate-x-1 max-w-0",
+                  : "opacity-0 -translate-x-1 max-w-0"
               )}
             >
               Main

@@ -11,7 +11,7 @@ import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import { useTranslations } from "next-intl";
-import LinkAs from "@base/client/components/LinkAs";
+import { IBaseLink } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
 
@@ -95,7 +95,7 @@ export default function ProductsViewPage(): React.ReactNode {
         </IBaseButton>
         {editLink ? (
           <IBaseButton
-            as={LinkAs as any}
+            as={IBaseLink as any}
             className="ml-2"
             color="primary"
             href={editLink.path}

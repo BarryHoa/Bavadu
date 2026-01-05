@@ -1,18 +1,8 @@
 "use client";
 
-import {
-  IBaseInput,
-  IBaseSingleSelect,
-  SelectItemOption,
-} from "@base/client/components";
-import LinkAs from "@base/client/components/LinkAs";
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
-import { IBaseButton } from "@base/client";
-import { IBaseCard, IBaseCardBody, IBaseTextarea } from "@base/client";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
 import {
   Controller,
   useFieldArray,
@@ -29,6 +19,20 @@ import {
   string,
   trim,
 } from "valibot";
+
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBaseTextarea,
+} from "@base/client";
+import {
+  IBaseInput,
+  IBaseSingleSelect,
+  SelectItemOption,
+} from "@base/client/components";
+import IBaseLink from "@base/client/components/IBaseLink";
+import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
 import StockService from "@mdl/stock/client/services/StockService";
 
 import { purchaseOrderService } from "../../services/PurchaseOrderService";
@@ -39,8 +43,8 @@ const quantitySchema = pipe(
   minLength(1, "Quantity is required"),
   custom(
     (value) => !Number.isNaN(Number(value)) && Number(value) > 0,
-    "Quantity must be a positive number",
-  ),
+    "Quantity must be a positive number"
+  )
 );
 
 const unitPriceSchema = pipe(
@@ -49,8 +53,8 @@ const unitPriceSchema = pipe(
   custom(
     (value) =>
       value === "" || (!Number.isNaN(Number(value)) && Number(value) >= 0),
-    "Unit price must be a number greater than or equal to 0",
-  ),
+    "Unit price must be a number greater than or equal to 0"
+  )
 );
 
 const orderLineSchema = object({
@@ -68,7 +72,7 @@ const purchaseOrderFormSchema = object({
   notes: optional(pipe(string(), trim())),
   lines: pipe(
     array(orderLineSchema),
-    minLength(1, "At least one order line is required"),
+    minLength(1, "At least one order line is required")
   ),
 });
 
@@ -180,16 +184,18 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
   };
 
   // React Compiler will automatically optimize this computation
-  const warehouseOptions: SelectItemOption[] = (warehousesQuery.data ?? []).map((warehouse) => ({
-    value: warehouse.id,
-    label: `${warehouse.code} — ${warehouse.name}`,
-  }));
+  const warehouseOptions: SelectItemOption[] = (warehousesQuery.data ?? []).map(
+    (warehouse) => ({
+      value: warehouse.id,
+      label: `${warehouse.code} — ${warehouse.name}`,
+    })
+  );
 
   return (
     <div className="space-y-6">
       <div className="flex justify-end">
         <IBaseButton
-          as={LinkAs as any}
+          as={IBaseLink as any}
           href="/workspace/modules/purchase"
           size="sm"
           variant="light"
@@ -305,7 +311,10 @@ export default function PurchaseOrderCreatePage(): React.ReactNode {
               </div>
 
               {fields.map((fieldItem, index) => (
-                <IBaseCard key={fieldItem.id} className="border border-content3/40">
+                <IBaseCard
+                  key={fieldItem.id}
+                  className="border border-content3/40"
+                >
                   <IBaseCardBody className="space-y-3">
                     <div className="grid gap-3 md:grid-cols-4">
                       <Controller

@@ -16,7 +16,7 @@ import {
 import { useLocalizedText } from "../../hooks/useLocalizedText";
 import { IBaseTable } from "../IBaseTable";
 import { IBaseTablePagination } from "../IBaseTable/IBaseTableInterface";
-import LinkAs from "../LinkAs";
+import { IBaseLink } from "../IBaseLink";
 import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 
 import ColumnVisibilityMenu from "./components/ColumnVisibilityMenu";
@@ -207,7 +207,7 @@ export default function ViewListDataTable<T = any>(
             return (
               <IBaseButton
                 key={action.key}
-                as={LinkAs as any}
+                as={IBaseLink as any}
                 color={color}
                 href={linkProps.href as string}
                 size={size}
