@@ -108,20 +108,12 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ actions, className }) => {
                       href: action.href,
                       target: action.target,
                       rel: action.as,
+                      hrefAs: action.as,
                     }
                   : {})}
+                as={isLink(action) ? IBaseLink : undefined}
               >
-                {isLink(action) ? (
-                  <IBaseLink
-                    href={action.href}
-                    rel={action.as}
-                    target={action.target}
-                  >
-                    {action.label}
-                  </IBaseLink>
-                ) : (
-                  action.label
-                )}
+                {action.label}
               </IBaseDropdownItem>
             )}
           </IBaseDropdownMenu>
