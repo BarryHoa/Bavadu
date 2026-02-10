@@ -69,32 +69,46 @@ export default function Menu({
 
   const effectiveOpen = isOpen || isHoverOpen;
 
-  // Memoize the flattened menu list for efficiency
-  const flattenedMenus = useMemo(() => {
-    return menuItems
-      .flatMap((item) => {
-        if (item.children && item.children.length > 0) {
-          const children = item.children.flat();
+  // Flatten toàn bộ cây menu (nhiều cấp)
+  type FlattenedMenuItem = MenuWorkspaceElement & { parentKey?: string };
 
-          return [item, ...children];
-        }
+  const flattenedMenus = useMemo<FlattenedMenuItem[]>(() => {
+    const result: FlattenedMenuItem[] = [];
 
-        return [item];
-      })
-      .sort((a: any, b: any) => {
-        const lenA = (a.path || "").length;
-        const lenB = (b.path || "").length;
+    const traverse = (item: MenuWorkspaceElement, parentKey?: string) => {
+      result.push({ ...item, parentKey });
+      item.children?.forEach((child) => traverse(child, item.key));
+    };
 
-        return lenB - lenA; // long to short
-      });
+    menuItems.forEach((item) => traverse(item));
+
+    return result.sort((a, b) => {
+      const lenA = (a.path || "").length;
+      const lenB = (b.path || "").length;
+
+      return lenB - lenA; // long to short
+    });
   }, [menuItems]);
 
-  const toggleExpanded = (itemName: string) => {
-    setExpandedItems((prev) =>
-      prev.includes(itemName)
-        ? prev.filter((name) => name !== itemName)
-        : [...prev, itemName]
-    );
+  const getParentKeys = (key: string | null | undefined): string[] => {
+    if (!key) return [];
+
+    const parents: string[] = [];
+    let current = flattenedMenus.find((item) => item.key === key);
+
+    while (current?.parentKey) {
+      parents.unshift(current.parentKey);
+      current = flattenedMenus.find(
+        (item) => item.key === current?.parentKey,
+      );
+    }
+
+    return parents;
+  };
+
+  const toggleExpanded = (itemKey: string) => {
+    const parentKeys = getParentKeys(itemKey);
+    setExpandedItems(Array.from(new Set([...parentKeys, itemKey])));
   };
 
   const normalizePath = (value: string) => {
@@ -106,103 +120,40 @@ export default function Menu({
     return trimmed || "/";
   };
 
-  // Tìm tất cả các item cha cần expand theo một đường dẫn bất kỳ
-  const findParentItemsToExpandByPath = (
-    items: MenuWorkspaceElement[],
-    path: string
-  ): string[] => {
-    const parentsToExpand: string[] = [];
-
-    const checkItem = (item: MenuWorkspaceElement): boolean => {
-      if (item.path && path) {
-        const normalized = normalizePath(path);
-        const itemPath = normalizePath(item.path);
-
-        if (normalized === itemPath || normalized.startsWith(`${itemPath}/`)) {
-          return true;
-        }
-      }
-
-      if (item.children) {
-        const hasActiveChild = item.children.some((child) => checkItem(child));
-
-        if (hasActiveChild) {
-          parentsToExpand.push(item.name);
-        }
-
-        return hasActiveChild;
-      }
-
-      return false;
-    };
-
-    items.forEach((item) => checkItem(item));
-
-    return parentsToExpand;
-  };
-
-  const findKeyByPath = (
-    items: MenuWorkspaceElement[],
-    path: string
-  ): string | null => {
-    const normalized = normalizePath(path);
-    let foundKey: string | null = null;
-
-    const checkItem = (item: MenuWorkspaceElement): boolean => {
-      if (item.path) {
-        const itemPath = normalizePath(item.path);
-
-        if (normalized === itemPath || normalized.startsWith(`${itemPath}/`)) {
-          foundKey = item.key;
-
-          return true;
-        }
-      }
-
-      if (item.children) {
-        return item.children.some((child) => checkItem(child));
-      }
-
-      return false;
-    };
-
-    items.forEach((item) => checkItem(item));
-
-    return foundKey;
-  };
-
   const hasActiveChildByKey = (
     item: MenuWorkspaceElement,
-    key: string | null
+    key: string | null,
   ): boolean => {
     if (!key || !item.children) return false;
 
     return item.children.some(
-      (child) => child.key === key || hasActiveChildByKey(child, key)
+      (child) => child.key === key || hasActiveChildByKey(child, key),
     );
   };
 
   // Tự expand menu và highlight item đang active (ưu tiên theo pathname)
   useEffect(() => {
-    const parentsToExpand: string[] = findParentItemsToExpandByPath(
-      flattenedMenus,
-      pathname
-    );
-
     const normalizedPathName = normalizePath(pathname);
-    const keyToSet: string | null =
+    const activeItem =
       flattenedMenus.find(
-        (item) => normalizePath(item.path || "") === normalizedPathName
-      )?.key || null;
+        (item) => normalizePath(item.path || "") === normalizedPathName,
+      ) || null;
 
+    const keyToSet = activeItem?.key || null;
     setActiveKey(keyToSet);
 
-    if (parentsToExpand.length > 0) {
-      setExpandedItems((prev) =>
-        Array.from(new Set([...prev, ...parentsToExpand]))
-      );
+    if (keyToSet) {
+      const parentsToExpand = getParentKeys(keyToSet);
+
+      if (parentsToExpand.length > 0) {
+        setExpandedItems((prev) =>
+          Array.from(
+            new Set([...prev, ...parentsToExpand, keyToSet].filter(Boolean)),
+          ),
+        );
+      }
     }
-  }, [pathname, menuItems]);
+  }, [pathname, flattenedMenus]);
 
   const renderIcon = (iconName: string | undefined, isHighlighted: boolean) => {
     const IconComponent = (iconName && ICON_MAP[iconName]) || Circle;
@@ -213,7 +164,7 @@ export default function Menu({
           "inline-flex h-7 w-7 items-center justify-center rounded-lg border text-[11px] flex-shrink-0",
           isHighlighted
             ? "bg-blue-600 border-blue-600 text-white shadow-sm"
-            : "bg-slate-50 border-slate-200 text-slate-500 group-hover:bg-blue-50 group-hover:border-blue-200 group-hover:text-blue-500"
+            : "bg-slate-50 border-slate-200 text-slate-500 group-hover:bg-blue-50 group-hover:border-blue-200 group-hover:text-blue-500",
         )}
       >
         <IconComponent className="h-4 w-4" />
@@ -221,45 +172,110 @@ export default function Menu({
     );
   };
 
-  // Render menu item (workspace hoặc module)
-  const renderMenuItem = (item: MenuWorkspaceElement) => {
+  // Render menu item (workspace hoặc module) theo đệ quy
+  const renderMenuItem = (item: MenuWorkspaceElement, level = 0) => {
     const hasChildren = item.children && item.children.length > 0;
-    const isExpanded = expandedItems.includes(item.name);
+    const isExpanded = expandedItems.includes(item.key);
     const itemPath = item.path;
     const isItemActive = activeKey === item.key;
     const hasActiveChildren =
       hasChildren && hasActiveChildByKey(item, activeKey);
     const isHighlighted = isItemActive || hasActiveChildren;
+    const isRootLevel = level === 0;
 
+    const handleLeafClick = () => {
+      if (typeof window !== "undefined" && item.key) {
+        window.localStorage.setItem(KEY_WORKSPACE_LAST_MENU_PATH, item.key);
+      }
+
+      setActiveKey(item.key);
+      onClose();
+    };
+
+    // Leaf node: dùng link
+    if (!hasChildren) {
+      const leafContent = (
+        <div
+          className={clsx(
+            "flex items-center justify-between rounded-lg px-2 py-1.5  transition-all duration-150",
+            isHighlighted
+              ? "bg-blue-100 text-blue-700 "
+              : "text-slate-600 hover:bg-slate-50 hover:text-blue-600",
+          )}
+        >
+          <div className="flex items-center gap-2">
+            {isRootLevel && renderIcon(item.icon, Boolean(isHighlighted))}
+            <span
+              className={clsx(
+                isRootLevel && "tracking-wide uppercase",
+                "transition-all duration-300 whitespace-nowrap overflow-hidden text-ellipsis",
+                effectiveOpen
+                  ? "opacity-100 translate-x-0 max-w-[160px]"
+                  : "opacity-0 -translate-x-1 max-w-0",
+              )}
+            >
+              {item.name}
+            </span>
+          </div>
+
+          {item.badge && effectiveOpen && (
+            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] uppercase tracking-wide text-blue-600">
+              {item.badge}
+            </span>
+          )}
+        </div>
+      );
+
+      return (
+        <div key={item.key || item.name} className="mb-1">
+          <IBaseLink
+            className="block"
+            href={itemPath || "#"}
+            onClick={handleLeafClick}
+            size="md"
+          >
+            {effectiveOpen ? (
+              leafContent
+            ) : (
+              <IBaseTooltip content={item.name} placement="right">
+                {leafContent}
+              </IBaseTooltip>
+            )}
+          </IBaseLink>
+        </div>
+      );
+    }
+
+    // Node có children: dùng button + render đệ quy
     const content = (
       <button
         ref={isItemActive ? activeItemRef : null}
         aria-current={isItemActive ? "page" : undefined}
         aria-expanded={hasChildren ? isExpanded : undefined}
         className={clsx(
-          "group flex w-full items-center justify-between px-2 py-1 rounded-xl cursor-pointer transition-all duration-200 text-left",
+          "group flex w-full items-center justify-between px-2 py-1 rounded-xl cursor-pointer transition-all duration-200",
           "border border-transparent",
           isHighlighted
             ? "bg-blue-50 text-blue-700 border-blue-100 shadow-[0_0_0_1px_rgba(59,130,246,0.15)]"
-            : "text-slate-700 hover:bg-slate-50 hover:text-blue-600"
+            : "text-slate-700 hover:bg-slate-50 hover:text-blue-600",
         )}
         type="button"
         onClick={() => {
           if (hasChildren) {
-            toggleExpanded(item.name);
+            toggleExpanded(item.key);
           }
         }}
       >
         <div className="flex items-center flex-1 gap-2">
-          {renderIcon(item.icon, Boolean(isHighlighted))}
+          {isRootLevel && renderIcon(item.icon, Boolean(isHighlighted))}
           <span
             className={clsx(
-              "text-xs font-semibold tracking-wide uppercase",
+              isRootLevel && "tracking-wide uppercase",
               "whitespace-nowrap overflow-hidden text-ellipsis",
               "transition-all duration-300",
               effectiveOpen
                 ? "opacity-100 translate-x-0 max-w-[160px]"
-                : "opacity-0 -translate-x-1 max-w-0"
+                : "opacity-0 -translate-x-1 max-w-0",
             )}
           >
             {item.name}
@@ -270,7 +286,7 @@ export default function Menu({
           <div
             className={clsx(
               "transition-all duration-200",
-              effectiveOpen ? "opacity-100" : "opacity-0 hidden"
+              effectiveOpen ? "opacity-100" : "opacity-0 hidden",
             )}
           >
             {isExpanded ? (
@@ -284,42 +300,13 @@ export default function Menu({
     );
 
     return (
-      <div key={item.name} className="mb-1">
-        {hasChildren ? (
-          <>
-            {effectiveOpen ? (
-              content
-            ) : (
-              <IBaseTooltip content={item.name} placement="right">
-                {content}
-              </IBaseTooltip>
-            )}
-          </>
+      <div key={item.key || item.name} className="mb-1">
+        {effectiveOpen ? (
+          content
         ) : (
-          <IBaseLink
-            className="block"
-            href={itemPath || "#"}
-            onClick={() => {
-              if (typeof window !== "undefined" && item.key) {
-                window.localStorage.setItem(
-                  KEY_WORKSPACE_LAST_MENU_PATH,
-                  item.key
-                );
-              }
-
-              setActiveKey(item.key);
-
-              onClose();
-            }}
-          >
-            {effectiveOpen ? (
-              content
-            ) : (
-              <IBaseTooltip content={item.name} placement="right">
-                {content}
-              </IBaseTooltip>
-            )}
-          </IBaseLink>
+          <IBaseTooltip content={item.name} placement="right">
+            {content}
+          </IBaseTooltip>
         )}
 
         {hasChildren && isExpanded && (
@@ -329,59 +316,10 @@ export default function Menu({
               "transition-all duration-200",
               effectiveOpen
                 ? "opacity-100"
-                : "opacity-0 max-h-0 overflow-hidden"
+                : "opacity-0 max-h-0 overflow-hidden",
             )}
           >
-            {item.children?.map((child) => {
-              const childPath = child.path;
-              const childAs = child.as;
-              const isChildActive = activeKey === child.key;
-
-              return (
-                <IBaseLink
-                  key={child.name}
-                  as={childAs || childPath}
-                  className={clsx(
-                    "flex items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-all duration-150",
-                    isChildActive
-                      ? "bg-blue-100 text-blue-700 font-medium"
-                      : "text-slate-600 hover:bg-slate-50 hover:text-blue-600"
-                  )}
-                  href={childPath || "#"}
-                  onClick={() => {
-                    if (typeof window !== "undefined" && child.key) {
-                      window.localStorage.setItem(
-                        KEY_WORKSPACE_LAST_MENU_PATH,
-                        child.key
-                      );
-                    }
-
-                    setActiveKey(child.key);
-
-                    onClose();
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={clsx(
-                        "transition-all duration-300 whitespace-nowrap overflow-hidden text-ellipsis",
-                        effectiveOpen
-                          ? "opacity-100 translate-x-0 max-w-[160px]"
-                          : "opacity-0 -translate-x-1 max-w-0"
-                      )}
-                    >
-                      {child.name}
-                    </span>
-                  </div>
-
-                  {child.badge && effectiveOpen && (
-                    <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-600">
-                      {child.badge}
-                    </span>
-                  )}
-                </IBaseLink>
-              );
-            })}
+            {item.children?.map((child) => renderMenuItem(child, level + 1))}
           </div>
         )}
       </div>
@@ -396,7 +334,7 @@ export default function Menu({
         className={clsx(
           "hidden lg:flex lg:flex-col flex-shrink-0 transition-all duration-300 ease-in-out",
           "bg-white/90 backdrop-blur border-r border-slate-100 shadow-sm",
-          effectiveOpen ? "w-64" : "w-[4.25rem]"
+          effectiveOpen ? "w-64" : "w-[4.25rem]",
         )}
         onMouseEnter={() => {
           if (!isOpen) {
@@ -415,16 +353,16 @@ export default function Menu({
             className={clsx(
               "mb-2 flex items-center gap-2 rounded-xl px-2 py-1.5",
               "bg-slate-50/80 border border-slate-100",
-              effectiveOpen ? "justify-between" : "justify-center"
+              effectiveOpen ? "justify-between" : "justify-center",
             )}
           >
             <div
               className={clsx(
-                "flex-auto text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500",
+                "flex-auto text-[11px]uppercase tracking-[0.16em] text-slate-500",
                 "transition-all duration-300 whitespace-nowrap overflow-hidden",
                 effectiveOpen
                   ? "opacity-100 translate-x-0 max-w-[160px]"
-                  : "opacity-0 -translate-x-1 max-w-0"
+                  : "opacity-0 -translate-x-1 max-w-0",
               )}
             >
               Main
@@ -444,12 +382,16 @@ export default function Menu({
             </button>
           </div>
 
-          <div className="space-y-1">{mainMenus.map(renderMenuItem)}</div>
+          <div className="space-y-1">
+            {mainMenus.map((item) => renderMenuItem(item, 0))}
+          </div>
 
           {moduleMenus.length > 0 && (
             <>
               <IBaseDivider className="my-3 bg-slate-100" />
-              <div className="space-y-1">{moduleMenus.map(renderMenuItem)}</div>
+              <div className="space-y-1">
+                {moduleMenus.map((item) => renderMenuItem(item, 0))}
+              </div>
             </>
           )}
         </IBaseScrollShadow>

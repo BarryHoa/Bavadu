@@ -12,4 +12,5 @@ export interface MenuWorkspaceElement<
   badge?: string;
   type: "main" | "mdl";
   children?: MenuWorkspaceElement<K>[];
+  parentKey?: K;
 }
