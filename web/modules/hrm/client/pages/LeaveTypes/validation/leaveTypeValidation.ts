@@ -27,26 +27,24 @@ export function createLeaveTypeValidation(t: TranslateFn) {
         typeof obj.en === "string" &&
         obj.en.trim() !== "")
     );
-  }, t("validation.name.required"));
+  }, t("name.required"));
 
   const leaveTypeFormSchema = object({
-    code: pipe(string(), trim(), minLength(1, t("validation.code.required"))),
+    code: pipe(string(), trim(), minLength(1, t("code.required"))),
     name: fullNameSchema,
     description: optional(object({})),
     accrualType: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.accrualType.required")),
+      minLength(1, t("accrualType.required")),
     ),
     accrualRate: optional(
-      pipe(number(), minValue(0, t("validation.accrualRate.invalid"))),
+      pipe(number(), minValue(0, t("accrualRate.invalid"))),
     ),
-    maxAccrual: optional(
-      pipe(number(), minValue(0, t("validation.maxAccrual.invalid"))),
-    ),
+    maxAccrual: optional(pipe(number(), minValue(0, t("maxAccrual.invalid")))),
     carryForward: optional(pipe(string(), trim())),
     maxCarryForward: optional(
-      pipe(number(), minValue(0, t("validation.maxCarryForward.invalid"))),
+      pipe(number(), minValue(0, t("maxCarryForward.invalid"))),
     ),
     requiresApproval: optional(pipe(string(), trim())),
     isPaid: optional(pipe(string(), trim())),

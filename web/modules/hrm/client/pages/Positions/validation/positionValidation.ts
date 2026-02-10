@@ -13,11 +13,7 @@ import {
 type TranslateFn = (key: string, values?: Record<string, any>) => string;
 
 export function createPositionValidation(t: TranslateFn) {
-  const codeSchema = pipe(
-    string(),
-    trim(),
-    minLength(1, t("validation.code.required")),
-  );
+  const codeSchema = pipe(string(), trim(), minLength(1, t("code.required")));
 
   const nameSchema = custom<{ vi?: string; en?: string }>((value) => {
     if (!value || typeof value !== "object") return false;
@@ -31,7 +27,7 @@ export function createPositionValidation(t: TranslateFn) {
         typeof obj.en === "string" &&
         obj.en.trim() !== "")
     );
-  }, t("validation.name.required"));
+  }, t("name.required"));
 
   const positionFormSchema = object({
     code: codeSchema,
@@ -42,12 +38,12 @@ export function createPositionValidation(t: TranslateFn) {
         if (typeof value !== "object") return false;
 
         return true;
-      }, t("validation.description.invalid")),
+      }, t("description.invalid")),
     ),
     departmentId: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.departmentId.required")),
+      minLength(1, t("departmentId.required")),
     ),
     jobFamily: optional(pipe(string(), trim())),
     jobGrade: optional(pipe(string(), trim())),
@@ -61,7 +57,7 @@ export function createPositionValidation(t: TranslateFn) {
           const num = Number(value);
 
           return !Number.isNaN(num) && num >= 0;
-        }, t("validation.minSalary.invalid")),
+        }, t("minSalary.invalid")),
       ),
     ),
     maxSalary: optional(
@@ -73,7 +69,7 @@ export function createPositionValidation(t: TranslateFn) {
           const num = Number(value);
 
           return !Number.isNaN(num) && num >= 0;
-        }, t("validation.maxSalary.invalid")),
+        }, t("maxSalary.invalid")),
       ),
     ),
     isActive: optional(boolean()),

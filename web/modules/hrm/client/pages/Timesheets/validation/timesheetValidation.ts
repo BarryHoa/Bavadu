@@ -14,22 +14,14 @@ type TranslateFn = (key: string, values?: Record<string, any>) => string;
 
 export function createTimesheetValidation(t: TranslateFn) {
   const timesheetFormSchema = object({
-    employeeId: pipe(
-      string(),
-      trim(),
-      minLength(1, t("validation.employeeId.required")),
-    ),
+    employeeId: pipe(string(), trim(), minLength(1, t("employeeId.required"))),
     rosterId: optional(pipe(string(), trim())),
-    workDate: pipe(
-      string(),
-      trim(),
-      minLength(1, t("validation.workDate.required")),
-    ),
+    workDate: pipe(string(), trim(), minLength(1, t("workDate.required"))),
     shiftId: optional(pipe(string(), trim())),
     checkInTime: optional(pipe(string(), trim())),
     checkOutTime: optional(pipe(string(), trim())),
     breakDuration: optional(
-      pipe(number(), minValue(0, t("validation.breakDuration.invalid"))),
+      pipe(number(), minValue(0, t("breakDuration.invalid"))),
     ),
     status: optional(pipe(string(), trim())),
     checkInMethod: optional(pipe(string(), trim())),

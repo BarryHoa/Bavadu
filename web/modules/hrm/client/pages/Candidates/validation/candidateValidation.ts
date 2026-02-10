@@ -27,7 +27,7 @@ export function createCandidateValidation(t: TranslateFn) {
         typeof obj.en === "string" &&
         obj.en.trim() !== "")
     );
-  }, t("validation.fullName.required"));
+  }, t("fullName.required"));
 
   const emailSchema = pipe(
     string(),
@@ -36,14 +36,14 @@ export function createCandidateValidation(t: TranslateFn) {
       const str = value as string;
 
       return str === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
-    }, t("validation.email.invalid")),
+    }, t("email.invalid")),
   );
 
   const candidateFormSchema = object({
     requisitionId: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.requisitionId.required")),
+      minLength(1, t("requisitionId.required")),
     ),
     firstName: optional(pipe(string(), trim())),
     lastName: optional(pipe(string(), trim())),
@@ -61,8 +61,8 @@ export function createCandidateValidation(t: TranslateFn) {
     rating: optional(
       pipe(
         number(),
-        minValue(0, t("validation.rating.min")),
-        maxValue(5, t("validation.rating.max")),
+        minValue(0, t("rating.min")),
+        maxValue(5, t("rating.max")),
       ),
     ),
     notes: optional(pipe(string(), trim())),

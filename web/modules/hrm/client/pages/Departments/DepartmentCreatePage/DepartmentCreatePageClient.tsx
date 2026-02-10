@@ -1,10 +1,11 @@
 "use client";
 
 import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { departmentService } from "@mdl/hrm/client/services/DepartmentService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { departmentService } from "@mdl/hrm/client/services/DepartmentService";
 
+import { addToast } from "@heroui/toast";
 import DepartmentForm, {
   type DepartmentFormValues,
 } from "../components/DepartmentForm/DepartmentForm";
@@ -13,11 +14,7 @@ export default function DepartmentCreatePageClient(): React.ReactNode {
   const router = useRouter();
   const t = useTranslations("hrm.department.create.labels");
 
-  const {
-    handleSubmit: submitDepartment,
-    error: submitError,
-    isPending,
-  } = useCreateUpdate<
+  const { handleSubmit: submitDepartment, isPending } = useCreateUpdate<
     Parameters<typeof departmentService.create>[0],
     { id: string }
   >({
@@ -25,7 +22,14 @@ export default function DepartmentCreatePageClient(): React.ReactNode {
       const response = await departmentService.create(payload);
 
       if (!response.data) {
-        throw new Error(response.message ?? t("errors.failedToCreate"));
+        addToast({
+          title: "Failed to create department",
+          description: response.message ?? "Failed to create department",
+          color: "danger",
+          variant: "solid",
+          timeout: 5000,
+        });
+        throw new Error(response.message ?? "Failed to create department");
       }
 
       return response.data;
@@ -54,7 +58,6 @@ export default function DepartmentCreatePageClient(): React.ReactNode {
   return (
     <DepartmentForm
       isSubmitting={isPending}
-      submitError={submitError}
       onCancel={() => router.push("/workspace/modules/hrm/departments")}
       onSubmit={handleSubmit}
     />

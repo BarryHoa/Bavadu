@@ -16,36 +16,28 @@ export function createContractValidation(t: TranslateFn) {
   const contractNumberSchema = pipe(
     string(),
     trim(),
-    minLength(1, t("validation.contractNumber.required")),
+    minLength(1, t("contractNumber.required")),
   );
 
   const contractFormSchema = object({
     contractNumber: contractNumberSchema,
-    employeeId: pipe(
-      string(),
-      trim(),
-      minLength(1, t("validation.employeeId.required")),
-    ),
+    employeeId: pipe(string(), trim(), minLength(1, t("employeeId.required"))),
     contractType: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.contractType.required")),
+      minLength(1, t("contractType.required")),
     ),
-    startDate: pipe(
-      string(),
-      trim(),
-      minLength(1, t("validation.startDate.required")),
-    ),
+    startDate: pipe(string(), trim(), minLength(1, t("startDate.required"))),
     endDate: optional(pipe(string(), trim())),
     baseSalary: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.baseSalary.required")),
+      minLength(1, t("baseSalary.required")),
       custom((value) => {
         const num = Number(value);
 
         return !Number.isNaN(num) && num >= 0;
-      }, t("validation.baseSalary.invalid")),
+      }, t("baseSalary.invalid")),
     ),
     currency: optional(pipe(string(), trim())),
     workingHours: optional(
@@ -57,7 +49,7 @@ export function createContractValidation(t: TranslateFn) {
           const num = Number(value);
 
           return !Number.isNaN(num) && num >= 0;
-        }, t("validation.workingHours.invalid")),
+        }, t("workingHours.invalid")),
       ),
     ),
     probationPeriod: optional(
@@ -69,7 +61,7 @@ export function createContractValidation(t: TranslateFn) {
           const num = Number(value);
 
           return !Number.isNaN(num) && num >= 0;
-        }, t("validation.probationPeriod.invalid")),
+        }, t("probationPeriod.invalid")),
       ),
     ),
     probationEndDate: optional(pipe(string(), trim())),

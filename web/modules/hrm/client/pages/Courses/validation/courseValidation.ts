@@ -26,16 +26,14 @@ export function createCourseValidation(t: TranslateFn) {
         typeof obj.en === "string" &&
         obj.en.trim() !== "")
     );
-  }, t("validation.name.required"));
+  }, t("name.required"));
 
   const courseFormSchema = object({
-    code: pipe(string(), trim(), minLength(1, t("validation.code.required"))),
+    code: pipe(string(), trim(), minLength(1, t("code.required"))),
     name: fullNameSchema,
     description: optional(object({})),
     category: optional(pipe(string(), trim())),
-    duration: optional(
-      pipe(number(), minValue(0, t("validation.duration.invalid"))),
-    ),
+    duration: optional(pipe(number(), minValue(0, t("duration.invalid")))),
     format: optional(pipe(string(), trim())),
     instructor: optional(pipe(string(), trim())),
     isActive: optional(pipe(string(), trim())),

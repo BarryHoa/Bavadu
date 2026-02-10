@@ -17,46 +17,37 @@ export function createPayrollValidation(t: TranslateFn) {
     payrollPeriodId: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.payrollPeriodId.required")),
+      minLength(1, t("payrollPeriodId.required")),
     ),
-    employeeId: pipe(
-      string(),
-      trim(),
-      minLength(1, t("validation.employeeId.required")),
-    ),
-    baseSalary: pipe(number(), minValue(0, t("validation.baseSalary.invalid"))),
+    employeeId: pipe(string(), trim(), minLength(1, t("employeeId.required"))),
+    baseSalary: pipe(number(), minValue(0, t("baseSalary.invalid"))),
     overtimePay: optional(
-      pipe(number(), minValue(0, t("validation.overtimePay.invalid"))),
+      pipe(number(), minValue(0, t("overtimePay.invalid"))),
     ),
-    bonuses: optional(
-      pipe(number(), minValue(0, t("validation.bonuses.invalid"))),
-    ),
+    bonuses: optional(pipe(number(), minValue(0, t("bonuses.invalid")))),
     otherEarnings: optional(
-      pipe(number(), minValue(0, t("validation.otherEarnings.invalid"))),
+      pipe(number(), minValue(0, t("otherEarnings.invalid"))),
     ),
     socialInsurance: optional(
-      pipe(number(), minValue(0, t("validation.socialInsurance.invalid"))),
+      pipe(number(), minValue(0, t("socialInsurance.invalid"))),
     ),
     healthInsurance: optional(
-      pipe(number(), minValue(0, t("validation.healthInsurance.invalid"))),
+      pipe(number(), minValue(0, t("healthInsurance.invalid"))),
     ),
     unemploymentInsurance: optional(
-      pipe(
-        number(),
-        minValue(0, t("validation.unemploymentInsurance.invalid")),
-      ),
+      pipe(number(), minValue(0, t("unemploymentInsurance.invalid"))),
     ),
     personalIncomeTax: optional(
-      pipe(number(), minValue(0, t("validation.personalIncomeTax.invalid"))),
+      pipe(number(), minValue(0, t("personalIncomeTax.invalid"))),
     ),
     workingDays: optional(
-      pipe(number(), minValue(0, t("validation.workingDays.invalid"))),
+      pipe(number(), minValue(0, t("workingDays.invalid"))),
     ),
     workingHours: optional(
-      pipe(number(), minValue(0, t("validation.workingHours.invalid"))),
+      pipe(number(), minValue(0, t("workingHours.invalid"))),
     ),
     overtimeHours: optional(
-      pipe(number(), minValue(0, t("validation.overtimeHours.invalid"))),
+      pipe(number(), minValue(0, t("overtimeHours.invalid"))),
     ),
     status: optional(pipe(string(), trim())),
     notes: optional(pipe(string(), trim())),

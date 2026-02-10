@@ -24,26 +24,14 @@ export function createCertificateValidation(t: TranslateFn) {
         typeof obj.en === "string" &&
         obj.en.trim() !== "")
     );
-  }, t("validation.name.required"));
+  }, t("name.required"));
 
   const certificateFormSchema = object({
-    employeeId: pipe(
-      string(),
-      trim(),
-      minLength(1, t("validation.employeeId.required")),
-    ),
+    employeeId: pipe(string(), trim(), minLength(1, t("employeeId.required"))),
     name: fullNameSchema,
-    issuer: pipe(
-      string(),
-      trim(),
-      minLength(1, t("validation.issuer.required")),
-    ),
+    issuer: pipe(string(), trim(), minLength(1, t("issuer.required"))),
     certificateNumber: optional(pipe(string(), trim())),
-    issueDate: pipe(
-      string(),
-      trim(),
-      minLength(1, t("validation.issueDate.required")),
-    ),
+    issueDate: pipe(string(), trim(), minLength(1, t("issueDate.required"))),
     expiryDate: optional(pipe(string(), trim())),
     documentUrl: optional(pipe(string(), trim())),
     isActive: optional(pipe(string(), trim())),

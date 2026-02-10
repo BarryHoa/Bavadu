@@ -13,11 +13,7 @@ import {
 type TranslateFn = (key: string, values?: Record<string, any>) => string;
 
 export function createDepartmentValidation(t: TranslateFn) {
-  const codeSchema = pipe(
-    string(),
-    trim(),
-    minLength(1, t("validation.code.required")),
-  );
+  const codeSchema = pipe(string(), trim(), minLength(1, t("code.required")));
 
   const nameSchema = custom<{ vi?: string; en?: string }>((value) => {
     if (!value || typeof value !== "object") return false;
@@ -31,7 +27,7 @@ export function createDepartmentValidation(t: TranslateFn) {
         typeof obj.en === "string" &&
         obj.en.trim() !== "")
     );
-  }, t("validation.name.required"));
+  }, t("name.required"));
 
   const departmentFormSchema = object({
     code: codeSchema,
@@ -42,7 +38,7 @@ export function createDepartmentValidation(t: TranslateFn) {
         if (typeof value !== "object") return false;
 
         return true;
-      }, t("validation.description.invalid")),
+      }, t("description.invalid")),
     ),
     parentId: optional(pipe(string(), trim())),
     level: optional(
@@ -54,7 +50,7 @@ export function createDepartmentValidation(t: TranslateFn) {
           const num = Number(value);
 
           return !Number.isNaN(num) && num >= 0;
-        }, t("validation.level.invalid")),
+        }, t("level.invalid")),
       ),
     ),
     managerId: optional(pipe(string(), trim())),

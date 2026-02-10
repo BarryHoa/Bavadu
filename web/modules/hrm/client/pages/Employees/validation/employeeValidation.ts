@@ -23,7 +23,7 @@ export function createEmployeeValidation(t: TranslateFn) {
   const employeeCodeSchema = pipe(
     string(),
     trim(),
-    minLength(1, t("validation.employeeCode.required")),
+    minLength(1, t("employeeCode.required")),
   );
 
   // Full name validation (object with vi/en) - using custom validation
@@ -39,7 +39,7 @@ export function createEmployeeValidation(t: TranslateFn) {
         typeof obj.en === "string" &&
         obj.en.trim() !== "")
     );
-  }, t("validation.fullName.required"));
+  }, t("fullName.required"));
 
   // Email validation
   const emailSchema = pipe(
@@ -48,7 +48,7 @@ export function createEmployeeValidation(t: TranslateFn) {
     custom(
       (value) =>
         value === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value)),
-      t("validation.email.invalid"),
+      t("email.invalid"),
     ),
   );
 
@@ -71,24 +71,16 @@ export function createEmployeeValidation(t: TranslateFn) {
     nationalId: optional(pipe(string(), trim())),
     taxId: optional(pipe(string(), trim())),
     address: optional(object({})),
-    positionId: pipe(
-      string(),
-      trim(),
-      minLength(1, t("validation.positionId.required")),
-    ),
+    positionId: pipe(string(), trim(), minLength(1, t("positionId.required"))),
     departmentId: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.departmentId.required")),
+      minLength(1, t("departmentId.required")),
     ),
     managerId: optional(pipe(string(), trim())),
     employmentStatus: optional(pipe(string(), trim())),
     employmentType: optional(pipe(string(), trim())),
-    hireDate: pipe(
-      string(),
-      trim(),
-      minLength(1, t("validation.hireDate.required")),
-    ),
+    hireDate: pipe(string(), trim(), minLength(1, t("hireDate.required"))),
     probationEndDate: optional(dateSchema),
     baseSalary: optional(
       pipe(
@@ -99,7 +91,7 @@ export function createEmployeeValidation(t: TranslateFn) {
           const num = Number(value);
 
           return !Number.isNaN(num) && num >= 0;
-        }, t("validation.baseSalary.invalid")),
+        }, t("baseSalary.invalid")),
       ),
     ),
     currency: optional(pipe(string(), trim())),

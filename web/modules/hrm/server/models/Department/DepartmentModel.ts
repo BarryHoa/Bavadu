@@ -1,5 +1,5 @@
-import { LocaleDataType } from "@base/shared/interface/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
+import { LocaleDataType } from "@base/shared/interface/Locale";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
@@ -103,9 +103,7 @@ export default class DepartmentModel extends BaseModel<
     return this.getDepartmentById(params.id);
   };
 
-  createDepartment = async (
-    payload: DepartmentInput,
-  ): Promise<DepartmentRow> => {
+  create = async (payload: DepartmentInput): Promise<DepartmentRow> => {
     const now = new Date();
     const insertData: NewHrmTbDepartment = {
       code: payload.code,
@@ -148,7 +146,7 @@ export default class DepartmentModel extends BaseModel<
     return row;
   };
 
-  updateDepartment = async (
+  update = async (
     id: string,
     payload: Partial<DepartmentInput>,
   ): Promise<DepartmentRow | null> => {
@@ -231,6 +229,6 @@ export default class DepartmentModel extends BaseModel<
       normalizedPayload.isActive = Boolean(payload.isActive);
     }
 
-    return this.updateDepartment(id, normalizedPayload);
+    return this.update(id, normalizedPayload);
   };
 }
