@@ -24,14 +24,14 @@ export function createSalesOrderB2CValidation(t: TranslateFn) {
   const quantitySchema = pipe(
     string(),
     trim(),
-    minLength(1, t("validation.quantity.required")),
+    minLength(1, t("quantity.required")),
     custom(
       (value) => {
         const num = Number(value);
 
         return !Number.isNaN(num) && num >= 0 && num <= 5000;
       },
-      t("validation.quantity.range", { min: 0, max: 5000 }),
+      t("quantity.range", { min: 0, max: 5000 }),
     ),
   );
 
@@ -46,7 +46,7 @@ export function createSalesOrderB2CValidation(t: TranslateFn) {
 
         return !Number.isNaN(num) && num >= 0 && num <= 100000000;
       },
-      t("validation.price.range", { min: 0, max: 100000000 }),
+      t("price.range", { min: 0, max: 100000000 }),
     ),
   );
 
@@ -57,7 +57,7 @@ export function createSalesOrderB2CValidation(t: TranslateFn) {
     custom(
       (value) =>
         value === "" || (!Number.isNaN(Number(value)) && Number(value) >= 0),
-      t("validation.discount.min", { min: 0 }),
+      t("discount.min", { min: 0 }),
     ),
   );
 
@@ -71,17 +71,13 @@ export function createSalesOrderB2CValidation(t: TranslateFn) {
         (!Number.isNaN(Number(value)) &&
           Number(value) >= 0 &&
           Number(value) <= 100),
-      t("validation.taxRate.range", { min: 0, max: 100 }),
+      t("taxRate.range", { min: 0, max: 100 }),
     ),
   );
 
   // Order line schema
   const orderLineSchema = object({
-    productId: pipe(
-      string(),
-      trim(),
-      minLength(1, t("validation.product.required")),
-    ),
+    productId: pipe(string(), trim(), minLength(1, t("product.required"))),
     unitId: optional(pipe(string(), trim())),
     quantity: quantitySchema,
     unitPrice: priceSchema,
@@ -96,19 +92,15 @@ export function createSalesOrderB2CValidation(t: TranslateFn) {
     priceListId: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.priceListId.required")),
+      minLength(1, t("priceListId.required")),
     ),
-    currency: pipe(
-      string(),
-      trim(),
-      minLength(1, t("validation.currency.required")),
-    ),
+    currency: pipe(string(), trim(), minLength(1, t("currency.required"))),
 
     // Customer
     customerName: pipe(
       string(),
       trim(),
-      minLength(1, t("validation.customerName.required")),
+      minLength(1, t("customerName.required")),
     ),
     requireInvoice: optional(boolean()),
 
@@ -125,10 +117,7 @@ export function createSalesOrderB2CValidation(t: TranslateFn) {
     notes: optional(pipe(string(), trim())),
     totalDiscount: optional(discountSchema),
     totalTax: optional(discountSchema),
-    lines: pipe(
-      array(orderLineSchema),
-      minLength(1, t("validation.lines.required")),
-    ),
+    lines: pipe(array(orderLineSchema), minLength(1, t("lines.required"))),
   });
 
   // Form values type

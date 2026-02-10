@@ -98,9 +98,7 @@ export default function Menu({
 
     while (current?.parentKey) {
       parents.unshift(current.parentKey);
-      current = flattenedMenus.find(
-        (item) => item.key === current?.parentKey,
-      );
+      current = flattenedMenus.find((item) => item.key === current?.parentKey);
     }
 
     return parents;
@@ -207,7 +205,7 @@ export default function Menu({
             {isRootLevel && renderIcon(item.icon, Boolean(isHighlighted))}
             <span
               className={clsx(
-                isRootLevel && "tracking-wide uppercase",
+                isRootLevel && "uppercase",
                 "transition-all duration-300 whitespace-nowrap overflow-hidden text-ellipsis",
                 effectiveOpen
                   ? "opacity-100 translate-x-0 max-w-[160px]"
@@ -219,7 +217,7 @@ export default function Menu({
           </div>
 
           {item.badge && effectiveOpen && (
-            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] uppercase tracking-wide text-blue-600">
+            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] uppercase text-blue-600">
               {item.badge}
             </span>
           )}
@@ -270,7 +268,7 @@ export default function Menu({
           {isRootLevel && renderIcon(item.icon, Boolean(isHighlighted))}
           <span
             className={clsx(
-              isRootLevel && "tracking-wide uppercase",
+              isRootLevel && "uppercase",
               "whitespace-nowrap overflow-hidden text-ellipsis",
               "transition-all duration-300",
               effectiveOpen

@@ -1,11 +1,12 @@
 import {
   Fira_Code as FontMono,
-  Inter as FontSans,
   Noto_Sans_SC,
+  Roboto as FontSans,
 } from "next/font/google";
 
 export const fontSans = FontSans({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
+  weight: ["100", "300", "400", "500", "700", "900"],
   variable: "--font-sans",
 });
 

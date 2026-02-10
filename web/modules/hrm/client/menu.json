@@ -6,7 +6,7 @@
   "children": [
     {
       "key": "hrm-org",
-      "name": "Org - Tổ chức",
+      "name": "Org",
       "icon": "Building",
       "order": 1,
       "children": [
@@ -42,7 +42,7 @@
     },
     {
       "key": "hrm-employees",
-      "name": "Employees - Quản lý nhân viên",
+      "name": "Employees",
       "path": "/employees",
       "as": "/employees",
       "order": 2
@@ -71,21 +71,21 @@
     },
     {
       "key": "hrm-payroll",
-      "name": "Payroll - Bảng lương",
+      "name": "Payroll",
       "path": "/payroll",
       "as": "/payroll",
       "order": 4
     },
     {
       "key": "hrm-recruitment",
-      "name": "Recruitment - Tuyển dụng",
+      "name": "Recruitment",
       "path": "/job-requisitions",
       "as": "/job-requisitions",
       "order": 5
     },
     {
       "key": "hrm-training",
-      "name": "Học Tập",
+      "name": "Training",
       "icon": "GraduationCap",
       "order": 6,
       "children": [
@@ -107,7 +107,7 @@
     },
     {
       "key": "hrm-performance",
-      "name": "Performance - Đánh giá hiệu suất",
+      "name": "Performance",
       "path": "/performance-reviews",
       "as": "/performance-reviews",
       "order": 7

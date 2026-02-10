@@ -2,8 +2,22 @@
 
 import type { SalesOrderB2CFormValues } from "../../validation/createSalesOrderB2CValidation";
 
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBaseTextarea,
+} from "@base/client";
 import { SelectItemOption } from "@base/client/components";
+import {
+  paymentMethodService,
+  shippingMethodService,
+  shippingTermService,
+  taxRateService,
+} from "@base/client/services";
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import UnitOfMeasureService from "@mdl/product/client/services/UnitOfMeasureService";
+import StockService from "@mdl/stock/client/services/StockService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
@@ -13,16 +27,6 @@ import {
   useForm,
   type SubmitHandler,
 } from "react-hook-form";
-import {
-  paymentMethodService,
-  shippingMethodService,
-  shippingTermService,
-  taxRateService,
-} from "@base/client/services";
-import { IBaseButton } from "@base/client";
-import { IBaseCard, IBaseCardBody, IBaseTextarea } from "@base/client";
-import UnitOfMeasureService from "@mdl/product/client/services/UnitOfMeasureService";
-import StockService from "@mdl/stock/client/services/StockService";
 
 import { type CustomerIndividualDto } from "../../../../services/CustomerService";
 import { createSalesOrderB2CValidation } from "../../validation/createSalesOrderB2CValidation";
@@ -51,13 +55,17 @@ export default function SalesOrderB2CForm({
   isSubmitting = false,
   defaultValues,
 }: SalesOrderB2CFormProps) {
-  const t = useTranslations("b2cSales.order.create.validation");
+  const tValidateion = useTranslations("b2cSales.order.create.validation");
+  // const t = useTranslations("b2cSales.order.create.validation");
   const tLabels = useTranslations("b2cSales.order.create.labels");
   const [selectedCustomer, setSelectedCustomer] =
     useState<CustomerIndividualDto | null>(null);
 
   // Create validation schemas with translation
-  const validation = useMemo(() => createSalesOrderB2CValidation(t), [t]);
+  const validation = useMemo(
+    () => createSalesOrderB2CValidation(tValidateion),
+    [tValidateion],
+  );
 
   const {
     control,

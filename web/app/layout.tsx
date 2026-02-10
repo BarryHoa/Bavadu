@@ -6,6 +6,7 @@ import ModuleI18nProvider from "@base/client/contexts/i18n";
 import { Providers } from "./providers";
 
 import { siteConfig } from "@/config/site";
+import { fontSans } from "@/config/fonts";
 
 export const metadata: Metadata = {
   title: {
@@ -54,9 +55,13 @@ export default async function RootLayout({
   };
 
   return (
-    <html suppressHydrationWarning className="light" lang={locale}>
+    <html
+      suppressHydrationWarning
+      className={`light ${fontSans.variable}`}
+      lang={locale}
+    >
       <head />
-      <body>
+      <body className="font-sans">
         <Providers>
           <ModuleI18nProvider initialMessages={initialMessages} locale={locale}>
             <div className="relative flex flex-col h-screen">
