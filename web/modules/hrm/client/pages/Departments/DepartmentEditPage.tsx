@@ -1,24 +1,38 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import {
+  useCreateUpdate,
+  useLocalizedText,
+  useSetBreadcrumbs,
+} from "@base/client/hooks";
+import { addToast } from "@heroui/toast";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+
+import { IBaseButton, IBaseSpinner } from "@base/client";
 import { departmentService } from "@mdl/hrm/client/services/DepartmentService";
 
 import DepartmentForm, {
   type DepartmentFormValues,
 } from "./components/DepartmentForm/DepartmentForm";
 
+const DEPARTMENTS_LIST_PATH = "/workspace/modules/hrm/departments";
+
 export default function DepartmentEditPage(): React.ReactNode {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
   const t = useTranslations("hrm.department.create.labels");
+  const tView = useTranslations("hrm.department.view.labels");
+  const tTitle = useTranslations("hrm.department");
+  const getLocalizedText = useLocalizedText();
 
-  const { data: departmentData, isLoading } = useQuery({
-    queryKey: ["hrm-department", id],
-    queryFn: async () => {
+  const { data: departmentData, isLoading, isError, error, refetch } =
+    useQuery({
+      queryKey: ["hrm-department", id],
+      queryFn: async () => {
       const response = await departmentService.getById(id);
 
       if (!response.data) {
@@ -27,8 +41,36 @@ export default function DepartmentEditPage(): React.ReactNode {
 
       return response.data;
     },
-    enabled: !!id,
-  });
+      enabled: !!id,
+    });
+
+  const viewPath = `${DEPARTMENTS_LIST_PATH}/view/${id}`;
+  const breadcrumbs = useMemo(
+    () =>
+      departmentData
+        ? [
+            { label: tTitle("title"), href: DEPARTMENTS_LIST_PATH },
+            {
+              label:
+                getLocalizedText(departmentData.name as any) ||
+                departmentData.code,
+              href: viewPath,
+            },
+            { label: t("editPageTitle") },
+          ]
+        : [
+            { label: tTitle("title"), href: DEPARTMENTS_LIST_PATH },
+            { label: t("editPageTitle") },
+          ],
+    [
+      departmentData,
+      viewPath,
+      tTitle,
+      t,
+      getLocalizedText,
+    ]
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: updateDepartment,
@@ -42,6 +84,13 @@ export default function DepartmentEditPage(): React.ReactNode {
       const response = await departmentService.update(payload);
 
       if (!response.data) {
+        addToast({
+          title: t("errors.failedToUpdate"),
+          description: response.message ?? t("errors.failedToUpdate"),
+          color: "danger",
+          variant: "solid",
+          timeout: 5000,
+        });
         throw new Error(response.message ?? t("errors.failedToUpdate"));
       }
 
@@ -49,7 +98,7 @@ export default function DepartmentEditPage(): React.ReactNode {
     },
     invalidateQueries: [["hrm-departments"], ["hrm-department", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/departments/view/${data.id}`);
+      router.push(`${DEPARTMENTS_LIST_PATH}/view/${data.id}`);
     },
   });
 
@@ -70,31 +119,60 @@ export default function DepartmentEditPage(): React.ReactNode {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
+        <IBaseSpinner size="md" />
+        <span>{tView("loading")}</span>
+      </div>
+    );
   }
 
-  if (!departmentData) {
-    return <div>Department not found</div>;
+  if (isError || !departmentData) {
+    return (
+      <div className="flex flex-col gap-4 rounded-xl border-2 border-danger-200 bg-danger-50/50 p-6">
+        <p className="font-medium text-danger-700">
+          {error instanceof Error ? error.message : tView("notFound")}
+        </p>
+        <IBaseButton
+          size="sm"
+          variant="bordered"
+          color="danger"
+          onPress={() => refetch()}
+        >
+          Retry
+        </IBaseButton>
+      </div>
+    );
   }
 
   return (
-    <DepartmentForm
-      defaultValues={{
-        code: departmentData.code,
-        name: (departmentData.name as any) || { vi: "", en: "" },
-        description: (departmentData.description as any) || undefined,
-        parentId: departmentData.parent?.id || "",
-        level: departmentData.level?.toString() || "",
-        managerId: departmentData.managerId || "",
-        locationId: departmentData.locationId || "",
-        isActive: departmentData.isActive ?? true,
-      }}
+    <div className="flex flex-col gap-6">
+      <header>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          {t("editPageTitle")}
+        </h1>
+        <p className="mt-1 text-sm text-default-500">
+          {departmentData.code}
+        </p>
+      </header>
+
+      <DepartmentForm
+        mode="edit"
+        defaultValues={{
+          code: departmentData.code,
+          name: (departmentData.name as any) || { vi: "", en: "" },
+          description: (departmentData.description as any) || undefined,
+          parentId: departmentData.parent?.id || "",
+          level: departmentData.level?.toString() || "",
+          managerId: departmentData.managerId || "",
+          locationId: departmentData.locationId || "",
+          isActive: departmentData.isActive ?? true,
+        }}
       isSubmitting={isPending}
       submitError={submitError}
-      onCancel={() =>
-        router.push(`/workspace/modules/hrm/departments/view/${id}`)
-      }
-      onSubmit={handleSubmit}
-    />
+      onCancel={() => router.push(viewPath)}
+        onSubmit={handleSubmit}
+      />
+    </div>
   );
 }

@@ -5,6 +5,7 @@ import { usePrefetchModuleMessages } from "@base/client/hooks/usePrefetchModuleM
 import { MenuWorkspaceElement } from "@base/client/interface/WorkspaceMenuInterface";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import Breadcrumb from "@base/client/layouts/workspace/components/Breadcrumb";
 import Content from "@base/client/layouts/workspace/components/Content";
 import MenuPanel from "@base/client/layouts/workspace/components/Menu";
 import Nav from "@base/client/layouts/workspace/components/Nav";
@@ -76,12 +77,8 @@ export default function WorkspaceLayoutClient({
 
           <div className="w-full min-h-0 flex flex-1 h-full overflow-auto scroll-overlay">
             <div className="min-w-3xl flex flex-col flex-1">
-              {/* Breadcrumb */}
-              {/* <div className="p-2">
-                <Breadcrumb items={initialCrumbs} />
-              </div> */}
+              <Breadcrumb />
 
-              {/* Page content */}
               <div className="flex-1 p-2">
                 <Content>{children}</Content>
               </div>

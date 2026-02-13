@@ -1,20 +1,37 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
 import { departmentService } from "@mdl/hrm/client/services/DepartmentService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 import { addToast } from "@heroui/toast";
 import DepartmentForm, {
   type DepartmentFormValues,
 } from "../components/DepartmentForm/DepartmentForm";
 
+const DEPARTMENTS_LIST_PATH = "/workspace/modules/hrm/departments";
+
 export default function DepartmentCreatePageClient(): React.ReactNode {
   const router = useRouter();
   const t = useTranslations("hrm.department.create.labels");
+  const tTitle = useTranslations("hrm.department");
 
-  const { handleSubmit: submitDepartment, isPending } = useCreateUpdate<
+  const breadcrumbs = useMemo(
+    () => [
+      { label: tTitle("title"), href: DEPARTMENTS_LIST_PATH },
+      { label: t("pageTitle") },
+    ],
+    [t, tTitle],
+  );
+  useSetBreadcrumbs(breadcrumbs);
+
+  const {
+    handleSubmit: submitDepartment,
+    error: submitError,
+    isPending,
+  } = useCreateUpdate<
     Parameters<typeof departmentService.create>[0],
     { id: string }
   >({
@@ -36,7 +53,7 @@ export default function DepartmentCreatePageClient(): React.ReactNode {
     },
     invalidateQueries: [["hrm-departments"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/departments/view/${data.id}`);
+      router.push(`${DEPARTMENTS_LIST_PATH}/view/${data.id}`);
     },
   });
 
@@ -56,10 +73,19 @@ export default function DepartmentCreatePageClient(): React.ReactNode {
   };
 
   return (
-    <DepartmentForm
-      isSubmitting={isPending}
-      onCancel={() => router.push("/workspace/modules/hrm/departments")}
-      onSubmit={handleSubmit}
-    />
+    <div className="flex flex-col gap-3">
+      <header>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          {t("pageTitle")}
+        </h1>
+      </header>
+
+      <DepartmentForm
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(DEPARTMENTS_LIST_PATH)}
+        onSubmit={handleSubmit}
+      />
+    </div>
   );
 }

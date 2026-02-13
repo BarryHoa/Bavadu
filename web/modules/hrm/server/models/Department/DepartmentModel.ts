@@ -97,9 +97,7 @@ export default class DepartmentModel extends BaseModel<
     };
   };
 
-  getDataById = async (params: {
-    id: string;
-  }): Promise<DepartmentRow | null> => {
+  getById = async (params: { id: string }): Promise<DepartmentRow | null> => {
     return this.getDepartmentById(params.id);
   };
 
