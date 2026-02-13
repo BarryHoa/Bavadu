@@ -26,9 +26,16 @@ export const IBaseLink = React.forwardRef<HTMLAnchorElement, IBaseLinkProps>(
   (props, ref) => {
     const { size = "sm", href, as: hrefAs, children, ...restProps } = props;
 
-    // Extract Next.js Link specific props
-    const { locale, prefetch, replace, scroll, shallow, ...heroUIProps } =
-      restProps as any;
+    // Extract Next.js Link specific props + filter DOM-invalid props (e.g. textValue from React Aria)
+    const {
+      locale,
+      prefetch,
+      replace,
+      scroll,
+      shallow,
+      textValue,
+      ...heroUIProps
+    } = restProps as any;
 
     return (
       <HeroUILink

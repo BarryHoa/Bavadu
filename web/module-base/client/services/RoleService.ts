@@ -88,16 +88,21 @@ class RoleService extends JsonRpcClientService {
     return new ClientHttpService("/api/base/settings/roles");
   }
 
-  private get permissionsHttp() {
-    return new ClientHttpService("/api/base/settings/permissions");
-  }
+  async getRole(id: string): Promise<RoleResponse> {
+    const data = await this.call<RoleWithPermissions | null>(
+      "base-role.curd.get",
+      { id },
+    );
 
-  getRoleList() {
-    return this.rolesHttp.get<RoleListResponse>("/list");
-  }
+    if (!data) {
+      throw new Error("Role not found");
+    }
 
-  getRole(id: string) {
-    return this.rolesHttp.get<RoleResponse>(`/get?id=${id}`);
+    return {
+      success: true,
+      data,
+      message: "Role loaded",
+    };
   }
 
   async createRole(payload: CreateRoleRequest): Promise<CreateRoleResponse> {
@@ -115,16 +120,50 @@ class RoleService extends JsonRpcClientService {
     };
   }
 
-  updateRole(payload: UpdateRoleRequest) {
-    return this.rolesHttp.put<UpdateRoleResponse>("/update", payload);
+  async updateRole(payload: UpdateRoleRequest): Promise<UpdateRoleResponse> {
+    const data = await this.call<Role | null>("base-role.curd.update", {
+      id: payload.id,
+      code: payload.code,
+      name: payload.name,
+      description: payload.description,
+      permissionIds: payload.permissionIds,
+    });
+
+    if (!data) {
+      throw new Error("Role not found");
+    }
+
+    return {
+      success: true,
+      data: data as Role,
+      message: "Role updated successfully",
+    };
   }
 
-  deleteRole(id: string) {
-    return this.rolesHttp.delete<DeleteRoleResponse>(`/delete?id=${id}`);
+  async deleteRole(id: string): Promise<DeleteRoleResponse> {
+    const result = await this.call<{ success: boolean; message: string }>(
+      "base-role.curd.delete",
+      { id },
+    );
+
+    return {
+      success: result.success,
+      message: result.message,
+    };
   }
 
-  getPermissionList() {
-    return this.permissionsHttp.get<PermissionListResponse>("/list");
+  async getPermissionList(): Promise<PermissionListResponse> {
+    const data = await this.call<Permission[]>(
+      "base-permission.curd.getPermissions",
+      {},
+    );
+
+    return {
+      success: true,
+      data,
+      total: data.length,
+      message: "Permissions loaded",
+    };
   }
 }
 

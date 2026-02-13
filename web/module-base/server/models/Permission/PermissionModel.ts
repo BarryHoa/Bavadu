@@ -23,9 +23,9 @@ export default class PermissionModel extends BaseModel<
   }
 
   /**
-   * Get all active permissions
+   * RPC entry point: base-permission.curd.getPermissions
    */
-  async getPermissions(): Promise<PermissionRow[]> {
+  getPermissions = async (): Promise<PermissionRow[]> => {
     const db = await this.db;
     const results = await db
       .select()
@@ -34,7 +34,7 @@ export default class PermissionModel extends BaseModel<
       .orderBy(this.table.module, this.table.resource, this.table.action);
 
     return results.map((row) => this.mapToPermissionRow(row));
-  }
+  };
 
   private mapToPermissionRow(
     row: typeof base_tb_permissions.$inferSelect,

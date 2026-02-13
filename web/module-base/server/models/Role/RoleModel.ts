@@ -1,6 +1,6 @@
 import { LocaleDataType } from "@base/shared/interface/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 
 import UserRoleModel from "../UserRole/UserRoleModel";
 import UserPermissionModel from "../UserPermission/UserPermissionModel";
@@ -27,8 +27,8 @@ export interface RoleInput {
   code: string;
   name: LocaleDataType<string>;
   description?: string | null;
-  permissions?: string[]; // permission keys
-  permissionIds?: string[]; // permission UUIDs (preferred when from client)
+  permissions?: string[];
+  permissionIds?: string[];
   isSystem?: boolean;
   isActive?: boolean;
 }
@@ -46,231 +46,6 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
     return null;
   }
 
-  /**
-   * Get all active roles
-   */
-  async getRoles(): Promise<RoleRow[]> {
-    const results = await this.db
-      .select()
-      .from(this.table)
-      .where(eq(this.table.isActive, true))
-      .orderBy(this.table.code);
-
-    return Promise.all(results.map((row) => this.mapToRoleRow(row)));
-  }
-
-  /**
-   * Get all roles (including inactive)
-   */
-  async getAllRoles(): Promise<RoleRow[]> {
-    const results = await this.db
-      .select()
-      .from(this.table)
-      .orderBy(this.table.createdAt);
-
-    return Promise.all(results.map((row) => this.mapToRoleRow(row)));
-  }
-
-  getRoleById = async (id: string): Promise<RoleRow | null> => {
-    const result = await this.db
-      .select()
-      .from(this.table)
-      .where(eq(this.table.id, id))
-      .limit(1);
-
-    const row = result[0];
-
-    if (!row) {
-      return null;
-    }
-
-    return this.mapToRoleRow(row);
-  };
-
-  /**
-   * Get role by code
-   */
-  async getRoleByCode(code: string): Promise<RoleRow | null> {
-    const [result] = await this.db
-      .select()
-      .from(this.table)
-      .where(eq(this.table.code, code))
-      .limit(1);
-
-    if (!result) {
-      return null;
-    }
-
-    return this.mapToRoleRow(result);
-  }
-
-  /**
-   * Get role by ID with permissions details
-   */
-  async getRoleWithPermissions(id: string): Promise<{
-    role: RoleRow;
-    permissions: Array<{
-      id: string;
-      key: string;
-      module: string;
-      resource: string;
-      action: string;
-      name?: unknown;
-      description?: unknown;
-    }>;
-  } | null> {
-    const role = await this.getRoleById(id);
-
-    if (!role) {
-      return null;
-    }
-
-    const rolePermissions = await this.db
-      .select({
-        id: base_tb_permissions.id,
-        key: base_tb_permissions.key,
-        module: base_tb_permissions.module,
-        resource: base_tb_permissions.resource,
-        action: base_tb_permissions.action,
-        name: base_tb_permissions.name,
-        description: base_tb_permissions.description,
-      })
-      .from(base_tb_role_permissions_default)
-      .innerJoin(
-        base_tb_permissions,
-        eq(
-          base_tb_role_permissions_default.permissionId,
-          base_tb_permissions.id,
-        ),
-      )
-      .where(eq(base_tb_role_permissions_default.roleId, id));
-
-    return {
-      role,
-      permissions: rolePermissions,
-    };
-  }
-
-  getDataById = async (params: { id: string }): Promise<RoleRow | null> => {
-    return this.getRoleById(params.id);
-  };
-
-  /**
-   * RPC entry point: base-role.curd.create
-   */
-  create = async (params: {
-    code: string;
-    name: LocaleDataType<string>;
-    description?: string | null;
-    permissionIds?: string[];
-  }): Promise<RoleRow> => {
-    const nameNorm = this.normalizeLocaleInput(params.name);
-
-    if (!params.code?.trim()) {
-      throw new Error("Code is required");
-    }
-    if (!nameNorm || (!nameNorm.en && !nameNorm.vi)) {
-      throw new Error("Name is required");
-    }
-
-    const existing = await this.getRoleByCode(params.code.trim());
-
-    if (existing) {
-      throw new Error("Role with this code already exists");
-    }
-
-    const roleInput: RoleInput = {
-      code: params.code.trim(),
-      name: nameNorm,
-      description: params.description ?? null,
-      permissionIds: Array.isArray(params.permissionIds) ? params.permissionIds : [],
-      isSystem: false,
-      isActive: true,
-    };
-
-    return this.createRole(roleInput);
-  };
-
-  createRole = async (payload: RoleInput): Promise<RoleRow> => {
-    const now = new Date();
-    const insertData = {
-      code: payload.code,
-      name: payload.name,
-      description: payload.description ?? null,
-      isSystem: payload.isSystem ?? false,
-      isActive:
-        payload.isActive === undefined || payload.isActive === null
-          ? true
-          : payload.isActive,
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    const [created] = await this.db
-      .insert(this.table)
-      .values(insertData)
-      .returning({ id: this.table.id });
-
-    if (!created) {
-      throw new Error("Failed to create role");
-    }
-
-    // Add permissions to role_permissions_default if provided
-    const permissionIdsToAdd: string[] = [];
-
-    if (payload.permissionIds && payload.permissionIds.length > 0) {
-      // Use permission IDs directly
-      for (const permId of payload.permissionIds) {
-        const perm = await this.db
-          .select({ id: base_tb_permissions.id })
-          .from(base_tb_permissions)
-          .where(
-            and(
-              eq(base_tb_permissions.id, permId),
-              eq(base_tb_permissions.isActive, true),
-            ),
-          )
-          .limit(1);
-        if (perm[0]) permissionIdsToAdd.push(perm[0].id);
-      }
-    } else if (payload.permissions && payload.permissions.length > 0) {
-      // Look up by permission keys
-      for (const permKey of payload.permissions) {
-        const perm = await this.db
-          .select({ id: base_tb_permissions.id })
-          .from(base_tb_permissions)
-          .where(
-            and(
-              eq(base_tb_permissions.key, permKey),
-              eq(base_tb_permissions.isActive, true),
-            ),
-          )
-          .limit(1);
-        if (perm[0]) permissionIdsToAdd.push(perm[0].id);
-      }
-    }
-
-    for (const permissionId of permissionIdsToAdd) {
-      await this.db.insert(base_tb_role_permissions_default).values({
-        roleId: created.id,
-        permissionId,
-        isActive: true,
-        createdAt: now,
-      });
-    }
-
-    const role = await this.getRoleById(created.id);
-
-    if (!role) {
-      throw new Error("Failed to load role after creation");
-    }
-
-    return role;
-  };
-
-  /**
-   * Invalidate cache permissions của tất cả users có role này
-   */
   private async invalidateRoleUsersCache(roleId: string): Promise<void> {
     const userRoleModel = new UserRoleModel();
     const userIds = await userRoleModel.getUserIdsByRole(roleId);
@@ -281,176 +56,11 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
     }
   }
 
-  updateRole = async (
-    id: string,
-    payload: Partial<RoleInput>,
-  ): Promise<RoleRow | null> => {
-    const updateData: Partial<typeof this.table.$inferInsert> = {
-      updatedAt: new Date(),
-    };
-
-    if (payload.code !== undefined) updateData.code = payload.code;
-    if (payload.name !== undefined) updateData.name = payload.name;
-    if (payload.description !== undefined)
-      updateData.description = payload.description ?? null;
-    if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
-
-    await this.db
-      .update(this.table)
-      .set(updateData)
-      .where(eq(this.table.id, id));
-
-    // Update permissions if provided
-    if (payload.permissions !== undefined) {
-      // Get permission IDs from keys
-      const permissionIds: string[] = [];
-
-      for (const permKey of payload.permissions) {
-        const perm = await this.db
-          .select({ id: base_tb_permissions.id })
-          .from(base_tb_permissions)
-          .where(eq(base_tb_permissions.key, permKey))
-          .limit(1);
-
-        if (perm[0]) {
-          permissionIds.push(perm[0].id);
-        }
-      }
-
-      // Remove all current permissions
-      await this.db
-        .update(base_tb_role_permissions_default)
-        .set({ isActive: false })
-        .where(eq(base_tb_role_permissions_default.roleId, id));
-
-      // Add new permissions
-      const now = new Date();
-
-      for (const permissionId of permissionIds) {
-        // Check if exists
-        const existing = await this.db
-          .select()
-          .from(base_tb_role_permissions_default)
-          .where(
-            and(
-              eq(base_tb_role_permissions_default.roleId, id),
-              eq(base_tb_role_permissions_default.permissionId, permissionId),
-            ),
-          )
-          .limit(1);
-
-        if (existing[0]) {
-          // Reactivate if inactive
-          await this.db
-            .update(base_tb_role_permissions_default)
-            .set({ isActive: true })
-            .where(eq(base_tb_role_permissions_default.id, existing[0].id));
-        } else {
-          // Insert new
-          await this.db.insert(base_tb_role_permissions_default).values({
-            roleId: id,
-            permissionId,
-            isActive: true,
-            createdAt: now,
-          });
-        }
-      }
-    }
-
-    // Invalidate cache nếu có thay đổi permissions hoặc role info
-    if (payload.permissions !== undefined || payload.isActive !== undefined) {
-      await this.invalidateRoleUsersCache(id);
-    }
-
-    return this.getRoleById(id);
-  };
-
-  updateData = async (params: { id: string; payload: any }) => {
-    const { id, payload } = params;
-
-    const normalizedPayload: Partial<RoleInput> = {};
-
-    if (payload.code !== undefined) {
-      normalizedPayload.code = String(payload.code);
-    }
-    if (payload.name !== undefined) {
-      normalizedPayload.name = this.normalizeLocaleInput(payload.name) ?? {
-        en: "",
-      };
-    }
-    if (payload.description !== undefined) {
-      normalizedPayload.description =
-        payload.description !== null && payload.description !== undefined
-          ? String(payload.description)
-          : null;
-    }
-    if (payload.permissions !== undefined) {
-      normalizedPayload.permissions = Array.isArray(payload.permissions)
-        ? payload.permissions
-        : [];
-    }
-    if (payload.isActive !== undefined) {
-      normalizedPayload.isActive = Boolean(payload.isActive);
-    }
-
-    return this.updateRole(id, normalizedPayload);
-  };
-
-  /**
-   * Delete role
-   */
-  async deleteRole(id: string): Promise<{ success: boolean; message: string }> {
-    const db = await this.db;
-
-    // Check if role exists
-    const [role] = await db
-      .select()
-      .from(this.table)
-      .where(eq(this.table.id, id))
-      .limit(1);
-
-    if (!role) {
-      return {
-        success: false,
-        message: "Role not found",
-      };
-    }
-
-    // Check if role is system role (cannot be deleted)
-    if (role.isSystem) {
-      return {
-        success: false,
-        message: "System roles cannot be deleted",
-      };
-    }
-
-    // Check if role is assigned to any users
-    const userRoles = await db
-      .select()
-      .from(base_tb_user_roles)
-      .where(eq(base_tb_user_roles.roleId, id))
-      .limit(1);
-
-    // Invalidate cache trước khi xóa
-    await this.invalidateRoleUsersCache(id);
-
-    // Delete role (cascade will handle related records)
-    await db.delete(this.table).where(eq(this.table.id, id));
-
-    return {
-      success: true,
-      message:
-        userRoles.length > 0
-          ? "Role deleted. Users with this role have been unassigned."
-          : "Role deleted successfully",
-    };
-  }
-
   private async mapToRoleRow(
     row: typeof base_tb_roles.$inferSelect,
+    dbOrTx?: typeof this.db,
   ): Promise<RoleRow> {
-    // Get permissions for this role
-    const db = await this.db;
+    const db = dbOrTx ?? this.db;
     const permissions = await db
       .select({
         permissionKey: base_tb_permissions.key,
@@ -483,4 +93,340 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
       updatedAt: row.updatedAt?.getTime(),
     };
   }
+
+  /**
+   * Get role by ID with full permissions (RPC: base-role.curd.get)
+   */
+  get = async (params: { id: string }) => {
+    const id = params.id;
+    const [roleRow] = await this.db
+      .select()
+      .from(this.table)
+      .where(eq(this.table.id, id))
+      .limit(1);
+
+    if (!roleRow) return null;
+
+    const permissions = await this.db
+      .select({
+        id: base_tb_permissions.id,
+        key: base_tb_permissions.key,
+        module: base_tb_permissions.module,
+        resource: base_tb_permissions.resource,
+        action: base_tb_permissions.action,
+        name: base_tb_permissions.name,
+        description: base_tb_permissions.description,
+      })
+      .from(base_tb_role_permissions_default)
+      .innerJoin(
+        base_tb_permissions,
+        eq(
+          base_tb_role_permissions_default.permissionId,
+          base_tb_permissions.id,
+        ),
+      )
+      .where(
+        and(
+          eq(base_tb_role_permissions_default.roleId, id),
+          eq(base_tb_role_permissions_default.isActive, true),
+        ),
+      );
+
+    return {
+      id: roleRow.id,
+      code: roleRow.code,
+      name: roleRow.name,
+      description: roleRow.description ?? undefined,
+      isSystem: roleRow.isSystem ?? false,
+      isActive: roleRow.isActive ?? true,
+      createdAt: roleRow.createdAt ? String(roleRow.createdAt.getTime()) : "",
+      updatedAt: roleRow.updatedAt
+        ? String(roleRow.updatedAt.getTime())
+        : undefined,
+      permissions: permissions.map((p) => ({
+        id: p.id,
+        key: p.key,
+        module: p.module,
+        resource: p.resource,
+        action: p.action,
+        name: p.name,
+        description: p.description,
+        isActive: true,
+      })),
+    };
+  };
+
+  /**
+   * Create role (RPC: base-role.curd.create)
+   */
+  create = async (params: {
+    code: string;
+    name: LocaleDataType<string>;
+    description?: string | null;
+    permissionIds?: string[];
+  }): Promise<RoleRow> => {
+    const nameNorm = this.normalizeLocaleInput(params.name);
+
+    if (!params.code?.trim()) throw new Error("Code is required");
+    if (!nameNorm || (!nameNorm.en && !nameNorm.vi)) throw new Error("Name is required");
+
+    const [existing] = await this.db
+      .select()
+      .from(this.table)
+      .where(eq(this.table.code, params.code.trim()))
+      .limit(1);
+    if (existing) throw new Error("Role with this code already exists");
+
+    return this.db.transaction(async (tx) => {
+      const now = new Date();
+      const [created] = await tx
+        .insert(this.table)
+        .values({
+          code: params.code.trim(),
+          name: nameNorm,
+          description: params.description ?? null,
+          isSystem: false,
+          isActive: true,
+          createdAt: now,
+          updatedAt: now,
+        })
+        .returning({ id: this.table.id });
+
+      if (!created) throw new Error("Failed to create role");
+
+      const permissionIds = Array.isArray(params.permissionIds)
+        ? params.permissionIds
+        : [];
+
+      if (permissionIds.length > 0) {
+        const validPerms = await tx
+          .select({ id: base_tb_permissions.id })
+          .from(base_tb_permissions)
+          .where(
+            and(
+              inArray(base_tb_permissions.id, permissionIds),
+              eq(base_tb_permissions.isActive, true),
+            ),
+          );
+
+        if (validPerms.length > 0) {
+          await tx.insert(base_tb_role_permissions_default).values(
+            validPerms.map((p) => ({
+              roleId: created.id,
+              permissionId: p.id,
+              isActive: true,
+              createdAt: now,
+            })),
+          );
+        }
+      }
+
+      const [roleRow] = await tx
+        .select()
+        .from(this.table)
+        .where(eq(this.table.id, created.id))
+        .limit(1);
+
+      if (!roleRow) throw new Error("Failed to load role after creation");
+
+      return this.mapToRoleRow(roleRow, tx);
+    });
+  };
+
+  /**
+   * Update role (RPC: base-role.curd.update)
+   * Accepts { id, payload? } or { id, code?, name?, description?, permissionIds? }
+   */
+  update = async (params: {
+    id: string;
+    payload?: Record<string, unknown>;
+    code?: string;
+    name?: LocaleDataType<string>;
+    description?: string | null;
+    permissionIds?: string[];
+    permissions?: string[];
+    isActive?: boolean;
+  }): Promise<RoleRow | null> => {
+    const id = params.id;
+    const payload: Record<string, unknown> =
+      params.payload ?? (params as Record<string, unknown>);
+
+    const updateData: Partial<RoleInput> = {};
+    if (payload.code !== undefined) updateData.code = String(payload.code);
+    if (payload.name !== undefined) {
+      updateData.name =
+        this.normalizeLocaleInput(payload.name as unknown) ?? undefined;
+    }
+    if (payload.description !== undefined) {
+      updateData.description =
+        payload.description !== null && payload.description !== undefined
+          ? String(payload.description)
+          : null;
+    }
+    if (payload.permissionIds !== undefined) {
+      updateData.permissionIds = Array.isArray(payload.permissionIds)
+        ? payload.permissionIds
+        : [];
+    }
+    if (payload.permissions !== undefined) {
+      updateData.permissions = Array.isArray(payload.permissions)
+        ? payload.permissions
+        : [];
+    }
+    if (payload.isActive !== undefined) updateData.isActive = Boolean(payload.isActive);
+
+    const role = await this.db.transaction(async (tx) => {
+      const now = new Date();
+      const dbUpdate: Partial<typeof this.table.$inferInsert> = {
+        updatedAt: now,
+      };
+      if (updateData.code !== undefined) dbUpdate.code = updateData.code;
+      if (updateData.name !== undefined) dbUpdate.name = updateData.name;
+      if (updateData.description !== undefined)
+        dbUpdate.description = updateData.description ?? null;
+      if (updateData.isActive !== undefined) dbUpdate.isActive = updateData.isActive;
+
+      await tx.update(this.table).set(dbUpdate).where(eq(this.table.id, id));
+
+      const isUpdatingPermissions =
+        updateData.permissionIds !== undefined ||
+        updateData.permissions !== undefined;
+
+      if (isUpdatingPermissions) {
+        let permissionIdsToSet: string[] = [];
+
+        if (
+          updateData.permissionIds !== undefined &&
+          updateData.permissionIds.length > 0
+        ) {
+          const validPerms = await tx
+            .select({ id: base_tb_permissions.id })
+            .from(base_tb_permissions)
+            .where(
+              and(
+                inArray(base_tb_permissions.id, updateData.permissionIds),
+                eq(base_tb_permissions.isActive, true),
+              ),
+            );
+          permissionIdsToSet = validPerms.map((p) => p.id);
+        } else if (
+          updateData.permissions !== undefined &&
+          updateData.permissions.length > 0
+        ) {
+          const validPerms = await tx
+            .select({ id: base_tb_permissions.id })
+            .from(base_tb_permissions)
+            .where(
+              and(
+                inArray(base_tb_permissions.key, updateData.permissions),
+                eq(base_tb_permissions.isActive, true),
+              ),
+            );
+          permissionIdsToSet = validPerms.map((p) => p.id);
+        }
+
+        await tx
+          .update(base_tb_role_permissions_default)
+          .set({ isActive: false })
+          .where(eq(base_tb_role_permissions_default.roleId, id));
+
+        if (permissionIdsToSet.length > 0) {
+          const existing = await tx
+            .select({
+              id: base_tb_role_permissions_default.id,
+              permissionId: base_tb_role_permissions_default.permissionId,
+            })
+            .from(base_tb_role_permissions_default)
+            .where(eq(base_tb_role_permissions_default.roleId, id));
+
+          const existingByPermId = new Map(
+            existing.map((r) => [r.permissionId, r.id]),
+          );
+          const toReactivate: string[] = [];
+          const toInsert: string[] = [];
+
+          for (const permId of permissionIdsToSet) {
+            const rowId = existingByPermId.get(permId);
+            if (rowId) toReactivate.push(rowId);
+            else toInsert.push(permId);
+          }
+
+          if (toReactivate.length > 0) {
+            await tx
+              .update(base_tb_role_permissions_default)
+              .set({ isActive: true })
+              .where(
+                inArray(base_tb_role_permissions_default.id, toReactivate),
+              );
+          }
+
+          if (toInsert.length > 0) {
+            await tx.insert(base_tb_role_permissions_default).values(
+              toInsert.map((permissionId) => ({
+                roleId: id,
+                permissionId,
+                isActive: true,
+                createdAt: now,
+              })),
+            );
+          }
+        }
+      }
+
+      const [roleRow] = await tx
+        .select()
+        .from(this.table)
+        .where(eq(this.table.id, id))
+        .limit(1);
+
+      if (!roleRow) return null;
+
+      return this.mapToRoleRow(roleRow, tx);
+    });
+
+    if (
+      role &&
+      (updateData.permissions !== undefined ||
+        updateData.permissionIds !== undefined ||
+        updateData.isActive !== undefined)
+    ) {
+      await this.invalidateRoleUsersCache(id);
+    }
+
+    return role;
+  };
+
+  /**
+   * Delete role (RPC: base-role.curd.delete)
+   */
+  delete = async (params: {
+    id: string;
+  }): Promise<{ success: boolean; message: string }> => {
+    const id = params.id;
+
+    const [role] = await this.db
+      .select()
+      .from(this.table)
+      .where(eq(this.table.id, id))
+      .limit(1);
+
+    if (!role) return { success: false, message: "Role not found" };
+    if (role.isSystem) return { success: false, message: "System roles cannot be deleted" };
+
+    const [userRole] = await this.db
+      .select()
+      .from(base_tb_user_roles)
+      .where(eq(base_tb_user_roles.roleId, id))
+      .limit(1);
+
+    await this.invalidateRoleUsersCache(id);
+    await this.db.delete(this.table).where(eq(this.table.id, id));
+
+    return {
+      success: true,
+      message: userRole
+        ? "Role deleted. Users with this role have been unassigned."
+        : "Role deleted successfully",
+    };
+  };
 }
