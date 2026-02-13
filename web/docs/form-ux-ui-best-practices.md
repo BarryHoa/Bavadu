@@ -69,6 +69,8 @@ Nghiên cứu của Seckler và cộng sự (CHI 2014) cho thấy: khi form tuâ
 
 Gần 70% người dùng bỏ form khi form gây khó hiểu hoặc thất vọng. Thiết kế form kém làm giảm conversion, tăng thời gian hoàn thành và tạo trải nghiệm tiêu cực.
 
+📷 **Xem minh họa:** [NN/G – Website Forms Usability: Top 10 Recommendations](https://www.nngroup.com/articles/web-form-design/) — 10 khuyến nghị với screenshot form tốt/xấu
+
 ### 1.3 Nguyên tắc cốt lõi (2024+)
 
 - **Giảm effort**: Chỉ hỏi thông tin cần thiết; dùng smart defaults, autocomplete, input phù hợp thiết bị
@@ -110,6 +112,8 @@ flowchart TD
 
 **Full-page:** Form nhiều field, user cần nhớ thông tin từ màn trước, không cần gián đoạn luồng.
 
+📷 **Xem minh họa:** [UX Planet – Modal vs Page](https://uxplanet.org/modal-vs-page-a-decision-framework-75843c4b322f) — So sánh khi nào dùng modal vs trang riêng
+
 **Dẫn chứng:** UX Planet – Modal vs Page; UX Stack Exchange – Forms: Modal dialog or separate page?
 
 ---
@@ -123,6 +127,8 @@ flowchart TD
 **Tại sao:** Độ dài dòng 45–75 ký tự (tối đa ~80) tốt cho đọc. `em` scale theo font size của user.
 
 **Thực hành:** Mobile dùng 100% width; min-width ~320px.
+
+📷 **Xem minh họa:** [Carbon Design System – Form](https://carbondesignsystem.com/components/form/usage) — Max-width, spacing, layout
 
 **Dẫn chứng:** UX Stack Exchange – Suggestion required for max width of a form; Newtarget – Max-Content Width
 
@@ -140,6 +146,8 @@ flowchart TD
 
 **Cảnh báo:** Tránh 2 cột với form dài (20+ field) – user dễ bỏ qua cột phải. Trên mobile chuyển về 1 cột.
 
+![Single-column vs Multi-column layout](./assets/form-ux/form-single-vs-multi-column.png)
+
 **Dẫn chứng:** Caroline Jarrett – Two-column forms best avoided; UX Stack Exchange – 2 column form logical order
 
 ### 3.3 Form Section và Divider
@@ -150,6 +158,8 @@ flowchart TD
 - Divider (line) hoặc spacer giữa section; tối đa 3 cấp heading
 
 **Tại sao:** Cấu trúc rõ ràng giúp quét nhanh và hỗ trợ screen reader.
+
+📷 **Xem minh họa:** [W3C – Grouping Controls](https://www.w3.org/WAI/tutorials/forms/grouping/) — fieldset, legend, nhóm field
 
 **Dẫn chứng:** W3C – Grouping Controls; ActivityInfo – Section header field
 
@@ -170,6 +180,8 @@ Các phần tử **gần nhau** được nhận thức là **liên quan**. Label
 
 Whitespace hợp lý có thể tăng comprehension ~20% và conversion từ ~6% lên hơn 15%. Dùng grid 4px hoặc 8px.
 
+📷 **Xem minh họa:** [NN/G – Form Design White Space](https://www.nngroup.com/articles/form-design-white-space/) — Khoảng cách macro/micro, ví dụ trước/sau
+
 **Dẫn chứng:** NN/G – Form Design White Space; UsePixelForm – Using Whitespace and Layout
 
 ---
@@ -182,6 +194,8 @@ Whitespace hợp lý có thể tăng comprehension ~20% và conversion từ ~6% 
 
 **Tại sao:** Placeholder biến mất khi gõ, độ tương phản thấp, screen reader không đọc; user dễ nhầm.
 
+📷 **Xem minh họa:** [NN/G – Placeholders in Form Fields Are Harmful](https://www.nngroup.com/articles/form-design-placeholders/) — So sánh placeholder vs label, ví dụ cụ thể
+
 **Dẫn chứng:** NN/G – Placeholders in Form Fields Are Harmful; Adam Silver – The problem with placeholders
 
 ### 5.2 Layout – Ưu tiên single-column
@@ -192,6 +206,8 @@ Sắp xếp fields một cột dọc. Ngoại lệ: City+State+Zip, Start+End da
 
 Đánh dấu **optional** khi đa số là required. Tránh hướng dẫn chung ở đầu form. Giảm optional field tối đa.
 
+📷 **Xem minh họa:** [NN/G – Marking Required Fields](https://www.nngroup.com/articles/required-fields/) — Cách đánh dấu required/optional
+
 **Dẫn chứng:** NN/G – Marking Required Fields; UXD World – Required and Optional Fields
 
 ### 5.4 Button text – Động từ mô tả hành động
@@ -201,6 +217,8 @@ Dùng "Tạo phòng ban", "Lưu thay đổi" thay vì "Submit", "Gửi".
 ### 5.5 Vị trí Label
 
 Label **phía trên** field là tốt nhất cho hầu hết form, đặc biệt mobile. Label bên trái tiết kiệm chiều dọc nhưng chậm hơn.
+
+![Các vị trí đặt label](./assets/form-ux/form-label-placement.png)
 
 **Dẫn chứng:** Baymard – Label Position; UXmatters – Label Placement in Forms
 
@@ -219,11 +237,15 @@ Label **phía trên** field là tốt nhất cho hầu hết form, đặc biệt
 
 Label: sentence case, ngắn gọn (≤3 từ). Khoảng cách dọc giữa field: ~32px.
 
+📷 **Xem minh họa:** [Material Design – Text fields](https://m3.material.io/components/text-fields) — Typography, states, variants
+
 **Dẫn chứng:** Carbon Design System – Form style; web.dev – Design basics; Primer – Forms
 
 ### 6.2 Border input
 
 Input cần **border rõ ràng** để trông như control tương tác. Border mặc định browser thường quá nhạt, ảnh hưởng usability trên mobile. Dùng `border: 1px solid` với màu đủ tương phản.
+
+📷 **Xem minh họa:** [web.dev – Styling forms](https://web.dev/learn/forms/styling/) — Border, focus, states
 
 **Dẫn chứng:** web.dev – Styling forms; W3C Design System – Forms
 
@@ -233,6 +255,8 @@ Input cần **border rõ ràng** để trông như control tương tác. Border 
 
 **Tại sao:** Người dùng keyboard cần biết vị trí focus. WCAG 2.2 yêu cầu focus rõ ràng. Không gỡ focus nếu không có thay thế.
 
+📷 **Xem minh họa:** [web.dev – Focus visible](https://web.dev/focus-visible/) — Focus ring, :focus-visible
+
 **Dẫn chứng:** WICG – focus-visible; Cr0x – Accessible Focus States; Bootstrap – Focus ring
 
 ### 6.4 Disabled state
@@ -240,6 +264,8 @@ Input cần **border rõ ràng** để trông như control tương tác. Border 
 **Quy tắc:** Tránh chỉ dùng màu xám – dễ nhầm với nút secondary. Cân nhắc **giảm opacity** (&lt; 40%) thay vì đổi màu hẳn.
 
 **Tại sao:** Opacity tạo chuyển đổi mượt hơn; màu xám khiến nút "nổi" và dễ bị click nhầm.
+
+📷 **Xem minh họa:** [UX Movement – Disabled Buttons](https://uxmovement.com/buttons/why-you-shouldnt-gray-out-disabled-buttons/) — Opacity vs gray
 
 **Dẫn chứng:** UX Movement – Why You Shouldn't Gray Out Disabled Buttons; Smashing Magazine – Usability Pitfalls of Disabled Buttons
 
@@ -257,6 +283,8 @@ Label trên field; chiều rộng phù hợp độ dài dự kiến; không dùn
 - Dùng `<input type="email">` – keyboard phù hợp mobile, validation cơ bản
 - Kết hợp client-side + server-side validation
 - `autocomplete="email"` cho WCAG
+
+📷 **Xem minh họa:** [web.dev – Form design basics](https://web.dev/learn/forms/form-structure/) — Input types, labels, structure
 
 **Dẫn chứng:** WebAIM – Form Validation; W3C – Validating Input; UXPin – Accessible Form Validation
 
@@ -284,6 +312,8 @@ Tương ứng độ dài dự kiến: 75–100px (số ngắn), 150px (trung bì
 | Large | 350px |
 | Fill | 100% |
 
+📷 **Xem minh họa:** [USWDS – Form controls](https://designsystem.digital.gov/components/form-controls/) — Width, alignment
+
 ---
 
 ## 9. Field Date
@@ -309,6 +339,8 @@ Single field: 150–250px. Date range: hai field cùng hàng desktop, mỗi cái
 - User quốc tế: label rõ (Month, Day) hoặc viết tên tháng
 - Ngày không hợp lệ: disable hoặc làm rõ
 
+📷 **Xem minh họa:** [NN/G – Date-Input Form Fields](https://www.nngroup.com/articles/date-input/) — Calendar, split dropdown, format; [PatternFly – Date Picker](https://patternfly.org/components/date-picker)
+
 **Dẫn chứng:** NN/G – [Date-Input Form Fields](https://www.nngroup.com/articles/date-input/); PatternFly – Date Picker
 
 ---
@@ -320,6 +352,8 @@ Single field: 150–250px. Date range: hai field cùng hàng desktop, mỗi cái
 - Country dropdown + 1 field nhập số
 - `autocomplete="tel"`
 - Chấp nhận format linh hoạt (dấu cách, gạch); validate server-side
+
+📷 **Xem minh họa:** [Base Web – Phone Input](https://baseweb.design/components/phone-input/) — Country dropdown + field
 
 **Dẫn chứng:** Base Web – Building an International Phone Input; UX Patterns – Phone Number
 
@@ -335,6 +369,8 @@ Single field: 150–250px. Date range: hai field cùng hàng desktop, mỗi cái
 
 **Tại sao:** Giúp kiểm tra nhập đúng; hữu ích cho người khuyết tật.
 
+📷 **Xem minh họa:** [Material Design – Password text field](https://m3.material.io/components/text-fields/guidelines#d09f2686-07c4-4b4c-a8d3-b1ee53a46d63) — Show/hide, requirements
+
 **Dẫn chứng:** UX Patterns – Password; Makethingsaccessible – Accessible password reveal input
 
 ---
@@ -345,6 +381,8 @@ Single field: 150–250px. Date range: hai field cùng hàng desktop, mỗi cái
 - Dùng `rows`/`cols` (HTML) và CSS; `cols` kém tin cậy nên ưu tiên CSS
 - Ví dụ: `width: 300px`, `height: 150px`; responsive trên mobile
 - Autoresize: tăng height theo nội dung, có `minRows` và `maxRows`
+
+📷 **Xem minh họa:** [MUI – Textarea Autosize](https://mui.com/material-ui/react-text-field/#multiline) — Multiline, autoresize
 
 **Dẫn chứng:** UX Patterns – Textarea; MUI – Textarea Autosize
 
@@ -364,6 +402,8 @@ Single field: 150–250px. Date range: hai field cùng hàng desktop, mỗi cái
 - Typeahead để tìm nhanh
 - Trên mobile: ưu tiên native `<select>`
 - Menu ~7 items trở xuống; nhiều hơn: nhóm hoặc scroll
+
+📷 **Xem minh họa:** [NN/G – Dropdowns](https://www.nngroup.com/articles/drop-down-menus/) — Khi dùng dropdown; [PatternFly – Select](https://patternfly.org/components/select)
 
 **Dẫn chứng:** UI Playbook – Select; PatternFly – Select; NN/G – Dropdowns
 
@@ -389,6 +429,8 @@ Parent + child; parent có trạng thái **indeterminate** (gạch) khi chỉ m�
 - **Radio:** Chọn **một** (mutually exclusive)
 - **Checkbox:** Chọn **nhiều** hoặc bật/tắt (boolean)
 
+📷 **Xem minh họa:** [NN/G – Checkboxes: Design Guidelines](https://www.nngroup.com/articles/checkboxes-design-guidelines/) — Hình vuông vs tròn, nested, indeterminate; [PatternFly – Checkbox](https://patternfly.org/components/forms/checkbox/design-guidelines)
+
 **Dẫn chứng:** NN/G – [Checkboxes: Design Guidelines](https://www.nngroup.com/articles/checkboxes-design-guidelines/); Canada.ca – Checkboxes and radio buttons
 
 ---
@@ -400,6 +442,8 @@ Parent + child; parent có trạng thái **indeterminate** (gạch) khi chỉ m�
 **Khi không:** &lt; 10 options; text tự do; mật khẩu; độ trễ mạng cao.
 
 **Accessibility:** HTML `autocomplete`, ARIA; điều hướng phím (mũi tên, Enter).
+
+📷 **Xem minh họa:** [Primer – Autocomplete](https://primer.style/product/components/autocomplete/guidelines); [Material Design – Autocomplete](https://m3.material.io/components/text-fields/guidelines#17c85694-f8b6-4024-9627-34e6d1d15f50)
 
 ---
 
@@ -413,6 +457,8 @@ Parent + child; parent có trạng thái **indeterminate** (gạch) khi chỉ m�
 - `accept` attribute; validate server-side
 - Hiển thị progress và lỗi
 
+📷 **Xem minh họa:** [GOV.UK – File upload](https://design-system.service.gov.uk/components/file-upload/) — Label, hint, drag-drop; [Michigan Design System – File Upload](https://designsystem.michigan.gov/components/form-elements/file-upload/)
+
 **Dẫn chứng:** GOV.UK – File upload; UX Patterns – File Input; Michigan Design System – File Upload
 
 ---
@@ -424,6 +470,8 @@ Parent + child; parent có trạng thái **indeterminate** (gạch) khi chỉ m�
 - Đếm: "X/Y ký tự" hoặc "Còn Y ký tự"
 - Khi sắp chạm limit: đổi màu (vd: cam, đỏ)
 - Vượt quá: "Vượt X ký tự" – rõ ràng
+
+📷 **Xem minh họa:** [USWDS – Character count](https://designsystem.digital.gov/components/character-count/) — Đếm ký tự, màu sắc khi gần limit
 
 **Dẫn chứng:** USWDS – Character count; UX Stack Exchange – Text box max character limit
 
@@ -439,6 +487,8 @@ Tương ứng độ dài dự kiến. Cân bằng giữa đúng kích thước v
 
 **WCAG 2.1/2.2 (AAA):** Tối thiểu **44x44 CSS pixels**. Material Design: **48x48 dp**. Khoảng cách giữa target: 8px.
 
+📷 **Xem minh họa:** [web.dev – Accessible tap targets](https://web.dev/accessible-tap-targets/) — 44x44px, spacing; [W3C – Target Size](https://www.w3.org/WAI/WCAG22/Understanding/target-size.html)
+
 **Dẫn chứng:** W3C – Target Size; web.dev – Accessible tap targets
 
 ---
@@ -450,6 +500,8 @@ Tương ứng độ dài dự kiến. Cân bằng giữa đúng kích thước v
 - Luồng **logic** – thông tin này dẫn đến thông tin kia
 - Giảm cognitive load với heading rõ ràng
 
+📷 **Xem minh họa:** [NN/G – 4 Principles to Reduce Cognitive Load](https://www.nngroup.com/articles/cognitive-load/) — Nhóm logic, thứ tự field
+
 **Dẫn chứng:** Formcentric – Getting the order right; NN/G – 4 Principles to Reduce Cognitive Load
 
 ---
@@ -459,6 +511,8 @@ Tương ứng độ dài dự kiến. Cân bằng giữa đúng kích thước v
 - Đặt **bên dưới** field: Label → Input → Helper text
 - Dùng cho input phức tạp, ràng buộc, giới hạn ký tự
 - **Tránh** tooltip thay helper text – helper text luôn hiển thị hiệu quả hơn
+
+📷 **Xem minh họa:** [PatternFly – Helper Text](https://patternfly.org/components/forms/helper-text); [UX Movement – Form Field Help Text](https://uxmovement.com/forms/why-infield-top-aligned-form-labels-win/)
 
 **Dẫn chứng:** UX Movement – Form Field Help Text; PatternFly – Helper Text
 
@@ -483,6 +537,8 @@ Hiển thị lỗi **dưới field** khi blur. Không validate khi đang gõ (tr
 9. Tránh tooltip cho lỗi
 10. Hỗ trợ khi lỗi lặp lại
 
+📷 **Xem minh họa:** [NN/G – 10 Design Guidelines for Reporting Errors in Forms](https://www.nngroup.com/articles/errors-forms-design-guidelines/) — Inline validation, màu + icon, vị trí message; [WebAIM – Form Validation](https://webaim.org/techniques/formvalidation/)
+
 **Dẫn chứng:** NN/G – [10 Design Guidelines for Reporting Errors in Forms](https://www.nngroup.com/articles/errors-forms-design-guidelines/); WebAIM – Form Validation
 
 ---
@@ -492,6 +548,8 @@ Hiển thị lỗi **dưới field** khi blur. Không validate khi đang gõ (tr
 ### 22.1 Tránh Reset/Clear
 
 Không dùng nút Reset/Clear – dễ nhấn nhầm, mất dữ liệu. Guideline hơn 15 năm.
+
+📷 **Xem minh họa:** [NN/G – Primary & Secondary Actions](https://www.nngroup.com/articles/primary-secondary-actions/) — Vị trí nút chính; [Material Design – Buttons](https://m3.material.io/components/buttons)
 
 ### 22.2 Nút Back
 
@@ -505,6 +563,14 @@ Không dùng nút Reset/Clear – dễ nhấn nhầm, mất dữ liệu. Guideli
 
 ### 22.4 Full-page: Primary trái; Modal: Primary phải
 
+**Full-page:** Nút primary (Submit, Lưu) đặt **bên trái**, Cancel bên phải – người dùng quét từ trái sang phải, primary xuất hiện trước.
+
+**Modal:** Nút primary đặt **bên phải**, Cancel bên trái – phù hợp với thói quen đóng modal (X ở góc phải) và hành động xác nhận cuối luồng.
+
+![Bố cục nút: Full-page vs Modal](./assets/form-ux/form-button-layout.png)
+
+**Dẫn chứng:** Material Design – Dialogs; iOS HIG – Buttons; NN/G – Primary & Secondary Actions
+
 ---
 
 ## 23. Keyboard, Tab order, Autocomplete attribute
@@ -517,6 +583,8 @@ Thứ tự Tab = thứ tự DOM. Tránh `tabindex` dương. Không dùng layout 
 
 Dùng `autocomplete` cho field thu thập thông tin user: `given-name`, `family-name`, `email`, `tel`, `street-address`. Đáp ứng WCAG 1.3.5 (Identify Input Purpose – AA).
 
+📷 **Xem minh họa:** [W3C – H98 autocomplete](https://www.w3.org/WAI/WCAG21/Techniques/html/H98); [WebAIM – Forms](https://webaim.org/techniques/formvalidation/) — Tab order, autocomplete
+
 **Dẫn chứng:** W3C – H4 Tab order; W3C – H98 autocomplete; WebAIM – Forms
 
 ---
@@ -525,6 +593,8 @@ Dùng `autocomplete` cho field thu thập thông tin user: `given-name`, `family
 
 Accordion/collapsible cho section ít quan trọng. Conditional fields – field con hiện khi chọn option; indent để thể hiện quan hệ. Dùng chevron + text.
 
+📷 **Xem minh họa:** [PatternFly – Progressive Disclosure](https://pf3.patternfly.org/v3/pattern-library/forms-and-controls/progressive-disclosure); [PatternFly – Accordion](https://patternfly.org/components/accordion/design-guidelines); [Primer – Progressive disclosure](https://primer.style/product/components/progressive-disclosure/guidelines)
+
 **Dẫn chứng:** Primer – Progressive disclosure; PatternFly – Progressive Disclosure
 
 ---
@@ -532,6 +602,8 @@ Accordion/collapsible cho section ít quan trọng. Conditional fields – field
 ## 25. Số lượng Field và Conversion
 
 Không có con số "vàng". Chỉ hỏi thông tin cần thiết; A/B test. Chất lượng và sự liên quan quan trọng hơn số lượng.
+
+📷 **Xem minh họa:** [NN/G – Web Form Design](https://www.nngroup.com/articles/web-form-design/) — Conversion, form length; [FormAssembly – Multi-step](https://www.formassembly.com/blog/multi-step-forms/) — Chia bước giảm bỏ form
 
 ---
 
@@ -543,6 +615,8 @@ Không có con số "vàng". Chỉ hỏi thông tin cần thiết; A/B test. Ch�
 | **Modal** | Primary phải, Cancel trái; &lt; 5–6 field |
 | **Full-page** | Primary trái; breadcrumb; section rõ |
 | **Wizard** | ~5 field/bước; lưu và tiếp tục; progress |
+
+📷 **Xem minh họa:** [Material Design – Dialogs](https://m3.material.io/components/dialogs) — Modal buttons; [PatternFly – Wizard](https://patternfly.org/components/wizard) — Multi-step
 
 ---
 
@@ -563,6 +637,8 @@ Không có con số "vàng". Chỉ hỏi thông tin cần thiết; A/B test. Ch�
 | Checkbox label phủ định | "Gửi cập nhật" thay vì "Không gửi" |
 | Split date dropdown | Cho phép gõ; calendar khi cần |
 | Gray out disabled | Cân nhắc giảm opacity |
+
+📷 **Xem minh họa:** Bảng trên tổng hợp từ các bài NN/G, GOV.UK, Material Design. Xem chi tiết từng mục trong [Mục 28 – Nguồn tham khảo](#28-nguồn-tham-khảo) bên dưới.
 
 ---
 
@@ -587,6 +663,19 @@ Không có con số "vàng". Chỉ hỏi thông tin cần thiết; A/B test. Ch�
 - **W3C:** Multi-page forms, Labels, Target Size (WCAG 2.5.5), H98 autocomplete, Grouping
 - **WebAIM:** Form validation and error recovery
 - **web.dev:** Form design basics, Styling forms, Accessible tap targets
+
+### Bộ sưu tập minh họa (theo chủ đề)
+
+| Chủ đề | Link minh họa |
+|--------|---------------|
+| Form tổng quan | [NN/G Web Form Design](https://www.nngroup.com/articles/web-form-design/) |
+| Placeholder vs Label | [NN/G Placeholders Harmful](https://www.nngroup.com/articles/form-design-placeholders/) |
+| Required/Optional | [NN/G Required Fields](https://www.nngroup.com/articles/required-fields/) |
+| Spacing/Whitespace | [NN/G Form White Space](https://www.nngroup.com/articles/form-design-white-space/) |
+| Checkbox/Radio | [NN/G Checkboxes](https://www.nngroup.com/articles/checkboxes-design-guidelines/) |
+| Date Input | [NN/G Date Input](https://www.nngroup.com/articles/date-input/) |
+| Validation/Errors | [NN/G Errors in Forms](https://www.nngroup.com/articles/errors-forms-design-guidelines/) |
+| Design Systems | [Material Design](https://m3.material.io/components/text-fields), [PatternFly](https://patternfly.org/components/forms/helper-text), [GOV.UK](https://design-system.service.gov.uk/components/), [Carbon](https://carbondesignsystem.com/components/form/) |
 
 ### Khác
 - **CXL / Foxit:** Single-column vs multi-column
