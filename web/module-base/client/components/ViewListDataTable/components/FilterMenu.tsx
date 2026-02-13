@@ -29,7 +29,7 @@ export default function FilterMenu<T = any>({
 
   return (
     <IBaseDropdown
-      items={filterOptions.map((option) => ({
+      items={(filterOptions ?? []).map((option) => ({
         key: option.label,
         textValue: option.label,
         children: (

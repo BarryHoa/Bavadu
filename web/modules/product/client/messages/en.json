@@ -19,7 +19,13 @@
       "accounting": "Accounting"
     },
     "images": "Images",
-
+    "product-list": {
+      "empty": {
+        "title": "No products yet",
+        "description": "Create your first product to get started.",
+        "action": "New Product"
+      }
+    },
     "product-create": {
       "baseUnitOfMeasure": "Base unit of measure",
       "unitOfMeasure": "Unit of measure",

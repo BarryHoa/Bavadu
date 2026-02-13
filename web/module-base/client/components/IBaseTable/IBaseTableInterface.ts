@@ -80,6 +80,24 @@ export interface IBaseTableSummary {
   values: Record<string, ReactNode>;
 }
 
+/** When set, table body scrolls inside this height; header and footer stay sticky. Omit or "auto" = table height follows content. */
+export type IBaseTableScrollHeight =
+  | "auto"
+  | {
+      minHeight?: number | string;
+      height?: number | string;
+      maxHeight?: number | string;
+    };
+
+/** When set, table is constrained by width; horizontal scroll if content overflows. Omit or "auto" = full width. */
+export type IBaseTableScrollWidth =
+  | "auto"
+  | {
+      minWidth?: number | string;
+      width?: number | string;
+      maxWidth?: number | string;
+    };
+
 export type IBaseTableProps<T = any> = TableProps & {
   columns: IBaseTableColumnDefinition<T>[];
   dataSource: T[];
@@ -96,6 +114,10 @@ export type IBaseTableProps<T = any> = TableProps & {
   rowSelection?: IBaseTableRowSelection<T> | false;
   classNames?: IBaseTableClassNames;
   emptyContent?: ReactNode;
+  /** "auto" (default) = no fixed height. Object = scrollable body with sticky header/footer. */
+  scrollHeight?: IBaseTableScrollHeight;
+  /** "auto" (default) = no width constraint. Object = constrained width, horizontal scroll if overflow. */
+  scrollWidth?: IBaseTableScrollWidth;
   //On change Table
   onChangeTable?: IBaseTableOnChange;
   onRefresh?: () => void;

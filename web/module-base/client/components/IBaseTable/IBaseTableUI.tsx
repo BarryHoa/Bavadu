@@ -56,11 +56,11 @@ export interface IBaseTableUIProps<T = any> {
   renderCell?: (
     column: Column<T, unknown>,
     row: Row<T>,
-    value: any
+    value: any,
   ) => ReactNode;
   renderHeader?: (
     header: HeaderGroup<T>,
-    column: Column<T, unknown>
+    column: Column<T, unknown>,
   ) => ReactNode;
 }
 
@@ -103,7 +103,7 @@ export default function IBaseTableUI<T = any>({
         ? sortIcons.ascending
         : sortIcons.descending;
     },
-    [sortDescriptor]
+    [sortDescriptor],
   );
 
   // Memoize header click handler
@@ -123,29 +123,35 @@ export default function IBaseTableUI<T = any>({
         direction: nextDirection,
       });
     },
-    [sortDescriptor, onSortChange]
+    [sortDescriptor, onSortChange],
   );
 
-  // Memoize classNames to prevent object recreation
+  // Memoize classNames: Carbon-style minimal table (light header, subtle borders)
   const memoizedClassNames = useMemo(
     () => ({
       ...classNames,
       tbody: clsx("overflow-x-auto", classNames.tbody),
       wrapper: clsx("rounded-none p-0", classNames.wrapper),
       th: clsx(
-        "px-0 bg-primary-600 text-white hover:bg-primary-700/80",
-        classNames.th
+        "px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-foreground bg-default-100 border-b border-r border-default-200 last:border-r-0",
+        classNames.th,
       ),
-      tr: clsx("hover:bg-primary-700/10", classNames.tr),
-      td: clsx("rounded-none py-1 px-2", classNames.td),
+      tr: clsx(
+        "border-b border-default-200/80 transition-colors hover:bg-default-100/80",
+        classNames.tr,
+      ),
+      td: clsx(
+        "rounded-none py-2 px-3 text-sm text-default-700",
+        classNames.td,
+      ),
     }),
-    [classNames]
+    [classNames],
   );
 
   // Create column lookup map for O(1) access - memoize to prevent recreation
   const columnMap = useMemo(
     () => new Map(visibleColumns.map((col) => [col.id, col])),
-    [visibleColumns]
+    [visibleColumns],
   );
 
   return (
@@ -185,7 +191,7 @@ export default function IBaseTableUI<T = any>({
                 className={clsx(
                   isPinned && "frozen-column",
                   isPinned === "left" && "frozen-left",
-                  isPinned === "right" && "frozen-right"
+                  isPinned === "right" && "frozen-right",
                 )}
                 maxWidth={column?.columnDef.maxSize}
                 minWidth={column?.columnDef.minSize}
@@ -198,7 +204,7 @@ export default function IBaseTableUI<T = any>({
                   <div
                     className={clsx(
                       "inline-flex h-full w-full items-center",
-                      isSortable && "cursor-pointer select-none"
+                      isSortable && "cursor-pointer select-none",
                     )}
                     role={isSortable ? "button" : undefined}
                     tabIndex={isSortable ? 0 : -1}
@@ -206,17 +212,17 @@ export default function IBaseTableUI<T = any>({
                   >
                     <span
                       className={clsx(
-                        "inline-flex w-full items-center px-2",
+                        "inline-flex w-full items-center",
                         meta.align === "end"
                           ? "justify-end"
                           : meta.align === "center"
                             ? "justify-center"
-                            : "justify-start"
+                            : "justify-start",
                       )}
                     >
                       {flexRender(
                         header.column.columnDef.header,
-                        header.getContext()
+                        header.getContext(),
                       )}
                       {isSortable && (
                         <span className="ml-2 inline-flex items-center justify-end">
@@ -228,7 +234,7 @@ export default function IBaseTableUI<T = any>({
                 )}
               </TableColumn>
             );
-          })
+          }),
         )}
       </TableHeader>
       <TableBody
@@ -241,7 +247,7 @@ export default function IBaseTableUI<T = any>({
               original: row.original,
               index: row.index,
             })),
-          [rows]
+          [rows],
         )}
         loadingContent={<Spinner label="Loading..." />}
       >
@@ -278,14 +284,14 @@ export default function IBaseTableUI<T = any>({
                     className={clsx(
                       isPinned && "frozen-column",
                       isPinned === "left" && "frozen-left",
-                      isPinned === "right" && "frozen-right"
+                      isPinned === "right" && "frozen-right",
                     )}
                     style={pinStyle}
                   >
                     <div
                       className={clsx(
                         "flex",
-                        `justify-${meta.align || "start"}`
+                        `justify-${meta.align || "start"}`,
                       )}
                     >
                       {renderCell
@@ -293,7 +299,7 @@ export default function IBaseTableUI<T = any>({
                             const customRender = renderCell(
                               column!,
                               row,
-                              cell.getValue()
+                              cell.getValue(),
                             );
 
                             return customRender !== null &&
@@ -301,12 +307,12 @@ export default function IBaseTableUI<T = any>({
                               ? customRender
                               : flexRender(
                                   cell.column.columnDef.cell,
-                                  cell.getContext()
+                                  cell.getContext(),
                                 );
                           })()
                         : flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                     </div>
                   </TableCell>

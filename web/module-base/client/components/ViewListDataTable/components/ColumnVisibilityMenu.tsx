@@ -40,7 +40,7 @@ export default function ColumnVisibilityMenu<T = any>({
         .map((item) =>
           typeof item === "string" || typeof item === "number"
             ? String(item)
-            : ""
+            : "",
         )
         .filter(Boolean)
         .join(" ");
@@ -81,7 +81,7 @@ export default function ColumnVisibilityMenu<T = any>({
         return results
           .map((result) => columnMap.get(result.id))
           .filter((column): column is IBaseTableColumnDefinition<T> =>
-            Boolean(column)
+            Boolean(column),
           );
       })();
 

@@ -19,6 +19,13 @@
       "accounting": "Kế toán"
     },
     "images": "Hình ảnh",
+    "product-list": {
+      "empty": {
+        "title": "Chưa có sản phẩm",
+        "description": "Tạo sản phẩm đầu tiên để bắt đầu.",
+        "action": "Tạo sản phẩm"
+      }
+    },
     "product-create": {
       "baseUnitOfMeasure": "Đơn vị đo cơ bản",
       "unitOfMeasure": "Đơn vị đo",

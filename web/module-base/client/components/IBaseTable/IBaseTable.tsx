@@ -5,6 +5,7 @@ import type { Selection, TableProps } from "@heroui/table";
 import clsx from "clsx";
 import { RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
+import type { CSSProperties } from "react";
 import { useMemo } from "react";
 
 import IBaseTooltip from "../IBaseTooltip";
@@ -15,6 +16,8 @@ import { IBaseTableCoreColumn, useIBaseTableCore } from "./IBaseTableCore";
 import {
   I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
   type IBaseTableProps as IBaseTablePropsType,
+  type IBaseTableScrollHeight,
+  type IBaseTableScrollWidth,
 } from "./IBaseTableInterface";
 import IBaseTableUI from "./IBaseTableUI";
 import useColumns from "./hooks/useColumns";
@@ -33,6 +36,8 @@ export function IBaseTable<T = any>({
   onChangeTable,
   classNames = {},
   emptyContent = "No data available",
+  scrollHeight = "auto",
+  scrollWidth = "auto",
   tableLayout = "auto",
   isResizableColumns = true,
   isDraggableColumns = true,
@@ -41,6 +46,31 @@ export function IBaseTable<T = any>({
   ...rest
 }: IBaseTablePropsType<T>) {
   const t = useTranslations("dataTable");
+
+  const scrollHeightStyle: CSSProperties | undefined =
+    scrollHeight !== "auto" && typeof scrollHeight === "object"
+      ? {
+          minHeight: scrollHeight.minHeight,
+          height: scrollHeight.height,
+          maxHeight: scrollHeight.maxHeight,
+          display: "flex",
+          flexDirection: "column",
+        }
+      : undefined;
+  const scrollWidthStyle: CSSProperties | undefined =
+    scrollWidth !== "auto" && typeof scrollWidth === "object"
+      ? {
+          minWidth: scrollWidth.minWidth,
+          width: scrollWidth.width,
+          maxWidth: scrollWidth.maxWidth,
+          overflowX: "auto",
+        }
+      : undefined;
+  const wrapperStyle: CSSProperties = {
+    ...scrollHeightStyle,
+    ...scrollWidthStyle,
+  };
+  const hasScrollContainer = scrollHeightStyle !== undefined;
 
   const processedColumns = useColumns(columns);
 
@@ -157,8 +187,16 @@ export function IBaseTable<T = any>({
       paginationState.paginationInfo.pages > 1);
 
   return (
-    <div className={clsx("w-full bg-content1", classNames.wrapper)}>
-      <div className="flex flex-1 flex-col gap-4">
+    <div
+      className={clsx("w-full bg-content1", classNames.wrapper)}
+      style={Object.keys(wrapperStyle).length > 0 ? wrapperStyle : undefined}
+    >
+      <div
+        className={clsx(
+          "flex flex-1 flex-col",
+          hasScrollContainer ? "min-h-0 overflow-auto" : "gap-4",
+        )}
+      >
         <IBaseTableUI
           aria-label={t("ariaLabel")}
           classNames={classNames}

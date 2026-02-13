@@ -15,6 +15,7 @@ export * from "./IBaseChip";
 export * from "./IBaseDigitViewer";
 export * from "./IBaseDivider";
 export * from "./IBaseDropdown";
+export * from "./IBaseEmpty";
 export * from "./IBaseImage";
 export * from "./IBaseInput";
 export * from "./IBaseInputMultipleLang";

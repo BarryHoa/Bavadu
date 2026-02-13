@@ -18,7 +18,7 @@ interface UseViewListDataTableQueriesOptions<T = any> {
 
 export function useViewListDataTableQueries<T = any>({
   model,
-  isDummyData = true,
+  isDummyData = false,
   pagination,
 }: UseViewListDataTableQueriesOptions<T>) {
   const service = useMemo(() => new ViewListDataTableService(), []);

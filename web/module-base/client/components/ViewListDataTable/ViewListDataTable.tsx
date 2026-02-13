@@ -4,19 +4,20 @@ import type { IBaseLinkProps } from "@base/client";
 import type { FilterOption } from "./components/FilterMenu";
 import type { GroupOption } from "./components/GroupByMenu";
 
+import { useTranslations } from "next-intl";
 import { memo, useMemo } from "react";
 
 import {
   IBaseButton,
   IBaseCard,
   IBaseCardBody,
-  IBaseDivider,
+  IBaseEmpty,
 } from "@base/client/components";
 
 import { useLocalizedText } from "../../hooks/useLocalizedText";
+import { IBaseLink } from "../IBaseLink";
 import { IBaseTable } from "../IBaseTable";
 import { IBaseTablePagination } from "../IBaseTable/IBaseTableInterface";
-import { IBaseLink } from "../IBaseLink";
 import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 
 import ColumnVisibilityMenu from "./components/ColumnVisibilityMenu";
@@ -82,13 +83,13 @@ const MemoizedTable = memo(
       prevProps.total === nextProps.total &&
       paginationEqual
     );
-  }
+  },
 );
 
 MemoizedTable.displayName = "MemoizedTable";
 
 export default function ViewListDataTable<T = any>(
-  props: ViewListDataTableProps<T>
+  props: ViewListDataTableProps<T>,
 ) {
   const {
     columns,
@@ -99,7 +100,7 @@ export default function ViewListDataTable<T = any>(
     groupBy,
     favorite,
     columnVisibility,
-    isDummyData = true,
+    isDummyData = false,
     actionsLeft,
     actionsRight,
     pagination: _pagination = {
@@ -114,6 +115,13 @@ export default function ViewListDataTable<T = any>(
     columns,
   });
   const getLocalizedText = useLocalizedText();
+  const tDataTable = useTranslations("dataTable");
+  const defaultEmptyContent = <IBaseEmpty description={tDataTable("empty")} />;
+  const effectiveEmptyContent =
+    dataTableProps.emptyContent !== undefined &&
+    dataTableProps.emptyContent !== null
+      ? dataTableProps.emptyContent
+      : defaultEmptyContent;
   const isFilterHidden = filter?.hidden === true;
   const isSearchHidden = search?.hidden === true;
   const isGroupByHidden = groupBy?.hidden === true;
@@ -139,7 +147,7 @@ export default function ViewListDataTable<T = any>(
   // Memoize loading state
   const tableLoading = useMemo(
     () => isLoading || isFetching || dataTableProps.loading,
-    [isLoading, isFetching, dataTableProps.loading]
+    [isLoading, isFetching, dataTableProps.loading],
   );
 
   // Memoize pagination object to ensure stable reference
@@ -149,7 +157,7 @@ export default function ViewListDataTable<T = any>(
       _pagination === false
         ? false
         : `${_pagination.page ?? 1}-${_pagination.pageSize ?? PAGINATION_DEFAULT_PAGE_SIZE}`,
-    ]
+    ],
   );
 
   // Memoize filter and groupBy options
@@ -159,7 +167,7 @@ export default function ViewListDataTable<T = any>(
   // Memoize visible columns filtering
   const cols = useMemo(
     () => columns.filter((col: any) => store.visibleColumns.has(col.key)),
-    [columns, store.visibleColumns]
+    [columns, store.visibleColumns],
   );
 
   // Memoize display columns (with dummy render if needed)
@@ -171,7 +179,7 @@ export default function ViewListDataTable<T = any>(
             render: () => null,
           }))
         : cols,
-    [cols, isDataDummy]
+    [cols, isDataDummy],
   );
 
   // Memoize renderActions callback
@@ -199,9 +207,9 @@ export default function ViewListDataTable<T = any>(
           case "link":
             const linkProps = action.props as Omit<IBaseLinkProps, "as"> & {
               hrefAs?: any;
+              as?: any;
             };
 
-            // Extract only valid props for IBaseButton, excluding 'as' and 'href' which are handled separately
             const { as, href, hrefAs, ...restLinkProps } = linkProps as any;
 
             return (
@@ -210,6 +218,7 @@ export default function ViewListDataTable<T = any>(
                 as={IBaseLink as any}
                 color={color}
                 href={linkProps.href as string}
+                hrefAs={hrefAs ?? as}
                 size={size}
                 variant={variant}
                 {...restLinkProps}
@@ -222,79 +231,80 @@ export default function ViewListDataTable<T = any>(
         }
       });
     },
-    [actionsLeft, actionsRight]
+    [actionsLeft, actionsRight],
   );
 
-  // Render
+  const hasSecondaryTools =
+    !isFilterHidden || !isGroupByHidden || !isColumnVisibilityHidden;
+
+  // Render: one clean toolbar row, minimal card, table in scroll wrapper
   return (
-    <IBaseCard>
-      {/* Actions Bar */}
+    <IBaseCard className="shadow-sm border border-default-100 overflow-hidden">
       {title && (
-        <div className="flex gap-2 flex-wrap flex-col px-3 py-2">
-          <h4 className="text-medium font-medium">{getLocalizedText(title)}</h4>
-          <IBaseDivider className="my-0" />
+        <div className="border-b border-default-200/80 px-4 py-3 sm:px-5 sm:py-3.5">
+          <h2 className="text-base font-semibold tracking-tight text-foreground">
+            {getLocalizedText(title)}
+          </h2>
         </div>
       )}
 
-      <IBaseCardBody className={`${title ? "pt-0" : ""}`}>
-        <div className="flex gap-2 items-center mb-2 flex-wrap">
-          {/* <div className="flex gap-2 flex-1 justify-start">
+      <IBaseCardBody className="p-4 sm:p-2">
+        {/* Single toolbar row: search (left) | actions + tools (right) */}
+        <div className="mb-2 flex flex-col gap-3 sm:mb-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          {!isSearchHidden && (
+            <div className="w-full sm:max-w-[280px]">
+              <SearchBar
+                placeholder={search?.placeholder}
+                value={store.search}
+                onChange={store.setSearch}
+              />
+            </div>
+          )}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
             {renderActions(actionsLeft ?? [])}
-          </div> */}
-          <div className="flex flex-col gap-2 flex-1">
-            <div className="flex gap-2 flex-1 justify-end">
-              {!isSearchHidden && (
-                <SearchBar
-                  placeholder={search?.placeholder}
-                  value={store.search}
-                  onChange={store.setSearch}
-                />
-              )}
-            </div>
-            <div className="flex gap-2 flex-1 ">
-              <div className="flex gap-2 flex-1 justify-start">
-                {renderActions(actionsLeft ?? [])}
-              </div>
-              <div className="flex gap-2 flex-1 justify-end">
-                {renderActions(actionsRight ?? [])}
-                {!isFilterHidden && (
-                  <FilterMenu
-                    activeFilters={store.activeFilters}
-                    filterOptions={filterOptions}
-                    onToggleFilter={store.toggleFilter}
-                  />
-                )}
-                {!isGroupByHidden && (
-                  <GroupByMenu
-                    currentGroupBy={store.groupBy}
-                    groupByOptions={groupByOptions}
-                    onSelectGroupBy={store.setGroupBy}
-                  />
-                )}
-
-                {!isColumnVisibilityHidden && (
-                  <ColumnVisibilityMenu
-                    columns={columns}
-                    visibleColumns={store.visibleColumns}
-                    onToggleColumn={store.toggleColumn}
-                  />
-                )}
-              </div>
-            </div>
+            {renderActions(actionsRight ?? [])}
+            {hasSecondaryTools && (
+              <span className="hidden h-5 w-px bg-default-200 sm:inline-block" />
+            )}
+            {!isFilterHidden && (
+              <FilterMenu
+                activeFilters={store.activeFilters}
+                filterOptions={filterOptions}
+                onToggleFilter={store.toggleFilter}
+              />
+            )}
+            {!isGroupByHidden && (
+              <GroupByMenu
+                currentGroupBy={store.groupBy}
+                groupByOptions={groupByOptions}
+                onSelectGroupBy={store.setGroupBy}
+              />
+            )}
+            {!isColumnVisibilityHidden && (
+              <ColumnVisibilityMenu
+                columns={columns}
+                visibleColumns={store.visibleColumns}
+                onToggleColumn={store.toggleColumn}
+              />
+            )}
           </div>
         </div>
 
-        {/* IBaseTablePrimitive - Memoized to prevent unnecessary re-renders */}
-        <MemoizedTable
-          columns={displayColumns}
-          dataSource={dataSource}
-          dataTableProps={dataTableProps}
-          loading={tableLoading}
-          pagination={memoizedPagination}
-          total={total}
-          onChangeTable={onChangeTable}
-          onRefresh={refresh}
-        />
+        <div className="w-full overflow-x-auto rounded-lg border border-default-200/80">
+          <MemoizedTable
+            columns={displayColumns}
+            dataSource={dataSource}
+            dataTableProps={{
+              ...dataTableProps,
+              emptyContent: effectiveEmptyContent,
+            }}
+            loading={tableLoading}
+            pagination={memoizedPagination}
+            total={total}
+            onChangeTable={onChangeTable}
+            onRefresh={refresh}
+          />
+        </div>
       </IBaseCardBody>
     </IBaseCard>
   );

@@ -17,7 +17,7 @@ function SearchBar({
 }: SearchBarProps) {
   return (
     <IBaseInputSearch
-      className="min-w-[180px]"
+      className="w-full min-w-0"
       placeholder={placeholder}
       value={value}
       onValueChange={onChange}
