@@ -1,13 +1,22 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBasePageLayout,
+  IBaseSpinner,
+} from "@base/client";
+import { IBaseDigitViewer } from "@base/client/components";
+import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
+import { leaveTypeService } from "@mdl/hrm/client/services/LeaveTypeService";
+import { Pencil } from "lucide-react";
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { leaveTypeService } from "@mdl/hrm/client/services/LeaveTypeService";
-import { IBaseButton } from "@base/client";
-import { IBaseCard, IBaseCardBody } from "@base/client";
-import { LoadingOverlay, IBaseDigitViewer } from "@base/client/components";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { useQuery } from "@tanstack/react-query";
+
+const LEAVE_TYPES_LIST_PATH = "/workspace/modules/hrm/leave-types";
 
 export default function LeaveTypeViewPage(): React.ReactNode {
   const router = useRouter();
@@ -22,6 +31,7 @@ export default function LeaveTypeViewPage(): React.ReactNode {
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["hrm-leave-types", id],
     queryFn: async () => {
@@ -36,49 +46,80 @@ export default function LeaveTypeViewPage(): React.ReactNode {
     enabled: !!id,
   });
 
-  if (isLoading) {
-    return <LoadingOverlay isLoading={true} />;
-  }
+  const breadcrumbs = useMemo(
+    () =>
+      leaveTypeData
+        ? [
+            { label: t("title"), href: LEAVE_TYPES_LIST_PATH },
+            {
+              label:
+                getLocalizedText(leaveTypeData.name) || leaveTypeData.code,
+              href: `${LEAVE_TYPES_LIST_PATH}/view/${id}`,
+            },
+          ]
+        : [
+            { label: t("title"), href: LEAVE_TYPES_LIST_PATH },
+            { label: isLoading ? "..." : "Leave Type" },
+          ],
+    [t, leaveTypeData, id, isLoading, getLocalizedText],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
-  if (isError) {
+  if (isLoading) {
     return (
-      <div className="text-danger-500">
-        {tCommon("errors.failedToLoadData")}: {error?.message}
+      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
+        <IBaseSpinner size="md" />
+        <span>Loading...</span>
       </div>
     );
   }
 
-  if (!leaveTypeData) {
+  if (isError || !leaveTypeData) {
     return (
-      <div className="text-warning-500">{tCommon("errors.dataNotFound")}</div>
+      <div className="flex flex-col gap-4 rounded-xl border-2 border-danger-200 bg-danger-50/50 p-6">
+        <p className="font-medium text-danger-700">
+          {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
+        </p>
+        <IBaseButton
+          size="sm"
+          variant="bordered"
+          color="danger"
+          onPress={() => refetch()}
+        >
+          Retry
+        </IBaseButton>
+      </div>
     );
   }
 
+  const title = getLocalizedText(leaveTypeData.name) || leaveTypeData.code;
+  const editPath = `${LEAVE_TYPES_LIST_PATH}/edit/${id}`;
+
   return (
-    <div className="space-y-4">
-      <div className="sticky top-0 z-10 flex justify-end gap-3 py-2 mb-3 bg-background border-b border-divider -mx-4 px-4">
-        <IBaseButton
-          size="sm"
-          variant="light"
-          onPress={() => router.push("/workspace/modules/hrm/leave-types")}
-        >
-          {tCommon("actions.backToList")}
-        </IBaseButton>
+    <IBasePageLayout
+      variant="detail"
+      maxWidth="content"
+      title={title}
+      subtitle={leaveTypeData.code}
+      headerActions={
         <IBaseButton
           color="primary"
-          size="sm"
-          onPress={() =>
-            router.push(`/workspace/modules/hrm/leave-types/edit/${id}`)
-          }
+          size="md"
+          startContent={<Pencil size={16} />}
+          onPress={() => router.push(editPath)}
         >
           {tCommon("actions.edit")}
         </IBaseButton>
-      </div>
-
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
-          <h2 className="text-base font-semibold mb-2">{t("generalInfo")}</h2>
-          <div className="grid gap-2 md:grid-cols-2">
+      }
+    >
+      <IBaseCard className="border border-default-200/60 shadow-sm">
+        <IBaseCardBody className="gap-6 p-6">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">
+              {t("generalInfo")}
+            </h2>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2">
             <IBaseDigitViewer
               label={t("labels.code")}
               value={leaveTypeData.code}
@@ -140,6 +181,6 @@ export default function LeaveTypeViewPage(): React.ReactNode {
           </div>
         </IBaseCardBody>
       </IBaseCard>
-    </div>
+    </IBasePageLayout>
   );
 }

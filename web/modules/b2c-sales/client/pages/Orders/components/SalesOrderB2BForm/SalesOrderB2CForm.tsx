@@ -293,34 +293,19 @@ export default function SalesOrderB2CForm({
   );
 
   return (
-    <form className="space-y-3" onSubmit={handleSubmit(onSubmitForm)}>
+    <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmitForm)}>
       {submitError ? (
-        <div className="mb-3 rounded-large border border-danger-200 bg-danger-50 px-3 py-2 text-sm text-danger-600">
+        <div
+          aria-live="polite"
+          className="rounded-xl border-2 border-danger-300 bg-danger-50 px-4 py-3 text-sm font-semibold text-danger-700 shadow-sm"
+        >
           {submitError}
         </div>
       ) : null}
 
-      {/* Action Buttons - Sticky */}
-      <div className="sticky top-0 z-10 flex justify-end gap-3 py-2 mb-3 bg-background border-b border-divider -mx-4 px-4">
-        {onCancel && (
-          <IBaseButton size="sm" variant="light" onPress={onCancel}>
-            {tLabels("cancel")}
-          </IBaseButton>
-        )}
-        <IBaseButton
-          color="primary"
-          disabled={isSubmitting}
-          isLoading={isSubmitting}
-          size="sm"
-          type="submit"
-        >
-          {tLabels("createOrder")}
-        </IBaseButton>
-      </div>
-
       {/* Section: Thông tin chung */}
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
+      <IBaseCard className="border border-default-200/60 shadow-sm">
+        <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
           <GeneralInfoSection
             control={control}
             createdAt={formattedCreatedAt}
@@ -330,8 +315,8 @@ export default function SalesOrderB2CForm({
       </IBaseCard>
 
       {/* Section: Order Lines */}
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
+      <IBaseCard className="border border-default-200/60 shadow-sm">
+        <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
           <OrderLinesSection
             append={append}
             control={control}
@@ -351,8 +336,8 @@ export default function SalesOrderB2CForm({
       </IBaseCard>
 
       {/* Section: Thông tin giao hàng */}
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
+      <IBaseCard className="border border-default-200/60 shadow-sm">
+        <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
           <DeliveryInfoSection
             control={control}
             errors={errors}
@@ -362,8 +347,8 @@ export default function SalesOrderB2CForm({
       </IBaseCard>
 
       {/* Order Totals */}
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
+      <IBaseCard className="border border-default-200/60 shadow-sm">
+        <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
           <OrderTotalsSection
             calculatedTotals={calculatedTotals}
             control={control}
@@ -375,8 +360,8 @@ export default function SalesOrderB2CForm({
       </IBaseCard>
 
       {/* Section: Thông tin khách hàng */}
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
+      <IBaseCard className="border border-default-200/60 shadow-sm">
+        <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
           <CustomerInfoSection
             control={control}
             errors={errors}
@@ -388,8 +373,8 @@ export default function SalesOrderB2CForm({
       </IBaseCard>
 
       {/* Notes */}
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
+      <IBaseCard className="border border-default-200/60 shadow-sm">
+        <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
           <Controller
             control={control}
             name="notes"
@@ -406,6 +391,22 @@ export default function SalesOrderB2CForm({
               />
             )}
           />
+          <div className="flex flex-wrap items-center gap-3 pt-6 border-t border-default-200">
+            <IBaseButton
+              color="primary"
+              disabled={isSubmitting}
+              isLoading={isSubmitting}
+              size="md"
+              type="submit"
+            >
+              {tLabels("createOrder")}
+            </IBaseButton>
+            {onCancel && (
+              <IBaseButton size="md" variant="light" onPress={onCancel}>
+                {tLabels("cancel")}
+              </IBaseButton>
+            )}
+          </div>
         </IBaseCardBody>
       </IBaseCard>
     </form>

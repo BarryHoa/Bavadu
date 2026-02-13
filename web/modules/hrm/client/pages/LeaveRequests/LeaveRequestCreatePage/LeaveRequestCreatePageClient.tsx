@@ -1,17 +1,31 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { leaveRequestService } from "@mdl/hrm/client/services/LeaveRequestService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { leaveRequestService } from "@mdl/hrm/client/services/LeaveRequestService";
+import { useMemo } from "react";
 
 import LeaveRequestForm, {
   type LeaveRequestFormValues,
 } from "../components/LeaveRequestForm/LeaveRequestForm";
 
+const LEAVE_REQUESTS_LIST_PATH = "/workspace/modules/hrm/leave-requests";
+
 export default function LeaveRequestCreatePageClient(): React.ReactNode {
   const router = useRouter();
   const t = useTranslations("hrm.leaveRequests");
+  const tTitle = useTranslations("hrm.leaveRequests");
+
+  const breadcrumbs = useMemo(
+    () => [
+      { label: tTitle("title"), href: LEAVE_REQUESTS_LIST_PATH },
+      { label: t("create") },
+    ],
+    [t, tTitle],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: submitLeaveRequest,
@@ -34,7 +48,7 @@ export default function LeaveRequestCreatePageClient(): React.ReactNode {
     },
     invalidateQueries: [["hrm-leave-requests"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/leave-requests/view/${data.data.id}`);
+      router.push(`${LEAVE_REQUESTS_LIST_PATH}/view/${data.data.id}`);
     },
   });
 
@@ -51,12 +65,18 @@ export default function LeaveRequestCreatePageClient(): React.ReactNode {
   };
 
   return (
-    <LeaveRequestForm
-      mode="create"
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() => router.push("/workspace/modules/hrm/leave-requests")}
-      onSubmit={handleSubmit}
-    />
+    <IBasePageLayout
+      variant="create"
+      maxWidth="form"
+      title={t("create")}
+    >
+      <LeaveRequestForm
+        mode="create"
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(LEAVE_REQUESTS_LIST_PATH)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

@@ -430,63 +430,22 @@ export default function ProductForm({
     : undefined;
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={submitForm}>
-      <IBaseCard>
-        <IBaseCardBody className="space-y-4">
-          <div className="flex gap-2 justify-between">
-            <div className="justify-start" />
-            <div className="justify-end flex items-center gap-2">
-              <IBaseTooltip content={tProduct("guideTooltip")} placement="top">
-                <IBaseButton
-                  isIconOnly
-                  aria-label={tProduct("guideAriaLabel")}
-                  isDisabled={isBusy}
-                  size="sm"
-                  variant="light"
-                  onPress={() => setIsGuideModalOpen(true)}
-                >
-                  <HelpCircle className="text-default-500" size={18} />
-                </IBaseButton>
-              </IBaseTooltip>
-              {onCancel ? (
-                <IBaseButton
-                  isDisabled={isBusy}
-                  size="sm"
-                  variant="light"
-                  onPress={onCancel}
-                >
-                  {t("actions.cancel")}
-                </IBaseButton>
-              ) : null}
-
-              {onSubmitAndContinue && submitAndContinueForm ? (
-                <IBaseButton
-                  isDisabled={isBusy}
-                  size="sm"
-                  type="button"
-                  variant="bordered"
-                  onPress={async () => {
-                    await submitAndContinueForm();
-                  }}
-                >
-                  {secondarySubmitLabel ??
-                    `${t("actions.save")} & ${t("actions.add")} ${t("another")}`}
-                </IBaseButton>
-              ) : null}
-
+    <form className="flex flex-col gap-6" onSubmit={submitForm}>
+      <IBaseCard className="border border-default-200/60 shadow-sm">
+        <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
+          <div className="flex gap-2 justify-end">
+            <IBaseTooltip content={tProduct("guideTooltip")} placement="top">
               <IBaseButton
-                color="primary"
+                isIconOnly
+                aria-label={tProduct("guideAriaLabel")}
                 isDisabled={isBusy}
-                isLoading={isBusy}
                 size="sm"
-                type="submit"
-                onPress={() => {
-                  submitForm();
-                }}
+                variant="light"
+                onPress={() => setIsGuideModalOpen(true)}
               >
-                {submitLabel ?? t("actions.save")}
+                <HelpCircle className="text-default-500" size={18} />
               </IBaseButton>
-            </div>
+            </IBaseTooltip>
           </div>
 
           <FormProvider {...form}>
@@ -623,6 +582,42 @@ export default function ProductForm({
               )}
             </IBaseTabsPrimary>
           </FormProvider>
+
+          <div className="flex flex-wrap items-center gap-3 pt-6 border-t border-default-200">
+            <IBaseButton
+              color="primary"
+              isDisabled={isBusy}
+              isLoading={isBusy}
+              size="md"
+              type="submit"
+            >
+              {submitLabel ?? t("actions.save")}
+            </IBaseButton>
+            {onSubmitAndContinue && submitAndContinueForm ? (
+              <IBaseButton
+                isDisabled={isBusy}
+                size="md"
+                type="button"
+                variant="bordered"
+                onPress={async () => {
+                  await submitAndContinueForm();
+                }}
+              >
+                {secondarySubmitLabel ??
+                  `${t("actions.save")} & ${t("actions.add")} ${t("another")}`}
+              </IBaseButton>
+            ) : null}
+            {onCancel ? (
+              <IBaseButton
+                isDisabled={isBusy}
+                size="md"
+                variant="light"
+                onPress={onCancel}
+              >
+                {t("actions.cancel")}
+              </IBaseButton>
+            ) : null}
+          </div>
         </IBaseCardBody>
       </IBaseCard>
 

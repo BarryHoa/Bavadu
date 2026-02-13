@@ -248,16 +248,21 @@ export default function ProductCategoryForm({
   const isBusy = loading || isSubmitting;
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={onSubmitForm}>
-      <IBaseCard>
-        <IBaseCardBody className="space-y-4">
+    <form className="flex flex-col gap-6" onSubmit={onSubmitForm}>
+      {error ? (
+        <div
+          aria-live="polite"
+          className="rounded-xl border-2 border-danger-300 bg-danger-50 px-4 py-3 text-sm font-semibold text-danger-700 shadow-sm"
+        >
+          {error}
+        </div>
+      ) : null}
+      <IBaseCard className="border border-default-200/60 shadow-sm">
+        <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
           <div>
             <h1 className="text-xl font-semibold">{title}</h1>
             {subtitle ? (
               <p className="text-default-500 text-small">{subtitle}</p>
-            ) : null}
-            {error ? (
-              <p className="text-small text-danger-500">{error}</p>
             ) : null}
           </div>
 
@@ -375,22 +380,21 @@ export default function ProductCategoryForm({
             )}
           />
 
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-            {onCancel ? (
-              <IBaseButton
-                isDisabled={isBusy}
-                size="sm"
-                variant="light"
-                onPress={onCancel}
-              >
-                Cancel
-              </IBaseButton>
-            ) : null}
-
+          <div className="flex flex-wrap items-center gap-3 pt-6 border-t border-default-200">
+            <IBaseButton
+              color="primary"
+              endContent={<Save size={16} />}
+              isDisabled={!isLevelValid}
+              isLoading={isBusy}
+              size="md"
+              type="submit"
+            >
+              {submitLabel}
+            </IBaseButton>
             {onSubmitAndContinue ? (
               <IBaseButton
                 isDisabled={isBusy || !isLevelValid}
-                size="sm"
+                size="md"
                 type="button"
                 variant="bordered"
                 onPress={
@@ -404,17 +408,16 @@ export default function ProductCategoryForm({
                 {secondarySubmitLabel}
               </IBaseButton>
             ) : null}
-
-            <IBaseButton
-              color="primary"
-              endContent={<Save size={16} />}
-              isDisabled={!isLevelValid}
-              isLoading={isBusy}
-              size="sm"
-              type="submit"
-            >
-              {submitLabel}
-            </IBaseButton>
+            {onCancel ? (
+              <IBaseButton
+                isDisabled={isBusy}
+                size="md"
+                variant="light"
+                onPress={onCancel}
+              >
+                Cancel
+              </IBaseButton>
+            ) : null}
           </div>
         </IBaseCardBody>
       </IBaseCard>

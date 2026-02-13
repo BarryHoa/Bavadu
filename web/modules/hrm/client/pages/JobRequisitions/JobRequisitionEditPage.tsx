@@ -1,15 +1,21 @@
 "use client";
 
-import { LoadingOverlay } from "@base/client/components";
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import {
+  useCreateUpdate,
+  useSetBreadcrumbs,
+} from "@base/client/hooks";
 import { jobRequisitionService } from "@mdl/hrm/client/services/JobRequisitionService";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 
+import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
 import JobRequisitionForm, {
   type JobRequisitionFormValues,
 } from "./components/JobRequisitionForm/JobRequisitionForm";
+
+const JOB_REQUISITIONS_LIST_PATH = "/workspace/modules/hrm/job-requisitions";
 
 export default function JobRequisitionEditPage(): React.ReactNode {
   const router = useRouter();
@@ -23,6 +29,7 @@ export default function JobRequisitionEditPage(): React.ReactNode {
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["hrm-job-requisitions", id],
     queryFn: async () => {
@@ -38,6 +45,28 @@ export default function JobRequisitionEditPage(): React.ReactNode {
     },
     enabled: !!id,
   });
+
+  const viewPath = `${JOB_REQUISITIONS_LIST_PATH}/view/${id}`;
+  const breadcrumbs = useMemo(
+    () =>
+      jobRequisitionData
+        ? [
+            { label: t("title"), href: JOB_REQUISITIONS_LIST_PATH },
+            {
+              label:
+                jobRequisitionData.requisitionNumber ||
+                t("edit"),
+              href: viewPath,
+            },
+            { label: t("edit") },
+          ]
+        : [
+            { label: t("title"), href: JOB_REQUISITIONS_LIST_PATH },
+            { label: t("edit") },
+          ],
+    [t, jobRequisitionData, viewPath],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: submitJobRequisition,
@@ -60,9 +89,7 @@ export default function JobRequisitionEditPage(): React.ReactNode {
     },
     invalidateQueries: [["hrm-job-requisitions"], ["hrm-job-requisitions", id]],
     onSuccess: (data) => {
-      router.push(
-        `/workspace/modules/hrm/job-requisitions/view/${data.data.id}`,
-      );
+      router.push(`${JOB_REQUISITIONS_LIST_PATH}/view/${data.data.id}`);
     },
   });
 
@@ -130,51 +157,65 @@ export default function JobRequisitionEditPage(): React.ReactNode {
   };
 
   if (isLoading) {
-    return <LoadingOverlay isLoading={true} />;
-  }
-
-  if (isError) {
     return (
-      <div className="text-danger-500">
-        {tCommon("errors.failedToLoadData")}: {error?.message}
+      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
+        <IBaseSpinner size="md" />
+        <span>Loading...</span>
       </div>
     );
   }
 
-  if (!jobRequisitionData) {
+  if (isError || !jobRequisitionData) {
     return (
-      <div className="text-warning-500">{tCommon("errors.dataNotFound")}</div>
+      <div className="flex flex-col gap-4 rounded-xl border-2 border-danger-200 bg-danger-50/50 p-6">
+        <p className="font-medium text-danger-700">
+          {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
+        </p>
+        <IBaseButton
+          size="sm"
+          variant="bordered"
+          color="danger"
+          onPress={() => refetch()}
+        >
+          Retry
+        </IBaseButton>
+      </div>
     );
   }
 
   return (
-    <JobRequisitionForm
-      defaultValues={{
-        requisitionNumber: jobRequisitionData.requisitionNumber,
-        title: (jobRequisitionData.title as any) || { vi: "", en: "" },
-        description: jobRequisitionData.description as any,
-        departmentId: jobRequisitionData.departmentId,
-        positionId: jobRequisitionData.positionId,
-        numberOfOpenings: jobRequisitionData.numberOfOpenings,
-        priority: jobRequisitionData.priority || "normal",
-        employmentType: jobRequisitionData.employmentType || "",
-        minSalary: jobRequisitionData.minSalary || undefined,
-        maxSalary: jobRequisitionData.maxSalary || undefined,
-        currency: jobRequisitionData.currency || "VND",
-        requirements: jobRequisitionData.requirements || "",
-        status: jobRequisitionData.status,
-        openedDate: jobRequisitionData.openedDate || "",
-        closedDate: jobRequisitionData.closedDate || "",
-        hiringManagerId: jobRequisitionData.hiringManagerId || "",
-        recruiterId: jobRequisitionData.recruiterId || "",
-        notes: jobRequisitionData.notes || "",
-      }}
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() =>
-        router.push(`/workspace/modules/hrm/job-requisitions/view/${id}`)
-      }
-      onSubmit={handleSubmit}
-    />
+    <IBasePageLayout
+      variant="edit"
+      maxWidth="form"
+      title={t("edit")}
+      subtitle={jobRequisitionData.requisitionNumber}
+    >
+      <JobRequisitionForm
+        defaultValues={{
+          requisitionNumber: jobRequisitionData.requisitionNumber,
+          title: (jobRequisitionData.title as any) || { vi: "", en: "" },
+          description: jobRequisitionData.description as any,
+          departmentId: jobRequisitionData.departmentId,
+          positionId: jobRequisitionData.positionId,
+          numberOfOpenings: jobRequisitionData.numberOfOpenings,
+          priority: jobRequisitionData.priority || "normal",
+          employmentType: jobRequisitionData.employmentType || "",
+          minSalary: jobRequisitionData.minSalary || undefined,
+          maxSalary: jobRequisitionData.maxSalary || undefined,
+          currency: jobRequisitionData.currency || "VND",
+          requirements: jobRequisitionData.requirements || "",
+          status: jobRequisitionData.status,
+          openedDate: jobRequisitionData.openedDate || "",
+          closedDate: jobRequisitionData.closedDate || "",
+          hiringManagerId: jobRequisitionData.hiringManagerId || "",
+          recruiterId: jobRequisitionData.recruiterId || "",
+          notes: jobRequisitionData.notes || "",
+        }}
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(viewPath)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

@@ -1,15 +1,18 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
+import { useCreateUpdate, useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
+import { certificateService } from "@mdl/hrm/client/services/CertificateService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { certificateService } from "@mdl/hrm/client/services/CertificateService";
-import { LoadingOverlay } from "@base/client/components";
+import { useMemo } from "react";
 
 import CertificateForm, {
   type CertificateFormValues,
 } from "./components/CertificateForm/CertificateForm";
+
+const CERTIFICATES_LIST_PATH = "/workspace/modules/hrm/certificates";
 
 export default function CertificateEditPage(): React.ReactNode {
   const router = useRouter();
@@ -17,12 +20,14 @@ export default function CertificateEditPage(): React.ReactNode {
   const id = params.id as string;
   const t = useTranslations("hrm.certificates");
   const tCommon = useTranslations("common");
+  const getLocalizedText = useLocalizedText();
 
   const {
     data: certificateData,
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["hrm-certificates", id],
     queryFn: async () => {
@@ -60,9 +65,33 @@ export default function CertificateEditPage(): React.ReactNode {
     },
     invalidateQueries: [["hrm-certificates"], ["hrm-certificates", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/certificates/view/${data.data.id}`);
+      router.push(`${CERTIFICATES_LIST_PATH}/view/${data.data.id}`);
     },
   });
+
+  const viewPath = `${CERTIFICATES_LIST_PATH}/view/${id}`;
+  const breadcrumbs = useMemo(
+    () =>
+      certificateData
+        ? [
+            { label: t("title"), href: CERTIFICATES_LIST_PATH },
+            {
+              label:
+                getLocalizedText(certificateData.name as any) ||
+                certificateData.certificateNumber ||
+                certificateData.issuer ||
+                t("edit"),
+              href: viewPath,
+            },
+            { label: t("edit") },
+          ]
+        : [
+            { label: t("title"), href: CERTIFICATES_LIST_PATH },
+            { label: t("edit") },
+          ],
+    [t, certificateData, viewPath, getLocalizedText],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const handleSubmit = async (values: CertificateFormValues) => {
     await submitCertificate({
@@ -79,25 +108,42 @@ export default function CertificateEditPage(): React.ReactNode {
   };
 
   if (isLoading) {
-    return <LoadingOverlay isLoading={true} />;
-  }
-
-  if (isError) {
     return (
-      <div className="text-danger-500">
-        {tCommon("errors.failedToLoadData")}: {error?.message}
+      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
+        <IBaseSpinner size="md" />
+        <span>{tCommon("loading")}</span>
       </div>
     );
   }
 
-  if (!certificateData) {
+  if (isError || !certificateData) {
     return (
-      <div className="text-warning-500">{tCommon("errors.dataNotFound")}</div>
+      <div className="flex flex-col gap-4 rounded-xl border-2 border-danger-200 bg-danger-50/50 p-6">
+        <p className="font-medium text-danger-700">
+          {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
+        </p>
+        <IBaseButton
+          size="sm"
+          variant="bordered"
+          color="danger"
+          onPress={() => refetch()}
+        >
+          Retry
+        </IBaseButton>
+      </div>
     );
   }
 
+  const subtitle = [certificateData.certificateNumber, certificateData.issuer].filter(Boolean).join(" · ");
+
   return (
-    <CertificateForm
+    <IBasePageLayout
+      variant="edit"
+      maxWidth="form"
+      title={t("edit")}
+      subtitle={subtitle || undefined}
+    >
+      <CertificateForm
       defaultValues={{
         employeeId: certificateData.employeeId,
         name: (certificateData.name as any) || { vi: "", en: "" },
@@ -110,10 +156,9 @@ export default function CertificateEditPage(): React.ReactNode {
       }}
       isSubmitting={isPending}
       submitError={submitError}
-      onCancel={() =>
-        router.push(`/workspace/modules/hrm/certificates/view/${id}`)
-      }
-      onSubmit={handleSubmit}
-    />
+      onCancel={() => router.push(viewPath)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

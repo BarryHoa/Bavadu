@@ -20,6 +20,8 @@
       },
       "create": {
         "labels": {
+          "pageTitle": "New Employee",
+          "editPageTitle": "Edit Employee",
           "basicInfo": "Basic Information",
           "employmentInfo": "Employment Information",
           "additionalInfo": "Additional Information",
@@ -39,6 +41,8 @@
           "gender": "Gender",
           "cancel": "Cancel",
           "save": "Save",
+          "saveCreate": "Create employee",
+          "saveUpdate": "Save changes",
           "errors": {
             "failedToCreate": "Failed to create employee",
             "failedToUpdate": "Failed to update employee"
@@ -174,6 +178,8 @@
       },
       "create": {
         "labels": {
+          "pageTitle": "New Position",
+          "editPageTitle": "Edit Position",
           "basicInfo": "Basic Information",
           "code": "Code",
           "name": "Name",
@@ -185,6 +191,8 @@
           "maxSalary": "Max Salary",
           "cancel": "Cancel",
           "save": "Save",
+          "saveCreate": "Create position",
+          "saveUpdate": "Save changes",
           "errors": {
             "failedToCreate": "Failed to create position",
             "failedToUpdate": "Failed to update position"
@@ -256,6 +264,8 @@
           "notes": "Notes",
           "cancel": "Cancel",
           "save": "Save",
+          "saveCreate": "Create contract",
+          "saveUpdate": "Save changes",
           "errors": {
             "failedToCreate": "Failed to create contract",
             "failedToUpdate": "Failed to update contract"
@@ -305,6 +315,7 @@
     "timesheets": {
       "title": "Timesheets",
       "create": "New Timesheet",
+      "edit": "Edit Timesheet",
       "generalInfo": "Timesheet Information",
       "labels": {
         "employee": "Employee",
@@ -343,6 +354,7 @@
     "candidates": {
       "title": "Candidates",
       "create": "New Candidate",
+      "edit": "Edit Candidate",
       "generalInfo": "Candidate Information",
       "labels": {
         "requisition": "Job Requisition",
@@ -385,6 +397,7 @@
     "leaveRequests": {
       "title": "Leave Requests",
       "create": "New Leave Request",
+      "edit": "Edit Leave Request",
       "generalInfo": "Leave Request Information",
       "labels": {
         "employee": "Employee",
@@ -429,6 +442,7 @@
     "leaveTypes": {
       "title": "Leave Types",
       "create": "New Leave Type",
+      "edit": "Edit Leave Type",
       "generalInfo": "Leave Type Information",
       "labels": {
         "code": "Code",
@@ -472,6 +486,7 @@
     "jobRequisitions": {
       "title": "Job Requisitions",
       "create": "New Job Requisition",
+      "edit": "Edit Job Requisition",
       "generalInfo": "Job Requisition Information",
       "labels": {
         "requisitionNumber": "Requisition Number",
@@ -524,6 +539,7 @@
     "payroll": {
       "title": "Payroll",
       "create": "New Payroll",
+      "edit": "Edit Payroll",
       "generalInfo": "Payroll Information",
       "labels": {
         "payrollPeriod": "Payroll Period",
@@ -565,6 +581,7 @@
     "courses": {
       "title": "Courses",
       "create": "New Course",
+      "edit": "Edit Course",
       "generalInfo": "Course Information",
       "labels": {
         "code": "Code",
@@ -596,6 +613,7 @@
     "certificates": {
       "title": "Certificates",
       "create": "New Certificate",
+      "edit": "Edit Certificate",
       "generalInfo": "Certificate Information",
       "labels": {
         "employee": "Employee",
@@ -630,6 +648,7 @@
     "performanceReviews": {
       "title": "Performance Reviews",
       "create": "New Performance Review",
+      "edit": "Edit Performance Review",
       "generalInfo": "Performance Review Information",
       "labels": {
         "employee": "Employee",

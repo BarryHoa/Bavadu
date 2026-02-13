@@ -20,6 +20,7 @@ interface ContractFormProps {
   submitError?: string | null;
   isSubmitting?: boolean;
   defaultValues?: Partial<ContractFormValues>;
+  mode?: "create" | "edit";
 }
 
 export default function ContractForm({
@@ -28,6 +29,7 @@ export default function ContractForm({
   submitError,
   isSubmitting = false,
   defaultValues,
+  mode = "create",
 }: ContractFormProps) {
   const t = useTranslations("hrm.contract.create.validation");
   const tLabels = useTranslations("hrm.contract.create.labels");
@@ -35,11 +37,7 @@ export default function ContractForm({
   // React Compiler will automatically optimize this computation
   const validation = createContractValidation(t);
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ContractFormValues>({
+  const { control, handleSubmit } = useForm<ContractFormValues>({
     resolver: valibotResolver(validation.contractFormSchema) as any,
     defaultValues: {
       isActive: true,
@@ -54,35 +52,24 @@ export default function ContractForm({
   };
 
   return (
-    <form className="space-y-3" onSubmit={handleSubmit(onSubmitForm)}>
+    <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmitForm)}>
       {submitError ? (
-        <div className="mb-3 rounded-large border border-danger-200 bg-danger-50 px-3 py-2 text-sm text-danger-600">
+        <div
+          aria-live="polite"
+          className="rounded-xl border-2 border-danger-300 bg-danger-50 px-4 py-3 text-sm font-semibold text-danger-700 shadow-sm"
+        >
           {submitError}
         </div>
       ) : null}
 
-      <div className="sticky top-0 z-10 flex justify-end gap-3 py-2 mb-3 bg-background border-b border-divider -mx-4 px-4">
-        {onCancel && (
-          <IBaseButton size="sm" variant="light" onPress={onCancel}>
-            {tLabels("cancel")}
-          </IBaseButton>
-        )}
-        <IBaseButton
-          color="primary"
-          disabled={isSubmitting}
-          isLoading={isSubmitting}
-          size="sm"
-          type="submit"
-        >
-          {tLabels("save")}
-        </IBaseButton>
-      </div>
-
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
-          <h2 className="text-base font-semibold mb-4">
-            {tLabels("basicInfo")}
-          </h2>
+      <IBaseCard className="border border-default-200/60 shadow-sm">
+        <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">
+              {tLabels("basicInfo")}
+            </h2>
+          </div>
+          <div className="flex flex-col gap-8">
           <div className="grid gap-4 md:grid-cols-2">
             <Controller
               control={control}
@@ -209,14 +196,18 @@ export default function ContractForm({
               )}
             />
           </div>
+          </div>
         </IBaseCardBody>
       </IBaseCard>
 
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
-          <h2 className="text-base font-semibold mb-4">
-            {tLabels("additionalInfo")}
-          </h2>
+      <IBaseCard className="border border-default-200/60 shadow-sm">
+        <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">
+              {tLabels("additionalInfo")}
+            </h2>
+          </div>
+          <div className="flex flex-col gap-8">
           <div className="grid gap-4 md:grid-cols-2">
             <Controller
               control={control}
@@ -296,6 +287,26 @@ export default function ContractForm({
                 />
               )}
             />
+          </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 pt-6 border-t border-default-200">
+            <IBaseButton
+              color="primary"
+              disabled={isSubmitting}
+              isLoading={isSubmitting}
+              size="md"
+              type="submit"
+            >
+              {mode === "create"
+                ? tLabels("saveCreate")
+                : tLabels("saveUpdate")}
+            </IBaseButton>
+            {onCancel && (
+              <IBaseButton size="md" variant="light" onPress={onCancel}>
+                {tLabels("cancel")}
+              </IBaseButton>
+            )}
           </div>
         </IBaseCardBody>
       </IBaseCard>

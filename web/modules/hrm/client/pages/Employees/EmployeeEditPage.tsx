@@ -1,34 +1,68 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import {
+  useCreateUpdate,
+  useLocalizedText,
+  useSetBreadcrumbs,
+} from "@base/client/hooks";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+
+import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
 import { employeeService } from "@mdl/hrm/client/services/EmployeeService";
 
 import EmployeeForm, {
   type EmployeeFormValues,
 } from "./components/EmployeeForm/EmployeeForm";
 
+const EMPLOYEES_LIST_PATH = "/workspace/modules/hrm/employees";
+
 export default function EmployeeEditPage(): React.ReactNode {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
   const t = useTranslations("hrm.employee.create.labels");
+  const tTitle = useTranslations("hrm.employee");
+  const getLocalizedText = useLocalizedText();
 
-  const { data: employeeData, isLoading } = useQuery({
-    queryKey: ["hrm-employee", id],
-    queryFn: async () => {
-      const response = await employeeService.getById(id);
+  const { data: employeeData, isLoading, isError, error, refetch } =
+    useQuery({
+      queryKey: ["hrm-employee", id],
+      queryFn: async () => {
+        const response = await employeeService.getById(id);
 
-      if (!response.data) {
-        throw new Error(response.message ?? "Employee not found");
-      }
+        if (!response.data) {
+          throw new Error(response.message ?? "Employee not found");
+        }
 
-      return response.data;
-    },
-    enabled: !!id,
-  });
+        return response.data;
+      },
+      enabled: !!id,
+    });
+
+  const viewPath = `${EMPLOYEES_LIST_PATH}/view/${id}`;
+  const breadcrumbs = useMemo(
+    () =>
+      employeeData
+        ? [
+            { label: tTitle("title"), href: EMPLOYEES_LIST_PATH },
+            {
+              label:
+                getLocalizedText(employeeData.fullName as any) ||
+                employeeData.employeeCode,
+              href: viewPath,
+            },
+            { label: t("editPageTitle") },
+          ]
+        : [
+            { label: tTitle("title"), href: EMPLOYEES_LIST_PATH },
+            { label: t("editPageTitle") },
+          ],
+    [employeeData, viewPath, tTitle, t, getLocalizedText],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: updateEmployee,
@@ -49,7 +83,7 @@ export default function EmployeeEditPage(): React.ReactNode {
     },
     invalidateQueries: [["hrm-employees"], ["hrm-employee", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/employees/view/${data.id}`);
+      router.push(`${EMPLOYEES_LIST_PATH}/view/${data.id}`);
     },
   });
 
@@ -84,44 +118,69 @@ export default function EmployeeEditPage(): React.ReactNode {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
+        <IBaseSpinner size="md" />
+        <span>Loading...</span>
+      </div>
+    );
   }
 
-  if (!employeeData) {
-    return <div>Employee not found</div>;
+  if (isError || !employeeData) {
+    return (
+      <div className="flex flex-col gap-4 rounded-xl border-2 border-danger-200 bg-danger-50/50 p-6">
+        <p className="font-medium text-danger-700">
+          {error instanceof Error ? error.message : "Employee not found"}
+        </p>
+        <IBaseButton
+          size="sm"
+          variant="bordered"
+          color="danger"
+          onPress={() => refetch()}
+        >
+          Retry
+        </IBaseButton>
+      </div>
+    );
   }
 
   return (
-    <EmployeeForm
-      defaultValues={{
-        employeeCode: employeeData.employeeCode,
-        firstName: employeeData.firstName || "",
-        lastName: employeeData.lastName || "",
-        fullName: (employeeData.fullName as any) || { vi: "", en: "" },
-        email: employeeData.email || "",
-        phone: employeeData.phone || "",
-        dateOfBirth: employeeData.dateOfBirth || "",
-        gender: employeeData.gender || "",
-        nationalId: employeeData.nationalId || "",
-        taxId: employeeData.taxId || "",
-        positionId: employeeData.positionId,
-        departmentId: employeeData.departmentId,
-        managerId: employeeData.managerId || "",
-        employmentStatus: employeeData.employmentStatus,
-        employmentType: employeeData.employmentType || "",
-        hireDate: employeeData.hireDate,
-        probationEndDate: employeeData.probationEndDate || "",
-        baseSalary: employeeData.baseSalary?.toString() || "",
-        currency: employeeData.currency || "VND",
-        locationId: employeeData.locationId || "",
-        isActive: employeeData.isActive ?? true,
-      }}
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() =>
-        router.push(`/workspace/modules/hrm/employees/view/${id}`)
-      }
-      onSubmit={handleSubmit}
-    />
+    <IBasePageLayout
+      variant="edit"
+      maxWidth="form"
+      title={t("editPageTitle")}
+      subtitle={employeeData.employeeCode}
+    >
+      <EmployeeForm
+        mode="edit"
+        defaultValues={{
+          employeeCode: employeeData.employeeCode,
+          firstName: employeeData.firstName || "",
+          lastName: employeeData.lastName || "",
+          fullName: (employeeData.fullName as any) || { vi: "", en: "" },
+          email: employeeData.email || "",
+          phone: employeeData.phone || "",
+          dateOfBirth: employeeData.dateOfBirth || "",
+          gender: employeeData.gender || "",
+          nationalId: employeeData.nationalId || "",
+          taxId: employeeData.taxId || "",
+          positionId: employeeData.positionId,
+          departmentId: employeeData.departmentId,
+          managerId: employeeData.managerId || "",
+          employmentStatus: employeeData.employmentStatus,
+          employmentType: employeeData.employmentType || "",
+          hireDate: employeeData.hireDate,
+          probationEndDate: employeeData.probationEndDate || "",
+          baseSalary: employeeData.baseSalary?.toString() || "",
+          currency: employeeData.currency || "VND",
+          locationId: employeeData.locationId || "",
+          isActive: employeeData.isActive ?? true,
+        }}
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(viewPath)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

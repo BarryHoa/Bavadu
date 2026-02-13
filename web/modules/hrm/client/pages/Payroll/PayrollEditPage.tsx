@@ -1,15 +1,18 @@
 "use client";
 
-import { LoadingOverlay } from "@base/client/components";
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
+import { useCreateUpdate, useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
 import { payrollService } from "@mdl/hrm/client/services/PayrollService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 import PayrollForm, {
   type PayrollFormValues,
 } from "./components/PayrollForm/PayrollForm";
+
+const PAYROLL_LIST_PATH = "/workspace/modules/hrm/payroll";
 
 export default function PayrollEditPage(): React.ReactNode {
   const router = useRouter();
@@ -17,12 +20,14 @@ export default function PayrollEditPage(): React.ReactNode {
   const id = params.id as string;
   const t = useTranslations("hrm.payroll");
   const tCommon = useTranslations("common");
+  const getLocalizedText = useLocalizedText();
 
   const {
     data: payrollData,
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["hrm-payroll", id],
     queryFn: async () => {
@@ -56,9 +61,33 @@ export default function PayrollEditPage(): React.ReactNode {
     },
     invalidateQueries: [["hrm-payroll"], ["hrm-payroll", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/payroll/view/${data.data.id}`);
+      router.push(`${PAYROLL_LIST_PATH}/view/${data.data.id}`);
     },
   });
+
+  const viewPath = `${PAYROLL_LIST_PATH}/view/${id}`;
+  const breadcrumbs = useMemo(
+    () =>
+      payrollData
+        ? [
+            { label: t("title"), href: PAYROLL_LIST_PATH },
+            {
+              label:
+                getLocalizedText(payrollData.employee?.fullName) ||
+                payrollData.employee?.employeeCode ||
+                payrollData.payrollPeriod?.code ||
+                t("edit"),
+              href: viewPath,
+            },
+            { label: t("edit") },
+          ]
+        : [
+            { label: t("title"), href: PAYROLL_LIST_PATH },
+            { label: t("edit") },
+          ],
+    [t, payrollData, viewPath, getLocalizedText],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const handleSubmit = async (values: PayrollFormValues) => {
     await submitPayroll({
@@ -112,25 +141,45 @@ export default function PayrollEditPage(): React.ReactNode {
   };
 
   if (isLoading) {
-    return <LoadingOverlay isLoading={true} />;
-  }
-
-  if (isError) {
     return (
-      <div className="text-danger-500">
-        {tCommon("errors.failedToLoadData")}: {error?.message}
+      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
+        <IBaseSpinner size="md" />
+        <span>{tCommon("loading")}</span>
       </div>
     );
   }
 
-  if (!payrollData) {
+  if (isError || !payrollData) {
     return (
-      <div className="text-warning-500">{tCommon("errors.dataNotFound")}</div>
+      <div className="flex flex-col gap-4 rounded-xl border-2 border-danger-200 bg-danger-50/50 p-6">
+        <p className="font-medium text-danger-700">
+          {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
+        </p>
+        <IBaseButton
+          size="sm"
+          variant="bordered"
+          color="danger"
+          onPress={() => refetch()}
+        >
+          Retry
+        </IBaseButton>
+      </div>
     );
   }
 
+  const subtitle = [
+    payrollData.payrollPeriod?.code,
+    getLocalizedText(payrollData.employee?.fullName) || payrollData.employee?.employeeCode,
+  ].filter(Boolean).join(" · ");
+
   return (
-    <PayrollForm
+    <IBasePageLayout
+      variant="edit"
+      maxWidth="form"
+      title={t("edit")}
+      subtitle={subtitle || undefined}
+    >
+      <PayrollForm
       defaultValues={{
         payrollPeriodId: payrollData.payrollPeriodId,
         employeeId: payrollData.employeeId,
@@ -150,8 +199,9 @@ export default function PayrollEditPage(): React.ReactNode {
       }}
       isSubmitting={isPending}
       submitError={submitError}
-      onCancel={() => router.push(`/workspace/modules/hrm/payroll/view/${id}`)}
-      onSubmit={handleSubmit}
-    />
+      onCancel={() => router.push(viewPath)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

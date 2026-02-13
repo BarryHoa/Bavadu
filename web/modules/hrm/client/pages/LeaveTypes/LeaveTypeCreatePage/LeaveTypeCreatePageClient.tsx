@@ -1,17 +1,31 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
 import { leaveTypeService } from "@mdl/hrm/client/services/LeaveTypeService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 import LeaveTypeForm, {
   type LeaveTypeFormValues,
 } from "../components/LeaveTypeForm/LeaveTypeForm";
 
+const LEAVE_TYPES_LIST_PATH = "/workspace/modules/hrm/leave-types";
+
 export default function LeaveTypeCreatePageClient(): React.ReactNode {
   const router = useRouter();
   const t = useTranslations("hrm.leaveTypes");
+  const tTitle = useTranslations("hrm.leaveTypes");
+
+  const breadcrumbs = useMemo(
+    () => [
+      { label: tTitle("title"), href: LEAVE_TYPES_LIST_PATH },
+      { label: t("create") },
+    ],
+    [t, tTitle],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: submitLeaveType,
@@ -34,7 +48,7 @@ export default function LeaveTypeCreatePageClient(): React.ReactNode {
     },
     invalidateQueries: [["hrm-leave-types"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/leave-types/view/${data.data.id}`);
+      router.push(`${LEAVE_TYPES_LIST_PATH}/view/${data.data.id}`);
     },
   });
 
@@ -75,11 +89,17 @@ export default function LeaveTypeCreatePageClient(): React.ReactNode {
   };
 
   return (
-    <LeaveTypeForm
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() => router.push("/workspace/modules/hrm/leave-types")}
-      onSubmit={handleSubmit}
-    />
+    <IBasePageLayout
+      variant="create"
+      maxWidth="form"
+      title={t("create")}
+    >
+      <LeaveTypeForm
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(LEAVE_TYPES_LIST_PATH)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

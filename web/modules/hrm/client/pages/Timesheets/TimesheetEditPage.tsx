@@ -1,15 +1,18 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
+import { useCreateUpdate, useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
+import { useMemo } from "react";
 import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
-import { LoadingOverlay } from "@base/client/components";
 
 import TimesheetForm, {
   type TimesheetFormValues,
 } from "./components/TimesheetForm/TimesheetForm";
+
+const TIMESHEETS_LIST_PATH = "/workspace/modules/hrm/timesheets";
 
 export default function TimesheetEditPage(): React.ReactNode {
   const router = useRouter();
@@ -17,12 +20,14 @@ export default function TimesheetEditPage(): React.ReactNode {
   const id = params.id as string;
   const t = useTranslations("hrm.timesheets");
   const tCommon = useTranslations("common");
+  const getLocalizedText = useLocalizedText();
 
   const {
     data: timesheetData,
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["hrm-timesheets", id],
     queryFn: async () => {
@@ -58,9 +63,33 @@ export default function TimesheetEditPage(): React.ReactNode {
     },
     invalidateQueries: [["hrm-timesheets"], ["hrm-timesheets", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/.../view/${data.data.id}`);
+      router.push(`${TIMESHEETS_LIST_PATH}/view/${data.data.id}`);
     },
   });
+
+  const viewPath = `${TIMESHEETS_LIST_PATH}/view/${id}`;
+  const breadcrumbs = useMemo(
+    () =>
+      timesheetData
+        ? [
+            { label: t("title"), href: TIMESHEETS_LIST_PATH },
+            {
+              label:
+                getLocalizedText(timesheetData.employee?.fullName) ||
+                timesheetData.employee?.employeeCode ||
+                timesheetData.workDate ||
+                t("edit"),
+              href: viewPath,
+            },
+            { label: t("edit") },
+          ]
+        : [
+            { label: t("title"), href: TIMESHEETS_LIST_PATH },
+            { label: t("edit") },
+          ],
+    [t, timesheetData, viewPath, getLocalizedText],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const handleSubmit = async (values: TimesheetFormValues) => {
     await submitTimesheet({
@@ -82,25 +111,45 @@ export default function TimesheetEditPage(): React.ReactNode {
   };
 
   if (isLoading) {
-    return <LoadingOverlay isLoading={true} />;
-  }
-
-  if (isError) {
     return (
-      <div className="text-danger-500">
-        {tCommon("errors.failedToLoadData")}: {error?.message}
+      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
+        <IBaseSpinner size="md" />
+        <span>{tCommon("loading")}</span>
       </div>
     );
   }
 
-  if (!timesheetData) {
+  if (isError || !timesheetData) {
     return (
-      <div className="text-warning-500">{tCommon("errors.dataNotFound")}</div>
+      <div className="flex flex-col gap-4 rounded-xl border-2 border-danger-200 bg-danger-50/50 p-6">
+        <p className="font-medium text-danger-700">
+          {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
+        </p>
+        <IBaseButton
+          size="sm"
+          variant="bordered"
+          color="danger"
+          onPress={() => refetch()}
+        >
+          Retry
+        </IBaseButton>
+      </div>
     );
   }
 
+  const subtitle = [
+    getLocalizedText(timesheetData.employee?.fullName) || timesheetData.employee?.employeeCode,
+    timesheetData.workDate,
+  ].filter(Boolean).join(" · ");
+
   return (
-    <TimesheetForm
+    <IBasePageLayout
+      variant="edit"
+      maxWidth="form"
+      title={t("edit")}
+      subtitle={subtitle || undefined}
+    >
+      <TimesheetForm
       defaultValues={{
         employeeId: timesheetData.employeeId,
         rosterId: timesheetData.rosterId || "",
@@ -122,10 +171,9 @@ export default function TimesheetEditPage(): React.ReactNode {
       }}
       isSubmitting={isPending}
       submitError={submitError}
-      onCancel={() =>
-        router.push(`/workspace/modules/hrm/timesheets/view/${id}`)
-      }
-      onSubmit={handleSubmit}
-    />
+      onCancel={() => router.push(viewPath)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

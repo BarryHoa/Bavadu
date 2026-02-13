@@ -1,22 +1,35 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
+import { useCreateUpdate, useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
 import { contractService } from "@mdl/hrm/client/services/ContractService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 import ContractForm, {
   type ContractFormValues,
 } from "./components/ContractForm/ContractForm";
+
+const CONTRACTS_LIST_PATH = "/workspace/modules/hrm/contracts";
 
 export default function ContractEditPage(): React.ReactNode {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
   const t = useTranslations("hrm.contract.create.labels");
+  const tTitle = useTranslations("hrm.contract");
+  const tCommon = useTranslations("common");
+  const getLocalizedText = useLocalizedText();
 
-  const { data: contractData, isLoading } = useQuery({
+  const {
+    data: contractData,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["hrm-contract", id],
     queryFn: async () => {
       const response = await contractService.getById(id);
@@ -49,9 +62,29 @@ export default function ContractEditPage(): React.ReactNode {
     },
     invalidateQueries: [["hrm-contracts"], ["hrm-contract", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/contracts/view/${data.id}`);
+      router.push(`${CONTRACTS_LIST_PATH}/view/${data.id}`);
     },
   });
+
+  const viewPath = `${CONTRACTS_LIST_PATH}/view/${id}`;
+  const breadcrumbs = useMemo(
+    () =>
+      contractData
+        ? [
+            { label: tTitle("title"), href: CONTRACTS_LIST_PATH },
+            {
+              label: contractData.contractNumber || tTitle("list.edit"),
+              href: viewPath,
+            },
+            { label: tTitle("list.edit") },
+          ]
+        : [
+            { label: tTitle("title"), href: CONTRACTS_LIST_PATH },
+            { label: tTitle("list.edit") },
+          ],
+    [tTitle, contractData, viewPath],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const handleSubmit = async (values: ContractFormValues) => {
     const payload = {
@@ -80,15 +113,41 @@ export default function ContractEditPage(): React.ReactNode {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
+        <IBaseSpinner size="md" />
+        <span>{tCommon("loading")}</span>
+      </div>
+    );
   }
 
-  if (!contractData) {
-    return <div>Contract not found</div>;
+  if (isError || !contractData) {
+    return (
+      <div className="flex flex-col gap-4 rounded-xl border-2 border-danger-200 bg-danger-50/50 p-6">
+        <p className="font-medium text-danger-700">
+          {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
+        </p>
+        <IBaseButton
+          size="sm"
+          variant="bordered"
+          color="danger"
+          onPress={() => refetch()}
+        >
+          Retry
+        </IBaseButton>
+      </div>
+    );
   }
 
   return (
-    <ContractForm
+    <IBasePageLayout
+      variant="edit"
+      maxWidth="form"
+      title={tTitle("list.edit")}
+      subtitle={contractData.contractNumber}
+    >
+      <ContractForm
+      mode="edit"
       defaultValues={{
         contractNumber: contractData.contractNumber,
         employeeId: contractData.employeeId,
@@ -109,10 +168,9 @@ export default function ContractEditPage(): React.ReactNode {
       }}
       isSubmitting={isPending}
       submitError={submitError}
-      onCancel={() =>
-        router.push(`/workspace/modules/hrm/contracts/view/${id}`)
-      }
-      onSubmit={handleSubmit}
-    />
+      onCancel={() => router.push(viewPath)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

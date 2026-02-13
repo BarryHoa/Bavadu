@@ -20,6 +20,8 @@
       },
       "create": {
         "labels": {
+          "pageTitle": "Thêm nhân viên",
+          "editPageTitle": "Sửa nhân viên",
           "basicInfo": "Thông tin cơ bản",
           "employmentInfo": "Thông tin công việc",
           "additionalInfo": "Thông tin bổ sung",
@@ -39,6 +41,8 @@
           "gender": "Giới tính",
           "cancel": "Hủy",
           "save": "Lưu",
+          "saveCreate": "Tạo nhân viên",
+          "saveUpdate": "Lưu thay đổi",
           "errors": {
             "failedToCreate": "Không thể tạo nhân viên",
             "failedToUpdate": "Không thể cập nhật nhân viên"
@@ -174,6 +178,8 @@
       },
       "create": {
         "labels": {
+          "pageTitle": "Thêm vị trí",
+          "editPageTitle": "Sửa vị trí",
           "basicInfo": "Thông tin cơ bản",
           "code": "Mã",
           "name": "Tên",
@@ -185,6 +191,8 @@
           "maxSalary": "Lương tối đa",
           "cancel": "Hủy",
           "save": "Lưu",
+          "saveCreate": "Tạo vị trí",
+          "saveUpdate": "Lưu thay đổi",
           "errors": {
             "failedToCreate": "Không thể tạo vị trí",
             "failedToUpdate": "Không thể cập nhật vị trí"
@@ -256,6 +264,8 @@
           "notes": "Ghi chú",
           "cancel": "Hủy",
           "save": "Lưu",
+          "saveCreate": "Tạo hợp đồng",
+          "saveUpdate": "Lưu thay đổi",
           "errors": {
             "failedToCreate": "Không thể tạo hợp đồng",
             "failedToUpdate": "Không thể cập nhật hợp đồng"
@@ -305,6 +315,7 @@
     "timesheets": {
       "title": "Chấm công",
       "create": "Thêm chấm công",
+      "edit": "Sửa chấm công",
       "generalInfo": "Thông tin chấm công",
       "labels": {
         "employee": "Nhân viên",
@@ -343,6 +354,7 @@
     "candidates": {
       "title": "Ứng viên",
       "create": "Thêm ứng viên",
+      "edit": "Sửa ứng viên",
       "generalInfo": "Thông tin ứng viên",
       "labels": {
         "requisition": "Yêu cầu tuyển dụng",
@@ -385,6 +397,7 @@
     "leaveRequests": {
       "title": "Đơn xin nghỉ phép",
       "create": "Thêm đơn xin nghỉ phép",
+      "edit": "Sửa đơn xin nghỉ phép",
       "generalInfo": "Thông tin đơn xin nghỉ phép",
       "labels": {
         "employee": "Nhân viên",
@@ -429,6 +442,7 @@
     "leaveTypes": {
       "title": "Loại nghỉ phép",
       "create": "Thêm loại nghỉ phép",
+      "edit": "Sửa loại nghỉ phép",
       "generalInfo": "Thông tin loại nghỉ phép",
       "labels": {
         "code": "Mã",
@@ -471,6 +485,7 @@
     },
     "jobRequisitions": {
       "title": "Yêu cầu tuyển dụng",
+      "edit": "Sửa yêu cầu tuyển dụng",
       "create": "Thêm yêu cầu tuyển dụng",
       "generalInfo": "Thông tin yêu cầu tuyển dụng",
       "labels": {
@@ -524,6 +539,7 @@
     "payroll": {
       "title": "Bảng lương",
       "create": "Thêm bảng lương",
+      "edit": "Sửa bảng lương",
       "generalInfo": "Thông tin bảng lương",
       "labels": {
         "payrollPeriod": "Kỳ lương",
@@ -595,6 +611,7 @@
     "courses": {
       "title": "Khóa học",
       "create": "Thêm khóa học",
+      "edit": "Sửa khóa học",
       "generalInfo": "Thông tin khóa học",
       "labels": {
         "code": "Mã",
@@ -626,6 +643,7 @@
     "certificates": {
       "title": "Chứng chỉ",
       "create": "Thêm chứng chỉ",
+      "edit": "Sửa chứng chỉ",
       "generalInfo": "Thông tin chứng chỉ",
       "labels": {
         "employee": "Nhân viên",
@@ -660,6 +678,7 @@
     "performanceReviews": {
       "title": "Đánh giá hiệu suất",
       "create": "Thêm đánh giá hiệu suất",
+      "edit": "Sửa đánh giá hiệu suất",
       "generalInfo": "Thông tin đánh giá hiệu suất",
       "labels": {
         "employee": "Nhân viên",

@@ -1,17 +1,31 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { positionService } from "@mdl/hrm/client/services/PositionService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { positionService } from "@mdl/hrm/client/services/PositionService";
+import { useMemo } from "react";
 
 import PositionForm, {
   type PositionFormValues,
 } from "../components/PositionForm/PositionForm";
 
+const POSITIONS_LIST_PATH = "/workspace/modules/hrm/positions";
+
 export default function PositionCreatePageClient(): React.ReactNode {
   const router = useRouter();
   const t = useTranslations("hrm.position.create.labels");
+  const tTitle = useTranslations("hrm.position");
+
+  const breadcrumbs = useMemo(
+    () => [
+      { label: tTitle("title"), href: POSITIONS_LIST_PATH },
+      { label: t("pageTitle") },
+    ],
+    [t, tTitle],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: submitPosition,
@@ -32,7 +46,7 @@ export default function PositionCreatePageClient(): React.ReactNode {
     },
     invalidateQueries: [["hrm-positions"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/positions/view/${data.data.id}`);
+      router.push(`${POSITIONS_LIST_PATH}/view/${data.data.id}`);
     },
   });
 
@@ -54,11 +68,17 @@ export default function PositionCreatePageClient(): React.ReactNode {
   };
 
   return (
-    <PositionForm
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() => router.push("/workspace/modules/hrm/positions")}
-      onSubmit={handleSubmit}
-    />
+    <IBasePageLayout
+      variant="create"
+      maxWidth="form"
+      title={t("pageTitle")}
+    >
+      <PositionForm
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(POSITIONS_LIST_PATH)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

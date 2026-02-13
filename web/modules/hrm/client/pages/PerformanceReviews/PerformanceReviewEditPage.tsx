@@ -1,15 +1,18 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
+import { useCreateUpdate, useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
+import { useMemo } from "react";
 import { performanceReviewService } from "@mdl/hrm/client/services/PerformanceReviewService";
-import { LoadingOverlay } from "@base/client/components";
 
 import PerformanceReviewForm, {
   type PerformanceReviewFormValues,
 } from "./components/PerformanceReviewForm/PerformanceReviewForm";
+
+const PERFORMANCE_REVIEWS_LIST_PATH = "/workspace/modules/hrm/performance-reviews";
 
 export default function PerformanceReviewEditPage(): React.ReactNode {
   const router = useRouter();
@@ -17,12 +20,14 @@ export default function PerformanceReviewEditPage(): React.ReactNode {
   const id = params.id as string;
   const t = useTranslations("hrm.performanceReviews");
   const tCommon = useTranslations("common");
+  const getLocalizedText = useLocalizedText();
 
   const {
     data: performanceReviewData,
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["hrm-performance-reviews", id],
     queryFn: async () => {
@@ -63,9 +68,33 @@ export default function PerformanceReviewEditPage(): React.ReactNode {
       ["hrm-performance-reviews", id],
     ],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/.../view/${data.data.id}`);
+      router.push(`${PERFORMANCE_REVIEWS_LIST_PATH}/view/${data.data.id}`);
     },
   });
+
+  const viewPath = `${PERFORMANCE_REVIEWS_LIST_PATH}/view/${id}`;
+  const breadcrumbs = useMemo(
+    () =>
+      performanceReviewData
+        ? [
+            { label: t("title"), href: PERFORMANCE_REVIEWS_LIST_PATH },
+            {
+              label:
+                getLocalizedText(performanceReviewData.employee?.fullName) ||
+                performanceReviewData.employee?.employeeCode ||
+                performanceReviewData.reviewType ||
+                t("edit"),
+              href: viewPath,
+            },
+            { label: t("edit") },
+          ]
+        : [
+            { label: t("title"), href: PERFORMANCE_REVIEWS_LIST_PATH },
+            { label: t("edit") },
+          ],
+    [t, performanceReviewData, viewPath, getLocalizedText],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const handleSubmit = async (values: PerformanceReviewFormValues) => {
     await submitPerformanceReview({
@@ -86,25 +115,45 @@ export default function PerformanceReviewEditPage(): React.ReactNode {
   };
 
   if (isLoading) {
-    return <LoadingOverlay isLoading={true} />;
-  }
-
-  if (isError) {
     return (
-      <div className="text-danger-500">
-        {tCommon("errors.failedToLoadData")}: {error?.message}
+      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
+        <IBaseSpinner size="md" />
+        <span>{tCommon("loading")}</span>
       </div>
     );
   }
 
-  if (!performanceReviewData) {
+  if (isError || !performanceReviewData) {
     return (
-      <div className="text-warning-500">{tCommon("errors.dataNotFound")}</div>
+      <div className="flex flex-col gap-4 rounded-xl border-2 border-danger-200 bg-danger-50/50 p-6">
+        <p className="font-medium text-danger-700">
+          {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
+        </p>
+        <IBaseButton
+          size="sm"
+          variant="bordered"
+          color="danger"
+          onPress={() => refetch()}
+        >
+          Retry
+        </IBaseButton>
+      </div>
     );
   }
 
+  const subtitle = [
+    performanceReviewData.reviewType,
+    performanceReviewData.reviewDate,
+  ].filter(Boolean).join(" · ");
+
   return (
-    <PerformanceReviewForm
+    <IBasePageLayout
+      variant="edit"
+      maxWidth="form"
+      title={t("edit")}
+      subtitle={subtitle || undefined}
+    >
+      <PerformanceReviewForm
       defaultValues={{
         employeeId: performanceReviewData.employeeId,
         reviewType: performanceReviewData.reviewType,
@@ -120,10 +169,9 @@ export default function PerformanceReviewEditPage(): React.ReactNode {
       }}
       isSubmitting={isPending}
       submitError={submitError}
-      onCancel={() =>
-        router.push(`/workspace/modules/hrm/performance-reviews/view/${id}`)
-      }
-      onSubmit={handleSubmit}
-    />
+      onCancel={() => router.push(viewPath)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

@@ -1,17 +1,30 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
 import { payrollService } from "@mdl/hrm/client/services/PayrollService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 import PayrollForm, {
   type PayrollFormValues,
 } from "../components/PayrollForm/PayrollForm";
 
+const PAYROLL_LIST_PATH = "/workspace/modules/hrm/payroll";
+
 export default function PayrollCreatePageClient(): React.ReactNode {
   const router = useRouter();
   const t = useTranslations("hrm.payroll");
+
+  const breadcrumbs = useMemo(
+    () => [
+      { label: t("title"), href: PAYROLL_LIST_PATH },
+      { label: t("create") },
+    ],
+    [t],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: submitPayroll,
@@ -32,7 +45,7 @@ export default function PayrollCreatePageClient(): React.ReactNode {
     },
     invalidateQueries: [["hrm-payroll"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/payroll/view/${data.data.id}`);
+      router.push(`${PAYROLL_LIST_PATH}/view/${data.data.id}`);
     },
   });
 
@@ -74,11 +87,17 @@ export default function PayrollCreatePageClient(): React.ReactNode {
   };
 
   return (
-    <PayrollForm
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() => router.push("/workspace/modules/hrm/payroll")}
-      onSubmit={handleSubmit}
-    />
+    <IBasePageLayout
+      variant="create"
+      maxWidth="form"
+      title={t("create")}
+    >
+      <PayrollForm
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(PAYROLL_LIST_PATH)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

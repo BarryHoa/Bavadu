@@ -1,34 +1,69 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import {
+  useCreateUpdate,
+  useLocalizedText,
+  useSetBreadcrumbs,
+} from "@base/client/hooks";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+
+import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
 import { positionService } from "@mdl/hrm/client/services/PositionService";
 
 import PositionForm, {
   type PositionFormValues,
 } from "./components/PositionForm/PositionForm";
 
+const POSITIONS_LIST_PATH = "/workspace/modules/hrm/positions";
+
 export default function PositionEditPage(): React.ReactNode {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
   const t = useTranslations("hrm.position.create.labels");
+  const tView = useTranslations("hrm.position.view.labels");
+  const tTitle = useTranslations("hrm.position");
+  const getLocalizedText = useLocalizedText();
 
-  const { data: positionData, isLoading } = useQuery({
-    queryKey: ["hrm-position", id],
-    queryFn: async () => {
-      const response = await positionService.getById(id);
+  const { data: positionData, isLoading, isError, error, refetch } =
+    useQuery({
+      queryKey: ["hrm-position", id],
+      queryFn: async () => {
+        const response = await positionService.getById(id);
 
-      if (!response.data) {
-        throw new Error(response.message ?? "Position not found");
-      }
+        if (!response.data) {
+          throw new Error(response.message ?? "Position not found");
+        }
 
-      return response.data;
-    },
-    enabled: !!id,
-  });
+        return response.data;
+      },
+      enabled: !!id,
+    });
+
+  const viewPath = `${POSITIONS_LIST_PATH}/view/${id}`;
+  const breadcrumbs = useMemo(
+    () =>
+      positionData
+        ? [
+            { label: tTitle("title"), href: POSITIONS_LIST_PATH },
+            {
+              label:
+                getLocalizedText(positionData.name as any) ||
+                positionData.code,
+              href: viewPath,
+            },
+            { label: t("editPageTitle") },
+          ]
+        : [
+            { label: tTitle("title"), href: POSITIONS_LIST_PATH },
+            { label: t("editPageTitle") },
+          ],
+    [positionData, viewPath, tTitle, t, getLocalizedText],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: updatePosition,
@@ -49,7 +84,7 @@ export default function PositionEditPage(): React.ReactNode {
     },
     invalidateQueries: [["hrm-positions"], ["hrm-position", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/positions/view/${data.data.id}`);
+      router.push(`${POSITIONS_LIST_PATH}/view/${data.data.id}`);
     },
   });
 
@@ -71,33 +106,58 @@ export default function PositionEditPage(): React.ReactNode {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
+        <IBaseSpinner size="md" />
+        <span>{tView("loading") ?? "Loading..."}</span>
+      </div>
+    );
   }
 
-  if (!positionData) {
-    return <div>Position not found</div>;
+  if (isError || !positionData) {
+    return (
+      <div className="flex flex-col gap-4 rounded-xl border-2 border-danger-200 bg-danger-50/50 p-6">
+        <p className="font-medium text-danger-700">
+          {error instanceof Error ? error.message : (tView("notFound") ?? "Position not found")}
+        </p>
+        <IBaseButton
+          size="sm"
+          variant="bordered"
+          color="danger"
+          onPress={() => refetch()}
+        >
+          Retry
+        </IBaseButton>
+      </div>
+    );
   }
 
   return (
-    <PositionForm
-      defaultValues={{
-        code: positionData.code,
-        name: (positionData.name as any) || { vi: "", en: "" },
-        description: (positionData.description as any) || undefined,
-        departmentId: positionData.departmentId,
-        jobFamily: positionData.jobFamily || "",
-        jobGrade: positionData.jobGrade || "",
-        reportsTo: positionData.reportsTo || "",
-        minSalary: positionData.minSalary?.toString() || "",
-        maxSalary: positionData.maxSalary?.toString() || "",
-        isActive: positionData.isActive ?? true,
-      }}
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() =>
-        router.push(`/workspace/modules/hrm/positions/view/${id}`)
-      }
-      onSubmit={handleSubmit}
-    />
+    <IBasePageLayout
+      variant="edit"
+      maxWidth="form"
+      title={t("editPageTitle")}
+      subtitle={positionData.code}
+    >
+      <PositionForm
+        mode="edit"
+        defaultValues={{
+          code: positionData.code,
+          name: (positionData.name as any) || { vi: "", en: "" },
+          description: (positionData.description as any) || undefined,
+          departmentId: positionData.departmentId,
+          jobFamily: positionData.jobFamily || "",
+          jobGrade: positionData.jobGrade || "",
+          reportsTo: positionData.reportsTo || "",
+          minSalary: positionData.minSalary?.toString() || "",
+          maxSalary: positionData.maxSalary?.toString() || "",
+          isActive: positionData.isActive ?? true,
+        }}
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(viewPath)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

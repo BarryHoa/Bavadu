@@ -1,15 +1,21 @@
 "use client";
 
-import { LoadingOverlay } from "@base/client/components";
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import {
+  useCreateUpdate,
+  useSetBreadcrumbs,
+} from "@base/client/hooks";
 import { leaveRequestService } from "@mdl/hrm/client/services/LeaveRequestService";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 
+import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
 import LeaveRequestForm, {
   type LeaveRequestFormValues,
 } from "./components/LeaveRequestForm/LeaveRequestForm";
+
+const LEAVE_REQUESTS_LIST_PATH = "/workspace/modules/hrm/leave-requests";
 
 export default function LeaveRequestEditPage(): React.ReactNode {
   const router = useRouter();
@@ -23,6 +29,7 @@ export default function LeaveRequestEditPage(): React.ReactNode {
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["hrm-leave-requests", id],
     queryFn: async () => {
@@ -38,6 +45,16 @@ export default function LeaveRequestEditPage(): React.ReactNode {
     },
     enabled: !!id,
   });
+
+  const viewPath = `${LEAVE_REQUESTS_LIST_PATH}/view/${id}`;
+  const breadcrumbs = useMemo(
+    () => [
+      { label: t("title"), href: LEAVE_REQUESTS_LIST_PATH },
+      { label: leaveRequestData ? t("edit") : "..." },
+    ],
+    [t, leaveRequestData],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: submitLeaveRequest,
@@ -60,7 +77,7 @@ export default function LeaveRequestEditPage(): React.ReactNode {
     },
     invalidateQueries: [["hrm-leave-requests"], ["hrm-leave-requests", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/leave-requests/view/${data.data.id}`);
+      router.push(`${LEAVE_REQUESTS_LIST_PATH}/view/${data.data.id}`);
     },
   });
 
@@ -78,41 +95,55 @@ export default function LeaveRequestEditPage(): React.ReactNode {
   };
 
   if (isLoading) {
-    return <LoadingOverlay isLoading={true} />;
-  }
-
-  if (isError) {
     return (
-      <div className="text-danger-500">
-        {tCommon("errors.failedToLoadData")}: {error?.message}
+      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
+        <IBaseSpinner size="md" />
+        <span>Loading...</span>
       </div>
     );
   }
 
-  if (!leaveRequestData) {
+  if (isError || !leaveRequestData) {
     return (
-      <div className="text-warning-500">{tCommon("errors.dataNotFound")}</div>
+      <div className="flex flex-col gap-4 rounded-xl border-2 border-danger-200 bg-danger-50/50 p-6">
+        <p className="font-medium text-danger-700">
+          {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
+        </p>
+        <IBaseButton
+          size="sm"
+          variant="bordered"
+          color="danger"
+          onPress={() => refetch()}
+        >
+          Retry
+        </IBaseButton>
+      </div>
     );
   }
 
   return (
-    <LeaveRequestForm
-      mode="edit"
-      defaultValues={{
-        employeeId: leaveRequestData.employeeId,
-        leaveTypeId: leaveRequestData.leaveTypeId,
-        startDate: leaveRequestData.startDate,
-        endDate: leaveRequestData.endDate,
-        days: leaveRequestData.days,
-        reason: leaveRequestData.reason || "",
-        status: leaveRequestData.status,
-      }}
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() =>
-        router.push(`/workspace/modules/hrm/leave-requests/view/${id}`)
-      }
-      onSubmit={handleSubmit}
-    />
+    <IBasePageLayout
+      variant="edit"
+      maxWidth="form"
+      title={t("edit")}
+      subtitle={`${leaveRequestData.startDate} – ${leaveRequestData.endDate}`}
+    >
+      <LeaveRequestForm
+        mode="edit"
+        defaultValues={{
+          employeeId: leaveRequestData.employeeId,
+          leaveTypeId: leaveRequestData.leaveTypeId,
+          startDate: leaveRequestData.startDate,
+          endDate: leaveRequestData.endDate,
+          days: leaveRequestData.days,
+          reason: leaveRequestData.reason || "",
+          status: leaveRequestData.status,
+        }}
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(viewPath)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

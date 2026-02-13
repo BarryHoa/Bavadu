@@ -1,17 +1,30 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
 import { jobRequisitionService } from "@mdl/hrm/client/services/JobRequisitionService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 import JobRequisitionForm, {
   type JobRequisitionFormValues,
 } from "../components/JobRequisitionForm/JobRequisitionForm";
 
+const JOB_REQUISITIONS_LIST_PATH = "/workspace/modules/hrm/job-requisitions";
+
 export default function JobRequisitionCreatePageClient(): React.ReactNode {
   const router = useRouter();
   const t = useTranslations("hrm.jobRequisitions");
+
+  const breadcrumbs = useMemo(
+    () => [
+      { label: t("title"), href: JOB_REQUISITIONS_LIST_PATH },
+      { label: t("create") },
+    ],
+    [t],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: submitJobRequisition,
@@ -34,9 +47,7 @@ export default function JobRequisitionCreatePageClient(): React.ReactNode {
     },
     invalidateQueries: [["hrm-job-requisitions"]],
     onSuccess: (data) => {
-      router.push(
-        `/workspace/modules/hrm/job-requisitions/view/${data.data.id}`,
-      );
+      router.push(`${JOB_REQUISITIONS_LIST_PATH}/view/${data.data.id}`);
     },
   });
 
@@ -96,11 +107,17 @@ export default function JobRequisitionCreatePageClient(): React.ReactNode {
   };
 
   return (
-    <JobRequisitionForm
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() => router.push("/workspace/modules/hrm/job-requisitions")}
-      onSubmit={handleSubmit}
-    />
+    <IBasePageLayout
+      variant="create"
+      maxWidth="form"
+      title={t("create")}
+    >
+      <JobRequisitionForm
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(JOB_REQUISITIONS_LIST_PATH)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

@@ -1,21 +1,38 @@
 "use client";
 
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { IBaseButton } from "@base/client";
-import { IBaseCard, IBaseCardBody } from "@base/client";
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBasePageLayout,
+  IBaseSpinner,
+} from "@base/client";
+import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
 import { contractService } from "@mdl/hrm/client/services/ContractService";
 import { useQuery } from "@tanstack/react-query";
+import { Pencil } from "lucide-react";
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
+
+const CONTRACTS_LIST_PATH = "/workspace/modules/hrm/contracts";
 
 export default function ContractViewPage(): React.ReactNode {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
   const t = useTranslations("hrm.contract.view.labels");
+  const tTitle = useTranslations("hrm.contract");
+  const tCommon = useTranslations("common");
   const getLocalizedText = useLocalizedText();
 
-  const { data: contract, isLoading } = useQuery({
+  const {
+    data: contract,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["hrm-contract", id],
     queryFn: async () => {
       const response = await contractService.getById(id);
@@ -29,41 +46,71 @@ export default function ContractViewPage(): React.ReactNode {
     enabled: !!id,
   });
 
+  const breadcrumbs = useMemo(
+    () =>
+      contract
+        ? [
+            { label: tTitle("title"), href: CONTRACTS_LIST_PATH },
+            { label: contract.contractNumber },
+          ]
+        : [
+            { label: tTitle("title"), href: CONTRACTS_LIST_PATH },
+            { label: isLoading ? "..." : tCommon("errors.dataNotFound") },
+          ],
+    [tTitle, contract, isLoading, tCommon],
+  );
+  useSetBreadcrumbs(breadcrumbs);
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
+        <IBaseSpinner size="md" />
+        <span>{tCommon("loading")}</span>
+      </div>
+    );
   }
 
-  if (!contract) {
-    return <div>Contract not found</div>;
+  if (isError || !contract) {
+    return (
+      <div className="flex flex-col gap-4 rounded-xl border-2 border-danger-200 bg-danger-50/50 p-6">
+        <p className="font-medium text-danger-700">
+          {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
+        </p>
+        <IBaseButton
+          size="sm"
+          variant="bordered"
+          color="danger"
+          onPress={() => refetch()}
+        >
+          Retry
+        </IBaseButton>
+      </div>
+    );
   }
+
+  const editPath = `${CONTRACTS_LIST_PATH}/edit/${id}`;
+  const subtitle = [contract.contractType, contract.status].filter(Boolean).join(" · ");
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
-        <div className="flex gap-2">
-          <IBaseButton
-            size="sm"
-            variant="light"
-            onPress={() => router.push("/workspace/modules/hrm/contracts")}
-          >
-            {t("backToList")}
-          </IBaseButton>
-          <IBaseButton
-            color="primary"
-            size="sm"
-            onPress={() =>
-              router.push(`/workspace/modules/hrm/contracts/edit/${id}`)
-            }
-          >
-            {t("edit")}
-          </IBaseButton>
-        </div>
-      </div>
-
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
-          <h2 className="text-base font-semibold mb-4">{t("basicInfo")}</h2>
+    <IBasePageLayout
+      variant="detail"
+      maxWidth="content"
+      title={contract.contractNumber}
+      subtitle={subtitle || undefined}
+      headerActions={
+        <IBaseButton
+          color="primary"
+          size="sm"
+          startContent={<Pencil className="size-4" />}
+          onPress={() => router.push(editPath)}
+        >
+          {t("edit")}
+        </IBaseButton>
+      }
+    >
+      <IBaseCard className="border border-default-200/60 shadow-sm">
+        <IBaseCardBody className="gap-6 p-6">
+          <h2 className="text-lg font-semibold text-foreground">{t("basicInfo")}</h2>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <div className="text-sm text-default-500">
@@ -109,6 +156,6 @@ export default function ContractViewPage(): React.ReactNode {
           </div>
         </IBaseCardBody>
       </IBaseCard>
-    </div>
+    </IBasePageLayout>
   );
 }

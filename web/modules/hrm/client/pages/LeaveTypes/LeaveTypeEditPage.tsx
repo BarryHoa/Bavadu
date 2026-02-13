@@ -1,15 +1,21 @@
 "use client";
 
-import { LoadingOverlay } from "@base/client/components";
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import {
+  useCreateUpdate,
+  useSetBreadcrumbs,
+} from "@base/client/hooks";
 import { leaveTypeService } from "@mdl/hrm/client/services/LeaveTypeService";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 
+import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
 import LeaveTypeForm, {
   type LeaveTypeFormValues,
 } from "./components/LeaveTypeForm/LeaveTypeForm";
+
+const LEAVE_TYPES_LIST_PATH = "/workspace/modules/hrm/leave-types";
 
 export default function LeaveTypeEditPage(): React.ReactNode {
   const router = useRouter();
@@ -23,6 +29,7 @@ export default function LeaveTypeEditPage(): React.ReactNode {
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["hrm-leave-types", id],
     queryFn: async () => {
@@ -36,6 +43,16 @@ export default function LeaveTypeEditPage(): React.ReactNode {
     },
     enabled: !!id,
   });
+
+  const viewPath = `${LEAVE_TYPES_LIST_PATH}/view/${id}`;
+  const breadcrumbs = useMemo(
+    () => [
+      { label: t("title"), href: LEAVE_TYPES_LIST_PATH },
+      { label: leaveTypeData ? t("edit") : "..." },
+    ],
+    [t, leaveTypeData],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: submitLeaveType,
@@ -58,7 +75,7 @@ export default function LeaveTypeEditPage(): React.ReactNode {
     },
     invalidateQueries: [["hrm-leave-types"], ["hrm-leave-types", id]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/leave-types/view/${data.data.id}`);
+      router.push(`${LEAVE_TYPES_LIST_PATH}/view/${data.data.id}`);
     },
   });
 
@@ -102,44 +119,58 @@ export default function LeaveTypeEditPage(): React.ReactNode {
   };
 
   if (isLoading) {
-    return <LoadingOverlay isLoading={true} />;
-  }
-
-  if (isError) {
     return (
-      <div className="text-danger-500">
-        {tCommon("errors.failedToLoadData")}: {error?.message}
+      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
+        <IBaseSpinner size="md" />
+        <span>Loading...</span>
       </div>
     );
   }
 
-  if (!leaveTypeData) {
+  if (isError || !leaveTypeData) {
     return (
-      <div className="text-warning-500">{tCommon("errors.dataNotFound")}</div>
+      <div className="flex flex-col gap-4 rounded-xl border-2 border-danger-200 bg-danger-50/50 p-6">
+        <p className="font-medium text-danger-700">
+          {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
+        </p>
+        <IBaseButton
+          size="sm"
+          variant="bordered"
+          color="danger"
+          onPress={() => refetch()}
+        >
+          Retry
+        </IBaseButton>
+      </div>
     );
   }
 
   return (
-    <LeaveTypeForm
-      defaultValues={{
-        code: leaveTypeData.code,
-        name: (leaveTypeData.name as any) || { vi: "", en: "" },
-        description: leaveTypeData.description as any,
-        accrualType: leaveTypeData.accrualType,
-        accrualRate: leaveTypeData.accrualRate || undefined,
-        maxAccrual: leaveTypeData.maxAccrual || undefined,
-        carryForward: leaveTypeData.carryForward ? "true" : "false",
-        maxCarryForward: leaveTypeData.maxCarryForward || undefined,
-        requiresApproval: leaveTypeData.requiresApproval ? "true" : "false",
-        isPaid: leaveTypeData.isPaid ? "true" : "false",
-        isActive: leaveTypeData.isActive ? "true" : "false",
-      }}
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() =>
-        router.push(`/workspace/modules/hrm/leave-types/view/${id}`)
-      }
-      onSubmit={handleSubmit}
-    />
+    <IBasePageLayout
+      variant="edit"
+      maxWidth="form"
+      title={t("edit")}
+      subtitle={leaveTypeData.code}
+    >
+      <LeaveTypeForm
+        defaultValues={{
+          code: leaveTypeData.code,
+          name: (leaveTypeData.name as any) || { vi: "", en: "" },
+          description: leaveTypeData.description as any,
+          accrualType: leaveTypeData.accrualType,
+          accrualRate: leaveTypeData.accrualRate || undefined,
+          maxAccrual: leaveTypeData.maxAccrual || undefined,
+          carryForward: leaveTypeData.carryForward ? "true" : "false",
+          maxCarryForward: leaveTypeData.maxCarryForward || undefined,
+          requiresApproval: leaveTypeData.requiresApproval ? "true" : "false",
+          isPaid: leaveTypeData.isPaid ? "true" : "false",
+          isActive: leaveTypeData.isActive ? "true" : "false",
+        }}
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(viewPath)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

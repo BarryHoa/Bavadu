@@ -1,14 +1,23 @@
 "use client";
 
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBasePageLayout,
+  IBaseSpinner,
+} from "@base/client";
+import { IBaseDigitViewer } from "@base/client/components";
+import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
+import { formatDate } from "@base/client/utils/date/formatDate";
 import { useQuery } from "@tanstack/react-query";
+import { Pencil } from "lucide-react";
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { performanceReviewService } from "@mdl/hrm/client/services/PerformanceReviewService";
-import { IBaseButton } from "@base/client";
-import { IBaseCard, IBaseCardBody } from "@base/client";
-import { LoadingOverlay, IBaseDigitViewer } from "@base/client/components";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { formatDate } from "@base/client/utils/date/formatDate";
+
+const PERFORMANCE_REVIEWS_LIST_PATH = "/workspace/modules/hrm/performance-reviews";
 
 export default function PerformanceReviewViewPage(): React.ReactNode {
   const router = useRouter();
@@ -23,6 +32,7 @@ export default function PerformanceReviewViewPage(): React.ReactNode {
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["hrm-performance-reviews", id],
     queryFn: async () => {
@@ -39,50 +49,85 @@ export default function PerformanceReviewViewPage(): React.ReactNode {
     enabled: !!id,
   });
 
-  if (isLoading) {
-    return <LoadingOverlay isLoading={true} />;
-  }
+  const breadcrumbs = useMemo(
+    () =>
+      performanceReviewData
+        ? [
+            { label: t("title"), href: PERFORMANCE_REVIEWS_LIST_PATH },
+            {
+              label:
+                getLocalizedText(performanceReviewData.employee?.fullName) ||
+                performanceReviewData.employee?.employeeCode ||
+                performanceReviewData.reviewType ||
+                t("generalInfo"),
+            },
+          ]
+        : [
+            { label: t("title"), href: PERFORMANCE_REVIEWS_LIST_PATH },
+            { label: isLoading ? "..." : tCommon("errors.dataNotFound") },
+          ],
+    [t, performanceReviewData, isLoading, tCommon, getLocalizedText],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
-  if (isError) {
+  if (isLoading) {
     return (
-      <div className="text-danger-500">
-        {tCommon("errors.failedToLoadData")}: {error?.message}
+      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
+        <IBaseSpinner size="md" />
+        <span>{tCommon("loading")}</span>
       </div>
     );
   }
 
-  if (!performanceReviewData) {
+  if (isError || !performanceReviewData) {
     return (
-      <div className="text-warning-500">{tCommon("errors.dataNotFound")}</div>
+      <div className="flex flex-col gap-4 rounded-xl border-2 border-danger-200 bg-danger-50/50 p-6">
+        <p className="font-medium text-danger-700">
+          {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
+        </p>
+        <IBaseButton
+          size="sm"
+          variant="bordered"
+          color="danger"
+          onPress={() => refetch()}
+        >
+          Retry
+        </IBaseButton>
+      </div>
     );
   }
 
+  const titleLabel =
+    getLocalizedText(performanceReviewData.employee?.fullName) ||
+    performanceReviewData.employee?.employeeCode ||
+    performanceReviewData.reviewType ||
+    t("generalInfo");
+  const subtitle = [
+    formatDate(performanceReviewData.reviewDate),
+    performanceReviewData.status,
+  ].filter(Boolean).join(" · ");
+  const editPath = `${PERFORMANCE_REVIEWS_LIST_PATH}/edit/${id}`;
+
   return (
-    <div className="space-y-4">
-      <div className="sticky top-0 z-10 flex justify-end gap-3 py-2 mb-3 bg-background border-b border-divider -mx-4 px-4">
-        <IBaseButton
-          size="sm"
-          variant="light"
-          onPress={() =>
-            router.push("/workspace/modules/hrm/performance-reviews")
-          }
-        >
-          {tCommon("actions.backToList")}
-        </IBaseButton>
+    <IBasePageLayout
+      variant="detail"
+      maxWidth="content"
+      title={titleLabel}
+      subtitle={subtitle || undefined}
+      headerActions={
         <IBaseButton
           color="primary"
           size="sm"
-          onPress={() =>
-            router.push(`/workspace/modules/hrm/performance-reviews/edit/${id}`)
-          }
+          startContent={<Pencil className="size-4" />}
+          onPress={() => router.push(editPath)}
         >
           {tCommon("actions.edit")}
         </IBaseButton>
-      </div>
-
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
-          <h2 className="text-base font-semibold mb-2">{t("generalInfo")}</h2>
+      }
+    >
+      <IBaseCard className="border border-default-200/60 shadow-sm">
+        <IBaseCardBody className="gap-6 p-6">
+          <h2 className="text-lg font-semibold text-foreground">{t("generalInfo")}</h2>
           <div className="grid gap-2 md:grid-cols-2">
             <IBaseDigitViewer
               label={t("labels.employee")}
@@ -153,6 +198,6 @@ export default function PerformanceReviewViewPage(): React.ReactNode {
           </div>
         </IBaseCardBody>
       </IBaseCard>
-    </div>
+    </IBasePageLayout>
   );
 }

@@ -1,17 +1,30 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { certificateService } from "@mdl/hrm/client/services/CertificateService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { certificateService } from "@mdl/hrm/client/services/CertificateService";
+import { useMemo } from "react";
 
 import CertificateForm, {
   type CertificateFormValues,
 } from "../components/CertificateForm/CertificateForm";
 
+const CERTIFICATES_LIST_PATH = "/workspace/modules/hrm/certificates";
+
 export default function CertificateCreatePageClient(): React.ReactNode {
   const router = useRouter();
   const t = useTranslations("hrm.certificates");
+
+  const breadcrumbs = useMemo(
+    () => [
+      { label: t("title"), href: CERTIFICATES_LIST_PATH },
+      { label: t("create") },
+    ],
+    [t],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: submitCertificate,
@@ -34,7 +47,7 @@ export default function CertificateCreatePageClient(): React.ReactNode {
     },
     invalidateQueries: [["hrm-certificates"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/certificates/view/${data.data.id}`);
+      router.push(`${CERTIFICATES_LIST_PATH}/view/${data.data.id}`);
     },
   });
 
@@ -52,11 +65,17 @@ export default function CertificateCreatePageClient(): React.ReactNode {
   };
 
   return (
-    <CertificateForm
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() => router.push("/workspace/modules/hrm/certificates")}
-      onSubmit={handleSubmit}
-    />
+    <IBasePageLayout
+      variant="create"
+      maxWidth="form"
+      title={t("create")}
+    >
+      <CertificateForm
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(CERTIFICATES_LIST_PATH)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

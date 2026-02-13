@@ -1,17 +1,30 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { performanceReviewService } from "@mdl/hrm/client/services/PerformanceReviewService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { performanceReviewService } from "@mdl/hrm/client/services/PerformanceReviewService";
+import { useMemo } from "react";
 
 import PerformanceReviewForm, {
   type PerformanceReviewFormValues,
 } from "../components/PerformanceReviewForm/PerformanceReviewForm";
 
+const PERFORMANCE_REVIEWS_LIST_PATH = "/workspace/modules/hrm/performance-reviews";
+
 export default function PerformanceReviewCreatePageClient(): React.ReactNode {
   const router = useRouter();
   const t = useTranslations("hrm.performanceReviews");
+
+  const breadcrumbs = useMemo(
+    () => [
+      { label: t("title"), href: PERFORMANCE_REVIEWS_LIST_PATH },
+      { label: t("create") },
+    ],
+    [t],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: submitPerformanceReview,
@@ -34,9 +47,7 @@ export default function PerformanceReviewCreatePageClient(): React.ReactNode {
     },
     invalidateQueries: [["hrm-performance-reviews"]],
     onSuccess: (data) => {
-      router.push(
-        `/workspace/modules/hrm/performance-reviews/view/${data.data.id}`,
-      );
+      router.push(`${PERFORMANCE_REVIEWS_LIST_PATH}/view/${data.data.id}`);
     },
   });
 
@@ -58,11 +69,17 @@ export default function PerformanceReviewCreatePageClient(): React.ReactNode {
   };
 
   return (
-    <PerformanceReviewForm
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() => router.push("/workspace/modules/hrm/performance-reviews")}
-      onSubmit={handleSubmit}
-    />
+    <IBasePageLayout
+      variant="create"
+      maxWidth="form"
+      title={t("create")}
+    >
+      <PerformanceReviewForm
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(PERFORMANCE_REVIEWS_LIST_PATH)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

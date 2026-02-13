@@ -41,11 +41,7 @@ export default function CourseForm({
   // React Compiler will automatically optimize this computation
   const validation = createCourseValidation(t);
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<CourseFormValues>({
+  const { control, handleSubmit } = useForm<CourseFormValues>({
     resolver: valibotResolver(validation.courseFormSchema) as any,
     defaultValues: {
       isActive: "true",
@@ -58,34 +54,25 @@ export default function CourseForm({
   };
 
   return (
-    <form className="space-y-3" onSubmit={handleSubmit(onSubmitForm)}>
+    <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmitForm)}>
       {submitError ? (
-        <div className="mb-3 rounded-large border border-danger-200 bg-danger-50 px-3 py-2 text-sm text-danger-600">
+        <div
+          aria-live="polite"
+          className="rounded-xl border-2 border-danger-300 bg-danger-50 px-4 py-3 text-sm font-semibold text-danger-700 shadow-sm"
+        >
           {submitError}
         </div>
       ) : null}
 
-      <div className="sticky top-0 z-10 flex justify-end gap-3 py-2 mb-3 bg-background border-b border-divider -mx-4 px-4">
-        {onCancel && (
-          <IBaseButton size="sm" variant="light" onPress={onCancel}>
-            {tCommon("actions.cancel")}
-          </IBaseButton>
-        )}
-        <IBaseButton
-          color="primary"
-          disabled={isSubmitting}
-          isLoading={isSubmitting}
-          size="sm"
-          type="submit"
-        >
-          {tCommon("actions.save")}
-        </IBaseButton>
-      </div>
-
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
-          <h2 className="text-base font-semibold mb-2">{t("generalInfo")}</h2>
-          <div className="grid gap-2 md:grid-cols-2">
+      <IBaseCard className="border border-default-200/60 shadow-sm">
+        <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">
+              {t("generalInfo")}
+            </h2>
+          </div>
+          <div className="flex flex-col gap-8">
+          <div className="grid gap-4 md:grid-cols-2">
             <Controller
               control={control}
               name="code"
@@ -219,6 +206,24 @@ export default function CourseForm({
                 </div>
               )}
             />
+          </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 pt-6 border-t border-default-200">
+            <IBaseButton
+              color="primary"
+              disabled={isSubmitting}
+              isLoading={isSubmitting}
+              size="md"
+              type="submit"
+            >
+              {tCommon("actions.save")}
+            </IBaseButton>
+            {onCancel && (
+              <IBaseButton size="md" variant="light" onPress={onCancel}>
+                {tCommon("actions.cancel")}
+              </IBaseButton>
+            )}
           </div>
         </IBaseCardBody>
       </IBaseCard>

@@ -1,17 +1,30 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
 import { candidateService } from "@mdl/hrm/client/services/CandidateService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 import CandidateForm, {
   type CandidateFormValues,
 } from "../components/CandidateForm/CandidateForm";
 
+const CANDIDATES_LIST_PATH = "/workspace/modules/hrm/candidates";
+
 export default function CandidateCreatePageClient(): React.ReactNode {
   const router = useRouter();
   const t = useTranslations("hrm.candidates");
+
+  const breadcrumbs = useMemo(
+    () => [
+      { label: t("title"), href: CANDIDATES_LIST_PATH },
+      { label: t("create") },
+    ],
+    [t],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: submitCandidate,
@@ -34,7 +47,7 @@ export default function CandidateCreatePageClient(): React.ReactNode {
     },
     invalidateQueries: [["hrm-candidates"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/candidates/view/${data.data.id}`);
+      router.push(`${CANDIDATES_LIST_PATH}/view/${data.data.id}`);
     },
   });
 
@@ -60,11 +73,17 @@ export default function CandidateCreatePageClient(): React.ReactNode {
   };
 
   return (
-    <CandidateForm
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() => router.push("/workspace/modules/hrm/candidates")}
-      onSubmit={handleSubmit}
-    />
+    <IBasePageLayout
+      variant="create"
+      maxWidth="form"
+      title={t("create")}
+    >
+      <CandidateForm
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(CANDIDATES_LIST_PATH)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

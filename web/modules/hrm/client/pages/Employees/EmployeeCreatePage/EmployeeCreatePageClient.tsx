@@ -1,17 +1,31 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { employeeService } from "@mdl/hrm/client/services/EmployeeService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { employeeService } from "@mdl/hrm/client/services/EmployeeService";
+import { useMemo } from "react";
 
 import EmployeeForm, {
   type EmployeeFormValues,
 } from "../components/EmployeeForm/EmployeeForm";
 
+const EMPLOYEES_LIST_PATH = "/workspace/modules/hrm/employees";
+
 export default function EmployeeCreatePageClient(): React.ReactNode {
   const router = useRouter();
   const t = useTranslations("hrm.employee.create.labels");
+  const tTitle = useTranslations("hrm.employee");
+
+  const breadcrumbs = useMemo(
+    () => [
+      { label: tTitle("title"), href: EMPLOYEES_LIST_PATH },
+      { label: t("pageTitle") },
+    ],
+    [t, tTitle],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: submitEmployee,
@@ -32,7 +46,7 @@ export default function EmployeeCreatePageClient(): React.ReactNode {
     },
     invalidateQueries: [["hrm-employees"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/employees/view/${data.id}`);
+      router.push(`${EMPLOYEES_LIST_PATH}/view/${data.id}`);
     },
   });
 
@@ -66,11 +80,17 @@ export default function EmployeeCreatePageClient(): React.ReactNode {
   };
 
   return (
-    <EmployeeForm
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() => router.push("/workspace/modules/hrm/employees")}
-      onSubmit={handleSubmit}
-    />
+    <IBasePageLayout
+      variant="create"
+      maxWidth="form"
+      title={t("pageTitle")}
+    >
+      <EmployeeForm
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(EMPLOYEES_LIST_PATH)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

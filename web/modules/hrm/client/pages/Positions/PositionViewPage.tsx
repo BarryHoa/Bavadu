@@ -1,21 +1,37 @@
 "use client";
 
-import { IBaseButton } from "@base/client";
-import { IBaseCard, IBaseCardBody } from "@base/client";
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBasePageLayout,
+  IBaseSpinner,
+} from "@base/client";
+import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
+import { positionService } from "@mdl/hrm/client/services/PositionService";
+import { Pencil } from "lucide-react";
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { positionService } from "@mdl/hrm/client/services/PositionService";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+
+const POSITIONS_LIST_PATH = "/workspace/modules/hrm/positions";
 
 export default function PositionViewPage(): React.ReactNode {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
   const t = useTranslations("hrm.position.view.labels");
+  const tTitle = useTranslations("hrm.position");
   const getLocalizedText = useLocalizedText();
 
-  const { data: position, isLoading } = useQuery({
+  const {
+    data: position,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["hrm-position", id],
     queryFn: async () => {
       const response = await positionService.getById(id);
@@ -29,65 +45,115 @@ export default function PositionViewPage(): React.ReactNode {
     enabled: !!id,
   });
 
+  const breadcrumbs = useMemo(
+    () =>
+      position
+        ? [
+            { label: tTitle("title"), href: POSITIONS_LIST_PATH },
+            {
+              label:
+                getLocalizedText(position.name as any) || position.code,
+              href: `${POSITIONS_LIST_PATH}/view/${id}`,
+            },
+          ]
+        : [
+            { label: tTitle("title"), href: POSITIONS_LIST_PATH },
+            { label: isLoading ? "..." : (t("notFound") ?? "Not found") },
+          ],
+    [position, id, isLoading, tTitle, t, getLocalizedText],
+  );
+  useSetBreadcrumbs(breadcrumbs);
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
+        <IBaseSpinner size="md" />
+        <span>{t("loading") ?? "Loading..."}</span>
+      </div>
+    );
   }
 
-  if (!position) {
-    return <div>Position not found</div>;
+  if (isError || !position) {
+    return (
+      <div className="flex flex-col gap-4 rounded-xl border-2 border-danger-200 bg-danger-50/50 p-6">
+        <p className="font-medium text-danger-700">
+          {error instanceof Error ? error.message : (t("notFound") ?? "Position not found")}
+        </p>
+        <IBaseButton
+          size="sm"
+          variant="bordered"
+          color="danger"
+          onPress={() => refetch()}
+        >
+          Retry
+        </IBaseButton>
+      </div>
+    );
   }
+
+  const positionName = getLocalizedText(position.name as any) || position.code;
+  const editPath = `${POSITIONS_LIST_PATH}/edit/${id}`;
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
-        <div className="flex gap-2">
-          <IBaseButton
-            size="sm"
-            variant="light"
-            onPress={() => router.push("/workspace/modules/hrm/positions")}
-          >
-            {t("backToList")}
-          </IBaseButton>
-          <IBaseButton
-            color="primary"
-            size="sm"
-            onPress={() =>
-              router.push(`/workspace/modules/hrm/positions/edit/${id}`)
-            }
-          >
-            {t("edit")}
-          </IBaseButton>
-        </div>
-      </div>
-
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
-          <h2 className="text-base font-semibold mb-4">{t("basicInfo")}</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <div className="text-sm text-default-500">{t("code")}</div>
-              <div className="text-base">{position.code}</div>
-            </div>
-            <div>
-              <div className="text-sm text-default-500">{t("name")}</div>
-              <div className="text-base">
-                {getLocalizedText(position.name as any)}
-              </div>
-            </div>
-            <div>
-              <div className="text-sm text-default-500">{t("department")}</div>
-              <div className="text-base">
-                {getLocalizedText(position.department?.name as any) || "—"}
-              </div>
-            </div>
-            <div>
-              <div className="text-sm text-default-500">{t("jobFamily")}</div>
-              <div className="text-base">{position.jobFamily || "—"}</div>
-            </div>
+    <IBasePageLayout
+      variant="detail"
+      maxWidth="content"
+      title={positionName}
+      subtitle={position.code}
+      headerActions={
+        <IBaseButton
+          color="primary"
+          size="md"
+          startContent={<Pencil size={16} />}
+          onPress={() => router.push(editPath)}
+        >
+          {t("edit")}
+        </IBaseButton>
+      }
+    >
+      <IBaseCard className="border border-default-200/60 shadow-sm">
+        <IBaseCardBody className="gap-6 p-6">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">
+              {t("basicInfo")}
+            </h2>
           </div>
+          <dl className="grid gap-5 sm:grid-cols-2">
+            <div>
+              <dt className="text-sm font-medium text-default-500">
+                {t("code")}
+              </dt>
+              <dd className="mt-1 text-base text-foreground">
+                {position.code}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-default-500">
+                {t("name")}
+              </dt>
+              <dd className="mt-1 text-base text-foreground">
+                {positionName}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-default-500">
+                {t("department")}
+              </dt>
+              <dd className="mt-1 text-base text-foreground">
+                {getLocalizedText(position.department?.name as any) || "—"}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-default-500">
+                {t("jobFamily")}
+              </dt>
+              <dd className="mt-1 text-base text-foreground">
+                {position.jobFamily || "—"}
+              </dd>
+            </div>
+          </dl>
         </IBaseCardBody>
       </IBaseCard>
-    </div>
+    </IBasePageLayout>
   );
 }

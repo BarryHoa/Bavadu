@@ -1,17 +1,30 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
+import { useMemo } from "react";
 
 import TimesheetForm, {
   type TimesheetFormValues,
 } from "../components/TimesheetForm/TimesheetForm";
 
+const TIMESHEETS_LIST_PATH = "/workspace/modules/hrm/timesheets";
+
 export default function TimesheetCreatePageClient(): React.ReactNode {
   const router = useRouter();
   const t = useTranslations("hrm.timesheets");
+
+  const breadcrumbs = useMemo(
+    () => [
+      { label: t("title"), href: TIMESHEETS_LIST_PATH },
+      { label: t("create") },
+    ],
+    [t],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: submitTimesheet,
@@ -34,7 +47,7 @@ export default function TimesheetCreatePageClient(): React.ReactNode {
     },
     invalidateQueries: [["hrm-timesheets"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/timesheets/view/${data.data.id}`);
+      router.push(`${TIMESHEETS_LIST_PATH}/view/${data.data.id}`);
     },
   });
 
@@ -57,11 +70,17 @@ export default function TimesheetCreatePageClient(): React.ReactNode {
   };
 
   return (
-    <TimesheetForm
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() => router.push("/workspace/modules/hrm/timesheets")}
-      onSubmit={handleSubmit}
-    />
+    <IBasePageLayout
+      variant="create"
+      maxWidth="form"
+      title={t("create")}
+    >
+      <TimesheetForm
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(TIMESHEETS_LIST_PATH)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

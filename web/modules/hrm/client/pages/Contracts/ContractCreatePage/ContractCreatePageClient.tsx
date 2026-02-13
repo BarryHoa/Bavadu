@@ -1,17 +1,31 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
 import { contractService } from "@mdl/hrm/client/services/ContractService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 import ContractForm, {
   type ContractFormValues,
 } from "../components/ContractForm/ContractForm";
 
+const CONTRACTS_LIST_PATH = "/workspace/modules/hrm/contracts";
+
 export default function ContractCreatePageClient(): React.ReactNode {
   const router = useRouter();
   const t = useTranslations("hrm.contract.create.labels");
+  const tTitle = useTranslations("hrm.contract");
+
+  const breadcrumbs = useMemo(
+    () => [
+      { label: tTitle("title"), href: CONTRACTS_LIST_PATH },
+      { label: tTitle("list.newContract") },
+    ],
+    [tTitle],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: submitContract,
@@ -32,7 +46,7 @@ export default function ContractCreatePageClient(): React.ReactNode {
     },
     invalidateQueries: [["hrm-contracts"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/contracts/view/${data.id}`);
+      router.push(`${CONTRACTS_LIST_PATH}/view/${data.id}`);
     },
   });
 
@@ -62,11 +76,17 @@ export default function ContractCreatePageClient(): React.ReactNode {
   };
 
   return (
-    <ContractForm
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() => router.push("/workspace/modules/hrm/contracts")}
-      onSubmit={handleSubmit}
-    />
+    <IBasePageLayout
+      variant="create"
+      maxWidth="form"
+      title={tTitle("list.newContract")}
+    >
+      <ContractForm
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(CONTRACTS_LIST_PATH)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

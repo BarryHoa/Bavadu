@@ -1,17 +1,30 @@
 "use client";
 
-import { useCreateUpdate } from "@base/client/hooks/useCreateUpdate";
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { courseService } from "@mdl/hrm/client/services/CourseService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { courseService } from "@mdl/hrm/client/services/CourseService";
+import { useMemo } from "react";
 
 import CourseForm, {
   type CourseFormValues,
 } from "../components/CourseForm/CourseForm";
 
+const COURSES_LIST_PATH = "/workspace/modules/hrm/courses";
+
 export default function CourseCreatePageClient(): React.ReactNode {
   const router = useRouter();
   const t = useTranslations("hrm.courses");
+
+  const breadcrumbs = useMemo(
+    () => [
+      { label: t("title"), href: COURSES_LIST_PATH },
+      { label: t("create") },
+    ],
+    [t],
+  );
+  useSetBreadcrumbs(breadcrumbs);
 
   const {
     handleSubmit: submitCourse,
@@ -32,7 +45,7 @@ export default function CourseCreatePageClient(): React.ReactNode {
     },
     invalidateQueries: [["hrm-courses"]],
     onSuccess: (data) => {
-      router.push(`/workspace/modules/hrm/courses/view/${data.data.id}`);
+      router.push(`${COURSES_LIST_PATH}/view/${data.data.id}`);
     },
   });
 
@@ -50,11 +63,17 @@ export default function CourseCreatePageClient(): React.ReactNode {
   };
 
   return (
-    <CourseForm
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() => router.push("/workspace/modules/hrm/courses")}
-      onSubmit={handleSubmit}
-    />
+    <IBasePageLayout
+      variant="create"
+      maxWidth="form"
+      title={t("create")}
+    >
+      <CourseForm
+        isSubmitting={isPending}
+        submitError={submitError}
+        onCancel={() => router.push(COURSES_LIST_PATH)}
+        onSubmit={handleSubmit}
+      />
+    </IBasePageLayout>
   );
 }

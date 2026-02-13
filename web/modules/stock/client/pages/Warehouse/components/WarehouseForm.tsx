@@ -259,11 +259,14 @@ export default function WarehouseForm({
     <div className="w-full">
       <form
         noValidate
-        className="space-y-6"
+        className="flex flex-col gap-6"
         onSubmit={handleSubmit(handleFormSubmit)}
       >
         {submitError ? (
-          <div className="rounded-large border border-danger-200 bg-danger-50 px-3 py-2 text-sm text-danger-600">
+          <div
+            aria-live="polite"
+            className="rounded-xl border-2 border-danger-300 bg-danger-50 px-4 py-3 text-sm font-semibold text-danger-700 shadow-sm"
+          >
             {submitError}
           </div>
         ) : null}
@@ -562,18 +565,17 @@ export default function WarehouseForm({
           )}
         />
 
-        <div className="flex flex-col-reverse gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-wrap items-center gap-3 pt-6 border-t border-default-200">
+          <IBaseButton
+            color="primary"
+            disabled={isSubmitting}
+            isLoading={isSubmitting}
+            size="md"
+            type="submit"
+          >
+            {submitLabel}
+          </IBaseButton>
           {secondaryAction && <div>{secondaryAction}</div>}
-          <div className="flex gap-3">
-            <IBaseButton
-              color="primary"
-              disabled={isSubmitting}
-              isLoading={isSubmitting}
-              type="submit"
-            >
-              {submitLabel}
-            </IBaseButton>
-          </div>
         </div>
       </form>
     </div>
