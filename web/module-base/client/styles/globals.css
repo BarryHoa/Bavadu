@@ -6,13 +6,6 @@ html {
   --dropdown-hover: #e7f3ff;
 }
 
-body {
-  background-image: var(--bg-image-url);
-  background-size: var(--bg-size);
-  background-position: center;
-  background-attachment: var(--bg-attach);
-}
-
 /* Helpers to toggle behavior via body className */
 .bg-cover-mode {
   --bg-size: cover;

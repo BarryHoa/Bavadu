@@ -1,12 +1,12 @@
-import "@base/client/styles/fonts.css";
+// import "@base/client/styles/fonts.css";
 import "@base/client/styles/globals.css";
 import { Metadata, Viewport } from "next";
 
-import ModuleI18nProvider from "@base/client/contexts/i18n";
-import { Providers } from "./providers";
-
-import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
+import { siteConfig } from "@/config/site";
+import ModuleI18nProvider from "@base/client/contexts/i18n";
+
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: {
@@ -61,7 +61,7 @@ export default async function RootLayout({
       lang={locale}
     >
       <head />
-      <body className="font-sans">
+      <body className="font-sans bg-content2">
         <Providers>
           <ModuleI18nProvider initialMessages={initialMessages} locale={locale}>
             <div className="relative flex flex-col h-screen">

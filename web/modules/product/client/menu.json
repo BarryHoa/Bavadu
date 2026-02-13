@@ -1,6 +1,6 @@
 {
   "key": "products-main",
-  "name": "Product Management",
+  "name": "Products",
   "icon": "Package",
   "order": 1,
   "children": [

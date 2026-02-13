@@ -11,7 +11,7 @@ const config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)", "Satoshi", "system-ui", "sans-serif"],
+        sans: ["var(--font-sans)", "Roboto", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)"],
         "noto-sans-sc": [
           "var(--font-noto-sans-sc)",
@@ -19,7 +19,7 @@ const config = {
           "system-ui",
           "sans-serif",
         ],
-        satoshi: ["Satoshi", "system-ui", "sans-serif"],
+        roboto: ["var(--font-sans)", "Roboto", "system-ui", "sans-serif"],
       },
       animation: {
         "spin-slow": "spin 3s linear infinite",
