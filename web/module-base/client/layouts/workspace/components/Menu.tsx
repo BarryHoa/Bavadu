@@ -106,6 +106,7 @@ export default function Menu({
 
   const toggleExpanded = (itemKey: string) => {
     const parentKeys = getParentKeys(itemKey);
+
     setExpandedItems(Array.from(new Set([...parentKeys, itemKey])));
   };
 
@@ -138,6 +139,7 @@ export default function Menu({
       ) || null;
 
     const keyToSet = activeItem?.key || null;
+
     setActiveKey(keyToSet);
 
     if (keyToSet) {
@@ -226,20 +228,16 @@ export default function Menu({
 
       return (
         <div key={item.key || item.name} className="mb-1">
-          <IBaseLink
-            className="block"
-            href={itemPath || "#"}
-            onClick={handleLeafClick}
-            size="md"
-          >
-            {effectiveOpen ? (
-              leafContent
-            ) : (
-              <IBaseTooltip content={item.name} placement="right">
-                {leafContent}
-              </IBaseTooltip>
-            )}
-          </IBaseLink>
+          <IBaseTooltip content={item.name} placement="right">
+            <IBaseLink
+              className="block"
+              href={itemPath || "#"}
+              size="md"
+              onClick={handleLeafClick}
+            >
+              {leafContent}
+            </IBaseLink>
+          </IBaseTooltip>
         </div>
       );
     }
@@ -299,13 +297,9 @@ export default function Menu({
 
     return (
       <div key={item.key || item.name} className="mb-1">
-        {effectiveOpen ? (
-          content
-        ) : (
-          <IBaseTooltip content={item.name} placement="right">
-            {content}
-          </IBaseTooltip>
-        )}
+        <IBaseTooltip content={item.name} placement="right">
+          {content}
+        </IBaseTooltip>
 
         {hasChildren && isExpanded && (
           <div
