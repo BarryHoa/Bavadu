@@ -117,6 +117,10 @@
           "save": "Save",
           "saveCreate": "Create department",
           "saveUpdate": "Save changes",
+          "sidebarTips": "Quick tips",
+          "sidebarTipCode": "Use a short, unique code (e.g. IT, HR, Sales).",
+          "sidebarTipParent": "Leave empty for top-level department.",
+          "sidebarTipLevel": "Level 1 = top-level. Increase for sub-departments.",
           "errors": {
             "failedToCreate": "Failed to create department",
             "failedToUpdate": "Failed to update department"
@@ -388,9 +392,13 @@
         "startDate": "Start Date",
         "endDate": "End Date",
         "days": "Days",
+        "daysHelper": "Auto-calculated from start and end dates.",
         "day": "day(s)",
         "reason": "Reason",
         "status": "Status",
+        "cancel": "Cancel",
+        "saveCreate": "Submit leave request",
+        "saveUpdate": "Save changes",
         "approvedAt": "Approved At",
         "rejectedAt": "Rejected At",
         "rejectionReason": "Rejection Reason"

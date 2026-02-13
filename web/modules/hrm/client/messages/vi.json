@@ -117,6 +117,10 @@
           "save": "Lưu",
           "saveCreate": "Tạo phòng ban",
           "saveUpdate": "Lưu thay đổi",
+          "sidebarTips": "Gợi ý nhanh",
+          "sidebarTipCode": "Dùng mã ngắn, duy nhất (vd: IT, HR, Sales).",
+          "sidebarTipParent": "Để trống nếu là phòng ban cấp cao nhất.",
+          "sidebarTipLevel": "Level 1 = cấp cao nhất. Tăng dần cho phòng ban con.",
           "errors": {
             "failedToCreate": "Không thể tạo phòng ban",
             "failedToUpdate": "Không thể cập nhật phòng ban"
@@ -388,9 +392,13 @@
         "startDate": "Ngày bắt đầu",
         "endDate": "Ngày kết thúc",
         "days": "Số ngày",
+        "daysHelper": "Tự động tính từ ngày bắt đầu và kết thúc.",
         "day": "ngày",
         "reason": "Lý do",
         "status": "Trạng thái",
+        "cancel": "Hủy",
+        "saveCreate": "Gửi đơn nghỉ phép",
+        "saveUpdate": "Lưu thay đổi",
         "approvedAt": "Ngày duyệt",
         "rejectedAt": "Ngày từ chối",
         "rejectionReason": "Lý do từ chối"

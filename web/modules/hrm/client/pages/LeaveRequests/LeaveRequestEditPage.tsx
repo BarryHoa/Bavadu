@@ -97,6 +97,7 @@ export default function LeaveRequestEditPage(): React.ReactNode {
 
   return (
     <LeaveRequestForm
+      mode="edit"
       defaultValues={{
         employeeId: leaveRequestData.employeeId,
         leaveTypeId: leaveRequestData.leaveTypeId,

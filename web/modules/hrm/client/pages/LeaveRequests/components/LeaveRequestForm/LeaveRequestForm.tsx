@@ -32,6 +32,8 @@ interface LeaveRequestFormProps {
   submitError?: string | null;
   isSubmitting?: boolean;
   defaultValues?: Partial<LeaveRequestFormValues>;
+  /** Designlab #16: Use descriptive, action-based button text */
+  mode?: "create" | "edit";
 }
 
 export default function LeaveRequestForm({
@@ -40,11 +42,11 @@ export default function LeaveRequestForm({
   submitError,
   isSubmitting = false,
   defaultValues,
+  mode = "create",
 }: LeaveRequestFormProps) {
   const t = useTranslations("hrm.leaveRequests");
-  const tCommon = useTranslations("common");
+  const tLabels = useTranslations("hrm.leaveRequests.labels");
 
-  // React Compiler will automatically optimize this computation
   const validation = createLeaveRequestValidation(t);
 
   const {
@@ -52,7 +54,6 @@ export default function LeaveRequestForm({
     handleSubmit,
     watch,
     setValue,
-    formState: { errors },
   } = useForm<LeaveRequestFormValues>({
     resolver: valibotResolver(validation.leaveRequestFormSchema) as any,
     defaultValues: {
@@ -85,34 +86,30 @@ export default function LeaveRequestForm({
   };
 
   return (
-    <form className="space-y-3" onSubmit={handleSubmit(onSubmitForm)}>
+    <form
+      className="flex max-w-[45rem] flex-col gap-6"
+      onSubmit={handleSubmit(onSubmitForm)}
+    >
+      {/* NN/G: Highly visible error - outline + red + font weight */}
       {submitError ? (
-        <div className="mb-3 rounded-large border border-danger-200 bg-danger-50 px-3 py-2 text-sm text-danger-600">
+        <div
+          aria-live="polite"
+          className="rounded-xl border-2 border-danger-300 bg-danger-50 px-4 py-3 text-sm font-semibold text-danger-700 shadow-sm"
+        >
           {submitError}
         </div>
       ) : null}
 
-      <div className="sticky top-0 z-10 flex justify-end gap-3 py-2 mb-3 bg-background border-b border-divider -mx-4 px-4">
-        {onCancel && (
-          <IBaseButton size="sm" variant="light" onPress={onCancel}>
-            {tCommon("actions.cancel")}
-          </IBaseButton>
-        )}
-        <IBaseButton
-          color="primary"
-          disabled={isSubmitting}
-          isLoading={isSubmitting}
-          size="sm"
-          type="submit"
-        >
-          {tCommon("actions.save")}
-        </IBaseButton>
-      </div>
+      <IBaseCard className="border border-default-200/60 shadow-sm">
+        <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">
+              {t("generalInfo")}
+            </h2>
+          </div>
 
-      <IBaseCard>
-        <IBaseCardBody className="p-4">
-          <h2 className="text-base font-semibold mb-2">{t("generalInfo")}</h2>
-          <div className="grid gap-2 md:grid-cols-2">
+          {/* NN/G: Single-column layout; Start+End date related → 2 cols on desktop */}
+          <div className="flex flex-col gap-8">
             <Controller
               control={control}
               name="employeeId"
@@ -122,9 +119,10 @@ export default function LeaveRequestForm({
                   callWhen="mount"
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
-                  label={t("labels.employee")}
+                  label={tLabels("employee")}
                   model="hrm.employee.dropdown"
                   selectedKey={field.value}
+                  size="sm"
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
@@ -140,108 +138,144 @@ export default function LeaveRequestForm({
                   callWhen="mount"
                   errorMessage={fieldState.error?.message}
                   isInvalid={fieldState.invalid}
-                  label={t("labels.leaveType")}
+                  label={tLabels("leaveType")}
                   model="hrm.leave-type.dropdown"
                   selectedKey={field.value}
+                  size="sm"
                   onSelectionChange={(key) => {
                     field.onChange(key || undefined);
                   }}
                 />
               )}
             />
-            <Controller
-              control={control}
-              name="startDate"
-              render={({ field, fieldState }) => (
-                <IBaseDatePicker
-                  isRequired
-                  errorMessage={fieldState.error?.message}
-                  isInvalid={fieldState.invalid}
-                  label={t("labels.startDate")}
-                  value={
-                    field.value
-                      ? toDayjs(field.value)
-                      : (undefined as unknown as IBaseDatePickerValue)
-                  }
-                  onChange={(val) => {
-                    field.onChange(val ? val.toString() : null);
-                    calculateDays();
-                  }}
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name="endDate"
-              render={({ field, fieldState }) => (
-                <IBaseDatePicker
-                  isRequired
-                  errorMessage={fieldState.error?.message}
-                  isInvalid={fieldState.invalid}
-                  label={t("labels.endDate")}
-                  value={
-                    field.value
-                      ? toDayjs(field.value)
-                      : (undefined as unknown as IBaseDatePickerValue)
-                  }
-                  onChange={(val) => {
-                    field.onChange(val ? val.toString() : null);
-                    calculateDays();
-                  }}
-                />
-              )}
-            />
+
+            {/* Start + End date: related fields → 2 cols (doc 3.2) */}
+            <div className="grid gap-8 md:grid-cols-2">
+              <Controller
+                control={control}
+                name="startDate"
+                render={({ field, fieldState }) => (
+                  <IBaseDatePicker
+                    isRequired
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
+                    label={tLabels("startDate")}
+                    size="sm"
+                    value={
+                      field.value
+                        ? toDayjs(field.value)
+                        : (undefined as unknown as IBaseDatePickerValue)
+                    }
+                    onChange={(val) => {
+                      field.onChange(val ? val.toString() : null);
+                      calculateDays();
+                    }}
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="endDate"
+                render={({ field, fieldState }) => (
+                  <IBaseDatePicker
+                    isRequired
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
+                    label={tLabels("endDate")}
+                    size="sm"
+                    value={
+                      field.value
+                        ? toDayjs(field.value)
+                        : (undefined as unknown as IBaseDatePickerValue)
+                    }
+                    onChange={(val) => {
+                      field.onChange(val ? val.toString() : null);
+                      calculateDays();
+                    }}
+                  />
+                )}
+              />
+            </div>
+
             <Controller
               control={control}
               name="days"
               render={({ field, fieldState }) => (
-                <IBaseInputNumber
-                  {...field}
-                  readOnly
-                  errorMessage={fieldState.error?.message}
-                  isInvalid={fieldState.invalid}
-                  label={t("labels.days")}
-                  min={1}
-                  size="sm"
-                  value={field.value}
-                  onValueChange={(val) => field.onChange(val ?? 1)}
-                />
+                <div className="flex flex-col gap-1">
+                  <IBaseInputNumber
+                    {...field}
+                    readOnly
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
+                    label={tLabels("days")}
+                    min={1}
+                    size="sm"
+                    value={field.value}
+                    onValueChange={(val) => field.onChange(val ?? 1)}
+                  />
+                  <p className="text-xs text-default-500">
+                    {tLabels("daysHelper")}
+                  </p>
+                </div>
               )}
             />
-            <Controller
-              control={control}
-              name="status"
-              render={({ field, fieldState }) => (
-                <IBaseSingleSelectAsync
-                  callWhen="mount"
-                  errorMessage={fieldState.error?.message}
-                  isInvalid={fieldState.invalid}
-                  label={t("labels.status")}
-                  model="base-leave-request-status"
-                  selectedKey={field.value}
-                  onSelectionChange={(key) => {
-                    field.onChange(key || undefined);
-                  }}
-                />
-              )}
-            />
+
+            {mode === "edit" ? (
+              <Controller
+                control={control}
+                name="status"
+                render={({ field, fieldState }) => (
+                  <IBaseSingleSelectAsync
+                    callWhen="mount"
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
+                    label={tLabels("status")}
+                    model="base-leave-request-status"
+                    selectedKey={field.value}
+                    size="sm"
+                    onSelectionChange={(key) => {
+                      field.onChange(key || undefined);
+                    }}
+                  />
+                )}
+              />
+            ) : null}
+
             <Controller
               control={control}
               name="reason"
               render={({ field, fieldState }) => (
-                <div className="md:col-span-2">
-                  <IBaseTextarea
-                    {...field}
-                    errorMessage={fieldState.error?.message}
-                    isInvalid={fieldState.invalid}
-                    label={t("labels.reason")}
-                    size="sm"
-                    value={field.value ?? ""}
-                    onValueChange={field.onChange}
-                  />
-                </div>
+                <IBaseTextarea
+                  {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={tLabels("reason")}
+                  size="sm"
+                  value={field.value ?? ""}
+                  onValueChange={field.onChange}
+                />
               )}
             />
+          </div>
+
+          {/* Designlab #16: Descriptive buttons; Full-page: primary left, cancel right */}
+          <div className="flex flex-wrap items-center gap-3 border-t border-default-200 pt-6">
+            <IBaseButton
+              color="primary"
+              disabled={isSubmitting}
+              isLoading={isSubmitting}
+              size="md"
+              type="submit"
+            >
+              {mode === "create"
+                ? tLabels("saveCreate")
+                : tLabels("saveUpdate")}
+            </IBaseButton>
+            {onCancel && (
+              <IBaseButton size="md" variant="light" onPress={onCancel}>
+                {tLabels("cancel")}
+              </IBaseButton>
+            )}
           </div>
         </IBaseCardBody>
       </IBaseCard>

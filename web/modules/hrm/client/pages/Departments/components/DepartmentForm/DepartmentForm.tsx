@@ -60,10 +60,7 @@ export default function DepartmentForm({
   };
 
   return (
-    <form
-      className="flex flex-col gap-6"
-      onSubmit={handleSubmit(onSubmitForm)}
-    >
+    <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmitForm)}>
       {/* NN/G: Highly visible error - outline + red + font weight */}
       {submitError ? (
         <div
@@ -83,8 +80,8 @@ export default function DepartmentForm({
             </h2>
           </div>
 
-          {/* Designlab #7: Single-column layout - better conversion, vertical eye journey */}
-          <div className="flex flex-col gap-4">
+          {/* NN/G: Single-column, ~32px between fields (gap-8) */}
+          <div className="flex flex-col gap-8">
             {/* Identifiers - required first (Designlab #3: easiest first) */}
             <Controller
               control={control}
@@ -247,11 +244,7 @@ export default function DepartmentForm({
                 : tLabels("saveUpdate")}
             </IBaseButton>
             {onCancel && (
-              <IBaseButton
-                size="md"
-                variant="light"
-                onPress={onCancel}
-              >
+              <IBaseButton size="md" variant="light" onPress={onCancel}>
                 {tLabels("cancel")}
               </IBaseButton>
             )}

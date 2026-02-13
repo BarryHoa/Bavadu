@@ -1,5 +1,6 @@
 "use client";
 
+import { IBasePageLayout } from "@base/client";
 import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
 import { departmentService } from "@mdl/hrm/client/services/DepartmentService";
 import { useTranslations } from "next-intl";
@@ -10,6 +11,7 @@ import { addToast } from "@heroui/toast";
 import DepartmentForm, {
   type DepartmentFormValues,
 } from "../components/DepartmentForm/DepartmentForm";
+import { DepartmentPageSidebar } from "../components/DepartmentPageSidebar/DepartmentPageSidebar";
 
 const DEPARTMENTS_LIST_PATH = "/workspace/modules/hrm/departments";
 
@@ -73,19 +75,18 @@ export default function DepartmentCreatePageClient(): React.ReactNode {
   };
 
   return (
-    <div className="flex flex-col gap-3">
-      <header>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          {t("pageTitle")}
-        </h1>
-      </header>
-
+    <IBasePageLayout
+      variant="create"
+      maxWidth="form"
+      title={t("pageTitle")}
+      sidebar={<DepartmentPageSidebar />}
+    >
       <DepartmentForm
         isSubmitting={isPending}
         submitError={submitError}
         onCancel={() => router.push(DEPARTMENTS_LIST_PATH)}
         onSubmit={handleSubmit}
       />
-    </div>
+    </IBasePageLayout>
   );
 }

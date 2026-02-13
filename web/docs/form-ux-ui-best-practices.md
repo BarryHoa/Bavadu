@@ -47,6 +47,7 @@ Tài liệu tổng hợp các quy tắc thiết kế form thân thiện với ng
 26. [Quy tắc riêng theo loại form](#26-quy-tắc-riêng-theo-loại-form)
 27. [Tránh sai lầm phổ biến](#27-tránh-sai-lầm-phổ-biến)
 28. [Nguồn tham khảo](#28-nguồn-tham-khảo)
+29. [Page Layout (Create/Edit/Detail)](#29-page-layout-createeditdetail)
 
 ---
 
@@ -682,3 +683,44 @@ Không có con số "vàng". Chỉ hỏi thông tin cần thiết; A/B test. Ch�
 - **UX Movement:** Helper text, Multi-column, Optional fields, Disabled buttons
 - **UX Planet:** Modal vs Page
 - **FormCreatorAI, Interaction Design Foundation:** Form design 2024+
+
+---
+
+## 29. Page Layout (Create/Edit/Detail)
+
+Wrapper chuẩn cho trang Create, Edit, Detail theo design guidelines – dùng component **IBasePageLayout**.
+
+### 29.1 Cấu trúc
+
+| Thành phần | Mô tả |
+|------------|-------|
+| **Header** | Title (h1), subtitle, headerActions (vd: nút Edit) |
+| **Main content** | Form hoặc detail card; max-width config |
+| **Sidebar** (tùy chọn) | Bên phải: Quick tips, Org preview, Related (pattern CRM) |
+
+### 29.2 Max-width
+
+| Giá trị | Width | Dùng cho |
+|---------|-------|----------|
+| `form` | 45rem (~720px) | Create, Edit – form full-page |
+| `content` | 60rem | Detail, list content |
+| `full` | 100% | Trang full-width |
+
+### 29.3 Breadcrumb
+
+Breadcrumb **không** nằm trong IBasePageLayout – mỗi page gọi `useSetBreadcrumbs()` để set. Breadcrumb được render bởi WorkspaceLayout.
+
+### 29.4 Ví dụ (Department)
+
+```tsx
+<IBasePageLayout
+  variant="create"
+  maxWidth="form"
+  title={t("pageTitle")}
+  sidebar={<DepartmentPageSidebar />}
+>
+  <DepartmentForm ... />
+</IBasePageLayout>
+```
+
+**Dẫn chứng:** Salesforce Lightning – [Layout Guidelines](https://v1.lightningdesignsystem.com/guidelines/layout/); CRM pattern Form + Sidebar

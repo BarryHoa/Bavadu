@@ -26,6 +26,7 @@ export * from "./IBaseLink";
 export * from "./IBaseModal";
 export * from "./IBaseNavbar";
 export * from "./IBasePagination";
+export * from "./IBasePageLayout";
 export * from "./IBasePicker";
 export * from "./IBasePopover";
 export * from "./IBaseProgress";

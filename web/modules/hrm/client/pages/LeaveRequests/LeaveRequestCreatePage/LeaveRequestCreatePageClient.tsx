@@ -52,6 +52,7 @@ export default function LeaveRequestCreatePageClient(): React.ReactNode {
 
   return (
     <LeaveRequestForm
+      mode="create"
       isSubmitting={isPending}
       submitError={submitError}
       onCancel={() => router.push("/workspace/modules/hrm/leave-requests")}

@@ -5,6 +5,7 @@ import {
   IBaseCard,
   IBaseCardBody,
   IBaseChip,
+  IBasePageLayout,
   IBaseSpinner,
 } from "@base/client";
 import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
@@ -94,43 +95,37 @@ export default function DepartmentViewPage(): React.ReactNode {
   const departmentName =
     getLocalizedText(department.name as any) || department.code;
   const editPath = `${DEPARTMENTS_LIST_PATH}/edit/${id}`;
+  const subtitle = `${t("code")}: ${department.code}${department.level != null ? ` · ${t("level")}: ${department.level}` : ""}`;
 
   return (
-    <div className="flex flex-col gap-6">
-        {/* CRM Record Header - Salesforce/HubSpot pattern: key info at top */}
-        <div className="flex flex-col gap-4 rounded-xl border border-default-200/60 bg-default-50/50 p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-col gap-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                {departmentName}
-              </h1>
-              <IBaseChip
-                color={department.isActive ? "success" : "default"}
-                size="sm"
-                variant="flat"
-              >
-                {department.isActive ? t("statusActive") : t("statusInactive")}
-              </IBaseChip>
-            </div>
-            <p className="text-sm text-default-500">
-              {t("code")}: {department.code}
-              {department.level != null
-                ? ` · ${t("level")}: ${department.level}`
-                : ""}
-            </p>
-          </div>
-          <IBaseButton
-            color="primary"
-            size="md"
-            startContent={<Pencil size={16} />}
-            onPress={() => router.push(editPath)}
+    <IBasePageLayout
+      variant="detail"
+      maxWidth="content"
+      title={
+        <span className="flex flex-wrap items-center gap-2">
+          {departmentName}
+          <IBaseChip
+            color={department.isActive ? "success" : "default"}
+            size="sm"
+            variant="flat"
           >
-            {t("edit")}
-          </IBaseButton>
-        </div>
-
-        {/* Detail sections - clear grouping */}
-        <IBaseCard className="border border-default-200/60 shadow-sm">
+            {department.isActive ? t("statusActive") : t("statusInactive")}
+          </IBaseChip>
+        </span>
+      }
+      subtitle={subtitle}
+      headerActions={
+        <IBaseButton
+          color="primary"
+          size="md"
+          startContent={<Pencil size={16} />}
+          onPress={() => router.push(editPath)}
+        >
+          {t("edit")}
+        </IBaseButton>
+      }
+    >
+      <IBaseCard className="border border-default-200/60 shadow-sm">
           <IBaseCardBody className="gap-6 p-6">
             <div>
               <h2 className="text-lg font-semibold text-foreground">
@@ -196,6 +191,6 @@ export default function DepartmentViewPage(): React.ReactNode {
             ) : null}
           </IBaseCardBody>
         </IBaseCard>
-    </div>
+    </IBasePageLayout>
   );
 }

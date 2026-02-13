@@ -11,12 +11,13 @@ import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 
-import { IBaseButton, IBaseSpinner } from "@base/client";
+import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
 import { departmentService } from "@mdl/hrm/client/services/DepartmentService";
 
 import DepartmentForm, {
   type DepartmentFormValues,
 } from "./components/DepartmentForm/DepartmentForm";
+import { DepartmentPageSidebar } from "./components/DepartmentPageSidebar/DepartmentPageSidebar";
 
 const DEPARTMENTS_LIST_PATH = "/workspace/modules/hrm/departments";
 
@@ -146,16 +147,13 @@ export default function DepartmentEditPage(): React.ReactNode {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <header>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          {t("editPageTitle")}
-        </h1>
-        <p className="mt-1 text-sm text-default-500">
-          {departmentData.code}
-        </p>
-      </header>
-
+    <IBasePageLayout
+      variant="edit"
+      maxWidth="form"
+      title={t("editPageTitle")}
+      subtitle={departmentData.code}
+      sidebar={<DepartmentPageSidebar />}
+    >
       <DepartmentForm
         mode="edit"
         defaultValues={{
@@ -173,6 +171,6 @@ export default function DepartmentEditPage(): React.ReactNode {
       onCancel={() => router.push(viewPath)}
         onSubmit={handleSubmit}
       />
-    </div>
+    </IBasePageLayout>
   );
 }
