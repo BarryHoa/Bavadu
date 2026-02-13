@@ -112,7 +112,7 @@ ON CONFLICT ("code") DO NOTHING;
 
 -- Seed exchange rates for today
 -- VND always has exchange rate = 1.0
-INSERT INTO "currency_exchange_rate_for_vnd" (
+INSERT INTO "md_base"."currency_exchange_rate_for_vnd" (
   "currency_id",
   "rate_date",
   "exchange_rate",
@@ -137,7 +137,7 @@ SET
   "updated_at" = NOW();
 
 -- USD exchange rate (example: 24500 VND = 1 USD)
-INSERT INTO "currency_exchange_rate_for_vnd" (
+INSERT INTO "md_base"."currency_exchange_rate_for_vnd" (
   "currency_id",
   "rate_date",
   "exchange_rate",
@@ -162,7 +162,7 @@ SET
   "updated_at" = NOW();
 
 -- RUB exchange rate (example: 270 VND = 1 RUB)
-INSERT INTO "currency_exchange_rate_for_vnd" (
+INSERT INTO "md_base"."currency_exchange_rate_for_vnd" (
   "currency_id",
   "rate_date",
   "exchange_rate",
@@ -187,7 +187,7 @@ SET
   "updated_at" = NOW();
 
 -- JPY exchange rate (example: 165 VND = 1 JPY)
-INSERT INTO "currency_exchange_rate_for_vnd" (
+INSERT INTO "md_base"."currency_exchange_rate_for_vnd" (
   "currency_id",
   "rate_date",
   "exchange_rate",
@@ -212,7 +212,7 @@ SET
   "updated_at" = NOW();
 
 -- CNY exchange rate (example: 3400 VND = 1 CNY)
-INSERT INTO "currency_exchange_rate_for_vnd" (
+INSERT INTO "md_base"."currency_exchange_rate_for_vnd" (
   "currency_id",
   "rate_date",
   "exchange_rate",

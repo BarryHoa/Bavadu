@@ -2,6 +2,11 @@
 -- Tạo các schemas PostgreSQL để tách biệt theo module
 
 -- ============================================
+-- Extensions (uuid_generate_v7 for PostgreSQL < 17)
+-- ============================================
+CREATE EXTENSION IF NOT EXISTS pg_uuidv7;
+
+-- ============================================
 -- Create Schemas
 -- ============================================
 
