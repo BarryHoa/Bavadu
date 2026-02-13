@@ -228,7 +228,9 @@
           "department": "Department",
           "jobFamily": "Job Family",
           "backToList": "Back to List",
-          "edit": "Edit"
+          "edit": "Edit",
+          "loading": "Loading position...",
+          "notFound": "Position not found"
         }
       }
     },

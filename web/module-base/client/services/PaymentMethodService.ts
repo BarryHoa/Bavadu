@@ -15,7 +15,7 @@ export interface PaymentMethodDto {
 
 export default class PaymentMethodService {
   getOptionsDropdown() {
-    return dropdownOptionsService.getOptionsDropdown("payment-method.dropdown");
+    return dropdownOptionsService.getOptionsDropdown("base-payment-method.dropdown");
   }
 }
 

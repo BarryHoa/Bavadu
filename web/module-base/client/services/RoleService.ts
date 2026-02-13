@@ -1,6 +1,7 @@
 import type { LocalizeText } from "../interface/LocalizeText";
 
 import ClientHttpService from "@base/client/services/ClientHttpService";
+import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export type Role = {
   id: string;
@@ -82,38 +83,48 @@ export type DeleteRoleResponse = {
   message?: string;
 };
 
-class RoleService extends ClientHttpService {
-  constructor() {
-    super("/api/base/settings/roles");
+class RoleService extends JsonRpcClientService {
+  private get rolesHttp() {
+    return new ClientHttpService("/api/base/settings/roles");
+  }
+
+  private get permissionsHttp() {
+    return new ClientHttpService("/api/base/settings/permissions");
   }
 
   getRoleList() {
-    return this.get<RoleListResponse>("/list");
+    return this.rolesHttp.get<RoleListResponse>("/list");
   }
 
   getRole(id: string) {
-    return this.get<RoleResponse>(`/get?id=${id}`);
+    return this.rolesHttp.get<RoleResponse>(`/get?id=${id}`);
   }
 
-  createRole(payload: CreateRoleRequest) {
-    return this.post<CreateRoleResponse>("/create", payload);
+  async createRole(payload: CreateRoleRequest): Promise<CreateRoleResponse> {
+    const data = await this.call<Role>("base-role.curd.create", {
+      code: payload.code,
+      name: payload.name,
+      description: payload.description,
+      permissionIds: payload.permissionIds,
+    });
+
+    return {
+      success: true,
+      data: data as Role,
+      message: "Role created successfully",
+    };
   }
 
   updateRole(payload: UpdateRoleRequest) {
-    return this.put<UpdateRoleResponse>("/update", payload);
+    return this.rolesHttp.put<UpdateRoleResponse>("/update", payload);
   }
 
   deleteRole(id: string) {
-    return this.delete<DeleteRoleResponse>(`/delete?id=${id}`);
+    return this.rolesHttp.delete<DeleteRoleResponse>(`/delete?id=${id}`);
   }
 
   getPermissionList() {
-    // Create a temporary service instance for permissions endpoint
-    const permissionsService = new ClientHttpService(
-      "/api/base/settings/permissions",
-    );
-
-    return permissionsService.get<PermissionListResponse>("/list");
+    return this.permissionsHttp.get<PermissionListResponse>("/list");
   }
 }
 

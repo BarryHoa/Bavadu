@@ -20,7 +20,7 @@ class GuidelineService extends JsonRpcClientService {
    */
   async getByKey(key: string): Promise<string> {
     const response = await this.call<GuidelineResponse>(
-      "guideline.curd.getByKey",
+      "base-guideline.curd.getByKey",
       { key },
     );
 
@@ -34,7 +34,7 @@ class GuidelineService extends JsonRpcClientService {
    */
   async getByKeyFull(key: string): Promise<GuidelineData | null> {
     const response = await this.call<GuidelineResponse>(
-      "guideline.curd.getByKey",
+      "base-guideline.curd.getByKey",
       { key },
     );
 

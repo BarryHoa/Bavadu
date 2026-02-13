@@ -16,7 +16,7 @@ export interface PaymentTermDto {
 
 export default class PaymentTermService {
   getOptionsDropdown() {
-    return dropdownOptionsService.getOptionsDropdown("payment-term.dropdown");
+    return dropdownOptionsService.getOptionsDropdown("base-payment-term.dropdown");
   }
 }
 

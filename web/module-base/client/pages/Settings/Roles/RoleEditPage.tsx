@@ -5,24 +5,27 @@ import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import IBaseSelectItem from "@/module-base/client/components/IBaseSelect/IBaseSelectItem";
 import {
   IBaseButton,
   IBaseCard,
   IBaseCardBody,
-  IBaseCardHeader,
   IBaseInput,
   IBaseInputMultipleLang,
-  IBaseSelect,
+  IBasePageLayout,
 } from "@base/client/components";
+import RolePermissionMatrix from "./components/RolePermissionMatrix";
+import { useSetBreadcrumbs } from "@base/client/hooks";
 import roleService from "@base/client/services/RoleService";
+
+import { addToast } from "@heroui/toast";
 
 const PERMISSIONS_QUERY_KEY = ["settings", "permissions", "list"] as const;
 const ROLE_QUERY_KEY = (id: string) =>
   ["settings", "roles", "get", id] as const;
 const ROLES_LIST_QUERY_KEY = ["settings", "roles", "list"] as const;
+const ROLES_LIST_PATH = "/workspace/settings/roles";
 
 export default function RoleEditPage() {
   const t = useTranslations("settings.roles");
@@ -39,14 +42,10 @@ export default function RoleEditPage() {
     vi: undefined,
   });
   const [description, setDescription] = useState("");
-  const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>(
-    []
-  );
+  const [selectedPermissionIds, setSelectedPermissionIds] = useState<
+    Set<string>
+  >(new Set());
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "error" | "success";
-  } | null>(null);
 
   const roleQuery = useQuery({
     queryKey: ROLE_QUERY_KEY(id),
@@ -67,15 +66,25 @@ export default function RoleEditPage() {
     },
   });
 
+  const role = roleQuery.data;
+  const breadcrumbs = useMemo(
+    () => [
+      { label: t("listTitle"), href: ROLES_LIST_PATH },
+      { label: role ? t("edit.title") : t("loading") },
+    ],
+    [t, role],
+  );
+  useSetBreadcrumbs(breadcrumbs);
+
   useEffect(() => {
     if (roleQuery.data) {
-      const role = roleQuery.data;
+      const data = roleQuery.data;
 
-      setCode(role.code);
-      setName(role.name);
-      setDescription(role.description || "");
+      setCode(data.code);
+      setName(data.name);
+      setDescription(data.description || "");
       setSelectedPermissionIds(
-        role.permissions ? role.permissions.map((p) => p.id) : []
+        new Set(data.permissions ? data.permissions.map((p) => p.id) : []),
       );
     }
   }, [roleQuery.data]);
@@ -89,18 +98,23 @@ export default function RoleEditPage() {
       permissionIds?: string[];
     }) => roleService.updateRole(payload),
     onSuccess: () => {
-      setToast({ message: t("toast.updateSuccess"), type: "success" });
+      addToast({
+        title: t("toast.updateSuccess"),
+        color: "success",
+        variant: "solid",
+      });
       queryClient.invalidateQueries({ queryKey: ROLES_LIST_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ROLE_QUERY_KEY(id) });
-      setTimeout(() => {
-        router.push("/settings/roles");
-      }, 1500);
+      router.push(ROLES_LIST_PATH);
     },
     onError: (error) => {
       const errorMessage =
         error instanceof Error ? error.message : t("toast.updateError");
-
-      setToast({ message: errorMessage, type: "error" });
+      addToast({
+        title: errorMessage,
+        color: "danger",
+        variant: "solid",
+      });
     },
   });
 
@@ -133,7 +147,9 @@ export default function RoleEditPage() {
       name,
       description: description.trim() || undefined,
       permissionIds:
-        selectedPermissionIds.length > 0 ? selectedPermissionIds : undefined,
+        selectedPermissionIds.size > 0
+          ? Array.from(selectedPermissionIds)
+          : undefined,
     });
   }, [
     id,
@@ -145,62 +161,53 @@ export default function RoleEditPage() {
     updateRoleMutation,
   ]);
 
-  const role = roleQuery.data;
   const permissions = permissionsQuery.data ?? [];
 
   if (roleQuery.isLoading) {
     return (
-      <IBaseCard>
-        <IBaseCardBody>
-          <p>{t("loading")}</p>
-        </IBaseCardBody>
-      </IBaseCard>
+      <IBasePageLayout variant="edit" title={t("loading")}>
+        <IBaseCard>
+          <IBaseCardBody>
+            <p>{t("loading")}</p>
+          </IBaseCardBody>
+        </IBaseCard>
+      </IBasePageLayout>
     );
   }
 
   if (!role) {
     return (
-      <IBaseCard>
-        <IBaseCardBody>
-          <p>{t("notFound")}</p>
-        </IBaseCardBody>
-      </IBaseCard>
+      <IBasePageLayout variant="edit" title={t("notFound")}>
+        <IBaseCard>
+          <IBaseCardBody>
+            <p>{t("notFound")}</p>
+          </IBaseCardBody>
+        </IBaseCard>
+      </IBasePageLayout>
     );
   }
 
   if (role.isSystem) {
     return (
-      <IBaseCard>
-        <IBaseCardBody>
-          <p>{t("cannotEditSystemRole")}</p>
-        </IBaseCardBody>
-      </IBaseCard>
+      <IBasePageLayout variant="edit" title={t("edit.title")}>
+        <IBaseCard>
+          <IBaseCardBody>
+            <p>{t("cannotEditSystemRole")}</p>
+          </IBaseCardBody>
+        </IBaseCard>
+      </IBasePageLayout>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <IBasePageLayout
+      variant="edit"
+      maxWidth="form"
+      title={t("edit.title")}
+    >
       <IBaseCard>
-        <IBaseCardHeader className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">{t("edit.title")}</h2>
-          <div className="flex gap-2">
-            <IBaseButton
-              variant="light"
-              onPress={() => router.push("/settings/roles")}
-            >
-              {actionsT("cancel")}
-            </IBaseButton>
-            <IBaseButton
-              color="primary"
-              isLoading={updateRoleMutation.isPending}
-              onPress={handleSubmit}
-            >
-              {actionsT("save")}
-            </IBaseButton>
-          </div>
-        </IBaseCardHeader>
         <IBaseCardBody className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <IBaseInput
               isRequired
               description={t("form.codeDescription")}
@@ -227,44 +234,38 @@ export default function RoleEditPage() {
               />
             </div>
             <div className="md:col-span-2">
-              <IBaseSelect
-                description={t("form.permissionsDescription")}
+              <label className="mb-2 block text-sm font-medium text-foreground">
+                {t("form.defaultPermissions")}
+              </label>
+              <RolePermissionMatrix
+                permissions={permissions}
+                selectedIds={selectedPermissionIds}
                 isLoading={permissionsQuery.isLoading}
-                label={t("form.defaultPermissions")}
-                placeholder={t("form.selectPermissions")}
-                selectedKeys={selectedPermissionIds}
-                selectionMode="multiple"
-                onSelectionChange={(keys) => {
-                  setSelectedPermissionIds(Array.from(keys) as string[]);
-                }}
-              >
-                {permissions.map((permission) => (
-                  <IBaseSelectItem
-                    key={permission.id}
-                    textValue={permission.key}
-                  >
-                    {permission.key} - {permission.module}.{permission.resource}
-                    .{permission.action}
-                  </IBaseSelectItem>
-                ))}
-              </IBaseSelect>
+                onSelectionChange={setSelectedPermissionIds}
+              />
             </div>
+          </div>
+
+          {/* §22.3: Nút chính ở cuối form; §22.4: Full-page Primary trái, Cancel phải */}
+          <div className="flex flex-wrap items-center gap-3 border-t border-default-200 pt-6">
+            <IBaseButton
+              color="primary"
+              isLoading={updateRoleMutation.isPending}
+              size="md"
+              onPress={handleSubmit}
+            >
+              {actionsT("save")}
+            </IBaseButton>
+            <IBaseButton
+              size="md"
+              variant="light"
+              onPress={() => router.push(ROLES_LIST_PATH)}
+            >
+              {actionsT("cancel")}
+            </IBaseButton>
           </div>
         </IBaseCardBody>
       </IBaseCard>
-      {toast && (
-        <div className="fixed right-4 top-4 z-50 flex max-w-sm flex-col gap-2">
-          <div
-            className={`rounded-medium px-4 py-3 text-sm shadow-large ${
-              toast.type === "error"
-                ? "bg-danger-100 text-danger"
-                : "bg-success-100 text-success"
-            }`}
-          >
-            {toast.message}
-          </div>
-        </div>
-      )}
-    </div>
+    </IBasePageLayout>
   );
 }

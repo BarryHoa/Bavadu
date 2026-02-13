@@ -15,7 +15,7 @@ export interface ShippingTermDto {
 
 export default class ShippingTermService {
   getOptionsDropdown() {
-    return dropdownOptionsService.getOptionsDropdown("shipping-term.dropdown");
+    return dropdownOptionsService.getOptionsDropdown("base-shipping-term.dropdown");
   }
 }
 

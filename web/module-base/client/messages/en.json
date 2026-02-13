@@ -8,6 +8,8 @@
     "description": "Description",
     "type": "Type",
     "active": "Active",
+    "inactive": "Inactive",
+    "loading": "Loading...",
     "master": "Master",
     "variant": "Variant",
     "another": "another",
@@ -27,7 +29,8 @@
       "maxLength": "Maximum {count} characters allowed",
       "invalid": "Invalid value",
       "barcodeRequired": "Barcode is required",
-      "skuRequired": "SKU is required"
+      "skuRequired": "SKU is required",
+      "dataNotFound": "Data not found"
     },
     "actions": {
       "save": "Save",
@@ -211,6 +214,7 @@
   },
   "settings": {
     "roles": {
+      "listTitle": "Roles and Permission",
       "loading": "Loading role...",
       "notFound": "Role not found",
       "cannotEditSystemRole": "System roles cannot be edited",
@@ -241,6 +245,29 @@
         "empty": {
           "search": "No roles match the current search.",
           "default": "No roles found."
+        }
+      },
+      "permissionMatrix": {
+        "legend": "Role permissions",
+        "description": "Tick the permissions this role should have. Permissions are grouped by module and resource. Click resource name or checkbox to toggle.",
+        "loading": "Loading permissions...",
+        "noPermissions": "No permissions available.",
+        "selectAll": "Select all",
+        "deselectAll": "Deselect all",
+        "selectModule": "Select all in module",
+        "deselectModule": "Deselect all in module",
+        "selectAllInModule": "Select or deselect all permissions in this module",
+        "all": "All",
+        "resource": "Resource",
+        "action": {
+          "view": "View",
+          "create": "Create",
+          "update": "Update",
+          "delete": "Delete",
+          "print": "Print",
+          "export": "Export",
+          "import": "Import",
+          "approve": "Approve"
         }
       },
       "form": {

@@ -29,7 +29,7 @@ interface Country {
 class LocationService extends JsonRpcClientService {
   async getCountries() {
     return this.call<{ success: boolean; data: Country[]; message: string }>(
-      "location.curd.getCountries",
+      "base-location.curd.getCountries",
       {},
     );
   }
@@ -45,7 +45,7 @@ class LocationService extends JsonRpcClientService {
       success: boolean;
       data: AdministrativeUnit[];
       message: string;
-    }>("location.curd.getLocationByCountryCode", {
+    }>("base-location.curd.getLocationByCountryCode", {
       countryCode,
       ...params,
     });
@@ -56,7 +56,7 @@ class LocationService extends JsonRpcClientService {
       success: boolean;
       data: AdministrativeUnit[];
       message: string;
-    }>("location.curd.getLocationBy", {
+    }>("base-location.curd.getLocationBy", {
       parentId,
       type,
     });

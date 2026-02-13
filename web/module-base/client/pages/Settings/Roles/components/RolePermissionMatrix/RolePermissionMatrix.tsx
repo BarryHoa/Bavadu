@@ -1,0 +1,372 @@
+"use client";
+
+import type { Permission } from "@base/client/services/RoleService";
+
+import { useCallback, useId, useMemo } from "react";
+
+import {
+  IBaseAccordion,
+  IBaseAccordionItem,
+  IBaseButton,
+  IBaseCheckbox,
+  IBaseSwitch,
+} from "@base/client/components";
+import { useTranslations } from "next-intl";
+
+/** Group permissions by module → resource → action */
+function groupPermissions(permissions: Permission[]) {
+  const byModule = new Map<
+    string,
+    Map<string, Map<string, Permission>>
+  >();
+
+  for (const p of permissions) {
+    if (!byModule.has(p.module)) {
+      byModule.set(p.module, new Map());
+    }
+    const byResource = byModule.get(p.module)!;
+    if (!byResource.has(p.resource)) {
+      byResource.set(p.resource, new Map());
+    }
+    const byAction = byResource.get(p.resource)!;
+    byAction.set(p.action, p);
+  }
+
+  return byModule;
+}
+
+const ACTION_ORDER = [
+  "view",
+  "create",
+  "update",
+  "delete",
+  "print",
+  "export",
+  "import",
+  "approve",
+];
+
+/** Get ordered actions for a module - known actions first, then any extras */
+function getOrderedActions(perms: Permission[]): string[] {
+  const seen = new Set(perms.map((p) => p.action));
+  const ordered = ACTION_ORDER.filter((a) => seen.has(a));
+  const rest = perms
+    .map((p) => p.action)
+    .filter((a) => !ACTION_ORDER.includes(a));
+  const uniqueRest = [...new Set(rest)];
+
+  return [...ordered, ...uniqueRest.sort()];
+}
+
+const formatLabel = (s: string) =>
+  s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, " ");
+
+function getActionLabel(t: (key: string) => string, action: string): string {
+  try {
+    const label = t(`action.${action}`);
+    if (label && !label.includes("permissionMatrix")) return label;
+  } catch {
+    /* ignore */
+  }
+  return formatLabel(action);
+}
+
+export interface RolePermissionMatrixProps {
+  permissions: Permission[];
+  selectedIds: Set<string>;
+  isLoading?: boolean;
+  onSelectionChange: (selectedIds: Set<string>) => void;
+}
+
+export default function RolePermissionMatrix({
+  permissions,
+  selectedIds,
+  isLoading,
+  onSelectionChange,
+}: RolePermissionMatrixProps) {
+  const t = useTranslations("settings.roles.permissionMatrix");
+  const fieldsetId = useId();
+
+  const grouped = useMemo(
+    () => groupPermissions(permissions),
+    [permissions],
+  );
+
+  const togglePermission = useCallback(
+    (perm: Permission, checked: boolean) => {
+      const next = new Set(selectedIds);
+      if (checked) {
+        next.add(perm.id);
+      } else {
+        next.delete(perm.id);
+      }
+      onSelectionChange(next);
+    },
+    [selectedIds, onSelectionChange],
+  );
+
+  const toggleResource = useCallback(
+    (moduleKey: string, resourceKey: string, checked: boolean) => {
+      const byResource = grouped.get(moduleKey)?.get(resourceKey);
+      if (!byResource) return;
+      const next = new Set(selectedIds);
+      for (const [, perm] of byResource) {
+        if (checked) next.add(perm.id);
+        else next.delete(perm.id);
+      }
+      onSelectionChange(next);
+    },
+    [grouped, selectedIds, onSelectionChange],
+  );
+
+  const toggleModule = useCallback(
+    (moduleKey: string, checked: boolean) => {
+      const byResource = grouped.get(moduleKey);
+      if (!byResource) return;
+      const next = new Set(selectedIds);
+      for (const [, byAction] of byResource) {
+        for (const [, perm] of byAction) {
+          if (checked) next.add(perm.id);
+          else next.delete(perm.id);
+        }
+      }
+      onSelectionChange(next);
+    },
+    [grouped, selectedIds, onSelectionChange],
+  );
+
+  const selectAll = useCallback(() => {
+    onSelectionChange(
+      new Set(permissions.map((p) => p.id)),
+    );
+  }, [permissions, onSelectionChange]);
+
+  const deselectAll = useCallback(() => {
+    onSelectionChange(new Set());
+  }, [onSelectionChange]);
+
+  if (isLoading) {
+    return (
+      <div className="rounded-lg border border-default-200 bg-default-50 px-4 py-8 text-center text-sm text-default-500">
+        {t("loading")}
+      </div>
+    );
+  }
+
+  if (permissions.length === 0) {
+    return (
+      <div className="rounded-lg border border-default-200 bg-default-50 px-4 py-8 text-center text-sm text-default-500">
+        {t("noPermissions")}
+      </div>
+    );
+  }
+
+  return (
+    <fieldset
+      id={fieldsetId}
+      className="flex flex-col gap-4 rounded-lg border border-default-200 bg-default-50/30 px-4 py-4"
+      aria-describedby={`${fieldsetId}-description`}
+    >
+      <legend className="sr-only">{t("legend")}</legend>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p
+          id={`${fieldsetId}-description`}
+          className="text-sm text-default-600"
+        >
+          {t("description")}
+        </p>
+        <div className="flex shrink-0 gap-2">
+          <IBaseButton
+            size="sm"
+            color="primary"
+            variant="flat"
+            onPress={selectAll}
+            aria-label={t("selectAll")}
+          >
+            {t("selectAll")}
+          </IBaseButton>
+          <IBaseButton
+            size="sm"
+            variant="light"
+            onPress={deselectAll}
+            aria-label={t("deselectAll")}
+          >
+            {t("deselectAll")}
+          </IBaseButton>
+        </div>
+      </div>
+
+      <IBaseAccordion
+        selectionMode="multiple"
+        defaultExpandedKeys={Array.from(grouped.keys())}
+        className="divide-y divide-default-200"
+        itemClasses={{
+          base: "border-0",
+          heading: "py-3",
+          trigger: "px-0 py-3 min-h-0",
+          content: "pb-4 pt-0",
+        }}
+      >
+        {Array.from(grouped.entries()).map(([moduleKey, byResource]) => {
+          const modulePerms = Array.from(byResource.values()).flatMap((m) =>
+            Array.from(m.values()),
+          );
+          const moduleActions = getOrderedActions(modulePerms);
+          const moduleSelectedCount = modulePerms.filter((p) =>
+            selectedIds.has(p.id),
+          ).length;
+          const moduleAllSelected =
+            moduleSelectedCount === modulePerms.length;
+
+          return (
+            <IBaseAccordionItem
+              key={moduleKey}
+              aria-label={formatLabel(moduleKey)}
+              classNames={{
+                base: "rounded-lg px-3 py-1 my-2 first:mt-0 bg-default-100/60",
+              }}
+              title={
+                <div className="flex w-full items-center justify-between gap-4 pr-2">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <span className="truncate font-semibold text-default-800">
+                      {formatLabel(moduleKey)}
+                    </span>
+                    <span className="shrink-0 text-xs tabular-nums text-default-500">
+                      {moduleSelectedCount}/{modulePerms.length}
+                    </span>
+                  </div>
+                  <div
+                    className="flex shrink-0 items-center gap-2"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <IBaseSwitch
+                      size="sm"
+                      isSelected={moduleAllSelected}
+                      onValueChange={(checked) =>
+                        toggleModule(moduleKey, checked)
+                      }
+                      aria-label={t("selectAllInModule")}
+                    />
+                    <span className="text-xs font-medium text-default-700">
+                      {t("all")}
+                    </span>
+                  </div>
+                </div>
+              }
+            >
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[420px] text-sm">
+                  <thead>
+                    <tr className="border-b border-default-200">
+                      <th
+                        scope="col"
+                        className="px-3 py-3 text-left text-sm font-semibold text-default-700"
+                      >
+                        {t("resource")}
+                      </th>
+                      {moduleActions.map((action) => (
+                        <th
+                          key={action}
+                          scope="col"
+                          className="px-2 py-3 text-center text-sm font-semibold text-default-600"
+                        >
+                          {getActionLabel(t, action)}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Array.from(byResource.entries()).map(
+                      ([resourceKey, byAction]) => {
+                        const resourcePerms = Array.from(
+                          byAction.values(),
+                        );
+                        const resourceSelectedCount =
+                          resourcePerms.filter((p) =>
+                            selectedIds.has(p.id),
+                          ).length;
+                        const resourceAllSelected =
+                          resourceSelectedCount === resourcePerms.length;
+                        const resourceIndeterminate =
+                          resourceSelectedCount > 0 && !resourceAllSelected;
+
+                        const resourceLabel = formatLabel(resourceKey);
+                        const resourceCheckboxId = `${fieldsetId}-${moduleKey}-${resourceKey}`;
+
+                        return (
+                          <tr
+                            key={resourceKey}
+                            className="min-h-[44px] border-b border-default-100 last:border-0 hover:bg-default-50/50"
+                          >
+                            <td className="px-3 py-3">
+                              <label
+                                htmlFor={resourceCheckboxId}
+                                className="flex min-h-[44px] cursor-pointer items-center gap-3 py-1"
+                              >
+                                <IBaseCheckbox
+                                  id={resourceCheckboxId}
+                                  isSelected={resourceAllSelected}
+                                  isIndeterminate={resourceIndeterminate}
+                                  onValueChange={(checked) =>
+                                    toggleResource(
+                                      moduleKey,
+                                      resourceKey,
+                                      !!checked,
+                                    )
+                                  }
+                                  aria-label={`${t("resource")}: ${resourceLabel}`}
+                                />
+                                <span className="font-medium text-default-800">
+                                  {resourceLabel}
+                                </span>
+                              </label>
+                            </td>
+                            {moduleActions.map((action) => {
+                              const perm = byAction.get(action);
+
+                              if (!perm) {
+                                return (
+                                  <td
+                                    key={action}
+                                    className="min-h-[44px] px-2 py-3 text-center"
+                                  >
+                                    —
+                                  </td>
+                                );
+                              }
+
+                              const isChecked = selectedIds.has(perm.id);
+                              const actionCheckboxId = `${fieldsetId}-${perm.id}`;
+
+                              return (
+                                <td
+                                  key={action}
+                                  className="px-2 py-3 text-center align-middle"
+                                >
+                                  <div className="flex min-h-[44px] min-w-[44px] items-center justify-center">
+                                    <IBaseCheckbox
+                                    id={actionCheckboxId}
+                                    isSelected={isChecked}
+                                    onValueChange={(checked) =>
+                                      togglePermission(perm, !!checked)
+                                    }
+                                    aria-label={`${resourceLabel} - ${getActionLabel(t, action)}`}
+                                    />
+                                  </div>
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        );
+                      },
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </IBaseAccordionItem>
+          );
+        })}
+      </IBaseAccordion>
+    </fieldset>
+  );
+}

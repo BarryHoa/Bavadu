@@ -24,7 +24,7 @@ import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import roleService, { type Role } from "@base/client/services/RoleService";
 
 const ROLES_LIST_QUERY_KEY = ["settings", "roles", "list"] as const;
-const BASE_PATH = "/settings/roles";
+const BASE_PATH = "/workspace/settings/roles";
 
 type RoleRow = Role & {
   createdAt?: number | string | null;
@@ -63,14 +63,7 @@ export default function RolesListPage() {
 
   const getActionMenuItems = useCallback(
     (row: RoleRow) => {
-      const baseActions: ActionItem[] = [
-        {
-          placement: "menu",
-          key: "view",
-          label: actionsT("view"),
-          href: `${BASE_PATH}/view/${row.id}`,
-        },
-      ];
+      const baseActions: ActionItem[] = [];
 
       if (!row.isSystem) {
         baseActions.push(
@@ -101,8 +94,8 @@ export default function RolesListPage() {
         key: "code",
         label: t("table.columns.code"),
         render: (value, row) =>
-          row?.id ? (
-            <IBaseLink href={`${BASE_PATH}/view/${row.id}`}>
+          row?.id && !row?.isSystem ? (
+            <IBaseLink href={`${BASE_PATH}/edit/${row.id}`}>
               {value as string}
             </IBaseLink>
           ) : (
@@ -164,7 +157,7 @@ export default function RolesListPage() {
         ]}
         columns={columns}
         isDummyData={false}
-        model="role.list"
+        model="base-role.list"
       />
       <IBaseModal isOpen={!!deleteConfirm} onClose={handleCloseModal}>
         <IBaseModalContent>

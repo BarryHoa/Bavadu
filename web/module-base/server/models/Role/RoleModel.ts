@@ -27,7 +27,8 @@ export interface RoleInput {
   code: string;
   name: LocaleDataType<string>;
   description?: string | null;
-  permissions: string[];
+  permissions?: string[]; // permission keys
+  permissionIds?: string[]; // permission UUIDs (preferred when from client)
   isSystem?: boolean;
   isActive?: boolean;
 }
@@ -154,6 +155,42 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
     return this.getRoleById(params.id);
   };
 
+  /**
+   * RPC entry point: base-role.curd.create
+   */
+  create = async (params: {
+    code: string;
+    name: LocaleDataType<string>;
+    description?: string | null;
+    permissionIds?: string[];
+  }): Promise<RoleRow> => {
+    const nameNorm = this.normalizeLocaleInput(params.name);
+
+    if (!params.code?.trim()) {
+      throw new Error("Code is required");
+    }
+    if (!nameNorm || (!nameNorm.en && !nameNorm.vi)) {
+      throw new Error("Name is required");
+    }
+
+    const existing = await this.getRoleByCode(params.code.trim());
+
+    if (existing) {
+      throw new Error("Role with this code already exists");
+    }
+
+    const roleInput: RoleInput = {
+      code: params.code.trim(),
+      name: nameNorm,
+      description: params.description ?? null,
+      permissionIds: Array.isArray(params.permissionIds) ? params.permissionIds : [],
+      isSystem: false,
+      isActive: true,
+    };
+
+    return this.createRole(roleInput);
+  };
+
   createRole = async (payload: RoleInput): Promise<RoleRow> => {
     const now = new Date();
     const insertData = {
@@ -179,36 +216,47 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
     }
 
     // Add permissions to role_permissions_default if provided
-    if (payload.permissions && payload.permissions.length > 0) {
-      // Get permission IDs from keys
-      const permissions = await this.db
-        .select({ id: base_tb_permissions.id })
-        .from(base_tb_permissions)
-        .where(
-          and(
-            eq(base_tb_permissions.isActive, true),
-            // Note: We'd need to filter by keys, but for now we'll handle this differently
-          ),
-        );
+    const permissionIdsToAdd: string[] = [];
 
-      // For now, we'll need to match permission keys to IDs
-      // This is a simplified version - you may want to improve this
+    if (payload.permissionIds && payload.permissionIds.length > 0) {
+      // Use permission IDs directly
+      for (const permId of payload.permissionIds) {
+        const perm = await this.db
+          .select({ id: base_tb_permissions.id })
+          .from(base_tb_permissions)
+          .where(
+            and(
+              eq(base_tb_permissions.id, permId),
+              eq(base_tb_permissions.isActive, true),
+            ),
+          )
+          .limit(1);
+        if (perm[0]) permissionIdsToAdd.push(perm[0].id);
+      }
+    } else if (payload.permissions && payload.permissions.length > 0) {
+      // Look up by permission keys
       for (const permKey of payload.permissions) {
         const perm = await this.db
           .select({ id: base_tb_permissions.id })
           .from(base_tb_permissions)
-          .where(eq(base_tb_permissions.key, permKey))
+          .where(
+            and(
+              eq(base_tb_permissions.key, permKey),
+              eq(base_tb_permissions.isActive, true),
+            ),
+          )
           .limit(1);
-
-        if (perm[0]) {
-          await this.db.insert(base_tb_role_permissions_default).values({
-            roleId: created.id,
-            permissionId: perm[0].id,
-            isActive: true,
-            createdAt: now,
-          });
-        }
+        if (perm[0]) permissionIdsToAdd.push(perm[0].id);
       }
+    }
+
+    for (const permissionId of permissionIdsToAdd) {
+      await this.db.insert(base_tb_role_permissions_default).values({
+        roleId: created.id,
+        permissionId,
+        isActive: true,
+        createdAt: now,
+      });
     }
 
     const role = await this.getRoleById(created.id);

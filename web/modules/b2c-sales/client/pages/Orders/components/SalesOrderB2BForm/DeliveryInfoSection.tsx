@@ -39,7 +39,7 @@ export default function DeliveryInfoSection({
               errorMessage={fieldState.error?.message}
               isInvalid={fieldState.invalid}
               label={t("paymentMethod")}
-              model="payment-method"
+              model="base-payment-method"
               selectedKey={field.value}
               size="sm"
               onSelectionChange={(key) => {
@@ -75,7 +75,7 @@ export default function DeliveryInfoSection({
               errorMessage={fieldState.error?.message}
               isInvalid={fieldState.invalid}
               label={t("shippingMethod")}
-              model="shipping-method"
+              model="base-shipping-method"
               selectedKey={field.value}
               size="sm"
               onSelectionChange={(key) => {

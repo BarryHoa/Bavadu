@@ -16,7 +16,7 @@ export interface TaxRateDto {
 
 export default class TaxRateService {
   getOptionsDropdown() {
-    return dropdownOptionsService.getOptionsDropdown("tax-rate.dropdown");
+    return dropdownOptionsService.getOptionsDropdown("base-tax-rate.dropdown");
   }
 }
 

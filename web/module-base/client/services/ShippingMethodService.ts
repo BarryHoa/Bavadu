@@ -17,7 +17,7 @@ export interface ShippingMethodDto {
 export default class ShippingMethodService {
   getOptionsDropdown() {
     return dropdownOptionsService.getOptionsDropdown(
-      "shipping-method.dropdown",
+      "base-shipping-method.dropdown",
     );
   }
 }

@@ -5,18 +5,18 @@
   "category": "System",
   "icon": "Package",
   "models": {
-    "user.curd": "Users/UserModel",
-    "role.curd": "Role/RoleModel",
-    "role.list": "Role/RoleViewListModel",
-    "role-permission.curd": "RolePermission/RolePermissionModel",
-    "user-role.curd": "UserRole/UserRoleModel",
-    "user-permission.curd": "UserPermission/UserPermissionModel",
-    "location.curd": "Locations/LocationModel",
-    "guideline.curd": "Guidelines/GuidelineModel",
-    "payment-method.dropdown": "PaymentMethod/PaymentMethodDropdownListModel",
-    "payment-term.dropdown": "PaymentTerm/PaymentTermDropdownListModel",
-    "shipping-method.dropdown": "ShippingMethod/ShippingMethodDropdownListModel",
-    "shipping-term.dropdown": "ShippingTerm/ShippingTermDropdownListModel",
-    "tax-rate.dropdown": "TaxRate/TaxRateDropdownListModel"
+    "base-user.curd": "Users/UserModel",
+    "base-role.curd": "Role/RoleModel",
+    "base-role.list": "Role/RoleViewListModel",
+    "base-role-permission.curd": "RolePermission/RolePermissionModel",
+    "base-user-role.curd": "UserRole/UserRoleModel",
+    "base-user-permission.curd": "UserPermission/UserPermissionModel",
+    "base-location.curd": "Locations/LocationModel",
+    "base-guideline.curd": "Guidelines/GuidelineModel",
+    "base-payment-method.dropdown": "PaymentMethod/PaymentMethodDropdownListModel",
+    "base-payment-term.dropdown": "PaymentTerm/PaymentTermDropdownListModel",
+    "base-shipping-method.dropdown": "ShippingMethod/ShippingMethodDropdownListModel",
+    "base-shipping-term.dropdown": "ShippingTerm/ShippingTermDropdownListModel",
+    "base-tax-rate.dropdown": "TaxRate/TaxRateDropdownListModel"
   }
 }
