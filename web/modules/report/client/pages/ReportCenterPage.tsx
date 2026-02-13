@@ -1,6 +1,6 @@
 "use client";
 
-import { IBaseTabs, IBaseTab } from "@base/client/components";
+import { IBaseTabsPrimary, IBaseTabPrimary } from "@base/client/components";
 import { IBaseCard } from "@base/client";
 import ReactECharts from "echarts-for-react";
 import { useTranslations } from "next-intl";
@@ -47,8 +47,8 @@ export default function ReportCenterPage() {
         </div>
       </div>
 
-      <IBaseTabs aria-label={t("ariaLabel")} color="primary">
-        <IBaseTab key="overview" title={t("tabs.overview.title")}>
+      <IBaseTabsPrimary aria-label={t("ariaLabel")}>
+        <IBaseTabPrimary key="overview" title={t("tabs.overview.title")}>
           <IBaseCard className="p-4">
             <div className="mb-3 text-sm font-medium text-slate-700">
               {t("tabs.overview.salesOverTime")}
@@ -60,16 +60,16 @@ export default function ReportCenterPage() {
               style={{ width: "100%", height: 360 }}
             />
           </IBaseCard>
-        </IBaseTab>
+        </IBaseTabPrimary>
 
-        <IBaseTab key="inventory" title={t("tabs.inventory.title")}>
+        <IBaseTabPrimary key="inventory" title={t("tabs.inventory.title")}>
           <IBaseCard className="p-4">
             <div className="text-sm text-slate-500">
               {t("tabs.inventory.placeholder")}
             </div>
           </IBaseCard>
-        </IBaseTab>
-      </IBaseTabs>
+        </IBaseTabPrimary>
+      </IBaseTabsPrimary>
     </div>
   );
 }

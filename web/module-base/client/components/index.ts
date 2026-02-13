@@ -37,7 +37,7 @@ export * from "./IBaseSpacer";
 export * from "./IBaseSpinner";
 export * from "./IBaseSwitch";
 export * from "./IBaseTable";
-export * from "./IBaseTabs";
+export * from "./IBaseTabsPrimary";
 export * from "./IBaseTextarea";
 export * from "./IBaseTooltip";
 export * from "./IBaseUploadImageDrag";

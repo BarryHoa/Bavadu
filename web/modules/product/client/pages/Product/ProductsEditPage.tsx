@@ -1,12 +1,10 @@
 "use client";
 
-import { IBaseButton } from "@base/client";
-import { IBaseSpinner } from "@base/client";
-import { addToast } from "@base/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useCallback } from "react";
+
+import { addToast, IBaseButton, IBaseSpinner } from "@base/client";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
 
 import ProductForm from "../../components/Product/ProductForm";
@@ -165,21 +163,6 @@ export default function ProductsEditPage(): React.ReactNode {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <IBaseButton
-          isDisabled={updateMutation.isPending}
-          size="sm"
-          startContent={<ArrowLeft size={14} />}
-          variant="light"
-          onPress={() => router.back()}
-        >
-          Back
-        </IBaseButton>
-        <span className="text-small text-default-500">
-          Editing product #{productId}
-        </span>
-      </div>
-
       <ProductForm
         initialValues={initialFormValues}
         loading={updateMutation.isPending}

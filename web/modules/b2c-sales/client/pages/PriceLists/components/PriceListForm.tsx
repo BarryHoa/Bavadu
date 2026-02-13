@@ -1,6 +1,6 @@
 "use client";
 
-import { IBaseTabs, SelectItemOption, IBaseTab } from "@base/client/components";
+import { IBaseTabsPrimary, SelectItemOption, IBaseTabPrimary } from "@base/client/components";
 import { Control, UseFormSetValue } from "react-hook-form";
 
 import ExplicitPricingTab from "./ExplicitPricingTab";
@@ -44,15 +44,14 @@ export default function PriceListForm({
   brandOptions = [],
 }: PriceListFormProps) {
   return (
-    <IBaseTabs
+    <IBaseTabsPrimary
       aria-label="Price List Form Tabs"
       classNames={{
         tab: "max-w-[200px]",
         tabContent: "truncate",
       }}
-      color="primary"
     >
-      <IBaseTab key="main" title="Main">
+      <IBaseTabPrimary key="main" title="Main">
         <MainTab
           channelOptions={channelOptions}
           control={control}
@@ -65,24 +64,24 @@ export default function PriceListForm({
           storeOptions={storeOptions}
           typeOptions={typeOptions}
         />
-      </IBaseTab>
+      </IBaseTabPrimary>
 
-      <IBaseTab key="rules" title="Rules and Conditions">
+      <IBaseTabPrimary key="rules" title="Rules and Conditions">
         <RulesAndConditionsTab
           brandOptions={brandOptions}
           categoryOptions={categoryOptions}
           control={control}
           errors={errors}
         />
-      </IBaseTab>
+      </IBaseTabPrimary>
 
-      <IBaseTab key="pricing" title="Explicit Pricing">
+      <IBaseTabPrimary key="pricing" title="Explicit Pricing">
         <ExplicitPricingTab
           control={control}
           errors={errors}
           setValue={setValue}
         />
-      </IBaseTab>
-    </IBaseTabs>
+      </IBaseTabPrimary>
+    </IBaseTabsPrimary>
   );
 }

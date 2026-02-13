@@ -1,6 +1,7 @@
 "use client";
 
-import { IBaseCard, IBaseCardBody, IBaseTab, IBaseTabs } from "@base/client";
+import { IBaseCard, IBaseCardBody } from "@base/client";
+import { IBaseTabPrimary, IBaseTabsPrimary } from "@base/client/components";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 
@@ -37,8 +38,8 @@ export default function PriceListB2CViewPage(): React.ReactNode {
       <h1 className="text-2xl font-bold">
         {name.vi || name.en || priceList.code}
       </h1>
-      <IBaseTabs>
-        <IBaseTab key="info" title="Information">
+      <IBaseTabsPrimary>
+        <IBaseTabPrimary key="info" title="Information">
           <IBaseCard>
             <IBaseCardBody className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
@@ -120,8 +121,8 @@ export default function PriceListB2CViewPage(): React.ReactNode {
               </div>
             </IBaseCardBody>
           </IBaseCard>
-        </IBaseTab>
-        <IBaseTab key="items" title="Price List Items">
+        </IBaseTabPrimary>
+        <IBaseTabPrimary key="items" title="Price List Items">
           <IBaseCard>
             <IBaseCardBody>
               <p className="text-gray-500">
@@ -129,8 +130,8 @@ export default function PriceListB2CViewPage(): React.ReactNode {
               </p>
             </IBaseCardBody>
           </IBaseCard>
-        </IBaseTab>
-        <IBaseTab key="rules" title="Pricing Rules">
+        </IBaseTabPrimary>
+        <IBaseTabPrimary key="rules" title="Pricing Rules">
           <IBaseCard>
             <IBaseCardBody>
               <p className="text-gray-500">
@@ -138,8 +139,8 @@ export default function PriceListB2CViewPage(): React.ReactNode {
               </p>
             </IBaseCardBody>
           </IBaseCard>
-        </IBaseTab>
-      </IBaseTabs>
+        </IBaseTabPrimary>
+      </IBaseTabsPrimary>
     </div>
   );
 }

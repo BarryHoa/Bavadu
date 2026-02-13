@@ -3,10 +3,6 @@
 import type { Resolver, SubmitHandler } from "react-hook-form";
 import type { VariantFieldValue } from "./types";
 
-import { IBaseTabs, IBaseTooltip, SelectItemOption, IBaseTab,  } from "@base/client/components";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { IBaseButton } from "@base/client";
-import { IBaseCard, IBaseCardBody } from "@base/client";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
 import { HelpCircle, Plus } from "lucide-react";
@@ -18,6 +14,15 @@ import {
   useForm,
   useWatch,
 } from "react-hook-form";
+
+import { IBaseButton, IBaseCard, IBaseCardBody } from "@base/client";
+import {
+  IBaseTabPrimary,
+  IBaseTabsPrimary,
+  IBaseTooltip,
+  SelectItemOption,
+} from "@base/client/components";
+import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { MediaService } from "@base/client/services";
 
 import {
@@ -69,7 +74,10 @@ export default function ProductForm({
   // React Compiler will automatically optimize this callback
   // Helper to format messages with variables
   // next-intl's useTranslations supports variables as second parameter
-  const formatMessage = (key: string, values: Record<string, string | number>) => {
+  const formatMessage = (
+    key: string,
+    values: Record<string, string | number>,
+  ) => {
     // Type assertion to allow passing variables to next-intl translation function
     const tWithVars = tProductForm as unknown as (
       key: string,
@@ -124,9 +132,9 @@ export default function ProductForm({
     name: "variants",
   });
 
-  useEffect(() => {
-    reset(mapToFieldValues(initialValues, featureOptions));
-  }, [initialValues, reset, featureOptions]);
+  // useEffect(() => {
+  //   reset(mapToFieldValues(initialValues, featureOptions));
+  // }, [initialValues]);
 
   const categoryQuery = useQuery({
     queryKey: ["product-category-tree"],
@@ -426,18 +434,7 @@ export default function ProductForm({
       <IBaseCard>
         <IBaseCardBody className="space-y-4">
           <div className="flex gap-2 justify-between">
-            <div className="justify-start">
-              <IBaseButton
-                color="primary"
-                isDisabled={isBusy || variantFields.length >= 20}
-                size="sm"
-                startContent={<Plus size={14} />}
-                variant="light"
-                onPress={addVariant}
-              >
-                {t("actions.add")} {t("variant")}
-              </IBaseButton>
-            </div>
+            <div className="justify-start" />
             <div className="justify-end flex items-center gap-2">
               <IBaseTooltip content={tProduct("guideTooltip")} placement="top">
                 <IBaseButton
@@ -493,7 +490,7 @@ export default function ProductForm({
           </div>
 
           <FormProvider {...form}>
-            <IBaseTabs
+            <IBaseTabsPrimary
               aria-label="Product form tabs"
               classNames={{
                 tabList: "overflow-x-auto mb-0",
@@ -501,13 +498,24 @@ export default function ProductForm({
                 tabContent: "max-w-[80px] truncate",
                 base: "mb-0",
               }}
-              color="primary"
               selectedKey={selectedTab}
+              tabBarExtraContent={
+                <IBaseButton
+                  color="primary"
+                  isDisabled={isBusy || variantFields.length >= 20}
+                  size="sm"
+                  startContent={<Plus size={14} />}
+                  variant="light"
+                  onPress={addVariant}
+                >
+                  {t("actions.add")} {t("variant")}
+                </IBaseButton>
+              }
               onSelectionChange={(key: React.Key) =>
                 setSelectedTab(key as string)
               }
             >
-              <IBaseTab key="master" title={t("master")}>
+              <IBaseTabPrimary key="master" title={t("master")}>
                 <MasterTab
                   categoryOptions={categoryOptions}
                   categoryQueryLoading={categoryQuery.isLoading}
@@ -568,7 +576,7 @@ export default function ProductForm({
                     }
                   }}
                 />
-              </IBaseTab>
+              </IBaseTabPrimary>
 
               {useMemo(
                 () =>
@@ -586,7 +594,7 @@ export default function ProductForm({
                     const tabKey = `variant-${variantIndex}`;
 
                     return (
-                      <IBaseTab key={tabKey} title={truncatedTitle}>
+                      <IBaseTabPrimary key={tabKey} title={truncatedTitle}>
                         <VariantTab
                           canRemove={variantFields.length > 1}
                           isBusy={isBusy}
@@ -599,7 +607,7 @@ export default function ProductForm({
                             updateVariant(variantIndex, updater)
                           }
                         />
-                      </IBaseTab>
+                      </IBaseTabPrimary>
                     );
                   }),
                 [
@@ -613,7 +621,7 @@ export default function ProductForm({
                   updateVariant,
                 ],
               )}
-            </IBaseTabs>
+            </IBaseTabsPrimary>
           </FormProvider>
         </IBaseCardBody>
       </IBaseCard>

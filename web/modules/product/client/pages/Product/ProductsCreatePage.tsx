@@ -1,11 +1,10 @@
 "use client";
 
-import { IBaseButton } from "@base/client";
-import { addToast } from "@base/client";
 import { useMutation } from "@tanstack/react-query";
-import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
+
+import { addToast } from "@base/client";
 import { getClientLink } from "@base/client/utils/link/getClientLink";
 
 import ProductForm from "../../components/Product/ProductForm";
@@ -107,18 +106,6 @@ const ProductsCreatePage = (): React.ReactNode => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <IBaseButton
-          isDisabled={createMutation.isPending}
-          size="sm"
-          startContent={<ArrowLeft size={14} />}
-          variant="light"
-          onPress={navigateToList}
-        >
-          Back
-        </IBaseButton>
-      </div>
-
       <ProductForm
         loading={createMutation.isPending}
         secondarySubmitLabel="Create & add another"
