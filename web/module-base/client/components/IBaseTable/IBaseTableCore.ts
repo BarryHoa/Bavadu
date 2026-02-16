@@ -490,7 +490,6 @@ export function useIBaseTableCore<T = any>(
 
   const handleSortingChange = useCallback(
     (updater: any) => {
-      console.log("handleSortingChange", updater);
       setSortingState((prev) => {
         const newSorting =
           typeof updater === "function" ? updater(prev) : updater;
@@ -650,7 +649,10 @@ export function useIBaseTableCore<T = any>(
 
     // Column features
     enableColumnResizing,
-    columnResizeMode: "onEnd",
+    columnResizeMode: "onChange",
+    defaultColumn: enableColumnResizing
+      ? { size: 150, minSize: 40, maxSize: 800 }
+      : undefined,
     enableColumnPinning,
 
     // Grouping
@@ -675,11 +677,11 @@ export function useIBaseTableCore<T = any>(
   const rows = table.getRowModel().rows;
   const headerGroups = useMemo(
     () => table.getHeaderGroups(),
-    [table, columnOrderState],
+    [table, columnOrderState, columnSizingState],
   );
   const visibleColumns = useMemo(
     () => table.getVisibleLeafColumns(),
-    [table, columnOrderState],
+    [table, columnOrderState, columnSizingState],
   );
 
   const selectedRowKeys = useMemo(() => {

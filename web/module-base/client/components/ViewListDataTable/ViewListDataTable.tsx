@@ -297,6 +297,8 @@ export default function ViewListDataTable<T = any>(
             dataTableProps={{
               ...dataTableProps,
               emptyContent: effectiveEmptyContent,
+              isDraggableColumns: dataTableProps.isDraggableColumns ?? true,
+              isResizableColumns: dataTableProps.isResizableColumns ?? true,
             }}
             loading={tableLoading}
             pagination={memoizedPagination}

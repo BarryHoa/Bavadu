@@ -150,7 +150,7 @@ function TableHeaderCell<T>({
     <div
       ref={setNodeRef}
       className={clsx(
-        "group flex h-full w-full items-center",
+        "group  flex h-full w-full items-center",
         isDragging &&
           "rounded-md border-2 border-primary shadow-md ring-2 ring-primary/30",
       )}
@@ -197,10 +197,19 @@ function TableHeaderCell<T>({
       </div>
       {canResize && typeof resizeHandler === "function" && (
         <div
-          className="absolute right-0 top-0 h-full w-1 cursor-col-resize touch-none bg-transparent hover:bg-primary/30"
+          className="absolute right-0 top-0 z-20 h-full w-2 shrink-0 cursor-col-resize select-none touch-none bg-transparent hover:bg-primary/50"
           aria-label="Resize column"
-          onMouseDown={resizeHandler}
-          onTouchStart={resizeHandler}
+          style={{ touchAction: "none" }}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            resizeHandler(e.nativeEvent ?? e);
+          }}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            resizeHandler(e.nativeEvent ?? e);
+          }}
         />
       )}
     </div>
@@ -328,6 +337,7 @@ export default function IBaseTableUI<T = any>({
     () => ({
       ...classNames,
       tbody: clsx("overflow-x-auto", classNames.tbody),
+      table: clsx(classNames.table),
       wrapper: clsx("rounded-none p-0", classNames.wrapper),
       th: clsx(
         "px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-foreground bg-default-100 border-b border-r border-default-200 last:border-r-0",
@@ -342,7 +352,7 @@ export default function IBaseTableUI<T = any>({
         classNames.td,
       ),
     }),
-    [classNames],
+    [classNames, enableColumnResizing],
   );
 
   const columnMap = useMemo(
@@ -358,7 +368,7 @@ export default function IBaseTableUI<T = any>({
       isCompact={isCompact}
       isHeaderSticky={isHeaderSticky}
       isStriped={isStriped}
-      layout={tableLayout}
+      layout={enableColumnResizing ? "fixed" : tableLayout}
       selectedKeys={selectedKeys}
       selectionMode={selectionMode}
       onSelectionChange={onSelectionChange}
@@ -370,6 +380,7 @@ export default function IBaseTableUI<T = any>({
             const meta = (column?.columnDef?.meta as Record<string, any>) || {};
             const isSortable = header.column.getCanSort();
             const isPinned = header.column.getIsPinned();
+            const size = header.column.getSize();
             const pinStyle = isPinned
               ? {
                   position: "sticky" as const,
@@ -378,6 +389,9 @@ export default function IBaseTableUI<T = any>({
                   zIndex: 10,
                 }
               : undefined;
+            const colStyle = enableColumnResizing
+              ? { ...pinStyle, width: size, minWidth: size }
+              : pinStyle;
 
             return (
               <TableColumn
@@ -385,15 +399,15 @@ export default function IBaseTableUI<T = any>({
                 align={meta.align || "start"}
                 allowsSorting={false}
                 className={clsx(
-                  "relative",
+                  "relative overflow-visible",
                   isPinned && "frozen-column",
                   isPinned === "left" && "frozen-left",
                   isPinned === "right" && "frozen-right",
                 )}
                 maxWidth={column?.columnDef.maxSize}
                 minWidth={column?.columnDef.minSize}
-                style={pinStyle}
-                width={header.column.getSize()}
+                style={colStyle}
+                width={size}
               >
                 <TableHeaderCell
                   enableColumnOrdering={enableColumnOrdering}
