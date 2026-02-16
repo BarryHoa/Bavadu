@@ -16,8 +16,6 @@ import { IBaseTableCoreColumn, useIBaseTableCore } from "./IBaseTableCore";
 import {
   I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
   type IBaseTableProps as IBaseTablePropsType,
-  type IBaseTableScrollHeight,
-  type IBaseTableScrollWidth,
 } from "./IBaseTableInterface";
 import IBaseTableUI from "./IBaseTableUI";
 import useColumns from "./hooks/useColumns";
@@ -95,13 +93,13 @@ export function IBaseTable<T = any>({
       isDraggable: col.isDraggable,
       enableSorting: col.sortable,
       enablePinning: !!col.fixed,
-      enableResizing: col.isResizable,
+      enableResizing: isResizableColumns && col.isResizable !== false,
       meta: {
         frozenStyle: col.frozenStyle,
         frozenClassName: col.frozenClassName,
         isRowNumber: col.key === I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
       },
-    })
+    }),
   );
 
   // Core table logic - all logic is now in useIBaseTableCore
@@ -201,9 +199,13 @@ export function IBaseTable<T = any>({
           aria-label={t("ariaLabel")}
           classNames={classNames}
           color={color}
+          columnOrder={core.columnOrderState}
           emptyContent={emptyContent ?? t("empty")}
+          enableColumnOrdering={isDraggableColumns}
+          enableColumnResizing={isResizableColumns}
           getRowKey={core.getRowKey}
           headerGroups={core.headerGroups}
+          setColumnOrder={core.setColumnOrder}
           isCompact={true}
           isHeaderSticky={true}
           isStriped={true}
@@ -235,7 +237,7 @@ export function IBaseTable<T = any>({
         <div
           className={clsx(
             "flex flex-col items-center justify-between px-2 sm:flex-row",
-            classNames.pagination
+            classNames.pagination,
           )}
         >
           <div className="flex items-center py-2 text-small text-default-500">

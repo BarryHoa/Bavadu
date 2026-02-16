@@ -130,7 +130,9 @@ export interface IBaseTableCoreReturn<T = any> {
       | RowSelectionState
       | ((prev: RowSelectionState) => RowSelectionState),
   ) => void;
-  setColumnOrder: (columnOrder: ColumnOrderState) => void;
+  setColumnOrder: (
+    updater: ColumnOrderState | ((prev: ColumnOrderState) => ColumnOrderState),
+  ) => void;
   setGrouping: (grouping: GroupingState) => void;
   setExpanded: (expanded: ExpandedState) => void;
   toggleRowSelection: (rowId: string, select?: boolean) => void;
@@ -648,6 +650,7 @@ export function useIBaseTableCore<T = any>(
 
     // Column features
     enableColumnResizing,
+    columnResizeMode: "onEnd",
     enableColumnPinning,
 
     // Grouping
@@ -668,9 +671,16 @@ export function useIBaseTableCore<T = any>(
   });
 
   // Computed values - memoize to prevent recalculation
+  // Include columnOrderState so headerGroups/visibleColumns recompute when column order changes
   const rows = table.getRowModel().rows;
-  const headerGroups = useMemo(() => table.getHeaderGroups(), [table]);
-  const visibleColumns = useMemo(() => table.getVisibleLeafColumns(), [table]);
+  const headerGroups = useMemo(
+    () => table.getHeaderGroups(),
+    [table, columnOrderState],
+  );
+  const visibleColumns = useMemo(
+    () => table.getVisibleLeafColumns(),
+    [table, columnOrderState],
+  );
 
   const selectedRowKeys = useMemo(() => {
     return Object.keys(rowSelectionState).filter(

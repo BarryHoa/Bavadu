@@ -1,9 +1,27 @@
 "use client";
 
 import type { SortDescriptor, TableProps } from "@heroui/table";
-import type { Column, HeaderGroup, Row } from "@tanstack/react-table";
+import type { Column, Header, HeaderGroup, Row } from "@tanstack/react-table";
 import type { ReactNode } from "react";
 
+import {
+  DndContext,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
+import {
+  SortableContext,
+  arrayMove,
+  horizontalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Spinner } from "@heroui/spinner";
 import {
   Table,
@@ -15,7 +33,12 @@ import {
 } from "@heroui/table";
 import { flexRender } from "@tanstack/react-table";
 import clsx from "clsx";
-import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
+  GripVertical,
+} from "lucide-react";
 import { useCallback, useMemo } from "react";
 
 export interface IBaseTableUIProps<T = any> {
@@ -51,6 +74,13 @@ export interface IBaseTableUIProps<T = any> {
   sortDescriptor?: SortDescriptor;
   onSortChange?: (sort: SortDescriptor) => void;
 
+  // Column resize & reorder
+  enableColumnResizing?: boolean;
+  enableColumnOrdering?: boolean;
+  columnOrder?: string[];
+  onColumnOrderChange?: (order: string[]) => void;
+  setColumnOrder?: (updater: string[] | ((prev: string[]) => string[])) => void;
+
   // Column configuration
   getRowKey: (record: T, index: number) => string;
   renderCell?: (
@@ -71,6 +101,112 @@ const sortIcons = {
   descending: <ChevronDown aria-hidden className="h-3.5 w-3.5 opacity-90" />,
 } as const;
 
+const alignClassMap = {
+  end: "justify-end",
+  center: "justify-center",
+  start: "justify-start",
+} as const;
+
+function TableHeaderCell<T>({
+  header,
+  column,
+  meta,
+  isSortable,
+  getSortIcon,
+  onHeaderClick,
+  enableColumnResizing,
+  enableColumnOrdering,
+  renderHeader,
+  headerGroup,
+}: {
+  header: Header<T, unknown>;
+  column: Column<T, unknown>;
+  meta: Record<string, any>;
+  isSortable: boolean;
+  getSortIcon: (columnId: string) => ReactNode;
+  onHeaderClick: (column: Column<T, unknown>) => void;
+  enableColumnResizing: boolean;
+  enableColumnOrdering: boolean;
+  renderHeader?: (
+    header: HeaderGroup<T>,
+    column: Column<T, unknown>,
+  ) => ReactNode;
+  headerGroup: HeaderGroup<T>;
+}) {
+  const isDraggable = enableColumnOrdering && meta?.isDraggable !== false;
+  const { attributes, isDragging, listeners, setNodeRef, transform } =
+    useSortable({
+      id: header.column.id,
+      disabled: !isDraggable,
+    });
+
+  const resizeHandler = header.getResizeHandler?.();
+  const canResize =
+    enableColumnResizing && header.column.getCanResize?.() && resizeHandler;
+  const alignClass =
+    alignClassMap[meta.align as keyof typeof alignClassMap] ?? "justify-start";
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={clsx(
+        "group flex h-full w-full items-center",
+        isDragging &&
+          "rounded-md border-2 border-primary shadow-md ring-2 ring-primary/30",
+      )}
+      style={{
+        opacity: isDragging ? 0.8 : 1,
+        transform: CSS.Translate.toString(transform),
+        transition: isDragging ? "none" : undefined,
+        whiteSpace: "nowrap" as const,
+        width: header.column.getSize(),
+        minWidth: header.column.getSize(),
+        willChange: isDragging ? "transform" : undefined,
+        zIndex: isDragging ? 1 : 0,
+      }}
+    >
+      <div
+        className={clsx(
+          "inline-flex h-full flex-1 items-center",
+          isSortable && "cursor-pointer select-none",
+        )}
+        role={isSortable ? "button" : undefined}
+        tabIndex={isSortable ? 0 : -1}
+        onClick={() => onHeaderClick(header.column)}
+      >
+        {isDraggable && (
+          <span
+            className="mr-1.5 inline-flex cursor-grab touch-none items-center text-default-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-default-600 active:cursor-grabbing"
+            aria-hidden
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical className="h-4 w-4" />
+          </span>
+        )}
+        <span className={clsx("inline-flex flex-1 items-center", alignClass)}>
+          {renderHeader
+            ? renderHeader(headerGroup, column)
+            : flexRender(header.column.columnDef.header, header.getContext())}
+          {isSortable && (
+            <span className="ml-2 inline-flex items-center justify-end">
+              {getSortIcon(header.id)}
+            </span>
+          )}
+        </span>
+      </div>
+      {canResize && typeof resizeHandler === "function" && (
+        <div
+          className="absolute right-0 top-0 h-full w-1 cursor-col-resize touch-none bg-transparent hover:bg-primary/30"
+          aria-label="Resize column"
+          onMouseDown={resizeHandler}
+          onTouchStart={resizeHandler}
+        />
+      )}
+    </div>
+  );
+}
+
 export default function IBaseTableUI<T = any>({
   headerGroups,
   rows,
@@ -88,11 +224,15 @@ export default function IBaseTableUI<T = any>({
   onSelectionChange,
   sortDescriptor,
   onSortChange,
+  enableColumnResizing = false,
+  enableColumnOrdering = false,
+  columnOrder = [],
+  onColumnOrderChange,
+  setColumnOrder,
   getRowKey,
   renderCell,
   renderHeader,
 }: IBaseTableUIProps<T>) {
-  // Memoize sort icon getter
   const getSortIcon = useCallback(
     (columnId: string) => {
       if (!sortDescriptor || sortDescriptor.column !== columnId) {
@@ -106,7 +246,6 @@ export default function IBaseTableUI<T = any>({
     [sortDescriptor],
   );
 
-  // Memoize header click handler
   const handleHeaderClick = useCallback(
     (column: Column<T, unknown>) => {
       if (!column.getCanSort() || !onSortChange) return;
@@ -126,7 +265,65 @@ export default function IBaseTableUI<T = any>({
     [sortDescriptor, onSortChange],
   );
 
-  // Memoize classNames: Carbon-style minimal table (light header, subtle borders)
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+
+      if (active && over && active.id !== over.id) {
+        const updateOrder = (prev: string[]) => {
+          const currentOrder =
+            prev.length > 0
+              ? prev
+              : headerGroups.flatMap((g) => g.headers.map((h) => h.id));
+          const oldIndex = currentOrder.indexOf(active.id as string);
+          const newIndex = currentOrder.indexOf(over.id as string);
+          if (oldIndex !== -1 && newIndex !== -1) {
+            return arrayMove(currentOrder, oldIndex, newIndex);
+          }
+
+          return prev;
+        };
+
+        if (setColumnOrder) {
+          setColumnOrder(updateOrder);
+        } else if (onColumnOrderChange) {
+          const currentOrder = columnOrder.length
+            ? columnOrder
+            : headerGroups.flatMap((g) => g.headers.map((h) => h.id));
+          const oldIndex = currentOrder.indexOf(active.id as string);
+          const newIndex = currentOrder.indexOf(over.id as string);
+          if (oldIndex !== -1 && newIndex !== -1) {
+            onColumnOrderChange(arrayMove(currentOrder, oldIndex, newIndex));
+          }
+        }
+      }
+    },
+    [columnOrder, headerGroups, onColumnOrderChange, setColumnOrder],
+  );
+
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor),
+  );
+
+  const sortableIds = useMemo(
+    () =>
+      columnOrder.length
+        ? columnOrder
+        : headerGroups.flatMap((g) => g.headers.map((h) => h.id)),
+    [columnOrder, headerGroups],
+  );
+
   const memoizedClassNames = useMemo(
     () => ({
       ...classNames,
@@ -148,13 +345,12 @@ export default function IBaseTableUI<T = any>({
     [classNames],
   );
 
-  // Create column lookup map for O(1) access - memoize to prevent recreation
   const columnMap = useMemo(
     () => new Map(visibleColumns.map((col) => [col.id, col])),
     [visibleColumns],
   );
 
-  return (
+  const tableContent = (
     <Table
       aria-label="Data table"
       classNames={memoizedClassNames}
@@ -189,6 +385,7 @@ export default function IBaseTableUI<T = any>({
                 align={meta.align || "start"}
                 allowsSorting={false}
                 className={clsx(
+                  "relative",
                   isPinned && "frozen-column",
                   isPinned === "left" && "frozen-left",
                   isPinned === "right" && "frozen-right",
@@ -196,42 +393,20 @@ export default function IBaseTableUI<T = any>({
                 maxWidth={column?.columnDef.maxSize}
                 minWidth={column?.columnDef.minSize}
                 style={pinStyle}
-                width={column?.getSize()}
+                width={header.column.getSize()}
               >
-                {renderHeader ? (
-                  renderHeader(headerGroup, column!)
-                ) : (
-                  <div
-                    className={clsx(
-                      "inline-flex h-full w-full items-center",
-                      isSortable && "cursor-pointer select-none",
-                    )}
-                    role={isSortable ? "button" : undefined}
-                    tabIndex={isSortable ? 0 : -1}
-                    onClick={() => handleHeaderClick(header.column)}
-                  >
-                    <span
-                      className={clsx(
-                        "inline-flex w-full items-center",
-                        meta.align === "end"
-                          ? "justify-end"
-                          : meta.align === "center"
-                            ? "justify-center"
-                            : "justify-start",
-                      )}
-                    >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                      {isSortable && (
-                        <span className="ml-2 inline-flex items-center justify-end">
-                          {getSortIcon(header.id)}
-                        </span>
-                      )}
-                    </span>
-                  </div>
-                )}
+                <TableHeaderCell
+                  enableColumnOrdering={enableColumnOrdering}
+                  enableColumnResizing={enableColumnResizing}
+                  getSortIcon={getSortIcon}
+                  header={header}
+                  headerGroup={headerGroup}
+                  column={column!}
+                  meta={meta}
+                  isSortable={isSortable}
+                  onHeaderClick={handleHeaderClick}
+                  renderHeader={renderHeader}
+                />
               </TableColumn>
             );
           }),
@@ -286,7 +461,11 @@ export default function IBaseTableUI<T = any>({
                       isPinned === "left" && "frozen-left",
                       isPinned === "right" && "frozen-right",
                     )}
-                    style={pinStyle}
+                    style={{
+                      ...pinStyle,
+                      width: cell.column.getSize(),
+                      minWidth: cell.column.getSize(),
+                    }}
                   >
                     <div
                       className={clsx(
@@ -323,5 +502,21 @@ export default function IBaseTableUI<T = any>({
         }}
       </TableBody>
     </Table>
+  );
+
+  return (
+    <DndContext
+      collisionDetection={closestCenter}
+      modifiers={[restrictToHorizontalAxis]}
+      onDragEnd={handleDragEnd}
+      sensors={sensors}
+    >
+      <SortableContext
+        items={sortableIds}
+        strategy={horizontalListSortingStrategy}
+      >
+        {tableContent}
+      </SortableContext>
+    </DndContext>
   );
 }
