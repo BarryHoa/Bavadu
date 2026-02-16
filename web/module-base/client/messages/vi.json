@@ -273,6 +273,58 @@
         "deleteError": "Không thể xóa role",
         "loadError": "Không thể tải danh sách role"
       }
+    },
+    "sequences": {
+      "listTitle": "Sequence Rules",
+      "loading": "Đang tải sequence...",
+      "notFound": "Không tìm thấy rule",
+      "create": { "title": "Tạo Rule Sequence" },
+      "edit": { "title": "Sửa Rule Sequence" },
+      "actions": { "addSequence": "Thêm Rule" },
+      "table": {
+        "columns": {
+          "name": "Tên",
+          "prefix": "Prefix",
+          "format": "Format",
+          "start": "Start",
+          "step": "Step",
+          "currentValue": "Giá trị hiện tại",
+          "countCount": "Counts",
+          "status": "Trạng thái",
+          "setActive": "Kích hoạt",
+          "setInactive": "Vô hiệu hóa"
+        },
+        "empty": {
+          "search": "Không tìm thấy rule nào phù hợp.",
+          "default": "Chưa có rule nào."
+        }
+      },
+      "form": {
+        "name": "Tên",
+        "nameDescription": "Tên unique cho getNext(name)",
+        "prefix": "Prefix",
+        "prefixDescription": "VD: ROLE, ORD",
+        "format": "Format",
+        "formatDescription": "VD: %06d",
+        "start": "Start",
+        "step": "Step",
+        "status": "Trạng thái",
+        "active": "Active",
+        "inactive": "Inactive",
+        "cannotEditHasCount": "Không thể sửa rule đã có count. Chỉ có thể inactive."
+      },
+      "deleteConfirm": {
+        "title": "Xóa Rule",
+        "message": "Bạn có chắc muốn xóa rule này?"
+      },
+      "toast": {
+        "createSuccess": "Tạo rule thành công",
+        "createError": "Không thể tạo rule",
+        "updateSuccess": "Cập nhật thành công",
+        "updateError": "Không thể cập nhật",
+        "deleteSuccess": "Xóa thành công",
+        "deleteError": "Không thể xóa"
+      }
     }
   }
 }

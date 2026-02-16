@@ -9,6 +9,8 @@ export * from "./base.payment-term";
 export * from "./base.permission";
 export * from "./base.role";
 export * from "./base.role-permissions-default";
+export * from "./base.sequence-count";
+export * from "./base.sequence-rule";
 export * from "./base.user-permissions";
 export * from "./base.user-roles";
 export * from "./base.session";

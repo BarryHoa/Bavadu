@@ -301,6 +301,58 @@
         "deleteError": "Failed to delete role",
         "loadError": "Failed to load roles"
       }
+    },
+    "sequences": {
+      "listTitle": "Sequence Rules",
+      "loading": "Loading sequence...",
+      "notFound": "Sequence rule not found",
+      "create": { "title": "Create Sequence Rule" },
+      "edit": { "title": "Edit Sequence Rule" },
+      "actions": { "addSequence": "Add Rule" },
+      "table": {
+        "columns": {
+          "name": "Name",
+          "prefix": "Prefix",
+          "format": "Format",
+          "start": "Start",
+          "step": "Step",
+          "currentValue": "Current Value",
+          "countCount": "Counts",
+          "status": "Status",
+          "setActive": "Set Active",
+          "setInactive": "Set Inactive"
+        },
+        "empty": {
+          "search": "No sequence rules match the search.",
+          "default": "No sequence rules found."
+        }
+      },
+      "form": {
+        "name": "Name",
+        "nameDescription": "Unique name for getNext(name)",
+        "prefix": "Prefix",
+        "prefixDescription": "e.g. ROLE, ORD",
+        "format": "Format",
+        "formatDescription": "e.g. %06d",
+        "start": "Start",
+        "step": "Step",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "cannotEditHasCount": "Cannot edit rule that has counts. You can only set it to inactive."
+      },
+      "deleteConfirm": {
+        "title": "Delete Sequence Rule",
+        "message": "Are you sure you want to delete this rule?"
+      },
+      "toast": {
+        "createSuccess": "Sequence rule created",
+        "createError": "Failed to create rule",
+        "updateSuccess": "Rule updated",
+        "updateError": "Failed to update rule",
+        "deleteSuccess": "Rule deleted",
+        "deleteError": "Failed to delete rule"
+      }
     }
   }
 }

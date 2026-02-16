@@ -3,6 +3,7 @@
  * Extends Kernel and defines the application's scheduled tasks
  */
 
+import SequenceModel from "../module-base/server/models/Sequence/SequenceModel";
 import SessionModel from "../module-base/server/models/Sessions/SessionModel";
 import { getLogCompressionModel } from "../module-base/server/models/Logs/LogCompressionModel";
 
@@ -23,6 +24,18 @@ export class ScheduledTask extends Kernel {
         console.log(`[Cron] Cleaned up ${deletedCount} expired session(s)`);
       } catch (error) {
         console.error("[Cron] Error cleaning up expired sessions:", error);
+      }
+    });
+
+    // Clear excess sequence counts daily at 4:00 AM (keep 3 per rule)
+    this.dailyAt("clear-sequence-counts", "04:00", async () => {
+      console.log("[Cron] Starting clear sequence counts...");
+      try {
+        const sequenceModel = new SequenceModel();
+        const { deleted } = await sequenceModel.clearExcessCounts();
+        console.log(`[Cron] Cleared ${deleted} excess sequence count(s)`);
+      } catch (error) {
+        console.error("[Cron] Error clearing sequence counts:", error);
       }
     });
 

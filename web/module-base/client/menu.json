@@ -26,6 +26,12 @@
         "name": "Roles and Permission",
         "path": "/settings/roles",
         "as": "/settings/roles"
+      },
+      {
+        "key": "settings.sequences",
+        "name": "Sequence Rules",
+        "path": "/settings/sequences",
+        "as": "/settings/sequences"
       }
     ]
   }
