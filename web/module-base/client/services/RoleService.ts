@@ -94,7 +94,7 @@ class RoleService extends JsonRpcClientService {
 
   async getRole(id: string): Promise<RoleResponse> {
     const data = await this.call<RoleWithPermissions | null>(
-      "base-role.curd.get",
+      "base-role-permission.curd.get",
       { id },
     );
 
@@ -110,7 +110,7 @@ class RoleService extends JsonRpcClientService {
   }
 
   async createRole(payload: CreateRoleRequest): Promise<CreateRoleResponse> {
-    const data = await this.call<Role>("base-role.curd.create", {
+    const data = await this.call<Role>("base-role-permission.curd.create", {
       code: payload.code,
       name: payload.name,
       description: payload.description,
@@ -126,14 +126,17 @@ class RoleService extends JsonRpcClientService {
   }
 
   async updateRole(payload: UpdateRoleRequest): Promise<UpdateRoleResponse> {
-    const data = await this.call<Role | null>("base-role.curd.update", {
-      id: payload.id,
-      code: payload.code,
-      name: payload.name,
-      description: payload.description,
-      permissionIds: payload.permissionIds,
-      isAdminModules: payload.isAdminModules,
-    });
+    const data = await this.call<Role | null>(
+      "base-role-permission.curd.update",
+      {
+        id: payload.id,
+        code: payload.code,
+        name: payload.name,
+        description: payload.description,
+        permissionIds: payload.permissionIds,
+        isAdminModules: payload.isAdminModules,
+      },
+    );
 
     if (!data) {
       throw new Error("Role not found");
@@ -148,7 +151,7 @@ class RoleService extends JsonRpcClientService {
 
   async deleteRole(id: string): Promise<DeleteRoleResponse> {
     const result = await this.call<{ success: boolean; message: string }>(
-      "base-role.curd.delete",
+      "base-role-permission.curd.delete",
       { id },
     );
 

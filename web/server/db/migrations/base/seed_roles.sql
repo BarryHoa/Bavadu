@@ -17,10 +17,11 @@ INSERT INTO "md_base"."roles" (
 	now()
 ) ON CONFLICT ("code") DO NOTHING;
 
--- System Role - Hệ thống (all permissions)
+-- System Role - Hệ thống (all permissions, admin all core modules)
 INSERT INTO "md_base"."roles" (
-	"id", "code", "name", "description", 
+	"id", "code", "name", "description",
 	"is_system", "is_active",
+	"is_admin_modules",
 	"created_at", "updated_at"
 ) VALUES (
 	'00000000-0000-0000-0000-000000000002',
@@ -29,14 +30,16 @@ INSERT INTO "md_base"."roles" (
 	'{"en": "System role with all permissions", "vi": "Vai trò hệ thống với tất cả quyền"}',
 	true,
 	true,
+	'{"base": true, "hrm": true, "b2c-sales": true, "product": true, "stock": true}'::jsonb,
 	now(),
 	now()
 ) ON CONFLICT ("code") DO NOTHING;
 
--- Admin Role - Quản trị viên
+-- Admin Role - Quản trị viên (admin all core modules)
 INSERT INTO "md_base"."roles" (
-	"id", "code", "name", "description", 
+	"id", "code", "name", "description",
 	"is_system", "is_active",
+	"is_admin_modules",
 	"created_at", "updated_at"
 ) VALUES (
 	'00000000-0000-0000-0000-000000000003',
@@ -45,6 +48,7 @@ INSERT INTO "md_base"."roles" (
 	'{"en": "Administrator with full access", "vi": "Quản trị viên với quyền truy cập đầy đủ"}',
 	true,
 	true,
+	'{"base": true, "hrm": true, "b2c-sales": true, "product": true, "stock": true}'::jsonb,
 	now(),
 	now()
 ) ON CONFLICT ("code") DO NOTHING;

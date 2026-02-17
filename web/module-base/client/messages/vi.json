@@ -284,6 +284,10 @@
         "inactive": "Không hoạt động",
         "noPermissions": "Chưa có quyền nào được gán"
       },
+      "detail": {
+        "title": "Chi tiết role",
+        "permissionsTitle": "Danh sách quyền"
+      },
       "deleteConfirm": {
         "title": "Xóa Role",
         "message": "Những user đã gắng role này sẽ được xóa role"

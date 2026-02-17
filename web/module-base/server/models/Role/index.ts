@@ -1,2 +1,2 @@
-export { default as RoleModel } from "./RoleModel";
-export type { RoleRow, RoleInput } from "./RoleModel";
+export { default as RoleAndPermissionModel } from "./RoleAndPermissionModel";
+export type { RoleRow, RoleInput, RolePermissionRow } from "./RoleAndPermissionModel";

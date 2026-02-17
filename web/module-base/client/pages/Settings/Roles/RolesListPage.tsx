@@ -17,11 +17,12 @@ import {
   IBaseTableColumnDefinition,
 } from "@base/client/components";
 import ActionMenu, {
-  ActionItem,
+  type ActionItem,
 } from "@base/client/components/ActionMenu/ActionMenu";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import roleService, { type Role } from "@base/client/services/RoleService";
+import RoleDetailModal from "./components/RoleDetailModal";
 
 const ROLES_LIST_QUERY_KEY = ["settings", "roles", "list"] as const;
 const BASE_PATH = "/workspace/settings/roles";
@@ -38,6 +39,7 @@ export default function RolesListPage() {
   const queryClient = useQueryClient();
   const getText = useLocalizedText();
   const [deleteConfirm, setDeleteConfirm] = useState<Role | null>(null);
+  const [viewRoleId, setViewRoleId] = useState<string | null>(null);
 
   const deleteRoleMutation = useMutation({
     mutationFn: (id: string) => roleService.deleteRole(id),
@@ -55,6 +57,10 @@ export default function RolesListPage() {
     setDeleteConfirm(null);
   }, []);
 
+  const handleCloseViewModal = useCallback(() => {
+    setViewRoleId(null);
+  }, []);
+
   const handleConfirmDelete = useCallback(() => {
     if (deleteConfirm) {
       deleteRoleMutation.mutate(deleteConfirm.id);
@@ -63,7 +69,14 @@ export default function RolesListPage() {
 
   const getActionMenuItems = useCallback(
     (row: RoleRow) => {
-      const baseActions: ActionItem[] = [];
+      const baseActions: ActionItem[] = [
+        {
+          placement: "menu",
+          key: "view",
+          label: actionsT("view"),
+          onPress: () => setViewRoleId(row.id),
+        },
+      ];
 
       if (!row.isSystem) {
         baseActions.push(
@@ -187,6 +200,11 @@ export default function RolesListPage() {
           )}
         </IBaseModalContent>
       </IBaseModal>
+      <RoleDetailModal
+        isOpen={!!viewRoleId}
+        roleId={viewRoleId}
+        onClose={handleCloseViewModal}
+      />
     </div>
   );
 }

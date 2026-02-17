@@ -2,7 +2,7 @@ import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/shared/interface/ListInterface";
-import type { RoleRow } from "./RoleModel";
+import type { RoleRow } from "./RoleAndPermissionModel";
 
 import { eq, ilike, sql } from "drizzle-orm";
 

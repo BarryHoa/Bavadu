@@ -21,6 +21,7 @@ CREATE TABLE "md_base"."roles" (
 	"description" text,
 	"is_system" boolean DEFAULT false NOT NULL,
 	"is_active" boolean DEFAULT true NOT NULL,
+	"is_admin_modules" jsonb NOT NULL DEFAULT '{}'::jsonb,Ư
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now(),
 	"created_by" varchar(36),
