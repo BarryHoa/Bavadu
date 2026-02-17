@@ -4,17 +4,18 @@ import type {
 } from "@base/shared/interface/ListInterface";
 import type { SequenceRuleRow } from "./SequenceModel";
 
+import { eq, ilike, sql } from "drizzle-orm";
+
 import {
   BaseViewListModel,
   type ColumnMap,
   type FilterConditionMap,
   type SearchConditionMap,
 } from "@base/server/models/BaseViewListModel";
-import { eq, ilike, sql } from "drizzle-orm";
-
-import { base_tb_sequence_counts } from "../../schemas/base.sequence-count";
-import { base_tb_sequence_rules } from "../../schemas/base.sequence-rule";
 import { ParamFilter } from "@base/shared/interface/FilterInterface";
+
+import { base_tb_sequence_rules } from "../../schemas/base.sequence-rule";
+
 
 class SequenceViewListModel extends BaseViewListModel<
   typeof base_tb_sequence_rules,

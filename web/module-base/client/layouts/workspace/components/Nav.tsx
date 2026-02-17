@@ -1,7 +1,11 @@
 "use client";
-import { IBaseAvatar, IBaseBadge, IBaseButton } from "@base/client/components";
 
 import type { IBaseDropdownItem } from "@base/client/components";
+
+import { Bell, LogOut, User } from "lucide-react";
+import IBaseImage from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import {
   IBaseNavbar,
@@ -10,11 +14,7 @@ import {
   IBaseNavbarContent,
   IBaseNavbarItem,
 } from "@base/client/components";
-import { Bell, LogOut, User } from "lucide-react";
-import IBaseImage from "next/image";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-
+import { IBaseAvatar, IBaseBadge, IBaseButton } from "@base/client/components";
 import { siteConfig } from "@/config/site";
 
 const DEFAULT_AVATAR = "/favicon/favicon-32x32.png";

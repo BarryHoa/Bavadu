@@ -1,5 +1,8 @@
 "use client";
 
+import { Control, Controller, useFieldArray } from "react-hook-form";
+import { Plus, Trash2 } from "lucide-react";
+
 import {
   IBaseInput,
   IBaseSingleSelect,
@@ -7,8 +10,6 @@ import {
 } from "@base/client/components";
 import { IBaseButton } from "@base/client";
 import { IBaseCard, IBaseCardBody, IBaseCheckbox } from "@base/client";
-import { Control, Controller, useFieldArray } from "react-hook-form";
-import { Plus, Trash2 } from "lucide-react";
 
 interface RulesAndConditionsTabProps {
   control: Control<any>;

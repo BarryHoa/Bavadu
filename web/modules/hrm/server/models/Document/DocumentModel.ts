@@ -1,7 +1,8 @@
-import { LocaleDataType } from "@base/shared/interface/Locale";
-import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
+
+import { LocaleDataType } from "@base/shared/interface/Locale";
+import { BaseModel } from "@base/server/models/BaseModel";
 
 import { NewHrmTbDocument, hrm_tb_documents } from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";

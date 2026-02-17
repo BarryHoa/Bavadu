@@ -1,9 +1,10 @@
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { join } from "path";
 
-import { SYSTEM_TIMEZONE } from "@base/server/config/system";
 import { getRequestConfig, GetRequestConfigParams } from "next-intl/server";
 import { notFound } from "next/navigation";
+
+import { SYSTEM_TIMEZONE } from "@base/server/config/system";
 
 // Can be imported from a shared config
 const locales = ["en", "vi"] as const;

@@ -5,11 +5,12 @@ import type {
 import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 import type { Column } from "drizzle-orm";
 
+import { ilike } from "drizzle-orm";
+
 import {
   BaseViewListModel,
   type FilterConditionMap,
 } from "@base/server/models/BaseViewListModel";
-import { ilike } from "drizzle-orm";
 
 import { hrm_tb_leave_types } from "../../schemas";
 

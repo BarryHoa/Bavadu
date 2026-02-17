@@ -1,9 +1,12 @@
+import type { NextRequest } from "next/server";
+
+import { and, eq, gte, lte } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
+
 import { BaseModel } from "@base/server/models/BaseModel";
 import { JsonRpcError, JSON_RPC_ERROR_CODES } from "@base/server/rpc/jsonRpcHandler";
 import UserPermissionModel from "@base/server/models/UserPermission/UserPermissionModel";
-import { and, eq, gte, lte } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
-import type { NextRequest } from "next/server";
+
 
 import EmployeeModel from "../Employee/EmployeeModel";
 import { NewHrmTbTimesheet, hrm_tb_timesheets } from "../../schemas";
@@ -170,6 +173,7 @@ export default class TimesheetModel extends BaseModel<
     const { year, month } = params;
 
     const userId = request?.headers.get("x-user-id") ?? null;
+
     if (!userId) {
       throw new JsonRpcError(
         JSON_RPC_ERROR_CODES.AUTHENTICATION_ERROR,
@@ -183,6 +187,7 @@ export default class TimesheetModel extends BaseModel<
 
     const employeeModel = new EmployeeModel();
     const currentEmp = await employeeModel.getByUserId({ userId });
+
     if (!currentEmp) {
       throw new JsonRpcError(
         JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
@@ -191,6 +196,7 @@ export default class TimesheetModel extends BaseModel<
     }
 
     let employeeId = params.employeeId ?? null;
+
     if (employeeId && employeeId !== currentEmp.id && !hasViewAll) {
       throw new JsonRpcError(
         JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
@@ -209,6 +215,7 @@ export default class TimesheetModel extends BaseModel<
       gte(this.table.workDate, firstDay),
       lte(this.table.workDate, lastDay),
     ];
+
     conditions.push(eq(this.table.employeeId, employeeId));
 
     const result = await this.db

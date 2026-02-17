@@ -1,11 +1,12 @@
 "use client";
 
-import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
-import { useCreateUpdate, useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo } from "react";
+
+import { useCreateUpdate, useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
+import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
 import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
 
 import TimesheetForm, {
@@ -89,6 +90,7 @@ export default function TimesheetEditPage(): React.ReactNode {
           ],
     [t, timesheetData, viewPath, getLocalizedText],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const handleSubmit = async (values: TimesheetFormValues) => {
@@ -126,9 +128,9 @@ export default function TimesheetEditPage(): React.ReactNode {
           {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
         </p>
         <IBaseButton
+          color="danger"
           size="sm"
           variant="bordered"
-          color="danger"
           onPress={() => refetch()}
         >
           Retry
@@ -144,10 +146,10 @@ export default function TimesheetEditPage(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="edit"
       maxWidth="form"
-      title={t("edit")}
       subtitle={subtitle || undefined}
+      title={t("edit")}
+      variant="edit"
     >
       <TimesheetForm
       defaultValues={{

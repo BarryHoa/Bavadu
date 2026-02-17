@@ -1,5 +1,9 @@
 "use client";
 
+import { Languages } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { useMemo, useState } from "react";
+
 import {
   IBaseButton,
   IBaseInput,
@@ -9,9 +13,6 @@ import {
   IBaseModalFooter,
   IBaseModalHeader,
 } from "@base/client/components";
-import { Languages } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
 
 import {
   DEFAULT_SUPPORTED_LANGS,

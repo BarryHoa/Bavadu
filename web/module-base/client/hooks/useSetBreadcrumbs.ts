@@ -1,8 +1,10 @@
 "use client";
 
 import type { BreadcrumbItem } from "@base/client/layouts/workspace/components/Breadcrumb";
-import { useBreadcrumbs } from "@base/client/contexts/workspace";
+
 import { useEffect } from "react";
+
+import { useBreadcrumbs } from "@base/client/contexts/workspace";
 
 /**
  * Set breadcrumbs for the current page. Call in page component - breadcrumbs

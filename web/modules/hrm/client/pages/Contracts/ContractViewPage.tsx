@@ -1,5 +1,13 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+import { Pencil } from "lucide-react";
+import { useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { useParams, useRouter } from "next/navigation";
+
+import { contractService } from "@mdl/hrm/client/services/ContractService";
+import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
 import {
   IBaseButton,
   IBaseCard,
@@ -7,13 +15,6 @@ import {
   IBasePageLayout,
   IBaseSpinner,
 } from "@base/client";
-import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
-import { contractService } from "@mdl/hrm/client/services/ContractService";
-import { useQuery } from "@tanstack/react-query";
-import { Pencil } from "lucide-react";
-import { useMemo } from "react";
-import { useTranslations } from "next-intl";
-import { useParams, useRouter } from "next/navigation";
 
 const CONTRACTS_LIST_PATH = "/workspace/modules/hrm/contracts";
 
@@ -59,6 +60,7 @@ export default function ContractViewPage(): React.ReactNode {
           ],
     [tTitle, contract, isLoading, tCommon],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   if (isLoading) {
@@ -77,9 +79,9 @@ export default function ContractViewPage(): React.ReactNode {
           {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
         </p>
         <IBaseButton
+          color="danger"
           size="sm"
           variant="bordered"
-          color="danger"
           onPress={() => refetch()}
         >
           Retry
@@ -93,10 +95,6 @@ export default function ContractViewPage(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="detail"
-      maxWidth="content"
-      title={contract.contractNumber}
-      subtitle={subtitle || undefined}
       headerActions={
         <IBaseButton
           color="primary"
@@ -107,6 +105,10 @@ export default function ContractViewPage(): React.ReactNode {
           {t("edit")}
         </IBaseButton>
       }
+      maxWidth="content"
+      subtitle={subtitle || undefined}
+      title={contract.contractNumber}
+      variant="detail"
     >
       <IBaseCard className="border border-default-200/60 shadow-sm">
         <IBaseCardBody className="gap-6 p-6">

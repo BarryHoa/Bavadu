@@ -1,11 +1,12 @@
 import type { InventoryCoreManagement } from "@mdl/stock/server/models/Inventory";
-import { StockMoveFrom } from "@mdl/stock/server/types";
 import type {
   NewSaleB2bTbDelivery,
   NewSaleB2bTbDeliveryLine,
 } from "../../schemas";
 
 import { eq } from "drizzle-orm";
+
+import { StockMoveFrom } from "@mdl/stock/server/types";
 import { RuntimeContext } from "@base/server/runtime/RuntimeContext";
 import { BaseModel } from "@base/server/models/BaseModel";
 import {

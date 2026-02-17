@@ -1,5 +1,6 @@
-import { BaseModel } from "@base/server/models/BaseModel";
 import { and, eq, inArray } from "drizzle-orm";
+
+import { BaseModel } from "@base/server/models/BaseModel";
 
 import { RuntimeContext } from "../../runtime/RuntimeContext";
 import { CACHE_NOT_FOUND, RedisCache } from "../../runtime/cache/RedisCache";
@@ -18,6 +19,16 @@ export interface UserPermissionResult {
     code: string;
     name: unknown;
   }>;
+  /**
+   * Global admin flag (system/admin roles).
+   * Khi true, user có thể được coi là có toàn quyền.
+   */
+  isGlobalAdmin?: boolean;
+  /**
+   * Danh sách module code mà user là admin module.
+   * Lấy từ JSONB is_admin_modules của các roles.
+   */
+  adminModules?: Set<string>;
 }
 
 // Interface cho cache data (Set không thể serialize, nên dùng Array)
@@ -29,6 +40,8 @@ interface CachedUserPermissionResult {
     name: unknown;
   }>;
   cachedAt: number;
+  isGlobalAdmin?: boolean;
+  adminModules?: string[];
 }
 
 export default class UserPermissionModel extends BaseModel<
@@ -46,6 +59,7 @@ export default class UserPermissionModel extends BaseModel<
    */
   private getCache(): RedisCache | undefined {
     const context = RuntimeContext.getInstance();
+
     return context.getRedisCache();
   }
 
@@ -93,6 +107,10 @@ export default class UserPermissionModel extends BaseModel<
         return {
           permissions: new Set(cached.permissions),
           roles: cached.roles,
+          isGlobalAdmin: cached.isGlobalAdmin,
+          adminModules: cached.adminModules
+            ? new Set(cached.adminModules)
+            : undefined,
         };
       }
     }
@@ -106,6 +124,10 @@ export default class UserPermissionModel extends BaseModel<
         permissions: Array.from(result.permissions), // Convert Set to Array
         roles: result.roles,
         cachedAt: Date.now(),
+        isGlobalAdmin: result.isGlobalAdmin,
+        adminModules: result.adminModules
+          ? Array.from(result.adminModules)
+          : undefined,
       };
 
       await cache.set(cacheKey, cacheData, {
@@ -130,6 +152,8 @@ export default class UserPermissionModel extends BaseModel<
           id: base_tb_roles.id,
           code: base_tb_roles.code,
           name: base_tb_roles.name,
+          isAdminModules: base_tb_roles.isAdminModules,
+          isSystem: base_tb_roles.isSystem,
         },
       })
       .from(base_tb_user_roles)
@@ -147,6 +171,30 @@ export default class UserPermissionModel extends BaseModel<
       code: r.role.code,
       name: r.role.name,
     }));
+
+    // Tính toán cờ admin từ roles
+    const adminModules = new Set<string>();
+    let isGlobalAdmin = false;
+
+    for (const r of userRoles) {
+      const role = r.role as {
+        code: string;
+        isAdminModules?: Record<string, boolean> | null;
+        isSystem?: boolean | null;
+      };
+
+      if (role.code === "system" || role.code === "admin" || role.isSystem) {
+        isGlobalAdmin = true;
+      }
+
+      const flags = role.isAdminModules ?? {};
+
+      for (const [moduleCode, isAdmin] of Object.entries(flags)) {
+        if (isAdmin) {
+          adminModules.add(moduleCode);
+        }
+      }
+    }
 
     // 2. Get permissions from role_permissions_default table for all user's roles
     const rolePermissions = new Set<string>();
@@ -206,6 +254,8 @@ export default class UserPermissionModel extends BaseModel<
     return {
       permissions: finalPermissions,
       roles,
+      isGlobalAdmin,
+      adminModules,
     };
   }
 
@@ -343,8 +393,10 @@ export default class UserPermissionModel extends BaseModel<
    */
   async invalidateCache(userId: string): Promise<void> {
     const cache = this.getCache();
+
     if (cache) {
       const cacheKey = this.getCacheKey(userId);
+
       await cache.delete(cacheKey, { prefix: this.cachePrefix });
     }
   }
@@ -358,8 +410,10 @@ export default class UserPermissionModel extends BaseModel<
     }
 
     const cache = this.getCache();
+
     if (cache) {
       const cacheKeys = userIds.map((id) => this.getCacheKey(id));
+
       await cache.deleteMany(cacheKeys, { prefix: this.cachePrefix });
     }
   }

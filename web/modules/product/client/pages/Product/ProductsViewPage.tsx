@@ -3,14 +3,15 @@
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
 import type { ProductDetail } from "../../interface/Product";
 
-import { IBaseButton } from "@base/client";
-import { IBaseCard, IBaseCardBody, IBaseChip, IBaseDivider } from "@base/client";
-import { IBaseSpinner } from "@base/client";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import { useTranslations } from "next-intl";
+
+import { IBaseSpinner } from "@base/client";
+import { IBaseCard, IBaseCardBody, IBaseChip, IBaseDivider } from "@base/client";
+import { IBaseButton } from "@base/client";
 import { IBaseLink } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { getClientLink } from "@base/client/utils/link/getClientLink";

@@ -1,9 +1,10 @@
 "use client";
 
-import { IBaseTabsPrimary, IBaseTabPrimary } from "@base/client/components";
-import { IBaseCard } from "@base/client";
 import ReactECharts from "echarts-for-react";
 import { useTranslations } from "next-intl";
+
+import { IBaseTabsPrimary, IBaseTabPrimary } from "@base/client/components";
+import { IBaseCard } from "@base/client";
 
 const overviewOption: echarts.EChartsOption = {
   tooltip: { trigger: "axis" },

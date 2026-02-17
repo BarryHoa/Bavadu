@@ -1,11 +1,12 @@
 "use client";
 
-import { IBasePageLayout } from "@base/client";
-import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
-import { performanceReviewService } from "@mdl/hrm/client/services/PerformanceReviewService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { performanceReviewService } from "@mdl/hrm/client/services/PerformanceReviewService";
 
 import PerformanceReviewForm, {
   type PerformanceReviewFormValues,
@@ -24,6 +25,7 @@ export default function PerformanceReviewCreatePageClient(): React.ReactNode {
     ],
     [t],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const {
@@ -70,9 +72,9 @@ export default function PerformanceReviewCreatePageClient(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="create"
       maxWidth="form"
       title={t("create")}
+      variant="create"
     >
       <PerformanceReviewForm
         isSubmitting={isPending}

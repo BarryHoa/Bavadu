@@ -1,15 +1,15 @@
 "use client";
 
-import {
-  useCreateUpdate,
-  useLocalizedText,
-  useSetBreadcrumbs,
-} from "@base/client/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 
+import {
+  useCreateUpdate,
+  useLocalizedText,
+  useSetBreadcrumbs,
+} from "@base/client/hooks";
 import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
 import { employeeService } from "@mdl/hrm/client/services/EmployeeService";
 
@@ -62,6 +62,7 @@ export default function EmployeeEditPage(): React.ReactNode {
           ],
     [employeeData, viewPath, tTitle, t, getLocalizedText],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const {
@@ -133,9 +134,9 @@ export default function EmployeeEditPage(): React.ReactNode {
           {error instanceof Error ? error.message : "Employee not found"}
         </p>
         <IBaseButton
+          color="danger"
           size="sm"
           variant="bordered"
-          color="danger"
           onPress={() => refetch()}
         >
           Retry
@@ -146,13 +147,12 @@ export default function EmployeeEditPage(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="edit"
       maxWidth="form"
-      title={t("editPageTitle")}
       subtitle={employeeData.employeeCode}
+      title={t("editPageTitle")}
+      variant="edit"
     >
       <EmployeeForm
-        mode="edit"
         defaultValues={{
           employeeCode: employeeData.employeeCode,
           firstName: employeeData.firstName || "",
@@ -177,6 +177,7 @@ export default function EmployeeEditPage(): React.ReactNode {
           isActive: employeeData.isActive ?? true,
         }}
         isSubmitting={isPending}
+        mode="edit"
         submitError={submitError}
         onCancel={() => router.push(viewPath)}
         onSubmit={handleSubmit}

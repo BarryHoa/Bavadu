@@ -1,11 +1,12 @@
 "use client";
 
-import { IBasePageLayout } from "@base/client";
-import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
-import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
 
 import TimesheetForm, {
   type TimesheetFormValues,
@@ -24,6 +25,7 @@ export default function TimesheetCreatePageClient(): React.ReactNode {
     ],
     [t],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const {
@@ -71,9 +73,9 @@ export default function TimesheetCreatePageClient(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="create"
       maxWidth="form"
       title={t("create")}
+      variant="create"
     >
       <TimesheetForm
         isSubmitting={isPending}

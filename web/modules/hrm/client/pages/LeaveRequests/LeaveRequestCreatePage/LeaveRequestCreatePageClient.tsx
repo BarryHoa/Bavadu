@@ -1,11 +1,12 @@
 "use client";
 
-import { IBasePageLayout } from "@base/client";
-import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
-import { leaveRequestService } from "@mdl/hrm/client/services/LeaveRequestService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { leaveRequestService } from "@mdl/hrm/client/services/LeaveRequestService";
 
 import LeaveRequestForm, {
   type LeaveRequestFormValues,
@@ -25,6 +26,7 @@ export default function LeaveRequestCreatePageClient(): React.ReactNode {
     ],
     [t, tTitle],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const {
@@ -66,13 +68,13 @@ export default function LeaveRequestCreatePageClient(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="create"
       maxWidth="form"
       title={t("create")}
+      variant="create"
     >
       <LeaveRequestForm
-        mode="create"
         isSubmitting={isPending}
+        mode="create"
         submitError={submitError}
         onCancel={() => router.push(LEAVE_REQUESTS_LIST_PATH)}
         onSubmit={handleSubmit}

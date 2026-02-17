@@ -249,7 +249,7 @@
       },
       "permissionMatrix": {
         "legend": "Role permissions",
-        "description": "Tick the permissions this role should have. Permissions are grouped by module and resource. Click resource name or checkbox to toggle.",
+        "description": "Tick the permissions this role should have. Permissions are grouped by module and resource. Use Admin module to grant full access and lock detailed toggles.",
         "loading": "Loading permissions...",
         "noPermissions": "No permissions available.",
         "selectAll": "Select all",
@@ -259,6 +259,7 @@
         "selectAllInModule": "Select or deselect all permissions in this module",
         "all": "All",
         "resource": "Resource",
+        "adminModule": "Admin module",
         "action": {
           "view": "View",
           "create": "Create",

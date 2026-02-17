@@ -1,16 +1,17 @@
 "use client";
 
-import {
-  useCreateUpdate,
-  useSetBreadcrumbs,
-} from "@base/client/hooks";
-import { leaveRequestService } from "@mdl/hrm/client/services/LeaveRequestService";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 
+import { leaveRequestService } from "@mdl/hrm/client/services/LeaveRequestService";
+import {
+  useCreateUpdate,
+  useSetBreadcrumbs,
+} from "@base/client/hooks";
 import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
+
 import LeaveRequestForm, {
   type LeaveRequestFormValues,
 } from "./components/LeaveRequestForm/LeaveRequestForm";
@@ -54,6 +55,7 @@ export default function LeaveRequestEditPage(): React.ReactNode {
     ],
     [t, leaveRequestData],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const {
@@ -110,9 +112,9 @@ export default function LeaveRequestEditPage(): React.ReactNode {
           {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
         </p>
         <IBaseButton
+          color="danger"
           size="sm"
           variant="bordered"
-          color="danger"
           onPress={() => refetch()}
         >
           Retry
@@ -123,13 +125,12 @@ export default function LeaveRequestEditPage(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="edit"
       maxWidth="form"
-      title={t("edit")}
       subtitle={`${leaveRequestData.startDate} – ${leaveRequestData.endDate}`}
+      title={t("edit")}
+      variant="edit"
     >
       <LeaveRequestForm
-        mode="edit"
         defaultValues={{
           employeeId: leaveRequestData.employeeId,
           leaveTypeId: leaveRequestData.leaveTypeId,
@@ -140,6 +141,7 @@ export default function LeaveRequestEditPage(): React.ReactNode {
           status: leaveRequestData.status,
         }}
         isSubmitting={isPending}
+        mode="edit"
         submitError={submitError}
         onCancel={() => router.push(viewPath)}
         onSubmit={handleSubmit}

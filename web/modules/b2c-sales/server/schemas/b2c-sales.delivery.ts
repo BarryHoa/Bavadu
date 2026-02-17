@@ -7,6 +7,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { stock_tb_stock_warehouses } from "@mdl/stock/server/schemas/stock.warehouse";
 
 import { mdlSaleB2cSchema } from "./schema";

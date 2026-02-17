@@ -1,6 +1,7 @@
+import { eq } from "drizzle-orm";
+
 import { LocaleDataType } from "@base/shared/interface/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
-import { eq } from "drizzle-orm";
 
 import { NewHrmTbWorkflow, hrm_tb_workflows } from "../../schemas";
 

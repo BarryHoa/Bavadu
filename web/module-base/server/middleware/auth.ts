@@ -1,3 +1,5 @@
+import { NextRequest, NextResponse } from "next/server";
+
 import { AUTH_CONFIG } from "@base/server/config/auth";
 import SessionModel from "@base/server/models/Sessions/SessionModel";
 import {
@@ -5,7 +7,6 @@ import {
   getUserAgent,
   logAuthFailure,
 } from "@base/server/utils/security-logger";
-import { NextRequest, NextResponse } from "next/server";
 
 /**
  * Authenticate request and inject user info into headers

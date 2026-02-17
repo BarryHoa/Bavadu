@@ -1,5 +1,3 @@
-import { product_tb_product_masters } from "@mdl/product/server/schemas/product.master";
-import { product_tb_product_variants } from "@mdl/product/server/schemas/product.variant";
 import { sql } from "drizzle-orm";
 import {
   boolean,
@@ -11,6 +9,9 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
+import { product_tb_product_masters } from "@mdl/product/server/schemas/product.master";
+import { product_tb_product_variants } from "@mdl/product/server/schemas/product.variant";
 
 import { sale_b2c_tb_price_lists } from "./b2c-sales.price-list";
 import { mdlSaleB2cSchema } from "./schema";

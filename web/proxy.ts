@@ -1,5 +1,7 @@
 import type { NextRequest } from "next/server";
 
+import { NextResponse } from "next/server";
+
 import {
   addPageHeaders,
   addSecurityHeaders,
@@ -8,7 +10,6 @@ import {
   checkRateLimit,
 } from "@base/server/middleware";
 import { checkSuspiciousRequest } from "@base/server/utils/request-monitor";
-import { NextResponse } from "next/server";
 
 // Public routes that don't require authentication
 const PUBLIC_ROUTES = [

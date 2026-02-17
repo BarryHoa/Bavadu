@@ -2,6 +2,10 @@
 
 import type { MasterFieldValue } from "./types";
 
+import { HelpCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useMemo } from "react";
+
 import {
   IBaseInput,
   IBaseInputMultipleLang,
@@ -14,9 +18,6 @@ import {
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { IBaseCheckbox, IBaseCheckboxGroup } from "@base/client";
-import { HelpCircle } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useMemo } from "react";
 
 import {
   ProductMasterFeatures,

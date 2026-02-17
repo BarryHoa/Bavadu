@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { addToast } from "@heroui/toast";
 
 import {
   IBaseButton,
@@ -15,11 +16,13 @@ import {
   IBaseInputMultipleLang,
   IBasePageLayout,
 } from "@base/client/components";
-import RolePermissionMatrix from "./components/RolePermissionMatrix";
 import { useSetBreadcrumbs } from "@base/client/hooks";
-import roleService from "@base/client/services/RoleService";
+import roleService, {
+  type UpdateRoleRequest,
+} from "@base/client/services/RoleService";
 
-import { addToast } from "@heroui/toast";
+import RolePermissionMatrix from "./components/RolePermissionMatrix";
+
 
 const PERMISSIONS_QUERY_KEY = ["settings", "permissions", "list"] as const;
 const ROLE_QUERY_KEY = (id: string) =>
@@ -45,6 +48,7 @@ export default function RoleEditPage() {
   const [selectedPermissionIds, setSelectedPermissionIds] = useState<
     Set<string>
   >(new Set());
+  const [adminModules, setAdminModules] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const roleQuery = useQuery({
@@ -74,6 +78,7 @@ export default function RoleEditPage() {
     ],
     [t, role],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   useEffect(() => {
@@ -86,17 +91,13 @@ export default function RoleEditPage() {
       setSelectedPermissionIds(
         new Set(data.permissions ? data.permissions.map((p) => p.id) : []),
       );
+      setAdminModules(data.isAdminModules ?? {});
     }
   }, [roleQuery.data]);
 
   const updateRoleMutation = useMutation({
-    mutationFn: (payload: {
-      id: string;
-      code: string;
-      name: LocalizeText;
-      description?: string;
-      permissionIds?: string[];
-    }) => roleService.updateRole(payload),
+    mutationFn: (payload: UpdateRoleRequest) =>
+      roleService.updateRole(payload),
     onSuccess: () => {
       addToast({
         title: t("toast.updateSuccess"),
@@ -110,6 +111,7 @@ export default function RoleEditPage() {
     onError: (error) => {
       const errorMessage =
         error instanceof Error ? error.message : t("toast.updateError");
+
       addToast({
         title: errorMessage,
         color: "danger",
@@ -150,6 +152,7 @@ export default function RoleEditPage() {
         selectedPermissionIds.size > 0
           ? Array.from(selectedPermissionIds)
           : undefined,
+      isAdminModules: adminModules,
     });
   }, [
     id,
@@ -157,6 +160,7 @@ export default function RoleEditPage() {
     name,
     description,
     selectedPermissionIds,
+    adminModules,
     validate,
     updateRoleMutation,
   ]);
@@ -165,7 +169,7 @@ export default function RoleEditPage() {
 
   if (roleQuery.isLoading) {
     return (
-      <IBasePageLayout variant="edit" title={t("loading")}>
+      <IBasePageLayout title={t("loading")} variant="edit">
         <IBaseCard>
           <IBaseCardBody>
             <p>{t("loading")}</p>
@@ -177,7 +181,7 @@ export default function RoleEditPage() {
 
   if (!role) {
     return (
-      <IBasePageLayout variant="edit" title={t("notFound")}>
+      <IBasePageLayout title={t("notFound")} variant="edit">
         <IBaseCard>
           <IBaseCardBody>
             <p>{t("notFound")}</p>
@@ -189,7 +193,7 @@ export default function RoleEditPage() {
 
   if (role.isSystem) {
     return (
-      <IBasePageLayout variant="edit" title={t("edit.title")}>
+      <IBasePageLayout title={t("edit.title")} variant="edit">
         <IBaseCard>
           <IBaseCardBody>
             <p>{t("cannotEditSystemRole")}</p>
@@ -201,9 +205,9 @@ export default function RoleEditPage() {
 
   return (
     <IBasePageLayout
-      variant="edit"
       maxWidth="form"
       title={t("edit.title")}
+      variant="edit"
     >
       <IBaseCard>
         <IBaseCardBody className="flex flex-col gap-4">
@@ -238,9 +242,11 @@ export default function RoleEditPage() {
                 {t("form.defaultPermissions")}
               </label>
               <RolePermissionMatrix
+                adminModules={adminModules}
+                isLoading={permissionsQuery.isLoading}
                 permissions={permissions}
                 selectedIds={selectedPermissionIds}
-                isLoading={permissionsQuery.isLoading}
+                onAdminModulesChange={setAdminModules}
                 onSelectionChange={setSelectedPermissionIds}
               />
             </div>

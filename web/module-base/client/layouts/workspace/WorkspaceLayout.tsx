@@ -1,10 +1,11 @@
+import { headers } from "next/headers";
+
 import {
   filterMenusByPermissions,
   loadAllMenus,
 } from "@base/server/loaders/menu-loader";
 import UserPermissionModel from "@base/server/models/UserPermission/UserPermissionModel";
 import { getModuleNames } from "@base/server/utils/get-module-names";
-import { headers } from "next/headers";
 import ModuleI18nProvider from "@base/client/contexts/i18n";
 import WorkspaceLayoutClient from "@base/client/layouts/workspace/WorkspaceLayoutClient";
 
@@ -30,6 +31,7 @@ export default async function WorkspaceLayout({
       const { permissions } = await userPermissionModel.getPermissionsByUser(
         userId,
       );
+
       menuItems = filterMenusByPermissions(
         menuItems as MenuWorkspaceElement[],
         permissions,

@@ -1,11 +1,12 @@
 "use client";
 
-import { IBasePageLayout } from "@base/client";
-import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
-import { courseService } from "@mdl/hrm/client/services/CourseService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { courseService } from "@mdl/hrm/client/services/CourseService";
 
 import CourseForm, {
   type CourseFormValues,
@@ -24,6 +25,7 @@ export default function CourseCreatePageClient(): React.ReactNode {
     ],
     [t],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const {
@@ -64,9 +66,9 @@ export default function CourseCreatePageClient(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="create"
       maxWidth="form"
       title={t("create")}
+      variant="create"
     >
       <CourseForm
         isSubmitting={isPending}

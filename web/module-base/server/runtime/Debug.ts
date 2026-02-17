@@ -13,8 +13,10 @@ class DebugClass {
     // Server-side: checks process.env.DEBUG
     if (typeof process !== "undefined" && process.env) {
       const debugEnv = process.env.DEBUG;
+
       return debugEnv === "true" || debugEnv === "1";
     }
+
     // Fallback: if process is not available, return false (disabled)
     return false;
   }

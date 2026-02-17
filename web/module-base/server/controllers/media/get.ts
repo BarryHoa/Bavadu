@@ -1,5 +1,6 @@
-import { getMediaServiceModel } from "@base/server/models/Media";
 import { NextRequest, NextResponse } from "next/server";
+
+import { getMediaServiceModel } from "@base/server/models/Media";
 
 export async function GET(
   request: NextRequest,

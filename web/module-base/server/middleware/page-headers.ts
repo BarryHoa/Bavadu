@@ -1,5 +1,6 @@
-import { AUTH_CONFIG } from "@base/server/config/auth";
 import { NextRequest } from "next/server";
+
+import { AUTH_CONFIG } from "@base/server/config/auth";
 
 /**
  * Add application-specific headers for page routes

@@ -1,6 +1,7 @@
+import { NextRequest } from "next/server";
+
 import { getMediaServiceModel } from "@base/server/models/Media";
 import { JSONResponse } from "@base/server/utils/JSONResponse";
-import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {

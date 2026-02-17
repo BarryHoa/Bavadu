@@ -30,6 +30,7 @@ class SessionModel extends BaseModel<typeof base_tb_sessions> {
   private shouldUseRedis(): boolean {
     try {
       const redisCache = RuntimeContext.getInstance().getRedisCache();
+
       return redisCache?.getStatus().connected ?? false;
     } catch {
       return false;
@@ -82,6 +83,7 @@ class SessionModel extends BaseModel<typeof base_tb_sessions> {
     }
 
     const cache = this.getRedisCache();
+
     if (!cache) {
       return;
     }
@@ -104,6 +106,7 @@ class SessionModel extends BaseModel<typeof base_tb_sessions> {
     }
 
     const cache = this.getRedisCache();
+
     if (cache) {
       await cache.delete(sessionToken, { prefix: this.cachePrefix });
     }
@@ -174,6 +177,7 @@ class SessionModel extends BaseModel<typeof base_tb_sessions> {
     // Try Redis cache first
     if (this.useRedis) {
       const cache = this.getRedisCache();
+
       if (cache) {
         const cached = await cache.get<ValidateSessionResult>(sessionToken, {
           prefix: this.cachePrefix,
@@ -342,6 +346,7 @@ class SessionModel extends BaseModel<typeof base_tb_sessions> {
     // Update cache if successful
     if (success) {
       const updated = await this._validateSessionFromDB(sessionToken);
+
       if (updated.valid) {
         await this.cacheSession(sessionToken, updated);
       }

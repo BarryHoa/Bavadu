@@ -3,8 +3,9 @@
  * Similar to Laravel's Kernel.php - defines scheduled tasks
  */
 
-import { SYSTEM_CONFIG } from "@base/server/config/system";
 import { getTasks, ScheduledTask as NodeCronTask, schedule } from "node-cron";
+
+import { SYSTEM_CONFIG } from "@base/server/config/system";
 
 export interface ScheduledTask {
   schedule: string;

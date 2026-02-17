@@ -1,12 +1,13 @@
 "use client";
 
-import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
-import { useCreateUpdate, useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
-import { contractService } from "@mdl/hrm/client/services/ContractService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo } from "react";
+
+import { contractService } from "@mdl/hrm/client/services/ContractService";
+import { useCreateUpdate, useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
+import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
 
 import ContractForm, {
   type ContractFormValues,
@@ -84,6 +85,7 @@ export default function ContractEditPage(): React.ReactNode {
           ],
     [tTitle, contractData, viewPath],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const handleSubmit = async (values: ContractFormValues) => {
@@ -128,9 +130,9 @@ export default function ContractEditPage(): React.ReactNode {
           {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
         </p>
         <IBaseButton
+          color="danger"
           size="sm"
           variant="bordered"
-          color="danger"
           onPress={() => refetch()}
         >
           Retry
@@ -141,13 +143,12 @@ export default function ContractEditPage(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="edit"
       maxWidth="form"
-      title={tTitle("list.edit")}
       subtitle={contractData.contractNumber}
+      title={tTitle("list.edit")}
+      variant="edit"
     >
       <ContractForm
-      mode="edit"
       defaultValues={{
         contractNumber: contractData.contractNumber,
         employeeId: contractData.employeeId,
@@ -167,6 +168,7 @@ export default function ContractEditPage(): React.ReactNode {
         isActive: contractData.isActive ?? true,
       }}
       isSubmitting={isPending}
+      mode="edit"
       submitError={submitError}
       onCancel={() => router.push(viewPath)}
         onSubmit={handleSubmit}

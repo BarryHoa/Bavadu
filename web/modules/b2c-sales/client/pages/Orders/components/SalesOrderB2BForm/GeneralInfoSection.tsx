@@ -1,8 +1,9 @@
 "use client";
 
-import { IBaseSingleSelectAsync } from "@base/client/components";
 import { useTranslations } from "next-intl";
 import { Control, Controller } from "react-hook-form";
+
+import { IBaseSingleSelectAsync } from "@base/client/components";
 
 import { useSalesOrderB2BForm } from "../../contexts/SalesOrderB2BFormContext";
 

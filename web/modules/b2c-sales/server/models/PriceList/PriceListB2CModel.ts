@@ -1,8 +1,9 @@
+import { and, desc, eq, ilike, sql } from "drizzle-orm";
+
 import {
   BaseViewListModel,
   type FilterConditionMap,
 } from "@base/server/models/BaseViewListModel";
-import { and, desc, eq, ilike, sql } from "drizzle-orm";
 
 import {
   NewSaleB2cTbPriceList,

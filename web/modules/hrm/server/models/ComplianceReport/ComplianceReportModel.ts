@@ -1,5 +1,6 @@
-import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
+
+import { BaseModel } from "@base/server/models/BaseModel";
 
 import {
   NewHrmTbComplianceReport,

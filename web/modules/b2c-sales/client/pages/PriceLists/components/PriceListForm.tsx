@@ -1,7 +1,8 @@
 "use client";
 
-import { IBaseTabsPrimary, SelectItemOption, IBaseTabPrimary } from "@base/client/components";
 import { Control, UseFormSetValue } from "react-hook-form";
+
+import { IBaseTabsPrimary, SelectItemOption, IBaseTabPrimary } from "@base/client/components";
 
 import ExplicitPricingTab from "./ExplicitPricingTab";
 import MainTab from "./MainTab";

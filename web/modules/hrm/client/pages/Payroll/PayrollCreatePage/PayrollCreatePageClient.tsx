@@ -1,11 +1,12 @@
 "use client";
 
-import { IBasePageLayout } from "@base/client";
-import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
-import { payrollService } from "@mdl/hrm/client/services/PayrollService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { payrollService } from "@mdl/hrm/client/services/PayrollService";
 
 import PayrollForm, {
   type PayrollFormValues,
@@ -24,6 +25,7 @@ export default function PayrollCreatePageClient(): React.ReactNode {
     ],
     [t],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const {
@@ -88,9 +90,9 @@ export default function PayrollCreatePageClient(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="create"
       maxWidth="form"
       title={t("create")}
+      variant="create"
     >
       <PayrollForm
         isSubmitting={isPending}

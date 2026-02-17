@@ -4,8 +4,6 @@
  * Handles compression of log files older than specified days into monthly archives
  */
 
-import { LOG_CONFIG } from "@base/server/config/log";
-import dayjs from "dayjs";
 import {
   createReadStream,
   createWriteStream,
@@ -18,6 +16,10 @@ import {
 import { basename, extname, join } from "path";
 import { pipeline } from "stream/promises";
 import { createGzip } from "zlib";
+
+import dayjs from "dayjs";
+
+import { LOG_CONFIG } from "@base/server/config/log";
 
 export interface CompressionResult {
   compressed: number;

@@ -1,7 +1,8 @@
-import { LocaleDataType } from "@base/shared/interface/Locale";
-import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
+
+import { LocaleDataType } from "@base/shared/interface/Locale";
+import { BaseModel } from "@base/server/models/BaseModel";
 
 import { NewHrmTbEmployee, hrm_tb_employees } from "../../schemas";
 import { hrm_tb_departments } from "../../schemas/hrm.department";
@@ -231,6 +232,7 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
       .limit(1);
 
     const row = result[0];
+
     if (!row) return null;
 
     return {

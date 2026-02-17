@@ -14,6 +14,8 @@ export type Role = {
   updatedAt?: string;
   createdBy?: string;
   updatedBy?: string;
+  // Module-level admin flags loaded from is_admin_modules JSONB
+  isAdminModules?: Record<string, boolean>;
 };
 
 export type Permission = {
@@ -56,6 +58,7 @@ export type CreateRoleRequest = {
   name: LocalizeText;
   description?: string;
   permissionIds?: string[];
+  isAdminModules?: Record<string, boolean>;
 };
 
 export type UpdateRoleRequest = {
@@ -64,6 +67,7 @@ export type UpdateRoleRequest = {
   name: LocalizeText;
   description?: string;
   permissionIds?: string[];
+  isAdminModules?: Record<string, boolean>;
 };
 
 export type CreateRoleResponse = {
@@ -111,6 +115,7 @@ class RoleService extends JsonRpcClientService {
       name: payload.name,
       description: payload.description,
       permissionIds: payload.permissionIds,
+      isAdminModules: payload.isAdminModules,
     });
 
     return {
@@ -127,6 +132,7 @@ class RoleService extends JsonRpcClientService {
       name: payload.name,
       description: payload.description,
       permissionIds: payload.permissionIds,
+      isAdminModules: payload.isAdminModules,
     });
 
     if (!data) {

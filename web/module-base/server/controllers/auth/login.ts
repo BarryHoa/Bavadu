@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
 
 import { SESSION_CONFIG } from "@base/server/config/session";
+
 import { setCsrfTokenCookie } from "../../middleware/csrf";
 import UserPermissionModel from "../../models/UserPermission/UserPermissionModel";
 import SessionModel from "../../models/Sessions/SessionModel";
@@ -157,6 +158,7 @@ export async function POST(request: NextRequest) {
     // Preload và cache permissions khi login
     try {
       const userPermissionModel = new UserPermissionModel();
+
       await userPermissionModel.getPermissionsByUser(user.id, true); // Force refresh và cache
     } catch (error) {
       // Log error nhưng không fail login nếu cache fail

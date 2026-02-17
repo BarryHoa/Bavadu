@@ -1,9 +1,10 @@
 "use client";
 
-import { IBaseCard, IBaseCardBody } from "@base/client";
-import { IBaseTabPrimary, IBaseTabsPrimary } from "@base/client/components";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
+
+import { IBaseCard, IBaseCardBody } from "@base/client";
+import { IBaseTabPrimary, IBaseTabsPrimary } from "@base/client/components";
 
 import { priceListB2CService } from "../../services/PriceListB2CService";
 

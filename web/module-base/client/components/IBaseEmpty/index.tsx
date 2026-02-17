@@ -4,9 +4,7 @@ import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import React from "react";
-
 import { Inbox } from "lucide-react";
-
 import clsx from "clsx";
 
 export interface IBaseEmptyProps {
@@ -61,7 +59,7 @@ export const IBaseEmpty = React.forwardRef<HTMLDivElement, IBaseEmptyProps>(
             iconSizeClasses[iconSize]
           )}
         >
-          <Icon className={iconInnerSizeClasses[iconSize]} aria-hidden />
+          <Icon aria-hidden className={iconInnerSizeClasses[iconSize]} />
         </div>
         {(title != null && title !== "") || (description != null && description !== "") ? (
           <div className="text-center space-y-1">

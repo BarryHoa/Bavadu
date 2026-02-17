@@ -1,5 +1,6 @@
-import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
+
+import { eq } from "drizzle-orm";
 
 import { base_tb_users, base_tb_users_login } from "../../schemas/base.user";
 import { BaseModel } from "../BaseModel";
@@ -31,9 +32,11 @@ class UserModel extends BaseModel<typeof base_tb_users> {
     };
   }> => {
     const userId = request?.headers.get("x-user-id") ?? null;
+
     if (!userId) return { data: { user: null } };
 
     const user = await this.getUserById(userId);
+
     if (!user) return { data: { user: null } };
 
     const [login] = await this.db

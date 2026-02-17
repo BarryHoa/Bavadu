@@ -1,11 +1,12 @@
 "use client";
 
-import { IBasePageLayout } from "@base/client";
-import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
-import { jobRequisitionService } from "@mdl/hrm/client/services/JobRequisitionService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { jobRequisitionService } from "@mdl/hrm/client/services/JobRequisitionService";
 
 import JobRequisitionForm, {
   type JobRequisitionFormValues,
@@ -24,6 +25,7 @@ export default function JobRequisitionCreatePageClient(): React.ReactNode {
     ],
     [t],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const {
@@ -108,9 +110,9 @@ export default function JobRequisitionCreatePageClient(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="create"
       maxWidth="form"
       title={t("create")}
+      variant="create"
     >
       <JobRequisitionForm
         isSubmitting={isPending}

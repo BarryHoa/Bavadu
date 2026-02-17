@@ -1,6 +1,6 @@
-import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { NextRequest } from "next/server";
 
+import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { SESSION_CONFIG } from "@base/server/config/session";
 import SessionModel from "@base/server/models/Sessions/SessionModel";
 import { Debug } from "@base/server/runtime/Debug";
@@ -15,6 +15,7 @@ export async function POST(request: NextRequest) {
 
     if (sessionToken) {
       const sessionModel = new SessionModel();
+
       await sessionModel.destroySession(sessionToken);
     }
 

@@ -1,3 +1,5 @@
+import { NextRequest, NextResponse } from "next/server";
+
 import { CSRF_CONFIG } from "@base/server/config/csrf";
 import {
   createSignedCsrfToken,
@@ -8,7 +10,6 @@ import {
   getUserAgent,
   logSuspiciousRequest,
 } from "@base/server/utils/security-logger";
-import { NextRequest, NextResponse } from "next/server";
 
 // CSRF configuration
 const CSRF_COOKIE_NAME = "csrf-token";

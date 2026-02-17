@@ -1,13 +1,14 @@
 "use client";
 
-import { IBasePageLayout } from "@base/client";
-import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
-import { departmentService } from "@mdl/hrm/client/services/DepartmentService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
-
 import { addToast } from "@heroui/toast";
+
+import { departmentService } from "@mdl/hrm/client/services/DepartmentService";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { IBasePageLayout } from "@base/client";
+
 import DepartmentForm, {
   type DepartmentFormValues,
 } from "../components/DepartmentForm/DepartmentForm";
@@ -27,6 +28,7 @@ export default function DepartmentCreatePageClient(): React.ReactNode {
     ],
     [t, tTitle],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const {
@@ -76,10 +78,10 @@ export default function DepartmentCreatePageClient(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="create"
       maxWidth="form"
-      title={t("pageTitle")}
       sidebar={<DepartmentPageSidebar />}
+      title={t("pageTitle")}
+      variant="create"
     >
       <DepartmentForm
         isSubmitting={isPending}

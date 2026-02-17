@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { addToast } from "@heroui/toast";
 
 import {
   IBaseButton,
@@ -16,7 +17,6 @@ import {
 import { useSetBreadcrumbs } from "@base/client/hooks";
 import sequenceService from "@base/client/services/SequenceService";
 
-import { addToast } from "@heroui/toast";
 
 const SEQUENCES_LIST_QUERY_KEY = ["settings", "sequences", "list"] as const;
 const SEQUENCE_QUERY_KEY = (id: string) =>
@@ -55,6 +55,7 @@ export default function SequenceEditPage() {
     ],
     [t, rule],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   useEffect(() => {
@@ -94,12 +95,16 @@ export default function SequenceEditPage() {
 
   const validate = useCallback(() => {
     const newErrors: Record<string, string> = {};
+
     if (!name.trim()) newErrors.name = errorsT("required");
     const startNum = parseInt(start, 10);
+
     if (isNaN(startNum) || startNum < 0) newErrors.start = errorsT("invalid");
     const stepNum = parseInt(step, 10);
+
     if (isNaN(stepNum) || stepNum < 1) newErrors.step = errorsT("invalid");
     setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   }, [name, start, step, errorsT]);
 
@@ -124,7 +129,7 @@ export default function SequenceEditPage() {
 
   if (ruleQuery.isLoading || !rule) {
     return (
-      <IBasePageLayout variant="edit" maxWidth="form" title={t("loading")}>
+      <IBasePageLayout maxWidth="form" title={t("loading")} variant="edit">
         <IBaseCard>
           <IBaseCardBody>Loading...</IBaseCardBody>
         </IBaseCard>
@@ -134,9 +139,9 @@ export default function SequenceEditPage() {
 
   return (
     <IBasePageLayout
-      variant="edit"
       maxWidth="form"
       title={t("edit.title")}
+      variant="edit"
     >
       <IBaseCard>
         <IBaseCardBody className="flex flex-col gap-4">
@@ -223,10 +228,10 @@ export default function SequenceEditPage() {
               </IBaseButton>
             )}
             <IBaseButton
+              isLoading={updateMutation.isPending}
               size="md"
               variant="flat"
               onPress={handleToggleActive}
-              isLoading={updateMutation.isPending}
             >
               {rule.isActive ? t("table.columns.setInactive") : t("table.columns.setActive")}
             </IBaseButton>

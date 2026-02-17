@@ -1,4 +1,3 @@
-import { base_tb_users } from "@base/server/schemas/base.user";
 import { sql } from "drizzle-orm";
 import {
   boolean,
@@ -11,6 +10,8 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
+import { base_tb_users } from "@base/server/schemas/base.user";
 
 import { hrm_tb_departments } from "./hrm.department";
 import { hrm_tb_positions } from "./hrm.position";

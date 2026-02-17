@@ -1,5 +1,16 @@
 "use client";
 
+import type { TimesheetDto } from "@mdl/hrm/client/interface/Timesheet";
+
+import { useQuery } from "@tanstack/react-query";
+import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
+
+import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
+import { formatDate } from "@base/client/utils/date/formatDate";
+import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import {
   IBaseButton,
   IBaseCard,
@@ -12,15 +23,6 @@ import {
   IBaseModalHeader,
   IBaseSpinner,
 } from "@base/client/components";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import { formatDate } from "@base/client/utils/date/formatDate";
-import type { TimesheetDto } from "@mdl/hrm/client/interface/Timesheet";
-import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
-import { useQuery } from "@tanstack/react-query";
-import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const WEEKDAYS_VI = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
@@ -32,6 +34,7 @@ function getMonthDays(year: number, month: number): (number | null)[][] {
   const daysInMonth = last.getDate();
   const rows: (number | null)[][] = [];
   let row: (number | null)[] = [];
+
   for (let i = 0; i < startDay; i++) row.push(null);
   for (let d = 1; d <= daysInMonth; d++) {
     row.push(d);
@@ -44,6 +47,7 @@ function getMonthDays(year: number, month: number): (number | null)[][] {
     while (row.length < 7) row.push(null);
     rows.push(row);
   }
+
   return rows;
 }
 
@@ -54,6 +58,7 @@ function getTimesheetByDate(
   day: number,
 ): TimesheetDto | undefined {
   const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
   return list.find((t) => t.workDate === dateStr);
 }
 
@@ -83,6 +88,7 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
         month,
         employeeId: employeeIdFromUrl ?? undefined,
       });
+
       return r?.data ?? [];
     },
   });
@@ -101,6 +107,7 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
   const isNextDisabled = useMemo(() => {
     const nowY = today.getFullYear();
     const nowM = today.getMonth() + 1;
+
     return year > nowY || (year === nowY && month >= nowM);
   }, [today, year, month]);
 
@@ -116,6 +123,7 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
   const goNext = useCallback(() => {
     const nowY = today.getFullYear();
     const nowM = today.getMonth() + 1;
+
     if (year > nowY || (year === nowY && month >= nowM)) {
       return;
     }
@@ -135,6 +143,7 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
   const handleDayClick = useCallback(
     (day: number) => {
       const ts = getTimesheetByDate(timesheetList, year, month, day);
+
       setDetailTimesheet(ts ?? null);
     },
     [timesheetList, year, month],
@@ -145,6 +154,7 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
     const isNoEmployeeLinked =
       msg.toLowerCase().includes("no employee linked") ||
       msg.toLowerCase().includes("employee linked");
+
     return (
       <div className="rounded-xl border border-default-200 bg-default-50 p-6 text-center text-default-600">
         <p className="font-medium">{t("noData")}</p>
@@ -166,27 +176,27 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
         <div className="flex items-center gap-2">
           <IBaseButton
             size="sm"
-            variant="bordered"
             startContent={<ChevronLeft className="size-4" />}
+            variant="bordered"
             onPress={goPrev}
           >
             {t("prevMonth")}
           </IBaseButton>
           <IBaseButton
-            size="sm"
             color="primary"
-            variant="flat"
+            size="sm"
             startContent={<Calendar className="size-4" />}
+            variant="flat"
             onPress={goCurrent}
           >
             {t("currentMonth")}
           </IBaseButton>
           <IBaseButton
+            endContent={<ChevronRight className="size-4" />}
+            isDisabled={isNextDisabled}
             size="sm"
             variant="bordered"
-            endContent={<ChevronRight className="size-4" />}
             onPress={goNext}
-            isDisabled={isNextDisabled}
           >
             {t("nextMonth")}
           </IBaseButton>
@@ -227,16 +237,17 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
                         day,
                       );
                       const hasData = !!ts;
+
                       return (
                         <td key={di} className="p-1 align-top">
                           <button
-                            type="button"
-                            onClick={() => handleDayClick(day)}
                             className={`min-h-[72px] w-full rounded-lg border p-2 text-left text-sm transition-colors ${
                               hasData
                                 ? "border-primary-300 bg-primary-50 hover:bg-primary-100"
                                 : "border-default-200 bg-default-50/50 hover:bg-default-100"
                             }`}
+                            type="button"
+                            onClick={() => handleDayClick(day)}
                           >
                             <span className="font-medium">{day}</span>
                             {hasData && ts && (
@@ -267,8 +278,8 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
 
       <IBaseModal
         isOpen={!!detailTimesheet}
-        onOpenChange={(open) => !open && setDetailTimesheet(null)}
         size="2xl"
+        onOpenChange={(open) => !open && setDetailTimesheet(null)}
       >
         <IBaseModalContent>
           <IBaseModalHeader className="flex flex-col gap-1">

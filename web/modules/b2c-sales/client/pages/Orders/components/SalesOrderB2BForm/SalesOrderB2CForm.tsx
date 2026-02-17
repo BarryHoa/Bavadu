@@ -2,6 +2,17 @@
 
 import type { SalesOrderB2CFormValues } from "../../validation/createSalesOrderB2CValidation";
 
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { useMemo, useState } from "react";
+import {
+  Controller,
+  useFieldArray,
+  useForm,
+  type SubmitHandler,
+} from "react-hook-form";
+
 import {
   IBaseButton,
   IBaseCard,
@@ -15,18 +26,9 @@ import {
   shippingTermService,
   taxRateService,
 } from "@base/client/services";
-import { valibotResolver } from "@hookform/resolvers/valibot";
 import UnitOfMeasureService from "@mdl/product/client/services/UnitOfMeasureService";
 import StockService from "@mdl/stock/client/services/StockService";
-import { useQuery } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
-import {
-  Controller,
-  useFieldArray,
-  useForm,
-  type SubmitHandler,
-} from "react-hook-form";
+
 
 import { type CustomerIndividualDto } from "../../../../services/CustomerService";
 import { createSalesOrderB2CValidation } from "../../validation/createSalesOrderB2CValidation";

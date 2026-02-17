@@ -33,6 +33,7 @@ export class ScheduledTask extends Kernel {
       try {
         const sequenceModel = new SequenceModel();
         const { deleted } = await sequenceModel.clearExcessCounts();
+
         console.log(`[Cron] Cleared ${deleted} excess sequence count(s)`);
       } catch (error) {
         console.error("[Cron] Error clearing sequence counts:", error);

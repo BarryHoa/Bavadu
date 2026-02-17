@@ -4,8 +4,9 @@ import type {
   AdministrativeUnitType,
 } from "@base/client/interface/Address";
 
-import { LocalizeText } from "@base/client/interface/LocalizeText";
 import isEmpty from "lodash/isEmpty";
+
+import { LocalizeText } from "@base/client/interface/LocalizeText";
 
 type LocalizeTextOrString = LocalizeText | string;
 /**

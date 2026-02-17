@@ -2,12 +2,10 @@
 
 import type { DepartmentFormValues } from "../../validation/departmentValidation";
 
-import {
-  IBaseButton,
-  IBaseCard,
-  IBaseCardBody,
-  IBaseSwitch,
-} from "@base/client";
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { useTranslations } from "next-intl";
+import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+
 import {
   IBaseAccordion,
   IBaseAccordionItem,
@@ -15,9 +13,12 @@ import {
   IBaseInputMultipleLang,
   IBaseSingleSelectAsync,
 } from "@base/client/components";
-import { valibotResolver } from "@hookform/resolvers/valibot";
-import { useTranslations } from "next-intl";
-import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+import {
+  IBaseButton,
+  IBaseCard,
+  IBaseCardBody,
+  IBaseSwitch,
+} from "@base/client";
 
 import { createDepartmentValidation } from "../../validation/departmentValidation";
 
@@ -165,16 +166,16 @@ export default function DepartmentForm({
 
             {/* P3: Progressive disclosure - Manager & Description in collapsible section */}
             <IBaseAccordion
-              selectionMode="single"
               defaultExpandedKeys={[]}
               itemClasses={{ base: "py-0" }}
+              selectionMode="single"
               variant="light"
             >
               <IBaseAccordionItem
                 key="additional"
                 aria-label={tLabels("additionalDetails")}
-                title={tLabels("additionalDetails")}
                 classNames={{ content: "pb-2 pt-0" }}
+                title={tLabels("additionalDetails")}
               >
                 <div className="flex flex-col gap-4">
                   <Controller

@@ -1,6 +1,7 @@
+import { NextRequest, NextResponse } from "next/server";
+
 import { getLogCompressionModel } from "@base/server/models/Logs/LogCompressionModel";
 import { initializeRuntime } from "@base/server/utils/initializeRuntime";
-import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

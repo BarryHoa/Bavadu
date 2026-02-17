@@ -1,7 +1,8 @@
 import type { StockTbStockLevel, StockTbStockMove } from "../../schemas";
 
-import { BaseModel } from "@base/server/models/BaseModel";
 import { and, eq, sql } from "drizzle-orm";
+
+import { BaseModel } from "@base/server/models/BaseModel";
 
 import { stock_tb_stock_levels, stock_tb_stock_moves } from "../../schemas";
 import {

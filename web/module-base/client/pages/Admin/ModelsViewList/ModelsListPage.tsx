@@ -1,19 +1,20 @@
 "use client";
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import MiniSearch from "minisearch";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
+
+import {
+  IBaseTable,
+  IBaseTableColumnDefinition,
+} from "@base/client/components/IBaseTable";
 import {
   IBaseButton,
   IBaseCard,
   IBaseCardBody,
   IBaseInput,
 } from "@base/client/components";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import MiniSearch from "minisearch";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  IBaseTable,
-  IBaseTableColumnDefinition,
-} from "@base/client/components/IBaseTable";
-import { useTranslations } from "next-intl";
 
 import adminModelService, {
   type ModelRow,

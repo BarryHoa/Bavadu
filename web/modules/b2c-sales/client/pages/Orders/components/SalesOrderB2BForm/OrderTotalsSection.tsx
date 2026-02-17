@@ -1,9 +1,10 @@
 "use client";
 
-import { IBaseInputNumber } from "@base/client/components";
-import { IBaseDivider } from "@base/client";
 import { useTranslations } from "next-intl";
 import { Control, Controller } from "react-hook-form";
+
+import { IBaseInputNumber } from "@base/client/components";
+import { IBaseDivider } from "@base/client";
 
 interface OrderTotalsSectionProps {
   control: Control<any>;

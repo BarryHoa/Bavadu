@@ -6,6 +6,7 @@ import type {
 } from "@base/shared/interface/ListInterface";
 
 import { ilike } from "drizzle-orm";
+
 import {
   BaseViewListModel,
   type FilterConditionMap,

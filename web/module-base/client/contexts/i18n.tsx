@@ -1,9 +1,10 @@
 "use client";
 
-import { useMessagesStore } from "@base/client/stores/messages-store";
-import { SYSTEM_TIMEZONE } from "@base/shared/constants";
 import { NextIntlClientProvider } from "next-intl";
 import { useEffect } from "react";
+
+import { useMessagesStore } from "@base/client/stores/messages-store";
+import { SYSTEM_TIMEZONE } from "@base/shared/constants";
 
 export default function ModuleI18nProvider({
   locale,

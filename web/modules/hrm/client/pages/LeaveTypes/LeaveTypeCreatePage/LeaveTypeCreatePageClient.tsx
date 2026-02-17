@@ -1,11 +1,12 @@
 "use client";
 
-import { IBasePageLayout } from "@base/client";
-import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
-import { leaveTypeService } from "@mdl/hrm/client/services/LeaveTypeService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { leaveTypeService } from "@mdl/hrm/client/services/LeaveTypeService";
 
 import LeaveTypeForm, {
   type LeaveTypeFormValues,
@@ -25,6 +26,7 @@ export default function LeaveTypeCreatePageClient(): React.ReactNode {
     ],
     [t, tTitle],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const {
@@ -90,9 +92,9 @@ export default function LeaveTypeCreatePageClient(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="create"
       maxWidth="form"
       title={t("create")}
+      variant="create"
     >
       <LeaveTypeForm
         isSubmitting={isPending}

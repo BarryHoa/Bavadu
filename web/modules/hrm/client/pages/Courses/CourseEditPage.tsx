@@ -1,12 +1,13 @@
 "use client";
 
-import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
-import { useCreateUpdate, useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
-import { courseService } from "@mdl/hrm/client/services/CourseService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo } from "react";
+
+import { courseService } from "@mdl/hrm/client/services/CourseService";
+import { useCreateUpdate, useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
+import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
 
 import CourseForm, {
   type CourseFormValues,
@@ -86,6 +87,7 @@ export default function CourseEditPage(): React.ReactNode {
           ],
     [t, courseData, viewPath, getLocalizedText],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const handleSubmit = async (values: CourseFormValues) => {
@@ -118,9 +120,9 @@ export default function CourseEditPage(): React.ReactNode {
           {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
         </p>
         <IBaseButton
+          color="danger"
           size="sm"
           variant="bordered"
-          color="danger"
           onPress={() => refetch()}
         >
           Retry
@@ -133,10 +135,10 @@ export default function CourseEditPage(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="edit"
       maxWidth="form"
-      title={t("edit")}
       subtitle={subtitle}
+      title={t("edit")}
+      variant="edit"
     >
       <CourseForm
       defaultValues={{

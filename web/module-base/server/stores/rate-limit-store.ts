@@ -33,6 +33,7 @@ class InMemoryRateLimitStore {
 
     if (Date.now() > entry.resetTime) {
       this.store.delete(key);
+
       return 0;
     }
 
@@ -48,10 +49,12 @@ class InMemoryRateLimitStore {
         count: 1,
         resetTime: now + windowMs,
       });
+
       return 1;
     }
 
     entry.count++;
+
     return entry.count;
   }
 
@@ -63,6 +66,7 @@ class InMemoryRateLimitStore {
     }
 
     const remaining = entry.resetTime - Date.now();
+
     return Math.max(0, remaining);
   }
 
@@ -76,6 +80,7 @@ class InMemoryRateLimitStore {
 
   private cleanup(): void {
     const now = Date.now();
+
     this.store.forEach((entry, key) => {
       if (now > entry.resetTime) {
         this.store.delete(key);
@@ -117,6 +122,7 @@ class RateLimitStore {
     }
     try {
       const redisCache = RuntimeContext.getInstance().getRedisCache();
+
       return redisCache?.getStatus().connected ?? false;
     } catch {
       return false;
@@ -137,6 +143,7 @@ class RateLimitStore {
     }
 
     const cache = this.getRedisCache();
+
     if (!cache) {
       return this.memoryStore.get(key);
     }
@@ -151,6 +158,7 @@ class RateLimitStore {
 
     if (Date.now() > cached.resetTime) {
       await this.reset(key);
+
       return 0;
     }
 
@@ -163,6 +171,7 @@ class RateLimitStore {
     }
 
     const cache = this.getRedisCache();
+
     if (!cache) {
       return this.memoryStore.increment(key, windowMs);
     }
@@ -178,6 +187,7 @@ class RateLimitStore {
       : { count: cached.count + 1, resetTime: cached.resetTime };
 
     const ttl = Math.max(1, Math.ceil((entry.resetTime - now) / 1000));
+
     await cache.set(key, entry, { prefix: this.cachePrefix, ttl });
 
     return entry.count;
@@ -189,6 +199,7 @@ class RateLimitStore {
     }
 
     const cache = this.getRedisCache();
+
     if (!cache) {
       return this.memoryStore.getTimeUntilReset(key);
     }
@@ -207,6 +218,7 @@ class RateLimitStore {
   async reset(key: string): Promise<void> {
     if (this.useRedis) {
       const cache = this.getRedisCache();
+
       if (cache) {
         await cache.delete(key, { prefix: this.cachePrefix });
       }
@@ -217,6 +229,7 @@ class RateLimitStore {
   async clear(): Promise<void> {
     if (this.useRedis) {
       const cache = this.getRedisCache();
+
       if (cache) {
         await cache.clearPattern("*", { prefix: this.cachePrefix });
       }

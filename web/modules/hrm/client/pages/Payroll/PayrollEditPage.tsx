@@ -1,12 +1,13 @@
 "use client";
 
-import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
-import { useCreateUpdate, useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
-import { payrollService } from "@mdl/hrm/client/services/PayrollService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo } from "react";
+
+import { payrollService } from "@mdl/hrm/client/services/PayrollService";
+import { useCreateUpdate, useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
+import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
 
 import PayrollForm, {
   type PayrollFormValues,
@@ -87,6 +88,7 @@ export default function PayrollEditPage(): React.ReactNode {
           ],
     [t, payrollData, viewPath, getLocalizedText],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const handleSubmit = async (values: PayrollFormValues) => {
@@ -156,9 +158,9 @@ export default function PayrollEditPage(): React.ReactNode {
           {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
         </p>
         <IBaseButton
+          color="danger"
           size="sm"
           variant="bordered"
-          color="danger"
           onPress={() => refetch()}
         >
           Retry
@@ -174,10 +176,10 @@ export default function PayrollEditPage(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="edit"
       maxWidth="form"
-      title={t("edit")}
       subtitle={subtitle || undefined}
+      title={t("edit")}
+      variant="edit"
     >
       <PayrollForm
       defaultValues={{

@@ -1,10 +1,11 @@
 "use client";
 
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+
 import { WorkspaceProvider } from "@base/client/contexts/workspace";
 import { usePrefetchModuleMessages } from "@base/client/hooks/usePrefetchModuleMessages";
 import { MenuWorkspaceElement } from "@base/client/interface/WorkspaceMenuInterface";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import Breadcrumb from "@base/client/layouts/workspace/components/Breadcrumb";
 import Content from "@base/client/layouts/workspace/components/Content";
 import MenuPanel from "@base/client/layouts/workspace/components/Menu";

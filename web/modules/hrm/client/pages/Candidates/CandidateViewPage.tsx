@@ -1,5 +1,11 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+import { Pencil } from "lucide-react";
+import { useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { useParams, useRouter } from "next/navigation";
+
 import {
   IBaseButton,
   IBaseCard,
@@ -11,11 +17,6 @@ import { IBaseDigitViewer } from "@base/client/components";
 import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { candidateService } from "@mdl/hrm/client/services/CandidateService";
-import { useQuery } from "@tanstack/react-query";
-import { Pencil } from "lucide-react";
-import { useMemo } from "react";
-import { useTranslations } from "next-intl";
-import { useParams, useRouter } from "next/navigation";
 
 const CANDIDATES_LIST_PATH = "/workspace/modules/hrm/candidates";
 
@@ -66,6 +67,7 @@ export default function CandidateViewPage(): React.ReactNode {
           ],
     [t, candidateData, isLoading, tCommon, getLocalizedText],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   if (isLoading) {
@@ -84,9 +86,9 @@ export default function CandidateViewPage(): React.ReactNode {
           {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
         </p>
         <IBaseButton
+          color="danger"
           size="sm"
           variant="bordered"
-          color="danger"
           onPress={() => refetch()}
         >
           Retry
@@ -105,10 +107,6 @@ export default function CandidateViewPage(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="detail"
-      maxWidth="content"
-      title={titleLabel}
-      subtitle={subtitle || undefined}
       headerActions={
         <IBaseButton
           color="primary"
@@ -119,6 +117,10 @@ export default function CandidateViewPage(): React.ReactNode {
           {tCommon("actions.edit")}
         </IBaseButton>
       }
+      maxWidth="content"
+      subtitle={subtitle || undefined}
+      title={titleLabel}
+      variant="detail"
     >
       <IBaseCard className="border border-default-200/60 shadow-sm">
         <IBaseCardBody className="gap-6 p-6">

@@ -8,6 +8,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { base_tb_payment_terms } from "@base/server/schemas/base.payment-term";
 
 import { mdlSaleB2cSchema } from "./schema";

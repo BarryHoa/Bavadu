@@ -1,5 +1,13 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+import { Pencil } from "lucide-react";
+import { useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { useParams, useRouter } from "next/navigation";
+
+import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
+import { IBaseDigitViewer } from "@base/client/components";
 import {
   IBaseButton,
   IBaseCard,
@@ -7,13 +15,6 @@ import {
   IBasePageLayout,
   IBaseSpinner,
 } from "@base/client";
-import { IBaseDigitViewer } from "@base/client/components";
-import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
-import { useQuery } from "@tanstack/react-query";
-import { Pencil } from "lucide-react";
-import { useMemo } from "react";
-import { useTranslations } from "next-intl";
-import { useParams, useRouter } from "next/navigation";
 import { payrollService } from "@mdl/hrm/client/services/PayrollService";
 
 const PAYROLL_LIST_PATH = "/workspace/modules/hrm/payroll";
@@ -65,6 +66,7 @@ export default function PayrollViewPage(): React.ReactNode {
           ],
     [t, payrollData, isLoading, tCommon, getLocalizedText],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   if (isLoading) {
@@ -83,9 +85,9 @@ export default function PayrollViewPage(): React.ReactNode {
           {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
         </p>
         <IBaseButton
+          color="danger"
           size="sm"
           variant="bordered"
-          color="danger"
           onPress={() => refetch()}
         >
           Retry
@@ -104,10 +106,6 @@ export default function PayrollViewPage(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="detail"
-      maxWidth="content"
-      title={titleLabel}
-      subtitle={subtitle || undefined}
       headerActions={
         <IBaseButton
           color="primary"
@@ -118,6 +116,10 @@ export default function PayrollViewPage(): React.ReactNode {
           {tCommon("actions.edit")}
         </IBaseButton>
       }
+      maxWidth="content"
+      subtitle={subtitle || undefined}
+      title={titleLabel}
+      variant="detail"
     >
       <IBaseCard className="border border-default-200/60 shadow-sm">
         <IBaseCardBody className="gap-6 p-6">

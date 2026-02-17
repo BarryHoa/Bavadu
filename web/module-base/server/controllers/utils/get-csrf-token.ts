@@ -1,6 +1,7 @@
+import { NextRequest } from "next/server";
+
 import { createSignedCsrfToken } from "@base/server/utils/csrf-token";
 import { JSONResponse } from "@base/server/utils/JSONResponse";
-import { NextRequest } from "next/server";
 
 /**
  * GET /api/base/utils/get-csrf-token

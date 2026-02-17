@@ -1,11 +1,12 @@
 "use client";
 
-import { IBasePageLayout } from "@base/client";
-import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
-import { employeeService } from "@mdl/hrm/client/services/EmployeeService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { employeeService } from "@mdl/hrm/client/services/EmployeeService";
 
 import EmployeeForm, {
   type EmployeeFormValues,
@@ -25,6 +26,7 @@ export default function EmployeeCreatePageClient(): React.ReactNode {
     ],
     [t, tTitle],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const {
@@ -81,9 +83,9 @@ export default function EmployeeCreatePageClient(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="create"
       maxWidth="form"
       title={t("pageTitle")}
+      variant="create"
     >
       <EmployeeForm
         isSubmitting={isPending}

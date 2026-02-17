@@ -28,6 +28,12 @@ export const base_tb_roles = mdBaseSchema.table(
     isSystem: boolean("is_system").default(false).notNull(),
     isActive: boolean("is_active").default(true).notNull(),
 
+    // Module-level admin flags, stored as JSONB: { [moduleCode]: true }
+    isAdminModules: jsonb("is_admin_modules")
+      .notNull()
+      .$type<Record<string, boolean>>()
+      .default({}),
+
     // Audit
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),

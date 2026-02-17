@@ -1,7 +1,8 @@
 "use client";
 
-import { useMessagesStore } from "@base/client/stores/messages-store";
 import { useEffect } from "react";
+
+import { useMessagesStore } from "@base/client/stores/messages-store";
 
 /**
  * Hook to prefetch messages for all modules except current one

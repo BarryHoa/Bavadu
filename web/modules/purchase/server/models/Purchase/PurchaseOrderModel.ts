@@ -4,9 +4,10 @@ import type {
   PurchaseTbPurchaseOrderLine,
 } from "../../schemas";
 import type { InventoryCoreManagement } from "@mdl/stock/server/models/Inventory";
-import { StockMoveFrom } from "@mdl/stock/server/types";
 
 import { desc, eq, sql } from "drizzle-orm";
+
+import { StockMoveFrom } from "@mdl/stock/server/types";
 import { BaseModel } from "@base/server/models/BaseModel";
 import { RuntimeContext } from "@base/server/runtime/RuntimeContext";
 

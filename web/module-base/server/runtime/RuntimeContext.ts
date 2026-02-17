@@ -193,10 +193,12 @@ export class RuntimeContext {
       // Initialize Redis if enabled
       let redisCache: RedisCache | undefined;
       const redisEnabled = process.env.REDIS_ENABLED === "true";
+
       if (redisEnabled) {
         Debug.log("[RuntimeContext] Initializing Redis...");
         try {
           const redisManager = new RedisClientManager();
+
           redisCache = new RedisCache(redisManager);
           Debug.log("[RuntimeContext] Redis initialized");
         } catch (error) {

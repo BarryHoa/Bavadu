@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
+import { addToast } from "@heroui/toast";
 
 import {
   IBaseButton,
@@ -15,7 +16,6 @@ import {
 import { useSetBreadcrumbs } from "@base/client/hooks";
 import sequenceService from "@base/client/services/SequenceService";
 
-import { addToast } from "@heroui/toast";
 
 const SEQUENCES_LIST_QUERY_KEY = ["settings", "sequences", "list"] as const;
 const BASE_PATH = "/workspace/settings/sequences";
@@ -41,6 +41,7 @@ export default function SequenceCreatePage() {
     ],
     [t],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const createMutation = useMutation({
@@ -67,12 +68,16 @@ export default function SequenceCreatePage() {
 
   const validate = useCallback(() => {
     const newErrors: Record<string, string> = {};
+
     if (!name.trim()) newErrors.name = errorsT("required");
     const startNum = parseInt(start, 10);
+
     if (isNaN(startNum) || startNum < 0) newErrors.start = errorsT("invalid");
     const stepNum = parseInt(step, 10);
+
     if (isNaN(stepNum) || stepNum < 1) newErrors.step = errorsT("invalid");
     setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   }, [name, start, step, errorsT]);
 
@@ -89,9 +94,9 @@ export default function SequenceCreatePage() {
 
   return (
     <IBasePageLayout
-      variant="create"
       maxWidth="form"
       title={t("create.title")}
+      variant="create"
     >
       <IBaseCard>
         <IBaseCardBody className="flex flex-col gap-4">

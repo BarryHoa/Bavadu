@@ -1,6 +1,7 @@
-import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
+
+import { BaseModel } from "@base/server/models/BaseModel";
 
 import { NewHrmTbLeaveRequest, hrm_tb_leave_requests } from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";

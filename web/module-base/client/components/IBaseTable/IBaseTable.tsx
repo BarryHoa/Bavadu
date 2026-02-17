@@ -1,11 +1,11 @@
 "use client";
 
 import type { Selection, TableProps } from "@heroui/table";
+import type { CSSProperties } from "react";
 
 import clsx from "clsx";
 import { RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
-import type { CSSProperties } from "react";
 import { useMemo } from "react";
 
 import IBaseTooltip from "../IBaseTooltip";
@@ -205,7 +205,6 @@ export function IBaseTable<T = any>({
           enableColumnResizing={isResizableColumns}
           getRowKey={core.getRowKey}
           headerGroups={core.headerGroups}
-          setColumnOrder={core.setColumnOrder}
           isCompact={true}
           isHeaderSticky={true}
           isStriped={true}
@@ -224,6 +223,7 @@ export function IBaseTable<T = any>({
           rows={core.rows}
           selectedKeys={selectionProps?.selectedKeys}
           selectionMode={selectionProps?.selectionMode}
+          setColumnOrder={core.setColumnOrder}
           sortDescriptor={core.sortDescriptor}
           tableLayout={tableLayout}
           visibleColumns={core.visibleColumns}

@@ -1,5 +1,13 @@
 "use client";
 
+import { Pencil } from "lucide-react";
+import { useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { useParams, useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+
+import { positionService } from "@mdl/hrm/client/services/PositionService";
+import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
 import {
   IBaseButton,
   IBaseCard,
@@ -7,13 +15,6 @@ import {
   IBasePageLayout,
   IBaseSpinner,
 } from "@base/client";
-import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
-import { positionService } from "@mdl/hrm/client/services/PositionService";
-import { Pencil } from "lucide-react";
-import { useMemo } from "react";
-import { useTranslations } from "next-intl";
-import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
 
 const POSITIONS_LIST_PATH = "/workspace/modules/hrm/positions";
 
@@ -62,6 +63,7 @@ export default function PositionViewPage(): React.ReactNode {
           ],
     [position, id, isLoading, tTitle, t, getLocalizedText],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   if (isLoading) {
@@ -80,9 +82,9 @@ export default function PositionViewPage(): React.ReactNode {
           {error instanceof Error ? error.message : (t("notFound") ?? "Position not found")}
         </p>
         <IBaseButton
+          color="danger"
           size="sm"
           variant="bordered"
-          color="danger"
           onPress={() => refetch()}
         >
           Retry
@@ -96,10 +98,6 @@ export default function PositionViewPage(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="detail"
-      maxWidth="content"
-      title={positionName}
-      subtitle={position.code}
       headerActions={
         <IBaseButton
           color="primary"
@@ -110,6 +108,10 @@ export default function PositionViewPage(): React.ReactNode {
           {t("edit")}
         </IBaseButton>
       }
+      maxWidth="content"
+      subtitle={position.code}
+      title={positionName}
+      variant="detail"
     >
       <IBaseCard className="border border-default-200/60 shadow-sm">
         <IBaseCardBody className="gap-6 p-6">

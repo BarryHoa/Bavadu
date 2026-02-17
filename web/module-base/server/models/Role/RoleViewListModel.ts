@@ -4,16 +4,17 @@ import type {
 } from "@base/shared/interface/ListInterface";
 import type { RoleRow } from "./RoleModel";
 
+import { eq, ilike, sql } from "drizzle-orm";
+
 import {
   BaseViewListModel,
   type ColumnMap,
   type FilterConditionMap,
   type SearchConditionMap,
 } from "@base/server/models/BaseViewListModel";
-import { eq, ilike, sql } from "drizzle-orm";
+import { ParamFilter } from "@base/shared/interface/FilterInterface";
 
 import { base_tb_roles } from "../../schemas/base.role";
-import { ParamFilter } from "@base/shared/interface/FilterInterface";
 
 class RoleViewListModel extends BaseViewListModel<
   typeof base_tb_roles,

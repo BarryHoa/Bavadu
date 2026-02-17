@@ -1,15 +1,15 @@
 "use client";
 
-import {
-  useCreateUpdate,
-  useLocalizedText,
-  useSetBreadcrumbs,
-} from "@base/client/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 
+import {
+  useCreateUpdate,
+  useLocalizedText,
+  useSetBreadcrumbs,
+} from "@base/client/hooks";
 import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
 import { positionService } from "@mdl/hrm/client/services/PositionService";
 
@@ -63,6 +63,7 @@ export default function PositionEditPage(): React.ReactNode {
           ],
     [positionData, viewPath, tTitle, t, getLocalizedText],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const {
@@ -121,9 +122,9 @@ export default function PositionEditPage(): React.ReactNode {
           {error instanceof Error ? error.message : (tView("notFound") ?? "Position not found")}
         </p>
         <IBaseButton
+          color="danger"
           size="sm"
           variant="bordered"
-          color="danger"
           onPress={() => refetch()}
         >
           Retry
@@ -134,13 +135,12 @@ export default function PositionEditPage(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="edit"
       maxWidth="form"
-      title={t("editPageTitle")}
       subtitle={positionData.code}
+      title={t("editPageTitle")}
+      variant="edit"
     >
       <PositionForm
-        mode="edit"
         defaultValues={{
           code: positionData.code,
           name: (positionData.name as any) || { vi: "", en: "" },
@@ -154,6 +154,7 @@ export default function PositionEditPage(): React.ReactNode {
           isActive: positionData.isActive ?? true,
         }}
         isSubmitting={isPending}
+        mode="edit"
         submitError={submitError}
         onCancel={() => router.push(viewPath)}
         onSubmit={handleSubmit}

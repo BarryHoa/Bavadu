@@ -1,5 +1,12 @@
 "use client";
 
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { Calendar, ChevronDown, Eye, User } from "lucide-react";
+import IBaseImage from "next/image";
+import { useMemo } from "react";
+
+import { formatDate } from "@base/client/utils/date/formatDate";
+import newsService from "@base/client/services/NewsService";
 import {
   IBaseButton,
   IBaseCard,
@@ -7,12 +14,6 @@ import {
   IBaseCardHeader,
   IBaseSpinner,
 } from "@base/client/components";
-import newsService from "@base/client/services/NewsService";
-import { formatDate } from "@base/client/utils/date/formatDate";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { Calendar, ChevronDown, Eye, User } from "lucide-react";
-import IBaseImage from "next/image";
-import { useMemo } from "react";
 
 const ITEMS_PER_PAGE = 12;
 

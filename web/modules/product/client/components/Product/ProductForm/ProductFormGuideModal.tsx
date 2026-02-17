@@ -1,11 +1,12 @@
 "use client";
 
-import { MarkdownContent } from "@base/client/components";
-import guidelineService from "@base/client/services/GuidelineService";
-import { IBaseModal, IBaseModalBody, IBaseModalContent, IBaseModalHeader,  } from "@base/client/components";
 import { useQuery } from "@tanstack/react-query";
 import { HelpCircle, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+
+import { MarkdownContent } from "@base/client/components";
+import guidelineService from "@base/client/services/GuidelineService";
+import { IBaseModal, IBaseModalBody, IBaseModalContent, IBaseModalHeader,  } from "@base/client/components";
 
 interface ProductFormGuideModalProps {
   isOpen: boolean;

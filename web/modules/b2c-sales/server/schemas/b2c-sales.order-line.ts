@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { index, numeric, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+
 import { product_tb_product_masters } from "@mdl/product/server/schemas/product.master";
 
 import { mdlSaleB2cSchema } from "./schema";

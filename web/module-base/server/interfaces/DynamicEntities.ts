@@ -1,4 +1,5 @@
 import { LocaleDataType } from "../../shared/interface/Locale";
+
 import { User } from "./User";
 
 export type DynamicEntityData =

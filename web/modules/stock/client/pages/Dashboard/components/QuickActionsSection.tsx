@@ -3,8 +3,9 @@
 import type { WarehouseDto } from "../../../services/StockService";
 import type { MovementResult, MovementPayload } from "../types";
 
-import { IBaseCard, IBaseCardBody } from "@base/client";
 import { useTranslations } from "next-intl";
+
+import { IBaseCard, IBaseCardBody } from "@base/client";
 
 import MovementCard from "./MovementCard";
 

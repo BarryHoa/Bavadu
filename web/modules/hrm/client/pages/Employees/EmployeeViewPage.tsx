@@ -1,5 +1,13 @@
 "use client";
 
+import { Pencil } from "lucide-react";
+import { useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { useParams, useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+
+import { employeeService } from "@mdl/hrm/client/services/EmployeeService";
+import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
 import {
   IBaseButton,
   IBaseCard,
@@ -7,13 +15,6 @@ import {
   IBasePageLayout,
   IBaseSpinner,
 } from "@base/client";
-import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
-import { employeeService } from "@mdl/hrm/client/services/EmployeeService";
-import { Pencil } from "lucide-react";
-import { useMemo } from "react";
-import { useTranslations } from "next-intl";
-import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
 
 const EMPLOYEES_LIST_PATH = "/workspace/modules/hrm/employees";
 
@@ -63,6 +64,7 @@ export default function EmployeeViewPage(): React.ReactNode {
           ],
     [employee, id, isLoading, tTitle, getLocalizedText],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   if (isLoading) {
@@ -81,9 +83,9 @@ export default function EmployeeViewPage(): React.ReactNode {
           {error instanceof Error ? error.message : "Employee not found"}
         </p>
         <IBaseButton
+          color="danger"
           size="sm"
           variant="bordered"
-          color="danger"
           onPress={() => refetch()}
         >
           Retry
@@ -98,10 +100,6 @@ export default function EmployeeViewPage(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="detail"
-      maxWidth="content"
-      title={employeeName}
-      subtitle={employee.employeeCode}
       headerActions={
         <IBaseButton
           color="primary"
@@ -112,6 +110,10 @@ export default function EmployeeViewPage(): React.ReactNode {
           {t("edit")}
         </IBaseButton>
       }
+      maxWidth="content"
+      subtitle={employee.employeeCode}
+      title={employeeName}
+      variant="detail"
     >
       <IBaseCard className="border border-default-200/60 shadow-sm">
         <IBaseCardBody className="gap-6 p-6">

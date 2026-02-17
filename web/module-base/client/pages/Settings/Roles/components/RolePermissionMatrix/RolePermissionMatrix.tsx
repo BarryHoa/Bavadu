@@ -2,6 +2,7 @@
 
 import type { Permission } from "@base/client/services/RoleService";
 
+import { useTranslations } from "next-intl";
 import { useCallback, useId, useMemo } from "react";
 
 import {
@@ -11,25 +12,30 @@ import {
   IBaseCheckbox,
   IBaseSwitch,
 } from "@base/client/components";
-import { useTranslations } from "next-intl";
 
-/** Group permissions by module → resource → action */
-function groupPermissions(permissions: Permission[]) {
-  const byModule = new Map<
-    string,
-    Map<string, Map<string, Permission>>
-  >();
+type ResourcePermissions = Record<string, Permission>; // action -> permission
+type ModulePermissions = {
+  resources: Record<string, ResourcePermissions>; // resource -> actions
+  actions: string[]; // ordered union of actions in this module
+};
+type GroupedPermissions = Record<string, ModulePermissions>; // module -> permissions
+
+/** Group permissions by module → resource → action (plain objects for simplicity) */
+function groupPermissions(permissions: Permission[]): GroupedPermissions {
+  const byModule: GroupedPermissions = {};
 
   for (const p of permissions) {
-    if (!byModule.has(p.module)) {
-      byModule.set(p.module, new Map());
+    const module = (byModule[p.module] ??= {
+      resources: {},
+      actions: [],
+    });
+
+    const resource = (module.resources[p.resource] ??= {});
+    resource[p.action] = p;
+
+    if (!module.actions.includes(p.action)) {
+      module.actions.push(p.action);
     }
-    const byResource = byModule.get(p.module)!;
-    if (!byResource.has(p.resource)) {
-      byResource.set(p.resource, new Map());
-    }
-    const byAction = byResource.get(p.resource)!;
-    byAction.set(p.action, p);
   }
 
   return byModule;
@@ -47,15 +53,12 @@ const ACTION_ORDER = [
 ];
 
 /** Get ordered actions for a module - known actions first, then any extras */
-function getOrderedActions(perms: Permission[]): string[] {
-  const seen = new Set(perms.map((p) => p.action));
-  const ordered = ACTION_ORDER.filter((a) => seen.has(a));
-  const rest = perms
-    .map((p) => p.action)
-    .filter((a) => !ACTION_ORDER.includes(a));
-  const uniqueRest = [...new Set(rest)];
+function getOrderedActions(actions: string[]): string[] {
+  const unique = Array.from(new Set(actions));
+  const ordered = ACTION_ORDER.filter((a) => unique.includes(a));
+  const rest = unique.filter((a) => !ACTION_ORDER.includes(a)).sort();
 
-  return [...ordered, ...uniqueRest.sort()];
+  return [...ordered, ...rest];
 }
 
 const formatLabel = (s: string) =>
@@ -64,10 +67,12 @@ const formatLabel = (s: string) =>
 function getActionLabel(t: (key: string) => string, action: string): string {
   try {
     const label = t(`action.${action}`);
+
     if (label && !label.includes("permissionMatrix")) return label;
   } catch {
     /* ignore */
   }
+
   return formatLabel(action);
 }
 
@@ -76,6 +81,9 @@ export interface RolePermissionMatrixProps {
   selectedIds: Set<string>;
   isLoading?: boolean;
   onSelectionChange: (selectedIds: Set<string>) => void;
+  // Optional per-module admin flags. When a module is admin, its checkboxes are disabled.
+  adminModules?: Record<string, boolean>;
+  onAdminModulesChange?: (value: Record<string, boolean>) => void;
 }
 
 export default function RolePermissionMatrix({
@@ -83,18 +91,18 @@ export default function RolePermissionMatrix({
   selectedIds,
   isLoading,
   onSelectionChange,
+  adminModules,
+  onAdminModulesChange,
 }: RolePermissionMatrixProps) {
   const t = useTranslations("settings.roles.permissionMatrix");
   const fieldsetId = useId();
 
-  const grouped = useMemo(
-    () => groupPermissions(permissions),
-    [permissions],
-  );
+  const grouped = useMemo(() => groupPermissions(permissions), [permissions]);
 
   const togglePermission = useCallback(
     (perm: Permission, checked: boolean) => {
       const next = new Set(selectedIds);
+
       if (checked) {
         next.add(perm.id);
       } else {
@@ -107,12 +115,19 @@ export default function RolePermissionMatrix({
 
   const toggleResource = useCallback(
     (moduleKey: string, resourceKey: string, checked: boolean) => {
-      const byResource = grouped.get(moduleKey)?.get(resourceKey);
-      if (!byResource) return;
+      const module = grouped[moduleKey];
+      if (!module) return;
+      const byAction = module.resources[resourceKey];
+      if (!byAction) return;
+
       const next = new Set(selectedIds);
-      for (const [, perm] of byResource) {
-        if (checked) next.add(perm.id);
-        else next.delete(perm.id);
+      const perms: Permission[] = Object.values(byAction);
+      for (const perm of perms) {
+        if (checked) {
+          next.add(perm.id);
+        } else {
+          next.delete(perm.id);
+        }
       }
       onSelectionChange(next);
     },
@@ -121,13 +136,19 @@ export default function RolePermissionMatrix({
 
   const toggleModule = useCallback(
     (moduleKey: string, checked: boolean) => {
-      const byResource = grouped.get(moduleKey);
-      if (!byResource) return;
+      const module = grouped[moduleKey];
+      if (!module) return;
       const next = new Set(selectedIds);
-      for (const [, byAction] of byResource) {
-        for (const [, perm] of byAction) {
-          if (checked) next.add(perm.id);
-          else next.delete(perm.id);
+
+      const resources = Object.values(module.resources);
+      for (const byAction of resources) {
+        const perms: Permission[] = Object.values(byAction);
+        for (const perm of perms) {
+          if (checked) {
+            next.add(perm.id);
+          } else {
+            next.delete(perm.id);
+          }
         }
       }
       onSelectionChange(next);
@@ -136,14 +157,15 @@ export default function RolePermissionMatrix({
   );
 
   const selectAll = useCallback(() => {
-    onSelectionChange(
-      new Set(permissions.map((p) => p.id)),
-    );
+    onSelectionChange(new Set(permissions.map((p) => p.id)));
   }, [permissions, onSelectionChange]);
 
   const deselectAll = useCallback(() => {
     onSelectionChange(new Set());
-  }, [onSelectionChange]);
+    if (onAdminModulesChange) {
+      onAdminModulesChange({});
+    }
+  }, [onSelectionChange, onAdminModulesChange]);
 
   if (isLoading) {
     return (
@@ -163,33 +185,33 @@ export default function RolePermissionMatrix({
 
   return (
     <fieldset
-      id={fieldsetId}
-      className="flex flex-col gap-4 rounded-lg border border-default-200 bg-default-50/30 px-4 py-4"
       aria-describedby={`${fieldsetId}-description`}
+      className="flex flex-col gap-4 rounded-lg border border-default-200 bg-default-50/30 px-4 py-4"
+      id={fieldsetId}
     >
       <legend className="sr-only">{t("legend")}</legend>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p
-          id={`${fieldsetId}-description`}
           className="text-sm text-default-600"
+          id={`${fieldsetId}-description`}
         >
           {t("description")}
         </p>
         <div className="flex shrink-0 gap-2">
           <IBaseButton
-            size="sm"
+            aria-label={t("selectAll")}
             color="primary"
+            size="sm"
             variant="flat"
             onPress={selectAll}
-            aria-label={t("selectAll")}
           >
             {t("selectAll")}
           </IBaseButton>
           <IBaseButton
+            aria-label={t("deselectAll")}
             size="sm"
             variant="light"
             onPress={deselectAll}
-            aria-label={t("deselectAll")}
           >
             {t("deselectAll")}
           </IBaseButton>
@@ -197,26 +219,26 @@ export default function RolePermissionMatrix({
       </div>
 
       <IBaseAccordion
-        selectionMode="multiple"
-        defaultExpandedKeys={Array.from(grouped.keys())}
         className="divide-y divide-default-200"
+        defaultExpandedKeys={Object.keys(grouped)}
         itemClasses={{
           base: "border-0",
           heading: "py-3",
           trigger: "px-0 py-3 min-h-0",
           content: "pb-4 pt-0",
         }}
+        selectionMode="multiple"
       >
-        {Array.from(grouped.entries()).map(([moduleKey, byResource]) => {
-          const modulePerms = Array.from(byResource.values()).flatMap((m) =>
-            Array.from(m.values()),
-          );
-          const moduleActions = getOrderedActions(modulePerms);
+        {Object.entries(grouped).map(([moduleKey, module]) => {
+          const modulePerms: Permission[] = Object.values(
+            module.resources,
+          ).flatMap((byAction) => Object.values(byAction));
+          const moduleActions = getOrderedActions(module.actions);
           const moduleSelectedCount = modulePerms.filter((p) =>
             selectedIds.has(p.id),
           ).length;
-          const moduleAllSelected =
-            moduleSelectedCount === modulePerms.length;
+          const moduleAllSelected = moduleSelectedCount === modulePerms.length;
+          const isAdminModule = adminModules?.[moduleKey] === true;
 
           return (
             <IBaseAccordionItem
@@ -235,17 +257,36 @@ export default function RolePermissionMatrix({
                       {moduleSelectedCount}/{modulePerms.length}
                     </span>
                   </div>
-                  <div
-                    className="flex shrink-0 items-center gap-2"
-                    onClick={(e) => e.stopPropagation()}
-                  >
+                  <div className="flex shrink-0 items-center gap-2">
+                    {/* Toggle: Admin module (full access, disable matrix) */}
                     <IBaseSwitch
+                      aria-label={t("selectAllInModule")}
+                      isSelected={isAdminModule}
                       size="sm"
+                      onValueChange={(checked) => {
+                        if (!onAdminModulesChange) return;
+                        const next: Record<string, boolean> = {
+                          ...(adminModules ?? {}),
+                          [moduleKey]: checked,
+                        };
+                        onAdminModulesChange(next);
+                        if (checked) {
+                          toggleModule(moduleKey, true);
+                        }
+                      }}
+                    />
+                    <span className="text-xs font-medium text-default-700">
+                      {t("adminModule")}
+                    </span>
+                    {/* Bulk select within module, disabled when adminModule is on */}
+                    <IBaseSwitch
+                      aria-label={t("selectAllInModule")}
+                      isDisabled={isAdminModule}
                       isSelected={moduleAllSelected}
+                      size="sm"
                       onValueChange={(checked) =>
                         toggleModule(moduleKey, checked)
                       }
-                      aria-label={t("selectAllInModule")}
                     />
                     <span className="text-xs font-medium text-default-700">
                       {t("all")}
@@ -259,16 +300,16 @@ export default function RolePermissionMatrix({
                   <thead>
                     <tr className="border-b border-default-200">
                       <th
-                        scope="col"
                         className="px-3 py-3 text-left text-sm font-semibold text-default-700"
+                        scope="col"
                       >
                         {t("resource")}
                       </th>
                       {moduleActions.map((action) => (
                         <th
                           key={action}
-                          scope="col"
                           className="px-2 py-3 text-center text-sm font-semibold text-default-600"
+                          scope="col"
                         >
                           {getActionLabel(t, action)}
                         </th>
@@ -276,15 +317,13 @@ export default function RolePermissionMatrix({
                     </tr>
                   </thead>
                   <tbody>
-                    {Array.from(byResource.entries()).map(
+                    {Object.entries(module.resources).map(
                       ([resourceKey, byAction]) => {
-                        const resourcePerms = Array.from(
-                          byAction.values(),
-                        );
-                        const resourceSelectedCount =
-                          resourcePerms.filter((p) =>
-                            selectedIds.has(p.id),
-                          ).length;
+                        const resourcePerms: Permission[] =
+                          Object.values(byAction);
+                        const resourceSelectedCount = resourcePerms.filter(
+                          (p) => selectedIds.has(p.id),
+                        ).length;
                         const resourceAllSelected =
                           resourceSelectedCount === resourcePerms.length;
                         const resourceIndeterminate =
@@ -300,13 +339,15 @@ export default function RolePermissionMatrix({
                           >
                             <td className="px-3 py-3">
                               <label
-                                htmlFor={resourceCheckboxId}
                                 className="flex min-h-[44px] cursor-pointer items-center gap-3 py-1"
+                                htmlFor={resourceCheckboxId}
                               >
                                 <IBaseCheckbox
+                                  aria-label={`${t("resource")}: ${resourceLabel}`}
                                   id={resourceCheckboxId}
-                                  isSelected={resourceAllSelected}
+                                  isDisabled={isAdminModule}
                                   isIndeterminate={resourceIndeterminate}
+                                  isSelected={resourceAllSelected}
                                   onValueChange={(checked) =>
                                     toggleResource(
                                       moduleKey,
@@ -314,7 +355,6 @@ export default function RolePermissionMatrix({
                                       !!checked,
                                     )
                                   }
-                                  aria-label={`${t("resource")}: ${resourceLabel}`}
                                 />
                                 <span className="font-medium text-default-800">
                                   {resourceLabel}
@@ -322,7 +362,7 @@ export default function RolePermissionMatrix({
                               </label>
                             </td>
                             {moduleActions.map((action) => {
-                              const perm = byAction.get(action);
+                              const perm = byAction[action];
 
                               if (!perm) {
                                 return (
@@ -345,12 +385,13 @@ export default function RolePermissionMatrix({
                                 >
                                   <div className="flex min-h-[44px] min-w-[44px] items-center justify-center">
                                     <IBaseCheckbox
-                                    id={actionCheckboxId}
-                                    isSelected={isChecked}
-                                    onValueChange={(checked) =>
-                                      togglePermission(perm, !!checked)
-                                    }
-                                    aria-label={`${resourceLabel} - ${getActionLabel(t, action)}`}
+                                      aria-label={`${resourceLabel} - ${getActionLabel(t, action)}`}
+                                      id={actionCheckboxId}
+                                      isDisabled={isAdminModule}
+                                      isSelected={isChecked}
+                                      onValueChange={(checked) =>
+                                        togglePermission(perm, !!checked)
+                                      }
                                     />
                                   </div>
                                 </td>

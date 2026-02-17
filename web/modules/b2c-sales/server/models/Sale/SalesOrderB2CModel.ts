@@ -5,6 +5,7 @@ import type {
 import type { NewSaleB2cTbOrder, SaleB2cTbOrder } from "../../schemas";
 
 import { desc, eq, sql } from "drizzle-orm";
+
 import { BaseModel } from "@base/server/models/BaseModel";
 import {
   base_tb_currencies,

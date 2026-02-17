@@ -242,6 +242,30 @@
           "default": "Chưa có role nào."
         }
       },
+      "permissionMatrix": {
+        "legend": "Quyền của role",
+        "description": "Chọn các quyền mà role này được phép sử dụng. Quyền được nhóm theo module và resource. Dùng Admin module để cấp toàn quyền và khóa chỉnh chi tiết.",
+        "loading": "Đang tải danh sách quyền...",
+        "noPermissions": "Chưa có quyền nào.",
+        "selectAll": "Chọn tất cả",
+        "deselectAll": "Bỏ chọn tất cả",
+        "selectModule": "Chọn tất cả trong module",
+        "deselectModule": "Bỏ chọn tất cả trong module",
+        "selectAllInModule": "Chọn hoặc bỏ chọn tất cả quyền trong module này",
+        "all": "Tất cả",
+        "resource": "Resource",
+        "adminModule": "Admin module",
+        "action": {
+          "view": "Xem",
+          "create": "Tạo",
+          "update": "Sửa",
+          "delete": "Xóa",
+          "print": "In",
+          "export": "Xuất",
+          "import": "Nhập",
+          "approve": "Duyệt"
+        }
+      },
       "form": {
         "code": "Mã",
         "name": "Tên",

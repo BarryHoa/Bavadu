@@ -1,11 +1,12 @@
 "use client";
 
-import { IBasePageLayout } from "@base/client";
-import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
-import { contractService } from "@mdl/hrm/client/services/ContractService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { contractService } from "@mdl/hrm/client/services/ContractService";
 
 import ContractForm, {
   type ContractFormValues,
@@ -25,6 +26,7 @@ export default function ContractCreatePageClient(): React.ReactNode {
     ],
     [tTitle],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const {
@@ -77,9 +79,9 @@ export default function ContractCreatePageClient(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="create"
       maxWidth="form"
       title={tTitle("list.newContract")}
+      variant="create"
     >
       <ContractForm
         isSubmitting={isPending}

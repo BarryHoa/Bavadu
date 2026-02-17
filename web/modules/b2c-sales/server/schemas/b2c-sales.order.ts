@@ -1,7 +1,3 @@
-import { base_tb_payment_methods } from "@base/server/schemas/base.payment-method";
-import { base_tb_shipping_methods } from "@base/server/schemas/base.shipping-method";
-import { base_tb_shipping_terms } from "@base/server/schemas/base.shipping-term";
-import { stock_tb_stock_warehouses } from "@mdl/stock/server/schemas/stock.warehouse";
 import { sql } from "drizzle-orm";
 import {
   boolean,
@@ -12,6 +8,11 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
+import { base_tb_payment_methods } from "@base/server/schemas/base.payment-method";
+import { base_tb_shipping_methods } from "@base/server/schemas/base.shipping-method";
+import { base_tb_shipping_terms } from "@base/server/schemas/base.shipping-term";
+import { stock_tb_stock_warehouses } from "@mdl/stock/server/schemas/stock.warehouse";
 
 import { sale_b2c_tb_price_lists } from "./b2c-sales.price-list";
 import { mdlSaleB2cSchema } from "./schema";

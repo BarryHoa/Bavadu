@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { addToast } from "@heroui/toast";
 
 import {
   IBaseButton,
@@ -20,7 +21,6 @@ import {
   type TimesheetSettingsUpdatePayload,
 } from "@mdl/hrm/client/services/TimesheetSettingsService";
 
-import { addToast } from "@heroui/toast";
 
 const SETTINGS_QUERY_KEY = ["hrm", "timesheet-settings"] as const;
 const WEEK_START_OPTIONS = [
@@ -41,7 +41,9 @@ const ROUND_DIRECTION_OPTIONS = [
 function timeToInputValue(v: string | null | undefined): string {
   if (!v) return "";
   const s = String(v);
+
   if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(s)) return s.slice(0, 5);
+
   return "";
 }
 
@@ -110,10 +112,12 @@ export default function TimesheetSettingsPage(): React.ReactNode {
       roundMinutes: parseInt(roundMinutes, 10) || 15,
       roundDirection: roundDirection,
     };
+
     updateMutation.mutate(payload);
   };
 
   const breadcrumbs = [{ label: t("title") }];
+
   useSetBreadcrumbs(breadcrumbs);
 
   return (
@@ -126,36 +130,36 @@ export default function TimesheetSettingsPage(): React.ReactNode {
             <div className="space-y-6">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <IBaseInput
-                  type="time"
+                  description={t("defaultCheckInTimeDesc")}
                   label={t("defaultCheckInTime")}
+                  type="time"
                   value={defaultCheckInTime}
                   onValueChange={setDefaultCheckInTime}
-                  description={t("defaultCheckInTimeDesc")}
                 />
                 <IBaseInput
-                  type="time"
+                  description={t("defaultCheckOutTimeDesc")}
                   label={t("defaultCheckOutTime")}
+                  type="time"
                   value={defaultCheckOutTime}
                   onValueChange={setDefaultCheckOutTime}
-                  description={t("defaultCheckOutTimeDesc")}
                 />
               </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <IBaseInput
-                  type="number"
+                  description={t("breakMinutesDesc")}
                   label={t("breakMinutes")}
+                  min={0}
+                  type="number"
                   value={breakMinutes}
                   onValueChange={setBreakMinutes}
-                  min={0}
-                  description={t("breakMinutesDesc")}
                 />
                 <IBaseInput
-                  type="number"
+                  description={t("maxHoursPerDayDesc")}
                   label={t("maxHoursPerDay")}
+                  min={1}
+                  type="number"
                   value={maxHoursPerDay}
                   onValueChange={setMaxHoursPerDay}
-                  min={1}
-                  description={t("maxHoursPerDayDesc")}
                 />
               </div>
               <IBaseSwitch
@@ -165,13 +169,14 @@ export default function TimesheetSettingsPage(): React.ReactNode {
                 {t("allowWeekend")}
               </IBaseSwitch>
               <IBaseSelect
+                description={t("weekStartDesc")}
                 label={t("weekStart")}
                 selectedKeys={[String(weekStart)]}
                 onSelectionChange={(keys) => {
                   const v = Array.from(keys)[0];
+
                   if (v != null) setWeekStart(Number(v));
                 }}
-                description={t("weekStartDesc")}
               >
                 {WEEK_START_OPTIONS.map((opt) => (
                   <IBaseSelectItem key={String(opt.value)}>
@@ -181,21 +186,22 @@ export default function TimesheetSettingsPage(): React.ReactNode {
               </IBaseSelect>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <IBaseInput
-                  type="number"
+                  description={t("roundMinutesDesc")}
                   label={t("roundMinutes")}
+                  min={1}
+                  type="number"
                   value={roundMinutes}
                   onValueChange={setRoundMinutes}
-                  min={1}
-                  description={t("roundMinutesDesc")}
                 />
                 <IBaseSelect
+                  description={t("roundDirectionDesc")}
                   label={t("roundDirection")}
                   selectedKeys={[roundDirection]}
                   onSelectionChange={(keys) => {
                     const v = Array.from(keys)[0];
+
                     if (typeof v === "string") setRoundDirection(v);
                   }}
-                  description={t("roundDirectionDesc")}
                 >
                   {ROUND_DIRECTION_OPTIONS.map((opt) => (
                     <IBaseSelectItem key={opt.value}>
@@ -207,8 +213,8 @@ export default function TimesheetSettingsPage(): React.ReactNode {
               <div className="flex gap-2 pt-2">
                 <IBaseButton
                   color="primary"
-                  onPress={handleSubmit}
                   isLoading={updateMutation.isPending}
+                  onPress={handleSubmit}
                 >
                   {tCommon("actions.save")}
                 </IBaseButton>

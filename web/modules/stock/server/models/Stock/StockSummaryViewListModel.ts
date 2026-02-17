@@ -5,6 +5,7 @@ import type {
 } from "@base/shared/interface/ListInterface";
 
 import { eq, ilike, sql } from "drizzle-orm";
+
 import { ParamFilter } from "@base/server";
 import {
   BaseViewListModel,

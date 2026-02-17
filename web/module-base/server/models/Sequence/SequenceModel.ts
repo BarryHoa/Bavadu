@@ -1,5 +1,6 @@
-import { BaseModel } from "@base/server/models/BaseModel";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
+
+import { BaseModel } from "@base/server/models/BaseModel";
 
 import {
   base_tb_sequence_counts,
@@ -35,6 +36,7 @@ function formatValue(prefix: string, format: string, value: number): string {
   const match = format.match(/%0?(\d+)d/);
   const width = match ? parseInt(match[1], 10) : 6;
   const numStr = String(value).padStart(width, "0");
+
   return prefix ? `${prefix}-${numStr}` : numStr;
 }
 
@@ -167,6 +169,7 @@ export default class SequenceModel extends BaseModel<typeof base_tb_sequence_rul
     const updateData: Record<string, unknown> = {
       updatedAt: new Date(),
     };
+
     if (params.name !== undefined) updateData.name = params.name.trim();
     if (params.prefix !== undefined) updateData.prefix = params.prefix;
     if (params.format !== undefined) updateData.format = params.format;
@@ -269,6 +272,7 @@ export default class SequenceModel extends BaseModel<typeof base_tb_sequence_rul
 
       if (toDelete.length > 0) {
         const ids = toDelete.map((r) => r.id);
+
         await tx
           .delete(base_tb_sequence_counts)
           .where(
@@ -300,6 +304,7 @@ export default class SequenceModel extends BaseModel<typeof base_tb_sequence_rul
 
       if (toDelete.length > 0) {
         const ids = toDelete.map((r) => r.id);
+
         await this.db
           .delete(base_tb_sequence_counts)
           .where(

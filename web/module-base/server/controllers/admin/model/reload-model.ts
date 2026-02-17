@@ -1,7 +1,8 @@
+import { NextRequest } from "next/server";
+
 import { requirePermissions } from "@base/server/middleware";
 import { JSONResponse } from "@base/server/utils/JSONResponse";
 import { escapeHtml } from "@base/server/utils/xss-protection";
-import { NextRequest } from "next/server";
 
 import { RuntimeContext } from "../../../runtime/RuntimeContext";
 

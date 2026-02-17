@@ -176,8 +176,8 @@ function TableHeaderCell<T>({
       >
         {isDraggable && (
           <span
-            className="mr-1.5 inline-flex cursor-grab touch-none items-center text-default-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-default-600 active:cursor-grabbing"
             aria-hidden
+            className="mr-1.5 inline-flex cursor-grab touch-none items-center text-default-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-default-600 active:cursor-grabbing"
             {...attributes}
             {...listeners}
           >
@@ -197,8 +197,8 @@ function TableHeaderCell<T>({
       </div>
       {canResize && typeof resizeHandler === "function" && (
         <div
-          className="absolute right-0 top-0 z-20 h-full w-2 shrink-0 cursor-col-resize select-none touch-none bg-transparent hover:bg-primary/50"
           aria-label="Resize column"
+          className="absolute right-0 top-0 z-20 h-full w-2 shrink-0 cursor-col-resize select-none touch-none bg-transparent hover:bg-primary/50"
           style={{ touchAction: "none" }}
           onMouseDown={(e) => {
             e.preventDefault();
@@ -286,6 +286,7 @@ export default function IBaseTableUI<T = any>({
               : headerGroups.flatMap((g) => g.headers.map((h) => h.id));
           const oldIndex = currentOrder.indexOf(active.id as string);
           const newIndex = currentOrder.indexOf(over.id as string);
+
           if (oldIndex !== -1 && newIndex !== -1) {
             return arrayMove(currentOrder, oldIndex, newIndex);
           }
@@ -301,6 +302,7 @@ export default function IBaseTableUI<T = any>({
             : headerGroups.flatMap((g) => g.headers.map((h) => h.id));
           const oldIndex = currentOrder.indexOf(active.id as string);
           const newIndex = currentOrder.indexOf(over.id as string);
+
           if (oldIndex !== -1 && newIndex !== -1) {
             onColumnOrderChange(arrayMove(currentOrder, oldIndex, newIndex));
           }
@@ -410,16 +412,16 @@ export default function IBaseTableUI<T = any>({
                 width={size}
               >
                 <TableHeaderCell
+                  column={column!}
                   enableColumnOrdering={enableColumnOrdering}
                   enableColumnResizing={enableColumnResizing}
                   getSortIcon={getSortIcon}
                   header={header}
                   headerGroup={headerGroup}
-                  column={column!}
-                  meta={meta}
                   isSortable={isSortable}
-                  onHeaderClick={handleHeaderClick}
+                  meta={meta}
                   renderHeader={renderHeader}
+                  onHeaderClick={handleHeaderClick}
                 />
               </TableColumn>
             );
@@ -522,8 +524,8 @@ export default function IBaseTableUI<T = any>({
     <DndContext
       collisionDetection={closestCenter}
       modifiers={[restrictToHorizontalAxis]}
-      onDragEnd={handleDragEnd}
       sensors={sensors}
+      onDragEnd={handleDragEnd}
     >
       <SortableContext
         items={sortableIds}

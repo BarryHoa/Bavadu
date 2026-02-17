@@ -1,6 +1,7 @@
-import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
+
+import { BaseModel } from "@base/server/models/BaseModel";
 
 import {
   NewHrmTbPerformanceReview,

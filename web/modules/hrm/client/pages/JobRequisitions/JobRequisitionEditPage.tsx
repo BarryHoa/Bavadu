@@ -1,16 +1,17 @@
 "use client";
 
-import {
-  useCreateUpdate,
-  useSetBreadcrumbs,
-} from "@base/client/hooks";
-import { jobRequisitionService } from "@mdl/hrm/client/services/JobRequisitionService";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 
+import { jobRequisitionService } from "@mdl/hrm/client/services/JobRequisitionService";
+import {
+  useCreateUpdate,
+  useSetBreadcrumbs,
+} from "@base/client/hooks";
 import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
+
 import JobRequisitionForm, {
   type JobRequisitionFormValues,
 } from "./components/JobRequisitionForm/JobRequisitionForm";
@@ -66,6 +67,7 @@ export default function JobRequisitionEditPage(): React.ReactNode {
           ],
     [t, jobRequisitionData, viewPath],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const {
@@ -172,9 +174,9 @@ export default function JobRequisitionEditPage(): React.ReactNode {
           {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
         </p>
         <IBaseButton
+          color="danger"
           size="sm"
           variant="bordered"
-          color="danger"
           onPress={() => refetch()}
         >
           Retry
@@ -185,10 +187,10 @@ export default function JobRequisitionEditPage(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="edit"
       maxWidth="form"
-      title={t("edit")}
       subtitle={jobRequisitionData.requisitionNumber}
+      title={t("edit")}
+      variant="edit"
     >
       <JobRequisitionForm
         defaultValues={{

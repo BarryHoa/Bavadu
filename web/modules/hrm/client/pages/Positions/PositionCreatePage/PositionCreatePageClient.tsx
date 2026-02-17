@@ -1,11 +1,12 @@
 "use client";
 
-import { IBasePageLayout } from "@base/client";
-import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
-import { positionService } from "@mdl/hrm/client/services/PositionService";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+
+import { IBasePageLayout } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
+import { positionService } from "@mdl/hrm/client/services/PositionService";
 
 import PositionForm, {
   type PositionFormValues,
@@ -25,6 +26,7 @@ export default function PositionCreatePageClient(): React.ReactNode {
     ],
     [t, tTitle],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const {
@@ -69,9 +71,9 @@ export default function PositionCreatePageClient(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="create"
       maxWidth="form"
       title={t("pageTitle")}
+      variant="create"
     >
       <PositionForm
         isSubmitting={isPending}

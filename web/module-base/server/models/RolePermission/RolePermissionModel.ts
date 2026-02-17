@@ -1,5 +1,6 @@
-import { BaseModel } from "@base/server/models/BaseModel";
 import { and, eq, inArray } from "drizzle-orm";
+
+import { BaseModel } from "@base/server/models/BaseModel";
 
 import UserRoleModel from "../UserRole/UserRoleModel";
 import UserPermissionModel from "../UserPermission/UserPermissionModel";
@@ -34,6 +35,7 @@ export default class RolePermissionModel extends BaseModel<
 
     if (userIds.length > 0) {
       const userPermissionModel = new UserPermissionModel();
+
       await userPermissionModel.invalidateCacheMany(userIds);
     }
   }

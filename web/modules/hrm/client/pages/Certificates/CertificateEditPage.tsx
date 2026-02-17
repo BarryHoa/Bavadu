@@ -1,12 +1,13 @@
 "use client";
 
-import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
-import { useCreateUpdate, useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
-import { certificateService } from "@mdl/hrm/client/services/CertificateService";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo } from "react";
+
+import { certificateService } from "@mdl/hrm/client/services/CertificateService";
+import { useCreateUpdate, useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
+import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
 
 import CertificateForm, {
   type CertificateFormValues,
@@ -91,6 +92,7 @@ export default function CertificateEditPage(): React.ReactNode {
           ],
     [t, certificateData, viewPath, getLocalizedText],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const handleSubmit = async (values: CertificateFormValues) => {
@@ -123,9 +125,9 @@ export default function CertificateEditPage(): React.ReactNode {
           {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
         </p>
         <IBaseButton
+          color="danger"
           size="sm"
           variant="bordered"
-          color="danger"
           onPress={() => refetch()}
         >
           Retry
@@ -138,10 +140,10 @@ export default function CertificateEditPage(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="edit"
       maxWidth="form"
-      title={t("edit")}
       subtitle={subtitle || undefined}
+      title={t("edit")}
+      variant="edit"
     >
       <CertificateForm
       defaultValues={{

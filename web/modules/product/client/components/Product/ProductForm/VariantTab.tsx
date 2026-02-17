@@ -2,6 +2,9 @@
 
 import type { LocaleFieldValue, VariantFieldValue } from "./types";
 
+import { Plus, Trash } from "lucide-react";
+import { useTranslations } from "next-intl";
+
 import {
   IBaseInput,
   IBaseInputMultipleLang,
@@ -10,8 +13,6 @@ import {
 } from "@base/client/components";
 import { IBaseButton } from "@base/client";
 import { IBaseCard, IBaseCardBody, IBaseDivider } from "@base/client";
-import { Plus, Trash } from "lucide-react";
-import { useTranslations } from "next-intl";
 
 import { ProductMasterFeaturesType } from "../../../interface/Product";
 

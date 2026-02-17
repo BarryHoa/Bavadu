@@ -1,6 +1,7 @@
+import { NextRequest, NextResponse } from "next/server";
+
 import SessionModel from "@base/server/models/Sessions/SessionModel";
 import { initializeRuntime } from "@base/server/utils/initializeRuntime";
-import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

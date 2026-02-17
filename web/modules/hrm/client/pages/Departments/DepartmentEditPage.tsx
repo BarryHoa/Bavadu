@@ -1,16 +1,16 @@
 "use client";
 
-import {
-  useCreateUpdate,
-  useLocalizedText,
-  useSetBreadcrumbs,
-} from "@base/client/hooks";
 import { addToast } from "@heroui/toast";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 
+import {
+  useCreateUpdate,
+  useLocalizedText,
+  useSetBreadcrumbs,
+} from "@base/client/hooks";
 import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
 import { departmentService } from "@mdl/hrm/client/services/DepartmentService";
 
@@ -71,6 +71,7 @@ export default function DepartmentEditPage(): React.ReactNode {
       getLocalizedText,
     ]
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const {
@@ -135,9 +136,9 @@ export default function DepartmentEditPage(): React.ReactNode {
           {error instanceof Error ? error.message : tView("notFound")}
         </p>
         <IBaseButton
+          color="danger"
           size="sm"
           variant="bordered"
-          color="danger"
           onPress={() => refetch()}
         >
           Retry
@@ -148,14 +149,13 @@ export default function DepartmentEditPage(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="edit"
       maxWidth="form"
-      title={t("editPageTitle")}
-      subtitle={departmentData.code}
       sidebar={<DepartmentPageSidebar />}
+      subtitle={departmentData.code}
+      title={t("editPageTitle")}
+      variant="edit"
     >
       <DepartmentForm
-        mode="edit"
         defaultValues={{
           code: departmentData.code,
           name: (departmentData.name as any) || { vi: "", en: "" },
@@ -166,7 +166,8 @@ export default function DepartmentEditPage(): React.ReactNode {
           locationId: departmentData.locationId || "",
           isActive: departmentData.isActive ?? true,
         }}
-      isSubmitting={isPending}
+        isSubmitting={isPending}
+      mode="edit"
       submitError={submitError}
       onCancel={() => router.push(viewPath)}
         onSubmit={handleSubmit}

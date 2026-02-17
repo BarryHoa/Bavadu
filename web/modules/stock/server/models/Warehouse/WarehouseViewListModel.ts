@@ -5,11 +5,12 @@ import type {
 } from "@base/shared/interface/ListInterface";
 import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 
+import { ilike } from "drizzle-orm";
+
 import {
   BaseViewListModel,
   type FilterConditionMap,
 } from "@base/server/models/BaseViewListModel";
-import { ilike } from "drizzle-orm";
 
 import { WarehouseAddress } from "../../../common/constants";
 import { stock_tb_stock_warehouses } from "../../schemas";

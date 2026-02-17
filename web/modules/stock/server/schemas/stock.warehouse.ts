@@ -10,6 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { base_tb_users } from "@base/server/schemas/base.user";
 
 import {

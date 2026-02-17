@@ -1,16 +1,17 @@
 "use client";
 
-import {
-  useCreateUpdate,
-  useSetBreadcrumbs,
-} from "@base/client/hooks";
-import { leaveTypeService } from "@mdl/hrm/client/services/LeaveTypeService";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 
+import { leaveTypeService } from "@mdl/hrm/client/services/LeaveTypeService";
+import {
+  useCreateUpdate,
+  useSetBreadcrumbs,
+} from "@base/client/hooks";
 import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
+
 import LeaveTypeForm, {
   type LeaveTypeFormValues,
 } from "./components/LeaveTypeForm/LeaveTypeForm";
@@ -52,6 +53,7 @@ export default function LeaveTypeEditPage(): React.ReactNode {
     ],
     [t, leaveTypeData],
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   const {
@@ -134,9 +136,9 @@ export default function LeaveTypeEditPage(): React.ReactNode {
           {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
         </p>
         <IBaseButton
+          color="danger"
           size="sm"
           variant="bordered"
-          color="danger"
           onPress={() => refetch()}
         >
           Retry
@@ -147,10 +149,10 @@ export default function LeaveTypeEditPage(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="edit"
       maxWidth="form"
-      title={t("edit")}
       subtitle={leaveTypeData.code}
+      title={t("edit")}
+      variant="edit"
     >
       <LeaveTypeForm
         defaultValues={{

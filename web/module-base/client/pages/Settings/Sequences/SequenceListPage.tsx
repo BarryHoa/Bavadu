@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useCallback, useMemo, useState } from "react";
+import { addToast } from "@heroui/toast";
 
 import {
   I_BASE_TABLE_COLUMN_KEY_ACTION,
@@ -24,7 +25,6 @@ import sequenceService, {
   type SequenceRule,
 } from "@base/client/services/SequenceService";
 
-import { addToast } from "@heroui/toast";
 
 const SEQUENCES_LIST_QUERY_KEY = ["settings", "sequences", "list"] as const;
 const BASE_PATH = "/workspace/settings/sequences";

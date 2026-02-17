@@ -1,3 +1,5 @@
+import { eq, and } from "drizzle-orm";
+
 import { LocaleDataType } from "@base/shared/interface/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
 import {
@@ -5,7 +7,6 @@ import {
   base_tb_role_permissions_default,
   base_tb_roles,
 } from "@base/server/schemas";
-import { eq, and } from "drizzle-orm";
 
 export interface RoleRow {
   id: string;

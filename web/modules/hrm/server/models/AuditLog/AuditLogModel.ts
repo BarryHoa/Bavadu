@@ -1,5 +1,6 @@
-import { BaseModel } from "@base/server/models/BaseModel";
 import { and, eq, gte, lte, sql } from "drizzle-orm";
+
+import { BaseModel } from "@base/server/models/BaseModel";
 
 import { NewHrmTbAuditLog, hrm_tb_audit_logs } from "../../schemas";
 

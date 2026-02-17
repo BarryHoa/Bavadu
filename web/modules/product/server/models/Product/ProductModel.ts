@@ -1,5 +1,6 @@
-import { BaseModel } from "@base/server/models/BaseModel";
 import { eq } from "drizzle-orm";
+
+import { BaseModel } from "@base/server/models/BaseModel";
 
 import {
   product_tb_product_attributes,

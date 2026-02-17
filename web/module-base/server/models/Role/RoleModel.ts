@@ -1,6 +1,7 @@
+import { and, eq, inArray } from "drizzle-orm";
+
 import { LocaleDataType } from "@base/shared/interface/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
-import { and, eq, inArray } from "drizzle-orm";
 
 import UserRoleModel from "../UserRole/UserRoleModel";
 import UserPermissionModel from "../UserPermission/UserPermissionModel";
@@ -21,6 +22,8 @@ export interface RoleRow {
   isActive?: boolean;
   createdAt?: number;
   updatedAt?: number;
+   // Module-level admin flags loaded from is_admin_modules JSONB
+  isAdminModules?: Record<string, boolean>;
 }
 
 export interface RoleInput {
@@ -31,6 +34,7 @@ export interface RoleInput {
   permissionIds?: string[];
   isSystem?: boolean;
   isActive?: boolean;
+  isAdminModules?: Record<string, boolean>;
 }
 
 export default class RoleModel extends BaseModel<typeof base_tb_roles> {
@@ -52,6 +56,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
 
     if (userIds.length > 0) {
       const userPermissionModel = new UserPermissionModel();
+
       await userPermissionModel.invalidateCacheMany(userIds);
     }
   }
@@ -91,6 +96,10 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
       isActive: row.isActive ?? undefined,
       createdAt: row.createdAt?.getTime(),
       updatedAt: row.updatedAt?.getTime(),
+      // Drizzle will map JSONB to plain JS object
+      isAdminModules: (row as typeof base_tb_roles.$inferSelect & {
+        isAdminModules?: Record<string, boolean>;
+      }).isAdminModules ?? {},
     };
   }
 
@@ -143,6 +152,9 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
       updatedAt: roleRow.updatedAt
         ? String(roleRow.updatedAt.getTime())
         : undefined,
+      isAdminModules: (roleRow as typeof base_tb_roles.$inferSelect & {
+        isAdminModules?: Record<string, boolean>;
+      }).isAdminModules ?? {},
       permissions: permissions.map((p) => ({
         id: p.id,
         key: p.key,
@@ -164,6 +176,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
     name: LocaleDataType<string>;
     description?: string | null;
     permissionIds?: string[];
+    isAdminModules?: Record<string, boolean>;
   }): Promise<RoleRow> => {
     const nameNorm = this.normalizeLocaleInput(params.name);
 
@@ -175,6 +188,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
       .from(this.table)
       .where(eq(this.table.code, params.code.trim()))
       .limit(1);
+
     if (existing) throw new Error("Role with this code already exists");
 
     return this.db.transaction(async (tx) => {
@@ -187,6 +201,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
           description: params.description ?? null,
           isSystem: false,
           isActive: true,
+          isAdminModules: params.isAdminModules ?? {},
           createdAt: now,
           updatedAt: now,
         })
@@ -252,6 +267,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
       params.payload ?? (params as Record<string, unknown>);
 
     const updateData: Partial<RoleInput> = {};
+
     if (payload.code !== undefined) updateData.code = String(payload.code);
     if (payload.name !== undefined) {
       updateData.name =
@@ -273,6 +289,12 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
         ? payload.permissions
         : [];
     }
+    if (payload.isAdminModules !== undefined) {
+      updateData.isAdminModules = payload.isAdminModules as Record<
+        string,
+        boolean
+      >;
+    }
     if (payload.isActive !== undefined) updateData.isActive = Boolean(payload.isActive);
 
     const role = await this.db.transaction(async (tx) => {
@@ -280,11 +302,17 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
       const dbUpdate: Partial<typeof this.table.$inferInsert> = {
         updatedAt: now,
       };
+
       if (updateData.code !== undefined) dbUpdate.code = updateData.code;
       if (updateData.name !== undefined) dbUpdate.name = updateData.name;
       if (updateData.description !== undefined)
         dbUpdate.description = updateData.description ?? null;
       if (updateData.isActive !== undefined) dbUpdate.isActive = updateData.isActive;
+      if (updateData.isAdminModules !== undefined) {
+        (dbUpdate as typeof this.table.$inferInsert & {
+          isAdminModules?: Record<string, boolean>;
+        }).isAdminModules = updateData.isAdminModules;
+      }
 
       await tx.update(this.table).set(dbUpdate).where(eq(this.table.id, id));
 
@@ -308,6 +336,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
                 eq(base_tb_permissions.isActive, true),
               ),
             );
+
           permissionIdsToSet = validPerms.map((p) => p.id);
         } else if (
           updateData.permissions !== undefined &&
@@ -322,6 +351,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
                 eq(base_tb_permissions.isActive, true),
               ),
             );
+
           permissionIdsToSet = validPerms.map((p) => p.id);
         }
 
@@ -347,6 +377,7 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
 
           for (const permId of permissionIdsToSet) {
             const rowId = existingByPermId.get(permId);
+
             if (rowId) toReactivate.push(rowId);
             else toInsert.push(permId);
           }
@@ -388,7 +419,8 @@ export default class RoleModel extends BaseModel<typeof base_tb_roles> {
       role &&
       (updateData.permissions !== undefined ||
         updateData.permissionIds !== undefined ||
-        updateData.isActive !== undefined)
+        updateData.isActive !== undefined ||
+        updateData.isAdminModules !== undefined)
     ) {
       await this.invalidateRoleUsersCache(id);
     }

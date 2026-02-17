@@ -1,5 +1,9 @@
 "use client";
 
+import { AlertCircle } from "lucide-react";
+import { useMemo } from "react";
+import { Control, Controller, UseFormSetValue } from "react-hook-form";
+
 import {
   IBaseInputNumber,
   IBaseSingleSelect,
@@ -8,9 +12,6 @@ import {
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { IBaseButton } from "@base/client";
 import { IBaseModal, IBaseModalBody, IBaseModalContent, IBaseModalFooter, IBaseModalHeader,  } from "@base/client";
-import { AlertCircle } from "lucide-react";
-import { useMemo } from "react";
-import { Control, Controller, UseFormSetValue } from "react-hook-form";
 
 interface PriceItemEditModalProps {
   isOpen: boolean;

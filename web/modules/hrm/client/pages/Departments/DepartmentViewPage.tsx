@@ -1,5 +1,14 @@
 "use client";
 
+import { Pencil } from "lucide-react";
+import { useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { useParams, useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+
+import { formatDate } from "@base/client/utils/date/formatDate";
+import { departmentService } from "@mdl/hrm/client/services/DepartmentService";
+import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
 import {
   IBaseButton,
   IBaseCard,
@@ -8,14 +17,6 @@ import {
   IBasePageLayout,
   IBaseSpinner,
 } from "@base/client";
-import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
-import { departmentService } from "@mdl/hrm/client/services/DepartmentService";
-import { formatDate } from "@base/client/utils/date/formatDate";
-import { Pencil } from "lucide-react";
-import { useMemo } from "react";
-import { useTranslations } from "next-intl";
-import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
 
 const DEPARTMENTS_LIST_PATH = "/workspace/modules/hrm/departments";
 
@@ -63,6 +64,7 @@ export default function DepartmentViewPage(): React.ReactNode {
           ],
     [department, isLoading, tTitle, t, getLocalizedText]
   );
+
   useSetBreadcrumbs(breadcrumbs);
 
   if (isLoading) {
@@ -81,9 +83,9 @@ export default function DepartmentViewPage(): React.ReactNode {
           {error instanceof Error ? error.message : t("notFound")}
         </p>
         <IBaseButton
+          color="danger"
           size="sm"
           variant="bordered"
-          color="danger"
           onPress={() => refetch()}
         >
           Retry
@@ -99,8 +101,18 @@ export default function DepartmentViewPage(): React.ReactNode {
 
   return (
     <IBasePageLayout
-      variant="detail"
+      headerActions={
+        <IBaseButton
+          color="primary"
+          size="md"
+          startContent={<Pencil size={16} />}
+          onPress={() => router.push(editPath)}
+        >
+          {t("edit")}
+        </IBaseButton>
+      }
       maxWidth="content"
+      subtitle={subtitle}
       title={
         <span className="flex flex-wrap items-center gap-2">
           {departmentName}
@@ -113,17 +125,7 @@ export default function DepartmentViewPage(): React.ReactNode {
           </IBaseChip>
         </span>
       }
-      subtitle={subtitle}
-      headerActions={
-        <IBaseButton
-          color="primary"
-          size="md"
-          startContent={<Pencil size={16} />}
-          onPress={() => router.push(editPath)}
-        >
-          {t("edit")}
-        </IBaseButton>
-      }
+      variant="detail"
     >
       <IBaseCard className="border border-default-200/60 shadow-sm">
           <IBaseCardBody className="gap-6 p-6">
