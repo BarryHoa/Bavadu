@@ -12,14 +12,14 @@ export default class TimesheetService extends JsonRpcClientService {
       data: TimesheetDto[];
       total: number;
       message?: string;
-    }>("hrm.timesheet.list.getData", {});
+    }>("timesheet.list.getData", {});
   }
 
   getById(id: string) {
     return this.call<{
       data: TimesheetDto;
       message?: string;
-    }>("hrm.timesheet.curd.getDataById", { id });
+    }>("timesheet.curd.getById", { id });
   }
 
   getByMonth(params: {
@@ -30,21 +30,21 @@ export default class TimesheetService extends JsonRpcClientService {
     return this.call<{
       data: TimesheetDto[];
       message?: string;
-    }>("hrm.timesheet.curd.getTimesheetsByMonth", params);
+    }>("timesheet.curd.getTimesheetsByMonth", params);
   }
 
   create(payload: CreateTimesheetPayload) {
     return this.call<{
       data: TimesheetDto;
       message?: string;
-    }>("hrm.timesheet.curd.createTimesheet", payload);
+    }>("timesheet.curd.createTimesheet", payload);
   }
 
   update(payload: UpdateTimesheetPayload) {
     return this.call<{
       data: TimesheetDto;
       message?: string;
-    }>("hrm.timesheet.curd.updateData", payload);
+    }>("timesheet.curd.updateData", payload);
   }
 }
 

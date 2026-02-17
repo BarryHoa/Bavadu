@@ -1,10 +1,8 @@
 import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 
-import { base_tb_users } from "../../schemas/base.user";
-import { getSessionInfo } from "../../utils/auth-helpers";
+import { base_tb_users, base_tb_users_login } from "../../schemas/base.user";
 import { BaseModel } from "../BaseModel";
-import SessionModel from "../Sessions/SessionModel";
 
 class UserModel extends BaseModel<typeof base_tb_users> {
   constructor() {
@@ -21,8 +19,8 @@ class UserModel extends BaseModel<typeof base_tb_users> {
   };
 
   /**
-   * Get current user from session: getSessionInfo(request) → validateSession(token) → user.
-   * RPC: base-user.curd.getMe. Returns { data: { user } } or user null when no valid session.
+   * Get current user (no session validation here).
+   * The private RPC endpoint must authenticate first and inject x-user-id/x-session-id headers.
    */
   getMe = async (
     _params: Record<string, unknown>,
@@ -32,20 +30,25 @@ class UserModel extends BaseModel<typeof base_tb_users> {
       user: { id: string; username?: string; avatar?: string | null } | null;
     };
   }> => {
-    if (!request) return { data: { user: null } };
-    const session = getSessionInfo(request);
-    if (!session?.token) return { data: { user: null } };
-    const sessionModel = new SessionModel();
-    const result = await sessionModel.validateSession(session.token);
+    const userId = request?.headers.get("x-user-id") ?? null;
+    if (!userId) return { data: { user: null } };
 
-    if (!result?.valid || !result?.session?.userId)
-      return { data: { user: null } };
-    const user = await this.getUserById(result.session.userId);
+    const user = await this.getUserById(userId);
     if (!user) return { data: { user: null } };
+
+    const [login] = await this.db
+      .select({ username: base_tb_users_login.username })
+      .from(base_tb_users_login)
+      .where(eq(base_tb_users_login.userId, userId))
+      .limit(1);
 
     return {
       data: {
-        user: user,
+        user: {
+          id: user.id,
+          username: login?.username ?? undefined,
+          avatar: user.avatar ?? undefined,
+        },
       },
     };
   };

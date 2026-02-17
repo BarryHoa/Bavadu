@@ -11,9 +11,9 @@ import {
   IBaseInput,
   IBasePageLayout,
   IBaseSelect,
-  IBaseSelectItem,
   IBaseSwitch,
 } from "@base/client/components";
+import IBaseSelectItem from "@base/client/components/IBaseSelect/IBaseSelectItem";
 import { useSetBreadcrumbs } from "@base/client/hooks";
 import {
   timesheetSettingsService,

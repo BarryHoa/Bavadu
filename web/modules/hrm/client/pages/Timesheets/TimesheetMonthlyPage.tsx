@@ -13,7 +13,6 @@ import {
   IBaseSpinner,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import userService from "@base/client/services/UserService";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import type { TimesheetDto } from "@mdl/hrm/client/interface/Timesheet";
 import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
@@ -72,31 +71,20 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
     null,
   );
 
-  const { data: userData } = useQuery({
-    queryKey: ["auth-me"],
-    queryFn: async () => {
-      try {
-        const r = await userService.getMe();
-        return r?.data?.user ?? null;
-      } catch {
-        return null;
-      }
-    },
-  });
-
-  const effectiveEmployeeId = employeeIdFromUrl ?? userData?.id ?? undefined;
-
-  const { data: monthData, isLoading } = useQuery({
-    queryKey: ["hrm-timesheets-by-month", year, month, effectiveEmployeeId],
+  const {
+    data: monthData,
+    isLoading,
+    error: monthError,
+  } = useQuery({
+    queryKey: ["hrm-timesheets-by-month", year, month, employeeIdFromUrl ?? "me"],
     queryFn: async () => {
       const r = await timesheetService.getByMonth({
         year,
         month,
-        employeeId: effectiveEmployeeId ?? null,
+        employeeId: employeeIdFromUrl ?? undefined,
       });
       return r?.data ?? [];
     },
-    enabled: !!effectiveEmployeeId || employeeIdFromUrl === null,
   });
 
   const timesheetList = monthData ?? [];
@@ -110,6 +98,12 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
     [year, month],
   );
 
+  const isNextDisabled = useMemo(() => {
+    const nowY = today.getFullYear();
+    const nowM = today.getMonth() + 1;
+    return year > nowY || (year === nowY && month >= nowM);
+  }, [today, year, month]);
+
   const goPrev = useCallback(() => {
     if (month === 1) {
       setMonth(12);
@@ -120,13 +114,18 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
   }, [month]);
 
   const goNext = useCallback(() => {
+    const nowY = today.getFullYear();
+    const nowM = today.getMonth() + 1;
+    if (year > nowY || (year === nowY && month >= nowM)) {
+      return;
+    }
     if (month === 12) {
       setMonth(1);
       setYear((y) => y + 1);
     } else {
       setMonth((m) => m + 1);
     }
-  }, [month]);
+  }, [month, today, year]);
 
   const goCurrent = useCallback(() => {
     setYear(today.getFullYear());
@@ -141,37 +140,19 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
     [timesheetList, year, month],
   );
 
-  const isLoadingUser = !employeeIdFromUrl && !userData;
-  const isLoadingEmployee =
-    !employeeIdFromUrl && !!userData && userData === undefined;
-  const noEmployeeLinked =
-    !employeeIdFromUrl && !!userData && userData === null;
-
-  if (isLoadingUser || isLoadingEmployee) {
-    return (
-      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
-        <IBaseSpinner size="md" />
-        <span>{tCommon("loading")}</span>
-      </div>
-    );
-  }
-
-  if (noEmployeeLinked) {
+  if (monthError) {
+    const msg = monthError instanceof Error ? monthError.message : String(monthError);
+    const isNoEmployeeLinked =
+      msg.toLowerCase().includes("no employee linked") ||
+      msg.toLowerCase().includes("employee linked");
     return (
       <div className="rounded-xl border border-default-200 bg-default-50 p-6 text-center text-default-600">
-        <p>{t("noData")}</p>
+        <p className="font-medium">{t("noData")}</p>
         <p className="mt-2 text-sm">
-          Không tìm thấy nhân viên liên kết với tài khoản của bạn.
+          {isNoEmployeeLinked
+            ? "Không tìm thấy nhân viên liên kết với tài khoản của bạn."
+            : msg}
         </p>
-      </div>
-    );
-  }
-
-  if (!effectiveEmployeeId) {
-    return (
-      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
-        <IBaseSpinner size="md" />
-        <span>{tCommon("loading")}</span>
       </div>
     );
   }
@@ -205,6 +186,7 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
             variant="bordered"
             endContent={<ChevronRight className="size-4" />}
             onPress={goNext}
+            isDisabled={isNextDisabled}
           >
             {t("nextMonth")}
           </IBaseButton>

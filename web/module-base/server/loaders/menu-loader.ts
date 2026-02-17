@@ -164,24 +164,30 @@ export function filterMenusByPermissions(
   items: MenuFactoryElm[],
   permissions: Set<string>,
 ): MenuFactoryElm[] {
-  return items
-    .map((item) => {
-      if (item.permission && !permissions.has(item.permission)) {
-        return null;
-      }
-      const filteredChildren =
-        item.children && item.children.length > 0
-          ? filterMenusByPermissions(item.children, permissions).filter(Boolean)
-          : undefined;
-      const hasChildren = filteredChildren && filteredChildren.length > 0;
-      const hasPath = !!item.path;
-      if (!hasPath && !hasChildren) {
-        return null;
-      }
-      return {
-        ...item,
-        children: hasChildren ? filteredChildren : undefined,
-      };
-    })
-    .filter((x): x is MenuFactoryElm => x !== null);
+  const out: MenuFactoryElm[] = [];
+
+  for (const item of items) {
+    if (item.permission && !permissions.has(item.permission)) {
+      continue;
+    }
+
+    const filteredChildren =
+      item.children && item.children.length > 0
+        ? filterMenusByPermissions(item.children, permissions)
+        : undefined;
+
+    const hasChildren = !!(filteredChildren && filteredChildren.length > 0);
+    const hasPath = !!item.path;
+
+    if (!hasPath && !hasChildren) {
+      continue;
+    }
+
+    out.push({
+      ...item,
+      children: hasChildren ? filteredChildren : undefined,
+    });
+  }
+
+  return out;
 }
