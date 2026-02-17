@@ -1,7 +1,9 @@
 import { BaseModel } from "@base/server/models/BaseModel";
-import { eq } from "drizzle-orm";
+import { JsonRpcError, JSON_RPC_ERROR_CODES } from "@base/server/rpc/jsonRpcHandler";
+import { and, eq, gte, lte } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
+import EmployeeModel from "../Employee/EmployeeModel";
 import { NewHrmTbTimesheet, hrm_tb_timesheets } from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";
 import { hrm_tb_shifts } from "../../schemas/hrm.shift";
@@ -145,6 +147,119 @@ export default class TimesheetModel extends BaseModel<
     id: string;
   }): Promise<TimesheetRow | null> => {
     return this.getTimesheetById(params.id);
+  };
+
+  /**
+   * Get timesheets for a given month, optionally filtered by employee.
+   * Params: { year, month, employeeId?, _rpcContext? }. When employeeId is omitted, user must have hrm.timesheet.viewAll; otherwise filter by current user's employee.
+   */
+  getTimesheetsByMonth = async (params: {
+    year: number;
+    month: number;
+    employeeId?: string | null;
+    _rpcContext?: { userId: string; permissions: string[] };
+  }): Promise<{ data: TimesheetRow[] }> => {
+    const { year, month, _rpcContext } = params;
+    let employeeId = params.employeeId;
+
+    if (_rpcContext?.userId != null && employeeId == null) {
+      const hasViewAll = _rpcContext.permissions?.includes("hrm.timesheet.viewAll");
+      if (!hasViewAll) {
+        const employeeModel = new EmployeeModel();
+        const emp = await employeeModel.getByUserId({ userId: _rpcContext.userId });
+        if (!emp) {
+          throw new JsonRpcError(
+            JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
+            "No employee linked to user",
+          );
+        }
+        employeeId = emp.id;
+      }
+    }
+
+    const firstDay = `${year}-${String(month).padStart(2, "0")}-01`;
+    const lastDate = new Date(year, month, 0);
+    const lastDay = lastDate.toISOString().slice(0, 10);
+
+    const conditions = [
+      gte(this.table.workDate, firstDay),
+      lte(this.table.workDate, lastDay),
+    ];
+    if (employeeId) {
+      conditions.push(eq(this.table.employeeId, employeeId));
+    }
+
+    const result = await this.db
+      .select({
+        id: this.table.id,
+        employeeId: this.table.employeeId,
+        employeeCode: employee.employeeCode,
+        employeeFullName: employee.fullName,
+        rosterId: this.table.rosterId,
+        workDate: this.table.workDate,
+        shiftId: this.table.shiftId,
+        shiftName: shift.name,
+        checkInTime: this.table.checkInTime,
+        checkOutTime: this.table.checkOutTime,
+        actualHours: this.table.actualHours,
+        regularHours: this.table.regularHours,
+        overtimeHours: this.table.overtimeHours,
+        breakDuration: this.table.breakDuration,
+        status: this.table.status,
+        checkInMethod: this.table.checkInMethod,
+        checkOutMethod: this.table.checkOutMethod,
+        checkInLocation: this.table.checkInLocation,
+        checkOutLocation: this.table.checkOutLocation,
+        notes: this.table.notes,
+        approvedBy: this.table.approvedBy,
+        approvedAt: this.table.approvedAt,
+        createdAt: this.table.createdAt,
+        updatedAt: this.table.updatedAt,
+      })
+      .from(this.table)
+      .leftJoin(employee, eq(this.table.employeeId, employee.id))
+      .leftJoin(shift, eq(this.table.shiftId, shift.id))
+      .where(and(...conditions))
+      .orderBy(this.table.workDate);
+
+    const data: TimesheetRow[] = result.map((row) => ({
+      id: row.id,
+      employeeId: row.employeeId,
+      employee: row.employeeId
+        ? {
+            id: row.employeeId,
+            employeeCode: row.employeeCode ?? undefined,
+            fullName: row.employeeFullName ?? undefined,
+          }
+        : null,
+      rosterId: row.rosterId ?? undefined,
+      workDate: row.workDate,
+      shiftId: row.shiftId ?? undefined,
+      shift: row.shiftId
+        ? {
+            id: row.shiftId,
+            name: row.shiftName ?? undefined,
+          }
+        : null,
+      checkInTime: row.checkInTime?.getTime(),
+      checkOutTime: row.checkOutTime?.getTime(),
+      actualHours: row.actualHours ?? undefined,
+      regularHours: row.regularHours ?? undefined,
+      overtimeHours: row.overtimeHours ?? undefined,
+      breakDuration: row.breakDuration ?? undefined,
+      status: row.status,
+      checkInMethod: row.checkInMethod ?? undefined,
+      checkOutMethod: row.checkOutMethod ?? undefined,
+      checkInLocation: row.checkInLocation ?? undefined,
+      checkOutLocation: row.checkOutLocation ?? undefined,
+      notes: row.notes ?? undefined,
+      approvedBy: row.approvedBy ?? undefined,
+      approvedAt: row.approvedAt?.getTime(),
+      createdAt: row.createdAt?.getTime(),
+      updatedAt: row.updatedAt?.getTime(),
+    }));
+
+    return { data };
   };
 
   createTimesheet = async (payload: TimesheetInput): Promise<TimesheetRow> => {

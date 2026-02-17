@@ -54,18 +54,27 @@
       "order": 3,
       "children": [
         {
-          "key": "hrm-timesheets",
-          "name": "Timesheets",
+          "key": "hrm-timesheets-mine",
+          "name": "Timesheet của tôi",
           "path": "/timesheets",
           "as": "/timesheets",
-          "order": 1
+          "order": 1,
+          "permission": "hrm.timesheet.view"
+        },
+        {
+          "key": "hrm-timesheets-all",
+          "name": "Timesheet mọi người",
+          "path": "/timesheets/all",
+          "as": "/timesheets/all",
+          "order": 2,
+          "permission": "hrm.timesheet.viewAll"
         },
         {
           "key": "hrm-leave-requests",
           "name": "Leave Requests",
           "path": "/leave-requests",
           "as": "/leave-requests",
-          "order": 2
+          "order": 3
         }
       ]
     },

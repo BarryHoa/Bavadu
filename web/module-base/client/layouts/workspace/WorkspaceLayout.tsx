@@ -1,4 +1,8 @@
-import { loadAllMenus } from "@base/server/loaders/menu-loader";
+import {
+  filterMenusByPermissions,
+  loadAllMenus,
+} from "@base/server/loaders/menu-loader";
+import UserPermissionModel from "@base/server/models/UserPermission/UserPermissionModel";
 import { getModuleNames } from "@base/server/utils/get-module-names";
 import { headers } from "next/headers";
 import ModuleI18nProvider from "@base/client/contexts/i18n";
@@ -16,9 +20,24 @@ export default async function WorkspaceLayout({
   const hdrs = await headers();
   const workspaceModule = hdrs.get("x-workspace-module");
   const locale = hdrs.get("x-locale") ?? "en";
+  const userId = hdrs.get("x-user-id");
 
-  // Fetch menus
-  const menuItems = loadAllMenus() as MenuWorkspaceElement[];
+  let menuItems = loadAllMenus() as MenuWorkspaceElement[];
+
+  if (userId) {
+    try {
+      const userPermissionModel = new UserPermissionModel();
+      const { permissions } = await userPermissionModel.getPermissionsByUser(
+        userId,
+      );
+      menuItems = filterMenusByPermissions(
+        menuItems as MenuWorkspaceElement[],
+        permissions,
+      ) as MenuWorkspaceElement[];
+    } catch {
+      // If permission check fails, use unfiltered menu
+    }
+  }
 
   // Fetch common messages and current module messages
   const [commonMessages, currentModuleMessages] = await Promise.all([

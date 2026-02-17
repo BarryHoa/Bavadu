@@ -128,6 +128,7 @@ export class JsonRpcHandler {
     // Get method function
     const modelMethodFunction = (modelInstance as any)[methodName] as (
       params?: Record<string, any>,
+      request?: NextRequest,
     ) => Promise<any>;
 
     if (!modelMethodFunction || typeof modelMethodFunction !== "function") {
@@ -138,7 +139,7 @@ export class JsonRpcHandler {
     }
 
     // Call model method
-    return await modelMethodFunction(params || {});
+    return await modelMethodFunction(params || {}, request);
   }
 
   /**

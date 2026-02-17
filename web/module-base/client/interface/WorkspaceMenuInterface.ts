@@ -10,6 +10,8 @@ export interface MenuWorkspaceElement<
   icon: string;
   order?: number;
   badge?: string;
+  /** If set, item is shown only when user has this permission (filtered server-side) */
+  permission?: string;
   type: "main" | "mdl";
   children?: MenuWorkspaceElement<K>[];
   parentKey?: K;

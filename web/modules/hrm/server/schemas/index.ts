@@ -30,4 +30,5 @@ export * from "./hrm.position";
 export * from "./hrm.roster";
 export * from "./hrm.shift";
 export * from "./hrm.timesheet";
+export * from "./hrm.timesheet-settings";
 export * from "./hrm.workflow";

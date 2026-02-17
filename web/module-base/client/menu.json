@@ -32,6 +32,13 @@
         "name": "Sequence Rules",
         "path": "/settings/sequences",
         "as": "/settings/sequences"
+      },
+      {
+        "key": "settings.timesheets",
+        "name": "Timesheets",
+        "path": "/modules/hrm/settings/timesheets",
+        "as": "/modules/hrm/settings/timesheets",
+        "order": 3
       }
     ]
   }

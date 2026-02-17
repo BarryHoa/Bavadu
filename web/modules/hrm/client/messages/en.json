@@ -319,6 +319,14 @@
       "create": "New Timesheet",
       "edit": "Edit Timesheet",
       "generalInfo": "Timesheet Information",
+      "monthly": "Timesheet",
+      "prevMonth": "Previous month",
+      "currentMonth": "Current month",
+      "nextMonth": "Next month",
+      "noData": "No timesheet for this day",
+      "viewDetail": "View detail",
+      "allPeople": "All timesheets",
+      "allPeoplePlaceholder": "List of employees with timesheet summary will be shown here. Click an employee to view their monthly timesheet.",
       "labels": {
         "employee": "Employee",
         "workDate": "Work Date",
@@ -351,6 +359,38 @@
         "failedToCreateTimesheet": "Failed to create timesheet",
         "failedToLoadTimesheet": "Failed to load timesheet",
         "failedToUpdateTimesheet": "Failed to update timesheet"
+      }
+    },
+    "settings": {
+      "timesheets": {
+        "title": "Timesheet settings",
+        "defaultCheckInTime": "Default check-in time",
+        "defaultCheckInTimeDesc": "Default start of work (e.g. 09:00)",
+        "defaultCheckOutTime": "Default check-out time",
+        "defaultCheckOutTimeDesc": "Default end of work (e.g. 18:00)",
+        "breakMinutes": "Break (minutes)",
+        "breakMinutesDesc": "Default break duration in minutes",
+        "maxHoursPerDay": "Max hours per day",
+        "maxHoursPerDayDesc": "Leave empty for no limit",
+        "allowWeekend": "Allow weekend entries",
+        "weekStart": "Week start day",
+        "weekStartDesc": "First day of the week in calendar",
+        "sun": "Sunday",
+        "mon": "Monday",
+        "tue": "Tuesday",
+        "wed": "Wednesday",
+        "thu": "Thursday",
+        "fri": "Friday",
+        "sat": "Saturday",
+        "roundMinutes": "Round to (minutes)",
+        "roundMinutesDesc": "Round clock times to this interval",
+        "roundDirection": "Round direction",
+        "roundDirectionDesc": "Down = floor, Up = ceil, Nearest = round",
+        "roundDown": "Down",
+        "roundUp": "Up",
+        "roundNearest": "Nearest",
+        "toastSaved": "Settings saved",
+        "toastError": "Failed to save settings"
       }
     },
     "candidates": {

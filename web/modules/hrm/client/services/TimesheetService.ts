@@ -22,6 +22,17 @@ export default class TimesheetService extends JsonRpcClientService {
     }>("hrm.timesheet.curd.getDataById", { id });
   }
 
+  getByMonth(params: {
+    year: number;
+    month: number;
+    employeeId?: string | null;
+  }) {
+    return this.call<{
+      data: TimesheetDto[];
+      message?: string;
+    }>("hrm.timesheet.curd.getTimesheetsByMonth", params);
+  }
+
   create(payload: CreateTimesheetPayload) {
     return this.call<{
       data: TimesheetDto;

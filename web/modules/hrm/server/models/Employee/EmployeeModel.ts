@@ -188,6 +188,93 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
     return this.getEmployeeById(params.id);
   };
 
+  getByUserId = async (params: {
+    userId: string;
+  }): Promise<EmployeeRow | null> => {
+    const result = await this.db
+      .select({
+        id: this.table.id,
+        employeeCode: this.table.employeeCode,
+        firstName: this.table.firstName,
+        lastName: this.table.lastName,
+        fullName: this.table.fullName,
+        email: this.table.email,
+        phone: this.table.phone,
+        dateOfBirth: this.table.dateOfBirth,
+        gender: this.table.gender,
+        nationalId: this.table.nationalId,
+        taxId: this.table.taxId,
+        address: this.table.address,
+        positionId: this.table.positionId,
+        positionName: position.name,
+        departmentId: this.table.departmentId,
+        departmentName: department.name,
+        managerId: this.table.managerId,
+        managerCode: manager.employeeCode,
+        managerFullName: manager.fullName,
+        employmentStatus: this.table.employmentStatus,
+        employmentType: this.table.employmentType,
+        hireDate: this.table.hireDate,
+        probationEndDate: this.table.probationEndDate,
+        baseSalary: this.table.baseSalary,
+        currency: this.table.currency,
+        locationId: this.table.locationId,
+        isActive: this.table.isActive,
+        createdAt: this.table.createdAt,
+        updatedAt: this.table.updatedAt,
+      })
+      .from(this.table)
+      .leftJoin(position, eq(this.table.positionId, position.id))
+      .leftJoin(department, eq(this.table.departmentId, department.id))
+      .leftJoin(manager, eq(this.table.managerId, manager.id))
+      .where(eq(this.table.userId, params.userId))
+      .limit(1);
+
+    const row = result[0];
+    if (!row) return null;
+
+    return {
+      id: row.id,
+      employeeCode: row.employeeCode,
+      firstName: row.firstName ?? undefined,
+      lastName: row.lastName ?? undefined,
+      fullName: row.fullName,
+      email: row.email ?? undefined,
+      phone: row.phone ?? undefined,
+      dateOfBirth: row.dateOfBirth ?? undefined,
+      gender: row.gender ?? undefined,
+      nationalId: row.nationalId ?? undefined,
+      taxId: row.taxId ?? undefined,
+      address: row.address,
+      positionId: row.positionId,
+      position: row.positionId
+        ? { id: row.positionId, name: row.positionName ?? undefined }
+        : null,
+      departmentId: row.departmentId,
+      department: row.departmentId
+        ? { id: row.departmentId, name: row.departmentName ?? undefined }
+        : null,
+      managerId: row.managerId ?? undefined,
+      manager: row.managerId
+        ? {
+            id: row.managerId,
+            employeeCode: row.managerCode ?? undefined,
+            fullName: row.managerFullName ?? undefined,
+          }
+        : null,
+      employmentStatus: row.employmentStatus,
+      employmentType: row.employmentType ?? undefined,
+      hireDate: row.hireDate,
+      probationEndDate: row.probationEndDate ?? undefined,
+      baseSalary: row.baseSalary ?? undefined,
+      currency: row.currency ?? undefined,
+      locationId: row.locationId ?? undefined,
+      isActive: row.isActive ?? undefined,
+      createdAt: row.createdAt?.getTime(),
+      updatedAt: row.updatedAt?.getTime(),
+    };
+  };
+
   createEmployee = async (payload: EmployeeInput): Promise<EmployeeRow> => {
     const now = new Date();
     const insertData: NewHrmTbEmployee = {

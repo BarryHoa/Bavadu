@@ -313,6 +313,14 @@
       }
     },
     "timesheets": {
+      "monthly": "Chấm công",
+      "prevMonth": "Tháng trước",
+      "currentMonth": "Hiện tại",
+      "nextMonth": "Tháng sau",
+      "noData": "Không có chấm công ngày này",
+      "viewDetail": "Xem chi tiết",
+      "allPeople": "Chấm công mọi người",
+      "allPeoplePlaceholder": "Danh sách nhân viên và tóm tắt chấm công sẽ hiển thị tại đây. Bấm vào nhân viên để xem chấm công theo tháng.",
       "title": "Chấm công",
       "create": "Thêm chấm công",
       "edit": "Sửa chấm công",
@@ -349,6 +357,38 @@
         "failedToCreateTimesheet": "Không thể tạo chấm công",
         "failedToLoadTimesheet": "Không thể tải thông tin chấm công",
         "failedToUpdateTimesheet": "Không thể cập nhật chấm công"
+      }
+    },
+    "settings": {
+      "timesheets": {
+        "title": "Cấu hình chấm công",
+        "defaultCheckInTime": "Giờ vào mặc định",
+        "defaultCheckInTimeDesc": "Giờ bắt đầu làm việc (vd. 09:00)",
+        "defaultCheckOutTime": "Giờ ra mặc định",
+        "defaultCheckOutTimeDesc": "Giờ kết thúc làm việc (vd. 18:00)",
+        "breakMinutes": "Nghỉ (phút)",
+        "breakMinutesDesc": "Thời gian nghỉ mặc định (phút)",
+        "maxHoursPerDay": "Tối đa giờ/ngày",
+        "maxHoursPerDayDesc": "Để trống nếu không giới hạn",
+        "allowWeekend": "Cho phép chấm công cuối tuần",
+        "weekStart": "Ngày bắt đầu tuần",
+        "weekStartDesc": "Ngày đầu tuần trên lịch",
+        "sun": "Chủ nhật",
+        "mon": "Thứ 2",
+        "tue": "Thứ 3",
+        "wed": "Thứ 4",
+        "thu": "Thứ 5",
+        "fri": "Thứ 6",
+        "sat": "Thứ 7",
+        "roundMinutes": "Làm tròn theo (phút)",
+        "roundMinutesDesc": "Làm tròn giờ theo bước này",
+        "roundDirection": "Hướng làm tròn",
+        "roundDirectionDesc": "Xuống = floor, Lên = ceil, Gần nhất = round",
+        "roundDown": "Xuống",
+        "roundUp": "Lên",
+        "roundNearest": "Gần nhất",
+        "toastSaved": "Đã lưu cấu hình",
+        "toastError": "Lưu cấu hình thất bại"
       }
     },
     "candidates": {

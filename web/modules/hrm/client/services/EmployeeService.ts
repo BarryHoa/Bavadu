@@ -57,6 +57,13 @@ export default class EmployeeService extends JsonRpcClientService {
     }>("employee.curd.getById", { id });
   }
 
+  getByUserId(userId: string) {
+    return this.call<{
+      data: EmployeeDto | null;
+      message?: string;
+    }>("employee.curd.getByUserId", { userId });
+  }
+
   create(payload: {
     employeeCode: string;
     firstName?: string | null;

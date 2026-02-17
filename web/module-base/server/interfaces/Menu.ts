@@ -5,6 +5,8 @@ export type MenuFactoryElm = {
   as?: string;
   icon?: string;
   order?: number;
+  /** If set, menu item is shown only when user has this permission key */
+  permission?: string;
   children?: MenuFactoryElm[];
   type: "main" | "mdl";
 };
