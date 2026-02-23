@@ -1,7 +1,5 @@
 "use client";
 
-import type { Header, HeaderGroup } from "@tanstack/react-table";
-
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { flexRender } from "@tanstack/react-table";
@@ -9,8 +7,8 @@ import clsx from "clsx";
 import { GripVertical } from "lucide-react";
 import { memo } from "react";
 
-import { alignClassMap } from "./constants";
 import type { TableHeaderCellProps } from "../types/IBaseTableUI.types";
+import { alignClassMap } from "./constants";
 
 function TableHeaderCellInner<T = any>({
   header,
@@ -51,7 +49,9 @@ function TableHeaderCellInner<T = any>({
         opacity: isDragging ? 0.8 : 1,
         transform: isDragging ? CSS.Translate.toString(transform) : undefined,
         transition: isDragging ? "none" : undefined,
-        whiteSpace: "nowrap" as const,
+        whiteSpace: "normal",
+        wordBreak: "break-word",
+        paddingRight: "4px",
         width: header.column.getSize(),
         minWidth: header.column.getSize(),
         willChange: isDragging ? "transform" : undefined,
@@ -76,7 +76,12 @@ function TableHeaderCellInner<T = any>({
             <GripVertical className="h-4 w-4" />
           </span>
         )}
-        <span className={clsx("inline-flex flex-1 items-center", alignClass)}>
+        <span
+          className={clsx(
+            "inline-flex min-w-0 flex-1 flex-wrap items-center gap-x-2",
+            alignClass,
+          )}
+        >
           {renderHeader
             ? renderHeader(headerGroup, column)
             : flexRender(header.column.columnDef.header, header.getContext())}

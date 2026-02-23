@@ -10,10 +10,18 @@
       "list": {
         "employeeCode": "Employee Code",
         "fullName": "Full Name",
+        "firstName": "First Name",
+        "lastName": "Last Name",
         "email": "Email",
         "phone": "Phone",
+        "position": "Position",
+        "department": "Department",
         "status": "Status",
+        "type": "Type",
         "hireDate": "Hire Date",
+        "baseSalary": "Base Salary",
+        "createdAt": "Created",
+        "updatedAt": "Updated",
         "view": "View",
         "edit": "Edit",
         "newEmployee": "New Employee"

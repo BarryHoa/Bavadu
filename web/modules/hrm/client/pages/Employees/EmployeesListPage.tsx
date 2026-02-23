@@ -15,9 +15,27 @@ import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { Employee } from "@mdl/hrm/client/interface/Employee";
 
+/** Hiển thị phần tử đầu nếu value là array. */
+function firstOf(value: unknown): string | number | null | undefined {
+  if (Array.isArray(value)) return value[0] as string | undefined ?? null;
+  return value as string | number | null | undefined;
+}
+
 type EmployeeRow = Employee & {
+  code?: string;
+  fullName?: unknown;
+  firstName?: string | null;
+  lastName?: string | null;
+  emails?: string[] | null;
+  phones?: string[] | null;
+  position?: { id: string; name?: unknown } | null;
+  department?: { id: string; name?: unknown } | null;
+  status?: string | null;
+  type?: string | null;
   hireDate?: number | string | null;
+  baseSalary?: number | null;
   createdAt?: number | string | null;
+  updatedAt?: number | string | null;
 };
 
 export default function EmployeesListPage(): React.ReactNode {
@@ -25,17 +43,17 @@ export default function EmployeesListPage(): React.ReactNode {
   const t = useTranslations("hrm.employee.list");
   const getLocalizedText = useLocalizedText();
 
-  // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<EmployeeRow>[] = [
     {
-      key: "employeeCode",
+      key: "code",
       label: t("employeeCode"),
       render: (value, row) => {
-        if (!row?.id) return value;
+        const code = (row?.code ?? row?.employeeCode ?? value) as string;
+        if (!row?.id) return code;
 
         return (
           <IBaseLink href={`/workspace/modules/hrm/employees/view/${row.id}`}>
-            {row.employeeCode}
+            {code}
           </IBaseLink>
         );
       },
@@ -46,15 +64,37 @@ export default function EmployeesListPage(): React.ReactNode {
       render: (value) => getLocalizedText(value as any),
     },
     {
-      key: "email",
+      key: "firstName",
+      label: t("firstName"),
+    },
+    {
+      key: "lastName",
+      label: t("lastName"),
+    },
+    {
+      key: "emails",
       label: t("email"),
+      render: (value) => firstOf(value) ?? "—",
     },
     {
-      key: "phone",
+      key: "phones",
       label: t("phone"),
+      render: (value) => firstOf(value) ?? "—",
     },
     {
-      key: "employmentStatus",
+      key: "position",
+      label: t("position"),
+      render: (_, row) =>
+        getLocalizedText(row?.position?.name as any) ?? row?.position?.name ?? "—",
+    },
+    {
+      key: "department",
+      label: t("department"),
+      render: (_, row) =>
+        getLocalizedText(row?.department?.name as any) ?? row?.department?.name ?? "—",
+    },
+    {
+      key: "status",
       label: t("status"),
       render: (value) => (
         <IBaseChip className="capitalize" size="sm" variant="flat">
@@ -63,8 +103,29 @@ export default function EmployeesListPage(): React.ReactNode {
       ),
     },
     {
+      key: "type",
+      label: t("type"),
+      render: (value) => (value ? String(value) : "—"),
+    },
+    {
       key: "hireDate",
       label: t("hireDate"),
+      render: (value) => formatDate(value),
+    },
+    {
+      key: "baseSalary",
+      label: t("baseSalary"),
+      render: (value) =>
+        value != null ? Number(value).toLocaleString() : "—",
+    },
+    {
+      key: "createdAt",
+      label: t("createdAt"),
+      render: (value) => formatDate(value),
+    },
+    {
+      key: "updatedAt",
+      label: t("updatedAt"),
       render: (value) => formatDate(value),
     },
     {

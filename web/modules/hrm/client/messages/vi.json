@@ -10,10 +10,18 @@
       "list": {
         "employeeCode": "Mã nhân viên",
         "fullName": "Họ tên",
+        "firstName": "Tên",
+        "lastName": "Họ",
         "email": "Email",
         "phone": "Số điện thoại",
+        "position": "Vị trí",
+        "department": "Phòng ban",
         "status": "Trạng thái",
+        "type": "Loại",
         "hireDate": "Ngày vào làm",
+        "baseSalary": "Lương cơ bản",
+        "createdAt": "Ngày tạo",
+        "updatedAt": "Cập nhật",
         "view": "Xem",
         "edit": "Sửa",
         "newEmployee": "Thêm nhân viên"
