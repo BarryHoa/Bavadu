@@ -26,46 +26,44 @@ export function createEmployeeValidation(t: TranslateFn) {
     minLength(1, t("employeeCode.required")),
   );
 
-  // Full name validation (object with vi/en) - using custom validation
-  const fullNameSchema = custom<{ vi?: string; en?: string }>((value) => {
-    if (!value || typeof value !== "object") return false;
-    const obj = value as any;
+  // Full name (optional; display-only, comes from user)
+  const fullNameSchema = optional(
+    custom<{ vi?: string; en?: string }>((value) => {
+      if (value === undefined || value === null) return true;
+      if (typeof value !== "object") return false;
+      const obj = value as any;
+      return (
+        (obj.vi !== undefined && typeof obj.vi === "string") ||
+        (obj.en !== undefined && typeof obj.en === "string")
+      );
+    }, t("fullName.required")),
+  );
 
-    return (
-      (obj.vi !== undefined &&
-        typeof obj.vi === "string" &&
-        obj.vi.trim() !== "") ||
-      (obj.en !== undefined &&
-        typeof obj.en === "string" &&
-        obj.en.trim() !== "")
-    );
-  }, t("fullName.required"));
-
-  // Email validation
-  const emailSchema = pipe(
-    string(),
-    trim(),
-    custom(
-      (value) =>
-        value === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value)),
-      t("email.invalid"),
+  // Email validation (optional; display-only)
+  const emailSchema = optional(
+    pipe(
+      string(),
+      trim(),
+      custom(
+        (value) =>
+          value === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value)),
+        t("email.invalid"),
+      ),
     ),
   );
 
-  // Phone validation
-  const phoneSchema = pipe(string(), trim());
-
-  // Date validation
+  const phoneSchema = optional(pipe(string(), trim()));
   const dateSchema = pipe(string(), trim());
 
-  // Main form schema
+  // Main form schema — HR fields + optional userId (create) and display-only personal fields
   const employeeFormSchema = object({
+    userId: optional(pipe(string(), trim())),
     employeeCode: employeeCodeSchema,
     firstName: optional(pipe(string(), trim())),
     lastName: optional(pipe(string(), trim())),
     fullName: fullNameSchema,
-    email: optional(emailSchema),
-    phone: optional(phoneSchema),
+    email: emailSchema,
+    phone: phoneSchema,
     dateOfBirth: optional(dateSchema),
     gender: optional(pipe(string(), trim())),
     nationalId: optional(pipe(string(), trim())),
@@ -89,13 +87,17 @@ export function createEmployeeValidation(t: TranslateFn) {
         custom((value) => {
           if (value === "") return true;
           const num = Number(value);
-
           return !Number.isNaN(num) && num >= 0;
         }, t("baseSalary.invalid")),
       ),
     ),
     currency: optional(pipe(string(), trim())),
     locationId: optional(pipe(string(), trim())),
+    bankAccount: optional(pipe(string(), trim())),
+    bankName: optional(pipe(string(), trim())),
+    bankBranch: optional(pipe(string(), trim())),
+    emergencyContactName: optional(pipe(string(), trim())),
+    emergencyContactPhone: optional(pipe(string(), trim())),
     isActive: optional(boolean()),
   });
 

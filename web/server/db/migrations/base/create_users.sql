@@ -30,4 +30,5 @@ CREATE TABLE IF NOT EXISTS "md_base"."users" (
 -- ============================================
 CREATE INDEX IF NOT EXISTS "users_status_idx" ON "md_base"."users" USING btree ("status");
 CREATE INDEX IF NOT EXISTS "users_lastname_idx" ON "md_base"."users" USING btree ("last_name");
+CREATE INDEX IF NOT EXISTS "users_firstname_idx" ON "md_base"."users" USING btree ("first_name");
 

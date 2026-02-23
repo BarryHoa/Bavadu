@@ -54,17 +54,10 @@ export default function EmployeeCreatePageClient(): React.ReactNode {
 
   const handleSubmit = async (values: EmployeeFormValues) => {
     const payload = {
+      userId: values.userId?.trim() || null,
       employeeCode: values.employeeCode.trim(),
-      firstName: values.firstName?.trim() || null,
-      lastName: values.lastName?.trim() || null,
-      fullName: values.fullName || { vi: "", en: "" },
-      email: values.email?.trim() || null,
-      phone: values.phone?.trim() || null,
-      dateOfBirth: values.dateOfBirth?.trim() || null,
-      gender: values.gender?.trim() || null,
       nationalId: values.nationalId?.trim() || null,
       taxId: values.taxId?.trim() || null,
-      address: values.address || null,
       positionId: values.positionId.trim(),
       departmentId: values.departmentId.trim(),
       managerId: values.managerId?.trim() || null,
@@ -75,6 +68,11 @@ export default function EmployeeCreatePageClient(): React.ReactNode {
       baseSalary: values.baseSalary ? Number(values.baseSalary) : null,
       currency: values.currency?.trim() || "VND",
       locationId: values.locationId?.trim() || null,
+      bankAccount: values.bankAccount?.trim() || null,
+      bankName: values.bankName?.trim() || null,
+      bankBranch: values.bankBranch?.trim() || null,
+      emergencyContactName: values.emergencyContactName?.trim() || null,
+      emergencyContactPhone: values.emergencyContactPhone?.trim() || null,
       isActive: values.isActive ?? true,
     };
 

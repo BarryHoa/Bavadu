@@ -78,6 +78,22 @@ export default function EmployeeForm({
             </h2>
           </div>
           <div className="flex flex-col gap-8">
+            {mode === "create" && (
+              <Controller
+                control={control}
+                name="userId"
+                render={({ field, fieldState }) => (
+                  <IBaseInput
+                    {...field}
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
+                    label={tLabels("userId")}
+                    placeholder={tLabels("userIdPlaceholder")}
+                    size="sm"
+                  />
+                )}
+              />
+            )}
             <div className="grid gap-4 md:grid-cols-2">
               <Controller
                 control={control}
@@ -98,7 +114,6 @@ export default function EmployeeForm({
                 name="fullName"
                 render={({ field, fieldState }) => (
                   <IBaseInputMultipleLang
-                    isRequired
                     errorMessage={fieldState.error?.message}
                     isInvalid={fieldState.invalid}
                     label={tLabels("fullName")}
@@ -315,6 +330,75 @@ export default function EmployeeForm({
                     errorMessage={fieldState.error?.message}
                     isInvalid={fieldState.invalid}
                     label={tLabels("gender")}
+                    size="sm"
+                  />
+                )}
+              />
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <Controller
+                control={control}
+                name="bankAccount"
+                render={({ field, fieldState }) => (
+                  <IBaseInput
+                    {...field}
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
+                    label={tLabels("bankAccount")}
+                    size="sm"
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="bankName"
+                render={({ field, fieldState }) => (
+                  <IBaseInput
+                    {...field}
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
+                    label={tLabels("bankName")}
+                    size="sm"
+                  />
+                )}
+              />
+            </div>
+            <Controller
+              control={control}
+              name="bankBranch"
+              render={({ field, fieldState }) => (
+                <IBaseInput
+                  {...field}
+                  errorMessage={fieldState.error?.message}
+                  isInvalid={fieldState.invalid}
+                  label={tLabels("bankBranch")}
+                  size="sm"
+                />
+              )}
+            />
+            <div className="grid gap-4 md:grid-cols-2">
+              <Controller
+                control={control}
+                name="emergencyContactName"
+                render={({ field, fieldState }) => (
+                  <IBaseInput
+                    {...field}
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
+                    label={tLabels("emergencyContactName")}
+                    size="sm"
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="emergencyContactPhone"
+                render={({ field, fieldState }) => (
+                  <IBaseInput
+                    {...field}
+                    errorMessage={fieldState.error?.message}
+                    isInvalid={fieldState.invalid}
+                    label={tLabels("emergencyContactPhone")}
                     size="sm"
                   />
                 )}

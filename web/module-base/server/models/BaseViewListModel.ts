@@ -1,13 +1,13 @@
-import type { PgTable } from "drizzle-orm/pg-core";
 import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/shared/interface/ListInterface";
 import type { ParamSortMultiple } from "@base/shared/interface/SortInterface";
+import type { PgTable } from "drizzle-orm/pg-core";
 
-import { isNil, omitBy } from "lodash";
 import { asc, desc, or, sql, type Column } from "drizzle-orm";
+import { isNil, omitBy } from "lodash";
 
 import { BaseModel } from "./BaseModel";
 

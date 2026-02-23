@@ -2,6 +2,7 @@ import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export interface EmployeeDto {
   id: string;
+  userId?: string | null;
   employeeCode: string;
   firstName?: string | null;
   lastName?: string | null;
@@ -36,9 +37,62 @@ export interface EmployeeDto {
   baseSalary?: number | null;
   currency?: string | null;
   locationId?: string | null;
+  bankAccount?: string | null;
+  bankName?: string | null;
+  bankBranch?: string | null;
+  emergencyContactName?: string | null;
+  emergencyContactPhone?: string | null;
   isActive?: boolean;
   createdAt?: number;
   updatedAt?: number;
+}
+
+/** HR-only + userId for create. Personal data (name, email, etc.) lives on user. */
+export interface EmployeeCreatePayload {
+  userId?: string | null;
+  employeeCode: string;
+  nationalId?: string | null;
+  taxId?: string | null;
+  positionId: string;
+  departmentId: string;
+  managerId?: string | null;
+  employmentStatus?: string;
+  employmentType?: string | null;
+  hireDate: string;
+  probationEndDate?: string | null;
+  baseSalary?: number | null;
+  currency?: string | null;
+  locationId?: string | null;
+  bankAccount?: string | null;
+  bankName?: string | null;
+  bankBranch?: string | null;
+  emergencyContactName?: string | null;
+  emergencyContactPhone?: string | null;
+  isActive?: boolean;
+}
+
+/** HR-only for update. */
+export interface EmployeeUpdatePayload {
+  id: string;
+  employeeCode?: string;
+  nationalId?: string | null;
+  taxId?: string | null;
+  positionId?: string;
+  departmentId?: string;
+  managerId?: string | null;
+  employmentStatus?: string;
+  employmentType?: string | null;
+  hireDate?: string;
+  probationEndDate?: string | null;
+  baseSalary?: number | null;
+  currency?: string | null;
+  locationId?: string | null;
+  bankAccount?: string | null;
+  bankName?: string | null;
+  bankBranch?: string | null;
+  emergencyContactName?: string | null;
+  emergencyContactPhone?: string | null;
+  isActive?: boolean;
 }
 
 export default class EmployeeService extends JsonRpcClientService {
@@ -64,61 +118,14 @@ export default class EmployeeService extends JsonRpcClientService {
     }>("employee.curd.getByUserId", { userId });
   }
 
-  create(payload: {
-    employeeCode: string;
-    firstName?: string | null;
-    lastName?: string | null;
-    fullName: { vi?: string; en?: string };
-    email?: string | null;
-    phone?: string | null;
-    dateOfBirth?: string | null;
-    gender?: string | null;
-    nationalId?: string | null;
-    taxId?: string | null;
-    address?: unknown;
-    positionId: string;
-    departmentId: string;
-    managerId?: string | null;
-    employmentStatus?: string;
-    employmentType?: string | null;
-    hireDate: string;
-    probationEndDate?: string | null;
-    baseSalary?: number | null;
-    currency?: string | null;
-    locationId?: string | null;
-    isActive?: boolean;
-  }) {
+  create(payload: EmployeeCreatePayload) {
     return this.call<{
       data: EmployeeDto;
       message?: string;
     }>("employee.curd.create", payload);
   }
 
-  update(payload: {
-    id: string;
-    employeeCode?: string;
-    firstName?: string | null;
-    lastName?: string | null;
-    fullName?: { vi?: string; en?: string };
-    email?: string | null;
-    phone?: string | null;
-    dateOfBirth?: string | null;
-    gender?: string | null;
-    nationalId?: string | null;
-    taxId?: string | null;
-    address?: unknown;
-    positionId?: string;
-    departmentId?: string;
-    managerId?: string | null;
-    employmentStatus?: string;
-    employmentType?: string | null;
-    hireDate?: string;
-    probationEndDate?: string | null;
-    baseSalary?: number | null;
-    currency?: string | null;
-    locationId?: string | null;
-    isActive?: boolean;
-  }) {
+  update(payload: EmployeeUpdatePayload) {
     return this.call<{
       data: EmployeeDto;
       message?: string;

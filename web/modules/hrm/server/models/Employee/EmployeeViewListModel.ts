@@ -1,8 +1,8 @@
+import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/shared/interface/ListInterface";
-import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 import type { Column } from "drizzle-orm";
 
 import { eq, ilike } from "drizzle-orm";
@@ -13,79 +13,67 @@ import {
   type FilterConditionMap,
 } from "@base/server/models/BaseViewListModel";
 
+import { base_tb_users } from "@base/server/schemas/base.user";
+
+import { fullNameSqlFrom } from "./employee.helpers";
+
 import { hrm_tb_employees } from "../../schemas";
 import { hrm_tb_departments } from "../../schemas/hrm.department";
 import { hrm_tb_positions } from "../../schemas/hrm.position";
 
 const department = alias(hrm_tb_departments, "department");
 const position = alias(hrm_tb_positions, "position");
+const employee = alias(hrm_tb_employees, "employee");
+const fullNameSql = fullNameSqlFrom(base_tb_users);
 
 export interface EmployeeRow {
   id: string;
-  employeeCode: string;
-  fullName?: unknown;
-  email?: string | null;
-  phone?: string | null;
+  code: string;
+  fullName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  emails?: string | null;
+  phones?: string | null;
   positionId: string;
-  position?: {
-    id: string;
-    name?: unknown;
-  } | null;
+  position?: { id: string; name?: unknown } | null;
   departmentId: string;
-  department?: {
-    id: string;
-    name?: unknown;
-  } | null;
-  employmentStatus: string;
+  department?: { id: string; name?: unknown } | null;
+  status: string;
+  type: string;
   hireDate: string;
   baseSalary?: number | null;
-  isActive?: boolean;
   createdAt?: number;
   updatedAt?: number;
 }
 
 class EmployeeViewListModel extends BaseViewListModel<
-  typeof hrm_tb_employees,
+  typeof base_tb_users,
   EmployeeRow
 > {
   protected declarationColumns = () =>
-    new Map<
-      string,
-      {
-        column: Column<any>;
-        sort?: boolean;
-      }
-    >([
-      ["id", { column: hrm_tb_employees.id, sort: true }],
-      ["employeeCode", { column: hrm_tb_employees.employeeCode, sort: true }],
-      ["fullName", { column: hrm_tb_employees.fullName, sort: true }],
-      ["email", { column: hrm_tb_employees.email, sort: true }],
-      ["phone", { column: hrm_tb_employees.phone, sort: true }],
-      ["positionId", { column: hrm_tb_employees.positionId, sort: true }],
-      ["departmentId", { column: hrm_tb_employees.departmentId, sort: true }],
-      [
-        "employmentStatus",
-        { column: hrm_tb_employees.employmentStatus, sort: true },
-      ],
-      ["hireDate", { column: hrm_tb_employees.hireDate, sort: true }],
-      ["baseSalary", { column: hrm_tb_employees.baseSalary, sort: true }],
-      ["isActive", { column: hrm_tb_employees.isActive, sort: true }],
-      ["createdAt", { column: hrm_tb_employees.createdAt, sort: true }],
-      ["updatedAt", { column: hrm_tb_employees.updatedAt, sort: true }],
+    new Map<string, { column: Column<any>; sort?: boolean }>([
+      ["id", { column: employee.id, sort: true }],
+      ["code", { column: employee.code, sort: true }],
+      ["type", { column: employee.type, sort: true }],
+      ["positionId", { column: employee.positionId, sort: true }],
+      ["departmentId", { column: employee.departmentId, sort: true }],
+      ["status", { column: employee.status, sort: true }],
+      ["hireDate", { column: employee.hireDate, sort: true }],
+      ["baseSalary", { column: employee.baseSalary, sort: true }],
+      ["createdAt", { column: employee.createdAt, sort: true }],
+      ["updatedAt", { column: employee.updatedAt, sort: true }],
     ]);
 
   constructor() {
-    super({ table: hrm_tb_employees });
+    super({ table: base_tb_users });
   }
 
   protected declarationSearch = () =>
     new Map([
-      [
-        "employeeCode",
-        (text: string) => ilike(hrm_tb_employees.employeeCode, text),
-      ],
-      ["fullName", (text: string) => ilike(hrm_tb_employees.fullName, text)],
-      ["email", (text: string) => ilike(hrm_tb_employees.email, text)],
+      ["code", (t: string) => ilike(employee.code, t)],
+      ["fullName", (t: string) => ilike(fullNameSql, t)],
+      ["emails", (t: string) => ilike(base_tb_users.emails, t)],
+      ["phones", (t: string) => ilike(base_tb_users.phones, t)],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
@@ -93,40 +81,62 @@ class EmployeeViewListModel extends BaseViewListModel<
 
   protected declarationMappingData = (row: any): EmployeeRow => ({
     id: row.id,
-    employeeCode: row.employeeCode,
+    code: row.code,
     fullName: row.fullName,
-    email: row.email ?? undefined,
-    phone: row.phone ?? undefined,
+    firstName: row.firstName,
+    lastName: row.lastName,
+    emails: row.emails,
+    phones: row.phones,
     positionId: row.positionId,
     position: row.positionId
-      ? {
-          id: row.positionId,
-          name: row.positionName ?? undefined,
-        }
+      ? { id: row.positionId, name: row.positionName }
       : null,
     departmentId: row.departmentId,
     department: row.departmentId
-      ? {
-          id: row.departmentId,
-          name: row.departmentName ?? undefined,
-        }
+      ? { id: row.departmentId, name: row.departmentName }
       : null,
-    employmentStatus: row.employmentStatus,
+    status: row.status,
+    type: row.type,
     hireDate: row.hireDate,
-    baseSalary: row.baseSalary ?? undefined,
-    isActive: row.isActive ?? undefined,
-    createdAt: row.createdAt?.getTime(),
-    updatedAt: row.updatedAt?.getTime(),
+    baseSalary: row.baseSalary,
+    createdAt: row.createdAt?.getTime?.(),
+    updatedAt: row.updatedAt?.getTime?.(),
   });
 
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<EmployeeRow>> => {
-    return this.buildQueryDataList(params, (query) =>
-      query
-        .leftJoin(position, eq(this.table.positionId, position.id))
-        .leftJoin(department, eq(this.table.departmentId, department.id)),
+    const select = {
+      id: employee.id,
+      code: employee.code,
+      fullName: fullNameSql.as("fullName"),
+      firstName: this.table.firstName,
+      lastName: this.table.lastName,
+      emails: this.table.emails,
+      phones: this.table.phones,
+      positionId: employee.positionId,
+      positionName: position.name,
+      departmentId: employee.departmentId,
+      departmentName: department.name,
+      status: employee.status,
+      hireDate: employee.hireDate,
+      baseSalary: employee.baseSalary,
+      createdAt: employee.createdAt,
+      updatedAt: employee.updatedAt,
+    };
+    const result = await this.buildQueryDataListWithSelect(
+      params,
+      select as unknown as Record<string, Column>,
+      (q) =>
+        q
+          .leftJoin(employee, eq(employee.userId, base_tb_users.id))
+          .leftJoin(position, eq(employee.positionId, position.id))
+          .leftJoin(department, eq(employee.departmentId, department.id)),
     );
+    return {
+      data: (result?.data ?? []).map((row) => this.declarationMappingData(row)),
+      total: result?.total ?? 0,
+    };
   };
 }
 
