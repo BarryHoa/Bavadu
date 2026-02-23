@@ -6,6 +6,7 @@ import { RuntimeContext } from "../../runtime/RuntimeContext";
 import { CACHE_NOT_FOUND, RedisCache } from "../../runtime/cache/RedisCache";
 import {
   base_tb_permissions,
+  base_tb_role_admin_modules,
   base_tb_role_permissions_default,
   base_tb_roles,
   base_tb_user_permissions,
@@ -25,8 +26,8 @@ export interface UserPermissionResult {
    */
   isGlobalAdmin?: boolean;
   /**
-   * Danh sách module code mà user là admin module.
-   * Lấy từ JSONB is_admin_modules của các roles.
+   * Admin scopes của user (từ bảng role_admin_modules).
+   * Phân cấp: 'hrm', 'hrm.timesheet', 'hrm.payroll'...
    */
   adminModules?: Set<string>;
 }
@@ -91,7 +92,7 @@ export default class UserPermissionModel extends BaseModel<
    */
   async getPermissionsByUser(
     userId: string,
-    forceRefresh = false
+    forceRefresh = false,
   ): Promise<UserPermissionResult> {
     const cache = this.getCache();
     const cacheKey = this.getCacheKey(userId);
@@ -143,7 +144,7 @@ export default class UserPermissionModel extends BaseModel<
    * Lấy permissions từ database (private method)
    */
   private async _getPermissionsByUserFromDB(
-    userId: string
+    userId: string,
   ): Promise<UserPermissionResult> {
     // 1. Get user's roles
     const userRoles = await this.db
@@ -152,7 +153,6 @@ export default class UserPermissionModel extends BaseModel<
           id: base_tb_roles.id,
           code: base_tb_roles.code,
           name: base_tb_roles.name,
-          isAdminModules: base_tb_roles.isAdminModules,
           isSystem: base_tb_roles.isSystem,
         },
       })
@@ -162,8 +162,8 @@ export default class UserPermissionModel extends BaseModel<
         and(
           eq(base_tb_user_roles.userId, userId),
           eq(base_tb_user_roles.isActive, true),
-          eq(base_tb_roles.isActive, true)
-        )
+          eq(base_tb_roles.isActive, true),
+        ),
       );
 
     const roles = userRoles.map((r) => ({
@@ -172,33 +172,35 @@ export default class UserPermissionModel extends BaseModel<
       name: r.role.name,
     }));
 
-    // Tính toán cờ admin từ roles
-    const adminModules = new Set<string>();
+    const roleIds = roles.map((r) => r.id);
     let isGlobalAdmin = false;
+    const adminModules = new Set<string>();
 
     for (const r of userRoles) {
-      const role = r.role as {
-        code: string;
-        isAdminModules?: Record<string, boolean> | null;
-        isSystem?: boolean | null;
-      };
-
+      const role = r.role as { code: string; isSystem?: boolean | null };
       if (role.code === "system" || role.code === "admin" || role.isSystem) {
         isGlobalAdmin = true;
       }
+    }
 
-      const flags = role.isAdminModules ?? {};
-
-      for (const [moduleCode, isAdmin] of Object.entries(flags)) {
-        if (isAdmin) {
-          adminModules.add(moduleCode);
-        }
+    // Admin scopes từ bảng role_admin_modules (hierarchical: hrm, hrm.timesheet...)
+    if (roleIds.length > 0) {
+      const scopeRows = await this.db
+        .select({ scope: base_tb_role_admin_modules.scope })
+        .from(base_tb_role_admin_modules)
+        .where(
+          and(
+            inArray(base_tb_role_admin_modules.roleId, roleIds),
+            eq(base_tb_role_admin_modules.isActive, true),
+          ),
+        );
+      for (const row of scopeRows) {
+        adminModules.add(row.scope);
       }
     }
 
     // 2. Get permissions from role_permissions_default table for all user's roles
     const rolePermissions = new Set<string>();
-    const roleIds = roles.map((r) => r.id);
 
     if (roleIds.length > 0) {
       const rolePerms = await this.db
@@ -210,15 +212,15 @@ export default class UserPermissionModel extends BaseModel<
           base_tb_permissions,
           eq(
             base_tb_role_permissions_default.permissionId,
-            base_tb_permissions.id
-          )
+            base_tb_permissions.id,
+          ),
         )
         .where(
           and(
             inArray(base_tb_role_permissions_default.roleId, roleIds),
             eq(base_tb_role_permissions_default.isActive, true),
-            eq(base_tb_permissions.isActive, true)
-          )
+            eq(base_tb_permissions.isActive, true),
+          ),
         );
 
       for (const rp of rolePerms) {
@@ -234,14 +236,14 @@ export default class UserPermissionModel extends BaseModel<
       .from(base_tb_user_permissions)
       .innerJoin(
         base_tb_permissions,
-        eq(base_tb_user_permissions.permissionId, base_tb_permissions.id)
+        eq(base_tb_user_permissions.permissionId, base_tb_permissions.id),
       )
       .where(
         and(
           eq(base_tb_user_permissions.userId, userId),
           eq(base_tb_user_permissions.isActive, true),
-          eq(base_tb_permissions.isActive, true)
-        )
+          eq(base_tb_permissions.isActive, true),
+        ),
       );
 
     // 4. Combine role permissions and user permissions
@@ -282,7 +284,7 @@ export default class UserPermissionModel extends BaseModel<
    */
   async hasAnyPermission(
     userId: string,
-    permissions: string[]
+    permissions: string[],
   ): Promise<boolean> {
     const result = await this.getPermissionsByUser(userId);
 
@@ -294,7 +296,7 @@ export default class UserPermissionModel extends BaseModel<
    */
   async hasAllPermissions(
     userId: string,
-    permissions: string[]
+    permissions: string[],
   ): Promise<boolean> {
     const result = await this.getPermissionsByUser(userId);
 
@@ -308,7 +310,7 @@ export default class UserPermissionModel extends BaseModel<
   async addPermissionToUser(
     userId: string,
     permissionId: string,
-    createdBy?: string
+    createdBy?: string,
   ) {
     const now = new Date();
 
@@ -319,8 +321,8 @@ export default class UserPermissionModel extends BaseModel<
       .where(
         and(
           eq(this.table.userId, userId),
-          eq(this.table.permissionId, permissionId)
-        )
+          eq(this.table.permissionId, permissionId),
+        ),
       )
       .limit(1);
 
@@ -373,8 +375,8 @@ export default class UserPermissionModel extends BaseModel<
         and(
           eq(this.table.userId, userId),
           eq(this.table.permissionId, permissionId),
-          eq(this.table.isActive, true)
-        )
+          eq(this.table.isActive, true),
+        ),
       )
       .returning();
 

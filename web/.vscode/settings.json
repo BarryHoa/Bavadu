@@ -127,5 +127,6 @@
     "modules/purchase/client/messages",
     "modules/report/client/messages",
     "modules/stock/client/messages"
-  ]
+  ],
+  "postman.settings.dotenv-detection-notification-visibility": false
 }

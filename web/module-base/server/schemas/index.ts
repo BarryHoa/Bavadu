@@ -8,6 +8,7 @@ export * from "./base.payment-method";
 export * from "./base.payment-term";
 export * from "./base.permission";
 export * from "./base.role";
+export * from "./base.role-admin-modules";
 export * from "./base.role-permissions-default";
 export * from "./base.sequence-count";
 export * from "./base.sequence-rule";

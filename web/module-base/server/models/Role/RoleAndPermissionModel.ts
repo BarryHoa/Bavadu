@@ -5,6 +5,7 @@ import { LocaleDataType } from "@base/shared/interface/Locale";
 
 import {
   base_tb_permissions,
+  base_tb_role_admin_modules,
   base_tb_role_permissions_default,
   base_tb_roles,
   base_tb_user_roles,
@@ -32,7 +33,7 @@ export interface RoleRow {
   isActive?: boolean;
   createdAt?: number;
   updatedAt?: number;
-  // Module-level admin flags loaded from is_admin_modules JSONB
+  // Admin scopes từ role_admin_modules: { 'hrm': true, 'hrm.timesheet': true, ... }
   isAdminModules?: Record<string, boolean>;
 }
 
@@ -60,6 +61,29 @@ export default class RoleAndPermissionModel extends BaseModel<
     if (typeof value === "object") return value as LocaleDataType<string>;
 
     return null;
+  }
+
+  /**
+   * Load admin scopes cho role từ bảng role_admin_modules.
+   * Trả về Record<scope, true> để tương thích isAdminModules.
+   */
+  private async loadAdminScopesForRole(
+    roleId: string,
+    dbOrTx?: typeof this.db,
+  ): Promise<Record<string, boolean>> {
+    const db = dbOrTx ?? this.db;
+    const rows = await db
+      .select({ scope: base_tb_role_admin_modules.scope })
+      .from(base_tb_role_admin_modules)
+      .where(
+        and(
+          eq(base_tb_role_admin_modules.roleId, roleId),
+          eq(base_tb_role_admin_modules.isActive, true),
+        ),
+      );
+    const out: Record<string, boolean> = {};
+    for (const r of rows) out[r.scope] = true;
+    return out;
   }
 
   /**
@@ -111,13 +135,7 @@ export default class RoleAndPermissionModel extends BaseModel<
       isActive: row.isActive ?? undefined,
       createdAt: row.createdAt?.getTime(),
       updatedAt: row.updatedAt?.getTime(),
-      // Drizzle will map JSONB to plain JS object
-      isAdminModules:
-        (
-          row as typeof base_tb_roles.$inferSelect & {
-            isAdminModules?: Record<string, boolean>;
-          }
-        ).isAdminModules ?? {},
+      isAdminModules: await this.loadAdminScopesForRole(row.id, db),
     };
   }
 
@@ -160,6 +178,8 @@ export default class RoleAndPermissionModel extends BaseModel<
       .from(base_tb_permissions)
       .where(inArray(base_tb_permissions.id, rolePermissionIds));
 
+    const isAdminModules = await this.loadAdminScopesForRole(id);
+
     return {
       id: roleRow.id,
       code: roleRow.code,
@@ -171,12 +191,7 @@ export default class RoleAndPermissionModel extends BaseModel<
       updatedAt: roleRow.updatedAt
         ? String(roleRow.updatedAt.getTime())
         : undefined,
-      isAdminModules:
-        (
-          roleRow as typeof base_tb_roles.$inferSelect & {
-            isAdminModules?: Record<string, boolean>;
-          }
-        ).isAdminModules ?? {},
+      isAdminModules,
       permissions: permissions.map((p) => ({
         id: p.id,
         key: p.key,
@@ -224,13 +239,28 @@ export default class RoleAndPermissionModel extends BaseModel<
           description: params.description ?? null,
           isSystem: false,
           isActive: true,
-          isAdminModules: params.isAdminModules ?? {},
           createdAt: now,
           updatedAt: now,
         })
         .returning({ id: this.table.id });
 
       if (!created) throw new Error("Failed to create role");
+
+      // role_admin_modules: lưu admin scopes (hrm, hrm.timesheet, ...)
+      const adminScopes = params.isAdminModules ?? {};
+      const scopes = Object.entries(adminScopes)
+        .filter(([, v]) => v)
+        .map(([scope]) => scope);
+      if (scopes.length > 0) {
+        await tx.insert(base_tb_role_admin_modules).values(
+          scopes.map((scope) => ({
+            roleId: created.id,
+            scope,
+            isActive: true,
+            createdAt: now,
+          })),
+        );
+      }
 
       const permissionIds = Array.isArray(params.permissionIds)
         ? params.permissionIds
@@ -314,6 +344,13 @@ export default class RoleAndPermissionModel extends BaseModel<
     }
     if (payload.isActive !== undefined)
       updateData.isActive = Boolean(payload.isActive);
+    if (payload.isAdminModules !== undefined) {
+      updateData.isAdminModules =
+        payload.isAdminModules !== null &&
+        typeof payload.isAdminModules === "object"
+          ? (payload.isAdminModules as Record<string, boolean>)
+          : {};
+    }
 
     const role = await this.db.transaction(async (tx) => {
       const now = new Date();
@@ -329,6 +366,26 @@ export default class RoleAndPermissionModel extends BaseModel<
         dbUpdate.isActive = updateData.isActive;
 
       await tx.update(this.table).set(dbUpdate).where(eq(this.table.id, id));
+
+      // Cập nhật role_admin_modules nếu có
+      if (updateData.isAdminModules !== undefined) {
+        await tx
+          .delete(base_tb_role_admin_modules)
+          .where(eq(base_tb_role_admin_modules.roleId, id));
+        const scopes = Object.entries(updateData.isAdminModules)
+          .filter(([, v]) => v)
+          .map(([scope]) => scope);
+        if (scopes.length > 0) {
+          await tx.insert(base_tb_role_admin_modules).values(
+            scopes.map((scope) => ({
+              roleId: id,
+              scope,
+              isActive: true,
+              createdAt: now,
+            })),
+          );
+        }
+      }
 
       const isUpdatingPermissions =
         updateData.permissionIds !== undefined ||
@@ -434,7 +491,8 @@ export default class RoleAndPermissionModel extends BaseModel<
       role &&
       (updateData.permissions !== undefined ||
         updateData.permissionIds !== undefined ||
-        updateData.isActive !== undefined)
+        updateData.isActive !== undefined ||
+        updateData.isAdminModules !== undefined)
     ) {
       await this.invalidateRoleUsersCache(id);
     }
