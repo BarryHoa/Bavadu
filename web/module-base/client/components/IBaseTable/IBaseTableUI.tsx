@@ -1,8 +1,6 @@
 "use client";
 
-import type { SortDescriptor, TableProps } from "@heroui/table";
-import type { Column, Header, HeaderGroup, Row } from "@tanstack/react-table";
-import type { ReactNode } from "react";
+import type { Column, HeaderGroup, Row } from "@tanstack/react-table";
 
 import {
   DndContext,
@@ -19,9 +17,7 @@ import {
   SortableContext,
   arrayMove,
   horizontalListSortingStrategy,
-  useSortable,
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { Spinner } from "@heroui/spinner";
 import {
   Table,
@@ -33,189 +29,13 @@ import {
 } from "@heroui/table";
 import { flexRender } from "@tanstack/react-table";
 import clsx from "clsx";
-import {
-  ChevronDown,
-  ChevronUp,
-  ChevronsUpDown,
-  GripVertical,
-} from "lucide-react";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 
-export interface IBaseTableUIProps<T = any> {
-  // TanStack Table data
-  headerGroups: HeaderGroup<T>[];
-  rows: Row<T>[];
-  visibleColumns: Column<T, unknown>[];
+import type { IBaseTableUIProps } from "./types/IBaseTableUI.types";
+import { TableHeaderCell } from "./ui/TableHeaderCell";
+import { sortIcons } from "./ui/constants";
 
-  // UI Props
-  loading?: boolean;
-  emptyContent?: ReactNode;
-  classNames?: {
-    wrapper?: string;
-    table?: string;
-    thead?: string;
-    tbody?: string;
-    tr?: string;
-    th?: string;
-    td?: string;
-  };
-  tableLayout?: "auto" | "fixed";
-  color?: TableProps["color"];
-  isStriped?: boolean;
-  isCompact?: boolean;
-  isHeaderSticky?: boolean;
-
-  // Selection
-  selectionMode?: TableProps["selectionMode"];
-  selectedKeys?: TableProps["selectedKeys"];
-  onSelectionChange?: TableProps["onSelectionChange"];
-
-  // Sorting
-  sortDescriptor?: SortDescriptor;
-  onSortChange?: (sort: SortDescriptor) => void;
-
-  // Column resize & reorder
-  enableColumnResizing?: boolean;
-  enableColumnOrdering?: boolean;
-  columnOrder?: string[];
-  onColumnOrderChange?: (order: string[]) => void;
-  setColumnOrder?: (updater: string[] | ((prev: string[]) => string[])) => void;
-
-  // Column configuration
-  getRowKey: (record: T, index: number) => string;
-  renderCell?: (
-    column: Column<T, unknown>,
-    row: Row<T>,
-    value: any,
-  ) => ReactNode;
-  renderHeader?: (
-    header: HeaderGroup<T>,
-    column: Column<T, unknown>,
-  ) => ReactNode;
-}
-
-// Memoize sort icons to prevent recreation
-const sortIcons = {
-  default: <ChevronsUpDown aria-hidden className="h-3.5 w-3.5 opacity-70" />,
-  ascending: <ChevronUp aria-hidden className="h-3.5 w-3.5 opacity-90" />,
-  descending: <ChevronDown aria-hidden className="h-3.5 w-3.5 opacity-90" />,
-} as const;
-
-const alignClassMap = {
-  end: "justify-end",
-  center: "justify-center",
-  start: "justify-start",
-} as const;
-
-function TableHeaderCell<T>({
-  header,
-  column,
-  meta,
-  isSortable,
-  getSortIcon,
-  onHeaderClick,
-  enableColumnResizing,
-  enableColumnOrdering,
-  renderHeader,
-  headerGroup,
-}: {
-  header: Header<T, unknown>;
-  column: Column<T, unknown>;
-  meta: Record<string, any>;
-  isSortable: boolean;
-  getSortIcon: (columnId: string) => ReactNode;
-  onHeaderClick: (column: Column<T, unknown>) => void;
-  enableColumnResizing: boolean;
-  enableColumnOrdering: boolean;
-  renderHeader?: (
-    header: HeaderGroup<T>,
-    column: Column<T, unknown>,
-  ) => ReactNode;
-  headerGroup: HeaderGroup<T>;
-}) {
-  const isDraggable = enableColumnOrdering && meta?.isDraggable !== false;
-  const { attributes, isDragging, listeners, setNodeRef, transform } =
-    useSortable({
-      id: header.column.id,
-      disabled: !isDraggable,
-    });
-
-  const resizeHandler = header.getResizeHandler?.();
-  const canResize =
-    enableColumnResizing && header.column.getCanResize?.() && resizeHandler;
-  const alignClass =
-    alignClassMap[meta.align as keyof typeof alignClassMap] ?? "justify-start";
-
-  return (
-    <div
-      ref={setNodeRef}
-      className={clsx(
-        "group  flex h-full w-full items-center",
-        isDragging &&
-          "rounded-md border-2 border-primary shadow-md ring-2 ring-primary/30",
-      )}
-      style={{
-        opacity: isDragging ? 0.8 : 1,
-        transform: CSS.Translate.toString(transform),
-        transition: isDragging ? "none" : undefined,
-        whiteSpace: "nowrap" as const,
-        width: header.column.getSize(),
-        minWidth: header.column.getSize(),
-        willChange: isDragging ? "transform" : undefined,
-        zIndex: isDragging ? 1 : 0,
-      }}
-    >
-      <div
-        className={clsx(
-          "inline-flex h-full flex-1 items-center",
-          isSortable && "cursor-pointer select-none",
-        )}
-        role={isSortable ? "button" : undefined}
-        tabIndex={isSortable ? 0 : -1}
-        onClick={() => onHeaderClick(header.column)}
-      >
-        {isDraggable && (
-          <span
-            aria-hidden
-            className="mr-1.5 inline-flex cursor-grab touch-none items-center text-default-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-default-600 active:cursor-grabbing"
-            {...attributes}
-            {...listeners}
-          >
-            <GripVertical className="h-4 w-4" />
-          </span>
-        )}
-        <span className={clsx("inline-flex flex-1 items-center", alignClass)}>
-          {renderHeader
-            ? renderHeader(headerGroup, column)
-            : flexRender(header.column.columnDef.header, header.getContext())}
-          {isSortable && (
-            <span className="ml-2 inline-flex items-center justify-end">
-              {getSortIcon(header.id)}
-            </span>
-          )}
-        </span>
-      </div>
-      {canResize && typeof resizeHandler === "function" && (
-        <div
-          aria-label="Resize column"
-          className="absolute right-0 top-0 z-20 h-full w-2 shrink-0 cursor-col-resize select-none touch-none bg-transparent hover:bg-primary/50"
-          style={{ touchAction: "none" }}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            resizeHandler(e.nativeEvent ?? e);
-          }}
-          onTouchStart={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            resizeHandler(e.nativeEvent ?? e);
-          }}
-        />
-      )}
-    </div>
-  );
-}
-
+/** Renders the leaf header row only (one row of columns). For column groups, TanStack gives multiple header groups; we use the last one. */
 export default function IBaseTableUI<T = any>({
   headerGroups,
   rows,
@@ -247,7 +67,6 @@ export default function IBaseTableUI<T = any>({
       if (!sortDescriptor || sortDescriptor.column !== columnId) {
         return sortIcons.default;
       }
-
       return sortDescriptor.direction === "ascending"
         ? sortIcons.ascending
         : sortIcons.descending;
@@ -258,18 +77,13 @@ export default function IBaseTableUI<T = any>({
   const handleHeaderClick = useCallback(
     (column: Column<T, unknown>) => {
       if (!column.getCanSort() || !onSortChange) return;
-
       const columnId = column.id;
       const isSameColumn = sortDescriptor?.column === columnId;
       const nextDirection =
         !isSameColumn || sortDescriptor?.direction === "descending"
           ? "ascending"
           : "descending";
-
-      onSortChange({
-        column: columnId,
-        direction: nextDirection,
-      });
+      onSortChange({ column: columnId, direction: nextDirection });
     },
     [sortDescriptor, onSortChange],
   );
@@ -277,35 +91,32 @@ export default function IBaseTableUI<T = any>({
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
+      if (!active || !over || active.id === over.id) return;
 
-      if (active && over && active.id !== over.id) {
-        const updateOrder = (prev: string[]) => {
-          const currentOrder =
-            prev.length > 0
-              ? prev
-              : headerGroups.flatMap((g) => g.headers.map((h) => h.id));
-          const oldIndex = currentOrder.indexOf(active.id as string);
-          const newIndex = currentOrder.indexOf(over.id as string);
+      const updateOrder = (prev: string[]) => {
+        const currentOrder =
+          prev.length > 0
+            ? prev
+            : headerGroups.flatMap((g) => g.headers.map((h) => h.id));
+        const oldIndex = currentOrder.indexOf(active.id as string);
+        const newIndex = currentOrder.indexOf(over.id as string);
+        if (oldIndex !== -1 && newIndex !== -1) {
+          return arrayMove(currentOrder, oldIndex, newIndex);
+        }
+        return prev;
+      };
 
-          if (oldIndex !== -1 && newIndex !== -1) {
-            return arrayMove(currentOrder, oldIndex, newIndex);
-          }
-
-          return prev;
-        };
-
-        if (setColumnOrder) {
-          setColumnOrder(updateOrder);
-        } else if (onColumnOrderChange) {
-          const currentOrder = columnOrder.length
+      if (setColumnOrder) {
+        setColumnOrder(updateOrder);
+      } else if (onColumnOrderChange) {
+        const currentOrder =
+          columnOrder.length > 0
             ? columnOrder
             : headerGroups.flatMap((g) => g.headers.map((h) => h.id));
-          const oldIndex = currentOrder.indexOf(active.id as string);
-          const newIndex = currentOrder.indexOf(over.id as string);
-
-          if (oldIndex !== -1 && newIndex !== -1) {
-            onColumnOrderChange(arrayMove(currentOrder, oldIndex, newIndex));
-          }
+        const oldIndex = currentOrder.indexOf(active.id as string);
+        const newIndex = currentOrder.indexOf(over.id as string);
+        if (oldIndex !== -1 && newIndex !== -1) {
+          onColumnOrderChange(arrayMove(currentOrder, oldIndex, newIndex));
         }
       }
     },
@@ -313,23 +124,26 @@ export default function IBaseTableUI<T = any>({
   );
 
   const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 200,
-        tolerance: 8,
-      },
-    }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
     useSensor(KeyboardSensor),
+  );
+
+  const [draggingColumnId, setDraggingColumnId] = useState<string | null>(null);
+  const onDragStart = useCallback(({ active }: { active: { id: unknown } }) => {
+    setDraggingColumnId(active.id as string);
+  }, []);
+  const onDragEndWithReset = useCallback(
+    (event: DragEndEvent) => {
+      setDraggingColumnId(null);
+      handleDragEnd(event);
+    },
+    [handleDragEnd],
   );
 
   const sortableIds = useMemo(
     () =>
-      columnOrder.length
+      columnOrder.length > 0
         ? columnOrder
         : headerGroups.flatMap((g) => g.headers.map((h) => h.id)),
     [columnOrder, headerGroups],
@@ -362,6 +176,10 @@ export default function IBaseTableUI<T = any>({
     [visibleColumns],
   );
 
+  // Use leaf header row only (last group) so we have one row of TableColumn for HeroUI
+  const leafHeaderGroup = headerGroups[headerGroups.length - 1];
+  const headerRow = leafHeaderGroup ?? headerGroups[0];
+
   const tableContent = (
     <Table
       aria-label="Data table"
@@ -376,57 +194,62 @@ export default function IBaseTableUI<T = any>({
       onSelectionChange={onSelectionChange}
     >
       <TableHeader>
-        {headerGroups.flatMap((headerGroup) =>
-          headerGroup.headers.map((header) => {
-            const column = columnMap.get(header.id);
-            const meta = (column?.columnDef?.meta as Record<string, any>) || {};
-            const isSortable = header.column.getCanSort();
-            const isPinned = header.column.getIsPinned();
-            const size = header.column.getSize();
-            const pinStyle = isPinned
-              ? {
-                  position: "sticky" as const,
-                  [isPinned === "left" ? "left" : "right"]:
-                    header.column.getStart(isPinned),
-                  zIndex: 10,
-                }
-              : undefined;
-            const colStyle = enableColumnResizing
-              ? { ...pinStyle, width: size, minWidth: size }
-              : pinStyle;
+        {headerRow?.headers.map((header) => {
+          const column = columnMap.get(header.id);
+          const meta = (column?.columnDef?.meta as Record<string, unknown>) ?? {};
+          const isSortable = header.column.getCanSort();
+          const isPinned = header.column.getIsPinned();
+          const size = header.column.getSize();
+          const pinStyle = isPinned
+            ? {
+                position: "sticky" as const,
+                [isPinned === "left" ? "left" : "right"]:
+                  header.column.getStart(isPinned),
+                zIndex: 5,
+              }
+            : undefined;
+          const isDraggingColumn = draggingColumnId === header.id;
+          const dragStyle = isDraggingColumn
+            ? {
+                ...(isPinned ? {} : { position: "relative" as const }),
+                zIndex: 1000,
+              }
+            : undefined;
+          const colStyle = enableColumnResizing
+            ? { ...pinStyle, ...dragStyle, width: size, minWidth: size }
+            : { ...pinStyle, ...dragStyle };
 
-            return (
-              <TableColumn
-                key={header.id}
-                align={meta.align || "start"}
-                allowsSorting={false}
-                className={clsx(
-                  "relative overflow-visible",
-                  isPinned && "frozen-column",
-                  isPinned === "left" && "frozen-left",
-                  isPinned === "right" && "frozen-right",
-                )}
-                maxWidth={column?.columnDef.maxSize}
-                minWidth={column?.columnDef.minSize}
-                style={colStyle}
-                width={size}
-              >
-                <TableHeaderCell
-                  column={column!}
-                  enableColumnOrdering={enableColumnOrdering}
-                  enableColumnResizing={enableColumnResizing}
-                  getSortIcon={getSortIcon}
-                  header={header}
-                  headerGroup={headerGroup}
-                  isSortable={isSortable}
-                  meta={meta}
-                  renderHeader={renderHeader}
-                  onHeaderClick={handleHeaderClick}
-                />
-              </TableColumn>
-            );
-          }),
-        )}
+          return (
+            <TableColumn
+              key={header.id}
+              align={(meta.align as "start" | "center" | "end") || "start"}
+              allowsSorting={false}
+              className={clsx(
+                "relative overflow-visible",
+                isPinned && "frozen-column",
+                isPinned === "left" && "frozen-left",
+                isPinned === "right" && "frozen-right",
+              )}
+              maxWidth={column?.columnDef.maxSize}
+              minWidth={column?.columnDef.minSize}
+              style={colStyle}
+              width={size}
+            >
+              <TableHeaderCell
+                column={column!}
+                enableColumnOrdering={enableColumnOrdering}
+                enableColumnResizing={enableColumnResizing}
+                getSortIcon={getSortIcon}
+                header={header}
+                headerGroup={headerRow}
+                isSortable={isSortable}
+                meta={meta}
+                renderHeader={renderHeader}
+                onHeaderClick={handleHeaderClick}
+              />
+            </TableColumn>
+          );
+        })}
       </TableHeader>
       <TableBody
         emptyContent={emptyContent}
@@ -452,13 +275,12 @@ export default function IBaseTableUI<T = any>({
           index: number;
         }) => {
           const rowKey = getRowKey(original, index);
-
           return (
             <TableRow key={rowKey}>
               {row.getVisibleCells().map((cell) => {
                 const column = columnMap.get(cell.column.id);
                 const meta =
-                  (column?.columnDef?.meta as Record<string, any>) || {};
+                  (column?.columnDef?.meta as Record<string, unknown>) ?? {};
                 const isPinned = cell.column.getIsPinned();
                 const pinStyle = isPinned
                   ? {
@@ -486,7 +308,7 @@ export default function IBaseTableUI<T = any>({
                     <div
                       className={clsx(
                         "flex",
-                        `justify-${meta.align || "start"}`,
+                        `justify-${(meta.align as string) || "start"}`,
                       )}
                     >
                       {renderCell
@@ -496,9 +318,7 @@ export default function IBaseTableUI<T = any>({
                               row,
                               cell.getValue(),
                             );
-
-                            return customRender !== null &&
-                              customRender !== undefined
+                            return customRender != null
                               ? customRender
                               : flexRender(
                                   cell.column.columnDef.cell,
@@ -525,7 +345,8 @@ export default function IBaseTableUI<T = any>({
       collisionDetection={closestCenter}
       modifiers={[restrictToHorizontalAxis]}
       sensors={sensors}
-      onDragEnd={handleDragEnd}
+      onDragEnd={onDragEndWithReset}
+      onDragStart={onDragStart}
     >
       <SortableContext
         items={sortableIds}

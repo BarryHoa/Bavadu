@@ -20,29 +20,42 @@ type FrozenMeta = {
   right: FrozenColumn[];
 };
 
-const computeFrozenMeta = <T>(
+/** Flatten column tree to leaf columns only. */
+function flattenLeafColumns<T>(
   columns: IBaseTableColumnDefinition<T>[],
+): IBaseTableColumnDefinition<T>[] {
+  const out: IBaseTableColumnDefinition<T>[] = [];
+  for (const col of columns) {
+    if (Array.isArray(col.children) && col.children.length > 0) {
+      out.push(...flattenLeafColumns(col.children));
+    } else {
+      out.push(col);
+    }
+  }
+  return out;
+}
+
+const computeFrozenMeta = <T>(
+  leafColumns: IBaseTableColumnDefinition<T>[],
 ): FrozenMeta => {
   let leftOffset = 0;
   let rightOffset = 0;
 
-  const leftColumns = columns.filter((column) => column.fixed === "left");
+  const leftColumns = leafColumns.filter((c) => c.fixed === "left");
   const left = leftColumns.map((column) => {
     const frozen: FrozenColumn = {
       key: column.key,
       offset: leftOffset,
       width: column.width || 150,
     };
-
     leftOffset += column.width || 150;
-
     return frozen;
   });
 
-  const rightColumns = columns
+  const rightColumns = leafColumns
     .slice()
     .reverse()
-    .filter((column) => column.fixed === "right");
+    .filter((c) => c.fixed === "right");
   const right = rightColumns
     .map((column) => {
       const frozen: FrozenColumn = {
@@ -50,9 +63,7 @@ const computeFrozenMeta = <T>(
         offset: rightOffset,
         width: column.width || 150,
       };
-
       rightOffset += column.width || 150;
-
       return frozen;
     })
     .reverse();
@@ -120,13 +131,48 @@ const buildRenderValue = <T>(
   };
 };
 
+function processColumn<T>(
+  column: IBaseTableColumnDefinition<T>,
+  frozenMeta: FrozenMeta,
+): ProcessedIBaseTableColumn<T> {
+  const hasChildren =
+    Array.isArray(column.children) && column.children.length > 0;
+
+  if (hasChildren) {
+    return {
+      ...column,
+      renderValue: () => null,
+      children: column.children!.map((child) =>
+        processColumn(child, frozenMeta),
+      ),
+    } as ProcessedIBaseTableColumn<T>;
+  }
+
+  const frozenStyle = getFrozenStyle(column.key, frozenMeta);
+  const frozenClassName = getFrozenClassName(column.key, frozenMeta);
+  const isSpecialKey = [
+    I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
+    "__action__",
+  ].includes(column.key);
+
+  return {
+    ...column,
+    frozenStyle,
+    frozenClassName,
+    renderValue: buildRenderValue(column),
+    isResizable: isSpecialKey ? false : column.isResizable,
+    isDraggable: isSpecialKey ? false : column.isDraggable,
+  } satisfies ProcessedIBaseTableColumn<T>;
+}
+
 export const useColumns = <T>(
   columns: IBaseTableColumnDefinition<T>[],
 ): ProcessedIBaseTableColumn<T>[] => {
   const t = useTranslations("dataTable");
 
   return useMemo(() => {
-    const frozenMeta = computeFrozenMeta(columns);
+    const leafColumns = flattenLeafColumns(columns);
+    const frozenMeta = computeFrozenMeta(leafColumns);
 
     const numberColumn: ProcessedIBaseTableColumn<T> = {
       key: I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
@@ -147,33 +193,8 @@ export const useColumns = <T>(
       isDraggable: false,
     };
 
-    const processed = columns.map((column) => {
-      const frozenStyle = getFrozenStyle(column.key, frozenMeta);
-      const frozenClassName = getFrozenClassName(column.key, frozenMeta);
-
-      // override isResizable and isDraggable for key action
-
-      return {
-        ...column,
-        frozenStyle,
-        frozenClassName,
-        renderValue: buildRenderValue(column),
-        isResizable: [
-          I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
-          "__action__",
-        ].includes(column.key)
-          ? false
-          : column.isResizable,
-        isDraggable: [
-          I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
-          "__action__",
-        ].includes(column.key)
-          ? false
-          : column.isDraggable,
-      } satisfies ProcessedIBaseTableColumn<T>;
-    });
-
-    return [numberColumn, ...processed];
+    const processed = columns.map((col) => processColumn(col, frozenMeta));
+    return [numberColumn, ...processed] as ProcessedIBaseTableColumn<T>[];
   }, [columns, t]);
 };
 

@@ -6,6 +6,7 @@ export * from "./IBaseTable";
 export * from "./IBaseTableCore";
 export * from "./IBaseTableInterface";
 export * from "./IBaseTableUI";
+export * from "./types";
 
 export { IBaseTable };
 

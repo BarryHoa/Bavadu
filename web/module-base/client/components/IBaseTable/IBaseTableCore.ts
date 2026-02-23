@@ -25,7 +25,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 
-// Column Definition Type (compatible with IBaseTableColumnDefinition)
+// Column Definition Type (compatible with IBaseTableColumnDefinition); supports group via children
 export interface IBaseTableCoreColumn<T = any> {
   key: string;
   title?: ReactNode;
@@ -44,6 +44,8 @@ export interface IBaseTableCoreColumn<T = any> {
   enablePinning?: boolean;
   enableResizing?: boolean;
   meta?: Record<string, any>;
+  /** Nested columns (group). Leaf columns have no children. */
+  children?: IBaseTableCoreColumn<T>[];
 }
 
 // Props for the core hook
@@ -157,10 +159,20 @@ export interface IBaseTableCoreReturn<T = any> {
   handleSortChange?: (sort: SortDescriptor) => void;
 }
 
-// Convert column definition to TanStack format
+// Convert column definition to TanStack format (supports nested group columns)
 function convertToTanStackColumn<T>(
   column: IBaseTableCoreColumn<T>,
 ): ColumnDef<T> {
+  const hasChildren = Array.isArray(column.children) && column.children.length > 0;
+
+  if (hasChildren && column.children) {
+    return {
+      id: column.key,
+      header: () => column.title ?? column.label ?? column.key,
+      columns: column.children.map((child) => convertToTanStackColumn(child)),
+    };
+  }
+
   const accessorKey =
     typeof column.dataIndex === "string" ? column.dataIndex : column.key;
   const useAccessorKey = accessorKey !== column.key;
@@ -200,6 +212,19 @@ function convertToTanStackColumn<T>(
   };
 
   return columnDef;
+}
+
+/** Flatten column tree to leaf keys (for column order / pinning). */
+function getLeafColumnKeys<T>(columns: IBaseTableCoreColumn<T>[]): string[] {
+  const keys: string[] = [];
+  for (const col of columns) {
+    if (Array.isArray(col.children) && col.children.length > 0) {
+      keys.push(...getLeafColumnKeys(col.children));
+    } else {
+      keys.push(col.key);
+    }
+  }
+  return keys;
 }
 
 // Convert SortDescriptor to TanStack SortingState
@@ -273,21 +298,25 @@ export function useIBaseTableCore<T = any>(
     return columns.map((col) => convertToTanStackColumn(col));
   }, [columns]);
 
-  // Memoize column keys for columnOrderState initialization
-  const columnKeys = useMemo(() => columns.map((col) => col.key), [columns]);
+  // Memoize leaf column keys for columnOrderState (flatten tree)
+  const columnKeys = useMemo(() => getLeafColumnKeys(columns), [columns]);
 
-  // Memoize initial column pinning state
+  // Memoize initial column pinning state (leaf columns only)
   const initialColumnPinning = useMemo<ColumnPinningState>(() => {
     const left: string[] = [];
     const right: string[] = [];
 
-    columns.forEach((col) => {
-      if (col.fixed === "left") {
-        left.push(col.key);
-      } else if (col.fixed === "right") {
-        right.push(col.key);
+    const visit = (cols: IBaseTableCoreColumn<T>[]) => {
+      for (const col of cols) {
+        if (Array.isArray(col.children) && col.children.length > 0) {
+          visit(col.children);
+        } else {
+          if (col.fixed === "left") left.push(col.key);
+          else if (col.fixed === "right") right.push(col.key);
+        }
       }
-    });
+    };
+    visit(columns);
 
     return { left, right };
   }, [columns]);

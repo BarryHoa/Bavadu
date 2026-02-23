@@ -15,7 +15,9 @@ import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 import { IBaseTableCoreColumn, useIBaseTableCore } from "./IBaseTableCore";
 import {
   I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
+  type IBaseTableColumnDefinition,
   type IBaseTableProps as IBaseTablePropsType,
+  type ProcessedIBaseTableColumn,
 } from "./IBaseTableInterface";
 import IBaseTableUI from "./IBaseTableUI";
 import useColumns from "./hooks/useColumns";
@@ -72,35 +74,42 @@ export function IBaseTable<T = any>({
 
   const processedColumns = useColumns(columns);
 
-  // React Compiler will automatically optimize this computation
-  const iBaseTableColumns: IBaseTableCoreColumn<T>[] = processedColumns.map(
-    (col) => ({
-      key: col.key,
-      title: col.title,
-      label: col.label,
-      dataIndex: col.dataIndex,
-      align: col.align,
-      width: col.width,
-      minWidth: col.minWidth,
-      maxWidth: col.maxWidth,
-      sortable: col.sortable,
-      fixed: col.fixed,
-      render: (value: any, record: T, index: number) => {
-        // Use renderValue from processed column
-        return col.renderValue(record, index);
-      },
-      isResizable: col.isResizable,
-      isDraggable: col.isDraggable,
-      enableSorting: col.sortable,
-      enablePinning: !!col.fixed,
-      enableResizing: isResizableColumns && col.isResizable !== false,
-      meta: {
-        frozenStyle: col.frozenStyle,
-        frozenClassName: col.frozenClassName,
-        isRowNumber: col.key === I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
-      },
-    }),
-  );
+  const iBaseTableColumns = useMemo((): IBaseTableCoreColumn<T>[] => {
+    const toCore = (
+      col: ProcessedIBaseTableColumn<T> | IBaseTableColumnDefinition<T>,
+    ): IBaseTableCoreColumn<T> => {
+      const p = col as ProcessedIBaseTableColumn<T>;
+      const base = {
+        key: p.key,
+        title: p.title,
+        label: p.label,
+        dataIndex: p.dataIndex,
+        align: p.align,
+        width: p.width,
+        minWidth: p.minWidth,
+        maxWidth: p.maxWidth,
+        sortable: p.sortable,
+        fixed: p.fixed,
+        render: (value: any, record: T, index: number) =>
+          p.renderValue(record, index),
+        isResizable: p.isResizable,
+        isDraggable: p.isDraggable,
+        enableSorting: p.sortable,
+        enablePinning: !!p.fixed,
+        enableResizing: isResizableColumns && p.isResizable !== false,
+        meta: {
+          frozenStyle: p.frozenStyle,
+          frozenClassName: p.frozenClassName,
+          isRowNumber: p.key === I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
+        },
+      };
+      if (Array.isArray(p.children) && p.children.length > 0) {
+        return { ...base, children: p.children.map(toCore) };
+      }
+      return base;
+    };
+    return processedColumns.map(toCore);
+  }, [processedColumns, isResizableColumns]);
 
   // Core table logic - all logic is now in useIBaseTableCore
   const core = useIBaseTableCore<T>({

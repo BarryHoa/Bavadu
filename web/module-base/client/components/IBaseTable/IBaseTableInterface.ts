@@ -50,6 +50,7 @@ export type IBaseTableColumnSortIcon =
       descending?: ReactNode;
     };
 
+/** Column group: use `children` for nested header; leaf columns have no `children`. */
 export interface IBaseTableColumnDefinition<T = any> {
   key: string;
   title?: ReactNode;
@@ -65,6 +66,8 @@ export interface IBaseTableColumnDefinition<T = any> {
   sortIcon?: IBaseTableColumnSortIcon;
   isResizable?: boolean;
   isDraggable?: boolean;
+  /** Nested columns (group header). When set, this column is a group; leaf columns are in `children`. */
+  children?: IBaseTableColumnDefinition<T>[];
 }
 
 export interface ProcessedIBaseTableColumn<
