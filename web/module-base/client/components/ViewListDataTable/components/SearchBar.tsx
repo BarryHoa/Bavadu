@@ -8,16 +8,18 @@ interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  className?: string;
 }
 
 function SearchBar({
   value,
   onChange,
   placeholder = "Search",
+  className,
 }: SearchBarProps) {
   return (
     <IBaseInputSearch
-      className="w-full min-w-0"
+      className={["min-w-[180px]", className].filter(Boolean).join(" ")}
       placeholder={placeholder}
       value={value}
       onValueChange={onChange}

@@ -98,7 +98,7 @@ export default function ViewListDataTable<T = any>(
     search,
     filter,
     groupBy,
-    favorite,
+    favorite: _favorite,
     columnVisibility,
     isDummyData = false,
     actionsLeft,
@@ -134,7 +134,7 @@ export default function ViewListDataTable<T = any>(
     total,
     isLoading,
     isFetching,
-    error: fetchError,
+    error: _fetchError,
     refresh,
     onChangeTable,
   } = useViewListDataTableQueries<T>({
