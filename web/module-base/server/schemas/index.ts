@@ -19,3 +19,4 @@ export * from "./base.shipping-method";
 export * from "./base.shipping-term";
 export * from "./base.tax-rate";
 export * from "./base.user";
+export * from "./base.user-saving";
