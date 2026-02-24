@@ -29,22 +29,22 @@ class UserSavingModel extends BaseModelCached<
     super(base_tb_user_saving);
   }
 
-  protected getCachedKey(
+  protected getCachedKey = (
     userId: string,
     key: string,
     group?: string | null,
-  ): string {
+  ): string => {
     return `${userId}:${key}:${group ?? "default"}`;
-  }
+  };
 
   /**
    * Lấy full row theo user và key.
    */
-  protected async get(
+  protected get_saving = async (
     userId: string,
     key: string,
     group?: string | null,
-  ): Promise<UserSavingRow | null> {
+  ): Promise<UserSavingRow | null> => {
     const cacheResult = await this.cacheGet<UserSavingRow | null>(
       this.getCachedKey(userId, key, group),
     );
@@ -71,17 +71,17 @@ class UserSavingModel extends BaseModelCached<
     await this.cacheSet(row, this.getCachedKey(userId, key, group));
 
     return row as UserSavingRow;
-  }
+  };
 
   /**
    * Ghi (insert hoặc update) theo user + key. values có thể là object bất kỳ (jsonb).
    */
-  protected async set(
+  protected set_saving = async (
     userId: string,
     key: string,
     group: string,
     values: Record<string, unknown> | null,
-  ): Promise<UserSavingRow> {
+  ): Promise<UserSavingRow> => {
     const now = new Date();
 
     const [row] = await this.db
@@ -97,7 +97,6 @@ class UserSavingModel extends BaseModelCached<
       .onConflictDoUpdate({
         target: [this.table.userId, this.table.key, this.table.group],
         set: {
-          group: group ?? "default",
           values,
           updatedAt: now,
         },
@@ -114,12 +113,12 @@ class UserSavingModel extends BaseModelCached<
     );
 
     return row as UserSavingRow;
-  }
+  };
 
   /**
    * Xóa một bản ghi theo user + key.
    */
-  async delete(id: string): Promise<boolean> {
+  delete_saving = async (id: string): Promise<boolean> => {
     const result = await this.db
       .delete(this.table)
       .where(eq(this.table.id, id))
@@ -132,12 +131,12 @@ class UserSavingModel extends BaseModelCached<
     }
 
     return row !== null;
-  }
+  };
 
   /**
    * Lấy tất cả saving của một user (vd: để list keys hoặc prefetch).
    */
-  async getByUser(userId: string): Promise<UserSavingItem[]> {
+  get_saving_by_user = async (userId: string): Promise<UserSavingItem[]> => {
     const rows = await this.db
       .select({
         key: this.table.key,
@@ -152,7 +151,7 @@ class UserSavingModel extends BaseModelCached<
       group: (r as any).group ?? null,
       values: r.values as Record<string, unknown> | null,
     }));
-  }
+  };
 }
 
 export default UserSavingModel;

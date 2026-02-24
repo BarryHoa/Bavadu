@@ -7,8 +7,8 @@ import clsx from "clsx";
 import { GripVertical } from "lucide-react";
 import { memo } from "react";
 
-import type { TableHeaderCellProps } from "../types/IBaseTableUI.types";
 import { alignClassMap } from "./constants";
+import type { TableHeaderCellProps } from "./types/IBaseTableUI.types";
 
 function TableHeaderCellInner<T = any>({
   header,
@@ -52,8 +52,6 @@ function TableHeaderCellInner<T = any>({
         whiteSpace: "normal",
         wordBreak: "break-word",
         paddingRight: "4px",
-        width: header.column.getSize(),
-        minWidth: header.column.getSize(),
         willChange: isDragging ? "transform" : undefined,
       }}
     >

@@ -1,6 +1,6 @@
 import type { SortDescriptor, TableProps } from "@heroui/table";
+import type { ReactNode } from "react";
 export type { SortDescriptor, TableProps };
-import type { CSSProperties, ReactNode } from "react";
 
 export type RowSelectionMode = "single" | "multiple";
 
@@ -14,8 +14,8 @@ export interface IBaseTableRowSelection<T = any> {
   ) => void;
 }
 
-export const I_BASE_TABLE_COLUMN_KEY_ACTION = "__action__";
-export const I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER = "__row-number__";
+export const I_BASE_TABLE_COLUMN_KEY_ACTION: string = "__action__";
+export const I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER: string = "__row-number__";
 
 export type IBaseTablePagination = {
   pageSize?: number;
@@ -73,8 +73,6 @@ export interface IBaseTableColumnDefinition<T = any> {
 export interface ProcessedIBaseTableColumn<
   T = any,
 > extends IBaseTableColumnDefinition<T> {
-  frozenStyle?: CSSProperties;
-  frozenClassName?: string;
   renderValue: (record: T, index: number) => ReactNode;
 }
 

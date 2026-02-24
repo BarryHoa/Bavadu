@@ -51,29 +51,18 @@ html {
   z-index: 10 !important;
 }
 
-/* Shadow effect for frozen columns */
+/* Shadow effect for frozen columns – Tailwind for ::after / ::before */
 .frozen-left::after {
+  @apply absolute inset-y-0 right-0 w-2.5 translate-x-full pointer-events-none;
   content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 10px;
-  transform: translateX(100%);
-  pointer-events: none;
-  box-shadow: inset 10px 0 8px -8px rgba(0, 0, 0, 0.15);
+  box-shadow: inset 10px 0 6px -4px rgba(0, 0, 0, 0.12);
 }
 
 .frozen-right::before {
+  /* Dùng màu nền table (HeroUI `bg-background`) thay vì inherit theo stripe row */
+  @apply absolute inset-y-0 left-0 w-2.5 -translate-x-full pointer-events-none bg-background;
   content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 10px;
-  transform: translateX(-100%);
-  pointer-events: none;
-  box-shadow: inset -10px 0 8px -8px rgba(0, 0, 0, 0.15);
+  box-shadow: inset -10px 0 6px -4px rgba(0, 0, 0, 0.12);
 }
 
 /* Ensure frozen columns maintain background on hover */

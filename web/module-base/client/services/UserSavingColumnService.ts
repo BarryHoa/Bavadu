@@ -23,7 +23,7 @@ class UserSavingColumnService extends JsonRpcClientService {
     params: GetUserSavingColumnsParams,
   ): Promise<GetUserSavingColumnsResult> {
     return this.call<GetUserSavingColumnsResult>(
-      "user-saving.column.getColumns",
+      "base-user-saving-column.curd.get_columns",
       params,
     );
   }
@@ -32,11 +32,10 @@ class UserSavingColumnService extends JsonRpcClientService {
     params: SetUserSavingColumnsParams,
   ): Promise<SetUserSavingColumnsResult> {
     return this.call<SetUserSavingColumnsResult>(
-      "user-saving.column.setColumns",
+      "base-user-saving-column.curd.set_columns",
       params,
     );
   }
 }
 
 export default UserSavingColumnService;
-

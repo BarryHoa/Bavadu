@@ -1,6 +1,6 @@
 "use client";
 
-import type { Column, HeaderGroup, Row } from "@tanstack/react-table";
+import type { Column, Row } from "@tanstack/react-table";
 
 import {
   DndContext,
@@ -31,9 +31,9 @@ import { flexRender } from "@tanstack/react-table";
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 
+import { TableHeaderCell } from "./TableHeaderCell";
+import { sortIcons } from "./constants";
 import type { IBaseTableUIProps } from "./types/IBaseTableUI.types";
-import { TableHeaderCell } from "./ui/TableHeaderCell";
-import { sortIcons } from "./ui/constants";
 
 /** Renders the leaf header row only (one row of columns). For column groups, TanStack gives multiple header groups; we use the last one. */
 export default function IBaseTableUI<T = any>({
@@ -125,7 +125,9 @@ export default function IBaseTableUI<T = any>({
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 8 },
+    }),
     useSensor(KeyboardSensor),
   );
 
@@ -164,7 +166,8 @@ export default function IBaseTableUI<T = any>({
         classNames.tr,
       ),
       td: clsx(
-        "rounded-none py-2 px-3 text-sm text-default-700",
+        // Override HeroUI default `last:before:rounded-e-lg` so last cell right edge is straight
+        "rounded-none py-2 px-3 text-sm text-default-700 last:before:rounded-none",
         classNames.td,
       ),
     }),
@@ -196,7 +199,8 @@ export default function IBaseTableUI<T = any>({
       <TableHeader>
         {headerRow?.headers.map((header) => {
           const column = columnMap.get(header.id);
-          const meta = (column?.columnDef?.meta as Record<string, unknown>) ?? {};
+          const meta =
+            (column?.columnDef?.meta as Record<string, unknown>) ?? {};
           const isSortable = header.column.getCanSort();
           const isPinned = header.column.getIsPinned();
           const size = header.column.getSize();
@@ -205,7 +209,6 @@ export default function IBaseTableUI<T = any>({
                 position: "sticky" as const,
                 [isPinned === "left" ? "left" : "right"]:
                   header.column.getStart(isPinned),
-                zIndex: 5,
               }
             : undefined;
           const isDraggingColumn = draggingColumnId === header.id;
@@ -275,8 +278,10 @@ export default function IBaseTableUI<T = any>({
           index: number;
         }) => {
           const rowKey = getRowKey(original, index);
+          const stripeClass =
+            isStriped && index % 2 === 1 ? "bg-default-50" : "bg-white";
           return (
-            <TableRow key={rowKey}>
+            <TableRow key={rowKey} className={stripeClass}>
               {row.getVisibleCells().map((cell) => {
                 const column = columnMap.get(cell.column.id);
                 const meta =
@@ -287,7 +292,6 @@ export default function IBaseTableUI<T = any>({
                       position: "sticky" as const,
                       [isPinned === "left" ? "left" : "right"]:
                         cell.column.getStart(isPinned),
-                      zIndex: 10,
                     }
                   : undefined;
 
@@ -295,6 +299,7 @@ export default function IBaseTableUI<T = any>({
                   <TableCell
                     key={cell.id}
                     className={clsx(
+                      stripeClass,
                       isPinned && "frozen-column",
                       isPinned === "left" && "frozen-left",
                       isPinned === "right" && "frozen-right",

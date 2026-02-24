@@ -39,7 +39,7 @@ class SessionModel extends BaseModelCached<
   }
 
   private normalizeCachedSession(
-    cached: ValidateSessionResult
+    cached: ValidateSessionResult,
   ): ValidateSessionResult {
     if (cached.valid && cached.session) {
       const session = {
@@ -69,7 +69,7 @@ class SessionModel extends BaseModelCached<
 
   private async cacheSession(
     sessionToken: string,
-    result: ValidateSessionResult
+    result: ValidateSessionResult,
   ): Promise<void> {
     if (!this.useRedis || !result.valid || !result.session) {
       return;
@@ -156,8 +156,7 @@ class SessionModel extends BaseModelCached<
   async validateSession(sessionToken: string): Promise<ValidateSessionResult> {
     // Try Redis cache first
     if (this.useRedis) {
-      const cached =
-        await this.cacheGet<ValidateSessionResult>(sessionToken);
+      const cached = await this.cacheGet<ValidateSessionResult>(sessionToken);
 
       if (cached !== this.CACHE_NOT_FOUND) {
         const normalized = this.normalizeCachedSession(
@@ -197,7 +196,7 @@ class SessionModel extends BaseModelCached<
    * Validate session from database (private method)
    */
   private async _validateSessionFromDB(
-    sessionToken: string
+    sessionToken: string,
   ): Promise<ValidateSessionResult> {
     const now = new Date();
 
@@ -245,11 +244,6 @@ class SessionModel extends BaseModelCached<
         expiresAt: session.session.expiresAt!,
         createdAt: session.session.createdAt!,
         updatedAt: now,
-      },
-      user: {
-        id: session.user.id,
-        username: session.userLogin?.username || session.user.id,
-        avatar: session.user.avatar || undefined,
       },
     };
   }

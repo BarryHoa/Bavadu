@@ -26,9 +26,4 @@ export interface CreateSessionParams {
 export interface ValidateSessionResult {
   valid: boolean;
   session?: SessionData;
-  user?: {
-    id: string;
-    username: string;
-    avatar?: string;
-  };
 }

@@ -98,8 +98,6 @@ export function IBaseTable<T = any>({
         enablePinning: !!p.fixed,
         enableResizing: isResizableColumns && p.isResizable !== false,
         meta: {
-          frozenStyle: p.frozenStyle,
-          frozenClassName: p.frozenClassName,
           isRowNumber: p.key === I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
         },
       };

@@ -26,4 +26,8 @@ FOREIGN KEY ("user_id") REFERENCES "md_base"."users"("id") ON DELETE CASCADE ON 
 -- ============================================
 CREATE INDEX IF NOT EXISTS "user_saving_user_id_idx"
   ON "md_base"."user_saving" USING btree ("user_id");
+CREATE INDEX IF NOT EXISTS "user_saving_group_idx"
+  ON "md_base"."user_saving" USING btree ("group");
+CREATE INDEX IF NOT EXISTS "user_saving_key_idx"
+  ON "md_base"."user_saving" USING btree ("key");
 

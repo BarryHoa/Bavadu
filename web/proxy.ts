@@ -115,8 +115,11 @@ async function handleApiRoute(
       return addSecurityHeaders(authResponse);
     }
   }
+  // Continue with modified headers
+  const response = NextResponse.next({ request: { headers: nextHeaders } });
 
-  return null; // Continue processing
+  // Add security headers to all responses
+  return addSecurityHeaders(response);
 }
 
 /**

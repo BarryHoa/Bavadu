@@ -14,10 +14,10 @@ import {
  */
 export async function authenticateRequest(
   request: NextRequest,
-  nextHeaders: Headers
+  nextHeaders: Headers,
 ): Promise<NextResponse | null> {
   const sessionToken = request.cookies.get(
-    AUTH_CONFIG.sessionCookieName
+    AUTH_CONFIG.sessionCookieName,
   )?.value;
 
   if (!sessionToken) {
@@ -34,7 +34,7 @@ export async function authenticateRequest(
         error: "Authentication required",
         message: "Session token is required",
       },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -59,18 +59,11 @@ export async function authenticateRequest(
           error: "Authentication failed",
           message: "Invalid or expired session",
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
-    // Inject user info into headers for route handlers
-    if (validationResult.user) {
-      nextHeaders.set("x-user-id", validationResult.user.id);
-      nextHeaders.set("x-username", validationResult.user.username);
-      if (validationResult.user.avatar) {
-        nextHeaders.set("x-user-avatar", validationResult.user.avatar);
-      }
-    }
+    nextHeaders.set("x-user-id", validationResult.session.userId);
     nextHeaders.set("x-session-id", validationResult.session.id);
     nextHeaders.set("x-session-token", sessionToken);
 
@@ -90,7 +83,7 @@ export async function authenticateRequest(
         error: "Authentication failed",
         message: "Failed to validate session",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

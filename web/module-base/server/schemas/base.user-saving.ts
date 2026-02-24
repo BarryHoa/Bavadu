@@ -39,6 +39,8 @@ export const base_tb_user_saving = mdBaseSchema.table(
       table.group,
     ),
     index("user_saving_key_idx").on(table.key),
+    index("user_saving_group_idx").on(table.group),
+    index("user_saving_user_id_idx").on(table.userId),
   ],
 );
 
