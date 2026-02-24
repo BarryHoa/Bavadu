@@ -25,7 +25,6 @@ import FilterMenu from "./components/FilterMenu";
 import GroupByMenu from "./components/GroupByMenu";
 import SearchBar from "./components/SearchBar";
 import { useViewListDataTableQueries } from "./useViewListDataTableQueries";
-import { useViewListDataTableStore } from "./useViewListDataTableStore";
 import {
   ActionElm,
   ViewListDataTableProps,
@@ -110,10 +109,7 @@ export default function ViewListDataTable<T = any>(
     ...dataTableProps
   } = props;
 
-  // Use the store hook - each instance gets its own store
-  const store = useViewListDataTableStore({
-    columns,
-  });
+  const columnVisibilitySavingKey = columnVisibility?.savingKey ?? model;
   const getLocalizedText = useLocalizedText();
   const tDataTable = useTranslations("dataTable");
   const defaultEmptyContent = <IBaseEmpty description={tDataTable("empty")} />;
@@ -127,7 +123,7 @@ export default function ViewListDataTable<T = any>(
   const isGroupByHidden = groupBy?.hidden === true;
   // const isFavoriteHidden = favorite?.hidden === true;
   const isColumnVisibilityHidden = columnVisibility?.hidden === true;
-  // Fetch data using react-query
+  // Fetch data using react-query + UI state
   const {
     data: dataSource,
     isDataDummy,
@@ -137,11 +133,21 @@ export default function ViewListDataTable<T = any>(
     error: _fetchError,
     refresh,
     onChangeTable,
+    // UI state & actions
+    search: searchValue,
+    setSearch,
+    visibleColumns,
+    activeFilters,
+    toggleFilter,
+    groupBy: groupByValue,
+    setGroupBy,
+    onToggleColumn,
   } = useViewListDataTableQueries<T>({
     model,
+    columns,
     isDummyData,
     pagination: _pagination as IBaseTablePagination,
-    // enabled: !propDataSource, // Only fetch if dataSource is not provided as prop
+    columnVisibilitySavingKey,
   });
 
   // Memoize loading state
@@ -166,8 +172,8 @@ export default function ViewListDataTable<T = any>(
 
   // Memoize visible columns filtering
   const cols = useMemo(
-    () => columns.filter((col: any) => store.visibleColumns.has(col.key)),
-    [columns, store.visibleColumns],
+    () => columns.filter((col: any) => visibleColumns.has(col.key)),
+    [columns, visibleColumns],
   );
 
   // Memoize display columns (with dummy render if needed)
@@ -255,8 +261,8 @@ export default function ViewListDataTable<T = any>(
             <div className="w-full sm:max-w-[280px]">
               <SearchBar
                 placeholder={search?.placeholder}
-                value={store.search}
-                onChange={store.setSearch}
+                value={searchValue}
+                onChange={setSearch}
               />
             </div>
           )}
@@ -268,23 +274,23 @@ export default function ViewListDataTable<T = any>(
             )}
             {!isFilterHidden && (
               <FilterMenu
-                activeFilters={store.activeFilters}
+                activeFilters={activeFilters}
                 filterOptions={filterOptions}
-                onToggleFilter={store.toggleFilter}
+                onToggleFilter={toggleFilter}
               />
             )}
             {!isGroupByHidden && (
               <GroupByMenu
-                currentGroupBy={store.groupBy}
+                currentGroupBy={groupByValue}
                 groupByOptions={groupByOptions}
-                onSelectGroupBy={store.setGroupBy}
+                onSelectGroupBy={setGroupBy}
               />
             )}
             {!isColumnVisibilityHidden && (
               <ColumnVisibilityMenu
                 columns={columns}
-                visibleColumns={store.visibleColumns}
-                onToggleColumn={store.toggleColumn}
+                visibleColumns={visibleColumns}
+                onToggleColumn={onToggleColumn}
               />
             )}
           </div>

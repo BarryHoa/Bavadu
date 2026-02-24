@@ -1,9 +1,7 @@
 import { and, eq, inArray } from "drizzle-orm";
 
-import { BaseModel } from "@base/server/models/BaseModel";
+import BaseModelCached from "@base/server/models/BaseModelCached";
 
-import { RuntimeContext } from "../../runtime/RuntimeContext";
-import { CACHE_NOT_FOUND, RedisCache } from "../../runtime/cache/RedisCache";
 import {
   base_tb_permissions,
   base_tb_role_admin_modules,
@@ -20,15 +18,7 @@ export interface UserPermissionResult {
     code: string;
     name: unknown;
   }>;
-  /**
-   * Global admin flag (system/admin roles).
-   * Khi true, user có thể được coi là có toàn quyền.
-   */
   isGlobalAdmin?: boolean;
-  /**
-   * Admin scopes của user (từ bảng role_admin_modules).
-   * Phân cấp: 'hrm', 'hrm.timesheet', 'hrm.payroll'...
-   */
   adminModules?: Set<string>;
 }
 
@@ -45,30 +35,15 @@ interface CachedUserPermissionResult {
   adminModules?: string[];
 }
 
-export default class UserPermissionModel extends BaseModel<
-  typeof base_tb_user_permissions
+export default class UserPermissionModel extends BaseModelCached<
+  typeof base_tb_user_permissions,
+  CachedUserPermissionResult
 > {
-  private cachePrefix = "permissions:";
+  protected cachePrefix = "permissions:";
   private cacheTTL = 1800; // 30 phút
 
   constructor() {
     super(base_tb_user_permissions);
-  }
-
-  /**
-   * Lấy RedisCache instance
-   */
-  private getCache(): RedisCache | undefined {
-    const context = RuntimeContext.getInstance();
-
-    return context.getRedisCache();
-  }
-
-  /**
-   * Lấy cache key cho user
-   */
-  private getCacheKey(userId: string): string {
-    return `${userId}`;
   }
 
   /**
@@ -94,23 +69,21 @@ export default class UserPermissionModel extends BaseModel<
     userId: string,
     forceRefresh = false,
   ): Promise<UserPermissionResult> {
-    const cache = this.getCache();
-    const cacheKey = this.getCacheKey(userId);
+    // Nếu không force refresh, thử lấy từ cache
+    if (!forceRefresh) {
+      const cached =
+        await this.cacheGet<CachedUserPermissionResult>(userId);
 
-    // Nếu không force refresh và có cache, lấy từ cache
-    if (!forceRefresh && cache) {
-      const cached = await cache.get<CachedUserPermissionResult>(cacheKey, {
-        prefix: this.cachePrefix,
-      });
+      if (cached !== this.CACHE_NOT_FOUND) {
+        const data = cached as CachedUserPermissionResult;
 
-      if (cached !== CACHE_NOT_FOUND) {
         // Convert Array back to Set
         return {
-          permissions: new Set(cached.permissions),
-          roles: cached.roles,
-          isGlobalAdmin: cached.isGlobalAdmin,
-          adminModules: cached.adminModules
-            ? new Set(cached.adminModules)
+          permissions: new Set(data.permissions),
+          roles: data.roles,
+          isGlobalAdmin: data.isGlobalAdmin,
+          adminModules: data.adminModules
+            ? new Set(data.adminModules)
             : undefined,
         };
       }
@@ -120,22 +93,17 @@ export default class UserPermissionModel extends BaseModel<
     const result = await this._getPermissionsByUserFromDB(userId);
 
     // Cache lại
-    if (cache) {
-      const cacheData: CachedUserPermissionResult = {
-        permissions: Array.from(result.permissions), // Convert Set to Array
-        roles: result.roles,
-        cachedAt: Date.now(),
-        isGlobalAdmin: result.isGlobalAdmin,
-        adminModules: result.adminModules
-          ? Array.from(result.adminModules)
-          : undefined,
-      };
+    const cacheData: CachedUserPermissionResult = {
+      permissions: Array.from(result.permissions), // Convert Set to Array
+      roles: result.roles,
+      cachedAt: Date.now(),
+      isGlobalAdmin: result.isGlobalAdmin,
+      adminModules: result.adminModules
+        ? Array.from(result.adminModules)
+        : undefined,
+    };
 
-      await cache.set(cacheKey, cacheData, {
-        prefix: this.cachePrefix,
-        ttl: this.cacheTTL,
-      });
-    }
+    await this.cacheSet(cacheData, userId, { ttl: this.cacheTTL });
 
     return result;
   }
@@ -178,6 +146,7 @@ export default class UserPermissionModel extends BaseModel<
 
     for (const r of userRoles) {
       const role = r.role as { code: string; isSystem?: boolean | null };
+
       if (role.code === "system" || role.code === "admin" || role.isSystem) {
         isGlobalAdmin = true;
       }
@@ -194,6 +163,7 @@ export default class UserPermissionModel extends BaseModel<
             eq(base_tb_role_admin_modules.isActive, true),
           ),
         );
+
       for (const row of scopeRows) {
         adminModules.add(row.scope);
       }
@@ -394,13 +364,7 @@ export default class UserPermissionModel extends BaseModel<
    * Xóa cache permissions của user (khi có thay đổi role/permission)
    */
   async invalidateCache(userId: string): Promise<void> {
-    const cache = this.getCache();
-
-    if (cache) {
-      const cacheKey = this.getCacheKey(userId);
-
-      await cache.delete(cacheKey, { prefix: this.cachePrefix });
-    }
+    await this.cacheDelete(userId);
   }
 
   /**
@@ -411,12 +375,6 @@ export default class UserPermissionModel extends BaseModel<
       return;
     }
 
-    const cache = this.getCache();
-
-    if (cache) {
-      const cacheKeys = userIds.map((id) => this.getCacheKey(id));
-
-      await cache.deleteMany(cacheKeys, { prefix: this.cachePrefix });
-    }
+    await this.cacheDeleteMany(userIds);
   }
 }

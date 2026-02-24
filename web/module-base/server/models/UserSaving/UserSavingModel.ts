@@ -1,11 +1,13 @@
 import { and, eq } from "drizzle-orm";
 
 import { base_tb_user_saving } from "../../schemas/base.user-saving";
-import { BaseModel } from "../BaseModel";
+import BaseModelCached from "../BaseModelCached";
 
 export interface UserSavingRow {
+  id: string;
   userId: string;
   key: string;
+  group: string;
   values: Record<string, unknown> | null;
   createdAt: Date;
   updatedAt: Date;
@@ -13,39 +15,44 @@ export interface UserSavingRow {
 
 export interface UserSavingItem {
   key: string;
+  group: string;
   values: Record<string, unknown> | null;
 }
 
-class UserSavingModel extends BaseModel<typeof base_tb_user_saving> {
+class UserSavingModel extends BaseModelCached<
+  typeof base_tb_user_saving,
+  UserSavingRow | null
+> {
+  protected cachePrefix = "user-saving:";
+
   constructor() {
     super(base_tb_user_saving);
   }
 
-  /**
-   * Lấy giá trị theo user và key.
-   */
-  async get(
+  protected getCachedKey(
     userId: string,
     key: string,
-  ): Promise<Record<string, unknown> | null> {
-    const [row] = await this.db
-      .select({ values: this.table.values })
-      .from(this.table)
-      .where(
-        and(
-          eq(this.table.userId, userId),
-          eq(this.table.key, key),
-        ),
-      )
-      .limit(1);
-
-    return (row?.values ?? null) as Record<string, unknown> | null;
+    group?: string | null,
+  ): string {
+    return `${userId}:${key}:${group ?? "default"}`;
   }
 
   /**
    * Lấy full row theo user và key.
    */
-  async getRow(userId: string, key: string): Promise<UserSavingRow | null> {
+  protected async get(
+    userId: string,
+    key: string,
+    group?: string | null,
+  ): Promise<UserSavingRow | null> {
+    const cacheResult = await this.cacheGet<UserSavingRow | null>(
+      this.getCachedKey(userId, key, group),
+    );
+
+    if (cacheResult !== this.CACHE_NOT_FOUND) {
+      return cacheResult as UserSavingRow | null;
+    }
+
     const [row] = await this.db
       .select()
       .from(this.table)
@@ -53,6 +60,7 @@ class UserSavingModel extends BaseModel<typeof base_tb_user_saving> {
         and(
           eq(this.table.userId, userId),
           eq(this.table.key, key),
+          ...(group != null ? [eq(this.table.group, group)] : []),
         ),
       )
       .limit(1);
@@ -60,22 +68,18 @@ class UserSavingModel extends BaseModel<typeof base_tb_user_saving> {
     if (!row) {
       return null;
     }
+    await this.cacheSet(row, this.getCachedKey(userId, key, group));
 
-    return {
-      userId: row.userId,
-      key: row.key,
-      values: row.values as Record<string, unknown> | null,
-      createdAt: row.createdAt!,
-      updatedAt: row.updatedAt!,
-    };
+    return row as UserSavingRow;
   }
 
   /**
    * Ghi (insert hoặc update) theo user + key. values có thể là object bất kỳ (jsonb).
    */
-  async set(
+  protected async set(
     userId: string,
     key: string,
+    group: string,
     values: Record<string, unknown> | null,
   ): Promise<UserSavingRow> {
     const now = new Date();
@@ -85,13 +89,15 @@ class UserSavingModel extends BaseModel<typeof base_tb_user_saving> {
       .values({
         userId,
         key,
+        group: group ?? "default",
         values,
         createdAt: now,
         updatedAt: now,
       })
       .onConflictDoUpdate({
-        target: [this.table.userId, this.table.key],
+        target: [this.table.userId, this.table.key, this.table.group],
         set: {
+          group: group ?? "default",
           values,
           updatedAt: now,
         },
@@ -102,30 +108,30 @@ class UserSavingModel extends BaseModel<typeof base_tb_user_saving> {
       throw new Error("UserSavingModel.set: failed to upsert");
     }
 
-    return {
-      userId: row.userId,
-      key: row.key,
-      values: row.values as Record<string, unknown> | null,
-      createdAt: row.createdAt!,
-      updatedAt: row.updatedAt!,
-    };
+    await this.cacheSet(
+      row as UserSavingRow,
+      this.getCachedKey(row.userId, row.key, row.group),
+    );
+
+    return row as UserSavingRow;
   }
 
   /**
    * Xóa một bản ghi theo user + key.
    */
-  async delete(userId: string, key: string): Promise<boolean> {
+  async delete(id: string): Promise<boolean> {
     const result = await this.db
       .delete(this.table)
-      .where(
-        and(
-          eq(this.table.userId, userId),
-          eq(this.table.key, key),
-        ),
-      )
+      .where(eq(this.table.id, id))
       .returning();
 
-    return result.length > 0;
+    const row = result[0] as UserSavingRow | null;
+
+    if (row) {
+      await this.cacheDelete(this.getCachedKey(row.userId, row.key, row.group));
+    }
+
+    return row !== null;
   }
 
   /**
@@ -133,12 +139,17 @@ class UserSavingModel extends BaseModel<typeof base_tb_user_saving> {
    */
   async getByUser(userId: string): Promise<UserSavingItem[]> {
     const rows = await this.db
-      .select({ key: this.table.key, values: this.table.values })
+      .select({
+        key: this.table.key,
+        group: this.table.group,
+        values: this.table.values,
+      })
       .from(this.table)
       .where(eq(this.table.userId, userId));
 
     return rows.map((r) => ({
       key: r.key,
+      group: (r as any).group ?? null,
       values: r.values as Record<string, unknown> | null,
     }));
   }

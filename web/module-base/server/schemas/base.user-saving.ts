@@ -3,6 +3,7 @@ import {
   jsonb,
   primaryKey,
   timestamp,
+  uniqueIndex,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -10,18 +11,18 @@ import {
 import { base_tb_users } from "./base.user";
 import { mdBaseSchema } from "./schema";
 
-/**
- * User saving - key/value lưu theo user (vd: danh sách cột show/hide của table).
- * Primary key (user_id, key).
- */
 export const base_tb_user_saving = mdBaseSchema.table(
   "user_saving",
   {
+    id: uuid("id").defaultRandom().notNull(),
+
     userId: uuid("user_id")
       .notNull()
       .references(() => base_tb_users.id, { onDelete: "cascade" }),
 
     key: varchar("key", { length: 255 }).notNull(),
+
+    group: varchar("group", { length: 64 }).default("default").notNull(),
 
     values: jsonb("values"),
 
@@ -29,7 +30,14 @@ export const base_tb_user_saving = mdBaseSchema.table(
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
   (table) => [
-    primaryKey({ columns: [table.userId, table.key] }),
+    // Primary key: id (uuid)
+    primaryKey({ columns: [table.id] }),
+    // Không cho phép trùng (user_id, key, group)
+    uniqueIndex("user_saving_user_key_group_uniq").on(
+      table.userId,
+      table.key,
+      table.group,
+    ),
     index("user_saving_key_idx").on(table.key),
   ],
 );

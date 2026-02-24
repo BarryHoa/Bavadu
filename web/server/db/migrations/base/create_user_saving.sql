@@ -5,12 +5,14 @@
 -- User Saving
 -- ============================================
 CREATE TABLE IF NOT EXISTS "md_base"."user_saving" (
-	"user_id" uuid NOT NULL,
-	"key" varchar(255) NOT NULL,
-	"values" jsonb,
-	"created_at" timestamp with time zone DEFAULT now(),
-	"updated_at" timestamp with time zone DEFAULT now(),
-	PRIMARY KEY ("user_id", "key")
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "user_id" uuid NOT NULL,
+  "key" varchar(255) NOT NULL,
+  "group" varchar(64) DEFAULT 'default' NOT NULL,
+  "values" jsonb,
+  "created_at" timestamp with time zone DEFAULT now(),
+  "updated_at" timestamp with time zone DEFAULT now(),
+  CONSTRAINT "user_saving_user_key_group_uniq" UNIQUE ("user_id", "key", "group")
 );
 
 -- ============================================
@@ -22,5 +24,6 @@ FOREIGN KEY ("user_id") REFERENCES "md_base"."users"("id") ON DELETE CASCADE ON 
 -- ============================================
 -- Indexes
 -- ============================================
-CREATE INDEX IF NOT EXISTS "user_saving_user_id_idx" ON "md_base"."user_saving" USING btree ("user_id");
-CREATE INDEX IF NOT EXISTS "user_saving_key_idx" ON "md_base"."user_saving" USING btree ("key");
+CREATE INDEX IF NOT EXISTS "user_saving_user_id_idx"
+  ON "md_base"."user_saving" USING btree ("user_id");
+

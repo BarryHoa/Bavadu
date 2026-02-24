@@ -8,16 +8,17 @@ import { randomBytes } from "crypto";
 
 import { and, eq, gt, lt } from "drizzle-orm";
 
-import { CACHE_NOT_FOUND } from "../../runtime/cache";
-import { RuntimeContext } from "../../runtime/RuntimeContext";
 import { Debug } from "../../runtime/Debug";
 import { base_tb_sessions } from "../../schemas/base.session";
 import { base_tb_users, base_tb_users_login } from "../../schemas/base.user";
-import { BaseModel } from "../BaseModel";
+import BaseModelCached from "../BaseModelCached";
 
-class SessionModel extends BaseModel<typeof base_tb_sessions> {
+class SessionModel extends BaseModelCached<
+  typeof base_tb_sessions,
+  ValidateSessionResult
+> {
   private readonly useRedis: boolean;
-  private readonly cachePrefix = "session:";
+  protected cachePrefix = "session:";
 
   constructor() {
     super(base_tb_sessions);
@@ -29,19 +30,11 @@ class SessionModel extends BaseModel<typeof base_tb_sessions> {
 
   private shouldUseRedis(): boolean {
     try {
-      const redisCache = RuntimeContext.getInstance().getRedisCache();
+      const redisCache = this.getCache();
 
       return redisCache?.getStatus().connected ?? false;
     } catch {
       return false;
-    }
-  }
-
-  private getRedisCache() {
-    try {
-      return RuntimeContext.getInstance().getRedisCache();
-    } catch {
-      return undefined;
     }
   }
 
@@ -82,21 +75,12 @@ class SessionModel extends BaseModel<typeof base_tb_sessions> {
       return;
     }
 
-    const cache = this.getRedisCache();
-
-    if (!cache) {
-      return;
-    }
-
     const expiresAt = result.session.expiresAt.getTime();
     const now = Date.now();
     const ttl = Math.ceil((expiresAt - now) / 1000);
 
     if (ttl > 0) {
-      await cache.set(sessionToken, result, {
-        prefix: this.cachePrefix,
-        ttl,
-      });
+      await this.cacheSet(result, sessionToken, { ttl });
     }
   }
 
@@ -105,11 +89,7 @@ class SessionModel extends BaseModel<typeof base_tb_sessions> {
       return;
     }
 
-    const cache = this.getRedisCache();
-
-    if (cache) {
-      await cache.delete(sessionToken, { prefix: this.cachePrefix });
-    }
+    await this.cacheDelete(sessionToken);
   }
 
   /**
@@ -176,31 +156,28 @@ class SessionModel extends BaseModel<typeof base_tb_sessions> {
   async validateSession(sessionToken: string): Promise<ValidateSessionResult> {
     // Try Redis cache first
     if (this.useRedis) {
-      const cache = this.getRedisCache();
+      const cached =
+        await this.cacheGet<ValidateSessionResult>(sessionToken);
 
-      if (cache) {
-        const cached = await cache.get<ValidateSessionResult>(sessionToken, {
-          prefix: this.cachePrefix,
-        });
+      if (cached !== this.CACHE_NOT_FOUND) {
+        const normalized = this.normalizeCachedSession(
+          cached as ValidateSessionResult,
+        );
 
-        if (cached !== CACHE_NOT_FOUND) {
-          const normalized = this.normalizeCachedSession(cached);
+        if (normalized.valid && normalized.session) {
+          const now = Date.now();
+          const expiresAt = normalized.session.expiresAt.getTime();
 
-          if (normalized.valid && normalized.session) {
-            const now = Date.now();
-            const expiresAt = normalized.session.expiresAt.getTime();
-
-            if (now < expiresAt) {
-              // Session is valid and not expired
-              return normalized;
-            } else {
-              // Session expired, remove from cache
-              await this.invalidateCache(sessionToken);
-            }
-          } else {
-            // Invalid session, return cached result
+          if (now < expiresAt) {
+            // Session is valid and not expired
             return normalized;
+          } else {
+            // Session expired, remove from cache
+            await this.invalidateCache(sessionToken);
           }
+        } else {
+          // Invalid session, return cached result
+          return normalized;
         }
       }
     }
