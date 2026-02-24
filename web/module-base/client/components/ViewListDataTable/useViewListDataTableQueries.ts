@@ -203,13 +203,18 @@ export function useViewListDataTableQueries<T = any>({
           .then((res) => {
             if (!isMounted) return;
 
-            if (res?.success && Array.isArray(res.columns) && res.columns.length) {
+            if (
+              res?.success &&
+              Array.isArray(res.columns) &&
+              res.columns.length
+            ) {
               const next = new Set(
                 res.columns.filter((key) => allowed.has(key)),
               );
 
               if (next.size > 0) {
                 applyColumns(next);
+
                 return;
               }
             }
@@ -241,7 +246,8 @@ export function useViewListDataTableQueries<T = any>({
         clearTimeout(timeoutId);
       }
     };
-  }, [columnService, columnVisibilitySavingKey, columns]);
+    // only run only one
+  }, []);
 
   const onToggleColumn = (key: string) => {
     setVisibleColumns((prev) => {
