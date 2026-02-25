@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import {
+  addPageHeaders,
   addSecurityHeaders,
   authenticateRequest,
   checkCsrfProtection,
@@ -142,7 +143,9 @@ export async function proxy(req: NextRequest) {
    *  Handle page routes
    * -----------------
    *  */
-  //
+  // Set locale and workspace-module headers so layouts (e.g. WorkspaceLayout) can load the right i18n messages
+  addPageHeaders(req, nextHeaders, pathname);
+
   let pageResponse: any = null;
 
   // Check authentication for protected routes
