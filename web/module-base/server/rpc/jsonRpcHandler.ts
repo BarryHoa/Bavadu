@@ -250,9 +250,6 @@ export class JsonRpcHandler {
     try {
       const body = await httpRequest.json();
 
-      console.log({ body });
-      console.log({ httpRequest });
-
       // FOR BATCH REQUEST, each request is a JsonRpcRequest
       if (Array.isArray(body)) {
         if (!body.length) {

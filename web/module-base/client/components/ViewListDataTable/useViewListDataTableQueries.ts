@@ -56,6 +56,8 @@ export function useViewListDataTableQueries<T = any>({
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
     () => new Set(columns.map((c) => c.key)),
   );
+  // Đánh dấu khi cấu hình cột (visibleColumns) đã được load ổn định (API hoặc default).
+  const [isColumnsReady, setIsColumnsReady] = useState(false);
   const [activeFilters, setActiveFilters] = useState<Set<string>>(
     () => new Set(),
   );
@@ -189,6 +191,8 @@ export function useViewListDataTableQueries<T = any>({
       if (!isMounted) return;
       hasApplied = true;
       setVisibleColumns(cols);
+      // Sau lần áp dụng đầu tiên (từ API hoặc default), coi như cấu hình cột đã “ổn định”
+      setIsColumnsReady(true);
     };
 
     const applyDefaultIfNeeded = () => {
@@ -297,5 +301,6 @@ export function useViewListDataTableQueries<T = any>({
     toggleFavorite,
     reset,
     onToggleColumn,
+    isColumnsReady,
   };
 }

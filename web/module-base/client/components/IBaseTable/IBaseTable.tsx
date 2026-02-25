@@ -11,7 +11,7 @@ import IBaseTooltip from "../IBaseTooltip";
 import PaginationComponent from "../Pagination/Pagination";
 import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 
-import { IBaseTableCoreColumn, useIBaseTableCore } from "./IBaseTableCore";
+import { useIBaseTableCore } from "./IBaseTableCore";
 import {
   I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
   type IBaseTableColumnDefinition,
@@ -19,8 +19,8 @@ import {
   type ProcessedIBaseTableColumn,
 } from "./IBaseTableInterface";
 import IBaseTableUI from "./IBaseTableUI";
-import useColumns from "./hooks/useColumns";
-import { useIBaseTablePagination } from "./hooks/useIBaseTablePagination";
+import processColumn from "./ultis/hooks/processColumn";
+import { useIBaseTablePagination } from "./ultis/hooks/useIBaseTablePagination";
 
 export function IBaseTable<T = any>({
   columns,
@@ -46,45 +46,10 @@ export function IBaseTable<T = any>({
 }: IBaseTablePropsType<T>) {
   const t = useTranslations("dataTable");
 
-  const processedColumns = useColumns(columns);
-
-  const iBaseTableColumns = useMemo((): IBaseTableCoreColumn<T>[] => {
-    const toCore = (
-      col: ProcessedIBaseTableColumn<T> | IBaseTableColumnDefinition<T>,
-    ): IBaseTableCoreColumn<T> => {
-      const p = col as ProcessedIBaseTableColumn<T>;
-      const base = {
-        key: p.key,
-        title: p.title,
-        label: p.label,
-        dataIndex: p.dataIndex,
-        align: p.align,
-        width: p.width,
-        minWidth: p.minWidth,
-        maxWidth: p.maxWidth,
-        sortable: p.sortable,
-        fixed: p.fixed,
-        render: (value: any, record: T, index: number) =>
-          p.renderValue(record, index),
-        isResizable: p.isResizable,
-        isDraggable: p.isDraggable,
-        enableSorting: p.sortable,
-        enablePinning: !!p.fixed,
-        enableResizing: isResizableColumns && p.isResizable !== false,
-        meta: {
-          isRowNumber: p.key === I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
-        },
-      };
-
-      if (Array.isArray(p.children) && p.children.length > 0) {
-        return { ...base, children: p.children.map(toCore) };
-      }
-
-      return base;
-    };
-
-    return processedColumns.map(toCore);
-  }, [processedColumns, isResizableColumns]);
+  const iBaseTableColumns = useMemo(
+    () => columns.map((col) => processColumn<T>(col, isResizableColumns)),
+    [columns, isResizableColumns],
+  );
 
   // Core table logic - all logic is now in useIBaseTableCore
   const core = useIBaseTableCore<T>({
@@ -187,7 +152,7 @@ export function IBaseTable<T = any>({
           loading={loading}
           renderCell={(column, row, cellValue) => {
             // Handle row number column with pagination offset
-            const meta = (column.columnDef.meta as Record<string, any>) || {};
+            const meta = (column?.columnDef?.meta as Record<string, any>) || {};
 
             if (meta.isRowNumber && paginationState.paginationInfo) {
               return paginationState.paginationInfo.from + row.index + 1;

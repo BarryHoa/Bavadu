@@ -183,10 +183,11 @@ export default function IBaseTableUI<T = any>({
     () => ({
       ...classNames,
       tbody: clsx("overflow-x-auto", classNames.tbody),
-      table: clsx(classNames.table),
+      table: clsx(classNames.table, "i-base-table"),
       wrapper: clsx("rounded-none p-0", classNames.wrapper),
       th: clsx(
-        "px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-foreground bg-default-100 border-b border-r border-default-200 last:border-r-0 sticky top-0",
+        // Sticky header handled via outer scroll container (div with scrollHeightStyle)
+        "px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-foreground bg-default-100 border-b border-r border-default-200 last:border-r-0  z-10",
         classNames.th,
       ),
       tr: clsx(
@@ -216,8 +217,8 @@ export default function IBaseTableUI<T = any>({
       aria-label="Data table"
       classNames={memoizedClassNames}
       color={color}
+      removeWrapper
       isCompact={isCompact}
-      isHeaderSticky={isHeaderSticky}
       isStriped={isStriped}
       layout={enableColumnResizing ? "fixed" : tableLayout}
       selectedKeys={selectedKeys}
@@ -232,13 +233,6 @@ export default function IBaseTableUI<T = any>({
           const isSortable = header.column.getCanSort();
           const isPinned = header.column.getIsPinned();
           const size = header.column.getSize();
-          const pinStyle = isPinned
-            ? {
-                position: "sticky" as const,
-                [isPinned === "left" ? "left" : "right"]:
-                  header.column.getStart(isPinned),
-              }
-            : undefined;
           const isDraggingColumn = draggingColumnId === header.id;
           const dragStyle = isDraggingColumn
             ? {
@@ -247,8 +241,8 @@ export default function IBaseTableUI<T = any>({
               }
             : undefined;
           const colStyle = enableColumnResizing
-            ? { ...pinStyle, ...dragStyle, width: size, minWidth: size }
-            : { ...pinStyle, ...dragStyle };
+            ? { ...dragStyle, width: size, minWidth: size }
+            : { ...dragStyle };
 
           return (
             <TableColumn
@@ -378,6 +372,12 @@ export default function IBaseTableUI<T = any>({
     </Table>
   );
 
+  // When scrollHeight is object, this div becomes the scroll container (supports px or CSS strings like calc(100vh - 250px)).
+  const scrollContainerClass =
+    scrollHeight !== "auto" && typeof scrollHeight === "object"
+      ? "overflow-y-auto overflow-x-auto"
+      : "";
+
   return (
     <DndContext
       collisionDetection={closestCenter}
@@ -391,10 +391,8 @@ export default function IBaseTableUI<T = any>({
         strategy={horizontalListSortingStrategy}
       >
         <div
-          className="relative"
-          style={{
-            ...scrollHeightStyle,
-          }}
+          className={clsx("relative", scrollContainerClass)}
+          style={scrollHeightStyle}
         >
           {tableContent}
         </div>

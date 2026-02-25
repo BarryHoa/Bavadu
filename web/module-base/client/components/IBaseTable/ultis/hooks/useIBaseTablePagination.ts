@@ -1,11 +1,11 @@
-import type { IBaseTablePagination } from "../IBaseTableInterface";
+import type { IBaseTablePagination } from "../../IBaseTableInterface";
 
 import { useMemo } from "react";
 
 import {
   PAGINATION_DEFAULT_PAGE_SIZE,
   PAGINATION_PAGE_SIZE_OPTIONS,
-} from "../../Pagination/paginationConsts";
+} from "../../../Pagination/paginationConsts";
 
 export interface UseIBaseTablePaginationProps {
   pagination?: IBaseTablePagination | false;

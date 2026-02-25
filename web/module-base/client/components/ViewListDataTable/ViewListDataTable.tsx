@@ -17,7 +17,10 @@ import {
 import { useLocalizedText } from "../../hooks/useLocalizedText";
 import { IBaseLink } from "../IBaseLink";
 import { IBaseTable } from "../IBaseTable";
-import { IBaseTablePagination } from "../IBaseTable/IBaseTableInterface";
+import {
+  I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
+  IBaseTablePagination,
+} from "../IBaseTable/IBaseTableInterface";
 import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 
 import ColumnVisibilityMenu from "./components/ColumnVisibilityMenu";
@@ -142,6 +145,7 @@ export default function ViewListDataTable<T = any>(
     groupBy: groupByValue,
     setGroupBy,
     onToggleColumn,
+    isColumnsReady,
   } = useViewListDataTableQueries<T>({
     model,
     columns,
@@ -176,17 +180,34 @@ export default function ViewListDataTable<T = any>(
     [columns, visibleColumns],
   );
 
-  // Memoize display columns (with dummy render if needed)
-  const displayColumns = useMemo(
-    () =>
-      isDataDummy
-        ? cols.map((col: any) => ({
-            ...col,
-            render: () => null,
-          }))
-        : cols,
-    [cols, isDataDummy],
-  );
+  // Khi cấu hình cột chưa sẵn sàng, render tạm 1 column duy nhất, không có title
+  const renderColumns = useMemo(() => {
+    if (!isColumnsReady) {
+      return [
+        {
+          key: "__loading__",
+          label: "",
+          title: "",
+          align: "center",
+          render: () => null,
+        } as any,
+      ];
+    }
+    const col_number = {
+      key: I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
+      label: tDataTable("columns.number"),
+      render: (_record: T, index: number) => index + 1,
+    } as any;
+    const col_process = [col_number, ...cols];
+    if (isDataDummy) {
+      return col_process.map((col: any) => ({
+        ...col,
+        render: () => null,
+      }));
+    }
+
+    return col_process;
+  }, [isColumnsReady, isDataDummy, cols]);
 
   // Memoize renderActions callback
   const renderActions = useMemo(
@@ -299,7 +320,7 @@ export default function ViewListDataTable<T = any>(
 
         <div className="w-full overflow-x-auto rounded-lg border border-default-200/80">
           <MemoizedTable
-            columns={displayColumns}
+            columns={renderColumns}
             dataSource={dataSource}
             dataTableProps={{
               ...dataTableProps,

@@ -42,28 +42,39 @@ html {
   background: transparent;
 }
 
+table.i-base-table {
+  thead {
+    @apply sticky z-10 top-0 bg-default-100;
+  }
+  .frozen-column {
+    @apply sticky;
+  }
+  .frozen-left::after {
+    @apply absolute inset-y-0 right-0 w-2.5 translate-x-full pointer-events-none;
+    content: "";
+    box-shadow: inset 10px 0 6px -4px rgba(0, 0, 0, 0.12);
+  }
+
+  .frozen-right::before {
+    /* Dùng màu nền table (HeroUI `bg-background`) thay vì inherit theo stripe row */
+    @apply absolute inset-y-0 left-0 w-2.5 -translate-x-full pointer-events-none bg-background;
+    content: "";
+    box-shadow: inset -10px 0 6px -4px rgba(0, 0, 0, 0.12);
+  }
+  thead .frozen-column {
+    @apply z-15;
+  }
+  tbody {
+    .frozen-column {
+      @apply z-5;
+    }
+  }
+}
 /* Dark mode glass effect */
 
 /* DataTable Frozen Columns */
-.frozen-column {
-  /* background-color: inherit; */
-  position: sticky !important;
-  z-index: 10 !important;
-}
 
 /* Shadow effect for frozen columns – Tailwind for ::after / ::before */
-.frozen-left::after {
-  @apply absolute inset-y-0 right-0 w-2.5 translate-x-full pointer-events-none;
-  content: "";
-  box-shadow: inset 10px 0 6px -4px rgba(0, 0, 0, 0.12);
-}
-
-.frozen-right::before {
-  /* Dùng màu nền table (HeroUI `bg-background`) thay vì inherit theo stripe row */
-  @apply absolute inset-y-0 left-0 w-2.5 -translate-x-full pointer-events-none bg-background;
-  content: "";
-  box-shadow: inset -10px 0 6px -4px rgba(0, 0, 0, 0.12);
-}
 
 /* Ensure frozen columns maintain background on hover */
 /* Global placeholder color */

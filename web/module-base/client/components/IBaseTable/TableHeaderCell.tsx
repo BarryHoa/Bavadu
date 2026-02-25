@@ -5,7 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { flexRender } from "@tanstack/react-table";
 import clsx from "clsx";
 import { GripVertical } from "lucide-react";
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 
 import { alignClassMap } from "./constants";
 import type { TableHeaderCellProps } from "./types/IBaseTableUI.types";
@@ -29,6 +29,12 @@ function TableHeaderCellInner<T = any>({
       id: header.column.id,
       disabled: !isDraggable,
     });
+
+  // Tránh hydration mismatch: không render drag handle (span) trong SSR / render đầu tiên
+  const [isHydrated, setIsHydrated] = useState(false);
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const resizeHandler = header.getResizeHandler?.();
   const canResize =
@@ -64,7 +70,7 @@ function TableHeaderCellInner<T = any>({
         tabIndex={isSortable ? 0 : -1}
         onClick={() => onHeaderClick(header.column)}
       >
-        {isDraggable && (
+        {isDraggable && isHydrated && (
           <span
             aria-hidden
             className="mr-1.5 inline-flex cursor-grab touch-none items-center text-default-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-default-600 active:cursor-grabbing"
