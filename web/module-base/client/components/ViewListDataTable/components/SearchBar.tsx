@@ -1,6 +1,7 @@
 "use client";
 
-import { memo } from "react";
+import { debounce } from "lodash";
+import { memo, useState } from "react";
 
 import { IBaseInputSearch } from "@base/client/components";
 
@@ -17,12 +18,22 @@ function SearchBar({
   placeholder = "Search",
   className,
 }: SearchBarProps) {
+  const [search, setSearch] = useState(value);
+
+  const onValueChange = (value: string) => {
+    setSearch(value);
+    // debounce
+    debounce(() => {
+      onChange(value);
+    }, 500);
+  };
+
   return (
     <IBaseInputSearch
-      className={["min-w-[180px]", className].filter(Boolean).join(" ")}
+      className={[className].filter(Boolean).join(" ")}
       placeholder={placeholder}
-      value={value}
-      onValueChange={onChange}
+      value={search}
+      onValueChange={onValueChange}
     />
   );
 }

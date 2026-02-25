@@ -2,6 +2,11 @@ import type { SortDescriptor, TableProps } from "@heroui/table";
 import type { Column, Header, HeaderGroup, Row } from "@tanstack/react-table";
 import type { ReactNode } from "react";
 
+import {
+  IBaseTableScrollHeight,
+  IBaseTableScrollWidth,
+} from "../IBaseTableInterface";
+
 export type { SortDescriptor };
 
 export interface IBaseTableUIClassNames {
@@ -24,6 +29,8 @@ export interface IBaseTableUIProps<T = any> {
   emptyContent?: ReactNode;
   classNames?: IBaseTableUIClassNames;
   tableLayout?: "auto" | "fixed";
+  scrollHeight?: IBaseTableScrollHeight;
+  scrollWidth?: IBaseTableScrollWidth;
   color?: TableProps["color"];
   isStriped?: boolean;
   isCompact?: boolean;

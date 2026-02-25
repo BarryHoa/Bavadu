@@ -1,6 +1,7 @@
 "use client";
 
 import type { Column, Row } from "@tanstack/react-table";
+import type { IBaseTableUIProps } from "./types/IBaseTableUI.types";
 
 import {
   DndContext,
@@ -29,21 +30,23 @@ import {
 } from "@heroui/table";
 import { flexRender } from "@tanstack/react-table";
 import clsx from "clsx";
-import { useCallback, useMemo, useState } from "react";
+import { CSSProperties, useCallback, useMemo, useState } from "react";
 
 import { TableHeaderCell } from "./TableHeaderCell";
 import { sortIcons } from "./constants";
-import type { IBaseTableUIProps } from "./types/IBaseTableUI.types";
 
 /** Renders the leaf header row only (one row of columns). For column groups, TanStack gives multiple header groups; we use the last one. */
 export default function IBaseTableUI<T = any>({
   headerGroups,
   rows,
   visibleColumns,
+
   loading = false,
   emptyContent = "No data available",
   classNames = {},
   tableLayout = "auto",
+  scrollHeight = "auto",
+  scrollWidth = "auto",
   color = "primary",
   isStriped = true,
   isCompact = true,
@@ -62,11 +65,31 @@ export default function IBaseTableUI<T = any>({
   renderCell,
   renderHeader,
 }: IBaseTableUIProps<T>) {
+  const scrollHeightStyle: CSSProperties | undefined =
+    scrollHeight !== "auto" && typeof scrollHeight === "object"
+      ? {
+          minHeight: scrollHeight.minHeight,
+          height: scrollHeight.height,
+          maxHeight: scrollHeight.maxHeight,
+          overflowY: "auto",
+        }
+      : undefined;
+  const scrollWidthStyle: CSSProperties | undefined =
+    scrollWidth !== "auto" && typeof scrollWidth === "object"
+      ? {
+          minWidth: scrollWidth.minWidth,
+          width: scrollWidth.width,
+          maxWidth: scrollWidth.maxWidth,
+          overflowX: "auto",
+        }
+      : undefined;
+
   const getSortIcon = useCallback(
     (columnId: string) => {
       if (!sortDescriptor || sortDescriptor.column !== columnId) {
         return sortIcons.default;
       }
+
       return sortDescriptor.direction === "ascending"
         ? sortIcons.ascending
         : sortIcons.descending;
@@ -83,6 +106,7 @@ export default function IBaseTableUI<T = any>({
         !isSameColumn || sortDescriptor?.direction === "descending"
           ? "ascending"
           : "descending";
+
       onSortChange({ column: columnId, direction: nextDirection });
     },
     [sortDescriptor, onSortChange],
@@ -91,6 +115,7 @@ export default function IBaseTableUI<T = any>({
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
+
       if (!active || !over || active.id === over.id) return;
 
       const updateOrder = (prev: string[]) => {
@@ -100,9 +125,11 @@ export default function IBaseTableUI<T = any>({
             : headerGroups.flatMap((g) => g.headers.map((h) => h.id));
         const oldIndex = currentOrder.indexOf(active.id as string);
         const newIndex = currentOrder.indexOf(over.id as string);
+
         if (oldIndex !== -1 && newIndex !== -1) {
           return arrayMove(currentOrder, oldIndex, newIndex);
         }
+
         return prev;
       };
 
@@ -115,6 +142,7 @@ export default function IBaseTableUI<T = any>({
             : headerGroups.flatMap((g) => g.headers.map((h) => h.id));
         const oldIndex = currentOrder.indexOf(active.id as string);
         const newIndex = currentOrder.indexOf(over.id as string);
+
         if (oldIndex !== -1 && newIndex !== -1) {
           onColumnOrderChange(arrayMove(currentOrder, oldIndex, newIndex));
         }
@@ -158,7 +186,7 @@ export default function IBaseTableUI<T = any>({
       table: clsx(classNames.table),
       wrapper: clsx("rounded-none p-0", classNames.wrapper),
       th: clsx(
-        "px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-foreground bg-default-100 border-b border-r border-default-200 last:border-r-0",
+        "px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-foreground bg-default-100 border-b border-r border-default-200 last:border-r-0 sticky top-0",
         classNames.th,
       ),
       tr: clsx(
@@ -267,6 +295,9 @@ export default function IBaseTableUI<T = any>({
           [rows],
         )}
         loadingContent={<Spinner label="Loading..." />}
+        style={{
+          ...scrollWidthStyle,
+        }}
       >
         {({
           row,
@@ -280,6 +311,7 @@ export default function IBaseTableUI<T = any>({
           const rowKey = getRowKey(original, index);
           const stripeClass =
             isStriped && index % 2 === 1 ? "bg-default-50" : "bg-white";
+
           return (
             <TableRow key={rowKey} className={stripeClass}>
               {row.getVisibleCells().map((cell) => {
@@ -323,6 +355,7 @@ export default function IBaseTableUI<T = any>({
                               row,
                               cell.getValue(),
                             );
+
                             return customRender != null
                               ? customRender
                               : flexRender(
@@ -357,7 +390,14 @@ export default function IBaseTableUI<T = any>({
         items={sortableIds}
         strategy={horizontalListSortingStrategy}
       >
-        {tableContent}
+        <div
+          className="relative"
+          style={{
+            ...scrollHeightStyle,
+          }}
+        >
+          {tableContent}
+        </div>
       </SortableContext>
     </DndContext>
   );

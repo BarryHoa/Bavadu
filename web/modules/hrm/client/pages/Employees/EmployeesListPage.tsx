@@ -17,7 +17,8 @@ import { Employee } from "@mdl/hrm/client/interface/Employee";
 
 /** Hiển thị phần tử đầu nếu value là array. */
 function firstOf(value: unknown): string | number | null | undefined {
-  if (Array.isArray(value)) return value[0] as string | undefined ?? null;
+  if (Array.isArray(value)) return (value[0] as string | undefined) ?? null;
+
   return value as string | number | null | undefined;
 }
 
@@ -49,6 +50,7 @@ export default function EmployeesListPage(): React.ReactNode {
       label: t("employeeCode"),
       render: (value, row) => {
         const code = (row?.code ?? row?.employeeCode ?? value) as string;
+
         if (!row?.id) return code;
 
         return (
@@ -85,13 +87,17 @@ export default function EmployeesListPage(): React.ReactNode {
       key: "position",
       label: t("position"),
       render: (_, row) =>
-        getLocalizedText(row?.position?.name as any) ?? row?.position?.name ?? "—",
+        getLocalizedText(row?.position?.name as any) ??
+        row?.position?.name ??
+        "—",
     },
     {
       key: "department",
       label: t("department"),
       render: (_, row) =>
-        getLocalizedText(row?.department?.name as any) ?? row?.department?.name ?? "—",
+        getLocalizedText(row?.department?.name as any) ??
+        row?.department?.name ??
+        "—",
     },
     {
       key: "status",
@@ -115,8 +121,7 @@ export default function EmployeesListPage(): React.ReactNode {
     {
       key: "baseSalary",
       label: t("baseSalary"),
-      render: (value) =>
-        value != null ? Number(value).toLocaleString() : "—",
+      render: (value) => (value != null ? Number(value).toLocaleString() : "—"),
     },
     {
       key: "createdAt",
@@ -173,6 +178,9 @@ export default function EmployeesListPage(): React.ReactNode {
         columns={columns}
         isDummyData={false}
         model="employee"
+        scrollHeight={{
+          maxHeight: "calc(100vh - 165px)",
+        }}
       />
     </div>
   );

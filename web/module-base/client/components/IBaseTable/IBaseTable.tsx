@@ -1,7 +1,6 @@
 "use client";
 
 import type { Selection, TableProps } from "@heroui/table";
-import type { CSSProperties } from "react";
 
 import clsx from "clsx";
 import { RefreshCw } from "lucide-react";
@@ -36,9 +35,9 @@ export function IBaseTable<T = any>({
   onChangeTable,
   classNames = {},
   emptyContent = "No data available",
-  scrollHeight = "auto",
-  scrollWidth = "auto",
-  tableLayout = "auto",
+  scrollHeight,
+  scrollWidth,
+  tableLayout,
   isResizableColumns = true,
   isDraggableColumns = true,
   isRefreshData = true,
@@ -46,31 +45,6 @@ export function IBaseTable<T = any>({
   ...rest
 }: IBaseTablePropsType<T>) {
   const t = useTranslations("dataTable");
-
-  const scrollHeightStyle: CSSProperties | undefined =
-    scrollHeight !== "auto" && typeof scrollHeight === "object"
-      ? {
-          minHeight: scrollHeight.minHeight,
-          height: scrollHeight.height,
-          maxHeight: scrollHeight.maxHeight,
-          display: "flex",
-          flexDirection: "column",
-        }
-      : undefined;
-  const scrollWidthStyle: CSSProperties | undefined =
-    scrollWidth !== "auto" && typeof scrollWidth === "object"
-      ? {
-          minWidth: scrollWidth.minWidth,
-          width: scrollWidth.width,
-          maxWidth: scrollWidth.maxWidth,
-          overflowX: "auto",
-        }
-      : undefined;
-  const wrapperStyle: CSSProperties = {
-    ...scrollHeightStyle,
-    ...scrollWidthStyle,
-  };
-  const hasScrollContainer = scrollHeightStyle !== undefined;
 
   const processedColumns = useColumns(columns);
 
@@ -101,11 +75,14 @@ export function IBaseTable<T = any>({
           isRowNumber: p.key === I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
         },
       };
+
       if (Array.isArray(p.children) && p.children.length > 0) {
         return { ...base, children: p.children.map(toCore) };
       }
+
       return base;
     };
+
     return processedColumns.map(toCore);
   }, [processedColumns, isResizableColumns]);
 
@@ -192,16 +169,8 @@ export function IBaseTable<T = any>({
       paginationState.paginationInfo.pages > 1);
 
   return (
-    <div
-      className={clsx("w-full bg-content1", classNames.wrapper)}
-      style={Object.keys(wrapperStyle).length > 0 ? wrapperStyle : undefined}
-    >
-      <div
-        className={clsx(
-          "flex flex-1 flex-col",
-          hasScrollContainer ? "min-h-0 overflow-auto" : "gap-4",
-        )}
-      >
+    <div className={clsx("w-full bg-content1", classNames.wrapper)}>
+      <div className={clsx("flex flex-1 flex-col")}>
         <IBaseTableUI
           aria-label={t("ariaLabel")}
           classNames={classNames}
@@ -228,6 +197,8 @@ export function IBaseTable<T = any>({
             return undefined;
           }}
           rows={core.rows}
+          scrollHeight={scrollHeight}
+          scrollWidth={scrollWidth}
           selectedKeys={selectionProps?.selectedKeys}
           selectionMode={selectionProps?.selectionMode}
           setColumnOrder={core.setColumnOrder}

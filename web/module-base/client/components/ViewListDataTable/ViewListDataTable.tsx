@@ -258,7 +258,7 @@ export default function ViewListDataTable<T = any>(
         {/* Single toolbar row: search (left) | actions + tools (right) */}
         <div className="mb-2 flex flex-col gap-3 sm:mb-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           {!isSearchHidden && (
-            <div className="w-full sm:max-w-[280px]">
+            <div className="w-full sm:min-w-[18rem] sm:max-w-[20rem]">
               <SearchBar
                 placeholder={search?.placeholder}
                 value={searchValue}

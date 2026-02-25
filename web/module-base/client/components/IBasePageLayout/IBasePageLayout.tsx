@@ -57,12 +57,14 @@ export function IBasePageLayout({
   className,
   contentClassName,
 }: IBasePageLayoutProps) {
-  const effectiveMaxWidth = maxWidth ?? (variant === "create" || variant === "edit" ? "form" : "content");
+  const effectiveMaxWidth =
+    maxWidth ??
+    (variant === "create" || variant === "edit" ? "form" : "content");
   const maxWidthClass =
     MAX_WIDTH_CLASSES[effectiveMaxWidth] ?? effectiveMaxWidth;
 
   return (
-    <article className={cn("flex flex-col gap-6", className)}>
+    <article className={cn("flex flex-col gap-6 pb-20", className)}>
       {/* Header – title, subtitle, actions */}
       <header className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="min-w-0 flex-1">
@@ -84,7 +86,7 @@ export function IBasePageLayout({
           className={cn(
             maxWidthClass,
             centered && !sidebar && "mx-auto",
-            contentClassName
+            contentClassName,
           )}
         >
           {children}
@@ -93,7 +95,7 @@ export function IBasePageLayout({
           <aside
             className={cn(
               "w-full shrink-0 lg:w-80 lg:min-w-[18rem]",
-              "lg:sticky lg:top-4"
+              "lg:sticky lg:top-4",
             )}
           >
             {sidebar}
