@@ -14,6 +14,7 @@ const APIS_ROUTES_DO_NOT_NEED_CHECK_CSRF = [
   "/api/base/utils/get-csrf-token",
   "/api/base/health",
   "/api/base/health/ping",
+  "/api/base/auth/logout",
 ];
 
 // Protected routes that require authentication
@@ -155,9 +156,10 @@ export async function proxy(req: NextRequest) {
       loginUrl.searchParams.set("redirect", pathname);
 
       pageResponse = NextResponse.redirect(loginUrl);
-    } else {
-      pageResponse = NextResponse.next({ request: { headers: nextHeaders } });
     }
+  }
+  if (!pageResponse) {
+    pageResponse = NextResponse.next({ request: { headers: nextHeaders } });
   }
 
   return addSecurityHeaders(pageResponse);

@@ -5,8 +5,9 @@ import type { IBaseDropdownItem } from "@base/client/components";
 import { Bell, LogOut, User } from "lucide-react";
 import IBaseImage from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
+import { AuthService } from "@base/client/services";
 import {
   IBaseNavbar,
   IBaseDropdown,
@@ -21,6 +22,7 @@ const DEFAULT_AVATAR = "/favicon/favicon-32x32.png";
 
 export default function Nav() {
   const router = useRouter();
+  const authService = useMemo(() => new AuthService(), []);
   const [avatarError, setAvatarError] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -31,23 +33,10 @@ export default function Nav() {
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
-      const response = await fetch("/api/base/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        // Redirect to login page
-        router.push("/login");
-        router.refresh();
-      } else {
-        console.error("Logout failed");
-        // Still redirect even if logout API fails
-        router.push("/login");
-      }
-    } catch (error) {
-      console.error("Logout error:", error);
-      // Still redirect on error
+      await authService.logout();
+      router.push("/login");
+      router.refresh();
+    } catch {
       router.push("/login");
     } finally {
       setIsLoggingOut(false);

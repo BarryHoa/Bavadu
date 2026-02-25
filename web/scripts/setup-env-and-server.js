@@ -59,6 +59,11 @@ try {
     stdio: "inherit",
     shell: false, // Don't use shell to have better control over process
     cwd: path.join(__dirname, ".."),
+    env: {
+      ...process.env,
+      // Tắt log verbose của @tailwindcss/postcss (chỉ log khi DEBUG truthy)
+      DEBUG: process.env.DEBUG ?? "0",
+    },
   });
 
   // Function to kill all bun processes

@@ -14,14 +14,16 @@ class UserSavingColumnModel extends UserSavingModel {
     request?: NextRequest,
   ): Promise<{ success: boolean; columns: string[] }> => {
     const userId = request?.headers.get("x-user-id") ?? null;
-    console.log({ userId, key: params?.key });
+
     const key = params?.key ?? "";
+
     if (!userId || !key) {
       throw new Error("User ID and key are required to get columns");
     }
     const row = await this.get_saving(userId, key, GROUP);
     const columns =
       (row?.values as { columns?: string[] } | null)?.columns ?? [];
+
     return { success: true, columns };
   };
 
@@ -36,10 +38,12 @@ class UserSavingColumnModel extends UserSavingModel {
     const userId = request?.headers.get("x-user-id") ?? null;
     const key = params?.key ?? "";
     const columns = Array.isArray(params?.columns) ? params.columns : [];
+
     if (!userId || !key) {
       throw new Error("User ID and key are required to save columns");
     }
     await this.set_saving(userId, key, GROUP, { columns });
+
     return { success: true };
   };
 }

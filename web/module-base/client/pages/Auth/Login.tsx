@@ -3,8 +3,9 @@
 import { Eye, EyeOff } from "lucide-react";
 import IBaseImage from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
+import { AuthService } from "@base/client/services";
 import {
   IBaseButton,
   IBaseCard,
@@ -17,6 +18,7 @@ import {
 
 export default function LoginPage() {
   const router = useRouter();
+  const authService = useMemo(() => new AuthService(), []);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -30,34 +32,18 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const trimmedUsername = username.trim();
-      const trimmedPassword = password.trim();
-
-      const response = await fetch("/api/base/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: trimmedUsername,
-          password: trimmedPassword,
-          rememberMe,
-        }),
+      await authService.login({
+        username: username.trim(),
+        password: password.trim(),
+        rememberMe,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || "Login failed");
-
-        return;
-      }
-
-      // Redirect to news page
       router.push("/workspace/news");
       router.refresh();
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      setError(
+        err instanceof Error ? err.message : "An error occurred. Please try again.",
+      );
     } finally {
       setIsLoading(false);
     }

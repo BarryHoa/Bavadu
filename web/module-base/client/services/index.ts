@@ -8,6 +8,14 @@ export * from "./TaxRateService";
 // Dropdown Options Service
 export * from "./DropdownOptionsService";
 
+// Auth Service
+export { default as AuthService } from "./AuthService";
+export type {
+  LoginParams,
+  LoginSuccessData,
+  LogoutSuccessData,
+} from "./AuthService";
+
 // JSON-RPC Client Service
 export * from "./JsonRpcClientService";
 
