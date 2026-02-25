@@ -12,12 +12,7 @@ import PaginationComponent from "../Pagination/Pagination";
 import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 
 import { useIBaseTableCore } from "./IBaseTableCore";
-import {
-  I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
-  type IBaseTableColumnDefinition,
-  type IBaseTableProps as IBaseTablePropsType,
-  type ProcessedIBaseTableColumn,
-} from "./IBaseTableInterface";
+import { type IBaseTableProps as IBaseTablePropsType } from "./IBaseTableInterface";
 import IBaseTableUI from "./IBaseTableUI";
 import processColumn from "./ultis/hooks/processColumn";
 import { useIBaseTablePagination } from "./ultis/hooks/useIBaseTablePagination";
@@ -169,7 +164,7 @@ export function IBaseTable<T = any>({
           setColumnOrder={core.setColumnOrder}
           sortDescriptor={core.sortDescriptor}
           tableLayout={tableLayout}
-          visibleColumns={core.visibleColumns}
+          columns={core.visibleColumns}
           onSelectionChange={selectionProps?.onSelectionChange}
           onSortChange={core.handleSortChange}
           {...rest}

@@ -23,7 +23,7 @@ export interface IBaseTableUIClassNames {
 export interface IBaseTableUIProps<T = any> {
   headerGroups: HeaderGroup<T>[];
   rows: Row<T>[];
-  visibleColumns: Column<T, unknown>[];
+  columns: Column<T, unknown>[];
 
   loading?: boolean;
   emptyContent?: ReactNode;

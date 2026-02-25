@@ -1,3 +1,4 @@
+"use client";
 import type { SortDescriptor } from "@react-types/shared";
 import type { ReactNode } from "react";
 
@@ -21,7 +22,7 @@ import {
   type Table as TanStackTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { PAGINATION_DEFAULT_PAGE_SIZE } from "../Pagination/paginationConsts";
 
@@ -163,7 +164,8 @@ export interface IBaseTableCoreReturn<T = any> {
 function convertToTanStackColumn<T>(
   column: IBaseTableCoreColumn<T>,
 ): ColumnDef<T> {
-  const hasChildren = Array.isArray(column.children) && column.children.length > 0;
+  const hasChildren =
+    Array.isArray(column.children) && column.children.length > 0;
 
   if (hasChildren && column.children) {
     return {
@@ -173,9 +175,9 @@ function convertToTanStackColumn<T>(
     };
   }
 
+  // TanStack needs accessorKey or accessorFn for getValue() to work; without it cell value is never read.
   const accessorKey =
     typeof column.dataIndex === "string" ? column.dataIndex : column.key;
-  const useAccessorKey = accessorKey !== column.key;
 
   const headerValue = column.title || column.label || column.key;
   const headerFn =
@@ -185,9 +187,7 @@ function convertToTanStackColumn<T>(
 
   const columnDef: ColumnDef<T> = {
     id: column.key,
-    ...(useAccessorKey && typeof accessorKey === "string"
-      ? { accessorKey }
-      : {}),
+    accessorKey,
     header: headerFn,
     cell: ({ row, getValue }) => {
       if (column.render) {
@@ -225,6 +225,25 @@ function getLeafColumnKeys<T>(columns: IBaseTableCoreColumn<T>[]): string[] {
     }
   }
   return keys;
+}
+
+function getLeafColumnPinning<T>(
+  columns: IBaseTableCoreColumn<T>[],
+): ColumnPinningState {
+  const left: string[] = [];
+  const right: string[] = [];
+  const visit = (cols: IBaseTableCoreColumn<T>[]) => {
+    for (const col of cols) {
+      if (Array.isArray(col.children) && col.children.length > 0) {
+        visit(col.children);
+      } else {
+        if (col.fixed === "left") left.push(col.key);
+        else if (col.fixed === "right") right.push(col.key);
+      }
+    }
+  };
+  visit(columns);
+  return { left, right };
 }
 
 // Convert SortDescriptor to TanStack SortingState
@@ -301,25 +320,10 @@ export function useIBaseTableCore<T = any>(
   // Memoize leaf column keys for columnOrderState (flatten tree)
   const columnKeys = useMemo(() => getLeafColumnKeys(columns), [columns]);
 
-  // Memoize initial column pinning state (leaf columns only)
-  const initialColumnPinning = useMemo<ColumnPinningState>(() => {
-    const left: string[] = [];
-    const right: string[] = [];
-
-    const visit = (cols: IBaseTableCoreColumn<T>[]) => {
-      for (const col of cols) {
-        if (Array.isArray(col.children) && col.children.length > 0) {
-          visit(col.children);
-        } else {
-          if (col.fixed === "left") left.push(col.key);
-          else if (col.fixed === "right") right.push(col.key);
-        }
-      }
-    };
-    visit(columns);
-
-    return { left, right };
-  }, [columns]);
+  const initialColumnPinning = useMemo(
+    () => getLeafColumnPinning(columns),
+    [columns],
+  );
 
   // Pagination state
   const [paginationState, setPaginationState] = useState<PaginationState>(
@@ -360,6 +364,12 @@ export function useIBaseTableCore<T = any>(
   const [columnPinningState, setColumnPinningState] =
     useState<ColumnPinningState>(() => initialColumnPinning);
 
+  // Khi cấu hình cột thay đổi (ví dụ: từ cột placeholder sang cột thật),
+  // đồng bộ lại trạng thái pinning theo fixed của column.
+  useEffect(() => {
+    setColumnPinningState(initialColumnPinning);
+  }, [initialColumnPinning]);
+
   // Column sizing state
   const [columnSizingState, setColumnSizingState] = useState<ColumnSizingState>(
     {},
@@ -374,44 +384,38 @@ export function useIBaseTableCore<T = any>(
     () => columnKeys,
   );
 
-  // Sync column order when columns change
+  // Derive effective column order in the same render so table never sees stale ids.
+  // Ensures column count always matches columnKeys (fixes "14 cells and 1 columns" when switching from 14 to 1 column).
+  const effectiveColumnOrder = useMemo<ColumnOrderState>(() => {
+    const keysSet = new Set(columnKeys);
+    const result: string[] = [];
+    columnOrderState.forEach((id) => {
+      if (keysSet.has(id)) result.push(id);
+    });
+    columnKeys.forEach((id) => {
+      if (!result.includes(id)) result.push(id);
+    });
+    return result.length > 0 ? result : columnKeys;
+  }, [columnKeys, columnOrderState]);
+
+  // Sync column order state when column keys change (for next render)
   useEffect(() => {
     setColumnOrderState((prev) => {
-      const currentKeys = new Set(prev);
       const newKeys = new Set(columnKeys);
-
-      // Check if order changed
       if (
         prev.length !== columnKeys.length ||
-        !columnKeys.every((key) => currentKeys.has(key)) ||
-        !prev.every((key) => newKeys.has(key))
+        !columnKeys.every((k) => prev.includes(k)) ||
+        !prev.every((k) => newKeys.has(k))
       ) {
-        // Merge: keep existing order for existing columns, add new ones at end
         const merged: string[] = [];
-        const existingSet = new Set(prev);
-
-        // Keep existing order
         prev.forEach((key) => {
-          if (newKeys.has(key)) {
-            merged.push(key);
-            existingSet.delete(key);
-          }
+          if (newKeys.has(key)) merged.push(key);
         });
-
-        // Add new columns at end
         columnKeys.forEach((key) => {
-          if (
-            !existingSet.has(key) &&
-            newKeys.has(key) &&
-            !merged.includes(key)
-          ) {
-            merged.push(key);
-          }
+          if (!merged.includes(key)) merged.push(key);
         });
-
         return merged.length > 0 ? merged : columnKeys;
       }
-
       return prev;
     });
   }, [columnKeys]);
@@ -435,27 +439,16 @@ export function useIBaseTableCore<T = any>(
   useEffect(() => {
     if (externalSortingState !== null) {
       setSortingState((prev) => {
-        // Only update if different
         if (
           prev.length !== externalSortingState.length ||
           (prev.length > 0 &&
             (prev[0].id !== externalSortingState[0].id ||
               prev[0].desc !== externalSortingState[0].desc))
         ) {
-          // Also update currentSort to keep it in sync
-          const sortDescriptor =
-            convertFromTanStackSorting(externalSortingState);
-
-          setCurrentSort(sortDescriptor);
-
           return externalSortingState;
         }
-
         return prev;
       });
-    } else {
-      // Reset sort if external sorting becomes undefined/null
-      setCurrentSort(undefined);
     }
   }, [externalSortingState]);
 
@@ -491,22 +484,24 @@ export function useIBaseTableCore<T = any>(
     }
   }, [expanded]);
 
-  // Track current sort for onChangeTable callback
-  const [currentSort, setCurrentSort] = useState<SortDescriptor | undefined>(
-    sorting,
+  const sortDescriptorRef = useRef<SortDescriptor | undefined>(
+    convertFromTanStackSorting(
+      sorting !== undefined ? convertToTanStackSorting(sorting) : [],
+    ),
   );
+  useEffect(() => {
+    sortDescriptorRef.current = convertFromTanStackSorting(sortingState);
+  }, [sortingState]);
 
-  // Memoize handlers to prevent recreation
   const handlePaginationChange = useCallback(
     (newPagination: PaginationState) => {
       const page = newPagination.pageIndex + 1;
       const pageSize = newPagination.pageSize;
-
       if (onChangeTable) {
         onChangeTable({
-          page: page,
-          pageSize: pageSize,
-          sort: currentSort ?? undefined,
+          page,
+          pageSize,
+          sort: sortDescriptorRef.current ?? undefined,
         });
       }
       setPaginationState({
@@ -514,30 +509,28 @@ export function useIBaseTableCore<T = any>(
         pageSize: newPagination.pageSize,
       });
     },
-    [onChangeTable, currentSort],
+    [onChangeTable],
   );
 
   const handleSortingChange = useCallback(
-    (updater: any) => {
+    (updaterOrValue: React.SetStateAction<SortingState>) => {
       setSortingState((prev) => {
         const newSorting =
-          typeof updater === "function" ? updater(prev) : updater;
-
+          typeof updaterOrValue === "function"
+            ? (updaterOrValue as (prev: SortingState) => SortingState)(prev)
+            : updaterOrValue;
         const sortDescriptor = convertFromTanStackSorting(newSorting);
-
-        setCurrentSort(sortDescriptor);
         if (onChangeTable) {
           onChangeTable({
-            page: 0,
+            page: 1,
             pageSize: paginationState.pageSize,
             sort: sortDescriptor ?? undefined,
           });
         }
-
         return newSorting;
       });
     },
-    [onChangeTable, pagination],
+    [onChangeTable, paginationState.pageSize],
   );
 
   const handleRowSelectionChange = useCallback(
@@ -611,20 +604,17 @@ export function useIBaseTableCore<T = any>(
     [onExpandedChange],
   );
 
-  // Memoize state object to prevent unnecessary re-renders
   const tableState = useMemo(
     () => ({
       rowSelection: rowSelectionState,
       columnPinning: columnPinningState,
       columnSizing: enableColumnResizing ? columnSizingState : {},
       columnVisibility: enableColumnVisibility ? columnVisibilityState : {},
-      columnOrder: enableColumnOrdering ? columnOrderState : undefined,
+      columnOrder: enableColumnOrdering ? effectiveColumnOrder : undefined,
       grouping: enableGrouping ? groupingState : undefined,
       expanded: enableGrouping ? expandedState : undefined,
     }),
     [
-      paginationState,
-      sortingState,
       rowSelectionState,
       columnPinningState,
       enableColumnResizing,
@@ -632,7 +622,7 @@ export function useIBaseTableCore<T = any>(
       enableColumnVisibility,
       columnVisibilityState,
       enableColumnOrdering,
-      columnOrderState,
+      effectiveColumnOrder,
       enableGrouping,
       groupingState,
       expandedState,
@@ -702,15 +692,14 @@ export function useIBaseTableCore<T = any>(
   });
 
   // Computed values - memoize to prevent recalculation
-  // Include columnOrderState so headerGroups/visibleColumns recompute when column order changes
   const rows = table.getRowModel().rows;
   const headerGroups = useMemo(
     () => table.getHeaderGroups(),
-    [table, columnOrderState, columnSizingState],
+    [table, effectiveColumnOrder, columnSizingState],
   );
   const visibleColumns = useMemo(
     () => table.getVisibleLeafColumns(),
-    [table, columnOrderState, columnSizingState],
+    [table, effectiveColumnOrder, columnSizingState],
   );
 
   const selectedRowKeys = useMemo(() => {

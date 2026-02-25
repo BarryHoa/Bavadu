@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
 
+import type { IBaseTableCoreColumn } from "../../IBaseTableCore";
 import {
   I_BASE_TABLE_COLUMN_KEY_ACTION,
   I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
   type IBaseTableColumnDefinition,
 } from "../../IBaseTableInterface";
-import type { IBaseTableCoreColumn } from "../../IBaseTableCore";
 
 const SPECIAL_KEYS = [
   I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
@@ -27,7 +27,7 @@ const WIDTH_BY_KEY: Record<string, number> = {
   [I_BASE_TABLE_COLUMN_KEY_ACTION]: 80,
 };
 
-const buildRenderValue = <T,>(
+const buildRenderValue = <T>(
   column: IBaseTableColumnDefinition<T>,
 ): ((value: any, record: T, index: number) => ReactNode) => {
   return (value: any, record: T, index: number) => {

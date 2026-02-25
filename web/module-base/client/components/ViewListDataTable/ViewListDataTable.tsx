@@ -18,6 +18,7 @@ import { useLocalizedText } from "../../hooks/useLocalizedText";
 import { IBaseLink } from "../IBaseLink";
 import { IBaseTable } from "../IBaseTable";
 import {
+  I_BASE_TABLE_COLUMN_KEY_ACTION,
   I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
   IBaseTablePagination,
 } from "../IBaseTable/IBaseTableInterface";
@@ -195,10 +196,18 @@ export default function ViewListDataTable<T = any>(
     }
     const col_number = {
       key: I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
+      fixed: "left",
       label: tDataTable("columns.number"),
       render: (_record: T, index: number) => index + 1,
     } as any;
-    const col_process = [col_number, ...cols];
+    const col_process = [
+      col_number,
+      ...columns.filter(
+        (col: any) =>
+          visibleColumns.has(col.key) ||
+          col.key === I_BASE_TABLE_COLUMN_KEY_ACTION,
+      ),
+    ];
     if (isDataDummy) {
       return col_process.map((col: any) => ({
         ...col,
@@ -207,7 +216,7 @@ export default function ViewListDataTable<T = any>(
     }
 
     return col_process;
-  }, [isColumnsReady, isDataDummy, cols]);
+  }, [isColumnsReady, isDataDummy, columns, visibleColumns]);
 
   // Memoize renderActions callback
   const renderActions = useMemo(
@@ -321,7 +330,7 @@ export default function ViewListDataTable<T = any>(
         <div className="w-full overflow-x-auto rounded-lg border border-default-200/80">
           <MemoizedTable
             columns={renderColumns}
-            dataSource={dataSource}
+            dataSource={isColumnsReady ? dataSource : []}
             dataTableProps={{
               ...dataTableProps,
               emptyContent: effectiveEmptyContent,

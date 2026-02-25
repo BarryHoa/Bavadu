@@ -39,8 +39,7 @@ import { sortIcons } from "./constants";
 export default function IBaseTableUI<T = any>({
   headerGroups,
   rows,
-  visibleColumns,
-
+  columns = [],
   loading = false,
   emptyContent = "No data available",
   classNames = {},
@@ -204,8 +203,8 @@ export default function IBaseTableUI<T = any>({
   );
 
   const columnMap = useMemo(
-    () => new Map(visibleColumns.map((col) => [col.id, col])),
-    [visibleColumns],
+    () => new Map(columns.map((col: Column<T, unknown>) => [col.id, col])),
+    [columns],
   );
 
   // Use leaf header row only (last group) so we have one row of TableColumn for HeroUI
@@ -218,9 +217,10 @@ export default function IBaseTableUI<T = any>({
       classNames={memoizedClassNames}
       color={color}
       removeWrapper
+      isHeaderSticky
       isCompact={isCompact}
       isStriped={isStriped}
-      layout={enableColumnResizing ? "fixed" : tableLayout}
+      layout={tableLayout ?? (enableColumnResizing ? "fixed" : "auto")}
       selectedKeys={selectedKeys}
       selectionMode={selectionMode}
       onSelectionChange={onSelectionChange}
@@ -286,7 +286,7 @@ export default function IBaseTableUI<T = any>({
               original: row.original,
               index: row.index,
             })),
-          [rows],
+          [rows, columns],
         )}
         loadingContent={<Spinner label="Loading..." />}
         style={{
