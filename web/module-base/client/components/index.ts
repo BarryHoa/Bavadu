@@ -43,6 +43,7 @@ export * from "./IBaseTabsPrimary";
 export * from "./IBaseTextarea";
 export * from "./IBaseTooltip";
 export * from "./IBaseUploadImageDrag";
+export * from "./UserPermissionPopup";
 export * from "./IBaseUploadImageTiny";
 export * from "./LoadingBar";
 export * from "./LoadingOverlay";

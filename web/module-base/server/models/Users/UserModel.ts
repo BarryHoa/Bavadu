@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 
 import { eq } from "drizzle-orm";
 
+import UserPermissionModel from "../UserPermission/UserPermissionModel";
 import { base_tb_users, base_tb_users_login } from "../../schemas/base.user";
 import { BaseModel } from "../BaseModel";
 
@@ -52,6 +53,49 @@ class UserModel extends BaseModel<typeof base_tb_users> {
           username: login?.username ?? undefined,
           avatar: user.avatar ?? undefined,
         },
+      },
+    };
+  };
+
+  /**
+   * Get current user with role codes and permissions (for client capability checks).
+   * Returns roleCodes (e.g. ['admin','manager']), permissions array, and isGlobalAdmin.
+   */
+  getMeWithRoles = async (
+    _params: Record<string, unknown>,
+    request?: NextRequest,
+  ): Promise<{
+    data: {
+      user: { id: string; username?: string; avatar?: string | null } | null;
+      roleCodes: string[];
+      permissions: string[];
+      isGlobalAdmin: boolean;
+    };
+  }> => {
+    const me = await this.getMe(_params, request);
+
+    if (!me.data.user) {
+      return {
+        data: {
+          user: null,
+          roleCodes: [],
+          permissions: [],
+          isGlobalAdmin: false,
+        },
+      };
+    }
+
+    const userPermissionModel = new UserPermissionModel();
+    const result = await userPermissionModel.getPermissionsByUser(
+      me.data.user.id,
+    );
+
+    return {
+      data: {
+        user: me.data.user,
+        roleCodes: result.roles.map((r) => r.code),
+        permissions: Array.from(result.permissions),
+        isGlobalAdmin: result.isGlobalAdmin ?? false,
       },
     };
   };

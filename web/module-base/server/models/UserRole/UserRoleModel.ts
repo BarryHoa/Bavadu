@@ -1,6 +1,9 @@
+import type { NextRequest } from "next/server";
+
 import { and, eq, inArray } from "drizzle-orm";
 
 import { BaseModel } from "@base/server/models/BaseModel";
+import { JsonRpcError, JSON_RPC_ERROR_CODES } from "../../rpc/jsonRpcHandler";
 
 import UserPermissionModel from "../UserPermission/UserPermissionModel";
 import {
@@ -76,6 +79,54 @@ export default class UserRoleModel extends BaseModel<
     }
 
     return permissionsSet;
+  }
+
+  /**
+   * RPC: Get roles for a user (with role id, code, name).
+   * Current user can get own roles; only admin/system can get another user's roles.
+   */
+  async getRolesForUser(
+    params: { userId: string },
+    request?: NextRequest,
+  ): Promise<{ id: string; roleId: string; code: string; name: unknown }[]> {
+    const currentUserId = request?.headers.get("x-user-id") ?? null;
+    if (!currentUserId) {
+      throw new JsonRpcError(
+        JSON_RPC_ERROR_CODES.AUTHENTICATION_ERROR,
+        "Authentication required",
+      );
+    }
+    if (params.userId !== currentUserId) {
+      const permModel = new UserPermissionModel();
+      const result = await permModel.getPermissionsByUser(currentUserId);
+      if (!result.isGlobalAdmin) {
+        throw new JsonRpcError(
+          JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
+          "Only admin or system admin can view or change another user's permissions",
+        );
+      }
+    }
+    const rows = await this.getUserRoles(params.userId);
+    if (rows.length === 0) return [];
+    const roleIds = [...new Set(rows.map((r) => r.roleId))];
+    const roleRows = await this.db
+      .select({
+        id: base_tb_roles.id,
+        code: base_tb_roles.code,
+        name: base_tb_roles.name,
+      })
+      .from(base_tb_roles)
+      .where(inArray(base_tb_roles.id, roleIds));
+    const roleMap = new Map(roleRows.map((r) => [r.id, r]));
+    return rows.map((r) => {
+      const role = roleMap.get(r.roleId);
+      return {
+        id: r.id,
+        roleId: r.roleId,
+        code: role?.code ?? "",
+        name: role?.name ?? null,
+      };
+    });
   }
 
   /**
@@ -181,6 +232,60 @@ export default class UserRoleModel extends BaseModel<
       createdAt: created.createdAt?.getTime(),
       createdBy: created.createdBy ?? undefined,
     };
+  }
+
+  /**
+   * RPC: Assign role to user. Only admin/system admin can change another user's roles.
+   */
+  async assignRoleToUser(
+    params: { userId: string; roleId: string; createdBy?: string },
+    request?: NextRequest,
+  ): Promise<UserRoleRow> {
+    const currentUserId = request?.headers.get("x-user-id") ?? null;
+    if (!currentUserId) {
+      throw new JsonRpcError(
+        JSON_RPC_ERROR_CODES.AUTHENTICATION_ERROR,
+        "Authentication required",
+      );
+    }
+    const permModel = new UserPermissionModel();
+    const result = await permModel.getPermissionsByUser(currentUserId);
+    if (!result.isGlobalAdmin) {
+      throw new JsonRpcError(
+        JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
+        "Only admin or system admin can change user permissions",
+      );
+    }
+    return this.assignRole(
+      params.userId,
+      params.roleId,
+      params.createdBy ?? currentUserId,
+    );
+  }
+
+  /**
+   * RPC: Revoke role from user. Only admin/system admin can change another user's roles.
+   */
+  async revokeRoleFromUser(
+    params: { userId: string; roleId: string },
+    request?: NextRequest,
+  ): Promise<boolean> {
+    const currentUserId = request?.headers.get("x-user-id") ?? null;
+    if (!currentUserId) {
+      throw new JsonRpcError(
+        JSON_RPC_ERROR_CODES.AUTHENTICATION_ERROR,
+        "Authentication required",
+      );
+    }
+    const permModel = new UserPermissionModel();
+    const result = await permModel.getPermissionsByUser(currentUserId);
+    if (!result.isGlobalAdmin) {
+      throw new JsonRpcError(
+        JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
+        "Only admin or system admin can change user permissions",
+      );
+    }
+    return this.revokeRole(params.userId, params.roleId);
   }
 
   /**

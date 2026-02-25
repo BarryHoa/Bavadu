@@ -28,6 +28,7 @@ const fullNameSql = fullNameSqlFrom(base_tb_users);
 
 export interface EmployeeRow {
   id: string;
+  userId?: string | null;
   code: string;
   fullName?: string | null;
   firstName?: string | null;
@@ -81,6 +82,7 @@ class EmployeeViewListModel extends BaseViewListModel<
 
   protected declarationMappingData = (row: any): EmployeeRow => ({
     id: row.id,
+    userId: row.userId ?? undefined,
     code: row.code,
     fullName: row.fullName,
     firstName: row.firstName,
@@ -108,6 +110,7 @@ class EmployeeViewListModel extends BaseViewListModel<
   ): Promise<ListParamsResponse<EmployeeRow>> => {
     const select = {
       id: employee.id,
+      userId: employee.userId,
       code: employee.code,
       fullName: fullNameSql.as("fullName"),
       firstName: this.table.firstName,

@@ -289,6 +289,7 @@ export default function ViewListDataTable<T = any>(
             {!isColumnVisibilityHidden && (
               <ColumnVisibilityMenu
                 columns={columns}
+                excludeKeys={columnVisibility?.excludeKeys ?? []}
                 visibleColumns={visibleColumns}
                 onToggleColumn={onToggleColumn}
               />

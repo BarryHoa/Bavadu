@@ -8,12 +8,16 @@ import {
   I_BASE_TABLE_COLUMN_KEY_ACTION,
   IBaseTableColumnDefinition,
 } from "@base/client/components";
-import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import IBaseLink from "@base/client/components/IBaseLink";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import {
+  useCurrentUserCapabilities,
+  useLocalizedText,
+} from "@base/client/hooks";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { Employee } from "@mdl/hrm/client/interface/Employee";
+
+import EmployeeActionMenu from "./components/EmployeeActionMenu";
 
 /** Hiển thị phần tử đầu nếu value là array. */
 function firstOf(value: unknown): string | number | null | undefined {
@@ -23,6 +27,7 @@ function firstOf(value: unknown): string | number | null | undefined {
 }
 
 type EmployeeRow = Employee & {
+  userId?: string | null;
   code?: string;
   fullName?: unknown;
   firstName?: string | null;
@@ -43,6 +48,7 @@ export default function EmployeesListPage(): React.ReactNode {
   const tDataTable = useTranslations("dataTable");
   const t = useTranslations("hrm.employee.list");
   const getLocalizedText = useLocalizedText();
+  const { canCreateEdit } = useCurrentUserCapabilities();
 
   const columns: IBaseTableColumnDefinition<EmployeeRow>[] = [
     {
@@ -139,24 +145,8 @@ export default function EmployeesListPage(): React.ReactNode {
       align: "end",
       render: (_, row) => {
         if (!row?.id) return null;
-        const viewLink = `/workspace/modules/hrm/employees/view/${row.id}`;
 
-        return (
-          <ActionMenu
-            actions={[
-              {
-                key: "view",
-                label: t("view"),
-                href: viewLink,
-              },
-              {
-                key: "edit",
-                label: t("edit"),
-                href: `/workspace/modules/hrm/employees/edit/${row.id}`,
-              },
-            ]}
-          />
-        );
+        return <EmployeeActionMenu row={row} />;
       },
     },
   ];
@@ -164,17 +154,22 @@ export default function EmployeesListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<EmployeeRow>
-        actionsRight={[
-          {
-            key: "new",
-            title: t("newEmployee"),
-            type: "link",
-            color: "primary",
-            props: {
-              href: "/workspace/modules/hrm/employees/create",
-            },
-          },
-        ]}
+        actionsRight={
+          canCreateEdit
+            ? [
+                {
+                  key: "new",
+                  title: t("newEmployee"),
+                  type: "link",
+                  color: "primary",
+                  props: {
+                    href: "/workspace/modules/hrm/employees/create",
+                  },
+                },
+              ]
+            : undefined
+        }
+
         columns={columns}
         isDummyData={false}
         model="employee"

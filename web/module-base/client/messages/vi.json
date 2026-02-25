@@ -354,5 +354,12 @@
         "deleteError": "Không thể xóa"
       }
     }
+  },
+  "userPermission": {
+    "title": "Vai trò & quyền",
+    "titleForUser": "Vai trò & quyền: {name}",
+    "noRoles": "Chưa có vai trò nào",
+    "saved": "Đã lưu quyền",
+    "saveFailed": "Lưu quyền thất bại"
   }
 }

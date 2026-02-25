@@ -2,7 +2,7 @@
 
 import { Table } from "lucide-react";
 import MiniSearch from "minisearch";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   IBaseButton,
@@ -11,79 +11,91 @@ import {
   IBaseInputSearch,
 } from "@base/client/components";
 
-import { IBaseTableColumnDefinition } from "../../IBaseTable/IBaseTableInterface";
+import {
+  I_BASE_TABLE_COLUMN_KEY_ACTION,
+  I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
+  IBaseTableColumnDefinition,
+} from "../../IBaseTable/IBaseTableInterface";
 
 interface ColumnVisibilityMenuProps<T = any> {
   columns: IBaseTableColumnDefinition<T>[];
+  excludeKeys: string[];
   visibleColumns: Set<string>;
   onToggleColumn: (key: string) => void;
 }
 
+// React Compiler will automatically optimize these expensive computations
+const toLabel = <T = any,>(column: IBaseTableColumnDefinition<T>) => {
+  const source = column.label ?? column.title ?? column.key;
+
+  if (typeof source === "string") return source;
+  if (typeof source === "number" || typeof source === "boolean") {
+    return String(source);
+  }
+  if (Array.isArray(source)) {
+    return source
+      .map((item) =>
+        typeof item === "string" || typeof item === "number"
+          ? String(item)
+          : "",
+      )
+      .filter(Boolean)
+      .join(" ");
+  }
+
+  return column.key.toString();
+};
+
 export default function ColumnVisibilityMenu<T = any>({
   columns,
+  excludeKeys,
   visibleColumns,
   onToggleColumn,
 }: ColumnVisibilityMenuProps<T>) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
-  // React Compiler will automatically optimize these expensive computations
-  const toLabel = (column: IBaseTableColumnDefinition<T>) => {
-    const source = column.label ?? column.title ?? column.key;
+  const docs = useMemo(() => {
+    const excluded: string[] = [
+      ...excludeKeys,
+      I_BASE_TABLE_COLUMN_KEY_ACTION,
+      I_BASE_TABLE_COLUMN_KEY_ROW_NUMBER,
+    ];
 
-    if (typeof source === "string") return source;
-    if (typeof source === "number" || typeof source === "boolean") {
-      return String(source);
-    }
-    if (Array.isArray(source)) {
-      return source
-        .map((item) =>
-          typeof item === "string" || typeof item === "number"
-            ? String(item)
-            : "",
-        )
-        .filter(Boolean)
-        .join(" ");
-    }
+    return columns
+      .filter((column) => !excluded.includes(column.key.toString()))
+      .map((column) => ({
+        id: column.key.toString(),
+        label: toLabel(column),
+      }));
+  }, [columns, excludeKeys]);
 
-    return column.key.toString();
-  };
+  const miniSearch = useMemo(() => {
+    const miniInstance = new MiniSearch({
+      fields: ["label"],
+      storeFields: ["id", "label"],
+    });
 
-  const docs = columns.map((column) => ({
-    id: column.key.toString(),
-    label: toLabel(column),
-  }));
+    miniInstance.addAll(docs);
 
-  const miniSearch = new MiniSearch({
-    fields: ["label"],
-    storeFields: ["id", "label"],
-  });
+    return miniInstance;
+  }, [docs]);
 
-  miniSearch.addAll(docs);
+  const filteredColumns = useMemo(() => {
+    const term = searchTerm.trim();
 
-  const columnMap = new Map<string, IBaseTableColumnDefinition<T>>();
+    if (!term) return docs;
+    const results = miniSearch.search(term, {
+      prefix: true,
+      fuzzy: 0.2,
+    });
 
-  columns.forEach((column) => {
-    columnMap.set(column.key.toString(), column);
-  });
+    if (results.length === 0) return [];
 
-  const term = searchTerm.trim();
-  const filteredColumns = !term
-    ? columns
-    : (() => {
-        const results = miniSearch.search(term, {
-          prefix: true,
-          fuzzy: 0.2,
-        });
-
-        if (results.length === 0) return [];
-
-        return results
-          .map((result) => columnMap.get(result.id))
-          .filter((column): column is IBaseTableColumnDefinition<T> =>
-            Boolean(column),
-          );
-      })();
+    return results.filter((column): column is { id: string; label: string } =>
+      Boolean(column),
+    );
+  }, [searchTerm, miniSearch, docs]);
 
   // React Compiler will automatically optimize this array creation
   const dropdownItems = [
@@ -105,19 +117,16 @@ export default function ColumnVisibilityMenu<T = any>({
       ),
     },
     ...filteredColumns.map((col) => ({
-      key: String(col.key),
-      textValue:
-        typeof col.label === "string"
-          ? col.label
-          : String(col.label ?? col.title ?? col.key),
-      onPress: () => onToggleColumn(String(col.key)),
+      key: col.id,
+      textValue: col.label,
+      onPress: () => onToggleColumn(col.id),
       children: (
         <IBaseCheckbox
           isReadOnly
           className="pointer-events-none"
-          isSelected={visibleColumns.has(String(col.key))}
+          isSelected={visibleColumns.has(col.id)}
         >
-          {col.label ?? col.title ?? col.key}
+          {col.label}
         </IBaseCheckbox>
       ),
     })),

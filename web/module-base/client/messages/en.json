@@ -359,5 +359,12 @@
         "deleteError": "Failed to delete rule"
       }
     }
+  },
+  "userPermission": {
+    "title": "Roles & permissions",
+    "titleForUser": "Roles & permissions: {name}",
+    "noRoles": "No roles available",
+    "saved": "Permissions saved",
+    "saveFailed": "Failed to save permissions"
   }
 }

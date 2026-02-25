@@ -52,11 +52,8 @@ export type ViewListDataTableProps<T = any> = Omit<
   };
   columnVisibility?: {
     hidden?: boolean;
-    /**
-     * Key dùng để lưu column visibility cho bảng này.
-     * Mặc định: dùng props.model nếu không truyền.
-     */
     savingKey?: string;
+    excludeKeys?: string[];
   };
   isDummyData?: boolean;
 };
