@@ -1,7 +1,5 @@
 import { NextRequest } from "next/server";
 
-import { AUTH_CONFIG } from "@base/server/config/auth";
-
 /**
  * Add application-specific headers for page routes
  * - Locale header from cookie
@@ -11,7 +9,7 @@ import { AUTH_CONFIG } from "@base/server/config/auth";
 export function addPageHeaders(
   request: NextRequest,
   nextHeaders: Headers,
-  pathname: string
+  pathname: string,
 ): void {
   // Get locale from cookie and set it to x-locale header
   const cookie = request.headers.get("cookie");
@@ -40,14 +38,5 @@ export function addPageHeaders(
     if (match?.[1]) {
       nextHeaders.set("x-workspace-module", match[1]);
     }
-  }
-
-  // Optionally inject session token for pages (if authenticated)
-  const sessionToken = request.cookies.get(
-    AUTH_CONFIG.sessionCookieName
-  )?.value;
-
-  if (sessionToken) {
-    nextHeaders.set("x-session-token", sessionToken);
   }
 }

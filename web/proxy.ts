@@ -3,7 +3,6 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import {
-  addPageHeaders,
   addSecurityHeaders,
   authenticateRequest,
   checkCsrfProtection,
@@ -11,33 +10,21 @@ import {
 } from "@base/server/middleware";
 import { checkSuspiciousRequest } from "@base/server/utils/request-monitor";
 
-// Public routes that don't require authentication
-const PUBLIC_ROUTES = [
-  "/api/base/auth/login",
-  "/api/base/auth/logout",
-  "/api/base/internal/public/json-rpc",
+const APIS_ROUTES_DO_NOT_NEED_CHECK_CSRF = [
+  "/api/base/utils/get-csrf-token",
   "/api/base/health",
   "/api/base/health/ping",
-  "/api/base/media", // Allow public access to media files (images/files) for viewing
-  "/login",
-  "/reset-password",
-  "/",
 ];
 
 // Protected routes that require authentication
-const PROTECTED_ROUTES = ["/workspace", "/api/base/internal/json-rpc"];
+const PROTECTED_ROUTES = [
+  "/workspace",
+  "/api/base/internal/json-rpc",
+  "/api/base/media/upload",
+];
 
 // Routes that should be excluded from proxy
 const EXCLUDED_PATHS = ["/_next", "/static", "/favicon"];
-
-/**
- * Check if a path is a public route
- */
-function isPublicRoute(pathname: string): boolean {
-  return PUBLIC_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(route + "/"),
-  );
-}
 
 /**
  * Check if a path is a protected route
@@ -61,13 +48,6 @@ function isApiRoute(pathname: string): boolean {
 }
 
 /**
- * Check if pathname is a page route
- */
-function isPageRoute(pathname: string): boolean {
-  return !isApiRoute(pathname) && !isExcludedPath(pathname);
-}
-
-/**
  * Handle API routes security
  * - Rate limiting
  * - CSRF protection
@@ -88,17 +68,9 @@ async function handleApiRoute(
   // 2. CSRF Protection (skip for public routes and GET requests)
   // Also skip CSRF endpoint itself
   // Upload endpoint requires CSRF even if media viewing is public
-  if (
-    !isPublicRoute(pathname) &&
-    pathname !== "/api/base/utils/get-csrf-token"
-  ) {
-    const csrfResponse = checkCsrfProtection(req);
+  const isCheckedCsrf = APIS_ROUTES_DO_NOT_NEED_CHECK_CSRF.includes(pathname);
 
-    if (csrfResponse) {
-      return addSecurityHeaders(csrfResponse);
-    }
-  } else if (pathname === "/api/base/media/upload") {
-    // Upload endpoint requires CSRF protection even though media viewing is public
+  if (!isCheckedCsrf) {
     const csrfResponse = checkCsrfProtection(req);
 
     if (csrfResponse) {
@@ -108,11 +80,11 @@ async function handleApiRoute(
 
   // 3. Authentication (skip for public routes)
   // Upload endpoint requires authentication even though media viewing is public
-  if (!isPublicRoute(pathname) || pathname === "/api/base/media/upload") {
-    const authResponse = await authenticateRequest(req, nextHeaders);
+  if (isProtectedRoute(pathname)) {
+    const authenticateResponse = await authenticateRequest(req, nextHeaders);
 
-    if (authResponse) {
-      return addSecurityHeaders(authResponse);
+    if (authenticateResponse) {
+      return addSecurityHeaders(authenticateResponse);
     }
   }
   // Continue with modified headers
@@ -120,35 +92,6 @@ async function handleApiRoute(
 
   // Add security headers to all responses
   return addSecurityHeaders(response);
-}
-
-/**
- * Handle page routes
- * - Authentication check for protected routes
- * - Locale and workspace headers
- */
-async function handlePageRoute(
-  req: NextRequest,
-  pathname: string,
-  nextHeaders: Headers,
-): Promise<NextResponse | null> {
-  // Check authentication for protected routes
-  if (isProtectedRoute(pathname) && !isPublicRoute(pathname)) {
-    const authResponse = await authenticateRequest(req, nextHeaders);
-
-    if (authResponse) {
-      // Redirect to login page if not authenticated
-      const loginUrl = new URL("/login", req.url);
-
-      loginUrl.searchParams.set("redirect", pathname);
-
-      return NextResponse.redirect(loginUrl);
-    }
-  }
-
-  addPageHeaders(req, nextHeaders, pathname);
-
-  return null;
 }
 
 /**
@@ -172,7 +115,11 @@ export async function proxy(req: NextRequest) {
   // Check for suspicious requests (non-blocking, just logs)
   checkSuspiciousRequest(req, pathname);
 
-  // Handle API routes
+  /**
+   * -----------------
+   *  Handle API routes
+   * -----------------
+   *  */
   if (isApiRoute(pathname)) {
     const apiResponse = await handleApiRoute(req, pathname, nextHeaders);
 
@@ -189,20 +136,31 @@ export async function proxy(req: NextRequest) {
     }
   }
 
-  // Handle page routes
-  if (isPageRoute(pathname)) {
-    const pageResponse = await handlePageRoute(req, pathname, nextHeaders);
+  /**
+   * -----------------
+   *  Handle page routes
+   * -----------------
+   *  */
+  //
+  let pageResponse: any = null;
 
-    if (pageResponse) {
-      return addSecurityHeaders(pageResponse); // Redirect to login
+  // Check authentication for protected routes
+  if (isProtectedRoute(pathname)) {
+    const authenticateResponse = await authenticateRequest(req, nextHeaders);
+
+    if (authenticateResponse) {
+      // Redirect to login page if not authenticated
+      const loginUrl = new URL("/login", req.url);
+
+      loginUrl.searchParams.set("redirect", pathname);
+
+      pageResponse = NextResponse.redirect(loginUrl);
+    } else {
+      pageResponse = NextResponse.next({ request: { headers: nextHeaders } });
     }
   }
 
-  // Continue with modified headers
-  const response = NextResponse.next({ request: { headers: nextHeaders } });
-
-  // Add security headers to all responses
-  return addSecurityHeaders(response);
+  return addSecurityHeaders(pageResponse);
 }
 // Next.js 16 uses proxy.ts instead of middleware.ts
 // Export config for Next.js to recognize this as the proxy middleware
