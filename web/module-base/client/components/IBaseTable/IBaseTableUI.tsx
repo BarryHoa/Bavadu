@@ -186,7 +186,7 @@ export default function IBaseTableUI<T = any>({
       wrapper: clsx("rounded-none p-0", classNames.wrapper),
       th: clsx(
         // Sticky header handled via outer scroll container (div with scrollHeightStyle)
-        "px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-foreground bg-default-100 border-b border-r border-default-200 last:border-r-0  z-10",
+        "px-1 py-1 text-left text-sm font-semibold  tracking-wide text-foreground bg-default-100 border-b border-r border-default-200 last:border-r-0  z-10",
         classNames.th,
       ),
       tr: clsx(
