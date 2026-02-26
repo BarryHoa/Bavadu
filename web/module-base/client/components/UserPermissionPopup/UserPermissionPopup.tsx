@@ -1,5 +1,6 @@
 "use client";
 
+import { addToast } from "@heroui/toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useCallback, useMemo, useState } from "react";
@@ -16,7 +17,6 @@ import {
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 import userRoleService from "@base/client/services/UserRoleService";
-import { addToast } from "@heroui/toast";
 
 export interface UserPermissionPopupProps {
   isOpen: boolean;
@@ -39,7 +39,9 @@ export function UserPermissionPopup({
   const tPerm = useTranslations("userPermission");
   const getLocalizedText = useLocalizedText();
   const queryClient = useQueryClient();
-  const [selectedRoleIds, setSelectedRoleIds] = useState<Set<string>>(new Set());
+  const [selectedRoleIds, setSelectedRoleIds] = useState<Set<string>>(
+    new Set(),
+  );
   const [saving, setSaving] = useState(false);
 
   const { data: userRoles = [], isLoading: loadingRoles } = useQuery({
@@ -58,10 +60,7 @@ export function UserPermissionPopup({
     enabled: isOpen,
   });
 
-  const allRoles = useMemo(
-    () => roleListData?.data ?? [],
-    [roleListData],
-  );
+  const allRoles = useMemo(() => roleListData?.data ?? [], [roleListData]);
 
   const initialSelected = useMemo(
     () => new Set(userRoles.map((r) => r.roleId)),
@@ -70,14 +69,17 @@ export function UserPermissionPopup({
 
   const currentSelected = useMemo(() => {
     if (selectedRoleIds.size > 0) return selectedRoleIds;
+
     return initialSelected;
   }, [initialSelected, selectedRoleIds]);
 
   const toggleRole = useCallback((roleId: string, checked: boolean) => {
     setSelectedRoleIds((prev) => {
       const next = new Set(prev);
+
       if (checked) next.add(roleId);
       else next.delete(roleId);
+
       return next;
     });
   }, []);
@@ -95,8 +97,12 @@ export function UserPermissionPopup({
   const handleSave = useCallback(async () => {
     setSaving(true);
     try {
-      const toAdd = [...currentSelected].filter((id) => !initialSelected.has(id));
-      const toRemove = [...initialSelected].filter((id) => !currentSelected.has(id));
+      const toAdd = Array.from(currentSelected).filter(
+        (id) => !initialSelected.has(id),
+      );
+      const toRemove = Array.from(initialSelected).filter(
+        (id) => !currentSelected.has(id),
+      );
 
       for (const roleId of toAdd) {
         await userRoleService.assignRoleToUser({ userId, roleId });
@@ -108,7 +114,8 @@ export function UserPermissionPopup({
       await queryClient.invalidateQueries({ queryKey: ["userRoles", userId] });
       addToast({
         title: tPerm("saved"),
-        type: "success",
+        color: "success",
+        variant: "solid",
       });
       onSuccess?.();
       onClose();
@@ -116,7 +123,8 @@ export function UserPermissionPopup({
       addToast({
         title: tPerm("saveFailed"),
         description: err instanceof Error ? err.message : undefined,
-        type: "danger",
+        color: "danger",
+        variant: "solid",
       });
     } finally {
       setSaving(false);
@@ -168,8 +176,8 @@ export function UserPermissionPopup({
           </IBaseButton>
           <IBaseButton
             color="primary"
-            isLoading={saving}
             isDisabled={isLoading}
+            isLoading={saving}
             onPress={handleSave}
           >
             {t("actions.save")}

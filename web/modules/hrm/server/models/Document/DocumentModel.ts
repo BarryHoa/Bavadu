@@ -1,13 +1,16 @@
 import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { LocaleDataType } from "@base/shared/interface/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
+import { base_tb_users } from "@base/server/schemas/base.user";
+import { LocaleDataType } from "@base/shared/interface/Locale";
 
 import { NewHrmTbDocument, hrm_tb_documents } from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";
+import { fullNameSqlFrom } from "../Employee/employee.helpers";
 
 const employee = alias(hrm_tb_employees, "employee");
+const user = alias(base_tb_users, "user");
 
 export interface DocumentRow {
   id: string;
@@ -71,8 +74,8 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
         title: this.table.title,
         description: this.table.description,
         employeeId: this.table.employeeId,
-        employeeCode: employee.employeeCode,
-        employeeFullName: employee.fullName,
+        employeeCode: employee.code,
+        employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
         fileUrl: this.table.fileUrl,
         fileSize: this.table.fileSize,
         mimeType: this.table.mimeType,
@@ -86,6 +89,7 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
       })
       .from(this.table)
       .leftJoin(employee, eq(this.table.employeeId, employee.id))
+      .leftJoin(user, eq(employee.userId, user.id))
       .where(eq(this.table.id, id))
       .limit(1);
 

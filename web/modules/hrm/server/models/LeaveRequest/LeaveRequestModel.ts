@@ -2,13 +2,16 @@ import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { BaseModel } from "@base/server/models/BaseModel";
+import { base_tb_users } from "@base/server/schemas/base.user";
 
 import { NewHrmTbLeaveRequest, hrm_tb_leave_requests } from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";
 import { hrm_tb_leave_types } from "../../schemas/hrm.leave-type";
+import { fullNameSqlFrom } from "../Employee/employee.helpers";
 
 const employee = alias(hrm_tb_employees, "employee");
 const leaveType = alias(hrm_tb_leave_types, "leave_type");
+const user = alias(base_tb_users, "user");
 
 export interface LeaveRequestRow {
   id: string;
@@ -61,8 +64,8 @@ export default class LeaveRequestModel extends BaseModel<
       .select({
         id: this.table.id,
         employeeId: this.table.employeeId,
-        employeeCode: employee.employeeCode,
-        employeeFullName: employee.fullName,
+        employeeCode: employee.code,
+        employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
         leaveTypeId: this.table.leaveTypeId,
         leaveTypeName: leaveType.name,
         startDate: this.table.startDate,
@@ -81,6 +84,7 @@ export default class LeaveRequestModel extends BaseModel<
       })
       .from(this.table)
       .leftJoin(employee, eq(this.table.employeeId, employee.id))
+      .leftJoin(user, eq(employee.userId, user.id))
       .leftJoin(leaveType, eq(this.table.leaveTypeId, leaveType.id))
       .where(eq(this.table.id, id))
       .limit(1);

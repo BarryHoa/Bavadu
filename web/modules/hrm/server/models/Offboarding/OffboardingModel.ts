@@ -2,11 +2,14 @@ import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { BaseModel } from "@base/server/models/BaseModel";
+import { base_tb_users } from "@base/server/schemas/base.user";
 
 import { NewHrmTbOffboarding, hrm_tb_offboardings } from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";
+import { fullNameSqlFrom } from "../Employee/employee.helpers";
 
 const employee = alias(hrm_tb_employees, "employee");
+const user = alias(base_tb_users, "user");
 
 export interface OffboardingRow {
   id: string;
@@ -55,8 +58,8 @@ export default class OffboardingModel extends BaseModel<
       .select({
         id: this.table.id,
         employeeId: this.table.employeeId,
-        employeeCode: employee.employeeCode,
-        employeeFullName: employee.fullName,
+        employeeCode: employee.code,
+        employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
         resignationDate: this.table.resignationDate,
         lastWorkingDate: this.table.lastWorkingDate,
         reason: this.table.reason,
@@ -72,6 +75,7 @@ export default class OffboardingModel extends BaseModel<
       })
       .from(this.table)
       .leftJoin(employee, eq(this.table.employeeId, employee.id))
+      .leftJoin(user, eq(employee.userId, user.id))
       .where(eq(this.table.id, id))
       .limit(1);
 

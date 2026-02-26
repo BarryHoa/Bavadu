@@ -1,8 +1,8 @@
+import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/shared/interface/ListInterface";
-import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 import type { Column } from "drizzle-orm";
 
 import { eq, ilike } from "drizzle-orm";
@@ -12,13 +12,16 @@ import {
   BaseViewListModel,
   type FilterConditionMap,
 } from "@base/server/models/BaseViewListModel";
+import { base_tb_users } from "@base/server/schemas/base.user";
 
 import { hrm_tb_timesheets } from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";
 import { hrm_tb_shifts } from "../../schemas/hrm.shift";
+import { fullNameSqlFrom } from "../Employee/employee.helpers";
 
 const employee = alias(hrm_tb_employees, "employee");
 const shift = alias(hrm_tb_shifts, "shift");
+const user = alias(base_tb_users, "user");
 
 export interface TimesheetRow {
   id: string;
@@ -74,8 +77,8 @@ class TimesheetViewListModel extends BaseViewListModel<
 
   protected declarationSearch = () =>
     new Map([
-      ["employeeCode", (text: string) => ilike(employee.employeeCode, text)],
-      ["fullName", (text: string) => ilike(employee.fullName, text)],
+      ["employeeCode", (text: string) => ilike(employee.code, text)],
+      ["fullName", (text: string) => ilike(fullNameSqlFrom(user), text)],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
@@ -115,6 +118,7 @@ class TimesheetViewListModel extends BaseViewListModel<
     return this.buildQueryDataList(params, (query) =>
       query
         .leftJoin(employee, eq(this.table.employeeId, employee.id))
+        .leftJoin(user, eq(employee.userId, user.id))
         .leftJoin(shift, eq(this.table.shiftId, shift.id)),
     );
   };

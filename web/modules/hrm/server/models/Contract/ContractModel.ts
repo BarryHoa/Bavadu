@@ -2,12 +2,16 @@ import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { BaseModel } from "@base/server/models/BaseModel";
+import { base_tb_users } from "@base/server/schemas/base.user";
 
 import { NewHrmTbContract, hrm_tb_contracts } from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";
+import { fullNameSqlFrom } from "../Employee/employee.helpers";
 
 const employee = alias(hrm_tb_employees, "employee");
 const signedByEmployee = alias(hrm_tb_employees, "signed_by_employee");
+const user = alias(base_tb_users, "user");
+const signedByUser = alias(base_tb_users, "signed_by_user");
 
 export interface ContractRow {
   id: string;
@@ -73,8 +77,8 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
         id: this.table.id,
         contractNumber: this.table.contractNumber,
         employeeId: this.table.employeeId,
-        employeeCode: employee.employeeCode,
-        employeeFullName: employee.fullName,
+        employeeCode: employee.code,
+        employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
         contractType: this.table.contractType,
         startDate: this.table.startDate,
         endDate: this.table.endDate,
@@ -87,8 +91,8 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
         documentUrl: this.table.documentUrl,
         signedDate: this.table.signedDate,
         signedBy: this.table.signedBy,
-        signedByCode: signedByEmployee.employeeCode,
-        signedByFullName: signedByEmployee.fullName,
+        signedByCode: signedByEmployee.code,
+        signedByFullName: fullNameSqlFrom(signedByUser).as("signedByFullName"),
         notes: this.table.notes,
         metadata: this.table.metadata,
         isActive: this.table.isActive,
@@ -97,7 +101,9 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
       })
       .from(this.table)
       .leftJoin(employee, eq(this.table.employeeId, employee.id))
+      .leftJoin(user, eq(employee.userId, user.id))
       .leftJoin(signedByEmployee, eq(this.table.signedBy, signedByEmployee.id))
+      .leftJoin(signedByUser, eq(signedByEmployee.userId, signedByUser.id))
       .where(eq(this.table.id, id))
       .limit(1);
 

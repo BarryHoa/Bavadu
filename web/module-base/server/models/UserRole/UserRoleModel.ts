@@ -3,15 +3,15 @@ import type { NextRequest } from "next/server";
 import { and, eq, inArray } from "drizzle-orm";
 
 import { BaseModel } from "@base/server/models/BaseModel";
-import { JsonRpcError, JSON_RPC_ERROR_CODES } from "../../rpc/jsonRpcHandler";
 
-import UserPermissionModel from "../UserPermission/UserPermissionModel";
+import { JSON_RPC_ERROR_CODES, JsonRpcError } from "../../rpc/jsonRpcHandler";
 import {
   base_tb_permissions,
   base_tb_role_permissions_default,
-  base_tb_user_roles,
   base_tb_roles,
+  base_tb_user_roles,
 } from "../../schemas";
+import UserPermissionModel from "../UserPermission/UserPermissionModel";
 
 export interface UserRoleRow {
   id: string;
@@ -90,6 +90,7 @@ export default class UserRoleModel extends BaseModel<
     request?: NextRequest,
   ): Promise<{ id: string; roleId: string; code: string; name: unknown }[]> {
     const currentUserId = request?.headers.get("x-user-id") ?? null;
+
     if (!currentUserId) {
       throw new JsonRpcError(
         JSON_RPC_ERROR_CODES.AUTHENTICATION_ERROR,
@@ -99,6 +100,7 @@ export default class UserRoleModel extends BaseModel<
     if (params.userId !== currentUserId) {
       const permModel = new UserPermissionModel();
       const result = await permModel.getPermissionsByUser(currentUserId);
+
       if (!result.isGlobalAdmin) {
         throw new JsonRpcError(
           JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
@@ -107,8 +109,9 @@ export default class UserRoleModel extends BaseModel<
       }
     }
     const rows = await this.getUserRoles(params.userId);
+
     if (rows.length === 0) return [];
-    const roleIds = [...new Set(rows.map((r) => r.roleId))];
+    const roleIds = Array.from(new Set(rows.map((r) => r.roleId)));
     const roleRows = await this.db
       .select({
         id: base_tb_roles.id,
@@ -118,8 +121,10 @@ export default class UserRoleModel extends BaseModel<
       .from(base_tb_roles)
       .where(inArray(base_tb_roles.id, roleIds));
     const roleMap = new Map(roleRows.map((r) => [r.id, r]));
+
     return rows.map((r) => {
       const role = roleMap.get(r.roleId);
+
       return {
         id: r.id,
         roleId: r.roleId,
@@ -242,6 +247,7 @@ export default class UserRoleModel extends BaseModel<
     request?: NextRequest,
   ): Promise<UserRoleRow> {
     const currentUserId = request?.headers.get("x-user-id") ?? null;
+
     if (!currentUserId) {
       throw new JsonRpcError(
         JSON_RPC_ERROR_CODES.AUTHENTICATION_ERROR,
@@ -250,12 +256,14 @@ export default class UserRoleModel extends BaseModel<
     }
     const permModel = new UserPermissionModel();
     const result = await permModel.getPermissionsByUser(currentUserId);
+
     if (!result.isGlobalAdmin) {
       throw new JsonRpcError(
         JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
         "Only admin or system admin can change user permissions",
       );
     }
+
     return this.assignRole(
       params.userId,
       params.roleId,
@@ -271,6 +279,7 @@ export default class UserRoleModel extends BaseModel<
     request?: NextRequest,
   ): Promise<boolean> {
     const currentUserId = request?.headers.get("x-user-id") ?? null;
+
     if (!currentUserId) {
       throw new JsonRpcError(
         JSON_RPC_ERROR_CODES.AUTHENTICATION_ERROR,
@@ -279,12 +288,14 @@ export default class UserRoleModel extends BaseModel<
     }
     const permModel = new UserPermissionModel();
     const result = await permModel.getPermissionsByUser(currentUserId);
+
     if (!result.isGlobalAdmin) {
       throw new JsonRpcError(
         JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
         "Only admin or system admin can change user permissions",
       );
     }
+
     return this.revokeRole(params.userId, params.roleId);
   }
 
@@ -325,12 +336,7 @@ export default class UserRoleModel extends BaseModel<
         userId: this.table.userId,
       })
       .from(this.table)
-      .where(
-        and(
-          eq(this.table.roleId, roleId),
-          eq(this.table.isActive, true),
-        ),
-      );
+      .where(and(eq(this.table.roleId, roleId), eq(this.table.isActive, true)));
 
     // Remove duplicates
     return Array.from(new Set(results.map((r) => r.userId)));
@@ -350,10 +356,7 @@ export default class UserRoleModel extends BaseModel<
       })
       .from(this.table)
       .where(
-        and(
-          inArray(this.table.roleId, roleIds),
-          eq(this.table.isActive, true),
-        ),
+        and(inArray(this.table.roleId, roleIds), eq(this.table.isActive, true)),
       );
 
     // Remove duplicates

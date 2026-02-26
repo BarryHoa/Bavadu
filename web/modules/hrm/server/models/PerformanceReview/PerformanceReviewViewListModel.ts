@@ -1,8 +1,8 @@
+import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/shared/interface/ListInterface";
-import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 import type { Column } from "drizzle-orm";
 
 import { eq, ilike } from "drizzle-orm";
@@ -12,12 +12,15 @@ import {
   BaseViewListModel,
   type FilterConditionMap,
 } from "@base/server/models/BaseViewListModel";
+import { base_tb_users } from "@base/server/schemas/base.user";
 
 import { hrm_tb_performance_reviews } from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";
+import { fullNameSqlFrom } from "../Employee/employee.helpers";
 
 const employee = alias(hrm_tb_employees, "employee");
 const reviewer = alias(hrm_tb_employees, "reviewer");
+const user = alias(base_tb_users, "user");
 
 export interface PerformanceReviewRow {
   id: string;
@@ -92,8 +95,8 @@ class PerformanceReviewViewListModel extends BaseViewListModel<
 
   protected declarationSearch = () =>
     new Map([
-      ["employeeCode", (text: string) => ilike(employee.employeeCode, text)],
-      ["fullName", (text: string) => ilike(employee.fullName, text)],
+      ["employeeCode", (text: string) => ilike(employee.code, text)],
+      ["fullName", (text: string) => ilike(fullNameSqlFrom(user), text)],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>
@@ -132,6 +135,7 @@ class PerformanceReviewViewListModel extends BaseViewListModel<
     return this.buildQueryDataList(params, (query) =>
       query
         .leftJoin(employee, eq(this.table.employeeId, employee.id))
+        .leftJoin(user, eq(employee.userId, user.id))
         .leftJoin(reviewer, eq(this.table.reviewerId, reviewer.id)),
     );
   };

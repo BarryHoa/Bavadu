@@ -1,8 +1,8 @@
+import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/shared/interface/ListInterface";
-import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 import type { Column } from "drizzle-orm";
 
 import { eq, ilike } from "drizzle-orm";
@@ -12,12 +12,11 @@ import {
   BaseViewListModel,
   type FilterConditionMap,
 } from "@base/server/models/BaseViewListModel";
-
 import { base_tb_users } from "@base/server/schemas/base.user";
 
-import { fullNameSqlFrom } from "./employee.helpers";
-
 import { hrm_tb_employees } from "../../schemas";
+
+import { fullNameSqlFrom } from "./employee.helpers";
 
 const user = alias(base_tb_users, "user");
 const fullNameSql = fullNameSqlFrom(user);
@@ -36,8 +35,8 @@ class EmployeeDropdownListModel extends BaseViewListModel<
   protected declarationColumns = () =>
     new Map<string, { column: Column<any>; sort?: boolean }>([
       ["id", { column: hrm_tb_employees.id, sort: true }],
-      ["employeeCode", { column: hrm_tb_employees.employeeCode, sort: true }],
-      ["isActive", { column: hrm_tb_employees.isActive, sort: true }],
+      ["employeeCode", { column: hrm_tb_employees.code, sort: true }],
+      ["status", { column: hrm_tb_employees.status, sort: true }],
     ]);
 
   constructor() {
@@ -46,7 +45,7 @@ class EmployeeDropdownListModel extends BaseViewListModel<
 
   protected declarationSearch = () =>
     new Map([
-      ["employeeCode", (t: string) => ilike(hrm_tb_employees.employeeCode, t)],
+      ["employeeCode", (t: string) => ilike(hrm_tb_employees.code, t)],
       ["fullName", (t: string) => ilike(fullNameSql, t)],
     ]);
 
@@ -55,9 +54,9 @@ class EmployeeDropdownListModel extends BaseViewListModel<
 
   protected declarationMappingData = (row: any): EmployeeDropdownRow => ({
     id: row.id,
-    employeeCode: row.employeeCode,
+    employeeCode: row.employeeCode ?? row.code,
     fullName: row.fullName ?? undefined,
-    isActive: row.isActive ?? undefined,
+    isActive: row.status === "active",
   });
 
   getData = async (
@@ -65,15 +64,16 @@ class EmployeeDropdownListModel extends BaseViewListModel<
   ): Promise<ListParamsResponse<EmployeeDropdownRow>> => {
     const select = {
       id: hrm_tb_employees.id,
-      employeeCode: hrm_tb_employees.employeeCode,
+      employeeCode: hrm_tb_employees.code,
       fullName: fullNameSql.as("fullName"),
-      isActive: hrm_tb_employees.isActive,
+      status: hrm_tb_employees.status,
     };
     const result = await this.buildQueryDataListWithSelect(
       params,
       select as unknown as Record<string, Column>,
       (q) => q.leftJoin(user, eq(hrm_tb_employees.userId, user.id)),
     );
+
     return {
       data: (result?.data ?? []).map((row) => this.declarationMappingData(row)),
       total: result?.total ?? 0,
