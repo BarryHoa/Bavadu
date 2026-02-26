@@ -1,1 +1,144 @@
-{"key":"hrm-main","name":"HRM","icon":"Users","order":1,"children":[{"key":"hrm-org","name":"Org","icon":"Building","order":1,"children":[{"key":"hrm-org-chart","name":"Org Chart","path":"/org-chart","as":"/org-chart","order":1,"permission":"hrm.department.view"},{"key":"hrm-departments","name":"Departments","path":"/departments","as":"/departments","order":2,"permission":"hrm.department.view"},{"key":"hrm-positions","name":"Positions","path":"/positions","as":"/positions","order":3,"permission":"hrm.position.view"},{"key":"hrm-contracts","name":"Contracts","path":"/contracts","as":"/contracts","order":4,"permission":"hrm.contract.view"},{"key":"hrm-permissions","name":"Permissions","path":"/permissions","as":"/permissions","order":5,"permission":"base.role.view"}]},{"key":"hrm-employees","name":"Employees","path":"/employees","as":"/employees","order":2,"permission":"hrm.employee.view"},{"key":"hrm-timesheets-leave","name":"Timesheets & Leave Request","icon":"Calendar","order":3,"children":[{"key":"hrm-timesheets-mine","name":"Timesheet của tôi","path":"/timesheets","as":"/timesheets","order":1,"permission":"hrm.timesheet.view"},{"key":"hrm-timesheets-all","name":"Timesheet mọi người","path":"/timesheets/all","as":"/timesheets/all","order":2,"permission":"hrm.timesheet.viewAll"},{"key":"hrm-leave-requests","name":"Leave Requests","path":"/leave-requests","as":"/leave-requests","order":3,"permission":"hrm.leave_request.view"}]},{"key":"hrm-payroll","name":"Payroll","path":"/payroll","as":"/payroll","order":4,"permission":"hrm.payroll.view"},{"key":"hrm-recruitment","name":"Recruitment","path":"/job-requisitions","as":"/job-requisitions","order":5,"permission":"hrm.job_requisition.view"},{"key":"hrm-training","name":"Training","icon":"GraduationCap","order":6,"children":[{"key":"hrm-courses","name":"Courses","path":"/courses","as":"/courses","order":1,"permission":"hrm.course.view"},{"key":"hrm-certificates","name":"Certificates","path":"/certificates","as":"/certificates","order":2,"permission":"hrm.certificate.view"}]},{"key":"hrm-performance","name":"Performance","path":"/performance-reviews","as":"/performance-reviews","order":7,"permission":"hrm.performance_review.view"}]}
+{
+  "key": "hrm-main",
+  "name": "HRM",
+  "icon": "Users",
+  "order": 1,
+  "children": [
+    {
+      "key": "hrm-org",
+      "name": "Org",
+      "icon": "Building",
+      "order": 1,
+      "children": [
+        {
+          "key": "hrm-org-chart",
+          "name": "Org Chart",
+          "path": "/org-chart",
+          "as": "/org-chart",
+          "order": 1,
+          "permission": "hrm.department.view"
+        },
+        {
+          "key": "hrm-departments",
+          "name": "Departments",
+          "path": "/departments",
+          "as": "/departments",
+          "order": 2,
+          "permission": "hrm.department.view"
+        },
+        {
+          "key": "hrm-positions",
+          "name": "Positions",
+          "path": "/positions",
+          "as": "/positions",
+          "order": 3,
+          "permission": "hrm.position.view"
+        },
+        {
+          "key": "hrm-contracts",
+          "name": "Contracts",
+          "path": "/contracts",
+          "as": "/contracts",
+          "order": 4,
+          "permission": "hrm.contract.view"
+        },
+        {
+          "key": "hrm-permissions",
+          "name": "Permissions",
+          "path": "/permissions",
+          "as": "/permissions",
+          "order": 5,
+          "permission": "base.role.view"
+        }
+      ]
+    },
+    {
+      "key": "hrm-employees",
+      "name": "Employees",
+      "path": "/employees",
+      "as": "/employees",
+      "order": 2,
+      "permission": "hrm.employee.view"
+    },
+    {
+      "key": "hrm-timesheets-leave",
+      "name": "Timesheets & Leave Request",
+      "icon": "Calendar",
+      "order": 3,
+      "children": [
+        {
+          "key": "hrm-timesheets-mine",
+          "name": "Timesheet của tôi",
+          "path": "/timesheets",
+          "as": "/timesheets",
+          "order": 1,
+          "permission": "hrm.timesheet.view"
+        },
+        {
+          "key": "hrm-timesheets-all",
+          "name": "Timesheet mọi người",
+          "path": "/timesheets/all",
+          "as": "/timesheets/all",
+          "order": 2,
+          "permission": "hrm.timesheet.viewAll"
+        },
+        {
+          "key": "hrm-leave-requests",
+          "name": "Leave Requests",
+          "path": "/leave-requests",
+          "as": "/leave-requests",
+          "order": 3,
+          "permission": "hrm.leave_request.view"
+        }
+      ]
+    },
+    {
+      "key": "hrm-payroll",
+      "name": "Payroll",
+      "path": "/payroll",
+      "as": "/payroll",
+      "order": 4,
+      "permission": "hrm.payroll.view"
+    },
+    {
+      "key": "hrm-recruitment",
+      "name": "Recruitment",
+      "path": "/job-requisitions",
+      "as": "/job-requisitions",
+      "order": 5,
+      "permission": "hrm.job_requisition.view"
+    },
+    {
+      "key": "hrm-training",
+      "name": "Training",
+      "icon": "GraduationCap",
+      "order": 6,
+      "children": [
+        {
+          "key": "hrm-courses",
+          "name": "Courses",
+          "path": "/courses",
+          "as": "/courses",
+          "order": 1,
+          "permission": "hrm.course.view"
+        },
+        {
+          "key": "hrm-certificates",
+          "name": "Certificates",
+          "path": "/certificates",
+          "as": "/certificates",
+          "order": 2,
+          "permission": "hrm.certificate.view"
+        }
+      ]
+    },
+    {
+      "key": "hrm-performance",
+      "name": "Performance",
+      "path": "/performance-reviews",
+      "as": "/performance-reviews",
+      "order": 7,
+      "permission": "hrm.performance_review.view"
+    }
+  ]
+}
