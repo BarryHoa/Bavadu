@@ -90,7 +90,7 @@ type DbRow = {
   bankBranch?: string | null;
   emergencyContactName?: string | null;
   emergencyContactPhone?: string | null;
-  isActive?: boolean | null;
+  status: string;
   createdAt?: Date | null;
   updatedAt?: Date | null;
   userFirstName?: string | null;
@@ -110,7 +110,7 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
   private selectShape = () => ({
     id: this.table.id,
     userId: this.table.userId,
-    employeeCode: this.table.employeeCode,
+    employeeCode: this.table.code,
     nationalId: this.table.nationalId,
     taxId: this.table.taxId,
     positionId: this.table.positionId,
@@ -118,11 +118,11 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
     departmentId: this.table.departmentId,
     departmentName: department.name,
     managerId: this.table.managerId,
-    managerCode: manager.employeeCode,
+    managerCode: manager.code,
     managerFirstName: managerUser.firstName,
     managerLastName: managerUser.lastName,
-    employmentStatus: this.table.employmentStatus,
-    employmentType: this.table.employmentType,
+    employmentStatus: this.table.status,
+    employmentType: this.table.type,
     hireDate: this.table.hireDate,
     probationEndDate: this.table.probationEndDate,
     baseSalary: this.table.baseSalary,
@@ -133,7 +133,7 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
     bankBranch: this.table.bankBranch,
     emergencyContactName: this.table.emergencyContactName,
     emergencyContactPhone: this.table.emergencyContactPhone,
-    isActive: this.table.isActive,
+    status: this.table.status,
     createdAt: this.table.createdAt,
     updatedAt: this.table.updatedAt,
     userFirstName: user.firstName,
@@ -197,7 +197,7 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
       bankBranch: r.bankBranch ?? undefined,
       emergencyContactName: r.emergencyContactName ?? undefined,
       emergencyContactPhone: r.emergencyContactPhone ?? undefined,
-      isActive: r.isActive ?? undefined,
+      isActive: r.status === "active",
       createdAt: r.createdAt?.getTime(),
       updatedAt: r.updatedAt?.getTime(),
     };
@@ -218,14 +218,14 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
     const now = new Date();
     const row: NewHrmTbEmployee = {
       userId: p.userId ?? null,
-      employeeCode: p.employeeCode,
+      code: p.employeeCode,
       nationalId: p.nationalId ?? null,
       taxId: p.taxId ?? null,
       positionId: p.positionId,
       departmentId: p.departmentId,
       managerId: p.managerId ?? null,
-      employmentStatus: p.employmentStatus ?? "active",
-      employmentType: p.employmentType ?? null,
+      status: p.employmentStatus ?? (p.isActive !== false ? "active" : "inactive"),
+      type: p.employmentType ?? null,
       hireDate: p.hireDate,
       probationEndDate: p.probationEndDate ?? null,
       baseSalary: p.baseSalary ?? null,
@@ -236,7 +236,6 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
       bankBranch: p.bankBranch ?? null,
       emergencyContactName: p.emergencyContactName ?? null,
       emergencyContactPhone: p.emergencyContactPhone ?? null,
-      isActive: p.isActive ?? true,
       createdAt: now,
       updatedAt: now,
     };
@@ -258,31 +257,35 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
     payload: Partial<EmployeeInput>,
   ): Promise<EmployeeRow | null> => {
     const set: Partial<NewHrmTbEmployee> = { updatedAt: new Date() };
-    const keys: (keyof EmployeeInput)[] = [
-      "userId",
-      "employeeCode",
-      "nationalId",
-      "taxId",
-      "positionId",
-      "departmentId",
-      "managerId",
-      "employmentStatus",
-      "employmentType",
-      "hireDate",
-      "probationEndDate",
-      "baseSalary",
-      "currency",
-      "locationId",
-      "bankAccount",
-      "bankName",
-      "bankBranch",
-      "emergencyContactName",
-      "emergencyContactPhone",
-      "isActive",
-    ];
-    for (const k of keys) {
-      if (payload[k] === undefined) continue;
-      (set as any)[k] = payload[k] ?? null;
+    const map: Record<string, keyof NewHrmTbEmployee> = {
+      userId: "userId",
+      employeeCode: "code",
+      nationalId: "nationalId",
+      taxId: "taxId",
+      positionId: "positionId",
+      departmentId: "departmentId",
+      managerId: "managerId",
+      employmentType: "type",
+      hireDate: "hireDate",
+      probationEndDate: "probationEndDate",
+      baseSalary: "baseSalary",
+      currency: "currency",
+      locationId: "locationId",
+      bankAccount: "bankAccount",
+      bankName: "bankName",
+      bankBranch: "bankBranch",
+      emergencyContactName: "emergencyContactName",
+      emergencyContactPhone: "emergencyContactPhone",
+    };
+    for (const [inputKey, dbKey] of Object.entries(map)) {
+      const v = payload[inputKey as keyof EmployeeInput];
+      if (v === undefined) continue;
+      (set as Record<string, unknown>)[dbKey] = v ?? null;
+    }
+    if (payload.employmentStatus !== undefined) {
+      (set as Record<string, unknown>).status = payload.employmentStatus;
+    } else if (payload.isActive !== undefined) {
+      (set as Record<string, unknown>).status = payload.isActive ? "active" : "inactive";
     }
     await this.db.update(this.table).set(set).where(eq(this.table.id, id));
     return this.getEmployeeById(id);

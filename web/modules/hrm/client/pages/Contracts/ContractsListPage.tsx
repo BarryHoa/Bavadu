@@ -11,7 +11,7 @@ import {
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import IBaseLink from "@base/client/components/IBaseLink";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { useHasPermissions, useLocalizedText } from "@base/client/hooks";
 import { Contract } from "@mdl/hrm/client/interface/Contract";
 
 type ContractRow = Contract & {
@@ -23,6 +23,8 @@ export default function ContractsListPage(): React.ReactNode {
   const tDataTable = useTranslations("dataTable");
   const t = useTranslations("hrm.contract.list");
   const getLocalizedText = useLocalizedText();
+  const { hasPermission: canCreate } = useHasPermissions(["hrm.contract.create"]);
+  const { hasPermission: canEdit } = useHasPermissions(["hrm.contract.update"]);
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<ContractRow>[] = [
@@ -81,23 +83,13 @@ export default function ContractsListPage(): React.ReactNode {
       render: (_, row) => {
         if (!row?.id) return null;
         const viewLink = `/workspace/modules/hrm/contracts/view/${row.id}`;
-
-        return (
-          <ActionMenu
-            actions={[
-              {
-                key: "view",
-                label: t("view"),
-                href: viewLink,
-              },
-              {
-                key: "edit",
-                label: t("edit"),
-                href: `/workspace/modules/hrm/contracts/edit/${row.id}`,
-              },
-            ]}
-          />
-        );
+        const actions = [
+          { key: "view", label: t("view"), href: viewLink },
+          ...(canEdit
+            ? [{ key: "edit", label: t("edit"), href: `/workspace/modules/hrm/contracts/edit/${row.id}` }]
+            : []),
+        ];
+        return <ActionMenu actions={actions} />;
       },
     },
   ];
@@ -105,17 +97,19 @@ export default function ContractsListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<ContractRow>
-        actionsRight={[
-          {
-            key: "new",
-            title: t("newContract"),
-            type: "link",
-            color: "primary",
-            props: {
-              href: "/workspace/modules/hrm/contracts/create",
-            },
-          },
-        ]}
+        actionsRight={
+          canCreate
+            ? [
+                {
+                  key: "new",
+                  title: t("newContract"),
+                  type: "link",
+                  color: "primary",
+                  props: { href: "/workspace/modules/hrm/contracts/create" },
+                },
+              ]
+            : undefined
+        }
         columns={columns}
         isDummyData={false}
         model="contract"

@@ -11,7 +11,7 @@ import {
 } from "@base/client/components";
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import IBaseLink from "@base/client/components/IBaseLink";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { useHasPermissions, useLocalizedText } from "@base/client/hooks";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { CandidateDto } from "@mdl/hrm/client/interface/Candidate";
 
@@ -25,6 +25,7 @@ export default function CandidatesListPage(): React.ReactNode {
   const tDataTable = useTranslations("dataTable");
   const t = useTranslations("hrm.candidates");
   const getLocalizedText = useLocalizedText();
+  const { hasPermission: canCreate } = useHasPermissions(["hrm.candidate.create"]);
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<CandidateRow>[] = [
@@ -104,17 +105,19 @@ export default function CandidatesListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<CandidateRow>
-        actionsRight={[
-          {
-            key: "new",
-            title: t("create"),
-            type: "link",
-            color: "primary",
-            props: {
-              href: "/workspace/modules/hrm/candidates/create",
-            },
-          },
-        ]}
+        actionsRight={
+          canCreate
+            ? [
+                {
+                  key: "new",
+                  title: t("create"),
+                  type: "link",
+                  color: "primary",
+                  props: { href: "/workspace/modules/hrm/candidates/create" },
+                },
+              ]
+            : undefined
+        }
         columns={columns}
         isDummyData={false}
         model="hrm.candidate"

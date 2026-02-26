@@ -22,6 +22,15 @@
     ]
   },
   {
+    "path": "/contracts",
+    "routes": [
+      { "path": "/", "page": "/Contracts/ContractsListPage" },
+      { "path": "/create", "page": "/Contracts/ContractCreatePage" },
+      { "path": "/edit/[id]", "page": "/Contracts/ContractEditPage" },
+      { "path": "/view/[id]", "page": "/Contracts/ContractViewPage" }
+    ]
+  },
+  {
     "path": "/permissions",
     "routes": [{ "path": "/", "page": "/Permissions/PermissionsPage" }]
   },

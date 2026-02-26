@@ -95,8 +95,8 @@ export function UserPermissionPopup({
   const handleSave = useCallback(async () => {
     setSaving(true);
     try {
-      const toAdd = [...currentSelected].filter((id) => !initialSelected.has(id));
-      const toRemove = [...initialSelected].filter((id) => !currentSelected.has(id));
+      const toAdd = Array.from(currentSelected).filter((id) => !initialSelected.has(id));
+      const toRemove = Array.from(initialSelected).filter((id) => !currentSelected.has(id));
 
       for (const roleId of toAdd) {
         await userRoleService.assignRoleToUser({ userId, roleId });
@@ -108,7 +108,8 @@ export function UserPermissionPopup({
       await queryClient.invalidateQueries({ queryKey: ["userRoles", userId] });
       addToast({
         title: tPerm("saved"),
-        type: "success",
+        color: "success",
+        variant: "solid",
       });
       onSuccess?.();
       onClose();
@@ -116,7 +117,8 @@ export function UserPermissionPopup({
       addToast({
         title: tPerm("saveFailed"),
         description: err instanceof Error ? err.message : undefined,
-        type: "danger",
+        color: "danger",
+        variant: "solid",
       });
     } finally {
       setSaving(false);

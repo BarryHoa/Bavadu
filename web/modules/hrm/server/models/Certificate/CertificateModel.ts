@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { LocaleDataType } from "@base/shared/interface/Locale";
@@ -59,8 +59,8 @@ export default class CertificateModel extends BaseModel<
       .select({
         id: this.table.id,
         employeeId: this.table.employeeId,
-        employeeCode: employee.employeeCode,
-        employeeFullName: employee.fullName,
+        employeeCode: employee.code,
+        employeeFullName: sql<string>`''`.as("employeeFullName"),
         name: this.table.name,
         issuer: this.table.issuer,
         certificateNumber: this.table.certificateNumber,

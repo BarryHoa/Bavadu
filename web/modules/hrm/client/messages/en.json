@@ -5,6 +5,29 @@
       "notFound": "{entity} not found",
       "backToList": "Back to List"
     },
+    "permissions": {
+      "title": "HRM Permissions",
+      "description": "View and manage HRM permission groups",
+      "intro": "HRM permissions are assigned to roles. Use Roles & Permissions in Settings to assign these permissions to roles.",
+      "manageRoles": "Manage Roles & Permissions",
+      "permissionGroups": "Permission groups",
+      "resources": {
+        "employee": "Employees",
+        "department": "Departments",
+        "position": "Positions",
+        "contract": "Contracts",
+        "shift": "Shifts",
+        "leaveType": "Leave types",
+        "leaveRequest": "Leave requests",
+        "timesheet": "Timesheets",
+        "payroll": "Payroll",
+        "jobRequisition": "Job requisitions",
+        "candidate": "Candidates",
+        "course": "Courses",
+        "certificate": "Certificates",
+        "performanceReview": "Performance reviews"
+      }
+    },
     "employee": {
       "title": "Employees",
       "list": {

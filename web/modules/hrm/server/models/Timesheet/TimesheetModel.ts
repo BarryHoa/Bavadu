@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 
-import { and, eq, gte, lte } from "drizzle-orm";
+import { and, eq, gte, lte, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { BaseModel } from "@base/server/models/BaseModel";
@@ -75,8 +75,8 @@ export default class TimesheetModel extends BaseModel<
   private selectJoined = () => ({
     id: this.table.id,
     employeeId: this.table.employeeId,
-    employeeCode: employee.employeeCode,
-    employeeFullName: employee.fullName,
+    employeeCode: employee.code,
+    employeeFullName: sql<string>`''`.as("employeeFullName"),
     rosterId: this.table.rosterId,
     workDate: this.table.workDate,
     shiftId: this.table.shiftId,

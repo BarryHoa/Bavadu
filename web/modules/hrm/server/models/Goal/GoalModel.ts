@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { LocaleDataType } from "@base/shared/interface/Locale";
@@ -64,8 +64,8 @@ export default class GoalModel extends BaseModel<typeof hrm_tb_goals> {
       .select({
         id: this.table.id,
         employeeId: this.table.employeeId,
-        employeeCode: employee.employeeCode,
-        employeeFullName: employee.fullName,
+        employeeCode: employee.code,
+        employeeFullName: sql<string>`''`.as("employeeFullName"),
         goalType: this.table.goalType,
         title: this.table.title,
         description: this.table.description,

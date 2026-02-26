@@ -11,7 +11,7 @@ import {
 } from "@base/client/components";
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import IBaseLink from "@base/client/components/IBaseLink";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { useHasPermissions, useLocalizedText } from "@base/client/hooks";
 import { LeaveTypeDto } from "@mdl/hrm/client/interface/LeaveType";
 
 type LeaveTypeRow = LeaveTypeDto & {
@@ -23,6 +23,8 @@ export default function LeaveTypesListPage(): React.ReactNode {
   const tDataTable = useTranslations("dataTable");
   const t = useTranslations("hrm.leaveTypes");
   const getLocalizedText = useLocalizedText();
+  const { hasPermission: canCreate } = useHasPermissions(["hrm.leave_type.create"]);
+  const { hasPermission: canEdit } = useHasPermissions(["hrm.leave_type.update"]);
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<LeaveTypeRow>[] = [
@@ -74,18 +76,13 @@ export default function LeaveTypesListPage(): React.ReactNode {
       render: (_, row) => {
         if (!row?.id) return null;
         const viewLink = `/workspace/modules/hrm/leave-types/view/${row.id}`;
-
-        return (
-          <ActionMenu
-            actions={[
-              {
-                key: "view",
-                label: tDataTable("columns.view"),
-                href: viewLink,
-              },
-            ]}
-          />
-        );
+        const actions = [
+          { key: "view", label: tDataTable("columns.view"), href: viewLink },
+          ...(canEdit
+            ? [{ key: "edit", label: tDataTable("columns.edit"), href: `/workspace/modules/hrm/leave-types/edit/${row.id}` }]
+            : []),
+        ];
+        return <ActionMenu actions={actions} />;
       },
     },
   ];
@@ -93,17 +90,19 @@ export default function LeaveTypesListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<LeaveTypeRow>
-        actionsRight={[
-          {
-            key: "new",
-            title: t("create"),
-            type: "link",
-            color: "primary",
-            props: {
-              href: "/workspace/modules/hrm/leave-types/create",
-            },
-          },
-        ]}
+        actionsRight={
+          canCreate
+            ? [
+                {
+                  key: "new",
+                  title: t("create"),
+                  type: "link",
+                  color: "primary",
+                  props: { href: "/workspace/modules/hrm/leave-types/create" },
+                },
+              ]
+            : undefined
+        }
         columns={columns}
         isDummyData={false}
         model="hrm.leave-type"

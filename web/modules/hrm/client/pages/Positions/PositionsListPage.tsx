@@ -11,7 +11,7 @@ import {
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import IBaseLink from "@base/client/components/IBaseLink";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { useHasPermissions, useLocalizedText } from "@base/client/hooks";
 import { Position } from "@mdl/hrm/client/interface/Position";
 
 type PositionRow = Position & {
@@ -22,6 +22,8 @@ export default function PositionsListPage(): React.ReactNode {
   const tDataTable = useTranslations("dataTable");
   const t = useTranslations("hrm.position.list");
   const getLocalizedText = useLocalizedText();
+  const { hasPermission: canCreate } = useHasPermissions(["hrm.position.create"]);
+  const { hasPermission: canEdit } = useHasPermissions(["hrm.position.update"]);
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<PositionRow>[] = [
@@ -64,23 +66,13 @@ export default function PositionsListPage(): React.ReactNode {
       render: (_, row) => {
         if (!row?.id) return null;
         const viewLink = `/workspace/modules/hrm/positions/view/${row.id}`;
-
-        return (
-          <ActionMenu
-            actions={[
-              {
-                key: "view",
-                label: t("view"),
-                href: viewLink,
-              },
-              {
-                key: "edit",
-                label: t("edit"),
-                href: `/workspace/modules/hrm/positions/edit/${row.id}`,
-              },
-            ]}
-          />
-        );
+        const actions = [
+          { key: "view", label: t("view"), href: viewLink },
+          ...(canEdit
+            ? [{ key: "edit", label: t("edit"), href: `/workspace/modules/hrm/positions/edit/${row.id}` }]
+            : []),
+        ];
+        return <ActionMenu actions={actions} />;
       },
     },
   ];
@@ -88,17 +80,19 @@ export default function PositionsListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<PositionRow>
-        actionsRight={[
-          {
-            key: "new",
-            title: t("newPosition"),
-            type: "link",
-            color: "primary",
-            props: {
-              href: "/workspace/modules/hrm/positions/create",
-            },
-          },
-        ]}
+        actionsRight={
+          canCreate
+            ? [
+                {
+                  key: "new",
+                  title: t("newPosition"),
+                  type: "link",
+                  color: "primary",
+                  props: { href: "/workspace/modules/hrm/positions/create" },
+                },
+              ]
+            : undefined
+        }
         columns={columns}
         isDummyData={false}
         model="position"

@@ -11,7 +11,7 @@ import {
 } from "@base/client/components";
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import IBaseLink from "@base/client/components/IBaseLink";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { useHasPermissions, useLocalizedText } from "@base/client/hooks";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { PerformanceReviewDto } from "@mdl/hrm/client/interface/PerformanceReview";
 
@@ -24,6 +24,7 @@ export default function PerformanceReviewsListPage(): React.ReactNode {
   const tDataTable = useTranslations("dataTable");
   const t = useTranslations("hrm.performanceReviews");
   const getLocalizedText = useLocalizedText();
+  const { hasPermission: canCreate } = useHasPermissions(["hrm.performance_review.create"]);
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<PerformanceReviewRow>[] = [
@@ -107,17 +108,19 @@ export default function PerformanceReviewsListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<PerformanceReviewRow>
-        actionsRight={[
-          {
-            key: "new",
-            title: t("create"),
-            type: "link",
-            color: "primary",
-            props: {
-              href: "/workspace/modules/hrm/performance-reviews/create",
-            },
-          },
-        ]}
+        actionsRight={
+          canCreate
+            ? [
+                {
+                  key: "new",
+                  title: t("create"),
+                  type: "link",
+                  color: "primary",
+                  props: { href: "/workspace/modules/hrm/performance-reviews/create" },
+                },
+              ]
+            : undefined
+        }
         columns={columns}
         isDummyData={false}
         model="hrm.performance-review"

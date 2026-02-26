@@ -36,8 +36,8 @@ class EmployeeDropdownListModel extends BaseViewListModel<
   protected declarationColumns = () =>
     new Map<string, { column: Column<any>; sort?: boolean }>([
       ["id", { column: hrm_tb_employees.id, sort: true }],
-      ["employeeCode", { column: hrm_tb_employees.employeeCode, sort: true }],
-      ["isActive", { column: hrm_tb_employees.isActive, sort: true }],
+      ["employeeCode", { column: hrm_tb_employees.code, sort: true }],
+      ["status", { column: hrm_tb_employees.status, sort: true }],
     ]);
 
   constructor() {
@@ -46,7 +46,7 @@ class EmployeeDropdownListModel extends BaseViewListModel<
 
   protected declarationSearch = () =>
     new Map([
-      ["employeeCode", (t: string) => ilike(hrm_tb_employees.employeeCode, t)],
+      ["employeeCode", (t: string) => ilike(hrm_tb_employees.code, t)],
       ["fullName", (t: string) => ilike(fullNameSql, t)],
     ]);
 
@@ -57,7 +57,7 @@ class EmployeeDropdownListModel extends BaseViewListModel<
     id: row.id,
     employeeCode: row.employeeCode,
     fullName: row.fullName ?? undefined,
-    isActive: row.isActive ?? undefined,
+    isActive: row.status === "active",
   });
 
   getData = async (
@@ -65,9 +65,9 @@ class EmployeeDropdownListModel extends BaseViewListModel<
   ): Promise<ListParamsResponse<EmployeeDropdownRow>> => {
     const select = {
       id: hrm_tb_employees.id,
-      employeeCode: hrm_tb_employees.employeeCode,
+      employeeCode: hrm_tb_employees.code,
       fullName: fullNameSql.as("fullName"),
-      isActive: hrm_tb_employees.isActive,
+      status: hrm_tb_employees.status,
     };
     const result = await this.buildQueryDataListWithSelect(
       params,

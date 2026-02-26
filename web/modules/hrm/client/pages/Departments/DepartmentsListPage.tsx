@@ -11,7 +11,7 @@ import {
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import IBaseLink from "@base/client/components/IBaseLink";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { useHasPermissions, useLocalizedText } from "@base/client/hooks";
 import { Department } from "@mdl/hrm/client/interface/Department";
 
 type DepartmentRow = Department & {
@@ -22,6 +22,8 @@ export default function DepartmentsListPage(): React.ReactNode {
   const tDataTable = useTranslations("dataTable");
   const t = useTranslations("hrm.department.list");
   const getLocalizedText = useLocalizedText();
+  const { hasPermission: canCreate } = useHasPermissions(["hrm.department.create"]);
+  const { hasPermission: canEdit } = useHasPermissions(["hrm.department.update"]);
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<DepartmentRow>[] = [
@@ -60,24 +62,19 @@ export default function DepartmentsListPage(): React.ReactNode {
       key: I_BASE_TABLE_COLUMN_KEY_ACTION,
       label: tDataTable("columns.action"),
       align: "end",
-      render: (_, row) => {
+        render: (_, row) => {
         if (!row?.id) return null;
         const viewLink = `/workspace/modules/hrm/departments/view/${row.id}`;
+        const actions = [
+          { key: "view", label: t("view"), href: viewLink },
+          ...(canEdit
+            ? [{ key: "edit", label: t("edit"), href: `/workspace/modules/hrm/departments/edit/${row.id}` }]
+            : []),
+        ];
 
         return (
           <ActionMenu
-            actions={[
-              {
-                key: "view",
-                label: t("view"),
-                href: viewLink,
-              },
-              {
-                key: "edit",
-                label: t("edit"),
-                href: `/workspace/modules/hrm/departments/edit/${row.id}`,
-              },
-            ]}
+            actions={actions}
           />
         );
       },
@@ -87,17 +84,21 @@ export default function DepartmentsListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<DepartmentRow>
-        actionsRight={[
-          {
-            key: "new",
-            title: t("newDepartment"),
-            type: "link",
-            color: "primary",
-            props: {
-              href: "/workspace/modules/hrm/departments/create",
-            },
-          },
-        ]}
+        actionsRight={
+          canCreate
+            ? [
+                {
+                  key: "new",
+                  title: t("newDepartment"),
+                  type: "link",
+                  color: "primary",
+                  props: {
+                    href: "/workspace/modules/hrm/departments/create",
+                  },
+                },
+              ]
+            : undefined
+        }
         columns={columns}
         isDummyData={false}
         model="department"

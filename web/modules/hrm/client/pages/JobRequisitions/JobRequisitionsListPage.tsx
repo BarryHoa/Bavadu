@@ -11,7 +11,7 @@ import {
   ViewListDataTable,
 } from "@base/client/components";
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { useHasPermissions, useLocalizedText } from "@base/client/hooks";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { JobRequisitionDto } from "@mdl/hrm/client/interface/JobRequisition";
 
@@ -24,6 +24,7 @@ export default function JobRequisitionsListPage(): React.ReactNode {
   const tDataTable = useTranslations("dataTable");
   const t = useTranslations("hrm.jobRequisitions");
   const getLocalizedText = useLocalizedText();
+  const { hasPermission: canCreate } = useHasPermissions(["hrm.job_requisition.create"]);
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<JobRequisitionRow>[] = [
@@ -110,17 +111,19 @@ export default function JobRequisitionsListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<JobRequisitionRow>
-        actionsRight={[
-          {
-            key: "new",
-            title: t("create"),
-            type: "link",
-            color: "primary",
-            props: {
-              href: "/workspace/modules/hrm/job-requisitions/create",
-            },
-          },
-        ]}
+        actionsRight={
+          canCreate
+            ? [
+                {
+                  key: "new",
+                  title: t("create"),
+                  type: "link",
+                  color: "primary",
+                  props: { href: "/workspace/modules/hrm/job-requisitions/create" },
+                },
+              ]
+            : undefined
+        }
         columns={columns}
         isDummyData={false}
         model="hrm.job-requisition"

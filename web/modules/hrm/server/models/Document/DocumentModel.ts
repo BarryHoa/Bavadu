@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { LocaleDataType } from "@base/shared/interface/Locale";
@@ -71,8 +71,8 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
         title: this.table.title,
         description: this.table.description,
         employeeId: this.table.employeeId,
-        employeeCode: employee.employeeCode,
-        employeeFullName: employee.fullName,
+        employeeCode: employee.code,
+        employeeFullName: sql<string>`''`.as("employeeFullName"),
         fileUrl: this.table.fileUrl,
         fileSize: this.table.fileSize,
         mimeType: this.table.mimeType,

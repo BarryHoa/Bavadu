@@ -5,6 +5,29 @@
       "notFound": "Không tìm thấy {entity}",
       "backToList": "Quay lại danh sách"
     },
+    "permissions": {
+      "title": "Quyền HRM",
+      "description": "Xem và quản lý nhóm quyền HRM",
+      "intro": "Quyền HRM được gán theo vai trò. Dùng Vai trò & Quyền trong Cài đặt để gán các quyền này cho vai trò.",
+      "manageRoles": "Quản lý Vai trò & Quyền",
+      "permissionGroups": "Nhóm quyền",
+      "resources": {
+        "employee": "Nhân viên",
+        "department": "Phòng ban",
+        "position": "Chức vụ",
+        "contract": "Hợp đồng",
+        "shift": "Ca làm việc",
+        "leaveType": "Loại nghỉ phép",
+        "leaveRequest": "Đơn nghỉ phép",
+        "timesheet": "Chấm công",
+        "payroll": "Lương",
+        "jobRequisition": "Yêu cầu tuyển dụng",
+        "candidate": "Ứng viên",
+        "course": "Khóa học",
+        "certificate": "Chứng chỉ",
+        "performanceReview": "Đánh giá hiệu suất"
+      }
+    },
     "employee": {
       "title": "Nhân viên",
       "list": {

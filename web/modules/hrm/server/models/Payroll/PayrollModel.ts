@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { BaseModel } from "@base/server/models/BaseModel";
@@ -79,8 +79,8 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
         periodCode: period.code,
         periodName: period.name,
         employeeId: this.table.employeeId,
-        employeeCode: employee.employeeCode,
-        employeeFullName: employee.fullName,
+        employeeCode: employee.code,
+        employeeFullName: sql<string>`''`.as("employeeFullName"),
         baseSalary: this.table.baseSalary,
         allowances: this.table.allowances,
         overtimePay: this.table.overtimePay,

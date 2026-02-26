@@ -11,7 +11,7 @@ import {
 } from "@base/client/components";
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import IBaseLink from "@base/client/components/IBaseLink";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { useHasPermissions, useLocalizedText } from "@base/client/hooks";
 import { CourseDto } from "@mdl/hrm/client/interface/Course";
 
 type CourseRow = CourseDto & {
@@ -23,6 +23,7 @@ export default function CoursesListPage(): React.ReactNode {
   const tDataTable = useTranslations("dataTable");
   const t = useTranslations("hrm.courses");
   const getLocalizedText = useLocalizedText();
+  const { hasPermission: canCreate } = useHasPermissions(["hrm.course.create"]);
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<CourseRow>[] = [
@@ -98,17 +99,19 @@ export default function CoursesListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<CourseRow>
-        actionsRight={[
-          {
-            key: "new",
-            title: t("create"),
-            type: "link",
-            color: "primary",
-            props: {
-              href: "/workspace/modules/hrm/courses/create",
-            },
-          },
-        ]}
+        actionsRight={
+          canCreate
+            ? [
+                {
+                  key: "new",
+                  title: t("create"),
+                  type: "link",
+                  color: "primary",
+                  props: { href: "/workspace/modules/hrm/courses/create" },
+                },
+              ]
+            : undefined
+        }
         columns={columns}
         isDummyData={false}
         model="hrm.course"

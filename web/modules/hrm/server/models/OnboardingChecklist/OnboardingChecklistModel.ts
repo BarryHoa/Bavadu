@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { LocaleDataType } from "@base/shared/interface/Locale";
@@ -71,14 +71,14 @@ export default class OnboardingChecklistModel extends BaseModel<
       .select({
         id: this.table.id,
         employeeId: this.table.employeeId,
-        employeeCode: employee.employeeCode,
-        employeeFullName: employee.fullName,
+        employeeCode: employee.code,
+        employeeFullName: sql<string>`''`.as("employeeFullName"),
         taskName: this.table.taskName,
         taskDescription: this.table.taskDescription,
         category: this.table.category,
         assignedTo: this.table.assignedTo,
-        assignedEmployeeCode: assignedEmployee.employeeCode,
-        assignedEmployeeFullName: assignedEmployee.fullName,
+        assignedEmployeeCode: assignedEmployee.code,
+        assignedEmployeeFullName: sql<string>`''`.as("assignedEmployeeFullName"),
         dueDate: this.table.dueDate,
         completedDate: this.table.completedDate,
         isCompleted: this.table.isCompleted,

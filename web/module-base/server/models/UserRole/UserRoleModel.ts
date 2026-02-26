@@ -108,7 +108,7 @@ export default class UserRoleModel extends BaseModel<
     }
     const rows = await this.getUserRoles(params.userId);
     if (rows.length === 0) return [];
-    const roleIds = [...new Set(rows.map((r) => r.roleId))];
+    const roleIds = Array.from(new Set(rows.map((r) => r.roleId)));
     const roleRows = await this.db
       .select({
         id: base_tb_roles.id,

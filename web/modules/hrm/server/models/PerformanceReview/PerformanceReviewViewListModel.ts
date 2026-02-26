@@ -5,7 +5,7 @@ import type {
 import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 import type { Column } from "drizzle-orm";
 
-import { eq, ilike } from "drizzle-orm";
+import { eq, ilike, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import {
@@ -92,8 +92,8 @@ class PerformanceReviewViewListModel extends BaseViewListModel<
 
   protected declarationSearch = () =>
     new Map([
-      ["employeeCode", (text: string) => ilike(employee.employeeCode, text)],
-      ["fullName", (text: string) => ilike(employee.fullName, text)],
+      ["employeeCode", (text: string) => ilike(employee.code, text)],
+      ["fullName", (_text: string) => sql`true`],
     ]);
 
   protected declarationFilter = (): FilterConditionMap<ParamFilter> =>

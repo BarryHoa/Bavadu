@@ -11,7 +11,7 @@ import {
 } from "@base/client/components";
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import IBaseLink from "@base/client/components/IBaseLink";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { useHasPermissions, useLocalizedText } from "@base/client/hooks";
 import { PayrollDto } from "@mdl/hrm/client/interface/Payroll";
 
 type PayrollRow = PayrollDto & {
@@ -23,6 +23,7 @@ export default function PayrollListPage(): React.ReactNode {
   const tDataTable = useTranslations("dataTable");
   const t = useTranslations("hrm.payroll");
   const getLocalizedText = useLocalizedText();
+  const { hasPermission: canCreate } = useHasPermissions(["hrm.payroll.create"]);
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<PayrollRow>[] = [
@@ -96,17 +97,19 @@ export default function PayrollListPage(): React.ReactNode {
   return (
     <div className="space-y-4">
       <ViewListDataTable<PayrollRow>
-        actionsRight={[
-          {
-            key: "new",
-            title: t("create"),
-            type: "link",
-            color: "primary",
-            props: {
-              href: "/workspace/modules/hrm/payroll/create",
-            },
-          },
-        ]}
+        actionsRight={
+          canCreate
+            ? [
+                {
+                  key: "new",
+                  title: t("create"),
+                  type: "link",
+                  color: "primary",
+                  props: { href: "/workspace/modules/hrm/payroll/create" },
+                },
+              ]
+            : undefined
+        }
         columns={columns}
         isDummyData={false}
         model="hrm.payroll"

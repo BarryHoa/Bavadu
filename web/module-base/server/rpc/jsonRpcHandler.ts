@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import UserPermissionModel from "@base/server/models/UserPermission/UserPermissionModel";
+import { getAuthenticatedUser } from "@base/server/utils/auth-helpers";
 import { RuntimeContext } from "../runtime/RuntimeContext";
 import {
   sanitizeJsonRpcParams,
   validateJsonRpcMethod,
 } from "../validation/schemas/jsonrpc";
+import { getRequiredPermission } from "./rpcPermissionMap";
 
 export interface JsonRpcRequest {
   jsonrpc: "2.0";
@@ -110,6 +113,29 @@ export class JsonRpcHandler {
         JSON_RPC_ERROR_CODES.INVALID_PARAMS,
         `Invalid model type. Expected: ${SUB_TYPE_LIST}, ${SUB_TYPE_DROPDOWN}, ${SUB_TYPE_CRUD}`,
       );
+    }
+
+    // Permission check for HRM (and other mapped modules)
+    const requiredPermission = getRequiredPermission(modelId, subType, methodName);
+    if (requiredPermission) {
+      const user = getAuthenticatedUser(request);
+      if (!user) {
+        throw new JsonRpcError(
+          JSON_RPC_ERROR_CODES.AUTHENTICATION_ERROR,
+          "Authentication required",
+        );
+      }
+      const permissionModel = new UserPermissionModel();
+      const hasPermission = await permissionModel.hasAllPermissions(user.id, [
+        requiredPermission,
+      ]);
+      if (!hasPermission) {
+        throw new JsonRpcError(
+          JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
+          "You do not have permission to perform this action",
+          { requiredPermission },
+        );
+      }
     }
 
     // Build model key

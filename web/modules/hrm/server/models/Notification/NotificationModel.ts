@@ -64,8 +64,8 @@ export default class NotificationModel extends BaseModel<
       .select({
         id: this.table.id,
         employeeId: this.table.employeeId,
-        employeeCode: employee.employeeCode,
-        employeeFullName: employee.fullName,
+        employeeCode: employee.code,
+        employeeFullName: sql<string>`''`.as("employeeFullName"),
         type: this.table.type,
         title: this.table.title,
         message: this.table.message,
@@ -159,8 +159,8 @@ export default class NotificationModel extends BaseModel<
         .select({
           id: this.table.id,
           employeeId: this.table.employeeId,
-          employeeCode: employee.employeeCode,
-          employeeFullName: employee.fullName,
+          employeeCode: employee.code,
+          employeeFullName: sql<string>`''`.as("employeeFullName"),
           type: this.table.type,
           title: this.table.title,
           message: this.table.message,

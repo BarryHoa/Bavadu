@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { BaseModel } from "@base/server/models/BaseModel";
@@ -73,8 +73,8 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
         id: this.table.id,
         contractNumber: this.table.contractNumber,
         employeeId: this.table.employeeId,
-        employeeCode: employee.employeeCode,
-        employeeFullName: employee.fullName,
+        employeeCode: employee.code,
+        employeeFullName: sql<string>`''`.as("employeeFullName"),
         contractType: this.table.contractType,
         startDate: this.table.startDate,
         endDate: this.table.endDate,
@@ -87,8 +87,8 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
         documentUrl: this.table.documentUrl,
         signedDate: this.table.signedDate,
         signedBy: this.table.signedBy,
-        signedByCode: signedByEmployee.employeeCode,
-        signedByFullName: signedByEmployee.fullName,
+        signedByCode: signedByEmployee.code,
+        signedByFullName: sql<string>`''`.as("signedByFullName"),
         notes: this.table.notes,
         metadata: this.table.metadata,
         isActive: this.table.isActive,
