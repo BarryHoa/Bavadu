@@ -1,13 +1,16 @@
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { LocaleDataType } from "@base/shared/interface/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
+import { base_tb_users } from "@base/server/schemas/base.user";
+import { LocaleDataType } from "@base/shared/interface/Locale";
 
 import { NewHrmTbCertificate, hrm_tb_certificates } from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";
+import { fullNameSqlFrom } from "../Employee/employee.helpers";
 
 const employee = alias(hrm_tb_employees, "employee");
+const user = alias(base_tb_users, "user");
 
 export interface CertificateRow {
   id: string;
@@ -60,7 +63,7 @@ export default class CertificateModel extends BaseModel<
         id: this.table.id,
         employeeId: this.table.employeeId,
         employeeCode: employee.code,
-        employeeFullName: sql<string>`''`.as("employeeFullName"),
+        employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
         name: this.table.name,
         issuer: this.table.issuer,
         certificateNumber: this.table.certificateNumber,
@@ -73,6 +76,7 @@ export default class CertificateModel extends BaseModel<
       })
       .from(this.table)
       .leftJoin(employee, eq(this.table.employeeId, employee.id))
+      .leftJoin(user, eq(employee.userId, user.id))
       .where(eq(this.table.id, id))
       .limit(1);
 

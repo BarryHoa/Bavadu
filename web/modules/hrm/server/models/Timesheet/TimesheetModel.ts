@@ -1,20 +1,25 @@
 import type { NextRequest } from "next/server";
 
-import { and, eq, gte, lte, sql } from "drizzle-orm";
+import { and, eq, gte, lte } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { BaseModel } from "@base/server/models/BaseModel";
-import { JsonRpcError, JSON_RPC_ERROR_CODES } from "@base/server/rpc/jsonRpcHandler";
 import UserPermissionModel from "@base/server/models/UserPermission/UserPermissionModel";
+import {
+  JSON_RPC_ERROR_CODES,
+  JsonRpcError,
+} from "@base/server/rpc/jsonRpcHandler";
+import { base_tb_users } from "@base/server/schemas/base.user";
 
-
-import EmployeeModel from "../Employee/EmployeeModel";
 import { NewHrmTbTimesheet, hrm_tb_timesheets } from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";
 import { hrm_tb_shifts } from "../../schemas/hrm.shift";
+import EmployeeModel from "../Employee/EmployeeModel";
+import { fullNameSqlFrom } from "../Employee/employee.helpers";
 
 const employee = alias(hrm_tb_employees, "employee");
 const shift = alias(hrm_tb_shifts, "shift");
+const user = alias(base_tb_users, "user");
 
 export interface TimesheetRow {
   id: string;
@@ -76,7 +81,7 @@ export default class TimesheetModel extends BaseModel<
     id: this.table.id,
     employeeId: this.table.employeeId,
     employeeCode: employee.code,
-    employeeFullName: sql<string>`''`.as("employeeFullName"),
+    employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
     rosterId: this.table.rosterId,
     workDate: this.table.workDate,
     shiftId: this.table.shiftId,
@@ -141,6 +146,7 @@ export default class TimesheetModel extends BaseModel<
       .select(this.selectJoined())
       .from(this.table)
       .leftJoin(employee, eq(this.table.employeeId, employee.id))
+      .leftJoin(user, eq(employee.userId, user.id))
       .leftJoin(shift, eq(this.table.shiftId, shift.id))
       .where(eq(this.table.id, id))
       .limit(1);
@@ -164,10 +170,10 @@ export default class TimesheetModel extends BaseModel<
    */
   getTimesheetsByMonth = async (
     params: {
-    year: number;
-    month: number;
-    employeeId?: string | null;
-  },
+      year: number;
+      month: number;
+      employeeId?: string | null;
+    },
     request?: NextRequest,
   ): Promise<{ data: TimesheetRow[] }> => {
     const { year, month } = params;
@@ -222,6 +228,7 @@ export default class TimesheetModel extends BaseModel<
       .select(this.selectJoined())
       .from(this.table)
       .leftJoin(employee, eq(this.table.employeeId, employee.id))
+      .leftJoin(user, eq(employee.userId, user.id))
       .leftJoin(shift, eq(this.table.shiftId, shift.id))
       .where(and(...conditions))
       .orderBy(this.table.workDate);

@@ -2,21 +2,20 @@ import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { BaseModel } from "@base/server/models/BaseModel";
-
 import {
   base_tb_users,
   base_tb_users_login,
 } from "@base/server/schemas/base.user";
+
+import { NewHrmTbEmployee, hrm_tb_employees } from "../../schemas";
+import { hrm_tb_departments } from "../../schemas/hrm.department";
+import { hrm_tb_positions } from "../../schemas/hrm.position";
 
 import {
   buildFullName,
   normalizePayload,
   type EmployeeInput,
 } from "./employee.helpers";
-
-import { NewHrmTbEmployee, hrm_tb_employees } from "../../schemas";
-import { hrm_tb_departments } from "../../schemas/hrm.department";
-import { hrm_tb_positions } from "../../schemas/hrm.position";
 
 export type { EmployeeInput };
 
@@ -46,7 +45,11 @@ export interface EmployeeRow {
   departmentId: string;
   department?: { id: string; name?: unknown } | null;
   managerId?: string | null;
-  manager?: { id: string; employeeCode?: string; fullName?: string | null } | null;
+  manager?: {
+    id: string;
+    employeeCode?: string;
+    fullName?: string | null;
+  } | null;
   employmentStatus: string;
   employmentType?: string | null;
   hireDate: string;
@@ -90,7 +93,6 @@ type DbRow = {
   bankBranch?: string | null;
   emergencyContactName?: string | null;
   emergencyContactPhone?: string | null;
-  status: string;
   createdAt?: Date | null;
   updatedAt?: Date | null;
   userFirstName?: string | null;
@@ -133,7 +135,6 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
     bankBranch: this.table.bankBranch,
     emergencyContactName: this.table.emergencyContactName,
     emergencyContactPhone: this.table.emergencyContactPhone,
-    status: this.table.status,
     createdAt: this.table.createdAt,
     updatedAt: this.table.updatedAt,
     userFirstName: user.firstName,
@@ -157,11 +158,15 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
       .leftJoin(managerUser, eq(manager.userId, managerUser.id));
 
   private mapRow(r: DbRow): EmployeeRow {
-    const fullName = buildFullName(r.userFirstName ?? null, r.userLastName ?? null);
+    const fullName = buildFullName(
+      r.userFirstName ?? null,
+      r.userLastName ?? null,
+    );
     const managerFullName =
       r.managerFirstName != null || r.managerLastName != null
         ? buildFullName(r.managerFirstName ?? null, r.managerLastName ?? null)
         : undefined;
+
     return {
       id: r.id,
       userId: r.userId ?? undefined,
@@ -177,13 +182,21 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
       taxId: r.taxId ?? undefined,
       address: r.userAddress,
       positionId: r.positionId,
-      position: r.positionId ? { id: r.positionId, name: r.positionName ?? undefined } : null,
+      position: r.positionId
+        ? { id: r.positionId, name: r.positionName ?? undefined }
+        : null,
       departmentId: r.departmentId,
-      department: r.departmentId ? { id: r.departmentId, name: r.departmentName ?? undefined } : null,
+      department: r.departmentId
+        ? { id: r.departmentId, name: r.departmentName ?? undefined }
+        : null,
       managerId: r.managerId ?? undefined,
       manager:
         r.managerId != null
-          ? { id: r.managerId, employeeCode: r.managerCode ?? undefined, fullName: managerFullName ?? undefined }
+          ? {
+              id: r.managerId,
+              employeeCode: r.managerCode ?? undefined,
+              fullName: managerFullName ?? undefined,
+            }
           : null,
       employmentStatus: r.employmentStatus,
       employmentType: r.employmentType ?? undefined,
@@ -197,7 +210,7 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
       bankBranch: r.bankBranch ?? undefined,
       emergencyContactName: r.emergencyContactName ?? undefined,
       emergencyContactPhone: r.emergencyContactPhone ?? undefined,
-      isActive: r.status === "active",
+      isActive: r.employmentStatus === "active",
       createdAt: r.createdAt?.getTime(),
       updatedAt: r.updatedAt?.getTime(),
     };
@@ -205,6 +218,7 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
 
   private getOne = async (where: ReturnType<typeof eq>) => {
     const [row] = await this.baseQuery().where(where).limit(1);
+
     return row ? this.mapRow(row as DbRow) : null;
   };
 
@@ -224,7 +238,8 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
       positionId: p.positionId,
       departmentId: p.departmentId,
       managerId: p.managerId ?? null,
-      status: p.employmentStatus ?? (p.isActive !== false ? "active" : "inactive"),
+      status:
+        p.employmentStatus ?? (p.isActive === false ? "inactive" : "active"),
       type: p.employmentType ?? null,
       hireDate: p.hireDate,
       probationEndDate: p.probationEndDate ?? null,
@@ -239,16 +254,25 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
       createdAt: now,
       updatedAt: now,
     };
-    const [created] = await this.db.insert(this.table).values(row).returning({ id: this.table.id });
+    const [created] = await this.db
+      .insert(this.table)
+      .values(row)
+      .returning({ id: this.table.id });
+
     if (!created) throw new Error("Failed to create employee");
     const out = await this.getEmployeeById(created.id);
+
     if (!out) throw new Error("Failed to load employee after creation");
+
     return out;
   };
 
-  update = async (params: Record<string, unknown>): Promise<EmployeeRow | null> => {
+  update = async (
+    params: Record<string, unknown>,
+  ): Promise<EmployeeRow | null> => {
     const id = params.id as string;
     const { id: _id, ...rest } = params;
+
     return this.updateData({ id, payload: rest });
   };
 
@@ -265,6 +289,7 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
       positionId: "positionId",
       departmentId: "departmentId",
       managerId: "managerId",
+      employmentStatus: "status",
       employmentType: "type",
       hireDate: "hireDate",
       probationEndDate: "probationEndDate",
@@ -277,22 +302,27 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
       emergencyContactName: "emergencyContactName",
       emergencyContactPhone: "emergencyContactPhone",
     };
-    for (const [inputKey, dbKey] of Object.entries(map)) {
-      const v = payload[inputKey as keyof EmployeeInput];
+
+    for (const [inputKey, colKey] of Object.entries(map)) {
+      const v = (payload as Record<string, unknown>)[inputKey];
+
       if (v === undefined) continue;
-      (set as Record<string, unknown>)[dbKey] = v ?? null;
+      (set as Record<string, unknown>)[colKey] = v ?? null;
     }
-    if (payload.employmentStatus !== undefined) {
-      (set as Record<string, unknown>).status = payload.employmentStatus;
-    } else if (payload.isActive !== undefined) {
-      (set as Record<string, unknown>).status = payload.isActive ? "active" : "inactive";
+    if (payload.isActive !== undefined) {
+      set.status = payload.isActive ? "active" : "inactive";
     }
     await this.db.update(this.table).set(set).where(eq(this.table.id, id));
+
     return this.getEmployeeById(id);
   };
 
-  updateData = async (params: { id: string; payload: Record<string, unknown> }) => {
+  updateData = async (params: {
+    id: string;
+    payload: Record<string, unknown>;
+  }) => {
     const normalized = normalizePayload(params.payload, { partial: true });
+
     return this.updateEmployee(params.id, normalized as Partial<EmployeeInput>);
   };
 }

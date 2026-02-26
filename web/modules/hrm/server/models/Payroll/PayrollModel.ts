@@ -1,7 +1,10 @@
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { BaseModel } from "@base/server/models/BaseModel";
+import { base_tb_users } from "@base/server/schemas/base.user";
+
+import { fullNameSqlFrom } from "../Employee/employee.helpers";
 
 import { NewHrmTbPayroll, hrm_tb_payrolls } from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";
@@ -9,6 +12,7 @@ import { hrm_tb_payrolls_period } from "../../schemas/hrm.payroll-period";
 
 const employee = alias(hrm_tb_employees, "employee");
 const period = alias(hrm_tb_payrolls_period, "period");
+const user = alias(base_tb_users, "user");
 
 export interface PayrollRow {
   id: string;
@@ -80,7 +84,7 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
         periodName: period.name,
         employeeId: this.table.employeeId,
         employeeCode: employee.code,
-        employeeFullName: sql<string>`''`.as("employeeFullName"),
+        employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
         baseSalary: this.table.baseSalary,
         allowances: this.table.allowances,
         overtimePay: this.table.overtimePay,
@@ -105,6 +109,7 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
       .from(this.table)
       .leftJoin(period, eq(this.table.payrollPeriodId, period.id))
       .leftJoin(employee, eq(this.table.employeeId, employee.id))
+      .leftJoin(user, eq(employee.userId, user.id))
       .where(eq(this.table.id, id))
       .limit(1);
 

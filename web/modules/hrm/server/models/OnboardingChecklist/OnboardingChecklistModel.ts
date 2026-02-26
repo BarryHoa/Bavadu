@@ -1,17 +1,21 @@
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { LocaleDataType } from "@base/shared/interface/Locale";
 import { BaseModel } from "@base/server/models/BaseModel";
+import { base_tb_users } from "@base/server/schemas/base.user";
+import { LocaleDataType } from "@base/shared/interface/Locale";
 
 import {
   NewHrmTbOnboardingChecklist,
   hrm_tb_onboarding_checklists,
 } from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";
+import { fullNameSqlFrom } from "../Employee/employee.helpers";
 
 const employee = alias(hrm_tb_employees, "employee");
 const assignedEmployee = alias(hrm_tb_employees, "assigned_employee");
+const user = alias(base_tb_users, "user");
+const assignedUser = alias(base_tb_users, "assigned_user");
 
 export interface OnboardingChecklistRow {
   id: string;
@@ -72,13 +76,15 @@ export default class OnboardingChecklistModel extends BaseModel<
         id: this.table.id,
         employeeId: this.table.employeeId,
         employeeCode: employee.code,
-        employeeFullName: sql<string>`''`.as("employeeFullName"),
+        employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
         taskName: this.table.taskName,
         taskDescription: this.table.taskDescription,
         category: this.table.category,
         assignedTo: this.table.assignedTo,
         assignedEmployeeCode: assignedEmployee.code,
-        assignedEmployeeFullName: sql<string>`''`.as("assignedEmployeeFullName"),
+        assignedEmployeeFullName: fullNameSqlFrom(assignedUser).as(
+          "assignedEmployeeFullName",
+        ),
         dueDate: this.table.dueDate,
         completedDate: this.table.completedDate,
         isCompleted: this.table.isCompleted,
@@ -88,10 +94,12 @@ export default class OnboardingChecklistModel extends BaseModel<
       })
       .from(this.table)
       .leftJoin(employee, eq(this.table.employeeId, employee.id))
+      .leftJoin(user, eq(employee.userId, user.id))
       .leftJoin(
         assignedEmployee,
         eq(this.table.assignedTo, assignedEmployee.id),
       )
+      .leftJoin(assignedUser, eq(assignedEmployee.userId, assignedUser.id))
       .where(eq(this.table.id, id))
       .limit(1);
 
