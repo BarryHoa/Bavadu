@@ -91,6 +91,7 @@ class DepartmentViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
+  @BaseViewListModel.Auth({ required: true, permissions: ["hrm.department.view"] })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<DepartmentRow>> => {

@@ -80,6 +80,7 @@ class DeliveryViewListModel extends BaseViewListModel<
     createdBy: row.createdBy ?? undefined,
   });
 
+  @BaseViewListModel.Auth({ required: true, permissions: ["b2csales.delivery.view"] })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<any>> => {

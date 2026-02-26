@@ -112,6 +112,7 @@ class TimesheetViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
+  @BaseViewListModel.Auth({ required: true, permissions: ["hrm.timesheet.view"] })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<TimesheetRow>> => {

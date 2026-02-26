@@ -108,6 +108,7 @@ class LeaveRequestViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
+  @BaseViewListModel.Auth({ required: true, permissions: ["hrm.leave-request.view"] })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<LeaveRequestRow>> => {

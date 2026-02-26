@@ -95,6 +95,7 @@ class CustomerCompanyViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
+  @BaseViewListModel.Auth({ required: true, permissions: ["b2bsales.customer.view"] })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<any>> => {

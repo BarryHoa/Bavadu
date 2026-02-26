@@ -104,6 +104,7 @@ class CandidateViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
+  @BaseViewListModel.Auth({ required: true, permissions: ["hrm.candidate.view"] })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<CandidateRow>> => {

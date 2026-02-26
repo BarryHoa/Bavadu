@@ -203,6 +203,7 @@ class ProductViewListModel extends BaseViewListModel<
     } as unknown as ProductVariantElm;
   };
 
+  @BaseViewListModel.Auth({ required: true, permissions: ["product.product.view"] })
   getData = async (
     params: ListParamsRequest<ProductFilter>,
   ): Promise<ListParamsResponse<ProductVariantElm>> => {

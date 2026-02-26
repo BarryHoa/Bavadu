@@ -73,6 +73,7 @@ class CourseViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
+  @BaseViewListModel.Auth({ required: true, permissions: ["hrm.course.view"] })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<CourseRow>> => {

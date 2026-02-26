@@ -7,7 +7,57 @@ import { isEmpty } from "lodash";
 
 import { RuntimeContext } from "../runtime/RuntimeContext";
 
+/**
+ * Rule for RPC method: require auth and/or permissions.
+ * Permission format: module.feature.action (vd: hrm.employee.view).
+ * Backend hỗ trợ wildcard: hrm.employee.* (mọi quyền feature), hrm.* (mọi quyền module).
+ */
+export type AuthRule = {
+  required: boolean;
+  permissions?: string[];
+};
+
+const AUTH_RULE_KEY = Symbol("BaseModel.authRule");
+
+/** Descriptor có thể có initializer (class field) theo TS experimentalDecorators */
+type DescriptorWithInitializer = PropertyDescriptor & {
+  initializer?: () => unknown;
+};
+
 export class BaseModel<TTable extends PgTable = PgTable> {
+  /**
+   * Decorator: gắn auth rule trực tiếp lên method hoặc arrow field.
+   * Hỗ trợ cả method (descriptor.value) và class field arrow (descriptor.initializer).
+   * @BaseModel.Auth({ required: true, permissions: ["..."] })
+   */
+  static Auth(rule: AuthRule) {
+    return function (
+      _target: object,
+      _propertyKey: string,
+      descriptor?: DescriptorWithInitializer,
+    ): any {
+      if (!descriptor) return descriptor;
+      if (typeof descriptor.value === "function") {
+        (descriptor.value as unknown as { [AUTH_RULE_KEY]: AuthRule })[
+          AUTH_RULE_KEY
+        ] = rule;
+        return descriptor;
+      }
+      if (typeof descriptor.initializer === "function") {
+        const originalInitializer = descriptor.initializer;
+        descriptor.initializer = function (this: unknown) {
+          const fn = originalInitializer.call(this);
+          if (typeof fn === "function") {
+            (fn as unknown as { [AUTH_RULE_KEY]: AuthRule })[AUTH_RULE_KEY] =
+              rule;
+          }
+          return fn;
+        };
+      }
+      return descriptor;
+    };
+  }
+
   /**Main table of the model */
   protected readonly table: TTable;
   private _db: PostgresJsDatabase<Record<string, never>> | null = null;
@@ -109,4 +159,14 @@ export class BaseModel<TTable extends PgTable = PgTable> {
       ? { isExist: true, data: result[0] }
       : { isExist: false, data: null };
   };
+
+  /**
+   * Get auth rule for an RPC method. Đọc trực tiếp từ metadata trên method (do @BaseModel.Auth gắn).
+   */
+  getAuthRuleForMethod(methodName: string): AuthRule | null {
+    const fn = (this as any)[methodName];
+    if (typeof fn !== "function") return null;
+    const rule = (fn as unknown as { [AUTH_RULE_KEY]?: AuthRule })[AUTH_RULE_KEY];
+    return rule ?? null;
+  }
 }

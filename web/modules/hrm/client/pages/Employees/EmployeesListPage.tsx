@@ -169,7 +169,6 @@ export default function EmployeesListPage(): React.ReactNode {
               ]
             : undefined
         }
-
         columns={columns}
         isDummyData={false}
         model="employee"

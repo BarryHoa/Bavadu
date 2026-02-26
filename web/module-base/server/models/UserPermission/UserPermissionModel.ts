@@ -262,7 +262,31 @@ export default class UserPermissionModel extends BaseModelCached<
   }
 
   /**
-   * Check if user has all of the specified permissions
+   * Kiểm tra user có đủ một permission theo quy ước:
+   * - required (vd: hrm.employee.view) = đúng quyền đó
+   * - feature wildcard (vd: hrm.employee.*) = mọi quyền của feature
+   * - module wildcard (vd: hrm.*) = mọi quyền của module
+   */
+  private hasPermissionWithWildcards(
+    userPermissions: Set<string>,
+    required: string,
+  ): boolean {
+    if (userPermissions.has(required)) return true;
+    const parts = required.split(".");
+    if (parts.length >= 2) {
+      const moduleWildcard = `${parts[0]}.*`;
+      if (userPermissions.has(moduleWildcard)) return true;
+    }
+    if (parts.length >= 3) {
+      const featureWildcard = `${parts[0]}.${parts[1]}.*`;
+      if (userPermissions.has(featureWildcard)) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Check if user has all of the specified permissions.
+   * Supports wildcards: hrm.employee.view is satisfied by hrm.employee.view, hrm.employee.*, or hrm.*.
    */
   async hasAllPermissions(
     userId: string,
@@ -270,7 +294,9 @@ export default class UserPermissionModel extends BaseModelCached<
   ): Promise<boolean> {
     const result = await this.getPermissionsByUser(userId);
 
-    return permissions.every((perm) => result.permissions.has(perm));
+    return permissions.every((perm) =>
+      this.hasPermissionWithWildcards(result.permissions, perm),
+    );
   }
 
   /**

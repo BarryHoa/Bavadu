@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import UserPermissionModel from "@base/server/models/UserPermission/UserPermissionModel";
-import { getAuthenticatedUser } from "@base/server/utils/auth-helpers";
+import { UserPermissionModel } from "../models/UserPermission";
 import { RuntimeContext } from "../runtime/RuntimeContext";
 import {
   sanitizeJsonRpcParams,
   validateJsonRpcMethod,
 } from "../validation/schemas/jsonrpc";
-import { getRequiredPermission } from "./rpcPermissionMap";
 
 export interface JsonRpcRequest {
   jsonrpc: "2.0";
@@ -60,6 +58,9 @@ export const JSON_RPC_ERROR_CODES = {
 const SUB_TYPE_LIST = "list";
 const SUB_TYPE_DROPDOWN = "dropdown";
 const SUB_TYPE_CRUD = "curd";
+
+/** Pathname chứa segment này thì coi là public (không bắt buộc auth). */
+const PUBLIC_PATH_SEGMENT = "/public/";
 
 /**
  * Method structure: <model-id>.<sub-type>.<method>
@@ -115,34 +116,13 @@ export class JsonRpcHandler {
       );
     }
 
-    // Permission check for HRM (and other mapped modules)
-    const requiredPermission = getRequiredPermission(modelId, subType, methodName);
-    if (requiredPermission) {
-      const user = getAuthenticatedUser(request);
-      if (!user) {
-        throw new JsonRpcError(
-          JSON_RPC_ERROR_CODES.AUTHENTICATION_ERROR,
-          "Authentication required",
-        );
-      }
-      const permissionModel = new UserPermissionModel();
-      const hasPermission = await permissionModel.hasAllPermissions(user.id, [
-        requiredPermission,
-      ]);
-      if (!hasPermission) {
-        throw new JsonRpcError(
-          JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
-          "You do not have permission to perform this action",
-          { requiredPermission },
-        );
-      }
-    }
-
     // Build model key
     const modelKey = `${modelId}.${subType}`;
 
     // Get model instance
     const modelInstance = await RuntimeContext.getModelInstanceBy(modelKey);
+
+    console.log("modelInstance", modelKey);
 
     if (!modelInstance) {
       throw new JsonRpcError(
@@ -151,11 +131,38 @@ export class JsonRpcHandler {
       );
     }
 
+    /**
+     * CHECK AUTH RULE FOR METHOD
+     */
+
+    const pathname = request.nextUrl.pathname;
+    const isPublicPath = pathname.includes(PUBLIC_PATH_SEGMENT);
+    const getAuthRule = (
+      modelInstance as { getAuthRuleForMethod?: (m: string) => unknown }
+    ).getAuthRuleForMethod;
+    // CALL
+    const authRule = getAuthRule?.call(modelInstance, methodName) as {
+      required: boolean;
+      permissions?: string[];
+    } | null;
+
+    // Only terminate when public path and auth rule is required
+    // IF PUBLIC PATH AND AUTH RULE IS REQUIRED, THROW ERROR
+    if (isPublicPath && !!authRule?.required) {
+      throw new JsonRpcError(
+        JSON_RPC_ERROR_CODES.AUTHENTICATION_ERROR,
+        "This method requires authentication and is not available on the public endpoint",
+      );
+    }
+
+    console.log("debug: 1");
     // Get method function
     const modelMethodFunction = (modelInstance as any)[methodName] as (
       params?: Record<string, any>,
       request?: NextRequest,
     ) => Promise<any>;
+
+    console.log("debug: 2");
 
     if (!modelMethodFunction || typeof modelMethodFunction !== "function") {
       throw new JsonRpcError(
@@ -164,8 +171,41 @@ export class JsonRpcHandler {
       );
     }
 
+    // permission check for method if required
+    console.log(authRule, "authRule", modelKey);
+    if (!!authRule?.required) {
+      if (!authRule?.permissions?.length) {
+        throw new JsonRpcError(
+          JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
+          "You do not have permission to perform this action",
+          { requiredPermissions: authRule.permissions },
+        );
+      }
+      // check permission for method if required
+      const userId = request.headers.get("x-user-id");
+      if (!userId) {
+        throw new JsonRpcError(
+          JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
+          "User not authenticated",
+        );
+      }
+      const permissionModel = new UserPermissionModel();
+
+      const hasAll = await permissionModel.hasAllPermissions(
+        userId,
+        authRule.permissions,
+      );
+      if (!hasAll) {
+        throw new JsonRpcError(
+          JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
+          "You do not have permission to perform this action",
+          { requiredPermissions: authRule.permissions },
+        );
+      }
+    }
+
     // Call model method
-    return await modelMethodFunction(params || {}, request);
+    return await modelMethodFunction.call(modelInstance, params || {}, request);
   }
 
   /**
@@ -275,8 +315,10 @@ export class JsonRpcHandler {
   async handle(httpRequest: NextRequest): Promise<NextResponse> {
     try {
       const body = await httpRequest.json();
+      console.log(httpRequest.headers.get("x-rpc-method"), "x-user-id");
 
       // FOR BATCH REQUEST, each request is a JsonRpcRequest
+
       if (Array.isArray(body)) {
         if (!body.length) {
           return NextResponse.json(

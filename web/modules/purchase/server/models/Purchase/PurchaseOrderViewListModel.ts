@@ -98,6 +98,7 @@ class PurchaseOrderViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
+  @BaseViewListModel.Auth({ required: true, permissions: ["purchase.purchase-order.view"] })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<any>> => {

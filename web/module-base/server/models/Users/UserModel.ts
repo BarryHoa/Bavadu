@@ -24,14 +24,15 @@ class UserModel extends BaseModel<typeof base_tb_users> {
    * Get current user (no session validation here).
    * The private RPC endpoint must authenticate first and inject x-user-id/x-session-id headers.
    */
-  getMe = async (
+  @BaseModel.Auth({ required: true, permissions: ["user.view"] })
+  async getMe(
     _params: Record<string, unknown>,
     request?: NextRequest,
   ): Promise<{
     data: {
       user: { id: string; username?: string; avatar?: string | null } | null;
     };
-  }> => {
+  }> {
     const userId = request?.headers.get("x-user-id") ?? null;
 
     if (!userId) return { data: { user: null } };
@@ -55,13 +56,14 @@ class UserModel extends BaseModel<typeof base_tb_users> {
         },
       },
     };
-  };
+  }
 
   /**
    * Get current user with role codes and permissions (for client capability checks).
    * Returns roleCodes (e.g. ['admin','manager']), permissions array, and isGlobalAdmin.
    */
-  getMeWithRoles = async (
+  @BaseModel.Auth({ required: true, permissions: ["user.view"] })
+  async getMeWithRoles(
     _params: Record<string, unknown>,
     request?: NextRequest,
   ): Promise<{
@@ -71,7 +73,7 @@ class UserModel extends BaseModel<typeof base_tb_users> {
       permissions: string[];
       isGlobalAdmin: boolean;
     };
-  }> => {
+  }> {
     const me = await this.getMe(_params, request);
 
     if (!me.data.user) {
@@ -98,7 +100,7 @@ class UserModel extends BaseModel<typeof base_tb_users> {
         isGlobalAdmin: result.isGlobalAdmin ?? false,
       },
     };
-  };
+  }
 }
 
 export default UserModel;

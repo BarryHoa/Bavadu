@@ -101,6 +101,7 @@ class ContractViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
+  @BaseViewListModel.Auth({ required: true, permissions: ["hrm.contract.view"] })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<ContractRow>> => {

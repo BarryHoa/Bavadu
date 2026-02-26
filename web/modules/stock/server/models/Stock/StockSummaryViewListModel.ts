@@ -191,6 +191,7 @@ class StockSummaryViewListModel extends BaseViewListModel<
     minStock: row.minStock ? Number(row.minStock) : null,
   });
 
+  @BaseViewListModel.Auth({ required: true, permissions: ["stock.stock.view"] })
   getData = async (
     params: ListParamsRequest<StockSummaryFilter> = {},
   ): Promise<ListParamsResponse<StockSummaryViewRow>> => {

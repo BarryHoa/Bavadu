@@ -84,6 +84,7 @@ class SequenceViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
+  @BaseViewListModel.Auth({ required: true, permissions: ["base.sequence.view"] })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<SequenceRuleRow>> => {

@@ -79,6 +79,7 @@ class SalesOrderB2BViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
+  @BaseViewListModel.Auth({ required: true, permissions: ["b2bsales.sale.view"] })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<any>> => {

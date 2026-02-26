@@ -106,6 +106,7 @@ class ProductCategoryViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
+  @BaseViewListModel.Auth({ required: true, permissions: ["product.product-category.view"] })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<ProductCategoryRow>> => {
