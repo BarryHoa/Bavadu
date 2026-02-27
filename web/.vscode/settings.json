@@ -120,8 +120,8 @@
   "i18n-ally.localesPaths": [
     "i18n",
     "module-base/client/messages",
-    "modules/b2b-sales/client/messages",
     "modules/b2c-sales/client/messages",
+    "modules/b2b-sales/client/messages",
     "modules/hrm/client/messages",
     "modules/product/client/messages",
     "modules/purchase/client/messages",
