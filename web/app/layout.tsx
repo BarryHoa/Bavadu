@@ -66,12 +66,7 @@ export default async function RootLayout({
           <ModuleI18nProvider initialMessages={initialMessages} locale={locale}>
             <div className="relative flex flex-col h-screen">
               {/* <Navbar /> */}
-              <main
-                className="container mx-auto p-0 flex-1"
-                style={{ maxWidth: "1920px" }}
-              >
-                {children}
-              </main>
+              {children}
             </div>
             {/* <ScrollbarReveal /> */}
           </ModuleI18nProvider>

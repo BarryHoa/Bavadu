@@ -11,13 +11,6 @@ import Content from "@base/client/layouts/workspace/components/Content";
 import MenuPanel from "@base/client/layouts/workspace/components/Menu";
 import Nav from "@base/client/layouts/workspace/components/Nav";
 
-interface SerializedNavigationItem {
-  name: string;
-  href: string;
-  icon: string;
-  badge?: string | null;
-}
-
 interface WorkspaceLayoutClientProps {
   children: React.ReactNode;
   menuItems: MenuWorkspaceElement[];
@@ -59,9 +52,9 @@ export default function WorkspaceLayoutClient({
 
   return (
     <WorkspaceProvider initialBreadcrumbs={[]}>
-      <div
-        className="w-full h-screen flex flex-col flex-1 overflow-hidden bg-slate-50"
-        id="workspace-layout"
+      <main
+        className="container mx-auto p-0 flex-1 w-full h-screen flex flex-col overflow-hidden bg-slate-50"
+        style={{ maxWidth: "1920px" }}
       >
         {/* Top header */}
         <Nav />
@@ -86,7 +79,7 @@ export default function WorkspaceLayoutClient({
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </WorkspaceProvider>
   );
 }
