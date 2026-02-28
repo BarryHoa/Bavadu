@@ -2,6 +2,7 @@
 
 import type { Permission } from "@base/client/services/RoleService";
 
+import { groupBy } from "lodash";
 import { useTranslations } from "next-intl";
 import { useCallback, useId, useMemo } from "react";
 
@@ -15,31 +16,11 @@ import {
 
 type ResourcePermissions = Record<string, Permission>; // action -> permission
 type ModulePermissions = {
-  resources: Record<string, ResourcePermissions>; // resource -> actions
+  module: string;
+  resources: { resource: string; permissions: Permission[] }[];
   actions: string[]; // ordered union of actions in this module
 };
-type GroupedPermissions = Record<string, ModulePermissions>; // module -> permissions
-
-/** Group permissions by module → resource → action (plain objects for simplicity) */
-function groupPermissions(permissions: Permission[]): GroupedPermissions {
-  const byModule: GroupedPermissions = {};
-
-  for (const p of permissions) {
-    const module = (byModule[p.module] ??= {
-      resources: {},
-      actions: [],
-    });
-
-    const resource = (module.resources[p.resource] ??= {});
-    resource[p.action] = p;
-
-    if (!module.actions.includes(p.action)) {
-      module.actions.push(p.action);
-    }
-  }
-
-  return byModule;
-}
+type GroupedPermissions = ModulePermissions[]; // module -> permissions
 
 const ACTION_ORDER = [
   "view",
@@ -51,6 +32,46 @@ const ACTION_ORDER = [
   "import",
   "approve",
 ];
+const MODULE_ORDER = {
+  base: 0,
+  hrm: 1,
+  products: 2,
+  "b2b-sales": 3,
+  "b2c-sales": 4,
+  purchase: 5,
+  stock: 6,
+  other: 7,
+  report: 8,
+};
+
+/** Group permissions by module → resource → action (plain objects for simplicity) */
+function groupPermissions(permissions: Permission[]): GroupedPermissions {
+  const grouped = groupBy(permissions, "module");
+
+  return Object.entries(grouped)
+    .sort((a, b) => {
+      return (
+        MODULE_ORDER[a[0] as keyof typeof MODULE_ORDER] -
+        MODULE_ORDER[b[0] as keyof typeof MODULE_ORDER]
+      );
+    })
+    .map(([moduleKey, permissions]) => {
+      return {
+        module: moduleKey,
+        resources: Object.entries(groupBy(permissions, "resource")).map(
+          ([resourceKey, permissions]) => {
+            return {
+              resource: resourceKey,
+              permissions: permissions as unknown as Permission[],
+            };
+          },
+        ),
+        actions: Array.from(
+          new Set(permissions.map((p) => p.action)),
+        ) as unknown as string[],
+      };
+    });
+}
 
 /** Get ordered actions for a module - known actions first, then any extras */
 function getOrderedActions(actions: string[]): string[] {
@@ -99,6 +120,10 @@ export default function RolePermissionMatrix({
 
   const grouped = useMemo(() => groupPermissions(permissions), [permissions]);
 
+  console.log({
+    grouped,
+  });
+
   const togglePermission = useCallback(
     (perm: Permission, checked: boolean) => {
       const next = new Set(selectedIds);
@@ -115,14 +140,12 @@ export default function RolePermissionMatrix({
 
   const toggleResource = useCallback(
     (moduleKey: string, resourceKey: string, checked: boolean) => {
-      const module = grouped[moduleKey];
-      if (!module) return;
-      const byAction = module.resources[resourceKey];
-      if (!byAction) return;
-
+      const allPermissions = permissions.filter(
+        (p) => p.module === moduleKey && p.resource === resourceKey,
+      );
       const next = new Set(selectedIds);
-      const perms: Permission[] = Object.values(byAction);
-      for (const perm of perms) {
+
+      for (const perm of allPermissions) {
         if (checked) {
           next.add(perm.id);
         } else {
@@ -131,29 +154,24 @@ export default function RolePermissionMatrix({
       }
       onSelectionChange(next);
     },
-    [grouped, selectedIds, onSelectionChange],
+    [permissions, selectedIds, onSelectionChange],
   );
 
   const toggleModule = useCallback(
     (moduleKey: string, checked: boolean) => {
-      const module = grouped[moduleKey];
-      if (!module) return;
+      const allPermissions = permissions.filter((p) => p.module === moduleKey);
       const next = new Set(selectedIds);
 
-      const resources = Object.values(module.resources);
-      for (const byAction of resources) {
-        const perms: Permission[] = Object.values(byAction);
-        for (const perm of perms) {
-          if (checked) {
-            next.add(perm.id);
-          } else {
-            next.delete(perm.id);
-          }
+      for (const perm of allPermissions) {
+        if (checked) {
+          next.add(perm.id);
+        } else {
+          next.delete(perm.id);
         }
       }
       onSelectionChange(next);
     },
-    [grouped, selectedIds, onSelectionChange],
+    [permissions, selectedIds, onSelectionChange],
   );
 
   const selectAll = useCallback(() => {
@@ -229,15 +247,23 @@ export default function RolePermissionMatrix({
         }}
         selectionMode="multiple"
       >
-        {Object.entries(grouped).map(([moduleKey, module]) => {
-          const modulePerms: Permission[] = Object.values(
-            module.resources,
-          ).flatMap((byAction) => Object.values(byAction));
-          const moduleActions = getOrderedActions(module.actions);
-          const moduleSelectedCount = modulePerms.filter((p) =>
-            selectedIds.has(p.id),
+        {grouped.map((mdl: ModulePermissions) => {
+          const { module: moduleKey, resources, actions } = mdl ?? {};
+          const moduleActions = getOrderedActions(actions);
+
+          const permissionsInModule: Permission[] =
+            resources?.flatMap((r) => r.permissions) ?? [];
+
+          const totalPermissionsInModule = permissionsInModule?.length ?? 0;
+          const totalActions = moduleActions?.length ?? 0;
+          const totalPermissionsInModuleSelected = permissionsInModule.filter(
+            (p) => selectedIds.has(p.id),
           ).length;
-          const moduleAllSelected = moduleSelectedCount === modulePerms.length;
+
+          const templateColumns = `200px repeat(${totalActions}, 80px)`;
+
+          const isAllPermissionsChecked =
+            totalPermissionsInModuleSelected === totalPermissionsInModule;
           const isAdminModule = adminModules?.[moduleKey] === true;
 
           return (
@@ -254,7 +280,8 @@ export default function RolePermissionMatrix({
                       {formatLabel(moduleKey)}
                     </span>
                     <span className="shrink-0 text-xs tabular-nums text-default-500">
-                      {moduleSelectedCount}/{modulePerms.length}
+                      {totalPermissionsInModuleSelected}/
+                      {totalPermissionsInModule}
                     </span>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
@@ -269,6 +296,7 @@ export default function RolePermissionMatrix({
                           ...(adminModules ?? {}),
                           [moduleKey]: checked,
                         };
+
                         onAdminModulesChange(next);
                         if (checked) {
                           toggleModule(moduleKey, true);
@@ -282,7 +310,7 @@ export default function RolePermissionMatrix({
                     <IBaseSwitch
                       aria-label={t("selectAllInModule")}
                       isDisabled={isAdminModule}
-                      isSelected={moduleAllSelected}
+                      isSelected={isAllPermissionsChecked}
                       size="sm"
                       onValueChange={(checked) =>
                         toggleModule(moduleKey, checked)
@@ -295,114 +323,112 @@ export default function RolePermissionMatrix({
                 </div>
               }
             >
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[420px] text-sm">
-                  <thead>
-                    <tr className="border-b border-default-200">
-                      <th
-                        className="px-3 py-3 text-left text-sm font-semibold text-default-700"
-                        scope="col"
-                      >
-                        {t("resource")}
-                      </th>
-                      {moduleActions.map((action) => (
-                        <th
-                          key={action}
-                          className="px-2 py-3 text-center text-sm font-semibold text-default-600"
-                          scope="col"
-                        >
-                          {getActionLabel(t, action)}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Object.entries(module.resources).map(
-                      ([resourceKey, byAction]) => {
-                        const resourcePerms: Permission[] =
-                          Object.values(byAction);
-                        const resourceSelectedCount = resourcePerms.filter(
-                          (p) => selectedIds.has(p.id),
-                        ).length;
-                        const resourceAllSelected =
-                          resourceSelectedCount === resourcePerms.length;
-                        const resourceIndeterminate =
-                          resourceSelectedCount > 0 && !resourceAllSelected;
+              <div className="flex min-w-[420px] flex-col text-sm">
+                {/* Header row */}
+                <div
+                  className="grid w-full border-b border-default-200 mb-2"
+                  style={{
+                    gridTemplateColumns: templateColumns,
+                  }}
+                >
+                  <div className="px-3 py-3 text-left text-sm font-semibold text-default-700">
+                    {t("resource")}
+                  </div>
+                  {moduleActions.map((action) => (
+                    <div
+                      key={action}
+                      className="flex justify-center items-center text-left text-sm font-semibold text-default-600"
+                    >
+                      {getActionLabel(t, action)}
+                    </div>
+                  ))}
+                </div>
+                {/* Data rows */}
+                {resources.map((resourceItem) => {
+                  const { resource: resourceKey, permissions: resourcePerms } =
+                    resourceItem;
 
-                        const resourceLabel = formatLabel(resourceKey);
-                        const resourceCheckboxId = `${fieldsetId}-${moduleKey}-${resourceKey}`;
+                  const resourceLabel = formatLabel(resourceKey);
+                  const resourceCheckboxId = `${fieldsetId}-${moduleKey}-${resourceKey}`;
+
+                  const totalPermissionsInResource = resourcePerms?.length ?? 0;
+                  const totalPermissionsInResourceSelected =
+                    resourcePerms?.filter((p) => selectedIds.has(p.id))
+                      .length ?? 0;
+                  const isAllPermissionsChecked =
+                    totalPermissionsInResourceSelected ===
+                    totalPermissionsInResource;
+                  const isIndeterminate =
+                    !isAllPermissionsChecked &&
+                    totalPermissionsInResourceSelected > 0;
+
+                  return (
+                    <div
+                      key={resourceKey}
+                      className="grid w-full border-b border-default-100 last:border-b-0 hover:bg-default-50/50"
+                      style={{
+                        gridTemplateColumns: templateColumns,
+                      }}
+                    >
+                      <div className=" px-3 py-1">
+                        <label
+                          className="flex  cursor-pointer pr-1"
+                          htmlFor={resourceCheckboxId}
+                        >
+                          <IBaseCheckbox
+                            aria-label={`${t("resource")}: ${resourceLabel}`}
+                            id={resourceCheckboxId}
+                            isDisabled={isAdminModule}
+                            isIndeterminate={isIndeterminate}
+                            isSelected={isAllPermissionsChecked}
+                            onValueChange={(checked) =>
+                              toggleResource(moduleKey, resourceKey, !!checked)
+                            }
+                          />
+                          <span className="font-medium text-default-800">
+                            {resourceLabel}
+                          </span>
+                        </label>
+                      </div>
+                      {moduleActions.map((action) => {
+                        const perm = resourcePerms?.find(
+                          (p) => p.action === action,
+                        );
+
+                        if (!perm) {
+                          return (
+                            <div
+                              key={action}
+                              className="flex justify-center items-center"
+                            >
+                              —
+                            </div>
+                          );
+                        }
+
+                        const isChecked = selectedIds.has(perm.id);
+                        const actionCheckboxId = `${fieldsetId}-${perm.id}`;
 
                         return (
-                          <tr
-                            key={resourceKey}
-                            className="min-h-[44px] border-b border-default-100 last:border-0 hover:bg-default-50/50"
-                          >
-                            <td className="px-3 py-3">
-                              <label
-                                className="flex min-h-[44px] cursor-pointer items-center gap-3 py-1"
-                                htmlFor={resourceCheckboxId}
-                              >
-                                <IBaseCheckbox
-                                  aria-label={`${t("resource")}: ${resourceLabel}`}
-                                  id={resourceCheckboxId}
-                                  isDisabled={isAdminModule}
-                                  isIndeterminate={resourceIndeterminate}
-                                  isSelected={resourceAllSelected}
-                                  onValueChange={(checked) =>
-                                    toggleResource(
-                                      moduleKey,
-                                      resourceKey,
-                                      !!checked,
-                                    )
-                                  }
-                                />
-                                <span className="font-medium text-default-800">
-                                  {resourceLabel}
-                                </span>
-                              </label>
-                            </td>
-                            {moduleActions.map((action) => {
-                              const perm = byAction[action];
-
-                              if (!perm) {
-                                return (
-                                  <td
-                                    key={action}
-                                    className="min-h-[44px] px-2 py-3 text-center"
-                                  >
-                                    —
-                                  </td>
-                                );
+                          <div key={action} className="flex justify-center">
+                            <IBaseCheckbox
+                              aria-label={`${resourceLabel} - ${getActionLabel(t, action)}`}
+                              classNames={{
+                                wrapper: "m-0 p-0",
+                              }}
+                              id={actionCheckboxId}
+                              isDisabled={isAdminModule}
+                              isSelected={isChecked}
+                              onValueChange={(checked) =>
+                                togglePermission(perm, !!checked)
                               }
-
-                              const isChecked = selectedIds.has(perm.id);
-                              const actionCheckboxId = `${fieldsetId}-${perm.id}`;
-
-                              return (
-                                <td
-                                  key={action}
-                                  className="px-2 py-3 text-center align-middle"
-                                >
-                                  <div className="flex min-h-[44px] min-w-[44px] items-center justify-center">
-                                    <IBaseCheckbox
-                                      aria-label={`${resourceLabel} - ${getActionLabel(t, action)}`}
-                                      id={actionCheckboxId}
-                                      isDisabled={isAdminModule}
-                                      isSelected={isChecked}
-                                      onValueChange={(checked) =>
-                                        togglePermission(perm, !!checked)
-                                      }
-                                    />
-                                  </div>
-                                </td>
-                              );
-                            })}
-                          </tr>
+                            />
+                          </div>
                         );
-                      },
-                    )}
-                  </tbody>
-                </table>
+                      })}
+                    </div>
+                  );
+                })}
               </div>
             </IBaseAccordionItem>
           );
