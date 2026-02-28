@@ -60,11 +60,16 @@ async function handleApiRoute(
   pathname: string,
   nextHeaders: Headers,
 ): Promise<NextResponse | null> {
-  // 1. Rate Limiting
-  const rateLimitResponse = await checkRateLimit(req, pathname);
+  const isDev = process.env.NODE_ENV === "development";
 
-  if (rateLimitResponse) {
-    return addSecurityHeaders(rateLimitResponse);
+  if (!isDev) {
+    // 1. Rate Limiting
+    // Only check rate limit in production
+    const rateLimitResponse = await checkRateLimit(req, pathname);
+
+    if (rateLimitResponse) {
+      return addSecurityHeaders(rateLimitResponse);
+    }
   }
 
   // 2. CSRF Protection (skip for public routes and GET requests)

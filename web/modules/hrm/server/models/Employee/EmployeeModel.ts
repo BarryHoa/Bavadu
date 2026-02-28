@@ -4,6 +4,7 @@ import { alias } from "drizzle-orm/pg-core";
 import { BaseModel } from "@base/server/models/BaseModel";
 import { base_tb_users } from "@base/server/schemas/base.user";
 
+import { JSON_RPC_ERROR_CODES, JsonRpcError } from "@/module-base/server/rpc";
 import { hrm_tb_employees } from "../../schemas";
 import { hrm_tb_departments } from "../../schemas/hrm.department";
 import { hrm_tb_positions } from "../../schemas/hrm.position";
@@ -13,10 +14,12 @@ const position = alias(hrm_tb_positions, "position");
 
 export interface EmployeeRow {
   employeeId: string;
-  userId: string;
+  id: string;
   employeeCode: string;
   firstName: string;
   lastName: string;
+  emails: string[] | null;
+  phones: string[] | null;
   nationalId: string | null;
   taxId: string | null;
   position: { id: string; name: string };
@@ -43,7 +46,7 @@ export default class EmployeeModel extends BaseModel<typeof base_tb_users> {
   private selectShape = () => ({
     employeeId: hrm_tb_employees.id,
     code: hrm_tb_employees.code,
-    userId: this.table.id,
+    id: this.table.id,
     firstName: this.table.firstName,
     lastName: this.table.lastName,
     nationalId: hrm_tb_employees.nationalId,
@@ -53,19 +56,13 @@ export default class EmployeeModel extends BaseModel<typeof base_tb_users> {
     dateOfBirth: this.table.dateOfBirth,
     gender: this.table.gender,
     address: this.table.address,
-    position: {
-      id: hrm_tb_positions.id,
-      name: hrm_tb_positions.name,
-    },
-    department: {
-      id: hrm_tb_departments.id,
-      name: hrm_tb_departments.name,
-    },
-    manager: {
-      id: hrm_tb_employees.managerId,
-      firstName: base_tb_users.firstName,
-      lastName: base_tb_users.lastName,
-    },
+    positionId: hrm_tb_employees.positionId,
+    positionName: position.name,
+    departmentId: hrm_tb_employees.departmentId,
+    departmentName: department.name,
+    managerId: hrm_tb_employees.managerId,
+    managerFirstName: base_tb_users.firstName,
+    managerLastName: base_tb_users.lastName,
     type: hrm_tb_employees.type,
     hireDate: hrm_tb_employees.hireDate,
     probationEndDate: hrm_tb_employees.probationEndDate,
@@ -84,24 +81,32 @@ export default class EmployeeModel extends BaseModel<typeof base_tb_users> {
       .from(this.table)
       .leftJoin(hrm_tb_employees, eq(this.table.id, hrm_tb_employees.userId))
       .leftJoin(position, eq(hrm_tb_employees.positionId, position.id))
-      .leftJoin(department, eq(hrm_tb_employees.departmentId, department.id))
-      .leftJoin(
-        base_tb_users,
-        eq(hrm_tb_employees.managerId, base_tb_users.id),
-      );
+      .leftJoin(department, eq(hrm_tb_employees.departmentId, department.id));
 
   private mapRow(r: any): EmployeeRow {
     return {
       employeeId: r.employeeId,
-      userId: r.userId,
-      employeeCode: r.employeeCode,
+      id: r.id,
+      employeeCode: r.code,
       firstName: r.firstName,
       lastName: r.lastName,
+      emails: r.emails,
+      phones: r.phones,
       nationalId: r.nationalId,
       taxId: r.taxId,
-      position: r.position,
-      department: r.department,
-      manager: r.manager,
+      position: {
+        id: r.positionId,
+        name: r.positionName,
+      },
+      department: {
+        id: r.departmentId,
+        name: r.departmentName,
+      },
+      manager: {
+        id: r.managerId,
+        firstName: r.managerFirstName,
+        lastName: r.managerLastName,
+      },
       status: r.status,
       type: r.type,
       hireDate: r.hireDate,
@@ -122,7 +127,15 @@ export default class EmployeeModel extends BaseModel<typeof base_tb_users> {
     return row ? this.mapRow(row) : null;
   };
 
-  getDataByUserId = (params: { userId: string }) => {
-    return this.getOne(eq(this.table.id, params.userId));
+  getDataByUserId = (params: { id?: string }) => {
+    const userId = params.id;
+    console.log("userId", userId);
+    if (!userId) {
+      throw new JsonRpcError(
+        JSON_RPC_ERROR_CODES.RESOURCE_NOT_FOUND,
+        "Employee not found",
+      );
+    }
+    return this.getOne(eq(this.table.id, userId));
   };
 }

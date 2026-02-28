@@ -5,8 +5,8 @@ import { useEffect } from "react";
 
 import userService from "@base/client/services/UserService";
 import {
+  getPermissionsStoreState,
   PERMISSION_BROADCAST_CHANNEL,
-  usePermissionsStore,
 } from "@base/client/stores/permission-store";
 
 /**
@@ -25,7 +25,7 @@ export function PermissionBroadcastListener() {
       const type = event.data?.type;
 
       if (type === "clear") {
-        usePermissionsStore.getState().clearPermissions();
+        getPermissionsStoreState().clearPermissions();
         // Tab khác (không phải tab đang bấm logout): thử đóng. Trình duyệt chỉ cho đóng tab mở bằng JS (window.open).
         // Nếu không đóng được, sau 200ms fallback: redirect về login để không giữ trang cũ.
         if (typeof window !== "undefined") {
@@ -48,7 +48,7 @@ export function PermissionBroadcastListener() {
           })
           .then((res) => {
             if (res?.data) {
-              usePermissionsStore.getState().setPermissions(res.data);
+              getPermissionsStoreState().setPermissions(res.data);
               // Tab khác (vd đang mở /login) → chuyển về trang mặc định để refresh vào app
               if (
                 typeof window !== "undefined" &&

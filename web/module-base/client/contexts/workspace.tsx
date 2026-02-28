@@ -2,7 +2,13 @@
 
 import type { BreadcrumbItem } from "../layouts/workspace/components/Breadcrumb";
 
-import React, { createContext, useContext, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useRef,
+  useState,
+} from "react";
 
 export interface WorkspaceState {
   currentModule: string | null;
@@ -48,43 +54,49 @@ export function WorkspaceProvider({
   initialState?: Partial<WorkspaceState>;
   initialBreadcrumbs?: BreadcrumbItem[];
 }) {
+  const initialBreadcrumbsRef = useRef(initialBreadcrumbs);
+  initialBreadcrumbsRef.current = initialBreadcrumbs;
+
   const [state, setState] = useState<WorkspaceState>({
     ...defaultWorkspaceState,
     ...initialState,
     breadcrumbs: initialBreadcrumbs || [],
   });
 
-  const setCurrentModule = (module: string | null) => {
+  const setCurrentModule = useCallback((module: string | null) => {
     setState((prev) => ({ ...prev, currentModule: module }));
-  };
+  }, []);
 
-  const setActiveMenu = (menu: string | null) => {
+  const setActiveMenu = useCallback((menu: string | null) => {
     setState((prev) => ({ ...prev, activeMenu: menu }));
-  };
+  }, []);
 
-  const setSidebarOpen = (open: boolean) => {
+  const setSidebarOpen = useCallback((open: boolean) => {
     setState((prev) => ({ ...prev, sidebarOpen: open }));
-  };
+  }, []);
 
-  const setLoading = (loading: boolean) => {
+  const setLoading = useCallback((loading: boolean) => {
     setState((prev) => ({ ...prev, loading }));
-  };
+  }, []);
 
-  const setError = (error: string | null) => {
+  const setError = useCallback((error: string | null) => {
     setState((prev) => ({ ...prev, error }));
-  };
+  }, []);
 
-  const setBreadcrumbs = (items: BreadcrumbItem[]) => {
+  const setBreadcrumbs = useCallback((items: BreadcrumbItem[]) => {
     setState((prev) => ({ ...prev, breadcrumbs: items }));
-  };
+  }, []);
 
-  const resetWorkspace = () => {
+  const resetWorkspace = useCallback(() => {
     setState(defaultWorkspaceState);
-  };
+  }, []);
 
-  const resetBreadcrumbs = () => {
-    setState((prev) => ({ ...prev, breadcrumbs: initialBreadcrumbs || [] }));
-  };
+  const resetBreadcrumbs = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      breadcrumbs: initialBreadcrumbsRef.current || [],
+    }));
+  }, []);
 
   // React Compiler will automatically optimize this object creation
   const value = {

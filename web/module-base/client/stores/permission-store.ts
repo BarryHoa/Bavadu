@@ -1,10 +1,9 @@
 "use client";
 
-import { create } from "zustand";
+import type { CreateStoreReturn } from "@base/client/stores/create-store";
+import { createStore } from "@base/client/stores/create-store";
 
-import type { AuthUser } from "@base/client/services/UserService";
-
-/** BroadcastChannel name for cross-tab sync (logout/ login in another tab) */
+/** BroadcastChannel name for cross-tab sync (logout / login in another tab) */
 export const PERMISSION_BROADCAST_CHANNEL = "bavadu:permissions";
 
 function broadcast(type: "clear" | "refresh") {
@@ -17,95 +16,70 @@ function broadcast(type: "clear" | "refresh") {
 }
 
 export interface PermissionStatePayload {
-  user: AuthUser | null;
   roleCodes: string[];
-  permissions: string[];
+  permissions: Set<string>;
   isGlobalAdmin: boolean;
+  adminModules?: Set<string>;
 }
 
-interface PermissionState {
-  user: AuthUser | null;
-  roleCodes: string[];
-  permissions: string[];
-  isGlobalAdmin: boolean;
+/** Store state: only data + set/clear. No check logic here. */
+export interface PermissionStoreState extends PermissionStatePayload {
   setPermissions: (payload: PermissionStatePayload) => void;
   clearPermissions: () => void;
-  hasPermission: (permission: string) => boolean;
-  hasAnyPermission: (permissions: string[]) => boolean;
-  hasAllPermissions: (permissions: string[]) => boolean;
 }
 
-/**
- * Check permission with wildcards (same logic as server):
- * - required (e.g. hrm.employee.view) = exact permission
- * - feature wildcard (e.g. hrm.employee.*) = any permission of feature
- * - module wildcard (e.g. hrm.*) = any permission of module
- */
-function hasPermissionWithWildcards(
-  userPermissions: string[],
-  required: string,
-): boolean {
-  const set = new Set(userPermissions);
-  if (set.has(required)) return true;
-  const parts = required.split(".");
-
-  if (parts.length >= 2) {
-    const moduleWildcard = `${parts[0]}.*`;
-    if (set.has(moduleWildcard)) return true;
-  }
-  if (parts.length >= 3) {
-    const featureWildcard = `${parts[0]}.${parts[1]}.*`;
-    if (set.has(featureWildcard)) return true;
-  }
-
-  return false;
-}
-
-const initialState = {
-  user: null as AuthUser | null,
-  roleCodes: [] as string[],
-  permissions: [] as string[],
+const initialState: PermissionStatePayload = {
+  roleCodes: [],
+  permissions: new Set(),
   isGlobalAdmin: false,
+  adminModules: new Set<string>(),
 };
 
-export const usePermissionsStore = create<PermissionState>((set, get) => ({
-  ...initialState,
+/** Permission data store (createStore pattern, key in root-store) */
+const permissionDataStore: CreateStoreReturn<PermissionStatePayload> =
+  createStore({
+    key: "permissions",
+    init: initialState,
+  });
 
-  setPermissions: (payload: PermissionStatePayload) => {
-    set({
-      user: payload.user,
-      roleCodes: payload.roleCodes ?? [],
-      permissions: payload.permissions ?? [],
-      isGlobalAdmin: payload.isGlobalAdmin ?? false,
-    });
-  },
+/**
+ * Subscribe to permission store (data only).
+ * Use with selector: usePermissionsStore((s) => s.user)
+ * Or without selector: usePermissionsStore() for full state
+ */
+export function usePermissionsStore(): PermissionStoreState;
+export function usePermissionsStore<R>(
+  selector: (state: PermissionStoreState) => R,
+): R;
+export function usePermissionsStore<R>(
+  selector?: (state: PermissionStoreState) => R,
+): R | PermissionStoreState {
+  const data = permissionDataStore.useSelector((d) => d);
+  const store = permissionDataStore;
 
-  clearPermissions: () => {
-    set(initialState);
-  },
+  const state: PermissionStoreState = {
+    ...data,
+    setPermissions: (payload: PermissionStatePayload) =>
+      store.setValue(payload),
+    clearPermissions: () => store.clearValue(),
+  };
 
-  hasPermission: (permission: string) => {
-    const { permissions, isGlobalAdmin } = get();
-    if (isGlobalAdmin) return true;
-    return hasPermissionWithWildcards(permissions, permission);
-  },
+  if (selector) return selector(state) as R;
+  return state;
+}
 
-  hasAnyPermission: (permissions: string[]) => {
-    const state = get();
-    if (state.isGlobalAdmin) return true;
-    return permissions.some((p) =>
-      hasPermissionWithWildcards(state.permissions, p),
-    );
-  },
+/** Direct access without subscription (e.g. after login, in Nav, listener) */
+export function getPermissionsStoreState(): PermissionStoreState {
+  const data = permissionDataStore.getValue();
+  const store = permissionDataStore;
 
-  hasAllPermissions: (permissions: string[]) => {
-    const state = get();
-    if (state.isGlobalAdmin) return true;
-    return permissions.every((p) =>
-      hasPermissionWithWildcards(state.permissions, p),
-    );
-  },
-}));
+  return {
+    ...data,
+    setPermissions: (payload: PermissionStatePayload) =>
+      store.setValue(payload),
+    clearPermissions: () => store.clearValue(),
+  };
+}
 
 /** Notify other tabs to clear permissions (call after logout in current tab) */
 export function broadcastPermissionsClear() {

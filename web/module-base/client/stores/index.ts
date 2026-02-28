@@ -16,8 +16,10 @@ export { useMessagesStore } from "./messages-store";
 export {
   broadcastPermissionsClear,
   broadcastPermissionsRefresh,
+  getPermissionsStoreState,
   usePermissionsStore,
   type PermissionStatePayload,
+  type PermissionStoreState,
 } from "./permission-store";
 
 // Create store factory

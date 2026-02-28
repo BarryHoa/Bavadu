@@ -1,13 +1,11 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { Pencil } from "lucide-react";
-import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 
-import { employeeService } from "@mdl/hrm/client/services/EmployeeService";
-import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
 import {
   IBaseButton,
   IBaseCard,
@@ -15,6 +13,8 @@ import {
   IBasePageLayout,
   IBaseSpinner,
 } from "@base/client";
+import { useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
+import { employeeService } from "@mdl/hrm/client/services/EmployeeService";
 
 const EMPLOYEES_LIST_PATH = "/workspace/modules/hrm/employees";
 
@@ -35,34 +35,25 @@ export default function EmployeeViewPage(): React.ReactNode {
   } = useQuery({
     queryKey: ["hrm-employee", id],
     queryFn: async () => {
-      const response = await employeeService.getById(id);
-
-      if (!response.data) {
-        throw new Error(response.message ?? "Employee not found");
-      }
-
-      return response.data;
+      return employeeService.getById(id);
     },
     enabled: !!id,
   });
 
+  const employeeName = employee
+    ? `${getLocalizedText(employee.firstName as any)} ${getLocalizedText(employee.lastName as any)}`
+    : "";
+  const editPath = `${EMPLOYEES_LIST_PATH}/edit/${id}`;
+
   const breadcrumbs = useMemo(
     () =>
       employee
-        ? [
-            { label: tTitle("title"), href: EMPLOYEES_LIST_PATH },
-            {
-              label:
-                getLocalizedText(employee.fullName as any) ||
-                employee.employeeCode,
-              href: `${EMPLOYEES_LIST_PATH}/view/${id}`,
-            },
-          ]
+        ? [{ label: tTitle("title"), href: EMPLOYEES_LIST_PATH }]
         : [
             { label: tTitle("title"), href: EMPLOYEES_LIST_PATH },
             { label: isLoading ? "..." : "Employee" },
           ],
-    [employee, id, isLoading, tTitle, getLocalizedText],
+    [employee, id, isLoading],
   );
 
   useSetBreadcrumbs(breadcrumbs);
@@ -93,10 +84,6 @@ export default function EmployeeViewPage(): React.ReactNode {
       </div>
     );
   }
-
-  const employeeName =
-    getLocalizedText(employee.fullName as any) || employee.employeeCode;
-  const editPath = `${EMPLOYEES_LIST_PATH}/edit/${id}`;
 
   return (
     <IBasePageLayout
@@ -135,16 +122,14 @@ export default function EmployeeViewPage(): React.ReactNode {
               <dt className="text-sm font-medium text-default-500">
                 {t("fullName")}
               </dt>
-              <dd className="mt-1 text-base text-foreground">
-                {employeeName}
-              </dd>
+              <dd className="mt-1 text-base text-foreground">{employeeName}</dd>
             </div>
             <div>
               <dt className="text-sm font-medium text-default-500">
                 {t("email")}
               </dt>
               <dd className="mt-1 text-base text-foreground">
-                {employee.email || "—"}
+                {employee.emails?.join(", ") || "—"}
               </dd>
             </div>
             <div>
@@ -152,7 +137,7 @@ export default function EmployeeViewPage(): React.ReactNode {
                 {t("phone")}
               </dt>
               <dd className="mt-1 text-base text-foreground">
-                {employee.phone || "—"}
+                {employee.phones?.join(", ") || "—"}
               </dd>
             </div>
           </dl>
@@ -196,7 +181,7 @@ export default function EmployeeViewPage(): React.ReactNode {
                 {t("employmentStatus")}
               </dt>
               <dd className="mt-1 text-base text-foreground">
-                {employee.employmentStatus || "—"}
+                {employee.status || "—"}
               </dd>
             </div>
           </dl>

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import userService from "@base/client/services/UserService";
-import { usePermissionsStore } from "@base/client/stores";
+import { getPermissionsStoreState } from "@base/client/stores";
 
 export interface CurrentUserCapabilities {
   /** Có thể xem chi tiết (mặc định true cho mọi user đã đăng nhập) */
@@ -29,7 +29,7 @@ export function useCurrentUserCapabilities(): CurrentUserCapabilities {
   // Sync permissions to store when data is loaded (e.g. already logged in)
   useEffect(() => {
     if (data?.data) {
-      usePermissionsStore.getState().setPermissions(data.data);
+      getPermissionsStoreState().setPermissions(data.data);
     }
   }, [data?.data]);
 

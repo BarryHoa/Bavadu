@@ -144,11 +144,9 @@ export default function EmployeesListPage(): React.ReactNode {
       label: tDataTable("columns.action"),
       align: "end",
       render: (_, row) => {
-        if (!row?.id) return null;
-
         return (
           <EmployeeActionMenu
-            row={row}
+            row={row as any}
             onPermissionChange={handlePermissionChange}
           />
         );

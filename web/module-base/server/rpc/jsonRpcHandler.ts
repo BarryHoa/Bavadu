@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { omit } from "lodash";
 import { UserPermissionModel } from "../models/UserPermission";
 import { RuntimeContext } from "../runtime/RuntimeContext";
 import { logHttp } from "../utils/security-logger";
@@ -266,12 +267,32 @@ export class JsonRpcHandler {
       return this.createSuccessResponse(result, request.id);
     } catch (error) {
       // normalize error
+
+      const errorCode =
+        (error as JsonRpcError)?.code ?? JSON_RPC_ERROR_CODES.INTERNAL_ERROR;
+
+      let errorMessageOverride = (error as JsonRpcError)?.message;
+      let otherErrorData = omit(error as Record<string, unknown>, [
+        "code",
+        "message",
+        "data",
+      ]) as Record<string, unknown>;
+
+      // for production environment, override message to internal error
+      if (process.env.NODE_ENV !== "development") {
+        // Override message to internal error
+        if (errorCode === JSON_RPC_ERROR_CODES.INTERNAL_ERROR) {
+          errorMessageOverride = DEFAULT_ERROR_MESSAGES[errorCode];
+        }
+        // Override other error data -> set to empty
+        otherErrorData = {};
+      }
+
       const errorNormalized = {
-        code:
-          (error as JsonRpcError)?.code ?? JSON_RPC_ERROR_CODES.INTERNAL_ERROR,
-        message: (error as JsonRpcError)?.message ?? "Internal error",
+        code: errorCode,
+        message: errorMessageOverride,
         data: (error as JsonRpcError)?.data ?? undefined,
-        ...(error as Record<string, unknown>),
+        ...otherErrorData,
       } as JsonRpcError;
 
       logHttp(errorNormalized as Error);

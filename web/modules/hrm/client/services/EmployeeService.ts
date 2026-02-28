@@ -1,47 +1,30 @@
 import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
+/** Align with server EmployeeRow (EmployeeModel). */
 export interface EmployeeDto {
+  employeeId: string;
   id: string;
-  userId: string;
   employeeCode: string;
-  firstName?: string | null;
-  lastName?: string | null;
-  fullName?: unknown;
-  email?: string | null;
-  phone?: string | null;
-  dateOfBirth?: string | null;
-  gender?: string | null;
-  nationalId?: string | null;
-  taxId?: string | null;
-  address?: unknown;
-  positionId: string;
-  position?: {
-    id: string;
-    name?: unknown;
-  } | null;
-  departmentId: string;
-  department?: {
-    id: string;
-    name?: unknown;
-  } | null;
-  managerId?: string | null;
-  manager?: {
-    id: string;
-    employeeCode?: string;
-    fullName?: unknown;
-  } | null;
-  employmentStatus: string;
-  employmentType?: string | null;
-  hireDate?: string | null;
-  probationEndDate?: string | null;
-  bankAccount?: string | null;
-  bankName?: string | null;
-  bankBranch?: string | null;
-  emergencyContactName?: string | null;
-  emergencyContactPhone?: string | null;
-  isActive?: boolean;
-  createdAt?: number;
-  updatedAt?: number;
+  firstName: string;
+  lastName: string;
+  emails?: string[] | null;
+  phones?: string[] | null;
+  nationalId: string | null;
+  taxId: string | null;
+  position: { id: string; name: string };
+  department: { id: string; name: string };
+  manager: { id: string; firstName: string; lastName: string };
+  status: string;
+  type: string;
+  hireDate: string;
+  probationEndDate: string;
+  bankAccount: string;
+  bankName: string;
+  bankBranch: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 /** HR-only + userId for create. Personal data (name, email, etc.) lives on user. */
@@ -96,17 +79,7 @@ export default class EmployeeService extends JsonRpcClientService {
   }
 
   getById(id: string) {
-    return this.call<{
-      data: EmployeeDto;
-      message?: string;
-    }>("employee.curd.getById", { id });
-  }
-
-  getByUserId(userId: string) {
-    return this.call<{
-      data: EmployeeDto | null;
-      message?: string;
-    }>("employee.curd.getByUserId", { userId });
+    return this.call<EmployeeDto>("employee.curd.getDataByUserId", { id });
   }
 
   create(payload: EmployeeCreatePayload) {

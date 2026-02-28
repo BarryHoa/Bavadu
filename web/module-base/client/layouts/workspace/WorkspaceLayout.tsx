@@ -10,6 +10,7 @@ import UserPermissionModel from "@base/server/models/UserPermission/UserPermissi
 import { getModuleNames } from "@base/server/utils/get-module-names";
 
 import { MenuWorkspaceElement } from "../../interface/WorkspaceMenuInterface";
+import { getPermissionsStoreState } from "../../stores/permission-store";
 
 // i18n is provided at module level layouts to avoid loading all messages here
 
@@ -29,14 +30,26 @@ export default async function WorkspaceLayout({
     try {
       const userPermissionModel = new UserPermissionModel();
 
-      const { permissions, isGlobalAdmin, adminModules } =
+      const userPermissionResult =
         await userPermissionModel.getPermissionsByUser(userId);
+
+      // Set permissions to store
+      getPermissionsStoreState().setPermissions({
+        roleCodes: userPermissionResult.roles.map((role) => role.code),
+        permissions: userPermissionResult.permissions,
+        isGlobalAdmin: userPermissionResult.isGlobalAdmin ?? false,
+        adminModules: userPermissionResult.adminModules
+          ? new Set(userPermissionResult.adminModules)
+          : undefined,
+      });
 
       menuItems = filterMenusByPermissions(
         menuItems as MenuWorkspaceElement[],
-        permissions,
-        isGlobalAdmin ?? false,
-        adminModules,
+        userPermissionResult.permissions,
+        userPermissionResult.isGlobalAdmin ?? false,
+        userPermissionResult.adminModules
+          ? new Set(userPermissionResult.adminModules)
+          : undefined,
       ) as MenuWorkspaceElement[];
     } catch {
       // If permission check fails, use unfiltered menu

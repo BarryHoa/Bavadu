@@ -28,7 +28,7 @@ import { useDisclosure } from "@base/client/hooks";
 import { AuthService } from "@base/client/services";
 import {
   broadcastPermissionsClear,
-  usePermissionsStore,
+  getPermissionsStoreState,
 } from "@base/client/stores";
 
 const DEFAULT_AVATAR = "/favicon/favicon-32x32.png";
@@ -54,7 +54,7 @@ export default function Nav() {
       setIsLoggingOut(true);
       closeLogoutConfirm();
       await authService.logout();
-      usePermissionsStore.getState().clearPermissions();
+      getPermissionsStoreState().clearPermissions();
       broadcastPermissionsClear(); // other tabs will redirect to login
       router.replace("/login");
       router.refresh();

@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 
 import { WorkspaceProvider } from "@base/client/contexts/workspace";
 import { usePrefetchModuleMessages } from "@base/client/hooks/usePrefetchModuleMessages";
-import { useSyncPermissionsOnInit } from "@base/client/hooks/useSyncPermissionsOnInit";
 import { MenuWorkspaceElement } from "@base/client/interface/WorkspaceMenuInterface";
 import Breadcrumb from "@base/client/layouts/workspace/components/Breadcrumb";
 import Content from "@base/client/layouts/workspace/components/Content";
@@ -32,9 +31,6 @@ export default function WorkspaceLayoutClient({
 
   // Prefetch messages for all other modules
   usePrefetchModuleMessages(allModuleNames, currentModule, locale);
-
-  // Sync permissions on init (authenticated layout) so store is ready even before any child uses useHasPermissions
-  useSyncPermissionsOnInit();
 
   useEffect(() => {
     const stored = window.localStorage.getItem("workspace_sidebar_pinned");

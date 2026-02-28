@@ -7,7 +7,8 @@ import { useCallback, useState } from "react";
 
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import { UserPermissionPopup } from "@base/client/components/UserPermissionPopup";
-import { useCurrentUserCapabilities } from "@base/client/hooks/useCurrentUserCapabilities";
+import { usePermission } from "@base/client/hooks/useHasPermissions";
+import { usePermissionsStore } from "@base/client/stores";
 
 /** Row shape from employee list (EmployeeViewListModel / list.getData) */
 export type EmployeeListRow = {
@@ -26,14 +27,24 @@ export interface EmployeeActionMenuProps {
   onPermissionChange?: () => void;
 }
 
+const EMPLOYEE_CREATE = "hrm.employee.create";
+const EMPLOYEE_UPDATE = "hrm.employee.update";
+
 export default function EmployeeActionMenu({
   row,
   onPermissionChange,
 }: EmployeeActionMenuProps) {
   const t = useTranslations("hrm.employee.list");
   const tPerm = useTranslations("userPermission");
-  const capabilities = useCurrentUserCapabilities();
+  const user = usePermissionsStore((s) => s.user);
+  const isGlobalAdmin = usePermissionsStore((s) => s.isGlobalAdmin);
+  const { hasPermission } = usePermission();
   const [permissionOpen, setPermissionOpen] = useState(false);
+
+  const canViewDetail = !!user;
+  const canCreateEdit =
+    hasPermission(EMPLOYEE_CREATE) || hasPermission(EMPLOYEE_UPDATE);
+  const canChangePermission = isGlobalAdmin;
 
   const displayName =
     typeof row.fullName === "string"
@@ -47,7 +58,7 @@ export default function EmployeeActionMenu({
   const actions = useCallback((): ActionItem[] => {
     const list: ActionItem[] = [];
 
-    if (capabilities.canViewDetail && row.id) {
+    if (canViewDetail && row.id) {
       list.push({
         key: "view",
         label: t("view"),
@@ -55,7 +66,7 @@ export default function EmployeeActionMenu({
       });
     }
 
-    if (capabilities.canCreateEdit && row.id) {
+    if (canCreateEdit && row.id) {
       list.push({
         key: "edit",
         label: t("edit"),
@@ -64,7 +75,7 @@ export default function EmployeeActionMenu({
     }
 
     if (
-      capabilities.canChangePermission &&
+      canChangePermission &&
       row.userId &&
       list.some((a) => a.key === "view")
     ) {
@@ -77,9 +88,9 @@ export default function EmployeeActionMenu({
 
     return list;
   }, [
-    capabilities.canViewDetail,
-    capabilities.canCreateEdit,
-    capabilities.canChangePermission,
+    canViewDetail,
+    canCreateEdit,
+    canChangePermission,
     row.id,
     row.userId,
     t,

@@ -1,17 +1,11 @@
 "use client";
 
 import { Eye, EyeOff } from "lucide-react";
-import IBaseImage from "next/image";
 import { useTranslations } from "next-intl";
+import IBaseImage from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
-import { AuthService } from "@base/client/services";
-import userService from "@base/client/services/UserService";
-import {
-  broadcastPermissionsRefresh,
-  usePermissionsStore,
-} from "@base/client/stores";
 import {
   IBaseButton,
   IBaseCard,
@@ -21,6 +15,9 @@ import {
   IBaseInput,
   IBaseLink,
 } from "@base/client/components";
+import { AuthService } from "@base/client/services";
+import userService from "@base/client/services/UserService";
+import { broadcastPermissionsRefresh } from "@base/client/stores";
 
 const DEFAULT_PAGE_AFTER_LOGIN = "/workspace/news";
 
@@ -61,13 +58,7 @@ export default function LoginPage() {
         rememberMe,
       });
 
-      // Get permissions and update store (like messages after login)
-      const res = await userService.getMeWithRoles();
-      if (res?.data) {
-        usePermissionsStore.getState().setPermissions(res.data);
-        broadcastPermissionsRefresh(); // notify other tabs to refetch
-      }
-
+      broadcastPermissionsRefresh(); // notify other tabs to refetch
       router.replace(DEFAULT_PAGE_AFTER_LOGIN);
       router.refresh();
     } catch (err) {
@@ -112,6 +103,7 @@ export default function LoginPage() {
               value={username}
               variant="bordered"
               onChange={(e) => setUsername(e.target.value)}
+              isDisabled={isLoading}
             />
 
             <IBaseInput
@@ -145,6 +137,7 @@ export default function LoginPage() {
               value={password}
               variant="bordered"
               onChange={(e) => setPassword(e.target.value)}
+              isDisabled={isLoading}
             />
 
             <div className="flex items-center justify-between">
