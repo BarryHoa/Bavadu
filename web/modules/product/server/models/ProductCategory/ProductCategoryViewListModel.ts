@@ -1,13 +1,14 @@
+import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/shared/interface/ListInterface";
-import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 import type { Column } from "drizzle-orm";
 
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
+import { PermissionRequired } from "@base/server/models/BaseModel";
 import {
   BaseViewListModel,
   type FilterConditionMap,
@@ -106,7 +107,10 @@ class ProductCategoryViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
-  @BaseViewListModel.Auth({ required: true, permissions: ["product.product-category.view"] })
+  @PermissionRequired({
+    auth: true,
+    permissions: ["product.product-category.view"],
+  })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<ProductCategoryRow>> => {

@@ -1,12 +1,13 @@
+import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/shared/interface/ListInterface";
-import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 import type { Column } from "drizzle-orm";
 
 import { ilike } from "drizzle-orm";
 
+import { PermissionRequired } from "@base/server/models/BaseModel";
 import {
   BaseViewListModel,
   type FilterConditionMap,
@@ -73,7 +74,7 @@ class CourseViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
-  @BaseViewListModel.Auth({ required: true, permissions: ["hrm.course.view"] })
+  @PermissionRequired({ auth: true, permissions: ["hrm.course.view"] })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<CourseRow>> => {

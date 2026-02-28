@@ -222,10 +222,9 @@ export default class EmployeeModel extends BaseModel<typeof hrm_tb_employees> {
     return row ? this.mapRow(row as DbRow) : null;
   };
 
-  getEmployeeById = (id: string) => this.getOne(eq(this.table.id, id));
-  getDataById = (params: { id: string }) => this.getEmployeeById(params.id);
-  getByUserId = (params: { userId: string }) =>
-    this.getOne(eq(this.table.userId, params.userId));
+  getDataById = (params: { id: string }) => {
+    return this.getOne(eq(this.table.id, params.id));
+  };
 
   create = async (payload: Record<string, unknown>): Promise<EmployeeRow> => {
     const p = normalizePayload(payload) as EmployeeInput;

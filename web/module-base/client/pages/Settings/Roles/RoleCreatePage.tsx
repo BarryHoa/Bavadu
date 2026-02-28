@@ -2,11 +2,11 @@
 
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
 
+import { addToast } from "@heroui/toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
-import { addToast } from "@heroui/toast";
 
 import {
   IBaseButton,
@@ -22,7 +22,6 @@ import roleService, {
 } from "@base/client/services/RoleService";
 
 import RolePermissionMatrix from "./components/RolePermissionMatrix";
-
 
 const PERMISSIONS_QUERY_KEY = ["settings", "permissions", "list"] as const;
 const ROLES_LIST_QUERY_KEY = ["settings", "roles", "list"] as const;
@@ -67,8 +66,7 @@ export default function RoleCreatePage() {
   });
 
   const createRoleMutation = useMutation({
-    mutationFn: (payload: CreateRoleRequest) =>
-      roleService.createRole(payload),
+    mutationFn: (payload: CreateRoleRequest) => roleService.createRole(payload),
     onSuccess: () => {
       addToast({
         title: t("toast.createSuccess"),
@@ -136,7 +134,7 @@ export default function RoleCreatePage() {
   const permissions = permissionsQuery.data ?? [];
 
   return (
-    <IBasePageLayout maxWidth="form" title={t("create.title")} variant="create">
+    <IBasePageLayout maxWidth="full" title={t("create.title")} variant="create">
       <IBaseCard>
         <IBaseCardBody className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

@@ -1,12 +1,13 @@
-import type { Column } from "drizzle-orm";
+import type { ParamFilter } from "@base/shared/interface/FilterInterface";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/shared/interface/ListInterface";
-import type { ParamFilter } from "@base/shared/interface/FilterInterface";
+import type { Column } from "drizzle-orm";
 
 import { ilike, sql } from "drizzle-orm";
 
+import { PermissionRequired } from "@base/server/models/BaseModel";
 import {
   BaseViewListModel,
   type FilterConditionMap,
@@ -87,7 +88,7 @@ class PriceListB2CViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
-  @BaseViewListModel.Auth({ required: true, permissions: ["b2csales.price-list.view"] })
+  @PermissionRequired({ auth: true, permissions: ["b2csales.price-list.view"] })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<any>> => {

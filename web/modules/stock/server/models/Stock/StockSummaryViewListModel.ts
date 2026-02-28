@@ -1,12 +1,13 @@
-import type { Column } from "drizzle-orm";
 import type {
   ListParamsRequest,
   ListParamsResponse,
 } from "@base/shared/interface/ListInterface";
+import type { Column } from "drizzle-orm";
 
 import { eq, ilike, sql } from "drizzle-orm";
 
 import { ParamFilter } from "@base/server";
+import { PermissionRequired } from "@base/server/models/BaseModel";
 import {
   BaseViewListModel,
   type FilterConditionMap,
@@ -191,7 +192,7 @@ class StockSummaryViewListModel extends BaseViewListModel<
     minStock: row.minStock ? Number(row.minStock) : null,
   });
 
-  @BaseViewListModel.Auth({ required: true, permissions: ["stock.stock.view"] })
+  @PermissionRequired({ auth: true, permissions: ["stock.stock.view"] })
   getData = async (
     params: ListParamsRequest<StockSummaryFilter> = {},
   ): Promise<ListParamsResponse<StockSummaryViewRow>> => {

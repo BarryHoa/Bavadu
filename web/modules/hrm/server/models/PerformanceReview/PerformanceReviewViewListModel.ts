@@ -8,6 +8,7 @@ import type { Column } from "drizzle-orm";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
+import { PermissionRequired } from "@base/server/models/BaseModel";
 import {
   BaseViewListModel,
   type FilterConditionMap,
@@ -129,7 +130,10 @@ class PerformanceReviewViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
-  @BaseViewListModel.Auth({ required: true, permissions: ["hrm.performance-review.view"] })
+  @PermissionRequired({
+    auth: true,
+    permissions: ["hrm.performance-review.view"],
+  })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<PerformanceReviewRow>> => {

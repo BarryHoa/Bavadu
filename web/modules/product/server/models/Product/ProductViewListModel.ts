@@ -6,6 +6,7 @@ import type { Column } from "drizzle-orm";
 
 import { eq, ilike, sql } from "drizzle-orm";
 
+import { PermissionRequired } from "@base/server/models/BaseModel";
 import {
   BaseViewListModel,
   type FilterConditionMap,
@@ -203,7 +204,7 @@ class ProductViewListModel extends BaseViewListModel<
     } as unknown as ProductVariantElm;
   };
 
-  @BaseViewListModel.Auth({ required: true, permissions: ["product.product.view"] })
+  @PermissionRequired({ auth: true, permissions: ["product.product.view"] })
   getData = async (
     params: ListParamsRequest<ProductFilter>,
   ): Promise<ListParamsResponse<ProductVariantElm>> => {

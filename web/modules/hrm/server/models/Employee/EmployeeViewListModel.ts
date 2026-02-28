@@ -8,6 +8,7 @@ import type { Column } from "drizzle-orm";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
+import { PermissionRequired } from "@base/server/models/BaseModel";
 import {
   BaseViewListModel,
   type FilterConditionMap,
@@ -105,8 +106,8 @@ class EmployeeViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime?.(),
   });
 
-  @BaseViewListModel.Auth({
-    required: true,
+  @PermissionRequired({
+    auth: true,
     permissions: ["hrm.employee.view"],
   })
   getData = async (

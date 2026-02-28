@@ -6,6 +6,7 @@ import type { SequenceRuleRow } from "./SequenceModel";
 
 import { eq, ilike, sql } from "drizzle-orm";
 
+import { PermissionRequired } from "@base/server/models/BaseModel";
 import {
   BaseViewListModel,
   type ColumnMap,
@@ -15,7 +16,6 @@ import {
 import { ParamFilter } from "@base/shared/interface/FilterInterface";
 
 import { base_tb_sequence_rules } from "../../schemas/base.sequence-rule";
-
 
 class SequenceViewListModel extends BaseViewListModel<
   typeof base_tb_sequence_rules,
@@ -84,7 +84,7 @@ class SequenceViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
-  @BaseViewListModel.Auth({ required: true, permissions: ["base.sequence.view"] })
+  @PermissionRequired({ auth: true, permissions: ["base.sequence.view"] })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<SequenceRuleRow>> => {

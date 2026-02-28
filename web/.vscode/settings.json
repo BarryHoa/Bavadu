@@ -115,7 +115,8 @@
     "PGPORT",
     "PGSSLMODE",
     "PGUSER",
-    "STOCKABLE"
+    "STOCKABLE",
+    "Timesheet"
   ],
   "i18n-ally.localesPaths": [
     "i18n",

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Security Logger Utility
  *
@@ -42,11 +43,6 @@ async function writeLog(
     metadata,
   };
 
-  // Write using LogModel
-  const logModel = getLogModel();
-
-  await logModel.write(entry);
-
   // Also output to console for development/debugging
   if (process.env.NODE_ENV === "development") {
     const formatted = formatSecurityLog(entry);
@@ -58,6 +54,11 @@ async function writeLog(
     } else {
       console.log(formatted);
     }
+  } else {
+    // Write using LogModel
+    const logModel = getLogModel();
+
+    await logModel.write(entry);
   }
 }
 
@@ -195,6 +196,25 @@ export function logRateLimitViolation(
   });
 }
 
+export function logHttp(
+  error: Error | string,
+  metadata: Record<string, unknown> = {},
+): void {
+  const type = (metadata?.logType as LogType) ?? LogType.HTTP_ERROR;
+  const severity = (metadata?.logSeverity as LogSeverity) ?? LogSeverity.LOW;
+
+  writeLog(
+    type,
+    severity,
+    "HTTP error: " + (error instanceof Error ? error.message : String(error)),
+    {
+      ...metadata,
+      error: error instanceof Error ? error.message : String(error),
+    },
+  ).catch((error) => {
+    console.error("Failed to write http error log:", error);
+  });
+}
 /**
  * Get client IP from request
  * Supports both NextRequest and objects with headers property

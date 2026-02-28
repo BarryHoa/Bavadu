@@ -13,8 +13,10 @@
  * @see Salesforce Lightning: https://v1.lightningdesignsystem.com/guidelines/layout/
  */
 import { cn } from "@heroui/theme";
+import { isNil } from "lodash";
+import { useMemo } from "react";
 
-export type PageLayoutMaxWidth = "form" | "content" | "full" | (string & {});
+export type PageLayoutMaxWidth = "form" | "content" | "full" | string | number;
 
 const MAX_WIDTH_CLASSES: Record<string, string> = {
   form: "max-w-[45rem] w-full", // 45rem ≈ 720px, form UX guideline
@@ -51,20 +53,42 @@ export function IBasePageLayout({
   headerActions,
   children,
   sidebar,
-  variant = "detail",
+  variant,
   maxWidth,
   centered = false,
   className,
   contentClassName,
 }: IBasePageLayoutProps) {
-  const effectiveMaxWidth =
-    maxWidth ??
-    (variant === "create" || variant === "edit" ? "form" : "content");
-  const maxWidthClass =
-    MAX_WIDTH_CLASSES[effectiveMaxWidth] ?? effectiveMaxWidth;
+  const maxWidthClass = useMemo(() => {
+    if (isNil(variant) && isNil(maxWidth)) return undefined;
+    if (isNil(maxWidth)) {
+      // max -width by variant
+      const variantMaxWidth = {
+        create: "form",
+        edit: "form",
+        detail: "content",
+      };
+
+      return MAX_WIDTH_CLASSES[
+        variantMaxWidth[variant as keyof typeof variantMaxWidth]
+      ];
+    }
+
+    if (typeof maxWidth === "number") return `max-w-[${maxWidth}px]`;
+
+    if (typeof maxWidth === "string") {
+      if (["form", "content", "full"].includes(maxWidth)) {
+        return MAX_WIDTH_CLASSES[maxWidth];
+      }
+
+      return maxWidth;
+    }
+
+    return undefined;
+  }, [maxWidth, variant]);
 
   return (
-    <article className={cn("flex flex-col gap-6 pb-20", className)}>
+    <article className={cn("flex flex-col gap-6 pb-20 ", className)}>
       {/* Header – title, subtitle, actions */}
       <header className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="min-w-0 flex-1">
@@ -84,6 +108,7 @@ export function IBasePageLayout({
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
         <div
           className={cn(
+            "w-full",
             maxWidthClass,
             centered && !sidebar && "mx-auto",
             contentClassName,

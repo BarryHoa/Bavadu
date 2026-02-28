@@ -8,6 +8,7 @@ import type { Column } from "drizzle-orm";
 import { eq, ilike } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
+import { PermissionRequired } from "@base/server/models/BaseModel";
 import {
   BaseViewListModel,
   type FilterConditionMap,
@@ -96,7 +97,7 @@ class CertificateViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
-  @BaseViewListModel.Auth({ required: true, permissions: ["hrm.certificate.view"] })
+  @PermissionRequired({ auth: true, permissions: ["hrm.certificate.view"] })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<CertificateRow>> => {

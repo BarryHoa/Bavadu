@@ -71,7 +71,6 @@ ON CONFLICT ("key") DO NOTHING;
 INSERT INTO "md_base"."permissions" ("key", "module", "resource", "action", "name", "description", "is_active", "created_at")
 VALUES 
 ('hrm.timesheet.view', 'hrm', 'timesheet', 'view', '{"en": "View Timesheets", "vi": "Xem chấm công"}', '{"en": "Permission to view own timesheets", "vi": "Quyền xem chấm công của mình"}', true, now()),
-('hrm.timesheet.viewAll', 'hrm', 'timesheet', 'viewAll', '{"en": "View All Timesheets", "vi": "Xem chấm công mọi người"}', '{"en": "Permission to view all employees timesheets", "vi": "Quyền xem chấm công mọi nhân viên"}', true, now()),
 ('hrm.timesheet.create', 'hrm', 'timesheet', 'create', '{"en": "Create Timesheets", "vi": "Tạo chấm công"}', '{"en": "Permission to create timesheets", "vi": "Quyền tạo chấm công"}', true, now()),
 ('hrm.timesheet.update', 'hrm', 'timesheet', 'update', '{"en": "Update Timesheets", "vi": "Cập nhật chấm công"}', '{"en": "Permission to update timesheets", "vi": "Quyền cập nhật chấm công"}', true, now()),
 ('hrm.timesheet.export', 'hrm', 'timesheet', 'export', '{"en": "Export Timesheets", "vi": "Xuất chấm công"}', '{"en": "Permission to export timesheets", "vi": "Quyền xuất chấm công"}', true, now()),

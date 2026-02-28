@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { UserPermissionModel } from "../models/UserPermission";
 import { RuntimeContext } from "../runtime/RuntimeContext";
+import { logHttp } from "../utils/security-logger";
 import {
   sanitizeJsonRpcParams,
   validateJsonRpcMethod,
@@ -32,27 +33,54 @@ export interface JsonRpcMethod {
 export class JsonRpcError extends Error {
   constructor(
     public code: number,
-    message: string,
+    message?: string,
     public data?: any,
   ) {
-    super(message);
+    const resolvedMessage =
+      message ?? DEFAULT_ERROR_MESSAGES[code] ?? "Unknown error";
+
+    super(resolvedMessage);
     this.name = "JsonRpcError";
   }
 }
 
+/**
+ * JSON-RPC 2.0 error codes.
+ * - Standard codes (-32700 .. -32603): https://www.jsonrpc.org/specification
+ * - Server errors (-32000 .. -32099): reserved for implementation-defined errors.
+ */
 export const JSON_RPC_ERROR_CODES = {
+  // Standard (spec section 5.1)
   PARSE_ERROR: -32700,
   INVALID_REQUEST: -32600,
+  /** Model method (e.g. getData, create) not found on model — not HTTP method (POST, PUT). */
   METHOD_NOT_FOUND: -32601,
+  /** Params/method wrong structure or format (protocol-level). */
   INVALID_PARAMS: -32602,
   INTERNAL_ERROR: -32603,
-  AUTHENTICATION_ERROR: -32001,
-  AUTHORIZATION_ERROR: -32002,
+  // Server / implementation-defined (-32000 .. -32099)
+  AUTHENTICATION_ERROR: -32000,
+  AUTHORIZATION_ERROR: -32001,
+  PERMISSION_DENIED: -32002,
+  /** Params structure OK but values fail business/domain validation rules. */
   VALIDATION_ERROR: -32003,
-  NOT_FOUND: -32004,
-  MODEL_ERROR: -32005,
-  MODEL_NOT_FOUND: -32006,
+  RESOURCE_NOT_FOUND: -32004,
 } as const;
+
+/** Default messages for each error code when message param is not provided */
+const DEFAULT_ERROR_MESSAGES: Record<number, string> = {
+  [JSON_RPC_ERROR_CODES.PARSE_ERROR]: "Parse error",
+  [JSON_RPC_ERROR_CODES.INVALID_REQUEST]: "Invalid Request",
+  [JSON_RPC_ERROR_CODES.METHOD_NOT_FOUND]: "Method not found",
+  [JSON_RPC_ERROR_CODES.INVALID_PARAMS]: "Invalid params",
+  [JSON_RPC_ERROR_CODES.INTERNAL_ERROR]: "Internal error",
+  [JSON_RPC_ERROR_CODES.AUTHENTICATION_ERROR]: "Authentication required",
+  [JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR]: "Access denied",
+  [JSON_RPC_ERROR_CODES.VALIDATION_ERROR]: "Validation failed",
+  [JSON_RPC_ERROR_CODES.RESOURCE_NOT_FOUND]: "Resource not found",
+  [JSON_RPC_ERROR_CODES.PERMISSION_DENIED]:
+    "You do not have permission to perform this action. Please contact your administrator to get the permission.",
+};
 
 // Constants for method structure
 const SUB_TYPE_LIST = "list";
@@ -122,13 +150,8 @@ export class JsonRpcHandler {
     // Get model instance
     const modelInstance = await RuntimeContext.getModelInstanceBy(modelKey);
 
-    console.log("modelInstance", modelKey);
-
     if (!modelInstance) {
-      throw new JsonRpcError(
-        JSON_RPC_ERROR_CODES.MODEL_NOT_FOUND,
-        `Model "${modelKey}" not found`,
-      );
+      throw new JsonRpcError(JSON_RPC_ERROR_CODES.METHOD_NOT_FOUND);
     }
 
     /**
@@ -137,11 +160,13 @@ export class JsonRpcHandler {
 
     const pathname = request.nextUrl.pathname;
     const isPublicPath = pathname.includes(PUBLIC_PATH_SEGMENT);
-    const getAuthRule = (
-      modelInstance as { getAuthRuleForMethod?: (m: string) => unknown }
-    ).getAuthRuleForMethod;
+    const getPermissionRequired = (
+      modelInstance as {
+        getPermissionRequiredForMethod?: (m: string) => unknown;
+      }
+    ).getPermissionRequiredForMethod;
     // CALL
-    const authRule = getAuthRule?.call(modelInstance, methodName) as {
+    const authRule = getPermissionRequired?.call(modelInstance, methodName) as {
       required: boolean;
       permissions?: string[];
     } | null;
@@ -155,52 +180,40 @@ export class JsonRpcHandler {
       );
     }
 
-    console.log("debug: 1");
     // Get method function
     const modelMethodFunction = (modelInstance as any)[methodName] as (
       params?: Record<string, any>,
       request?: NextRequest,
     ) => Promise<any>;
 
-    console.log("debug: 2");
-
     if (!modelMethodFunction || typeof modelMethodFunction !== "function") {
-      throw new JsonRpcError(
-        JSON_RPC_ERROR_CODES.METHOD_NOT_FOUND,
-        `Method "${methodName}" not found on model "${modelKey}"`,
-      );
+      throw new JsonRpcError(JSON_RPC_ERROR_CODES.METHOD_NOT_FOUND);
     }
 
     // permission check for method if required
-    console.log(authRule, "authRule", modelKey);
+    const userId = request.headers.get("x-user-id");
+
     if (!!authRule?.required) {
-      if (!authRule?.permissions?.length) {
-        throw new JsonRpcError(
-          JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
-          "You do not have permission to perform this action",
-          { requiredPermissions: authRule.permissions },
-        );
-      }
-      // check permission for method if required
-      const userId = request.headers.get("x-user-id");
+      // Need to login to system
       if (!userId) {
-        throw new JsonRpcError(
-          JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
-          "User not authenticated",
-        );
+        throw new JsonRpcError(JSON_RPC_ERROR_CODES.AUTHENTICATION_ERROR);
       }
+      const permissions = authRule?.permissions ?? [];
+
+      // if it has required, but no permissions, throw permission denied error
+      if (!permissions.length) {
+        throw new JsonRpcError(JSON_RPC_ERROR_CODES.PERMISSION_DENIED);
+      }
+
       const permissionModel = new UserPermissionModel();
 
       const hasAll = await permissionModel.hasAllPermissions(
         userId,
-        authRule.permissions,
+        permissions,
       );
+
       if (!hasAll) {
-        throw new JsonRpcError(
-          JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
-          "You do not have permission to perform this action",
-          { requiredPermissions: authRule.permissions },
-        );
+        throw new JsonRpcError(JSON_RPC_ERROR_CODES.PERMISSION_DENIED);
       }
     }
 
@@ -249,38 +262,36 @@ export class JsonRpcHandler {
     request: JsonRpcRequest,
     httpRequest: NextRequest,
   ): Promise<JsonRpcResponse> {
-    // Validate JSON-RPC version
-    if (request.jsonrpc !== this.rpcVersion) {
-      throw new JsonRpcError(
-        JSON_RPC_ERROR_CODES.INVALID_REQUEST,
-        `Invalid JSON-RPC version. Only ${this.rpcVersion} is supported`,
-      );
-    }
-
-    // Validate method exists
-    if (!request.method) {
-      throw new JsonRpcError(
-        JSON_RPC_ERROR_CODES.INVALID_REQUEST,
-        "Method is required",
-      );
-    }
-
-    // Validate method format
-    const methodValidation = validateJsonRpcMethod(request.method);
-
-    if (!methodValidation.valid) {
-      throw new JsonRpcError(
-        JSON_RPC_ERROR_CODES.INVALID_PARAMS,
-        methodValidation.error || "Invalid method format",
-      );
-    }
-
-    // Sanitize params to prevent XSS
-    const sanitizedParams = request.params
-      ? sanitizeJsonRpcParams(request.params)
-      : undefined;
-
     try {
+      // Validate JSON-RPC version
+      if (request.jsonrpc !== this.rpcVersion) {
+        throw new JsonRpcError(
+          JSON_RPC_ERROR_CODES.INVALID_REQUEST,
+          `Invalid JSON-RPC version. Only ${this.rpcVersion} is supported`,
+        );
+      }
+      // Validate method exists
+      if (!request.method) {
+        throw new JsonRpcError(
+          JSON_RPC_ERROR_CODES.INVALID_REQUEST,
+          "Method is required",
+        );
+      }
+      // Validate method format
+      const methodValidation = validateJsonRpcMethod(request.method);
+
+      if (!methodValidation.valid) {
+        throw new JsonRpcError(
+          JSON_RPC_ERROR_CODES.INVALID_PARAMS,
+          methodValidation.error || "Invalid method format",
+        );
+      }
+
+      // Sanitize params to prevent XSS
+      const sanitizedParams = request.params
+        ? sanitizeJsonRpcParams(request.params)
+        : undefined;
+
       const result = await this.handleDynamicModelQuery(
         request.method,
         sanitizedParams,
@@ -289,21 +300,21 @@ export class JsonRpcHandler {
 
       return this.createSuccessResponse(result, request.id);
     } catch (error) {
-      if (error instanceof JsonRpcError) {
-        return this.createErrorResponse(
-          error.code,
-          error.message,
-          error.data,
-          request.id,
-        );
-      }
+      // normalize error
+      const errorNormalized = {
+        code:
+          (error as JsonRpcError)?.code ?? JSON_RPC_ERROR_CODES.INTERNAL_ERROR,
+        message: (error as JsonRpcError)?.message ?? "Internal error",
+        data: (error as JsonRpcError)?.data ?? undefined,
+        ...(error as Record<string, unknown>),
+      } as JsonRpcError;
 
-      console.error("JSON-RPC internal error:", error);
+      logHttp(errorNormalized as Error);
 
       return this.createErrorResponse(
-        JSON_RPC_ERROR_CODES.INTERNAL_ERROR,
-        error instanceof Error ? error.message : "Internal error",
-        process.env.NODE_ENV === "development" ? String(error) : undefined,
+        errorNormalized.code,
+        errorNormalized.message,
+        errorNormalized.data,
         request.id,
       );
     }
@@ -315,7 +326,6 @@ export class JsonRpcHandler {
   async handle(httpRequest: NextRequest): Promise<NextResponse> {
     try {
       const body = await httpRequest.json();
-      console.log(httpRequest.headers.get("x-rpc-method"), "x-user-id");
 
       // FOR BATCH REQUEST, each request is a JsonRpcRequest
 
@@ -330,7 +340,7 @@ export class JsonRpcHandler {
           );
         }
 
-        const responses = await Promise.all(
+        const responses = await Promise.allSettled(
           body.map((request) => this.handleRequest(request, httpRequest)),
         );
 
@@ -342,6 +352,10 @@ export class JsonRpcHandler {
 
       return NextResponse.json(response);
     } catch (error) {
+      // Log error to console for development
+
+      logHttp(error as Error);
+
       return NextResponse.json(
         this.createErrorResponse(
           JSON_RPC_ERROR_CODES.PARSE_ERROR,

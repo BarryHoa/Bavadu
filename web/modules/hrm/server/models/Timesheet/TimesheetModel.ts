@@ -3,18 +3,16 @@ import type { NextRequest } from "next/server";
 import { and, eq, gte, lte } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { BaseModel } from "@base/server/models/BaseModel";
-import UserPermissionModel from "@base/server/models/UserPermission/UserPermissionModel";
 import {
   JSON_RPC_ERROR_CODES,
   JsonRpcError,
-} from "@base/server/rpc/jsonRpcHandler";
+} from "@/module-base/server/rpc/jsonRpcHandler";
+import { BaseModel, PermissionRequired } from "@base/server/models/BaseModel";
 import { base_tb_users } from "@base/server/schemas/base.user";
 
 import { NewHrmTbTimesheet, hrm_tb_timesheets } from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";
 import { hrm_tb_shifts } from "../../schemas/hrm.shift";
-import EmployeeModel from "../Employee/EmployeeModel";
 import { fullNameSqlFrom } from "../Employee/employee.helpers";
 
 const employee = alias(hrm_tb_employees, "employee");
@@ -145,8 +143,6 @@ export default class TimesheetModel extends BaseModel<
     const result = await this.db
       .select(this.selectJoined())
       .from(this.table)
-      .leftJoin(employee, eq(this.table.employeeId, employee.id))
-      .leftJoin(user, eq(employee.userId, user.id))
       .leftJoin(shift, eq(this.table.shiftId, shift.id))
       .where(eq(this.table.id, id))
       .limit(1);
@@ -166,13 +162,15 @@ export default class TimesheetModel extends BaseModel<
    * Get timesheets for a given month, optionally filtered by employee.
    * Params: { year, month, employeeId? }.
    * - If employeeId is omitted: returns current user's timesheets (resolved via session).
-   * - If employeeId is provided for another employee: requires hrm.timesheet.viewAll.
    */
-  getTimesheetsByMonth = async (
+  @PermissionRequired({
+    auth: true,
+    permissions: ["hrm.timesheet.view"],
+  })
+  getMyTimesheet = async (
     params: {
       year: number;
       month: number;
-      employeeId?: string | null;
     },
     request?: NextRequest,
   ): Promise<{ data: TimesheetRow[] }> => {
@@ -181,36 +179,7 @@ export default class TimesheetModel extends BaseModel<
     const userId = request?.headers.get("x-user-id") ?? null;
 
     if (!userId) {
-      throw new JsonRpcError(
-        JSON_RPC_ERROR_CODES.AUTHENTICATION_ERROR,
-        "Authentication required",
-      );
-    }
-
-    const permModel = new UserPermissionModel();
-    const perms = await permModel.getPermissionsByUser(userId);
-    const hasViewAll = perms.permissions.has("hrm.timesheet.viewAll");
-
-    const employeeModel = new EmployeeModel();
-    const currentEmp = await employeeModel.getByUserId({ userId });
-
-    if (!currentEmp) {
-      throw new JsonRpcError(
-        JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
-        "No employee linked to user",
-      );
-    }
-
-    let employeeId = params.employeeId ?? null;
-
-    if (employeeId && employeeId !== currentEmp.id && !hasViewAll) {
-      throw new JsonRpcError(
-        JSON_RPC_ERROR_CODES.AUTHORIZATION_ERROR,
-        "Missing permission: hrm.timesheet.viewAll",
-      );
-    }
-    if (!employeeId) {
-      employeeId = currentEmp.id;
+      throw new JsonRpcError(JSON_RPC_ERROR_CODES.AUTHENTICATION_ERROR);
     }
 
     const firstDay = `${year}-${String(month).padStart(2, "0")}-01`;
@@ -220,15 +189,12 @@ export default class TimesheetModel extends BaseModel<
     const conditions = [
       gte(this.table.workDate, firstDay),
       lte(this.table.workDate, lastDay),
+      eq(this.table.employeeId, userId),
     ];
-
-    conditions.push(eq(this.table.employeeId, employeeId));
 
     const result = await this.db
       .select(this.selectJoined())
       .from(this.table)
-      .leftJoin(employee, eq(this.table.employeeId, employee.id))
-      .leftJoin(user, eq(employee.userId, user.id))
       .leftJoin(shift, eq(this.table.shiftId, shift.id))
       .where(and(...conditions))
       .orderBy(this.table.workDate);

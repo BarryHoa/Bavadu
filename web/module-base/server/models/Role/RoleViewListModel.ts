@@ -6,6 +6,7 @@ import type { RoleRow } from "./RoleAndPermissionModel";
 
 import { eq, ilike, sql } from "drizzle-orm";
 
+import { PermissionRequired } from "@base/server/models/BaseModel";
 import {
   BaseViewListModel,
   type ColumnMap,
@@ -88,7 +89,7 @@ class RoleViewListModel extends BaseViewListModel<
     updatedAt: row.updatedAt?.getTime(),
   });
 
-  @BaseViewListModel.Auth({ required: true, permissions: ["base.role.view"] })
+  @PermissionRequired({ auth: true, permissions: ["base.role.view"] })
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<RoleRow>> => this.buildQueryDataList(params);

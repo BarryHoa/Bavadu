@@ -2,9 +2,9 @@ import type { NextRequest } from "next/server";
 
 import { eq } from "drizzle-orm";
 
-import UserPermissionModel from "../UserPermission/UserPermissionModel";
 import { base_tb_users, base_tb_users_login } from "../../schemas/base.user";
-import { BaseModel } from "../BaseModel";
+import { BaseModel, PermissionRequired } from "../BaseModel";
+import UserPermissionModel from "../UserPermission/UserPermissionModel";
 
 class UserModel extends BaseModel<typeof base_tb_users> {
   constructor() {
@@ -24,7 +24,7 @@ class UserModel extends BaseModel<typeof base_tb_users> {
    * Get current user (no session validation here).
    * The private RPC endpoint must authenticate first and inject x-user-id/x-session-id headers.
    */
-  @BaseModel.Auth({ required: true, permissions: ["user.view"] })
+  @PermissionRequired({ auth: true, permissions: ["user.view"] })
   async getMe(
     _params: Record<string, unknown>,
     request?: NextRequest,
@@ -62,7 +62,7 @@ class UserModel extends BaseModel<typeof base_tb_users> {
    * Get current user with role codes and permissions (for client capability checks).
    * Returns roleCodes (e.g. ['admin','manager']), permissions array, and isGlobalAdmin.
    */
-  @BaseModel.Auth({ required: true, permissions: ["user.view"] })
+  @PermissionRequired({ auth: true, permissions: ["user.view"] })
   async getMeWithRoles(
     _params: Record<string, unknown>,
     request?: NextRequest,

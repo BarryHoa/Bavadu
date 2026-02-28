@@ -2,11 +2,11 @@
 
 import type { LocalizeText } from "@base/client/interface/LocalizeText";
 
+import { addToast } from "@heroui/toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { addToast } from "@heroui/toast";
 
 import {
   IBaseButton,
@@ -22,7 +22,6 @@ import roleService, {
 } from "@base/client/services/RoleService";
 
 import RolePermissionMatrix from "./components/RolePermissionMatrix";
-
 
 const PERMISSIONS_QUERY_KEY = ["settings", "permissions", "list"] as const;
 const ROLE_QUERY_KEY = (id: string) =>
@@ -96,8 +95,7 @@ export default function RoleEditPage() {
   }, [roleQuery.data]);
 
   const updateRoleMutation = useMutation({
-    mutationFn: (payload: UpdateRoleRequest) =>
-      roleService.updateRole(payload),
+    mutationFn: (payload: UpdateRoleRequest) => roleService.updateRole(payload),
     onSuccess: () => {
       addToast({
         title: t("toast.updateSuccess"),
@@ -204,11 +202,7 @@ export default function RoleEditPage() {
   }
 
   return (
-    <IBasePageLayout
-      maxWidth="form"
-      title={t("edit.title")}
-      variant="edit"
-    >
+    <IBasePageLayout maxWidth="full" title={t("edit.title")} variant="edit">
       <IBaseCard>
         <IBaseCardBody className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

@@ -7,55 +7,73 @@ import { isEmpty } from "lodash";
 
 import { RuntimeContext } from "../runtime/RuntimeContext";
 
-/**
- * Rule for RPC method: require auth and/or permissions.
- * Permission format: module.feature.action (vd: hrm.employee.view).
- * Backend hỗ trợ wildcard: hrm.employee.* (mọi quyền feature), hrm.* (mọi quyền module).
- */
-export type AuthRule = {
-  required: boolean;
+export type PermissionRequiredOptions = {
+  auth: boolean;
   permissions?: string[];
 };
 
-const AUTH_RULE_KEY = Symbol("BaseModel.authRule");
+const PERMISSION_RULE_KEY = Symbol("BaseModel.permissionRule");
 
 /** Descriptor có thể có initializer (class field) theo TS experimentalDecorators */
 type DescriptorWithInitializer = PropertyDescriptor & {
   initializer?: () => unknown;
 };
 
+function applyPermissionRequiredDecorator(rule: PermissionRequiredOptions) {
+  return function (
+    _target: object,
+    _propertyKey: string,
+    descriptor?: DescriptorWithInitializer,
+  ): any {
+    if (!descriptor) return descriptor;
+    if (typeof descriptor.value === "function") {
+      (
+        descriptor.value as unknown as {
+          [PERMISSION_RULE_KEY]: PermissionRequiredOptions;
+        }
+      )[PERMISSION_RULE_KEY] = rule;
+
+      return descriptor;
+    }
+    if (typeof descriptor.initializer === "function") {
+      const originalInitializer = descriptor.initializer;
+
+      descriptor.initializer = function (this: unknown) {
+        const fn = originalInitializer.call(this);
+
+        if (typeof fn === "function") {
+          (
+            fn as unknown as {
+              [PERMISSION_RULE_KEY]: PermissionRequiredOptions;
+            }
+          )[PERMISSION_RULE_KEY] = rule;
+        }
+
+        return fn;
+      };
+    }
+
+    return descriptor;
+  };
+}
+
+/**
+ * Decorator: gắn permission rule lên method hoặc arrow field.
+ * Dùng thay cho BaseModel.PermissionRequired / BaseViewListModel.PermissionRequired.
+ * @PermissionRequired({ auth: true, permissions: ["..."] })
+ * hoặc @PermissionRequired({ auth: true, permissions: ["..."] })
+ */
+export function PermissionRequired(rule: PermissionRequiredOptions) {
+  return applyPermissionRequiredDecorator(rule);
+}
+
 export class BaseModel<TTable extends PgTable = PgTable> {
   /**
-   * Decorator: gắn auth rule trực tiếp lên method hoặc arrow field.
-   * Hỗ trợ cả method (descriptor.value) và class field arrow (descriptor.initializer).
-   * @BaseModel.Auth({ required: true, permissions: ["..."] })
+   * Decorator: gắn permission rule trực tiếp lên method hoặc arrow field.
+   * Prefer standalone @PermissionRequired từ import.
    */
-  static Auth(rule: AuthRule) {
-    return function (
-      _target: object,
-      _propertyKey: string,
-      descriptor?: DescriptorWithInitializer,
-    ): any {
-      if (!descriptor) return descriptor;
-      if (typeof descriptor.value === "function") {
-        (descriptor.value as unknown as { [AUTH_RULE_KEY]: AuthRule })[
-          AUTH_RULE_KEY
-        ] = rule;
-        return descriptor;
-      }
-      if (typeof descriptor.initializer === "function") {
-        const originalInitializer = descriptor.initializer;
-        descriptor.initializer = function (this: unknown) {
-          const fn = originalInitializer.call(this);
-          if (typeof fn === "function") {
-            (fn as unknown as { [AUTH_RULE_KEY]: AuthRule })[AUTH_RULE_KEY] =
-              rule;
-          }
-          return fn;
-        };
-      }
-      return descriptor;
-    };
+  static PermissionRequired(rule: PermissionRequiredOptions) {
+    return applyPermissionRequiredDecorator(rule);
   }
 
   /**Main table of the model */
@@ -161,12 +179,18 @@ export class BaseModel<TTable extends PgTable = PgTable> {
   };
 
   /**
-   * Get auth rule for an RPC method. Đọc trực tiếp từ metadata trên method (do @BaseModel.Auth gắn).
+   * Get permission rule for an RPC method. Đọc trực tiếp từ metadata trên method (do @PermissionRequired gắn).
    */
-  getAuthRuleForMethod(methodName: string): AuthRule | null {
+  getPermissionRequiredForMethod(
+    methodName: string,
+  ): PermissionRequiredOptions | null {
     const fn = (this as any)[methodName];
+
     if (typeof fn !== "function") return null;
-    const rule = (fn as unknown as { [AUTH_RULE_KEY]?: AuthRule })[AUTH_RULE_KEY];
+    const rule = (
+      fn as unknown as { [PERMISSION_RULE_KEY]?: PermissionRequiredOptions }
+    )[PERMISSION_RULE_KEY];
+
     return rule ?? null;
   }
 }
