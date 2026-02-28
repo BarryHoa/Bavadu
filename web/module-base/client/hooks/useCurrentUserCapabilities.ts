@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import userService from "@base/client/services/UserService";
+import { usePermissionsStore } from "@base/client/stores";
 
 export interface CurrentUserCapabilities {
   /** Có thể xem chi tiết (mặc định true cho mọi user đã đăng nhập) */
@@ -23,6 +25,13 @@ export function useCurrentUserCapabilities(): CurrentUserCapabilities {
     queryFn: () => userService.getMeWithRoles(),
     staleTime: 5 * 60 * 1000,
   });
+
+  // Sync permissions to store when data is loaded (e.g. already logged in)
+  useEffect(() => {
+    if (data?.data) {
+      usePermissionsStore.getState().setPermissions(data.data);
+    }
+  }, [data?.data]);
 
   const d = data?.data;
   const permissions = d?.permissions ?? [];

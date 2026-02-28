@@ -25,11 +25,15 @@ export async function POST(request: NextRequest) {
       status: 200,
     });
 
-    // Clear session cookie
-    response.cookies.delete(SESSION_CONFIG.cookie.name);
-
-    // Clear CSRF token cookie
-    response.cookies.delete("csrf-token");
+    // Clear cookies via raw Set-Cookie headers (path + expire so browser removes them)
+    const expireDate = "Thu, 01 Jan 1970 00:00:00 GMT";
+    const path = SESSION_CONFIG.cookie.path;
+    const secure =
+      process.env.NODE_ENV === "production" ? "; Secure" : "";
+    const sessionCookie = `${SESSION_CONFIG.cookie.name}=; Path=${path}; Max-Age=0; Expires=${expireDate}; HttpOnly; SameSite=${SESSION_CONFIG.cookie.sameSite}${secure}`;
+    const csrfCookie = `csrf-token=; Path=/; Max-Age=0; Expires=${expireDate}; SameSite=lax${secure}`;
+    response.headers.append("Set-Cookie", sessionCookie);
+    response.headers.append("Set-Cookie", csrfCookie);
 
     return response;
   } catch (error) {

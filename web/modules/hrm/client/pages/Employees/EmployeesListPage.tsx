@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import React from "react";
 
@@ -44,10 +45,15 @@ type EmployeeRow = Employee & {
 };
 
 export default function EmployeesListPage(): React.ReactNode {
+  const queryClient = useQueryClient();
   const tDataTable = useTranslations("dataTable");
   const t = useTranslations("hrm.employee.list");
   const getLocalizedText = useLocalizedText();
   const { canCreateEdit } = useCurrentUserCapabilities();
+
+  const handlePermissionChange = React.useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ["hrm-employees"] });
+  }, [queryClient]);
 
   const columns: IBaseTableColumnDefinition<EmployeeRow>[] = [
     {
@@ -140,7 +146,12 @@ export default function EmployeesListPage(): React.ReactNode {
       render: (_, row) => {
         if (!row?.id) return null;
 
-        return <EmployeeActionMenu row={row} />;
+        return (
+          <EmployeeActionMenu
+            row={row}
+            onPermissionChange={handlePermissionChange}
+          />
+        );
       },
     },
   ];

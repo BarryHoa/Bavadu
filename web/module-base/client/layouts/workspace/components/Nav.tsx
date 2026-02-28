@@ -4,44 +4,71 @@ import type { IBaseDropdownItem } from "@base/client/components";
 
 import { Bell, LogOut, User } from "lucide-react";
 import IBaseImage from "next/image";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
-import { AuthService } from "@base/client/services";
+import { siteConfig } from "@/config/site";
 import {
-  IBaseNavbar,
+  IBaseAvatar,
+  IBaseBadge,
+  IBaseButton,
   IBaseDropdown,
+  IBaseModal,
+  IBaseModalBody,
+  IBaseModalContent,
+  IBaseModalFooter,
+  IBaseModalHeader,
+  IBaseNavbar,
   IBaseNavbarBrand,
   IBaseNavbarContent,
   IBaseNavbarItem,
 } from "@base/client/components";
-import { IBaseAvatar, IBaseBadge, IBaseButton } from "@base/client/components";
-import { siteConfig } from "@/config/site";
+import { useDisclosure } from "@base/client/hooks";
+import { AuthService } from "@base/client/services";
+import {
+  broadcastPermissionsClear,
+  usePermissionsStore,
+} from "@base/client/stores";
 
 const DEFAULT_AVATAR = "/favicon/favicon-32x32.png";
 
 export default function Nav() {
+  const t = useTranslations("auth.logoutConfirm");
   const router = useRouter();
   const authService = useMemo(() => new AuthService(), []);
   const [avatarError, setAvatarError] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const {
+    isOpen: isLogoutConfirmOpen,
+    onOpen: openLogoutConfirm,
+    onClose: closeLogoutConfirm,
+  } = useDisclosure();
 
   // TODO: Get user data from session/context
   const userAvatar = "https://i.pravatar.cc/150?u=a042581f4e29026024d";
   const displayAvatar = avatarError ? DEFAULT_AVATAR : userAvatar;
 
-  const handleLogout = async () => {
+  const performLogout = useCallback(async () => {
     try {
       setIsLoggingOut(true);
+      closeLogoutConfirm();
       await authService.logout();
-      router.push("/login");
+      usePermissionsStore.getState().clearPermissions();
+      broadcastPermissionsClear(); // other tabs will redirect to login
+      router.replace("/login");
       router.refresh();
     } catch {
-      router.push("/login");
+      router.replace("/login");
     } finally {
       setIsLoggingOut(false);
     }
-  };
+  }, [authService, closeLogoutConfirm, router]);
+
+  const handleLogoutClick = useCallback(() => {
+    // Delay so dropdown close doesn't interfere with modal open
+    setTimeout(() => openLogoutConfirm(), 0);
+  }, [openLogoutConfirm]);
 
   return (
     <IBaseNavbar
@@ -97,7 +124,7 @@ export default function Nav() {
                 isDisabled: isLoggingOut,
                 startContent: <LogOut size={16} />,
                 textValue: "Logout",
-                onPress: handleLogout,
+                onPress: handleLogoutClick,
                 children: isLoggingOut ? "Logging out..." : "Logout",
               } satisfies IBaseDropdownItem,
             ]}
@@ -119,6 +146,30 @@ export default function Nav() {
           </IBaseDropdown>
         </IBaseNavbarItem>
       </IBaseNavbarContent>
+
+      <IBaseModal
+        isOpen={isLogoutConfirmOpen}
+        onOpenChange={(open) => {
+          if (!open) closeLogoutConfirm();
+        }}
+      >
+        <IBaseModalContent>
+          <IBaseModalHeader>{t("title")}</IBaseModalHeader>
+          <IBaseModalBody>{t("message")}</IBaseModalBody>
+          <IBaseModalFooter>
+            <IBaseButton variant="light" onPress={closeLogoutConfirm}>
+              {t("cancel")}
+            </IBaseButton>
+            <IBaseButton
+              color="danger"
+              isLoading={isLoggingOut}
+              onPress={performLogout}
+            >
+              {t("confirm")}
+            </IBaseButton>
+          </IBaseModalFooter>
+        </IBaseModalContent>
+      </IBaseModal>
     </IBaseNavbar>
   );
 }

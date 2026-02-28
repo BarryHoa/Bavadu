@@ -49,4 +49,5 @@ export * from "./LoadingBar";
 export * from "./LoadingOverlay";
 export * from "./MarkdownContent";
 export * from "./NavigationLoader";
+export * from "./PermissionBroadcastListener";
 export * from "./ViewListDataTable";

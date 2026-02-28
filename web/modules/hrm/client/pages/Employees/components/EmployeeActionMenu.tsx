@@ -9,15 +9,19 @@ import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
 import { UserPermissionPopup } from "@base/client/components/UserPermissionPopup";
 import { useCurrentUserCapabilities } from "@base/client/hooks/useCurrentUserCapabilities";
 
-type EmployeeRow = {
+/** Row shape from employee list (EmployeeViewListModel / list.getData) */
+export type EmployeeListRow = {
   id: string;
-  userId?: string | null;
+  userId: string;
   code?: string;
+  employeeCode?: string;
   fullName?: unknown;
+  firstName?: string | null;
+  lastName?: string | null;
 };
 
 export interface EmployeeActionMenuProps {
-  row: EmployeeRow;
+  row: EmployeeListRow;
   /** Optional: refetch list after permission change */
   onPermissionChange?: () => void;
 }
@@ -37,6 +41,7 @@ export default function EmployeeActionMenu({
       : ((row.fullName as { en?: string; vi?: string })?.en ??
         (row.fullName as { en?: string; vi?: string })?.vi ??
         row.code ??
+        row.employeeCode ??
         row.id);
 
   const actions = useCallback((): ActionItem[] => {

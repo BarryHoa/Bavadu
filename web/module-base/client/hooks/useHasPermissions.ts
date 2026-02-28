@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import userService from "@base/client/services/UserService";
+import { usePermissionsStore } from "@base/client/stores";
 
 export type HasPermissionsMode = "any" | "all";
 
@@ -19,6 +21,13 @@ export function useHasPermissions(
     queryFn: () => userService.getMeWithRoles(),
     staleTime: 5 * 60 * 1000,
   });
+
+  // Sync permissions to store when data is loaded
+  useEffect(() => {
+    if (data?.data) {
+      usePermissionsStore.getState().setPermissions(data.data);
+    }
+  }, [data?.data]);
 
   const list = data?.data?.permissions ?? [];
   const isGlobalAdmin = data?.data?.isGlobalAdmin ?? false;

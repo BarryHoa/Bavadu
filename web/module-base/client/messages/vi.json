@@ -361,5 +361,40 @@
     "noRoles": "Chưa có vai trò nào",
     "saved": "Đã lưu quyền",
     "saveFailed": "Lưu quyền thất bại"
+  },
+  "auth": {
+    "login": {
+      "title": "Đăng nhập vào tài khoản",
+      "subtitle": "Nhập thông tin đăng nhập để truy cập tài khoản",
+      "username": "Tên đăng nhập",
+      "usernamePlaceholder": "Nhập tên đăng nhập",
+      "password": "Mật khẩu",
+      "passwordPlaceholder": "Nhập mật khẩu",
+      "rememberMe": "Ghi nhớ đăng nhập",
+      "forgotPassword": "Quên mật khẩu?",
+      "submit": "Đăng nhập",
+      "errorGeneric": "Đã xảy ra lỗi. Vui lòng thử lại.",
+      "logoAlt": "Logo BAVADU",
+      "showPassword": "Hiện mật khẩu",
+      "hidePassword": "Ẩn mật khẩu"
+    },
+    "resetPassword": {
+      "title": "Đặt lại mật khẩu",
+      "subtitle": "Nhập email của bạn, chúng tôi sẽ gửi link đặt lại mật khẩu",
+      "checkEmailTitle": "Kiểm tra email",
+      "checkEmailMessage": "Chúng tôi đã gửi link đặt lại mật khẩu đến email của bạn",
+      "checkEmailDetail": "Nếu có tài khoản với email {email}, bạn sẽ nhận được link đặt lại mật khẩu trong thời gian sớm nhất.",
+      "email": "Email",
+      "emailPlaceholder": "Nhập email",
+      "sendLink": "Gửi link đặt lại",
+      "backToLogin": "Quay lại đăng nhập",
+      "errorGeneric": "Đã xảy ra lỗi. Vui lòng thử lại."
+    },
+    "logoutConfirm": {
+      "title": "Xác nhận thoát",
+      "message": "Bạn có chắc muốn thoát? Các tab khác cũng sẽ chuyển về màn hình đăng nhập.",
+      "cancel": "Hủy",
+      "confirm": "Xác nhận"
+    }
   }
 }

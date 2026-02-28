@@ -366,5 +366,40 @@
     "noRoles": "No roles available",
     "saved": "Permissions saved",
     "saveFailed": "Failed to save permissions"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in to your account",
+      "subtitle": "Enter your credentials to access your account",
+      "username": "Username",
+      "usernamePlaceholder": "Enter your username",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "submit": "Sign in",
+      "errorGeneric": "An error occurred. Please try again.",
+      "logoAlt": "BAVADU Logo",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    },
+    "resetPassword": {
+      "title": "Reset your password",
+      "subtitle": "Enter your email address and we'll send you a link to reset your password",
+      "checkEmailTitle": "Check your email",
+      "checkEmailMessage": "We've sent a password reset link to your email address",
+      "checkEmailDetail": "If an account exists with the email {email}, you will receive a password reset link shortly.",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "sendLink": "Send reset link",
+      "backToLogin": "Back to login",
+      "errorGeneric": "An error occurred. Please try again."
+    },
+    "logoutConfirm": {
+      "title": "Confirm sign out",
+      "message": "Are you sure you want to sign out? Other tabs will also be redirected to the login screen.",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    }
   }
 }

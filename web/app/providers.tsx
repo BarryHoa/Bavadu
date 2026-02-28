@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useLayoutEffect, useState } from "react";
 
 import { NavigationLoader } from "@base/client/components/NavigationLoader";
+import { PermissionBroadcastListener } from "@base/client/components/PermissionBroadcastListener";
 import { GlobalSettingsProvider } from "@base/client/contexts/global-settings";
 import { usePreventBackspaceNavigation } from "@base/client/hooks/usePreventBackspaceNavigation";
 // Import root-store để khởi tạo và test DevTools
@@ -51,6 +52,7 @@ export function Providers({ children }: ProvidersProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <PermissionBroadcastListener />
       <HeroUIProvider navigate={router.push}>
         <ToastProvider
           placement="top-right"
