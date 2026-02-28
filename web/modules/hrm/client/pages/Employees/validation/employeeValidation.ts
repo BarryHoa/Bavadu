@@ -55,9 +55,9 @@ export function createEmployeeValidation(t: TranslateFn) {
   const phoneSchema = optional(pipe(string(), trim()));
   const dateSchema = pipe(string(), trim());
 
-  // Main form schema — HR fields + optional userId (create) and display-only personal fields
+  // Main form schema — HR fields + userId required for create, display-only personal fields
   const employeeFormSchema = object({
-    userId: optional(pipe(string(), trim())),
+    userId: optional(pipe(string(), trim())), // required on create; validated in submit
     employeeCode: employeeCodeSchema,
     firstName: optional(pipe(string(), trim())),
     lastName: optional(pipe(string(), trim())),
@@ -78,21 +78,8 @@ export function createEmployeeValidation(t: TranslateFn) {
     managerId: optional(pipe(string(), trim())),
     employmentStatus: optional(pipe(string(), trim())),
     employmentType: optional(pipe(string(), trim())),
-    hireDate: pipe(string(), trim(), minLength(1, t("hireDate.required"))),
+    hireDate: optional(dateSchema),
     probationEndDate: optional(dateSchema),
-    baseSalary: optional(
-      pipe(
-        string(),
-        trim(),
-        custom((value) => {
-          if (value === "") return true;
-          const num = Number(value);
-          return !Number.isNaN(num) && num >= 0;
-        }, t("baseSalary.invalid")),
-      ),
-    ),
-    currency: optional(pipe(string(), trim())),
-    locationId: optional(pipe(string(), trim())),
     bankAccount: optional(pipe(string(), trim())),
     bankName: optional(pipe(string(), trim())),
     bankBranch: optional(pipe(string(), trim())),

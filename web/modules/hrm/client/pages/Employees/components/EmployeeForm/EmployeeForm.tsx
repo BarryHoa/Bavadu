@@ -50,7 +50,6 @@ export default function EmployeeForm({
     defaultValues: {
       isActive: true,
       employmentStatus: "active",
-      currency: "VND",
       ...defaultValues,
     },
   });
@@ -85,6 +84,7 @@ export default function EmployeeForm({
                 render={({ field, fieldState }) => (
                   <IBaseInput
                     {...field}
+                    isRequired
                     errorMessage={fieldState.error?.message}
                     isInvalid={fieldState.invalid}
                     label={tLabels("userId")}
@@ -257,7 +257,6 @@ export default function EmployeeForm({
                 render={({ field, fieldState }) => (
                   <IBaseInput
                     {...field}
-                    isRequired
                     errorMessage={fieldState.error?.message}
                     isInvalid={fieldState.invalid}
                     label={tLabels("hireDate")}
@@ -280,20 +279,6 @@ export default function EmployeeForm({
                 )}
               />
             </div>
-            <Controller
-              control={control}
-              name="baseSalary"
-              render={({ field, fieldState }) => (
-                <IBaseInput
-                  {...field}
-                  errorMessage={fieldState.error?.message}
-                  isInvalid={fieldState.invalid}
-                  label={tLabels("baseSalary")}
-                  size="sm"
-                  type="number"
-                />
-              )}
-            />
           </div>
         </IBaseCardBody>
       </IBaseCard>

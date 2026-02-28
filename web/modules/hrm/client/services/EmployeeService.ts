@@ -2,7 +2,7 @@ import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export interface EmployeeDto {
   id: string;
-  userId?: string | null;
+  userId: string;
   employeeCode: string;
   firstName?: string | null;
   lastName?: string | null;
@@ -32,11 +32,8 @@ export interface EmployeeDto {
   } | null;
   employmentStatus: string;
   employmentType?: string | null;
-  hireDate: string;
+  hireDate?: string | null;
   probationEndDate?: string | null;
-  baseSalary?: number | null;
-  currency?: string | null;
-  locationId?: string | null;
   bankAccount?: string | null;
   bankName?: string | null;
   bankBranch?: string | null;
@@ -49,7 +46,7 @@ export interface EmployeeDto {
 
 /** HR-only + userId for create. Personal data (name, email, etc.) lives on user. */
 export interface EmployeeCreatePayload {
-  userId?: string | null;
+  userId: string;
   employeeCode: string;
   nationalId?: string | null;
   taxId?: string | null;
@@ -58,11 +55,8 @@ export interface EmployeeCreatePayload {
   managerId?: string | null;
   employmentStatus?: string;
   employmentType?: string | null;
-  hireDate: string;
+  hireDate?: string | null;
   probationEndDate?: string | null;
-  baseSalary?: number | null;
-  currency?: string | null;
-  locationId?: string | null;
   bankAccount?: string | null;
   bankName?: string | null;
   bankBranch?: string | null;
@@ -82,11 +76,8 @@ export interface EmployeeUpdatePayload {
   managerId?: string | null;
   employmentStatus?: string;
   employmentType?: string | null;
-  hireDate?: string;
+  hireDate?: string | null;
   probationEndDate?: string | null;
-  baseSalary?: number | null;
-  currency?: string | null;
-  locationId?: string | null;
   bankAccount?: string | null;
   bankName?: string | null;
   bankBranch?: string | null;

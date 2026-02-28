@@ -53,8 +53,12 @@ export default function EmployeeCreatePageClient(): React.ReactNode {
   });
 
   const handleSubmit = async (values: EmployeeFormValues) => {
+    const userId = values.userId?.trim();
+    if (!userId) {
+      throw new Error("UserId is required");
+    }
     const payload = {
-      userId: values.userId?.trim() || null,
+      userId,
       employeeCode: values.employeeCode.trim(),
       nationalId: values.nationalId?.trim() || null,
       taxId: values.taxId?.trim() || null,
@@ -63,11 +67,8 @@ export default function EmployeeCreatePageClient(): React.ReactNode {
       managerId: values.managerId?.trim() || null,
       employmentStatus: values.employmentStatus || "active",
       employmentType: values.employmentType?.trim() || null,
-      hireDate: values.hireDate.trim(),
+      hireDate: values.hireDate?.trim() || null,
       probationEndDate: values.probationEndDate?.trim() || null,
-      baseSalary: values.baseSalary ? Number(values.baseSalary) : null,
-      currency: values.currency?.trim() || "VND",
-      locationId: values.locationId?.trim() || null,
       bankAccount: values.bankAccount?.trim() || null,
       bankName: values.bankName?.trim() || null,
       bankBranch: values.bankBranch?.trim() || null,

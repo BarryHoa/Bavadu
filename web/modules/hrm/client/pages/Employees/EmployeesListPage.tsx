@@ -39,7 +39,6 @@ type EmployeeRow = Employee & {
   status?: string | null;
   type?: string | null;
   hireDate?: number | string | null;
-  baseSalary?: number | null;
   createdAt?: number | string | null;
   updatedAt?: number | string | null;
 };
@@ -123,11 +122,6 @@ export default function EmployeesListPage(): React.ReactNode {
       key: "hireDate",
       label: t("hireDate"),
       render: (value) => formatDate(value),
-    },
-    {
-      key: "baseSalary",
-      label: t("baseSalary"),
-      render: (value) => (value != null ? Number(value).toLocaleString() : "—"),
     },
     {
       key: "createdAt",

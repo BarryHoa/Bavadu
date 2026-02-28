@@ -1,9 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   date,
-  foreignKey,
   index,
-  integer,
   timestamp,
   uniqueIndex,
   uuid,
@@ -24,11 +22,11 @@ export const hrm_tb_employees = mdlHrmSchema.table(
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
 
-    userId: uuid("user_id").references(() => base_tb_users.id, {
-      onDelete: "set null",
-    }), // 1:1 with user when set (unique)
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => base_tb_users.id, { onDelete: "restrict" }),
 
-    code: varchar("code", { length: 100 }).notNull().unique(),
+    code: varchar("code", { length: 100 }).notNull(),
     nationalId: varchar("national_id", { length: 50 }), // CMND/CCCD
     taxId: varchar("tax_id", { length: 50 }),
 
@@ -38,15 +36,13 @@ export const hrm_tb_employees = mdlHrmSchema.table(
     departmentId: uuid("department_id")
       .references(() => hrm_tb_departments.id, { onDelete: "restrict" })
       .notNull(),
-    managerId: uuid("manager_id"),
+    managerId: uuid("manager_id").references(() => base_tb_users.id, {
+      onDelete: "set null",
+    }),
     status: varchar("status", { length: 50 }).notNull().default("active"),
     type: varchar("type", { length: 50 }),
-    hireDate: date("hire_date").notNull(),
+    hireDate: date("hire_date"),
     probationEndDate: date("probation_end_date"),
-    baseSalary: integer("base_salary"),
-    currency: varchar("currency", { length: 10 }).default("VND"),
-    locationId: uuid("location_id"),
-
     bankAccount: varchar("bank_account", { length: 100 }),
     bankName: varchar("bank_name", { length: 255 }),
     bankBranch: varchar("bank_branch", { length: 255 }),
@@ -58,13 +54,8 @@ export const hrm_tb_employees = mdlHrmSchema.table(
     updatedBy: varchar("updated_by", { length: 36 }),
   },
   (table) => [
-    foreignKey({
-      columns: [table.managerId],
-      foreignColumns: [table.id],
-    }),
     uniqueIndex("employees_user_id_unique").on(table.userId),
-    index("employees_user_idx").on(table.userId),
-    index("employees_code_idx").on(table.code),
+    uniqueIndex("employees_code_unique").on(table.code),
     index("employees_position_idx").on(table.positionId),
     index("employees_department_idx").on(table.departmentId),
     index("employees_manager_idx").on(table.managerId),

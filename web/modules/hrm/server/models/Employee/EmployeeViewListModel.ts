@@ -29,7 +29,7 @@ const fullNameSql = fullNameSqlFrom(base_tb_users);
 
 export interface EmployeeRow {
   id: string;
-  userId?: string | null;
+  userId: string;
   code: string;
   fullName?: string | null;
   firstName?: string | null;
@@ -41,9 +41,8 @@ export interface EmployeeRow {
   departmentId: string;
   department?: { id: string; name?: unknown } | null;
   status: string;
-  type: string;
-  hireDate: string;
-  baseSalary?: number | null;
+  type?: string | null;
+  hireDate?: string | null;
   createdAt?: number;
   updatedAt?: number;
 }
@@ -54,14 +53,12 @@ class EmployeeViewListModel extends BaseViewListModel<
 > {
   protected declarationColumns = () =>
     new Map<string, { column: Column<any>; sort?: boolean }>([
-      ["id", { column: employee.id, sort: true }],
       ["code", { column: employee.code, sort: true }],
       ["type", { column: employee.type, sort: true }],
       ["positionId", { column: employee.positionId, sort: true }],
       ["departmentId", { column: employee.departmentId, sort: true }],
       ["status", { column: employee.status, sort: true }],
       ["hireDate", { column: employee.hireDate, sort: true }],
-      ["baseSalary", { column: employee.baseSalary, sort: true }],
       ["createdAt", { column: employee.createdAt, sort: true }],
       ["updatedAt", { column: employee.updatedAt, sort: true }],
     ]);
@@ -99,9 +96,8 @@ class EmployeeViewListModel extends BaseViewListModel<
       ? { id: row.departmentId, name: row.departmentName }
       : null,
     status: row.status,
-    type: row.type,
-    hireDate: row.hireDate,
-    baseSalary: row.baseSalary,
+    type: row.type ?? undefined,
+    hireDate: row.hireDate ?? undefined,
     createdAt: row.createdAt?.getTime?.(),
     updatedAt: row.updatedAt?.getTime?.(),
   });
@@ -127,8 +123,8 @@ class EmployeeViewListModel extends BaseViewListModel<
       departmentId: employee.departmentId,
       departmentName: department.name,
       status: employee.status,
+      type: employee.type,
       hireDate: employee.hireDate,
-      baseSalary: employee.baseSalary,
       createdAt: employee.createdAt,
       updatedAt: employee.updatedAt,
     };
