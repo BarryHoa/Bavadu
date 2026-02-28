@@ -8,16 +8,10 @@ import {
   JsonRpcError,
 } from "@/module-base/server/rpc/jsonRpcHandler";
 import { BaseModel, PermissionRequired } from "@base/server/models/BaseModel";
-import { base_tb_users } from "@base/server/schemas/base.user";
 
 import { NewHrmTbTimesheet, hrm_tb_timesheets } from "../../schemas";
-import { hrm_tb_employees } from "../../schemas/hrm.employee";
 import { hrm_tb_shifts } from "../../schemas/hrm.shift";
-import { fullNameSqlFrom } from "../Employee/employee.helpers";
-
-const employee = alias(hrm_tb_employees, "employee");
 const shift = alias(hrm_tb_shifts, "shift");
-const user = alias(base_tb_users, "user");
 
 export interface TimesheetRow {
   id: string;
@@ -78,8 +72,6 @@ export default class TimesheetModel extends BaseModel<
   private selectJoined = () => ({
     id: this.table.id,
     employeeId: this.table.employeeId,
-    employeeCode: employee.code,
-    employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
     rosterId: this.table.rosterId,
     workDate: this.table.workDate,
     shiftId: this.table.shiftId,
@@ -105,11 +97,10 @@ export default class TimesheetModel extends BaseModel<
   private mapJoinedRow = (row: any): TimesheetRow => ({
     id: row.id,
     employeeId: row.employeeId,
-    employee: row.employeeId
+    employee: row.employeeFullName
       ? {
           id: row.employeeId,
-          employeeCode: row.employeeCode ?? undefined,
-          fullName: row.employeeFullName ?? undefined,
+          fullName: row.employeeFullName,
         }
       : null,
     rosterId: row.rosterId ?? undefined,

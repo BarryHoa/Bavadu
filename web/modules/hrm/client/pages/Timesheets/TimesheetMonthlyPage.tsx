@@ -5,12 +5,8 @@ import type { TimesheetDto } from "@mdl/hrm/client/interface/Timesheet";
 import { useQuery } from "@tanstack/react-query";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 
-import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
-import { formatDate } from "@base/client/utils/date/formatDate";
-import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import {
   IBaseButton,
   IBaseCard,
@@ -23,6 +19,9 @@ import {
   IBaseModalHeader,
   IBaseSpinner,
 } from "@base/client/components";
+import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
+import { formatDate } from "@base/client/utils/date/formatDate";
+import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const WEEKDAYS_VI = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
@@ -66,8 +65,6 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
   const t = useTranslations("hrm.timesheets");
   const tCommon = useTranslations("common");
   const getLocalizedText = useLocalizedText();
-  const searchParams = useSearchParams();
-  const employeeIdFromUrl = searchParams.get("employeeId");
 
   const today = useMemo(() => new Date(), []);
   const [year, setYear] = useState(() => today.getFullYear());
@@ -81,12 +78,11 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
     isLoading,
     error: monthError,
   } = useQuery({
-    queryKey: ["hrm-timesheets-by-month", year, month, employeeIdFromUrl ?? "me"],
+    queryKey: ["hrm-monthly-timesheet", year, month, "me"],
     queryFn: async () => {
-      const r = await timesheetService.getByMonth({
+      const r = await timesheetService.getMyTimesheet({
         year,
         month,
-        employeeId: employeeIdFromUrl ?? undefined,
       });
 
       return r?.data ?? [];
@@ -150,7 +146,8 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
   );
 
   if (monthError) {
-    const msg = monthError instanceof Error ? monthError.message : String(monthError);
+    const msg =
+      monthError instanceof Error ? monthError.message : String(monthError);
     const isNoEmployeeLinked =
       msg.toLowerCase().includes("no employee linked") ||
       msg.toLowerCase().includes("employee linked");

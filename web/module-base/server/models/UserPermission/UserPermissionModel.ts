@@ -91,8 +91,6 @@ export default class UserPermissionModel extends BaseModelCached<
     // Lấy từ database
     const result = await this._getPermissionsByUserFromDB(userId);
 
-    console.log({ result });
-
     // Cache lại
     const cacheData: CachedUserPermissionResult = {
       permissions: Array.from(result.permissions), // Convert Set to Array

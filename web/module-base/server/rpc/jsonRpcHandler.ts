@@ -65,6 +65,7 @@ export const JSON_RPC_ERROR_CODES = {
   /** Params structure OK but values fail business/domain validation rules. */
   VALIDATION_ERROR: -32003,
   RESOURCE_NOT_FOUND: -32004,
+  MODEL_METHOD_NOT_SUPPORTED: -32005,
 } as const;
 
 /** Default messages for each error code when message param is not provided */
@@ -80,12 +81,9 @@ const DEFAULT_ERROR_MESSAGES: Record<number, string> = {
   [JSON_RPC_ERROR_CODES.RESOURCE_NOT_FOUND]: "Resource not found",
   [JSON_RPC_ERROR_CODES.PERMISSION_DENIED]:
     "You do not have permission to perform this action. Please contact your administrator to get the permission.",
+  [JSON_RPC_ERROR_CODES.MODEL_METHOD_NOT_SUPPORTED]:
+    "Model method not supported",
 };
-
-// Constants for method structure
-const SUB_TYPE_LIST = "list";
-const SUB_TYPE_DROPDOWN = "dropdown";
-const SUB_TYPE_CRUD = "curd";
 
 /** Pathname chứa segment này thì coi là public (không bắt buộc auth). */
 const PUBLIC_PATH_SEGMENT = "/public/";
@@ -120,29 +118,16 @@ export class JsonRpcHandler {
     request: NextRequest,
   ): Promise<any> {
     // Parse method: <model-id>.<sub-type>.<method>
-    const parts = method.split(".");
+    const methodValidation = validateJsonRpcMethod(method);
 
-    if (parts.length < 3) {
+    if (!methodValidation?.valid) {
       throw new JsonRpcError(
-        JSON_RPC_ERROR_CODES.INVALID_PARAMS,
-        `Invalid model method format. Expected: <model-id>.<sub-type>.<method>\n` +
-          `Example: product-category.list.getData, product.curd.create`,
+        JSON_RPC_ERROR_CODES.METHOD_NOT_FOUND,
+        methodValidation.error,
       );
     }
 
-    const [modelId, subType, methodName] = parts;
-
-    // Validate sub-type
-    if (
-      subType !== SUB_TYPE_LIST &&
-      subType !== SUB_TYPE_DROPDOWN &&
-      subType !== SUB_TYPE_CRUD
-    ) {
-      throw new JsonRpcError(
-        JSON_RPC_ERROR_CODES.INVALID_PARAMS,
-        `Invalid model type. Expected: ${SUB_TYPE_LIST}, ${SUB_TYPE_DROPDOWN}, ${SUB_TYPE_CRUD}`,
-      );
-    }
+    const { modelId, subType, methodName = "" } = methodValidation.parts ?? {};
 
     // Build model key
     const modelKey = `${modelId}.${subType}`;
@@ -150,8 +135,14 @@ export class JsonRpcHandler {
     // Get model instance
     const modelInstance = await RuntimeContext.getModelInstanceBy(modelKey);
 
-    if (!modelInstance) {
-      throw new JsonRpcError(JSON_RPC_ERROR_CODES.METHOD_NOT_FOUND);
+    // Get method function
+    const modelMethodFunction = (modelInstance as any)?.[methodName] as (
+      params?: Record<string, any>,
+      request?: NextRequest,
+    ) => Promise<any>;
+
+    if (!modelMethodFunction || typeof modelMethodFunction !== "function") {
+      throw new JsonRpcError(JSON_RPC_ERROR_CODES.MODEL_METHOD_NOT_SUPPORTED);
     }
 
     /**
@@ -178,16 +169,6 @@ export class JsonRpcHandler {
         JSON_RPC_ERROR_CODES.AUTHENTICATION_ERROR,
         "This method requires authentication and is not available on the public endpoint",
       );
-    }
-
-    // Get method function
-    const modelMethodFunction = (modelInstance as any)[methodName] as (
-      params?: Record<string, any>,
-      request?: NextRequest,
-    ) => Promise<any>;
-
-    if (!modelMethodFunction || typeof modelMethodFunction !== "function") {
-      throw new JsonRpcError(JSON_RPC_ERROR_CODES.METHOD_NOT_FOUND);
     }
 
     // permission check for method if required
@@ -268,22 +249,6 @@ export class JsonRpcHandler {
         throw new JsonRpcError(
           JSON_RPC_ERROR_CODES.INVALID_REQUEST,
           `Invalid JSON-RPC version. Only ${this.rpcVersion} is supported`,
-        );
-      }
-      // Validate method exists
-      if (!request.method) {
-        throw new JsonRpcError(
-          JSON_RPC_ERROR_CODES.INVALID_REQUEST,
-          "Method is required",
-        );
-      }
-      // Validate method format
-      const methodValidation = validateJsonRpcMethod(request.method);
-
-      if (!methodValidation.valid) {
-        throw new JsonRpcError(
-          JSON_RPC_ERROR_CODES.INVALID_PARAMS,
-          methodValidation.error || "Invalid method format",
         );
       }
 

@@ -1,6 +1,6 @@
 import type {
-  TimesheetDto,
   CreateTimesheetPayload,
+  TimesheetDto,
   UpdateTimesheetPayload,
 } from "../interface/Timesheet";
 
@@ -22,7 +22,7 @@ export default class TimesheetService extends JsonRpcClientService {
     }>("timesheet.curd.getById", { id });
   }
 
-  getByMonth(params: {
+  getMyTimesheet(params: {
     year: number;
     month: number;
     employeeId?: string | null;
@@ -30,7 +30,7 @@ export default class TimesheetService extends JsonRpcClientService {
     return this.call<{
       data: TimesheetDto[];
       message?: string;
-    }>("timesheet.curd.getTimesheetsByMonth", params);
+    }>("timesheet.curd.getMyTimesheet", params);
   }
 
   create(payload: CreateTimesheetPayload) {
