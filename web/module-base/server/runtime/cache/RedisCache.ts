@@ -4,7 +4,7 @@ import { Debug } from "../Debug";
 
 import { RedisClientManager, RedisStatus } from "./RedisClientManager";
 
-export const CACHE_NOT_FOUND = Symbol("CACHE_NOT_FOUND");
+export const CACHE_NOT_FOUND = "CACHE_NOT_FOUND";
 
 export type CacheResult<T> = T | typeof CACHE_NOT_FOUND;
 
@@ -55,10 +55,10 @@ export class RedisCache {
    */
   async get<T = any>(
     key: string,
-    options?: CacheOptions
+    options?: CacheOptions,
   ): Promise<CacheResult<T>> {
     Debug.log(
-      `[RedisCache] Getting value for key "${key}" with prefix "${options?.prefix}"`
+      `[RedisCache] Getting value for key "${key}" with prefix "${options?.prefix}"`,
     );
     if (!this.checkStatus()) {
       return CACHE_NOT_FOUND;
@@ -86,10 +86,10 @@ export class RedisCache {
   async set<T = any>(
     key: string,
     value: T,
-    options?: CacheOptions
+    options?: CacheOptions,
   ): Promise<boolean> {
     Debug.log(
-      `[RedisCache] Setting value for key "${key}" with prefix "${options?.prefix}"`
+      `[RedisCache] Setting value for key "${key}" with prefix "${options?.prefix}"`,
     );
     if (!this.checkStatus()) {
       return false;
@@ -119,7 +119,7 @@ export class RedisCache {
    */
   async delete(key: string, options?: CacheOptions): Promise<boolean> {
     Debug.log(
-      `[RedisCache] Deleting key "${key}" with prefix "${options?.prefix}"`
+      `[RedisCache] Deleting key "${key}" with prefix "${options?.prefix}"`,
     );
     if (!this.checkStatus()) {
       return false;
@@ -142,7 +142,7 @@ export class RedisCache {
    */
   async deleteMany(keys: string[], options?: CacheOptions): Promise<number> {
     Debug.log(
-      `[RedisCache] Deleting multiple keys with prefix "${options?.prefix}"`
+      `[RedisCache] Deleting multiple keys with prefix "${options?.prefix}"`,
     );
     if (!this.checkStatus() || keys.length === 0) {
       return 0;
@@ -166,7 +166,7 @@ export class RedisCache {
    */
   async exists(key: string, options?: CacheOptions): Promise<boolean> {
     Debug.log(
-      `[RedisCache] Checking if key "${key}" with prefix "${options?.prefix}" exists`
+      `[RedisCache] Checking if key "${key}" with prefix "${options?.prefix}" exists`,
     );
     if (!this.checkStatus()) {
       return false;
@@ -189,7 +189,7 @@ export class RedisCache {
    */
   async getTtl(key: string, options?: CacheOptions): Promise<number> {
     Debug.log(
-      `[RedisCache] Getting TTL for key "${key}" with prefix "${options?.prefix}"`
+      `[RedisCache] Getting TTL for key "${key}" with prefix "${options?.prefix}"`,
     );
     if (!this.checkStatus()) {
       return -1;
@@ -212,10 +212,10 @@ export class RedisCache {
   async increment(
     key: string,
     by: number = 1,
-    options?: CacheOptions
+    options?: CacheOptions,
   ): Promise<number | null> {
     Debug.log(
-      `[RedisCache] Incrementing key "${key}" with prefix "${options?.prefix}" by ${by}`
+      `[RedisCache] Incrementing key "${key}" with prefix "${options?.prefix}" by ${by}`,
     );
     if (!this.checkStatus()) {
       return null;
@@ -241,7 +241,7 @@ export class RedisCache {
     connected: boolean;
   } {
     Debug.log(
-      `[RedisCache] Getting status: ${this.manager.getStatus()} ${this.manager.isConnected()}`
+      `[RedisCache] Getting status: ${this.manager.getStatus()} ${this.manager.isConnected()}`,
     );
 
     return {
@@ -256,7 +256,7 @@ export class RedisCache {
    */
   async clearPattern(pattern: string, options?: CacheOptions): Promise<number> {
     Debug.log(
-      `[RedisCache] Clearing pattern "${pattern}" with prefix "${options?.prefix}"`
+      `[RedisCache] Clearing pattern "${pattern}" with prefix "${options?.prefix}"`,
     );
     if (!this.checkStatus()) {
       return 0;
@@ -290,7 +290,7 @@ export class RedisCache {
     } catch (error) {
       Debug.error(
         `[RedisCache] ClearPattern error for pattern "${pattern}":`,
-        error
+        error,
       );
 
       return 0;

@@ -117,6 +117,7 @@ export function loadMenusFromModules(): MenuFactoryElm[] {
 
       menus.push({
         ...menuData,
+        module: moduleDir,
         type: "mdl" as const,
         // path: normalizePath(modulePrefix, menuData.path ?? "/"),
         // as: normalizePath(modulePrefix, menuData.as ?? menuData.path ?? "/"),
@@ -160,34 +161,32 @@ export function loadAllMenus(): MenuFactoryElm[] {
  * Items without "permission" are always kept. Children are filtered recursively.
  * Parents with no remaining children (and no path) are removed.
  */
-export function filterMenusByPermissions(
+export const filterMenusByPermissions = (
   items: MenuFactoryElm[],
   permissions: Set<string>,
-): MenuFactoryElm[] {
-  const out: MenuFactoryElm[] = [];
+  isGlobalAdmin: boolean,
+  adminModules?: Set<string>,
+): MenuFactoryElm[] =>
+  items
+    ?.map((item) => {
+      let isAccepted = false;
 
-  for (const item of items) {
-    if (item.permission && !permissions.has(item.permission)) {
-      continue;
-    }
+      if (item.children) {
+        isAccepted = !!filterMenusByPermissions(
+          item.children,
+          permissions,
+          isGlobalAdmin,
+          adminModules,
+        );
+      }
+      if (isAccepted || isGlobalAdmin || adminModules?.has(item.module)) {
+        return item;
+      }
+      // check permission
+      if (item.permission && !permissions.has(item.permission)) {
+        return undefined;
+      }
 
-    const filteredChildren =
-      item.children && item.children.length > 0
-        ? filterMenusByPermissions(item.children, permissions)
-        : undefined;
-
-    const hasChildren = !!(filteredChildren && filteredChildren.length > 0);
-    const hasPath = !!item.path;
-
-    if (!hasPath && !hasChildren) {
-      continue;
-    }
-
-    out.push({
-      ...item,
-      children: hasChildren ? filteredChildren : undefined,
-    });
-  }
-
-  return out;
-}
+      return item;
+    })
+    .filter((item) => item !== undefined) as MenuFactoryElm[];

@@ -71,8 +71,7 @@ export default class UserPermissionModel extends BaseModelCached<
   ): Promise<UserPermissionResult> {
     // Nếu không force refresh, thử lấy từ cache
     if (!forceRefresh) {
-      const cached =
-        await this.cacheGet<CachedUserPermissionResult>(userId);
+      const cached = await this.cacheGet<CachedUserPermissionResult>(userId);
 
       if (cached !== this.CACHE_NOT_FOUND) {
         const data = cached as CachedUserPermissionResult;
@@ -91,6 +90,8 @@ export default class UserPermissionModel extends BaseModelCached<
 
     // Lấy từ database
     const result = await this._getPermissionsByUserFromDB(userId);
+
+    console.log({ result });
 
     // Cache lại
     const cacheData: CachedUserPermissionResult = {
@@ -273,14 +274,18 @@ export default class UserPermissionModel extends BaseModelCached<
   ): boolean {
     if (userPermissions.has(required)) return true;
     const parts = required.split(".");
+
     if (parts.length >= 2) {
       const moduleWildcard = `${parts[0]}.*`;
+
       if (userPermissions.has(moduleWildcard)) return true;
     }
     if (parts.length >= 3) {
       const featureWildcard = `${parts[0]}.${parts[1]}.*`;
+
       if (userPermissions.has(featureWildcard)) return true;
     }
+
     return false;
   }
 

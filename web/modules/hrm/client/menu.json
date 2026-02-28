@@ -80,7 +80,7 @@
           "path": "/timesheets/all",
           "as": "/timesheets/all",
           "order": 2,
-          "permission": "hrm.timesheet.viewAll"
+          "permission": "hrm.timesheet.view"
         },
         {
           "key": "hrm-leave-requests",

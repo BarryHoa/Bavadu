@@ -1,13 +1,13 @@
 import { headers } from "next/headers";
 
+import ModuleI18nProvider from "@base/client/contexts/i18n";
+import WorkspaceLayoutClient from "@base/client/layouts/workspace/WorkspaceLayoutClient";
 import {
   filterMenusByPermissions,
   loadAllMenus,
 } from "@base/server/loaders/menu-loader";
 import UserPermissionModel from "@base/server/models/UserPermission/UserPermissionModel";
 import { getModuleNames } from "@base/server/utils/get-module-names";
-import ModuleI18nProvider from "@base/client/contexts/i18n";
-import WorkspaceLayoutClient from "@base/client/layouts/workspace/WorkspaceLayoutClient";
 
 import { MenuWorkspaceElement } from "../../interface/WorkspaceMenuInterface";
 
@@ -28,13 +28,15 @@ export default async function WorkspaceLayout({
   if (userId) {
     try {
       const userPermissionModel = new UserPermissionModel();
-      const { permissions } = await userPermissionModel.getPermissionsByUser(
-        userId,
-      );
+
+      const { permissions, isGlobalAdmin, adminModules } =
+        await userPermissionModel.getPermissionsByUser(userId);
 
       menuItems = filterMenusByPermissions(
         menuItems as MenuWorkspaceElement[],
         permissions,
+        isGlobalAdmin ?? false,
+        adminModules,
       ) as MenuWorkspaceElement[];
     } catch {
       // If permission check fails, use unfiltered menu

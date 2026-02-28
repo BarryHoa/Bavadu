@@ -8,5 +8,6 @@ export type MenuFactoryElm = {
   /** If set, menu item is shown only when user has this permission key */
   permission?: string;
   children?: MenuFactoryElm[];
+  module: string;
   type: "main" | "mdl";
 };

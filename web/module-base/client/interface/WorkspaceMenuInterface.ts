@@ -15,4 +15,5 @@ export interface MenuWorkspaceElement<
   type: "main" | "mdl";
   children?: MenuWorkspaceElement<K>[];
   parentKey?: K;
+  module: string;
 }

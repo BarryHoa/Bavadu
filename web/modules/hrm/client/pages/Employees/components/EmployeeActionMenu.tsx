@@ -1,10 +1,11 @@
 "use client";
 
+import type { ActionItem } from "@base/client/components/ActionMenu/ActionMenu";
+
 import { useTranslations } from "next-intl";
 import { useCallback, useState } from "react";
 
 import ActionMenu from "@base/client/components/ActionMenu/ActionMenu";
-import type { ActionItem } from "@base/client/components/ActionMenu/ActionMenu";
 import { UserPermissionPopup } from "@base/client/components/UserPermissionPopup";
 import { useCurrentUserCapabilities } from "@base/client/hooks/useCurrentUserCapabilities";
 
@@ -33,10 +34,10 @@ export default function EmployeeActionMenu({
   const displayName =
     typeof row.fullName === "string"
       ? row.fullName
-      : (row.fullName as { en?: string; vi?: string })?.en ??
+      : ((row.fullName as { en?: string; vi?: string })?.en ??
         (row.fullName as { en?: string; vi?: string })?.vi ??
         row.code ??
-        row.id;
+        row.id);
 
   const actions = useCallback((): ActionItem[] => {
     const list: ActionItem[] = [];
@@ -89,10 +90,10 @@ export default function EmployeeActionMenu({
       <ActionMenu actions={menuActions} />
       {row.userId && (
         <UserPermissionPopup
-          isOpen={permissionOpen}
-          onClose={() => setPermissionOpen(false)}
-          userId={row.userId}
           displayName={String(displayName)}
+          isOpen={permissionOpen}
+          userId={row.userId}
+          onClose={() => setPermissionOpen(false)}
           onSuccess={onPermissionChange}
         />
       )}
