@@ -6,8 +6,11 @@
 -- ============================================
 CREATE TABLE IF NOT EXISTS "md_base"."sequence_rules" (
   "id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
-  "name" varchar(100) NOT NULL UNIQUE,
-  "prefix" varchar(50) DEFAULT '',
+  "code" varchar(64) NOT NULL UNIQUE,
+  "name" varchar (100),
+  "prefix" varchar(32) DEFAULT '',
+  "suffix" varchar(32) DEFAULT '',
+  "description" text DEFAULT '',
   "format" varchar(20) DEFAULT '%06d',
   "start" integer DEFAULT 1 NOT NULL,
   "step" integer DEFAULT 1 NOT NULL,
@@ -17,7 +20,9 @@ CREATE TABLE IF NOT EXISTS "md_base"."sequence_rules" (
   "updated_at" timestamp with time zone DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS "sequence_rules_name_idx" ON "md_base"."sequence_rules"("name");
+CREATE INDEX IF NOT EXISTS "sequence_rules_code_idx" ON "md_base"."sequence_rules"("code");
+CREATE INDEX IF NOT EXISTS "sequence_rules_prefix_idx" ON "md_base"."sequence_rules"("prefix");
+CREATE INDEX IF NOT EXISTS "sequence_rules_suffix_idx" ON "md_base"."sequence_rules"("suffix");
 CREATE INDEX IF NOT EXISTS "sequence_rules_active_idx" ON "md_base"."sequence_rules"("is_active");
 CREATE INDEX IF NOT EXISTS "sequence_rules_created_at_idx" ON "md_base"."sequence_rules"("created_at" DESC);
 

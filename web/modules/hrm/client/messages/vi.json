@@ -107,6 +107,8 @@
           "genderFemale": "Nữ",
           "genderUnspecified": "Không xác định",
           "generatePassword": "Tạo mật khẩu",
+          "generateEmployeeCode": "Tạo mã nhân viên",
+          "generateEmployeeCodeTooltip": "Lấy mã mới từ Sequence (Cài đặt → Sequence Rules, name: employee.code)",
           "tabInfo": "Thông tin",
           "tabPermissions": "Phân quyền",
           "selectRoles": "Chọn vai trò (kết hợp quyền)",
@@ -153,6 +155,9 @@
           },
           "password": {
             "minLength": "Mật khẩu tối thiểu 6 ký tự"
+          },
+          "loginIdentifier": {
+            "required": "Tài khoản đăng nhập (email hoặc tên đăng nhập) là bắt buộc"
           },
           "nationalId": {
             "required": "CCCD/Định danh cá nhân là bắt buộc"

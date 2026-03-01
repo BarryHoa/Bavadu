@@ -1,0 +1,2 @@
+# Preload: expose AsyncLocalStorage on globalThis for Next.js (Bun không gán sẵn → Next báo lỗi)
+preload = ["./scripts/bun-preload-async-storage.js"]

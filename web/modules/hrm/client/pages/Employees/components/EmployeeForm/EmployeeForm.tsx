@@ -10,7 +10,7 @@ import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 
-import { Trash2 } from "lucide-react";
+import { RefreshCw, Trash2 } from "lucide-react";
 
 import { IBaseCard, IBaseCardBody } from "@base/client";
 import {
@@ -20,6 +20,7 @@ import {
   IBaseDatePicker,
   IBaseInput,
   IBaseInputEmail,
+  IBaseInputPassword,
   IBaseInputPhone,
   IBaseRadio,
   IBaseRadioGroup,
@@ -27,6 +28,7 @@ import {
   IBaseTabPrimary,
   IBaseTabsPrimary,
   IBaseTextarea,
+  IBaseTooltip,
 } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import RolePermissionMatrix from "@base/client/pages/Settings/Roles/components/RolePermissionMatrix/RolePermissionMatrix";
@@ -34,6 +36,7 @@ import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 import roleService from "@base/client/services/RoleService";
 import sequenceService from "@base/client/services/SequenceService";
 import userService from "@base/client/services/UserService";
+import { generateRandomPassword } from "@base/client/utils";
 
 import { createEmployeeValidation } from "../../validation/employeeValidation";
 
@@ -48,15 +51,6 @@ const DEFAULT_ADDRESS: Address = {
   administrativeUnits: [],
   formattedAddress: "",
 };
-
-function generateRandomPassword(length = 12): string {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%";
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-}
 
 interface EmployeeFormProps {
   onSubmit: (values: EmployeeFormValues) => Promise<void>;
@@ -88,23 +82,28 @@ export default function EmployeeForm({
     return d.toISOString().slice(0, 10);
   }, []);
 
-  const { control, handleSubmit, setValue, watch, formState: { errors } } =
-    useForm<EmployeeFormValues>({
-      resolver: valibotResolver(validation.employeeFormSchema) as any,
-      defaultValues: {
-        isActive: true,
-        employmentStatus: "active",
-        roleIds: [],
-        permissionIds: [],
-        emails: [""],
-        phones: [""],
-        gender: "unspecified",
-        hireDate: today,
-        probationEndDate: probationEndDateDefault,
-        address: DEFAULT_ADDRESS as unknown as Record<string, unknown>,
-        ...defaultValues,
-      },
-    });
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<EmployeeFormValues>({
+    resolver: valibotResolver(validation.employeeFormSchema) as any,
+    defaultValues: {
+      isActive: true,
+      employmentStatus: "active",
+      roleIds: [],
+      permissionIds: [],
+      emails: [""],
+      phones: [""],
+      gender: "unspecified",
+      hireDate: today,
+      probationEndDate: probationEndDateDefault,
+      address: DEFAULT_ADDRESS as unknown as Record<string, unknown>,
+      ...defaultValues,
+    },
+  });
 
   const emails = watch("emails") ?? [];
   const phones = watch("phones") ?? [];
@@ -144,55 +143,50 @@ export default function EmployeeForm({
     [permissionIds],
   );
 
-  const checkLoginExists = useCallback(
-    async (identifier: string) => {
-      const id = identifier?.trim();
-      if (!id) {
-        setLoginCheckMessage(null);
-        return;
-      }
-      setLoginCheckLoading(true);
+  const checkLoginExists = useCallback(async (identifier: string) => {
+    const id = identifier?.trim();
+    if (!id) {
       setLoginCheckMessage(null);
-      try {
-        const { exists } = await userService.checkLoginIdentifierExists(id);
-        setLoginCheckMessage(exists ? tLabels("identifierExists") : null);
-      } catch {
-        setLoginCheckMessage(null);
-      } finally {
-        setLoginCheckLoading(false);
-      }
-    },
-    [tLabels],
-  );
-
-  useEffect(() => {
-    const firstEmail =
-      Array.isArray(emails) && emails[0] ? emails[0].trim() : "";
-    if (firstEmail && !loginIdentifier) {
-      setValue("loginIdentifier", firstEmail);
+      return;
     }
-  }, [emails, loginIdentifier, setValue]);
-
-  const handleGenPassword = useCallback(async () => {
+    setLoginCheckLoading(true);
+    setLoginCheckMessage(null);
     try {
-      const value = await sequenceService.getNext("user.initial.password");
-      if (value) setValue("password", value);
+      const { exists } = await userService.checkLoginIdentifierExists(id);
+      setLoginCheckMessage(exists ? tLabels("identifierExists") : null);
     } catch {
-      setValue("password", generateRandomPassword());
+      setLoginCheckMessage(null);
+    } finally {
+      setLoginCheckLoading(false);
     }
-  }, [setValue]);
+  }, []);
+
+  const handleGenPassword = useCallback(() => {
+    setValue("password", generateRandomPassword());
+  }, []);
+
+  const [employeeCodeGenLoading, setEmployeeCodeGenLoading] = useState(false);
+  const handleGenEmployeeCode = useCallback(async () => {
+    setEmployeeCodeGenLoading(true);
+    try {
+      const value = await sequenceService.getNext("employee_code");
+      if (value) setValue("employeeCode", value);
+    } finally {
+      setEmployeeCodeGenLoading(false);
+    }
+  }, []);
 
   const addEmail = useCallback(() => {
     const list = Array.isArray(emails) ? emails : [];
     if (list.length >= 3) return;
     setValue("emails", [...list, ""]);
-  }, [emails, setValue]);
+  }, [emails]);
 
   const addPhone = useCallback(() => {
     const list = Array.isArray(phones) ? phones : [];
     if (list.length >= 3) return;
     setValue("phones", [...list, ""]);
-  }, [phones, setValue]);
+  }, [phones]);
 
   const removeEmail = useCallback(
     (index: number) => {
@@ -200,7 +194,7 @@ export default function EmployeeForm({
       next.splice(index, 1);
       setValue("emails", next);
     },
-    [emails, setValue],
+    [emails],
   );
 
   const removePhone = useCallback(
@@ -209,7 +203,7 @@ export default function EmployeeForm({
       next.splice(index, 1);
       setValue("phones", next);
     },
-    [phones, setValue],
+    [phones],
   );
 
   const toggleRole = useCallback(
@@ -223,14 +217,14 @@ export default function EmployeeForm({
           : [];
       setValue("roleIds", next);
     },
-    [roleIds, setValue],
+    [roleIds],
   );
 
   const handlePermissionMatrixChange = useCallback(
     (selectedIds: Set<string>) => {
       setValue("permissionIds", Array.from(selectedIds));
     },
-    [setValue],
+    [],
   );
 
   useEffect(() => {
@@ -249,7 +243,7 @@ export default function EmployeeForm({
       setValue("permissionIds", Array.from(merged));
     };
     load();
-  }, [mode, roleIds, setValue]);
+  }, [mode, roleIds]);
 
   const onSubmitForm: SubmitHandler<EmployeeFormValues> = async (values) => {
     await onSubmit(values);
@@ -327,6 +321,25 @@ export default function EmployeeForm({
                       <IBaseInput
                         {...field}
                         isRequired
+                        endContent={
+                          <IBaseTooltip
+                            content={tLabels("generateEmployeeCodeTooltip")}
+                            placement="top"
+                          >
+                            <button
+                              type="button"
+                              aria-label={tLabels("generateEmployeeCode")}
+                              className="rounded-small p-1 text-default-400 outline-none transition-colors hover:bg-default-100 hover:text-foreground disabled:opacity-50"
+                              disabled={employeeCodeGenLoading}
+                              onClick={handleGenEmployeeCode}
+                              onMouseDown={(e) => e.preventDefault()}
+                            >
+                              <RefreshCw
+                                className={`size-4 ${employeeCodeGenLoading ? "animate-spin" : ""}`}
+                              />
+                            </button>
+                          </IBaseTooltip>
+                        }
                         errorMessage={fieldState.error?.message}
                         isInvalid={fieldState.invalid}
                         label={tLabels("employeeCode")}
@@ -422,93 +435,99 @@ export default function EmployeeForm({
                     />
                   )}
                 />
-                {/* Emails — ít nhất 1 email; không xóa dòng đầu; nút xóa trong input */}
-                <div className="space-y-4">
-                  {(Array.isArray(emails) ? emails : []).map((_, i) => (
-                    <Controller
-                      key={`email-${i}`}
-                      control={control}
-                      name={`emails.${i}`}
-                      render={({ field, fieldState }) => (
-                        <IBaseInputEmail
-                          {...field}
-                          className="w-full md:w-1/2"
-                          endContent={
-                            i > 0 ? (
-                              <button
-                                type="button"
-                                aria-label={tLabels("removeEmail")}
-                                className="rounded-small p-1 text-default-400 outline-none transition-colors hover:bg-danger-100 hover:text-danger"
-                                onClick={() => removeEmail(i)}
-                                onMouseDown={(e) => e.preventDefault()}
-                              >
-                                <Trash2 className="size-4" />
-                              </button>
-                            ) : undefined
-                          }
-                          errorMessage={fieldState.error?.message ?? (i === 0 ? errors.emails?.message : undefined)}
-                          isInvalid={fieldState.invalid || (i === 0 && !!errors.emails)}
-                          isRequired={i === 0}
-                          label={i === 0 ? tLabels("emails") : undefined}
-                          size="sm"
-                        />
-                      )}
-                    />
-                  ))}
-                  {(emails?.length ?? 0) < 3 && (
-                    <IBaseButton
-                      color="primary"
-                      size="sm"
-                      variant="flat"
-                      onPress={addEmail}
-                    >
-                      {tLabels("addEmail")}
-                    </IBaseButton>
-                  )}
-                </div>
-                {/* Phones — ít nhất 1 SĐT; tối đa 3; không xóa dòng đầu; nút xóa trong input */}
-                <div className="space-y-4">
-                  {(Array.isArray(phones) ? phones : []).map((_, i) => (
-                    <Controller
-                      key={`phone-${i}`}
-                      control={control}
-                      name={`phones.${i}`}
-                      render={({ field, fieldState }) => (
-                        <IBaseInputPhone
-                          className="w-full md:w-1/2"
-                          endContent={
-                            i > 0 ? (
-                              <button
-                                type="button"
-                                aria-label={tLabels("removePhone")}
-                                className="rounded-small p-1 text-default-400 outline-none transition-colors hover:bg-danger-100 hover:text-danger"
-                                onClick={() => removePhone(i)}
-                                onMouseDown={(e) => e.preventDefault()}
-                              >
-                                <Trash2 className="size-4" />
-                              </button>
-                            ) : undefined
-                          }
-                          errorMessage={fieldState.error?.message}
-                          isInvalid={fieldState.invalid}
-                          label={i === 0 ? tLabels("phones") : undefined}
-                          size="sm"
-                          value={field.value ?? ""}
-                          onValueChange={field.onChange}
-                        />
-                      )}
-                    />
-                  ))}
-                  {(phones?.length ?? 0) < 3 && (
-                    <IBaseButton
-                      color="primary"
-                      size="sm"
-                      variant="flat"
-                      onPress={addPhone}
-                    >
-                      {tLabels("addPhone")}
-                    </IBaseButton>
-                  )}
+                {/* Emails (trái) | Phones (phải) — 2 cột */}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {/* Cột trái: Emails */}
+                  <div className="space-y-4">
+                    {(Array.isArray(emails) ? emails : []).map((_, i) => (
+                      <Controller
+                        key={`email-${i}`}
+                        control={control}
+                        name={`emails.${i}`}
+                        render={({ field, fieldState }) => (
+                          <IBaseInputEmail
+                            {...field}
+                            endContent={
+                              i > 0 ? (
+                                <button
+                                  type="button"
+                                  aria-label={tLabels("removeEmail")}
+                                  className="rounded-small p-1 text-default-400 outline-none transition-colors hover:bg-danger-100 hover:text-danger"
+                                  onClick={() => removeEmail(i)}
+                                  onMouseDown={(e) => e.preventDefault()}
+                                >
+                                  <Trash2 className="size-4" />
+                                </button>
+                              ) : undefined
+                            }
+                            errorMessage={
+                              fieldState.error?.message ??
+                              (i === 0 ? errors.emails?.message : undefined)
+                            }
+                            isInvalid={
+                              fieldState.invalid || (i === 0 && !!errors.emails)
+                            }
+                            isRequired={i === 0}
+                            label={i === 0 ? tLabels("emails") : undefined}
+                            size="sm"
+                          />
+                        )}
+                      />
+                    ))}
+                    {(emails?.length ?? 0) < 3 && (
+                      <IBaseButton
+                        color="primary"
+                        size="sm"
+                        variant="flat"
+                        onPress={addEmail}
+                      >
+                        {tLabels("addEmail")}
+                      </IBaseButton>
+                    )}
+                  </div>
+                  {/* Cột phải: Phones */}
+                  <div className="space-y-4">
+                    {(Array.isArray(phones) ? phones : []).map((_, i) => (
+                      <Controller
+                        key={`phone-${i}`}
+                        control={control}
+                        name={`phones.${i}`}
+                        render={({ field, fieldState }) => (
+                          <IBaseInputPhone
+                            endContent={
+                              i > 0 ? (
+                                <button
+                                  type="button"
+                                  aria-label={tLabels("removePhone")}
+                                  className="rounded-small p-1 text-default-400 outline-none transition-colors hover:bg-danger-100 hover:text-danger"
+                                  onClick={() => removePhone(i)}
+                                  onMouseDown={(e) => e.preventDefault()}
+                                >
+                                  <Trash2 className="size-4" />
+                                </button>
+                              ) : undefined
+                            }
+                            errorMessage={fieldState.error?.message}
+                            isInvalid={fieldState.invalid}
+                            label={i === 0 ? tLabels("phones") : undefined}
+                            size="sm"
+                            value={field.value ?? ""}
+                            onValueChange={field.onChange}
+                          />
+                        )}
+                      />
+                    ))}
+                    {(phones?.length ?? 0) < 3 && (
+                      <IBaseButton
+                        color="primary"
+                        size="sm"
+                        variant="flat"
+                        onPress={addPhone}
+                      >
+                        {tLabels("addPhone")}
+                      </IBaseButton>
+                    )}
+                  </div>
                 </div>
                 {/* Address — không disabled */}
                 <Controller
@@ -698,6 +717,70 @@ export default function EmployeeForm({
               </IBaseCardBody>
             </IBaseCard>
 
+            {/* Section: Login (create only) — căn nút với input */}
+            {mode === "create" && (
+              <IBaseCard className="border border-default-200/60 shadow-sm">
+                <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
+                  <h2 className="text-lg font-semibold text-foreground">
+                    {tLabels("sectionAccount")}
+                  </h2>
+                  <Controller
+                    control={control}
+                    name="loginIdentifier"
+                    render={({ field, fieldState }) => (
+                      <div className="space-y-1">
+                        <IBaseInput
+                          {...field}
+                          errorMessage={
+                            fieldState.error?.message ??
+                            loginCheckMessage ??
+                            undefined
+                          }
+                          isInvalid={fieldState.invalid || !!loginCheckMessage}
+                          isRequired
+                          label={tLabels("loginIdentifier")}
+                          placeholder={tLabels("loginIdentifierPlaceholder")}
+                          size="sm"
+                          onBlur={() => checkLoginExists(field.value ?? "")}
+                        />
+                        {loginCheckLoading && (
+                          <span className="text-default-500 text-xs">
+                            {tLabels("checkingLogin")}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  />
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:gap-3">
+                    <Controller
+                      control={control}
+                      name="password"
+                      render={({ field, fieldState }) => (
+                        <IBaseInputPassword
+                          {...field}
+                          className="sm:min-w-[240px] sm:flex-1"
+                          errorMessage={fieldState.error?.message}
+                          isInvalid={fieldState.invalid}
+                          label={tLabels("password")}
+                          placeholder={tLabels("passwordPlaceholder")}
+                          size="sm"
+                        />
+                      )}
+                    />
+                    <IBaseButton
+                      className="shrink-0"
+                      color="primary"
+                      size="sm"
+                      variant="flat"
+                      onPress={handleGenPassword}
+                    >
+                      {tLabels("generatePassword")}
+                    </IBaseButton>
+                  </div>
+                </IBaseCardBody>
+              </IBaseCard>
+            )}
+
             {/* Section: Education & Experience */}
             <IBaseCard className="border border-default-200/60 shadow-sm">
               <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
@@ -736,70 +819,6 @@ export default function EmployeeForm({
                 />
               </IBaseCardBody>
             </IBaseCard>
-
-            {/* Section: Login (create only) — căn nút với input */}
-            {mode === "create" && (
-              <IBaseCard className="border border-default-200/60 shadow-sm">
-                <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
-                  <h2 className="text-lg font-semibold text-foreground">
-                    {tLabels("sectionAccount")}
-                  </h2>
-                  <Controller
-                    control={control}
-                    name="loginIdentifier"
-                    render={({ field, fieldState }) => (
-                      <div className="space-y-1">
-                        <IBaseInput
-                          {...field}
-                          errorMessage={
-                            fieldState.error?.message ??
-                            loginCheckMessage ??
-                            undefined
-                          }
-                          isInvalid={fieldState.invalid || !!loginCheckMessage}
-                          label={tLabels("loginIdentifier")}
-                          placeholder={tLabels("loginIdentifierPlaceholder")}
-                          size="sm"
-                          onBlur={() => checkLoginExists(field.value ?? "")}
-                        />
-                        {loginCheckLoading && (
-                          <span className="text-default-500 text-xs">
-                            {tLabels("checkingLogin")}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  />
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:gap-3">
-                    <Controller
-                      control={control}
-                      name="password"
-                      render={({ field, fieldState }) => (
-                        <IBaseInput
-                          {...field}
-                          className="sm:min-w-[240px] sm:flex-1"
-                          errorMessage={fieldState.error?.message}
-                          isInvalid={fieldState.invalid}
-                          label={tLabels("password")}
-                          placeholder={tLabels("passwordPlaceholder")}
-                          size="sm"
-                          type="password"
-                        />
-                      )}
-                    />
-                    <IBaseButton
-                      className="shrink-0"
-                      color="primary"
-                      size="sm"
-                      variant="flat"
-                      onPress={handleGenPassword}
-                    >
-                      {tLabels("generatePassword")}
-                    </IBaseButton>
-                  </div>
-                </IBaseCardBody>
-              </IBaseCard>
-            )}
 
             {/* Section: Ghi chú */}
             <IBaseCard className="border border-default-200/60 shadow-sm">

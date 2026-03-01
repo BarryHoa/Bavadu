@@ -32,6 +32,7 @@
     "actions": {
       "save": "Lưu",
       "cancel": "Hủy",
+      "confirm": "Xác nhận",
       "apply": "Áp dụng",
       "preview": "Xem trước",
       "add": "Thêm",
@@ -39,6 +40,7 @@
       "delete": "Xóa",
       "edit": "Sửa",
       "view": "Xem",
+      "copy": "Sao chép vào clipboard",
       "saveChanges": "Lưu thay đổi",
       "close": "Đóng",
       "regenerate": "Tạo lại",
@@ -134,7 +136,10 @@
       "numberPlaceholder": "Nhập số...",
       "searchPlaceholder": "Tìm kiếm...",
       "emailPlaceholder": "Nhập email...",
-      "phonePlaceholder": "Nhập số điện thoại..."
+      "phonePlaceholder": "Nhập số điện thoại...",
+      "passwordPlaceholder": "Nhập mật khẩu...",
+      "showPassword": "Hiện mật khẩu",
+      "hidePassword": "Ẩn mật khẩu"
     },
     "textarea": {
       "placeholder": "Nhập thông tin..."
@@ -308,13 +313,19 @@
       "listTitle": "Sequence Rules",
       "loading": "Đang tải sequence...",
       "notFound": "Không tìm thấy rule",
+      "sidebar": {
+        "guidelines": "Hướng dẫn"
+      },
       "create": { "title": "Tạo Rule Sequence" },
       "edit": { "title": "Sửa Rule Sequence" },
       "actions": { "addSequence": "Thêm Rule" },
       "table": {
+        "copyCode": "Sao chép mã",
         "columns": {
-          "name": "Tên",
+          "code": "Mã (code)",
+          "name": "Tên hiển thị",
           "prefix": "Prefix",
+          "suffix": "Suffix",
           "format": "Format",
           "start": "Start",
           "step": "Step",
@@ -330,10 +341,16 @@
         }
       },
       "form": {
-        "name": "Tên",
-        "nameDescription": "Tên unique cho getNext(name)",
+        "code": "Mã (code)",
+        "codeDescription": "Mã unique dùng cho getNext(code), VD: employee.code",
+        "name": "Tên hiển thị",
+        "nameDescription": "Tên mô tả (tùy chọn)",
         "prefix": "Prefix",
         "prefixDescription": "VD: ROLE, ORD",
+        "suffix": "Suffix",
+        "suffixDescription": "Chuỗi thêm vào sau phần số",
+        "description": "Mô tả",
+        "descriptionPlaceholder": "Mô tả rule (tùy chọn)",
         "format": "Format",
         "formatDescription": "VD: %06d",
         "start": "Start",
@@ -341,11 +358,16 @@
         "status": "Trạng thái",
         "active": "Active",
         "inactive": "Inactive",
-        "cannotEditHasCount": "Không thể sửa rule đã có count. Chỉ có thể inactive."
+        "cannotEditHasCount": "Đã có ít nhất một Sequence count. Chỉ được thay đổi: Tên hiển thị, Mô tả, Trạng thái. Không được sửa: Mã (code), Prefix, Suffix, Format, Start, Step.",
+        "lockedFieldsSection": "Thông tin cố định (không thể sửa)"
       },
       "deleteConfirm": {
         "title": "Xóa Rule",
         "message": "Bạn có chắc muốn xóa rule này?"
+      },
+      "toggleStatusConfirm": {
+        "title": "Thay đổi trạng thái",
+        "message": "Bạn có muốn thay đổi trạng thái (Active/Inactive) của rule này?"
       },
       "toast": {
         "createSuccess": "Tạo rule thành công",
@@ -353,7 +375,9 @@
         "updateSuccess": "Cập nhật thành công",
         "updateError": "Không thể cập nhật",
         "deleteSuccess": "Xóa thành công",
-        "deleteError": "Không thể xóa"
+        "deleteError": "Không thể xóa",
+        "copied": "Đã sao chép",
+        "copyFailed": "Sao chép thất bại"
       }
     }
   },

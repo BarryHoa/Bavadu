@@ -6,25 +6,18 @@ export interface GuidelineData {
   updatedAt: string;
 }
 
-export interface GuidelineResponse {
-  success: boolean;
-  data: GuidelineData;
-  message?: string;
-}
-
 class GuidelineService extends JsonRpcClientService {
   /**
-   * Get guideline by key
+   * Get guideline by key (JSON-RPC result is GuidelineData | null)
    * @param key - Guideline key
    * @returns Guideline content
    */
   async getByKey(key: string): Promise<string> {
-    const response = await this.call<GuidelineResponse>(
+    const result = await this.call<GuidelineData | null>(
       "base-guideline.curd.getByKey",
       { key },
     );
-
-    return response.data?.content || "";
+    return result?.content ?? "";
   }
 
   /**
@@ -33,12 +26,11 @@ class GuidelineService extends JsonRpcClientService {
    * @returns Full guideline data including metadata
    */
   async getByKeyFull(key: string): Promise<GuidelineData | null> {
-    const response = await this.call<GuidelineResponse>(
+    const result = await this.call<GuidelineData | null>(
       "base-guideline.curd.getByKey",
       { key },
     );
-
-    return response.data || null;
+    return result ?? null;
   }
 }
 

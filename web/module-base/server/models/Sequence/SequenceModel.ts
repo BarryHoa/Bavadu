@@ -1,16 +1,17 @@
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 
-import { BaseModel } from "@base/server/models/BaseModel";
+import { BaseModel, PermissionRequired } from "@base/server/models/BaseModel";
 
-import {
-  base_tb_sequence_counts,
-  base_tb_sequence_rules,
-} from "../../schemas";
+import { JSON_RPC_ERROR_CODES, JsonRpcError } from "../../rpc/jsonRpcHandler";
+import { base_tb_sequence_counts, base_tb_sequence_rules } from "../../schemas";
 
 export interface SequenceRuleRow {
   id: string;
-  name: string;
+  code: string;
+  name?: string;
   prefix: string;
+  suffix: string;
+  description?: string;
   format: string;
   start: number;
   step: number;
@@ -23,8 +24,11 @@ export interface SequenceRuleRow {
 }
 
 export interface SequenceRuleInput {
-  name: string;
+  code: string;
+  name?: string;
   prefix?: string;
+  suffix?: string;
+  description?: string;
   format?: string;
   start?: number;
   step?: number;
@@ -32,15 +36,22 @@ export interface SequenceRuleInput {
 
 const MAX_COUNTS_PER_RULE = 3;
 
-function formatValue(prefix: string, format: string, value: number): string {
+function formatValue(
+  prefix: string,
+  format: string,
+  value: number,
+  suffix: string,
+): string {
   const match = format.match(/%0?(\d+)d/);
   const width = match ? parseInt(match[1], 10) : 6;
   const numStr = String(value).padStart(width, "0");
 
-  return prefix ? `${prefix}-${numStr}` : numStr;
+  return `${prefix ? `${prefix}-` : ""}${numStr}${suffix ? `-${suffix}` : ""}`;
 }
 
-export default class SequenceModel extends BaseModel<typeof base_tb_sequence_rules> {
+export default class SequenceModel extends BaseModel<
+  typeof base_tb_sequence_rules
+> {
   constructor() {
     super(base_tb_sequence_rules);
   }
@@ -78,8 +89,11 @@ export default class SequenceModel extends BaseModel<typeof base_tb_sequence_rul
 
     return {
       id: rule.id,
-      name: rule.name,
+      code: rule.code,
+      name: rule.name ?? undefined,
       prefix: rule.prefix ?? "",
+      suffix: rule.suffix ?? "",
+      description: rule.description ?? undefined,
       format: rule.format ?? "%06d",
       start: rule.start ?? 1,
       step: rule.step ?? 1,
@@ -97,25 +111,33 @@ export default class SequenceModel extends BaseModel<typeof base_tb_sequence_rul
 
   /**
    * Create rule (RPC: base-sequence.curd.create)
-   * Chỉ system role mới có quyền - enforce tại API/middleware
    */
+  @PermissionRequired({ auth: true, permissions: ["base.sequence.create"] })
   create = async (params: SequenceRuleInput): Promise<SequenceRuleRow> => {
-    if (!params.name?.trim()) throw new Error("Name is required");
+    const codeTrim = params.code?.trim();
+    if (!codeTrim) throw new Error("Code is required");
 
     const [existing] = await this.db
       .select()
       .from(base_tb_sequence_rules)
-      .where(eq(base_tb_sequence_rules.name, params.name.trim()))
+      .where(eq(base_tb_sequence_rules.code, codeTrim))
       .limit(1);
 
-    if (existing) throw new Error("Sequence rule with this name already exists");
+    if (existing)
+      throw new JsonRpcError(
+        JSON_RPC_ERROR_CODES.VALIDATION_ERROR,
+        "Sequence rule with this code already exists",
+      );
 
     const [created] = await this.db
       .insert(base_tb_sequence_rules)
       .values({
-        name: params.name.trim(),
-        prefix: params.prefix ?? "",
-        format: params.format ?? "%06d",
+        code: codeTrim,
+        name: params.name?.trim(),
+        prefix: params.prefix,
+        suffix: params.suffix,
+        description: params.description?.trim(),
+        format: params.format,
         start: params.start ?? 1,
         step: params.step ?? 1,
         currentValue: (params.start ?? 1) - (params.step ?? 1),
@@ -123,17 +145,23 @@ export default class SequenceModel extends BaseModel<typeof base_tb_sequence_rul
       })
       .returning();
 
-    if (!created) throw new Error("Failed to create sequence rule");
+    if (!created)
+      throw new JsonRpcError(
+        JSON_RPC_ERROR_CODES.INTERNAL_ERROR,
+        "Failed to create sequence rule",
+      );
 
     return {
       id: created.id,
-      name: created.name,
+      code: created.code,
+      name: created.name ?? undefined,
       prefix: created.prefix ?? "",
+      suffix: created.suffix ?? "",
+      description: created.description ?? undefined,
       format: created.format ?? "%06d",
       start: created.start ?? 1,
       step: created.step ?? 1,
       currentValue: Number(created.currentValue ?? 0),
-      isActive: created.isActive ?? true,
       countCount: 0,
       createdAt: created.createdAt?.getTime(),
       updatedAt: created.updatedAt?.getTime(),
@@ -142,27 +170,35 @@ export default class SequenceModel extends BaseModel<typeof base_tb_sequence_rul
 
   /**
    * Update rule (RPC: base-sequence.curd.update)
-   * Nếu có count thì không cho edit - gợi ý inactive
+   * Nếu có count thì chỉ cho đổi isActive, name, description
    */
   update = async (params: {
     id: string;
+    code?: string;
     name?: string;
     prefix?: string;
+    suffix?: string;
+    description?: string;
     format?: string;
     start?: number;
     step?: number;
     isActive?: boolean;
   }): Promise<SequenceRuleRow | null> => {
     const countCount = await this.getCountCount(params.id);
-    const isOnlyActiveUpdate =
-      params.isActive !== undefined &&
-      Object.keys(params).filter(
-        (k) => k !== "id" && k !== "isActive" && params[k as keyof typeof params] !== undefined,
-      ).length === 0;
+    const onlySafeUpdate =
+      countCount > 0 &&
+      Object.keys(params).every(
+        (k) =>
+          k === "id" ||
+          k === "isActive" ||
+          k === "name" ||
+          k === "description" ||
+          params[k as keyof typeof params] === undefined,
+      );
 
-    if (countCount > 0 && !isOnlyActiveUpdate) {
+    if (countCount > 0 && !onlySafeUpdate) {
       throw new Error(
-        "Cannot edit rule that has counts. You can only set it to inactive.",
+        "Cannot edit rule that has counts. You can only change status, name or description.",
       );
     }
 
@@ -170,8 +206,13 @@ export default class SequenceModel extends BaseModel<typeof base_tb_sequence_rul
       updatedAt: new Date(),
     };
 
-    if (params.name !== undefined) updateData.name = params.name.trim();
+    if (params.code !== undefined) updateData.code = params.code.trim();
+    if (params.name !== undefined)
+      updateData.name = params.name?.trim() || null;
     if (params.prefix !== undefined) updateData.prefix = params.prefix;
+    if (params.suffix !== undefined) updateData.suffix = params.suffix;
+    if (params.description !== undefined)
+      updateData.description = params.description?.trim() || null;
     if (params.format !== undefined) updateData.format = params.format;
     if (params.start !== undefined) updateData.start = params.start;
     if (params.step !== undefined) updateData.step = params.step;
@@ -187,8 +228,11 @@ export default class SequenceModel extends BaseModel<typeof base_tb_sequence_rul
 
     return {
       id: updated.id,
-      name: updated.name,
+      code: updated.code,
+      name: updated.name ?? undefined,
       prefix: updated.prefix ?? "",
+      suffix: updated.suffix ?? "",
+      description: updated.description ?? undefined,
       format: updated.format ?? "%06d",
       start: updated.start ?? 1,
       step: updated.step ?? 1,
@@ -202,7 +246,6 @@ export default class SequenceModel extends BaseModel<typeof base_tb_sequence_rul
 
   /**
    * Delete rule (RPC: base-sequence.curd.delete)
-   * Nếu có count thì không cho xóa - gợi ý inactive
    */
   delete = async (params: {
     id: string;
@@ -212,7 +255,8 @@ export default class SequenceModel extends BaseModel<typeof base_tb_sequence_rul
     if (countCount > 0) {
       return {
         success: false,
-        message: "Cannot delete rule that has counts. You can only set it to inactive.",
+        message:
+          "Cannot delete rule that has counts. You can only set it to inactive.",
       };
     }
 
@@ -225,38 +269,39 @@ export default class SequenceModel extends BaseModel<typeof base_tb_sequence_rul
 
   /**
    * Get next value (RPC: base-sequence.curd.getNext)
-   * Rule phải active mới sinh count mới
+   * Lookup by code. Rule phải active mới sinh count mới.
    */
-  getNext = async (params: { name: string }): Promise<string> => {
+  getNext = async (params: { code: string }): Promise<string> => {
     const [rule] = await this.db
       .select()
       .from(base_tb_sequence_rules)
-      .where(eq(base_tb_sequence_rules.name, params.name))
+      .where(eq(base_tb_sequence_rules.code, params.code))
       .limit(1);
 
-    if (!rule) throw new Error(`Sequence rule "${params.name}" not found`);
+    if (!rule)
+      throw new Error(`Sequence rule with code "${params.code}" not found`);
     if (!rule.isActive) {
       throw new Error(
-        `Sequence rule "${params.name}" is inactive. Cannot generate new count.`,
+        `Sequence rule "${params.code}" is inactive. Cannot generate new count.`,
       );
     }
 
     return this.db.transaction(async (tx) => {
       const prefix = rule.prefix ?? "";
+      const suffix = rule.suffix ?? "";
       const format = rule.format ?? "%06d";
       const step = rule.step ?? 1;
       const nextValue = Number(rule.currentValue ?? 0) + step;
 
-      const [updated] = await tx
+      await tx
         .update(base_tb_sequence_rules)
         .set({
           currentValue: nextValue,
           updatedAt: new Date(),
         })
-        .where(eq(base_tb_sequence_rules.id, rule.id))
-        .returning({ currentValue: base_tb_sequence_rules.currentValue });
+        .where(eq(base_tb_sequence_rules.id, rule.id));
 
-      const value = formatValue(prefix, format, nextValue);
+      const value = formatValue(prefix, format, nextValue, suffix);
 
       await tx.insert(base_tb_sequence_counts).values({
         ruleId: rule.id,
@@ -291,7 +336,9 @@ export default class SequenceModel extends BaseModel<typeof base_tb_sequence_rul
    * Clear excess counts - keep only 3 newest per rule (for cron job)
    */
   clearExcessCounts = async (): Promise<{ deleted: number }> => {
-    const rules = await this.db.select({ id: base_tb_sequence_rules.id }).from(base_tb_sequence_rules);
+    const rules = await this.db
+      .select({ id: base_tb_sequence_rules.id })
+      .from(base_tb_sequence_rules);
     let totalDeleted = 0;
 
     for (const rule of rules) {

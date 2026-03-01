@@ -105,7 +105,10 @@ export function createEmployeeValidation(t: TranslateFn) {
       string(),
       trim(),
       custom(
-        (v) => !v || ["male", "female", "unspecified"].includes(v),
+        (v) =>
+          !v ||
+          (typeof v === "string" &&
+            ["male", "female", "unspecified"].includes(v)),
         "Invalid gender",
       ),
     ),
@@ -113,7 +116,11 @@ export function createEmployeeValidation(t: TranslateFn) {
 
   // Main form schema — 2 tabs: Thông tin (sections) + Phân quyền (roles + matrix)
   const employeeFormSchema = object({
-    loginIdentifier: optional(pipe(string(), trim())),
+    loginIdentifier: pipe(
+      string(),
+      trim(),
+      minLength(1, t("loginIdentifier.required")),
+    ),
     password: passwordSchema,
     emails: emailsSchema,
     phones: phonesSchema,

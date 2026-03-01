@@ -2,8 +2,11 @@ import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 
 export type SequenceRule = {
   id: string;
-  name: string;
+  code: string;
+  name?: string;
   prefix: string;
+  suffix?: string;
+  description?: string;
   format: string;
   start: number;
   step: number;
@@ -16,8 +19,11 @@ export type SequenceRule = {
 };
 
 export type CreateSequenceRequest = {
-  name: string;
+  code: string;
+  name?: string;
   prefix?: string;
+  suffix?: string;
+  description?: string;
   format?: string;
   start?: number;
   step?: number;
@@ -25,8 +31,11 @@ export type CreateSequenceRequest = {
 
 export type UpdateSequenceRequest = {
   id: string;
+  code?: string;
   name?: string;
   prefix?: string;
+  suffix?: string;
+  description?: string;
   format?: string;
   start?: number;
   step?: number;
@@ -53,8 +62,9 @@ class SequenceService extends JsonRpcClientService {
     );
   }
 
-  async getNext(name: string): Promise<string> {
-    return this.call<string>("base-sequence.curd.getNext", { name });
+  /** Lấy giá trị tiếp theo từ sequence theo code (vd: "employee.code") */
+  async getNext(code: string): Promise<string> {
+    return this.call<string>("base-sequence.curd.getNext", { code });
   }
 }
 

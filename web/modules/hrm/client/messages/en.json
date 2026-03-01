@@ -106,6 +106,8 @@
           "genderFemale": "Female",
           "genderUnspecified": "Unspecified",
           "generatePassword": "Generate password",
+          "generateEmployeeCode": "Generate employee code",
+          "generateEmployeeCodeTooltip": "Get next code from Sequence (Settings → Sequence Rules, name: employee.code)",
           "tabInfo": "Information",
           "tabPermissions": "Permissions",
           "selectRoles": "Select roles (combine permissions)",
@@ -152,6 +154,9 @@
           },
           "password": {
             "minLength": "Password must be at least 6 characters"
+          },
+          "loginIdentifier": {
+            "required": "Login account (email or username) is required"
           },
           "nationalId": {
             "required": "National ID (CCCD) is required"

@@ -7,4 +7,5 @@ export * from "./link/getClientLink";
 export * from "./number/formatNumber";
 export * from "./cn";
 export * from "./tv";
+export * from "./generate";
 

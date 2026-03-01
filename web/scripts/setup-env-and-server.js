@@ -44,7 +44,8 @@ try {
     `🚀 Starting ${mode === "dev" ? "development" : "production"} server with ${environment} environment...`
   );
 
-  // Start the custom server with bun (or tsx if bun not available)
+  // Prefer Bun; fallback to tsx (Node). Khi dùng Bun, bunfig.toml preload script
+  // gán globalThis.AsyncLocalStorage (cho Next.js), nếu không sẽ lỗi "AsyncLocalStorage not available".
   const isBun = require("child_process")
     .execSync("which bun", { encoding: "utf-8", stdio: "pipe" })
     .trim();

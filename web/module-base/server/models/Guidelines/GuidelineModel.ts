@@ -26,9 +26,12 @@ class GuidelineModel extends BaseModel<typeof base_tb_guidelines> {
   }
 
   /**
-   * Get guideline by key
+   * Get guideline by key (RPC: base-guideline.curd.getByKey)
+   * @param params - { key: string }
    */
-  async getByKey(key: string): Promise<GuidelineData | null> {
+  async getByKey(params: { key: string }): Promise<GuidelineData | null> {
+    const key = typeof params === "object" && params?.key != null ? String(params.key).trim() : "";
+    if (!key) return null;
     const [guideline] = await this.db
       .select()
       .from(this.table)
@@ -55,7 +58,7 @@ class GuidelineModel extends BaseModel<typeof base_tb_guidelines> {
     const { key, content } = params;
 
     // Check if key already exists
-    const existing = await this.getByKey(key);
+    const existing = await this.getByKey({ key });
 
     if (existing) {
       throw new Error(`Guideline with key "${key}" already exists`);

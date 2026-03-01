@@ -31,8 +31,10 @@ class SequenceViewListModel extends BaseViewListModel<
   protected declarationColumns = (): ColumnMap =>
     new Map([
       ["id", { column: base_tb_sequence_rules.id, sort: false }],
+      ["code", { column: base_tb_sequence_rules.code, sort: true }],
       ["name", { column: base_tb_sequence_rules.name, sort: true }],
       ["prefix", { column: base_tb_sequence_rules.prefix, sort: true }],
+      ["suffix", { column: base_tb_sequence_rules.suffix, sort: true }],
       ["format", { column: base_tb_sequence_rules.format, sort: true }],
       ["start", { column: base_tb_sequence_rules.start, sort: true }],
       ["step", { column: base_tb_sequence_rules.step, sort: true }],
@@ -47,6 +49,11 @@ class SequenceViewListModel extends BaseViewListModel<
 
   protected declarationSearch = (): SearchConditionMap =>
     new Map([
+      [
+        "code",
+        (text: string) =>
+          text ? ilike(base_tb_sequence_rules.code, `%${text}%`) : undefined,
+      ],
       [
         "name",
         (text: string) =>
@@ -72,8 +79,11 @@ class SequenceViewListModel extends BaseViewListModel<
 
   protected declarationMappingData = (row: any): SequenceRuleRow => ({
     id: row.id,
-    name: row.name,
+    code: row.code,
+    name: row.name ?? undefined,
     prefix: row.prefix ?? "",
+    suffix: row.suffix ?? "",
+    description: row.description ?? undefined,
     format: row.format ?? "%06d",
     start: row.start ?? 1,
     step: row.step ?? 1,

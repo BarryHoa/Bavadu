@@ -4,6 +4,7 @@ import {
   boolean,
   index,
   integer,
+  text,
   timestamp,
   uuid,
   varchar,
@@ -18,8 +19,11 @@ export const base_tb_sequence_rules = mdBaseSchema.table(
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
 
-    name: varchar("name", { length: 100 }).notNull().unique(),
-    prefix: varchar("prefix", { length: 50 }).default(""),
+    code: varchar("code", { length: 64 }).notNull().unique(),
+    name: varchar("name", { length: 100 }),
+    prefix: varchar("prefix", { length: 32 }).default(""),
+    suffix: varchar("suffix", { length: 32 }).default(""),
+    description: text("description").default(""),
     format: varchar("format", { length: 20 }).default("%06d"),
     start: integer("start").default(1).notNull(),
     step: integer("step").default(1).notNull(),
@@ -30,7 +34,9 @@ export const base_tb_sequence_rules = mdBaseSchema.table(
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
   (table) => [
-    index("sequence_rules_name_idx").on(table.name),
+    index("sequence_rules_code_idx").on(table.code),
+    index("sequence_rules_prefix_idx").on(table.prefix),
+    index("sequence_rules_suffix_idx").on(table.suffix),
     index("sequence_rules_active_idx").on(table.isActive),
     index("sequence_rules_created_at_idx").on(table.createdAt),
   ],

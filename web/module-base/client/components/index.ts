@@ -21,6 +21,7 @@ export * from "./IBaseInput";
 export * from "./IBaseInputEmail";
 export * from "./IBaseInputMultipleLang";
 export * from "./IBaseInputNumber";
+export * from "./IBaseInputPassword";
 export * from "./IBaseInputPhone";
 export * from "./IBaseInputSearch";
 export * from "./IBaseKbd";
