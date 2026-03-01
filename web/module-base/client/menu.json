@@ -16,6 +16,23 @@
     "as": "/news"
   },
   {
+    "key": "admin",
+    "name": "Admin",
+    "icon": "Shield",
+    "order": 2.5,
+    "module": "base",
+    "permission": "system.models.read",
+    "children": [
+      {
+        "key": "admin.models",
+        "name": "Models",
+        "path": "/admin/models",
+        "as": "/admin/models",
+        "order": 1
+      }
+    ]
+  },
+  {
     "key": "settings",
     "name": "Settings",
     "icon": "Settings",

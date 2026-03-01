@@ -19,8 +19,8 @@ import { useMemo } from "react";
 export type PageLayoutMaxWidth = "form" | "content" | "full" | string | number;
 
 const MAX_WIDTH_CLASSES: Record<string, string> = {
-  form: "w-[60vw] max-w-full min-w-0",
-  content: "w-[60vw] max-w-full min-w-0",
+  form: "xl:w-[65vw] w-full",
+  content: "xl:w-[65vw] w-full",
   full: "w-full",
 };
 
@@ -118,7 +118,7 @@ export function IBasePageLayout({
         {sidebar != null && (
           <aside
             className={cn(
-              "w-full shrink-0 lg:w-80 lg:min-w-[18rem]",
+              "w-full shrink-0 lg:w-80 lg:min-w-[18rem] hidden lg:flex",
               "lg:sticky lg:top-4",
             )}
           >

@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
 
     if (!modelKey) {
       return JSONResponse({
+        success: false,
         message: "Model key is required.",
         status: 400,
       });
@@ -37,6 +38,7 @@ export async function POST(request: NextRequest) {
 
     if (!modelInstance) {
       return JSONResponse({
+        success: false,
         message: "Model instance is not available.",
         status: 500,
       });
@@ -49,6 +51,7 @@ export async function POST(request: NextRequest) {
       const safeModelKey = escapeHtml(modelKey);
 
       return JSONResponse({
+        success: false,
         message: `Failed to reload model "${safeModelKey}".`,
         status: 404,
       });
@@ -58,6 +61,7 @@ export async function POST(request: NextRequest) {
     const safeModelKey = escapeHtml(modelKey);
 
     return JSONResponse({
+      success: true,
       message: `Model "${safeModelKey}" reloaded successfully.`,
       status: 200,
     });
@@ -65,6 +69,7 @@ export async function POST(request: NextRequest) {
     console.error("Failed to reload model:", error);
 
     return JSONResponse({
+      success: false,
       message: "Unexpected error while reloading model.",
       status: 500,
     });

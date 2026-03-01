@@ -1,6 +1,5 @@
 "use client";
 
-import { Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "next-intl";
 import IBaseImage from "next/image";
 import { useRouter } from "next/navigation";
@@ -13,6 +12,7 @@ import {
   IBaseCardHeader,
   IBaseCheckbox,
   IBaseInput,
+  IBaseInputPassword,
   IBaseLink,
 } from "@base/client/components";
 import { AuthService } from "@base/client/services";
@@ -30,7 +30,6 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   // F5 on login page with existing session → go to default page
   useEffect(() => {
@@ -106,38 +105,15 @@ export default function LoginPage() {
               isDisabled={isLoading}
             />
 
-            <IBaseInput
+            <IBaseInputPassword
               required
               autoComplete="current-password"
-              endContent={
-                <button
-                  aria-label={
-                    isPasswordVisible ? t("hidePassword") : t("showPassword")
-                  }
-                  className="focus:outline-none"
-                  type="button"
-                  onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                >
-                  {isPasswordVisible ? (
-                    <EyeOff
-                      className="text-default-400 pointer-events-none"
-                      size={20}
-                    />
-                  ) : (
-                    <Eye
-                      className="text-default-400 pointer-events-none"
-                      size={20}
-                    />
-                  )}
-                </button>
-              }
+              isDisabled={isLoading}
               label={t("password")}
               placeholder={t("passwordPlaceholder")}
-              type={isPasswordVisible ? "text" : "password"}
               value={password}
               variant="bordered"
-              onChange={(e) => setPassword(e.target.value)}
-              isDisabled={isLoading}
+              onValueChange={setPassword}
             />
 
             <div className="flex items-center justify-between">

@@ -25,6 +25,13 @@ VALUES
 ('base.role.delete', 'base', 'role', 'delete', '{"en": "Delete Roles", "vi": "Xóa vai trò"}', '{"en": "Permission to delete roles", "vi": "Quyền xóa vai trò"}', true, now())
 ON CONFLICT ("key") DO NOTHING;
 
+-- System / Admin models (Admin module: list & reload models)
+INSERT INTO "md_base"."permissions" ("key", "module", "resource", "action", "name", "description", "is_active", "created_at")
+VALUES
+('system.models.read', 'base', 'models', 'read', '{"en": "View System Models", "vi": "Xem danh sách models"}', '{"en": "Permission to list/reload system models (Admin)", "vi": "Quyền xem danh sách models (Admin)"}', true, now()),
+('system.models.reload', 'base', 'models', 'reload', '{"en": "Reload System Models", "vi": "Reload models hệ thống"}', '{"en": "Permission to reload a system model (Admin)", "vi": "Quyền reload model (Admin)"}', true, now())
+ON CONFLICT ("key") DO NOTHING;
+
 -- ============================================
 -- HRM Module Permissions
 -- ============================================

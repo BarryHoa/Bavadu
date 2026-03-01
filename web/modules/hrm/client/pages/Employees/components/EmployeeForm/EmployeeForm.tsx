@@ -1,6 +1,5 @@
 "use client";
 
-import type { Address } from "@base/client/interface/Address";
 import type { Permission } from "@base/client/services/RoleService";
 import type { EmployeeFormValues } from "../../validation/employeeValidation";
 
@@ -8,30 +7,10 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 
-import { RefreshCw, Trash2 } from "lucide-react";
-
-import { IBaseCard, IBaseCardBody } from "@base/client";
-import {
-  AddressPicker,
-  IBaseButton,
-  IBaseCheckbox,
-  IBaseDatePicker,
-  IBaseInput,
-  IBaseInputEmail,
-  IBaseInputPassword,
-  IBaseInputPhone,
-  IBaseRadio,
-  IBaseRadioGroup,
-  IBaseSingleSelectAsync,
-  IBaseTabPrimary,
-  IBaseTabsPrimary,
-  IBaseTextarea,
-  IBaseTooltip,
-} from "@base/client/components";
+import { IBaseButton, IBaseTabPrimary, IBaseTabsPrimary } from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import RolePermissionMatrix from "@base/client/pages/Settings/Roles/components/RolePermissionMatrix/RolePermissionMatrix";
 import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 import roleService from "@base/client/services/RoleService";
 import sequenceService from "@base/client/services/SequenceService";
@@ -39,18 +18,19 @@ import userService from "@base/client/services/UserService";
 import { generateRandomPassword } from "@base/client/utils";
 
 import { createEmployeeValidation } from "../../validation/employeeValidation";
+import {
+  DEFAULT_ADDRESS,
+  EmployeeFormAccountSection,
+  EmployeeFormEducationSection,
+  EmployeeFormEmploymentSection,
+  EmployeeFormNotesSection,
+  EmployeeFormPersonalSection,
+  EmployeeFormPermissionsSection,
+} from "./sections";
 
 export type { EmployeeFormValues };
 
 const rpc = new JsonRpcClientService();
-
-const DEFAULT_ADDRESS: Address = {
-  street: "",
-  postalCode: "",
-  country: { id: "VN", name: { vi: "Việt Nam", en: "Vietnam" }, code: "VN" },
-  administrativeUnits: [],
-  formattedAddress: "",
-};
 
 interface EmployeeFormProps {
   onSubmit: (values: EmployeeFormValues) => Promise<void>;
@@ -107,7 +87,6 @@ export default function EmployeeForm({
 
   const emails = watch("emails") ?? [];
   const phones = watch("phones") ?? [];
-  const loginIdentifier = watch("loginIdentifier");
   const roleIds = watch("roleIds") ?? [];
   const permissionIds = watch("permissionIds") ?? [];
 
@@ -119,7 +98,9 @@ export default function EmployeeForm({
   const { data: roleListData } = useQuery({
     queryKey: ["base-role-list"],
     queryFn: () =>
-      rpc.call<{ data: { id: string; code: string; name: unknown }[] }>(
+      rpc.call<{
+        data: { id: string; code: string; name: unknown; isSystem?: boolean }[];
+      }>(
         "base-role.list.getData",
         { page: 1, pageSize: 200 },
       ),
@@ -132,7 +113,13 @@ export default function EmployeeForm({
     enabled: mode === "create",
   });
 
-  const allRoles = useMemo(() => roleListData?.data ?? [], [roleListData]);
+  const allRoles = useMemo(
+    () =>
+      (roleListData?.data ?? []).filter(
+        (r) => r.code !== "system",
+      ),
+    [roleListData],
+  );
   const allPermissions = useMemo(
     () => permissionListRes?.data ?? [],
     [permissionListRes],
@@ -263,623 +250,46 @@ export default function EmployeeForm({
       <IBaseTabsPrimary defaultSelectedKey="info" variant="bordered">
         <IBaseTabPrimary key="info" title={tLabels("tabInfo")}>
           <div className="flex flex-col gap-8">
-            {/* Section: Personal — Fn, lastName | commonName | Employee code | National ID | Tax ID | DOB | Gender | about | emails | phones | address */}
-            <IBaseCard className="border border-default-200/60 shadow-sm">
-              <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
-                <h2 className="text-lg font-semibold text-foreground">
-                  {tLabels("sectionPersonal")}
-                </h2>
-                {/* Row: firstName, lastName | commonName */}
-                <div className="grid gap-4 md:grid-cols-3">
-                  <Controller
-                    control={control}
-                    name="firstName"
-                    render={({ field, fieldState }) => (
-                      <IBaseInput
-                        {...field}
-                        errorMessage={fieldState.error?.message}
-                        isInvalid={fieldState.invalid}
-                        label={tLabels("firstName")}
-                        size="sm"
-                      />
-                    )}
-                  />
-                  <Controller
-                    control={control}
-                    name="lastName"
-                    render={({ field, fieldState }) => (
-                      <IBaseInput
-                        {...field}
-                        errorMessage={fieldState.error?.message}
-                        isInvalid={fieldState.invalid}
-                        label={tLabels("lastName")}
-                        size="sm"
-                      />
-                    )}
-                  />
-                  <Controller
-                    control={control}
-                    name="commonName"
-                    render={({ field, fieldState }) => (
-                      <IBaseInput
-                        {...field}
-                        errorMessage={fieldState.error?.message}
-                        isInvalid={fieldState.invalid}
-                        label={tLabels("commonName")}
-                        placeholder={tLabels("commonNamePlaceholder")}
-                        size="sm"
-                      />
-                    )}
-                  />
-                </div>
-                {/* Row: Employee code | National ID | Tax ID */}
-                <div className="grid gap-4 md:grid-cols-3">
-                  <Controller
-                    control={control}
-                    name="employeeCode"
-                    render={({ field, fieldState }) => (
-                      <IBaseInput
-                        {...field}
-                        isRequired
-                        endContent={
-                          <IBaseTooltip
-                            content={tLabels("generateEmployeeCodeTooltip")}
-                            placement="top"
-                          >
-                            <button
-                              type="button"
-                              aria-label={tLabels("generateEmployeeCode")}
-                              className="rounded-small p-1 text-default-400 outline-none transition-colors hover:bg-default-100 hover:text-foreground disabled:opacity-50"
-                              disabled={employeeCodeGenLoading}
-                              onClick={handleGenEmployeeCode}
-                              onMouseDown={(e) => e.preventDefault()}
-                            >
-                              <RefreshCw
-                                className={`size-4 ${employeeCodeGenLoading ? "animate-spin" : ""}`}
-                              />
-                            </button>
-                          </IBaseTooltip>
-                        }
-                        errorMessage={fieldState.error?.message}
-                        isInvalid={fieldState.invalid}
-                        label={tLabels("employeeCode")}
-                        size="sm"
-                      />
-                    )}
-                  />
-                  <Controller
-                    control={control}
-                    name="nationalId"
-                    render={({ field, fieldState }) => (
-                      <IBaseInput
-                        {...field}
-                        isRequired
-                        errorMessage={fieldState.error?.message}
-                        isInvalid={fieldState.invalid}
-                        label={tLabels("nationalId")}
-                        size="sm"
-                      />
-                    )}
-                  />
-                  <Controller
-                    control={control}
-                    name="taxId"
-                    render={({ field, fieldState }) => (
-                      <IBaseInput
-                        {...field}
-                        errorMessage={fieldState.error?.message}
-                        isInvalid={fieldState.invalid}
-                        label={tLabels("taxId")}
-                        size="sm"
-                      />
-                    )}
-                  />
-                </div>
-                {/* Row: Date of birth | Gender (col 3 để Date of birth không quá dài) */}
-                <div className="grid gap-4 md:grid-cols-3">
-                  <Controller
-                    control={control}
-                    name="dateOfBirth"
-                    render={({ field, fieldState }) => (
-                      <IBaseDatePicker
-                        allowClear
-                        errorMessage={fieldState.error?.message}
-                        format="YYYY-MM-DD"
-                        isInvalid={fieldState.invalid}
-                        label={tLabels("dateOfBirth")}
-                        size="sm"
-                        value={field.value ?? null}
-                        onChange={(v) => field.onChange(v ?? undefined)}
-                      />
-                    )}
-                  />
-                  <Controller
-                    control={control}
-                    name="gender"
-                    render={({ field }) => (
-                      <div>
-                        <label className="mb-2 block text-sm font-medium text-foreground">
-                          {tLabels("gender")}
-                        </label>
-                        <IBaseRadioGroup
-                          value={field.value ?? "unspecified"}
-                          onValueChange={field.onChange}
-                          orientation="horizontal"
-                        >
-                          <IBaseRadio value="male">
-                            {tLabels("genderMale")}
-                          </IBaseRadio>
-                          <IBaseRadio value="female">
-                            {tLabels("genderFemale")}
-                          </IBaseRadio>
-                          <IBaseRadio value="unspecified">
-                            {tLabels("genderUnspecified")}
-                          </IBaseRadio>
-                        </IBaseRadioGroup>
-                      </div>
-                    )}
-                  />
-                </div>
-                {/* About */}
-                <Controller
-                  control={control}
-                  name="bio"
-                  render={({ field, fieldState }) => (
-                    <IBaseTextarea
-                      {...field}
-                      errorMessage={fieldState.error?.message}
-                      isInvalid={fieldState.invalid}
-                      label={tLabels("bio")}
-                      minRows={2}
-                      size="sm"
-                    />
-                  )}
-                />
-                {/* Emails (trái) | Phones (phải) — 2 cột */}
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {/* Cột trái: Emails */}
-                  <div className="space-y-4">
-                    {(Array.isArray(emails) ? emails : []).map((_, i) => (
-                      <Controller
-                        key={`email-${i}`}
-                        control={control}
-                        name={`emails.${i}`}
-                        render={({ field, fieldState }) => (
-                          <IBaseInputEmail
-                            {...field}
-                            endContent={
-                              i > 0 ? (
-                                <button
-                                  type="button"
-                                  aria-label={tLabels("removeEmail")}
-                                  className="rounded-small p-1 text-default-400 outline-none transition-colors hover:bg-danger-100 hover:text-danger"
-                                  onClick={() => removeEmail(i)}
-                                  onMouseDown={(e) => e.preventDefault()}
-                                >
-                                  <Trash2 className="size-4" />
-                                </button>
-                              ) : undefined
-                            }
-                            errorMessage={
-                              fieldState.error?.message ??
-                              (i === 0 ? errors.emails?.message : undefined)
-                            }
-                            isInvalid={
-                              fieldState.invalid || (i === 0 && !!errors.emails)
-                            }
-                            isRequired={i === 0}
-                            label={i === 0 ? tLabels("emails") : undefined}
-                            size="sm"
-                          />
-                        )}
-                      />
-                    ))}
-                    {(emails?.length ?? 0) < 3 && (
-                      <IBaseButton
-                        color="primary"
-                        size="sm"
-                        variant="flat"
-                        onPress={addEmail}
-                      >
-                        {tLabels("addEmail")}
-                      </IBaseButton>
-                    )}
-                  </div>
-                  {/* Cột phải: Phones */}
-                  <div className="space-y-4">
-                    {(Array.isArray(phones) ? phones : []).map((_, i) => (
-                      <Controller
-                        key={`phone-${i}`}
-                        control={control}
-                        name={`phones.${i}`}
-                        render={({ field, fieldState }) => (
-                          <IBaseInputPhone
-                            endContent={
-                              i > 0 ? (
-                                <button
-                                  type="button"
-                                  aria-label={tLabels("removePhone")}
-                                  className="rounded-small p-1 text-default-400 outline-none transition-colors hover:bg-danger-100 hover:text-danger"
-                                  onClick={() => removePhone(i)}
-                                  onMouseDown={(e) => e.preventDefault()}
-                                >
-                                  <Trash2 className="size-4" />
-                                </button>
-                              ) : undefined
-                            }
-                            errorMessage={fieldState.error?.message}
-                            isInvalid={fieldState.invalid}
-                            label={i === 0 ? tLabels("phones") : undefined}
-                            size="sm"
-                            value={field.value ?? ""}
-                            onValueChange={field.onChange}
-                          />
-                        )}
-                      />
-                    ))}
-                    {(phones?.length ?? 0) < 3 && (
-                      <IBaseButton
-                        color="primary"
-                        size="sm"
-                        variant="flat"
-                        onPress={addPhone}
-                      >
-                        {tLabels("addPhone")}
-                      </IBaseButton>
-                    )}
-                  </div>
-                </div>
-                {/* Address — không disabled */}
-                <Controller
-                  control={control}
-                  name="address"
-                  render={({ field }) => {
-                    const addr = (field.value as Address) ?? DEFAULT_ADDRESS;
-                    const displayVal =
-                      typeof addr?.formattedAddress === "string"
-                        ? addr.formattedAddress
-                        : "";
-                    return (
-                      <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-end">
-                        <div className="flex-1">
-                          <IBaseInput
-                            label={tLabels("address")}
-                            readOnly
-                            size="sm"
-                            value={displayVal}
-                          />
-                        </div>
-                        <AddressPicker
-                          value={addr}
-                          onChange={() => {}}
-                          onAddressChange={(a) =>
-                            setValue(
-                              "address",
-                              a as unknown as Record<string, unknown>,
-                            )
-                          }
-                        />
-                      </div>
-                    );
-                  }}
-                />
-              </IBaseCardBody>
-            </IBaseCard>
-
-            {/* Section: Employment (other info — department, position, hire, bank, emergency) */}
-            <IBaseCard className="border border-default-200/60 shadow-sm">
-              <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
-                <h2 className="text-lg font-semibold text-foreground">
-                  {tLabels("sectionEmployment")}
-                </h2>
-                <div className="flex flex-col gap-4">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <Controller
-                      control={control}
-                      name="departmentId"
-                      render={({ field, fieldState }) => (
-                        <IBaseSingleSelectAsync
-                          isRequired
-                          callWhen="mount"
-                          errorMessage={fieldState.error?.message}
-                          isInvalid={fieldState.invalid}
-                          label={tLabels("department")}
-                          model="department.dropdown"
-                          selectedKey={field.value}
-                          size="sm"
-                          onSelectionChange={(key) =>
-                            field.onChange(key || undefined)
-                          }
-                        />
-                      )}
-                    />
-                    <Controller
-                      control={control}
-                      name="positionId"
-                      render={({ field, fieldState }) => (
-                        <IBaseSingleSelectAsync
-                          isRequired
-                          callWhen="mount"
-                          errorMessage={fieldState.error?.message}
-                          isInvalid={fieldState.invalid}
-                          label={tLabels("position")}
-                          model="position.dropdown"
-                          selectedKey={field.value}
-                          size="sm"
-                          onSelectionChange={(key) =>
-                            field.onChange(key || undefined)
-                          }
-                        />
-                      )}
-                    />
-                  </div>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <Controller
-                      control={control}
-                      name="hireDate"
-                      render={({ field, fieldState }) => (
-                        <IBaseDatePicker
-                          allowClear
-                          errorMessage={fieldState.error?.message}
-                          format="YYYY-MM-DD"
-                          isInvalid={fieldState.invalid}
-                          label={tLabels("hireDate")}
-                          size="sm"
-                          value={field.value ?? null}
-                          onChange={(v) => field.onChange(v ?? undefined)}
-                        />
-                      )}
-                    />
-                    <Controller
-                      control={control}
-                      name="probationEndDate"
-                      render={({ field, fieldState }) => (
-                        <IBaseDatePicker
-                          allowClear
-                          errorMessage={fieldState.error?.message}
-                          format="YYYY-MM-DD"
-                          isInvalid={fieldState.invalid}
-                          label={tLabels("probationEndDate")}
-                          size="sm"
-                          value={field.value ?? null}
-                          onChange={(v) => field.onChange(v ?? undefined)}
-                        />
-                      )}
-                    />
-                  </div>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <Controller
-                      control={control}
-                      name="emergencyContactName"
-                      render={({ field }) => (
-                        <IBaseInput
-                          {...field}
-                          label={tLabels("emergencyContactName")}
-                          size="sm"
-                        />
-                      )}
-                    />
-                    <Controller
-                      control={control}
-                      name="emergencyContactPhone"
-                      render={({ field }) => (
-                        <IBaseInputPhone
-                          label={tLabels("emergencyContactPhone")}
-                          size="sm"
-                          value={field.value ?? ""}
-                          onValueChange={field.onChange}
-                        />
-                      )}
-                    />
-                  </div>
-                  {/* Bank — đặt sau Emergency */}
-                  <div className="rounded-lg border border-default-200/60 bg-default-50/50 p-4">
-                    <h3 className="mb-3 text-sm font-medium text-foreground">
-                      {tLabels("sectionBank")}
-                    </h3>
-                    <div className="grid gap-4 md:grid-cols-3">
-                      <Controller
-                        control={control}
-                        name="bankName"
-                        render={({ field }) => (
-                          <IBaseInput
-                            {...field}
-                            label={tLabels("bankName")}
-                            size="sm"
-                          />
-                        )}
-                      />
-                      <Controller
-                        control={control}
-                        name="bankAccount"
-                        render={({ field }) => (
-                          <IBaseInput
-                            {...field}
-                            label={tLabels("bankAccount")}
-                            size="sm"
-                          />
-                        )}
-                      />
-                      <Controller
-                        control={control}
-                        name="bankBranch"
-                        render={({ field }) => (
-                          <IBaseInput
-                            {...field}
-                            label={tLabels("bankBranch")}
-                            size="sm"
-                          />
-                        )}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </IBaseCardBody>
-            </IBaseCard>
-
-            {/* Section: Login (create only) — căn nút với input */}
+            <EmployeeFormPersonalSection
+              control={control}
+              setValue={setValue}
+              errors={errors}
+              emails={emails}
+              phones={phones}
+              employeeCodeGenLoading={employeeCodeGenLoading}
+              onGenEmployeeCode={handleGenEmployeeCode}
+              onAddEmail={addEmail}
+              onAddPhone={addPhone}
+              onRemoveEmail={removeEmail}
+              onRemovePhone={removePhone}
+            />
+            <EmployeeFormEmploymentSection control={control} />
             {mode === "create" && (
-              <IBaseCard className="border border-default-200/60 shadow-sm">
-                <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
-                  <h2 className="text-lg font-semibold text-foreground">
-                    {tLabels("sectionAccount")}
-                  </h2>
-                  <Controller
-                    control={control}
-                    name="loginIdentifier"
-                    render={({ field, fieldState }) => (
-                      <div className="space-y-1">
-                        <IBaseInput
-                          {...field}
-                          errorMessage={
-                            fieldState.error?.message ??
-                            loginCheckMessage ??
-                            undefined
-                          }
-                          isInvalid={fieldState.invalid || !!loginCheckMessage}
-                          isRequired
-                          label={tLabels("loginIdentifier")}
-                          placeholder={tLabels("loginIdentifierPlaceholder")}
-                          size="sm"
-                          onBlur={() => checkLoginExists(field.value ?? "")}
-                        />
-                        {loginCheckLoading && (
-                          <span className="text-default-500 text-xs">
-                            {tLabels("checkingLogin")}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  />
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:gap-3">
-                    <Controller
-                      control={control}
-                      name="password"
-                      render={({ field, fieldState }) => (
-                        <IBaseInputPassword
-                          {...field}
-                          className="sm:min-w-[240px] sm:flex-1"
-                          errorMessage={fieldState.error?.message}
-                          isInvalid={fieldState.invalid}
-                          label={tLabels("password")}
-                          placeholder={tLabels("passwordPlaceholder")}
-                          size="sm"
-                        />
-                      )}
-                    />
-                    <IBaseButton
-                      className="shrink-0"
-                      color="primary"
-                      size="sm"
-                      variant="flat"
-                      onPress={handleGenPassword}
-                    >
-                      {tLabels("generatePassword")}
-                    </IBaseButton>
-                  </div>
-                </IBaseCardBody>
-              </IBaseCard>
+              <EmployeeFormAccountSection
+                control={control}
+                loginCheckMessage={loginCheckMessage}
+                loginCheckLoading={loginCheckLoading}
+                onCheckLoginExists={checkLoginExists}
+                onGenPassword={handleGenPassword}
+              />
             )}
-
-            {/* Section: Education & Experience */}
-            <IBaseCard className="border border-default-200/60 shadow-sm">
-              <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
-                <h2 className="text-lg font-semibold text-foreground">
-                  {tLabels("sectionEducationExperience")}
-                </h2>
-                <Controller
-                  control={control}
-                  name="educationLevel"
-                  render={({ field, fieldState }) => (
-                    <IBaseTextarea
-                      {...field}
-                      errorMessage={fieldState.error?.message}
-                      isInvalid={fieldState.invalid}
-                      label={tLabels("educationLevel")}
-                      minRows={2}
-                      placeholder={tLabels("educationLevelPlaceholder")}
-                      size="sm"
-                    />
-                  )}
-                />
-                <Controller
-                  control={control}
-                  name="experience"
-                  render={({ field, fieldState }) => (
-                    <IBaseTextarea
-                      {...field}
-                      errorMessage={fieldState.error?.message}
-                      isInvalid={fieldState.invalid}
-                      label={tLabels("experience")}
-                      minRows={3}
-                      placeholder={tLabels("experiencePlaceholder")}
-                      size="sm"
-                    />
-                  )}
-                />
-              </IBaseCardBody>
-            </IBaseCard>
-
-            {/* Section: Ghi chú */}
-            <IBaseCard className="border border-default-200/60 shadow-sm">
-              <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
-                <h2 className="text-lg font-semibold text-foreground">
-                  {tLabels("sectionNotes")}
-                </h2>
-                <Controller
-                  control={control}
-                  name="notes"
-                  render={({ field, fieldState }) => (
-                    <IBaseTextarea
-                      {...field}
-                      errorMessage={fieldState.error?.message}
-                      isInvalid={fieldState.invalid}
-                      minRows={3}
-                      placeholder={tLabels("notesPlaceholder")}
-                      size="sm"
-                    />
-                  )}
-                />
-              </IBaseCardBody>
-            </IBaseCard>
+            <EmployeeFormEducationSection control={control} />
+            <EmployeeFormNotesSection control={control} />
           </div>
         </IBaseTabPrimary>
 
         {mode === "create" && (
           <IBaseTabPrimary key="permissions" title={tLabels("tabPermissions")}>
-            <div className="flex flex-col gap-6">
-              <IBaseCard className="border border-default-200/60 shadow-sm">
-                <IBaseCardBody className="gap-5 px-4 py-4 md:p-5">
-                  <h2 className="text-lg font-semibold text-foreground">
-                    {tLabels("selectRoles")}
-                  </h2>
-                  <div className="flex flex-wrap gap-4">
-                    {allRoles.map((role) => (
-                      <IBaseCheckbox
-                        key={role.id}
-                        isSelected={roleIds.includes(role.id)}
-                        onValueChange={(checked) =>
-                          toggleRole(role.id, !!checked)
-                        }
-                      >
-                        {getLocalizedText(role.name as any) ?? role.code}
-                      </IBaseCheckbox>
-                    ))}
-                    {allRoles.length === 0 && (
-                      <p className="text-default-500 text-sm">
-                        {tLabels("noRoles")}
-                      </p>
-                    )}
-                  </div>
-                </IBaseCardBody>
-              </IBaseCard>
-              <RolePermissionMatrix
-                isLoading={permissionsLoading}
-                permissions={allPermissions}
-                selectedIds={selectedPermissionIdsSet}
-                onSelectionChange={handlePermissionMatrixChange}
-              />
-            </div>
+            <EmployeeFormPermissionsSection
+              roleIds={roleIds}
+              allRoles={allRoles}
+              allPermissions={allPermissions}
+              permissionsLoading={permissionsLoading}
+              selectedPermissionIdsSet={selectedPermissionIdsSet}
+              onToggleRole={toggleRole}
+              onPermissionMatrixChange={handlePermissionMatrixChange}
+              getLocalizedText={getLocalizedText}
+            />
           </IBaseTabPrimary>
         )}
       </IBaseTabsPrimary>
