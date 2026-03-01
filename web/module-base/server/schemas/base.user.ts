@@ -24,6 +24,7 @@ export const base_tb_users = mdBaseSchema.table(
     // Identity
     firstName: varchar("first_name", { length: 50 }),
     lastName: varchar("last_name", { length: 50 }),
+    commonName: varchar("common_name", { length: 50 }),
     avatar: varchar("avatar", { length: 512 }),
     dateOfBirth: timestamp("date_of_birth", { withTimezone: true }),
     gender: varchar("gender", { length: 10 }),

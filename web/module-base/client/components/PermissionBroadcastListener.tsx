@@ -3,7 +3,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-import userService from "@base/client/services/UserService";
 import {
   getPermissionsStoreState,
   PERMISSION_BROADCAST_CHANNEL,
@@ -38,29 +37,6 @@ export function PermissionBroadcastListener() {
           }, 200);
         }
         return;
-      }
-
-      if (type === "refresh") {
-        queryClient
-          .fetchQuery({
-            queryKey: ["meWithRoles"],
-            queryFn: () => userService.getMeWithRoles(),
-          })
-          .then((res) => {
-            if (res?.data) {
-              getPermissionsStoreState().setPermissions(res.data);
-              // Tab khác (vd đang mở /login) → chuyển về trang mặc định để refresh vào app
-              if (
-                typeof window !== "undefined" &&
-                window.location.pathname.startsWith("/login")
-              ) {
-                window.location.replace("/workspace/news");
-              }
-            }
-          })
-          .catch(() => {
-            // ignore
-          });
       }
     };
 

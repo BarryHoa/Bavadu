@@ -14,7 +14,7 @@ function hasPermissionWithWildcards(
   targetPermission: string,
   allPermissions: Array<string> | Set<string>,
   isGlobalAdmin: boolean,
-  adminModules: Record<string, boolean>,
+  adminModules: Set<string>,
 ): boolean {
   const parts = targetPermission.split(".");
   if (isGlobalAdmin) {
@@ -54,7 +54,9 @@ export function usePermission(): {
 } {
   const permissions = usePermissionsStore((s) => s.permissions);
   const isGlobalAdmin = usePermissionsStore((s) => s.isGlobalAdmin);
-  const adminModules = usePermissionsStore((s) => s.adminModules);
+  const adminModules = usePermissionsStore(
+    (s) => s.adminModules ?? new Set<string>(),
+  );
   return {
     hasPermission: (targetPermission: string) => {
       if (isGlobalAdmin) return true;

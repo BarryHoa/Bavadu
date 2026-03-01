@@ -11,10 +11,7 @@ import {
 } from "@base/client/components";
 import IBaseLink from "@base/client/components/IBaseLink";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
-import {
-  useCurrentUserCapabilities,
-  useLocalizedText,
-} from "@base/client/hooks";
+import { useLocalizedText, usePermission } from "@base/client/hooks";
 import { formatDate } from "@base/client/utils/date/formatDate";
 import { Employee } from "@mdl/hrm/client/interface/Employee";
 
@@ -49,7 +46,8 @@ export default function EmployeesListPage(): React.ReactNode {
   const tDataTable = useTranslations("dataTable");
   const t = useTranslations("hrm.employee.list");
   const getLocalizedText = useLocalizedText();
-  const { canCreateEdit } = useCurrentUserCapabilities();
+  const { hasPermission } = usePermission();
+  const canCreate = hasPermission("hrm.employee.create");
 
   const handlePermissionChange = React.useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ["hrm-employees"] });
@@ -158,7 +156,7 @@ export default function EmployeesListPage(): React.ReactNode {
     <div className="space-y-4">
       <ViewListDataTable<EmployeeRow>
         actionsRight={
-          canCreateEdit
+          canCreate
             ? [
                 {
                   key: "new",

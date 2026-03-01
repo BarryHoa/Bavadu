@@ -17,6 +17,7 @@ const EMPLOYEES_LIST_PATH = "/workspace/modules/hrm/employees";
 export default function EmployeeCreatePageClient(): React.ReactNode {
   const router = useRouter();
   const t = useTranslations("hrm.employee.create.labels");
+  const tValidation = useTranslations("hrm.employee.create.validation");
   const tTitle = useTranslations("hrm.employee");
 
   const breadcrumbs = useMemo(
@@ -53,20 +54,47 @@ export default function EmployeeCreatePageClient(): React.ReactNode {
   });
 
   const handleSubmit = async (values: EmployeeFormValues) => {
-    const userId = values.userId?.trim();
-    if (!userId) {
-      throw new Error("UserId is required");
+    const loginIdentifier = values.loginIdentifier?.trim();
+    if (!loginIdentifier) {
+      throw new Error("Login identifier (email or username) is required");
     }
+    const password = values.password?.trim();
+    if (!password || password.length < 6) {
+      throw new Error(tValidation("password.minLength"));
+    }
+    const nationalId = values.nationalId?.trim();
+    if (!nationalId) {
+      throw new Error(tValidation("nationalId.required"));
+    }
+
+    const emailsFiltered = (values.emails ?? [])
+      .map((e) => (typeof e === "string" ? e.trim() : ""))
+      .filter(Boolean);
+    const phonesFiltered = (values.phones ?? [])
+      .map((p) => (typeof p === "string" ? p.trim() : ""))
+      .filter(Boolean);
+
     const payload = {
-      userId,
+      loginIdentifier,
+      password,
+      emails: emailsFiltered.length ? emailsFiltered : null,
+      phones: phonesFiltered.length ? phonesFiltered : null,
+      firstName: values.firstName?.trim() || null,
+      lastName: values.lastName?.trim() || null,
+      commonName: values.commonName?.trim() || null,
+      bio: values.bio?.trim() || null,
+      address: values.address
+        ? (values.address as Record<string, unknown>)
+        : null,
+      dateOfBirth: values.dateOfBirth?.trim() || null,
+      gender: values.gender?.trim() || null,
+      notes: values.notes?.trim() || null,
       employeeCode: values.employeeCode.trim(),
-      nationalId: values.nationalId?.trim() || null,
+      nationalId,
       taxId: values.taxId?.trim() || null,
       positionId: values.positionId.trim(),
       departmentId: values.departmentId.trim(),
-      managerId: values.managerId?.trim() || null,
-      employmentStatus: values.employmentStatus || "active",
-      employmentType: values.employmentType?.trim() || null,
+      employmentStatus: "active",
       hireDate: values.hireDate?.trim() || null,
       probationEndDate: values.probationEndDate?.trim() || null,
       bankAccount: values.bankAccount?.trim() || null,
@@ -74,7 +102,9 @@ export default function EmployeeCreatePageClient(): React.ReactNode {
       bankBranch: values.bankBranch?.trim() || null,
       emergencyContactName: values.emergencyContactName?.trim() || null,
       emergencyContactPhone: values.emergencyContactPhone?.trim() || null,
-      isActive: values.isActive ?? true,
+      roleIds: Array.isArray(values.roleIds) ? values.roleIds : [],
+      educationLevel: values.educationLevel?.trim() || null,
+      experience: values.experience?.trim() || null,
     };
 
     await submitEmployee(payload);

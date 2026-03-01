@@ -1,16 +1,12 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
+import { useMemo } from "react";
 
-import {
-  useCreateUpdate,
-  useLocalizedText,
-  useSetBreadcrumbs,
-} from "@base/client/hooks";
 import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
+import { useCreateUpdate, useSetBreadcrumbs } from "@base/client/hooks";
 import { employeeService } from "@mdl/hrm/client/services/EmployeeService";
 
 import EmployeeForm, {
@@ -25,22 +21,22 @@ export default function EmployeeEditPage(): React.ReactNode {
   const id = params.id as string;
   const t = useTranslations("hrm.employee.create.labels");
   const tTitle = useTranslations("hrm.employee");
-  const getLocalizedText = useLocalizedText();
 
-  const { data: employeeData, isLoading, isError, error, refetch } =
-    useQuery({
-      queryKey: ["hrm-employee", id],
-      queryFn: async () => {
-        const response = await employeeService.getById(id);
+  const {
+    data: employeeData,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["hrm-employee", id],
+    queryFn: async () => {
+      const response = await employeeService.getById(id);
 
-        if (!response.data) {
-          throw new Error(response.message ?? "Employee not found");
-        }
-
-        return response.data;
-      },
-      enabled: !!id,
-    });
+      return response;
+    },
+    enabled: !!id,
+  });
 
   const viewPath = `${EMPLOYEES_LIST_PATH}/view/${id}`;
   const breadcrumbs = useMemo(
@@ -50,8 +46,9 @@ export default function EmployeeEditPage(): React.ReactNode {
             { label: tTitle("title"), href: EMPLOYEES_LIST_PATH },
             {
               label:
-                getLocalizedText(employeeData.fullName as any) ||
-                employeeData.employeeCode,
+                [employeeData.firstName, employeeData.lastName]
+                  .filter(Boolean)
+                  .join(" ") || employeeData.employeeCode,
               href: viewPath,
             },
             { label: t("editPageTitle") },
@@ -60,7 +57,7 @@ export default function EmployeeEditPage(): React.ReactNode {
             { label: tTitle("title"), href: EMPLOYEES_LIST_PATH },
             { label: t("editPageTitle") },
           ],
-    [employeeData, viewPath, tTitle, t, getLocalizedText],
+    [employeeData, viewPath, tTitle, t],
   );
 
   useSetBreadcrumbs(breadcrumbs);
@@ -96,9 +93,7 @@ export default function EmployeeEditPage(): React.ReactNode {
       taxId: values.taxId?.trim() || null,
       positionId: values.positionId.trim(),
       departmentId: values.departmentId.trim(),
-      managerId: values.managerId?.trim() || null,
       employmentStatus: values.employmentStatus || "active",
-      employmentType: values.employmentType?.trim() || null,
       hireDate: values.hireDate?.trim() || null,
       probationEndDate: values.probationEndDate?.trim() || null,
       bankAccount: values.bankAccount?.trim() || null,
@@ -148,30 +143,31 @@ export default function EmployeeEditPage(): React.ReactNode {
     >
       <EmployeeForm
         defaultValues={{
-          userId: employeeData.userId || "",
-          employeeCode: employeeData.employeeCode,
-          firstName: employeeData.firstName || "",
-          lastName: employeeData.lastName || "",
-          fullName: (employeeData.fullName as any) || { vi: "", en: "" },
-          email: employeeData.email || "",
-          phone: employeeData.phone || "",
-          dateOfBirth: employeeData.dateOfBirth || "",
-          gender: employeeData.gender || "",
-          nationalId: employeeData.nationalId || "",
-          taxId: employeeData.taxId || "",
-          positionId: employeeData.positionId,
-          departmentId: employeeData.departmentId,
-          managerId: employeeData.managerId || "",
-          employmentStatus: employeeData.employmentStatus,
-          employmentType: employeeData.employmentType || "",
-          hireDate: employeeData.hireDate || "",
-          probationEndDate: employeeData.probationEndDate || "",
-          bankAccount: employeeData.bankAccount || "",
-          bankName: employeeData.bankName || "",
-          bankBranch: employeeData.bankBranch || "",
-          emergencyContactName: employeeData.emergencyContactName || "",
-          emergencyContactPhone: employeeData.emergencyContactPhone || "",
-          isActive: employeeData.isActive ?? true,
+          employeeCode: employeeData.employeeCode ?? "",
+          firstName: employeeData.firstName ?? "",
+          lastName: employeeData.lastName ?? "",
+          commonName: employeeData.commonName ?? "",
+          emails:
+            (employeeData.emails?.length ?? 0) > 0
+              ? employeeData.emails!
+              : [""],
+          phones:
+            (employeeData.phones?.length ?? 0) > 0
+              ? employeeData.phones!
+              : [""],
+          nationalId: employeeData.nationalId ?? "",
+          taxId: employeeData.taxId ?? "",
+          positionId: employeeData.position?.id ?? "",
+          departmentId: employeeData.department?.id ?? "",
+          employmentStatus: employeeData.status ?? "active",
+          hireDate: employeeData.hireDate ?? "",
+          probationEndDate: employeeData.probationEndDate ?? "",
+          bankAccount: employeeData.bankAccount ?? "",
+          bankName: employeeData.bankName ?? "",
+          bankBranch: employeeData.bankBranch ?? "",
+          emergencyContactName: employeeData.emergencyContactName ?? "",
+          emergencyContactPhone: employeeData.emergencyContactPhone ?? "",
+          isActive: employeeData.status === "active",
         }}
         isSubmitting={isPending}
         mode="edit"

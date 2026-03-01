@@ -35,6 +35,16 @@ class UserService extends JsonRpcClientService {
   async getMeWithRoles(): Promise<GetMeWithRolesResult> {
     return this.call<GetMeWithRolesResult>("base-user.curd.getMeWithRoles", {});
   }
+
+  /** Check if login identifier (email or username) already exists. */
+  async checkLoginIdentifierExists(
+    identifier: string,
+  ): Promise<{ exists: boolean }> {
+    return this.call<{ exists: boolean }>(
+      "base-user.curd.checkLoginIdentifierExists",
+      { identifier: identifier.trim() },
+    );
+  }
 }
 
 const userService = new UserService();

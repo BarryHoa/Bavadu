@@ -36,14 +36,14 @@ export default function EmployeeActionMenu({
 }: EmployeeActionMenuProps) {
   const t = useTranslations("hrm.employee.list");
   const tPerm = useTranslations("userPermission");
-  const user = usePermissionsStore((s) => s.user);
   const isGlobalAdmin = usePermissionsStore((s) => s.isGlobalAdmin);
   const { hasPermission } = usePermission();
   const [permissionOpen, setPermissionOpen] = useState(false);
 
-  const canViewDetail = !!user;
+  const canViewDetail = hasPermission("hrm.employee.view");
   const canCreateEdit =
-    hasPermission(EMPLOYEE_CREATE) || hasPermission(EMPLOYEE_UPDATE);
+    hasPermission("hrm.employee.create") ||
+    hasPermission("hrm.employee.update");
   const canChangePermission = isGlobalAdmin;
 
   const displayName =

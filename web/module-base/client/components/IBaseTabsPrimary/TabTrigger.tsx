@@ -28,7 +28,6 @@ function TabTriggerComponent({ item, isSelected, onSelect }: TabTriggerProps) {
         "disabled:opacity-50 disabled:pointer-events-none",
         SIZE_CLASS_MAP[size],
         VARIANT_CLASS_MAP[variant],
-        "max-w-[80px]",
         classNames?.tab,
       )}
       data-selected={isSelected}

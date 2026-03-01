@@ -7,6 +7,7 @@ export interface EmployeeDto {
   employeeCode: string;
   firstName: string;
   lastName: string;
+  commonName?: string | null;
   emails?: string[] | null;
   phones?: string[] | null;
   nationalId: string | null;
@@ -27,16 +28,30 @@ export interface EmployeeDto {
   updatedAt: Date;
 }
 
-/** HR-only + userId for create. Personal data (name, email, etc.) lives on user. */
+/**
+ * Create employee = Register user (loginIdentifier, password) + employee record + roles.
+ * User: loginIdentifier (email or username), password, emails[], phones[], firstName, lastName, bio, address, dateOfBirth, gender, notes.
+ * Employee: employeeCode, nationalId (required), positionId, departmentId, ... (no manager).
+ */
 export interface EmployeeCreatePayload {
-  userId: string;
+  loginIdentifier: string;
+  password: string;
+  emails?: string[] | null;
+  phones?: string[] | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  commonName?: string | null;
+  bio?: string | null;
+  address?: Record<string, unknown> | null;
+  dateOfBirth?: string | null;
+  gender?: string | null;
+  notes?: string | null;
   employeeCode: string;
-  nationalId?: string | null;
+  nationalId: string;
   taxId?: string | null;
   positionId: string;
   departmentId: string;
-  managerId?: string | null;
-  employmentStatus?: string;
+  employmentStatus?: string | null;
   employmentType?: string | null;
   hireDate?: string | null;
   probationEndDate?: string | null;
@@ -45,7 +60,9 @@ export interface EmployeeCreatePayload {
   bankBranch?: string | null;
   emergencyContactName?: string | null;
   emergencyContactPhone?: string | null;
-  isActive?: boolean;
+  roleIds?: string[];
+  educationLevel?: string | null;
+  experience?: string | null;
 }
 
 /** HR-only for update. */

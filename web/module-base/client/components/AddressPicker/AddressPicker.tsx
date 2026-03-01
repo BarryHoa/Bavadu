@@ -36,12 +36,15 @@ const PickerAddressByCountryVN = dynamic(
 export interface AddressPickerProps {
   value?: Address | null;
   onChange: (value: string) => void;
+  /** When set, called with the full Address object on save (for storing in DB as jsonb). */
+  onAddressChange?: (address: Address) => void;
   isShowPostalCode?: boolean;
 }
 
 export default function AddressPicker({
   value,
   onChange,
+  onAddressChange,
   isShowPostalCode = false,
 }: AddressPickerProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -131,8 +134,8 @@ export default function AddressPicker({
       formattedAddress: addressString,
     };
 
-    // Call onChange with the formatted address string
     onChange(addressString);
+    onAddressChange?.(updatedAddress);
     onClose();
   };
 

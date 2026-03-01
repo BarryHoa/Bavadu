@@ -6,8 +6,7 @@
     "@mdl/*": "./modules/*"
   },
   "scripts": {
-    "dev": "npm run routes:generate && node scripts/dev-with-env.js local",
-    "dev:prod": "npm run routes:generate && node scripts/dev-with-env.js prod",
+    "dev": "rm -rf .next && (fuser -k 3000/tcp 2>/dev/null || true) && npm run routes:generate && node scripts/dev-with-env.js local",
     "next": "next dev",
     "build": "npm run routes:generate && next build",
     "server:start": "NODE_ENV=production tsx server.ts",
@@ -126,6 +125,7 @@
     "@typescript-eslint/eslint-plugin": "8.48.1",
     "@typescript-eslint/parser": "8.48.1",
     "babel-plugin-react-compiler": "latest",
+    "baseline-browser-mapping": "^2.10.0",
     "drizzle-kit": "^0.31.7",
     "eslint": "9.39.1",
     "eslint-config-next": "^16.0.7",

@@ -4,7 +4,7 @@
  * IBasePageLayout – Wrapper cho page Create, Edit, Detail theo design guidelines.
  *
  * Design guidelines:
- * - Full-page form: max-width 40–50em (45rem) cho vùng nội dung chính
+ * - Full-page form / content: max-width 60% cho vùng nội dung chính
  * - CRM pattern: Form bên trái + Sidebar bên phải (Activity, Quick tips, Related)
  * - Header: title (h1), subtitle, actions (Edit button)
  * - Breadcrumb: Dùng useSetBreadcrumbs trong page – layout không render breadcrumb
@@ -19,8 +19,8 @@ import { useMemo } from "react";
 export type PageLayoutMaxWidth = "form" | "content" | "full" | string | number;
 
 const MAX_WIDTH_CLASSES: Record<string, string> = {
-  form: "max-w-[45rem] w-full", // 45rem ≈ 720px, form UX guideline
-  content: "max-w-[60rem] w-full", // Rộng hơn cho detail/list
+  form: "w-[60vw] max-w-full min-w-0",
+  content: "w-[60vw] max-w-full min-w-0",
   full: "w-full",
 };
 
@@ -37,7 +37,7 @@ export interface IBasePageLayoutProps {
   sidebar?: React.ReactNode;
   /** Page type – affects default maxWidth when not specified */
   variant?: "create" | "edit" | "detail" | "list";
-  /** Max width of main content area. "form"=45rem, "content"=60rem, "full"=100% */
+  /** Max width of main content area. "form"|"content"=60%, "full"=100% */
   maxWidth?: PageLayoutMaxWidth;
   /** Center main content horizontally when no sidebar */
   centered?: boolean;
@@ -108,8 +108,7 @@ export function IBasePageLayout({
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
         <div
           className={cn(
-            "w-full",
-            maxWidthClass,
+            maxWidthClass ?? "w-full",
             centered && !sidebar && "mx-auto",
             contentClassName,
           )}

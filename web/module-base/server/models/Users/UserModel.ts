@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 
 import { base_tb_users, base_tb_users_login } from "../../schemas/base.user";
 import { BaseModel, PermissionRequired } from "../BaseModel";
@@ -100,6 +100,31 @@ class UserModel extends BaseModel<typeof base_tb_users> {
         isGlobalAdmin: result.isGlobalAdmin ?? false,
       },
     };
+  }
+
+  /**
+   * Check if a login identifier (email or username) is already used.
+   * RPC: base-user.curd.checkLoginIdentifierExists
+   */
+  @PermissionRequired({ auth: true })
+  async checkLoginIdentifierExists(
+    params: { identifier: string },
+  ): Promise<{ exists: boolean }> {
+    const identifier = (params.identifier ?? "").trim().toLowerCase();
+    if (!identifier) {
+      return { exists: false };
+    }
+    const [row] = await this.db
+      .select({ id: base_tb_users_login.userId })
+      .from(base_tb_users_login)
+      .where(
+        or(
+          eq(base_tb_users_login.email, identifier),
+          eq(base_tb_users_login.username, identifier),
+        ),
+      )
+      .limit(1);
+    return { exists: !!row };
   }
 }
 
