@@ -19,6 +19,8 @@ import {
   IBaseCheckbox,
   IBaseDatePicker,
   IBaseInput,
+  IBaseInputEmail,
+  IBaseInputPhone,
   IBaseRadio,
   IBaseRadioGroup,
   IBaseSingleSelectAsync,
@@ -86,7 +88,7 @@ export default function EmployeeForm({
     return d.toISOString().slice(0, 10);
   }, []);
 
-  const { control, handleSubmit, setValue, watch } =
+  const { control, handleSubmit, setValue, watch, formState: { errors } } =
     useForm<EmployeeFormValues>({
       resolver: valibotResolver(validation.employeeFormSchema) as any,
       defaultValues: {
@@ -428,9 +430,9 @@ export default function EmployeeForm({
                       control={control}
                       name={`emails.${i}`}
                       render={({ field, fieldState }) => (
-                        <IBaseInput
+                        <IBaseInputEmail
                           {...field}
-                          className="w-full"
+                          className="w-full md:w-1/2"
                           endContent={
                             i > 0 ? (
                               <button
@@ -444,11 +446,11 @@ export default function EmployeeForm({
                               </button>
                             ) : undefined
                           }
-                          errorMessage={fieldState.error?.message}
-                          isInvalid={fieldState.invalid}
+                          errorMessage={fieldState.error?.message ?? (i === 0 ? errors.emails?.message : undefined)}
+                          isInvalid={fieldState.invalid || (i === 0 && !!errors.emails)}
+                          isRequired={i === 0}
                           label={i === 0 ? tLabels("emails") : undefined}
                           size="sm"
-                          type="email"
                         />
                       )}
                     />
@@ -472,9 +474,8 @@ export default function EmployeeForm({
                       control={control}
                       name={`phones.${i}`}
                       render={({ field, fieldState }) => (
-                        <IBaseInput
-                          {...field}
-                          className="w-full"
+                        <IBaseInputPhone
+                          className="w-full md:w-1/2"
                           endContent={
                             i > 0 ? (
                               <button
@@ -492,6 +493,8 @@ export default function EmployeeForm({
                           isInvalid={fieldState.invalid}
                           label={i === 0 ? tLabels("phones") : undefined}
                           size="sm"
+                          value={field.value ?? ""}
+                          onValueChange={field.onChange}
                         />
                       )}
                     />
@@ -641,10 +644,11 @@ export default function EmployeeForm({
                       control={control}
                       name="emergencyContactPhone"
                       render={({ field }) => (
-                        <IBaseInput
-                          {...field}
+                        <IBaseInputPhone
                           label={tLabels("emergencyContactPhone")}
                           size="sm"
+                          value={field.value ?? ""}
+                          onValueChange={field.onChange}
                         />
                       )}
                     />
@@ -796,7 +800,6 @@ export default function EmployeeForm({
                 </IBaseCardBody>
               </IBaseCard>
             )}
-
 
             {/* Section: Ghi chú */}
             <IBaseCard className="border border-default-200/60 shadow-sm">

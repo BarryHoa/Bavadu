@@ -6,7 +6,8 @@
     "@mdl/*": "./modules/*"
   },
   "scripts": {
-    "dev": "rm -rf .next && (fuser -k 3000/tcp 2>/dev/null || true) && npm run routes:generate && node scripts/dev-with-env.js local",
+    "dev": "(fuser -k 3000/tcp 2>/dev/null || true) && npm run routes:generate && node scripts/dev-with-env.js local",
+    "dev:clean": "rm -rf .next && npm run dev",
     "next": "next dev",
     "build": "npm run routes:generate && next build",
     "server:start": "NODE_ENV=production tsx server.ts",

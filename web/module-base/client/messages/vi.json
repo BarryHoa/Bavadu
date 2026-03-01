@@ -132,7 +132,9 @@
     "input": {
       "placeholder": "Nhập thông tin...",
       "numberPlaceholder": "Nhập số...",
-      "searchPlaceholder": "Tìm kiếm..."
+      "searchPlaceholder": "Tìm kiếm...",
+      "emailPlaceholder": "Nhập email...",
+      "phonePlaceholder": "Nhập số điện thoại..."
     },
     "textarea": {
       "placeholder": "Nhập thông tin..."

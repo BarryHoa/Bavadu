@@ -147,7 +147,8 @@
             "requiredAtLeastOneValid": "At least one valid email is required"
           },
           "phones": {
-            "requiredAtLeastOne": "At least one phone number is required"
+            "requiredAtLeastOne": "At least one phone number is required",
+            "requiredAtLeastOneValid": "At least one valid phone number is required (9 or 10 digits)"
           },
           "password": {
             "minLength": "Password must be at least 6 characters"

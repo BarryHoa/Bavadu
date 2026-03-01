@@ -148,7 +148,8 @@
             "requiredAtLeastOneValid": "Cần ít nhất một email hợp lệ"
           },
           "phones": {
-            "requiredAtLeastOne": "Cần ít nhất một số điện thoại"
+            "requiredAtLeastOne": "Cần ít nhất một số điện thoại",
+            "requiredAtLeastOneValid": "Cần ít nhất một số điện thoại hợp lệ (9 hoặc 10 số)"
           },
           "password": {
             "minLength": "Mật khẩu tối thiểu 6 ký tự"

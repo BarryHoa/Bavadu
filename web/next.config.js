@@ -65,6 +65,12 @@ const nextConfig = {
     externalDir: true,
     // Enable React Compiler for automatic memoization
     reactCompiler: true,
+    // Giảm RAM khi dev/build (Next.js 15+)
+    webpackMemoryOptimizations: true,
+    // Chạy webpack trong worker riêng → giảm peak memory (cần khi có custom webpack)
+    webpackBuildWorker: true,
+    // Không preload toàn bộ pages lúc start → giảm RAM lúc khởi động
+    preloadEntriesOnStart: false,
   },
 };
 

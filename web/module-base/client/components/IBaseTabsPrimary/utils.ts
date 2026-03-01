@@ -21,14 +21,14 @@ export function getTabItemsFromChildren(
     ) {
       const p =
         (child.props as {
-          key?: string;
           title?: React.ReactNode;
           children?: React.ReactNode;
           disabled?: boolean;
           icon?: React.ReactNode;
         }) ?? {};
 
-      const k = p?.key || child?.key;
+      // key is a special prop in React 19 — only read from element.key, never from props
+      const k = child.key != null ? String(child.key) : undefined;
 
       if (k) {
         items.push({

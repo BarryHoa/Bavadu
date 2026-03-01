@@ -52,7 +52,8 @@ export function createEmployeeValidation(t: TranslateFn) {
     ),
   );
 
-  const phoneSchema = optional(pipe(string(), trim()));
+  /** Số điện thoại VN: 9 hoặc 10 chữ số */
+  const PHONE_DIGITS_REGEX = /^\d{9,10}$/;
   const dateSchema = pipe(string(), trim());
   const passwordSchema = optional(
     pipe(
@@ -73,6 +74,7 @@ export function createEmployeeValidation(t: TranslateFn) {
       return Array.isArray(value);
     }, t("roleIds.invalid")),
   );
+  /** Ít nhất 1 email hợp lệ; mỗi email không rỗng phải đúng format */
   const emailsSchema = pipe(
     custom<string[]>((value) => {
       if (value === undefined || value === null) return false;
@@ -85,15 +87,18 @@ export function createEmployeeValidation(t: TranslateFn) {
       return filled.every((s) => emailRegex.test(s));
     }, t("emails.requiredAtLeastOneValid")),
   );
+
+  /** Ít nhất 1 SĐT; mỗi SĐT không rỗng phải đúng 9 hoặc 10 chữ số (VN) */
   const phonesSchema = pipe(
     custom<string[]>((value) => {
       if (value === undefined || value === null) return false;
       if (!Array.isArray(value)) return false;
       const filled = value
-        .map((s) => (typeof s === "string" ? s.trim() : ""))
+        .map((s) => (typeof s === "string" ? String(s).replace(/\D/g, "") : ""))
         .filter((s) => s.length > 0);
-      return filled.length >= 1;
-    }, t("phones.requiredAtLeastOne")),
+      if (filled.length === 0) return false;
+      return filled.every((s) => PHONE_DIGITS_REGEX.test(s));
+    }, t("phones.requiredAtLeastOneValid")),
   );
   const genderSchema = optional(
     pipe(
