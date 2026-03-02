@@ -21,13 +21,16 @@ import ActionMenu, {
 } from "@base/client/components/ActionMenu/ActionMenu";
 import ViewListDataTable from "@base/client/components/ViewListDataTable";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
-import roleService, { type Role } from "@base/client/services/RoleService";
+import { Role } from "@base/client/interface/RoleAndPermission";
+import roleService, {
+  type RoleWithPermissions,
+} from "@base/client/services/RoleService";
 import RoleDetailModal from "./components/RoleDetailModal";
 
 const ROLES_LIST_QUERY_KEY = ["settings", "roles", "list"] as const;
 const BASE_PATH = "/workspace/settings/roles";
 
-type RoleRow = Role & {
+type RoleRow = RoleWithPermissions & {
   createdAt?: number | string | null;
   updatedAt?: number | string | null;
 };
@@ -92,13 +95,13 @@ export default function RolesListPage() {
             label: actionsT("delete"),
             onPress: () => handleDelete(row),
             disabled: deleteRoleMutation.isPending,
-          }
+          },
         );
       }
 
       return baseActions;
     },
-    [actionsT, handleDelete, deleteRoleMutation.isPending]
+    [actionsT, handleDelete, deleteRoleMutation.isPending],
   );
 
   const columns = useMemo<IBaseTableColumnDefinition<RoleRow>[]>(
@@ -153,7 +156,7 @@ export default function RolesListPage() {
           row?.id ? <ActionMenu actions={getActionMenuItems(row)} /> : null,
       },
     ],
-    [t, tIBaseTable, getText, getActionMenuItems]
+    [t, tIBaseTable, getText, getActionMenuItems],
   );
 
   return (
@@ -170,7 +173,7 @@ export default function RolesListPage() {
         ]}
         columns={columns}
         isDummyData={false}
-        model="base-role.list"
+        model="base-role-permission.list"
       />
       <IBaseModal isOpen={!!deleteConfirm} onClose={handleCloseModal}>
         <IBaseModalContent>

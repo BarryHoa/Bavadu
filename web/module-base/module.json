@@ -6,8 +6,10 @@
   "icon": "Package",
   "models": {
     "base-user.curd": "Users/UserModel",
-    "base-role.list": "Role/RoleViewListModel",
     "base-role-permission.curd": "Role/RoleAndPermissionModel",
+    "base-role-permission.list": "Role/RoleAndPermissionViewListModel",
+    "base-role-permission.dropdown": "Role/RoleAndPermissionDropdownListModel",
+    "base-role.dropdown": "Role/RoleDropdownListModel",
     "base-user-role.curd": "UserRole/UserRoleModel",
     "base-user-permission.curd": "UserPermission/UserPermissionModel",
     "base-location.curd": "Locations/LocationModel",

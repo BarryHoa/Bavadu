@@ -1,6 +1,6 @@
 import { and, eq, inArray } from "drizzle-orm";
 
-import BaseModelCached from "@base/server/models/BaseModelCached";
+import { BaseModel } from "@base/server/models/BaseModel";
 
 import {
   base_tb_permissions,
@@ -12,14 +12,14 @@ import {
 } from "../../schemas";
 
 export interface UserPermissionResult {
-  permissions: Set<string>;
+  permissions: string[];
   roles: Array<{
     id: string;
     code: string;
     name: unknown;
   }>;
   isGlobalAdmin?: boolean;
-  adminModules?: Set<string>;
+  adminModules?: string[];
 }
 
 // Interface cho cache data (Set không thể serialize, nên dùng Array)
@@ -35,9 +35,8 @@ interface CachedUserPermissionResult {
   adminModules?: string[];
 }
 
-export default class UserPermissionModel extends BaseModelCached<
-  typeof base_tb_user_permissions,
-  CachedUserPermissionResult
+export default class UserPermissionModel extends BaseModel<
+  typeof base_tb_user_permissions
 > {
   protected cachePrefix = "permissions:";
   private cacheTTL = 1800; // 30 phút
@@ -73,17 +72,14 @@ export default class UserPermissionModel extends BaseModelCached<
     if (!forceRefresh) {
       const cached = await this.cacheGet<CachedUserPermissionResult>(userId);
 
-      if (cached !== this.CACHE_NOT_FOUND) {
+      if (!this.isCachedNotFound<CachedUserPermissionResult>(cached)) {
         const data = cached as CachedUserPermissionResult;
 
-        // Convert Array back to Set
         return {
-          permissions: new Set(data.permissions),
           roles: data.roles,
+          permissions: data.permissions ?? [],
           isGlobalAdmin: data.isGlobalAdmin,
-          adminModules: data.adminModules
-            ? new Set(data.adminModules)
-            : undefined,
+          adminModules: data.adminModules ?? [],
         };
       }
     }
@@ -223,41 +219,11 @@ export default class UserPermissionModel extends BaseModelCached<
     }
 
     return {
-      permissions: finalPermissions,
+      permissions: Array.from(finalPermissions),
       roles,
       isGlobalAdmin,
-      adminModules,
+      adminModules: Array.from(adminModules),
     };
-  }
-
-  /**
-   * Get user's permissions as array (for API responses)
-   */
-  async getPermissionsByUserArray(userId: string): Promise<string[]> {
-    const result = await this.getPermissionsByUser(userId);
-
-    return Array.from(result.permissions).sort();
-  }
-
-  /**
-   * Check if user has specific permission
-   */
-  async hasPermission(userId: string, permission: string): Promise<boolean> {
-    const result = await this.getPermissionsByUser(userId);
-
-    return result.permissions.has(permission);
-  }
-
-  /**
-   * Check if user has any of the specified permissions
-   */
-  async hasAnyPermission(
-    userId: string,
-    permissions: string[],
-  ): Promise<boolean> {
-    const result = await this.getPermissionsByUser(userId);
-
-    return permissions.some((perm) => result.permissions.has(perm));
   }
 
   /**
@@ -265,23 +231,34 @@ export default class UserPermissionModel extends BaseModelCached<
    * - required (vd: hrm.employee.view) = đúng quyền đó
    * - feature wildcard (vd: hrm.employee.*) = mọi quyền của feature
    * - module wildcard (vd: hrm.*) = mọi quyền của module
+   * - all quyền * = true
    */
   private hasPermissionWithWildcards(
-    userPermissions: Set<string>,
-    required: string,
+    permissions: string[],
+    perCheck: string,
   ): boolean {
-    if (userPermissions.has(required)) return true;
-    const parts = required.split(".");
+    // * is public -> allow all permissions
+    if (perCheck === "*") return true;
 
+    const permissionsSet = new Set(permissions);
+    // check exact permission
+    if (permissionsSet.has(perCheck)) return true;
+
+    // check wildcard permission
+    const parts = perCheck.split(".");
+
+    // check module wildcard permission
     if (parts.length >= 2) {
       const moduleWildcard = `${parts[0]}.*`;
 
-      if (userPermissions.has(moduleWildcard)) return true;
+      if (permissionsSet.has(moduleWildcard)) return true;
     }
+
+    // check feature wildcard permission
     if (parts.length >= 3) {
       const featureWildcard = `${parts[0]}.${parts[1]}.*`;
 
-      if (userPermissions.has(featureWildcard)) return true;
+      if (permissionsSet.has(featureWildcard)) return true;
     }
 
     return false;

@@ -154,39 +154,3 @@ export function loadAllMenus(): MenuFactoryElm[] {
 
   return sortByOrder(menuItems);
 }
-
-/**
- * Filter menu items by user permissions.
- * Items with a "permission" key are kept only when the user has that permission.
- * Items without "permission" are always kept. Children are filtered recursively.
- * Parents with no remaining children (and no path) are removed.
- */
-export const filterMenusByPermissions = (
-  items: MenuFactoryElm[],
-  permissions: Set<string>,
-  isGlobalAdmin: boolean,
-  adminModules?: Set<string>,
-): MenuFactoryElm[] =>
-  items
-    ?.map((item) => {
-      let isAccepted = false;
-
-      if (item.children) {
-        isAccepted = !!filterMenusByPermissions(
-          item.children,
-          permissions,
-          isGlobalAdmin,
-          adminModules,
-        );
-      }
-      if (isAccepted || isGlobalAdmin || adminModules?.has(item.module)) {
-        return item;
-      }
-      // check permission
-      if (item.permission && !permissions.has(item.permission)) {
-        return undefined;
-      }
-
-      return item;
-    })
-    .filter((item) => item !== undefined) as MenuFactoryElm[];

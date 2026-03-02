@@ -2,13 +2,11 @@ import { headers } from "next/headers";
 
 import ModuleI18nProvider from "@base/client/contexts/i18n";
 import WorkspaceLayoutClient from "@base/client/layouts/workspace/WorkspaceLayoutClient";
-import {
-  filterMenusByPermissions,
-  loadAllMenus,
-} from "@base/server/loaders/menu-loader";
+import { loadAllMenus } from "@base/server/loaders/menu-loader";
 import UserPermissionModel from "@base/server/models/UserPermission/UserPermissionModel";
 import { getModuleNames } from "@base/server/utils/get-module-names";
 
+import { filterMenusByPermissions } from "@base/client/utils/x";
 import { MenuWorkspaceElement } from "../../interface/WorkspaceMenuInterface";
 import { getPermissionsStoreState } from "../../stores/permission-store";
 
@@ -36,20 +34,16 @@ export default async function WorkspaceLayout({
       // Set permissions to store
       getPermissionsStoreState().setPermissions({
         roleCodes: userPermissionResult.roles.map((role) => role.code),
-        permissions: userPermissionResult.permissions,
+        permissions: userPermissionResult.permissions ?? [],
         isGlobalAdmin: userPermissionResult.isGlobalAdmin ?? false,
-        adminModules: userPermissionResult.adminModules
-          ? new Set(userPermissionResult.adminModules)
-          : undefined,
+        adminModules: userPermissionResult.adminModules ?? [],
       });
 
       menuItems = filterMenusByPermissions(
         menuItems as MenuWorkspaceElement[],
-        userPermissionResult.permissions,
+        userPermissionResult.permissions ?? [],
         userPermissionResult.isGlobalAdmin ?? false,
-        userPermissionResult.adminModules
-          ? new Set(userPermissionResult.adminModules)
-          : undefined,
+        userPermissionResult.adminModules ?? [],
       ) as MenuWorkspaceElement[];
     } catch {
       // If permission check fails, use unfiltered menu

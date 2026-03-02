@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 
 import { base_tb_user_saving } from "../../schemas/base.user-saving";
-import BaseModelCached from "../BaseModelCached";
+import { BaseModel } from "../BaseModel";
 
 export interface UserSavingRow {
   id: string;
@@ -19,10 +19,7 @@ export interface UserSavingItem {
   values: Record<string, unknown> | null;
 }
 
-class UserSavingModel extends BaseModelCached<
-  typeof base_tb_user_saving,
-  UserSavingRow | null
-> {
+class UserSavingModel extends BaseModel<typeof base_tb_user_saving> {
   protected cachePrefix = "user-saving:";
 
   constructor() {
@@ -49,7 +46,7 @@ class UserSavingModel extends BaseModelCached<
       this.getCachedKey(userId, key, group),
     );
 
-    if (cacheResult !== this.CACHE_NOT_FOUND) {
+    if (!this.isCachedNotFound<UserSavingRow | null>(cacheResult)) {
       return cacheResult as UserSavingRow | null;
     }
 

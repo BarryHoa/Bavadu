@@ -12,11 +12,15 @@ import { isNil, omitBy } from "lodash";
 import { BaseModel } from "./BaseModel";
 
 /**
- * Abstract base class for models that support view list data table functionality
- * Extends BaseModel and implements IBaseViewListModel interface
+ * Abstract base class for models that expose tabular "view list" data.
  *
- * Models that need view list functionality should extend this class
- * and implement the getViewDataList method
+ * Responsibilities:
+ * - Define a column map used for SELECT and ORDER BY.
+ * - Define optional search and filter behaviour.
+ * - Provide shared helpers for building paginated list queries.
+ *
+ * Any model that needs reusable data‑table behaviour should extend this class
+ * and override the `declaration*` hooks as needed.
  */
 export type ColumnMap = Map<
   string,
@@ -100,9 +104,10 @@ export abstract class BaseViewListModel<
   // ============================================================================
 
   /**
-   * Declare which columns are available for select/sort.
-   * Default implementation returns an empty Map.
-   * Subclass can override to provide columns mapping.
+   * Declare which columns are available for selection/sorting.
+   *
+   * The default implementation returns an empty map (no columns).
+   * Subclasses are expected to override and provide a concrete mapping.
    */
   protected declarationColumns = (): ColumnMap => {
     return new Map();
@@ -110,11 +115,12 @@ export abstract class BaseViewListModel<
 
   /**
    * Declare how global search text is mapped to conditions.
-   * Returns a Map where key is the search field name and value is a function
-   * that receives the processed search text (may be empty string)
-   * and should return a drizzle condition or undefined.
-   * Default implementation returns an empty Map (no search).
-   * Subclass can override to provide search conditions.
+   *
+   * Returns a map where the key is a logical search field name and the value
+   * is a function that receives the processed search text and returns either
+   * a drizzle condition or `undefined`.
+   *
+   * The default implementation returns an empty map (no search support).
    */
   protected declarationSearch = (): SearchConditionMap => {
     return new Map();
@@ -122,21 +128,22 @@ export abstract class BaseViewListModel<
 
   /**
    * Declare how filters are mapped to conditions.
-   * Returns a Map where key is the filter field name and value is a function
-   * that receives the filters object and returns a drizzle condition or undefined.
-   * Default implementation returns an empty Map (no additional filters).
-   * Subclass can override to provide filter conditions.
+   *
+   * Returns a map where the key is the filter field name and the value is a
+   * function that receives both the current filter value and the full filters
+   * object, and returns a drizzle condition or `undefined`.
+   *
+   * The default implementation returns an empty map (no additional filters).
    */
-
   protected declarationFilter = (): FilterConditionMap<TFilter> => {
     return new Map();
   };
 
   /**
-   * Declare how to map a raw DB row to the view row type (TRow)
-   * when using shared list/query helpers.
-   * Default implementation returns the row as-is.
-   * Subclass can override to transform the row data.
+   * Map a raw DB row into the view row type (`TRow`).
+   *
+   * Used by shared list/query helpers before returning results to callers.
+   * The default implementation returns the row as‑is.
    */
   protected declarationMappingData = (row: unknown, index?: number): TRow => {
     return row as TRow;

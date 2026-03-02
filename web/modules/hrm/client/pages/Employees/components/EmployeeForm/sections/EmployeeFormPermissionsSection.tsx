@@ -6,31 +6,18 @@ import { useTranslations } from "next-intl";
 
 import { IBaseCard, IBaseCardBody } from "@base/client";
 import { IBaseCheckbox } from "@base/client/components";
+import { Permission, Role } from "@base/client/interface/RoleAndPermission";
 import RolePermissionMatrix from "@base/client/pages/Settings/Roles/components/RolePermissionMatrix/RolePermissionMatrix";
-
-interface RoleItem {
-  id: string;
-  code: string;
-  name: unknown;
-  isSystem?: boolean;
-}
-
-interface PermissionItem {
-  id: string;
-  [key: string]: unknown;
-}
 
 interface EmployeeFormPermissionsSectionProps {
   roleIds: string[];
-  allRoles: RoleItem[];
-  allPermissions: PermissionItem[];
+  allRoles: Role[];
+  allPermissions: Permission[];
   permissionsLoading: boolean;
   selectedPermissionIdsSet: Set<string>;
   onToggleRole: (roleId: string, checked: boolean) => void;
   onPermissionMatrixChange: (selectedIds: Set<string>) => void;
-  getLocalizedText: (
-    text: LocalizeText | string | undefined | null,
-  ) => string;
+  getLocalizedText: (text: LocalizeText | string | undefined | null) => string;
 }
 
 export function EmployeeFormPermissionsSection({
@@ -47,14 +34,15 @@ export function EmployeeFormPermissionsSection({
   const systemRoles = allRoles.filter((r) => r.isSystem === true);
   const customRoles = allRoles.filter((r) => !r.isSystem);
 
-  const renderRoleCheckboxes = (roles: RoleItem[]) =>
+  const renderRoleCheckboxes = (roles: Role[]) =>
     roles.map((role) => (
       <IBaseCheckbox
         key={role.id}
         isSelected={roleIds.includes(role.id)}
         onValueChange={(checked) => onToggleRole(role.id, !!checked)}
       >
-        {getLocalizedText(role.name ?? null) ?? role.code}
+        {getLocalizedText((role?.name as unknown as string) ?? null) ??
+          role.code}
       </IBaseCheckbox>
     ));
 

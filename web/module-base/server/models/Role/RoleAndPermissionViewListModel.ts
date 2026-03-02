@@ -17,7 +17,7 @@ import { ParamFilter } from "@base/shared/interface/FilterInterface";
 
 import { base_tb_roles } from "../../schemas/base.role";
 
-class RoleViewListModel extends BaseViewListModel<
+class RoleAndPermissionViewListModel extends BaseViewListModel<
   typeof base_tb_roles,
   RoleRow
 > {
@@ -95,4 +95,4 @@ class RoleViewListModel extends BaseViewListModel<
   ): Promise<ListParamsResponse<RoleRow>> => this.buildQueryDataList(params);
 }
 
-export default RoleViewListModel;
+export default RoleAndPermissionViewListModel;

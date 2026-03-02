@@ -1,6 +1,7 @@
 "use client";
 
 import { usePermissionsStore } from "@base/client/stores";
+import { UserPermission } from "../interface/RoleAndPermission";
 
 export type HasPermissionsMode = "any" | "all";
 
@@ -12,9 +13,9 @@ export type HasPermissionsMode = "any" | "all";
  */
 function hasPermissionWithWildcards(
   targetPermission: string,
-  allPermissions: Array<string> | Set<string>,
-  isGlobalAdmin: boolean,
-  adminModules: Set<string>,
+  allPermissions: UserPermission["permissions"],
+  isGlobalAdmin: UserPermission["isGlobalAdmin"],
+  adminModules: UserPermission["adminModules"],
 ): boolean {
   const parts = targetPermission.split(".");
   if (isGlobalAdmin) {
@@ -22,22 +23,18 @@ function hasPermissionWithWildcards(
   }
   // todo: check admin modules
 
-  let permissions: Set<string> = new Set();
-  if (Array.isArray(allPermissions)) {
-    permissions = new Set(allPermissions);
-  } else if (allPermissions instanceof Set) {
-    permissions = allPermissions;
-  }
+  let permissions = new Set(allPermissions);
+  const permissionsSet = new Set(allPermissions);
 
-  if (permissions.has(targetPermission)) return true;
+  if (permissionsSet.has(targetPermission)) return true;
 
   if (parts.length >= 2) {
     const moduleWildcard = `${parts[0]}.*`;
-    if (permissions.has(moduleWildcard)) return true;
+    if (permissionsSet.has(moduleWildcard)) return true;
   }
   if (parts.length >= 3) {
     const featureWildcard = `${parts[0]}.${parts[1]}.*`;
-    if (permissions.has(featureWildcard)) return true;
+    if (permissionsSet.has(featureWildcard)) return true;
   }
 
   return false;
@@ -54,9 +51,8 @@ export function usePermission(): {
 } {
   const permissions = usePermissionsStore((s) => s.permissions);
   const isGlobalAdmin = usePermissionsStore((s) => s.isGlobalAdmin);
-  const adminModules = usePermissionsStore(
-    (s) => s.adminModules ?? new Set<string>(),
-  );
+  const adminModules = usePermissionsStore((s) => s.adminModules);
+
   return {
     hasPermission: (targetPermission: string) => {
       if (isGlobalAdmin) return true;

@@ -1,15 +1,18 @@
 "use client";
 
-import type { Permission } from "@base/client/services/RoleService";
 import type { EmployeeFormValues } from "../../validation/employeeValidation";
 
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
-import { IBaseButton, IBaseTabPrimary, IBaseTabsPrimary } from "@base/client/components";
+import {
+  IBaseButton,
+  IBaseTabPrimary,
+  IBaseTabsPrimary,
+} from "@base/client/components";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 import roleService from "@base/client/services/RoleService";
@@ -24,8 +27,8 @@ import {
   EmployeeFormEducationSection,
   EmployeeFormEmploymentSection,
   EmployeeFormNotesSection,
-  EmployeeFormPersonalSection,
   EmployeeFormPermissionsSection,
+  EmployeeFormPersonalSection,
 } from "./sections";
 
 export type { EmployeeFormValues };
@@ -100,10 +103,7 @@ export default function EmployeeForm({
     queryFn: () =>
       rpc.call<{
         data: { id: string; code: string; name: unknown; isSystem?: boolean }[];
-      }>(
-        "base-role.list.getData",
-        { page: 1, pageSize: 200 },
-      ),
+      }>("base-role.list.getData", { page: 1, pageSize: 200 }),
     enabled: mode === "create",
   });
 
@@ -114,10 +114,7 @@ export default function EmployeeForm({
   });
 
   const allRoles = useMemo(
-    () =>
-      (roleListData?.data ?? []).filter(
-        (r) => r.code !== "system",
-      ),
+    () => (roleListData?.data ?? []).filter((r) => r.code !== "system"),
     [roleListData],
   );
   const allPermissions = useMemo(
@@ -214,23 +211,24 @@ export default function EmployeeForm({
     [],
   );
 
-  useEffect(() => {
-    if (mode !== "create" || roleIds.length === 0) return;
-    const load = async () => {
-      const merged = new Set<string>();
-      for (const roleId of roleIds) {
-        try {
-          const res = await roleService.getRole(roleId);
-          const perms = res?.data?.permissions ?? [];
-          perms.forEach((p: Permission) => merged.add(p.id));
-        } catch {
-          /* ignore */
-        }
-      }
-      setValue("permissionIds", Array.from(merged));
-    };
-    load();
-  }, [mode, roleIds]);
+  //Todo should get
+  // useEffect(() => {
+  //   if (mode !== "create" || roleIds.length === 0) return;
+  //   const load = async () => {
+  //     const merged = new Set<string>();
+  //     for (const roleId of roleIds) {
+  //       try {
+  //         const res = await roleService.getRole(roleId);
+  //         const perms = res?.data?.permissions ?? [];
+  //         perms.forEach((p: Permission) => merged.add(p.id));
+  //       } catch {
+  //         /* ignore */
+  //       }
+  //     }
+  //     setValue("permissionIds", Array.from(merged));
+  //   };
+  //   load();
+  // }, [mode, roleIds]);
 
   const onSubmitForm: SubmitHandler<EmployeeFormValues> = async (values) => {
     await onSubmit(values);

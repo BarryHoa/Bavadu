@@ -1,33 +1,7 @@
 import type { LocalizeText } from "../interface/LocalizeText";
 
-import ClientHttpService from "@base/client/services/ClientHttpService";
+import { Permission, Role } from "@base/client/interface/RoleAndPermission";
 import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
-
-export type Role = {
-  id: string;
-  code: string;
-  name: LocalizeText;
-  description?: string;
-  isSystem: boolean;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  // Module-level admin flags loaded from is_admin_modules JSONB
-  isAdminModules?: Record<string, boolean>;
-};
-
-export type Permission = {
-  id: string;
-  key: string;
-  module: string;
-  resource: string;
-  action: string;
-  name: LocalizeText;
-  description?: string;
-  isActive: boolean;
-};
 
 export type RoleWithPermissions = Role & {
   permissions: Permission[];
@@ -88,10 +62,6 @@ export type DeleteRoleResponse = {
 };
 
 class RoleService extends JsonRpcClientService {
-  private get rolesHttp() {
-    return new ClientHttpService("/api/base/settings/roles");
-  }
-
   async getRole(id: string): Promise<RoleResponse> {
     const data = await this.call<RoleWithPermissions | null>(
       "base-role-permission.curd.get",

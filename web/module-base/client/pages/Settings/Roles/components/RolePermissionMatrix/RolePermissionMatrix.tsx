@@ -1,6 +1,6 @@
 "use client";
 
-import type { Permission } from "@base/client/services/RoleService";
+import type { Permission } from "@base/client/interface/RoleAndPermission";
 
 import { groupBy } from "lodash";
 import { useTranslations } from "next-intl";

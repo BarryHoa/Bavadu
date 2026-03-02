@@ -11,30 +11,17 @@ import { and, eq, gt, lt } from "drizzle-orm";
 import { Debug } from "../../runtime/Debug";
 import { base_tb_sessions } from "../../schemas/base.session";
 import { base_tb_users, base_tb_users_login } from "../../schemas/base.user";
-import BaseModelCached from "../BaseModelCached";
+import { BaseModel } from "../BaseModel";
 
-class SessionModel extends BaseModelCached<
-  typeof base_tb_sessions,
-  ValidateSessionResult
-> {
+class SessionModel extends BaseModel<typeof base_tb_sessions> {
   private readonly useRedis: boolean;
   protected cachePrefix = "session:";
 
   constructor() {
     super(base_tb_sessions);
-    this.useRedis = this.shouldUseRedis();
+    this.useRedis = this.isCacheConnected();
     if (this.useRedis) {
       Debug.log("[SessionModel] Using Redis for session caching");
-    }
-  }
-
-  private shouldUseRedis(): boolean {
-    try {
-      const redisCache = this.getCache();
-
-      return redisCache?.getStatus().connected ?? false;
-    } catch {
-      return false;
     }
   }
 
@@ -158,7 +145,7 @@ class SessionModel extends BaseModelCached<
     if (this.useRedis) {
       const cached = await this.cacheGet<ValidateSessionResult>(sessionToken);
 
-      if (cached !== this.CACHE_NOT_FOUND) {
+      if (!this.isCachedNotFound<ValidateSessionResult>(cached)) {
         const normalized = this.normalizeCachedSession(
           cached as ValidateSessionResult,
         );

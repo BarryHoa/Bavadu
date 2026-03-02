@@ -17,9 +17,9 @@ function broadcast(type: "clear" | "refresh") {
 
 export interface PermissionStatePayload {
   roleCodes: string[];
-  permissions: Set<string>;
+  permissions: string[];
   isGlobalAdmin: boolean;
-  adminModules?: Set<string>;
+  adminModules?: string[];
 }
 
 /** Store state: only data + set/clear. No check logic here. */
@@ -30,9 +30,9 @@ export interface PermissionStoreState extends PermissionStatePayload {
 
 const initialState: PermissionStatePayload = {
   roleCodes: [],
-  permissions: new Set(),
+  permissions: [],
   isGlobalAdmin: false,
-  adminModules: new Set<string>(),
+  adminModules: [],
 };
 
 /** Permission data store (createStore pattern, key in root-store) */
