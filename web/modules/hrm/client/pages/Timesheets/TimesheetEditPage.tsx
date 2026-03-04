@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useMemo } from "react";
 
 import { useCreateUpdate, useLocalizedText, useSetBreadcrumbs } from "@base/client/hooks";
-import { IBaseButton, IBasePageLayout, IBaseSpinner } from "@base/client";
+import { IBaseButton, IBasePageLayout } from "@base/client";
 import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
 
 import TimesheetForm, {
@@ -112,16 +112,7 @@ export default function TimesheetEditPage(): React.ReactNode {
     });
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center gap-2 py-16 text-default-500">
-        <IBaseSpinner size="md" />
-        <span>{tCommon("loading")}</span>
-      </div>
-    );
-  }
-
-  if (isError || !timesheetData) {
+  if (isError || (!isLoading && !timesheetData)) {
     return (
       <div className="flex flex-col gap-4 rounded-xl border-2 border-danger-200 bg-danger-50/50 p-6">
         <p className="font-medium text-danger-700">
@@ -139,43 +130,50 @@ export default function TimesheetEditPage(): React.ReactNode {
     );
   }
 
-  const subtitle = [
-    getLocalizedText(timesheetData.employee?.fullName) || timesheetData.employee?.employeeCode,
-    timesheetData.workDate,
-  ].filter(Boolean).join(" · ");
+  const subtitle = timesheetData
+    ? [
+        getLocalizedText(timesheetData.employee?.fullName) ||
+          timesheetData.employee?.employeeCode,
+        timesheetData.workDate,
+      ]
+        .filter(Boolean)
+        .join(" · ")
+    : undefined;
 
   return (
     <IBasePageLayout
       maxWidth="form"
-      subtitle={subtitle || undefined}
+      subtitle={subtitle}
       title={t("edit")}
       variant="edit"
     >
-      <TimesheetForm
-      defaultValues={{
-        employeeId: timesheetData.employeeId,
-        rosterId: timesheetData.rosterId || "",
-        workDate: timesheetData.workDate,
-        shiftId: timesheetData.shiftId || "",
-        checkInTime: timesheetData.checkInTime
-          ? new Date(timesheetData.checkInTime).toISOString().slice(0, 16)
-          : "",
-        checkOutTime: timesheetData.checkOutTime
-          ? new Date(timesheetData.checkOutTime).toISOString().slice(0, 16)
-          : "",
-        breakDuration: timesheetData.breakDuration || 0,
-        status: timesheetData.status,
-        checkInMethod: timesheetData.checkInMethod || "",
-        checkOutMethod: timesheetData.checkOutMethod || "",
-        checkInLocation: timesheetData.checkInLocation || "",
-        checkOutLocation: timesheetData.checkOutLocation || "",
-        notes: timesheetData.notes || "",
-      }}
-      isSubmitting={isPending}
-      submitError={submitError}
-      onCancel={() => router.push(viewPath)}
-        onSubmit={handleSubmit}
-      />
+      {timesheetData ? (
+        <TimesheetForm
+            defaultValues={{
+              employeeId: timesheetData.employeeId,
+              rosterId: timesheetData.rosterId || "",
+              workDate: timesheetData.workDate,
+              shiftId: timesheetData.shiftId || "",
+              checkInTime: timesheetData.checkInTime
+                ? new Date(timesheetData.checkInTime).toISOString().slice(0, 16)
+                : "",
+              checkOutTime: timesheetData.checkOutTime
+                ? new Date(timesheetData.checkOutTime).toISOString().slice(0, 16)
+                : "",
+              breakDuration: timesheetData.breakDuration || 0,
+              status: timesheetData.status,
+              checkInMethod: timesheetData.checkInMethod || "",
+              checkOutMethod: timesheetData.checkOutMethod || "",
+              checkInLocation: timesheetData.checkInLocation || "",
+              checkOutLocation: timesheetData.checkOutLocation || "",
+              notes: timesheetData.notes || "",
+            }}
+            isSubmitting={isPending}
+            submitError={submitError}
+            onCancel={() => router.push(viewPath)}
+            onSubmit={handleSubmit}
+          />
+        ) : null}
     </IBasePageLayout>
   );
 }
