@@ -114,10 +114,6 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
     [timesheetList, year, month],
   );
 
-  const handleEdit = useCallback((id: string) => {
-    window.location.href = `/workspace/modules/hrm/timesheets/edit/${id}`;
-  }, []);
-
   if (monthError) {
     const msg =
       monthError instanceof Error ? monthError.message : String(monthError);
@@ -158,7 +154,6 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
       <TimesheetDetailModal
         timesheet={detailTimesheet}
         onClose={() => setDetailTimesheet(null)}
-        onEdit={handleEdit}
       />
     </div>
   );

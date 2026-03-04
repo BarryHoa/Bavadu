@@ -54,8 +54,6 @@
     "routes": [
       { "path": "/", "page": "/Timesheets/TimesheetMonthlyPage" },
       { "path": "/all", "page": "/Timesheets/TimesheetAllPage" },
-      { "path": "/create", "page": "/Timesheets/TimesheetCreatePage" },
-      { "path": "/edit/[id]", "page": "/Timesheets/TimesheetEditPage" },
       { "path": "/view/[id]", "page": "/Timesheets/TimesheetViewPage" }
     ]
   },

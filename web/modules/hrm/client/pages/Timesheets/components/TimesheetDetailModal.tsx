@@ -22,13 +22,11 @@ import {
 interface TimesheetDetailModalProps {
   timesheet: TimesheetDto | null;
   onClose: () => void;
-  onEdit: (id: string) => void;
 }
 
 export function TimesheetDetailModal({
   timesheet,
   onClose,
-  onEdit,
 }: TimesheetDetailModalProps): React.ReactNode {
   const t = useTranslations("hrm.timesheets");
   const tCommon = useTranslations("common");
@@ -102,15 +100,6 @@ export function TimesheetDetailModal({
           </div>
         </IBaseModalBody>
         <IBaseModalFooter>
-          <IBaseButton
-            color="primary"
-            onPress={() => {
-              onClose();
-              onEdit(timesheet.id);
-            }}
-          >
-            {tCommon("actions.edit")}
-          </IBaseButton>
           <IBaseButton variant="bordered" onPress={onClose}>
             {tCommon("actions.close")}
           </IBaseButton>

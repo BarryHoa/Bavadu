@@ -103,20 +103,9 @@ export default function TimesheetViewPage(): React.ReactNode {
     formatDate(timesheetData.workDate) ||
     t("generalInfo");
   const subtitle = [formatDate(timesheetData.workDate), timesheetData.status].filter(Boolean).join(" · ");
-  const editPath = `${TIMESHEETS_LIST_PATH}/edit/${id}`;
 
   return (
     <IBasePageLayout
-      headerActions={
-        <IBaseButton
-          color="primary"
-          size="sm"
-          startContent={<Pencil className="size-4" />}
-          onPress={() => router.push(editPath)}
-        >
-          {tCommon("actions.edit")}
-        </IBaseButton>
-      }
       maxWidth="content"
       subtitle={subtitle || undefined}
       title={titleLabel}
