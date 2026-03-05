@@ -23,6 +23,7 @@ const PROTECTED_ROUTES = [
   "/workspace",
   "/api/base/internal/json-rpc",
   "/api/base/media/upload",
+  "/api/base/import",
 ];
 
 // Routes that should be excluded from proxy

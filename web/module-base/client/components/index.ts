@@ -17,6 +17,7 @@ export * from "./IBaseDivider";
 export * from "./IBaseDropdown";
 export * from "./IBaseEmpty";
 export * from "./IBaseImage";
+export * from "./IBaseImportTemplate";
 export * from "./IBaseInput";
 export * from "./IBaseInputEmail";
 export * from "./IBaseInputMultipleLang";

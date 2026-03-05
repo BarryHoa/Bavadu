@@ -22,6 +22,7 @@
     "base-permission.curd": "Permission/PermissionModel",
     "base-sequence.curd": "Sequence/SequenceModel",
     "base-sequence.list": "Sequence/SequenceViewListModel",
-    "base-user-saving-column.curd": "UserSaving/UserSavingColumnModel"
+    "base-user-saving-column.curd": "UserSaving/UserSavingColumnModel",
+    "base-import.curd": "Import/ImportModel"
   }
 }

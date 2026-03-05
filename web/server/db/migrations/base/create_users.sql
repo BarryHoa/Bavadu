@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS "md_base"."users" (
 	"bio" varchar(120),
 	"first_name" varchar(50),
 	"last_name" varchar(50),
+	"common_name" varchar(50);
 	"phones" varchar(20)[],
 	"addresses" varchar(225)[],
 	"emails" varchar(255)[],
