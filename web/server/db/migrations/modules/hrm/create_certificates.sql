@@ -3,7 +3,7 @@
 
 CREATE TABLE "mdl_hrm"."certificates" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
-	"employee_id" uuid NOT NULL,
+	"user_id" uuid NOT NULL REFERENCES "md_base"."users"("id") ON DELETE CASCADE,
 	"name" jsonb NOT NULL,
 	"issuer" varchar(255) NOT NULL,
 	"certificate_number" varchar(100),
@@ -16,3 +16,7 @@ CREATE TABLE "mdl_hrm"."certificates" (
 	"created_by" varchar(36),
 	"updated_by" varchar(36)
 );
+
+CREATE INDEX IF NOT EXISTS "certificates_user_idx" ON "mdl_hrm"."certificates"("user_id");
+CREATE INDEX IF NOT EXISTS "certificates_expiry_idx" ON "mdl_hrm"."certificates"("expiry_date");
+CREATE INDEX IF NOT EXISTS "certificates_active_idx" ON "mdl_hrm"."certificates"("is_active");

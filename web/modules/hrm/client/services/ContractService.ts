@@ -3,7 +3,8 @@ import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 export interface ContractDto {
   id: string;
   contractNumber: string;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -51,7 +52,8 @@ export default class ContractService extends JsonRpcClientService {
 
   create(payload: {
     contractNumber: string;
-    employeeId: string;
+    userId?: string;
+    employeeId?: string;
     contractType: string;
     startDate: string;
     endDate?: string | null;

@@ -2,7 +2,8 @@ import type { LocaleDataType } from "@base/shared/interface/Locale";
 
 export interface CertificateDto {
   id: string;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -20,7 +21,8 @@ export interface CertificateDto {
 }
 
 export interface CreateCertificatePayload {
-  employeeId: string;
+  userId?: string;
+  employeeId?: string;
   name: LocaleDataType<string>;
   issuer: string;
   certificateNumber?: string | null;

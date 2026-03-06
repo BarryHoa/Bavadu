@@ -24,7 +24,8 @@ const user = alias(base_tb_users, "user");
 
 export interface CertificateRow {
   id: string;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -53,7 +54,7 @@ class CertificateViewListModel extends BaseViewListModel<
       }
     >([
       ["id", { column: hrm_tb_certificates.id, sort: true }],
-      ["employeeId", { column: hrm_tb_certificates.employeeId, sort: true }],
+      ["userId", { column: hrm_tb_certificates.userId, sort: true }],
       ["name", { column: hrm_tb_certificates.name, sort: true }],
       ["issuer", { column: hrm_tb_certificates.issuer, sort: true }],
       ["issueDate", { column: hrm_tb_certificates.issueDate, sort: true }],
@@ -79,7 +80,8 @@ class CertificateViewListModel extends BaseViewListModel<
 
   protected declarationMappingData = (row: any): CertificateRow => ({
     id: row.id,
-    employeeId: row.employeeId,
+    userId: row.userId,
+    employeeId: row.employeeId ?? undefined,
     employee: row.employeeId
       ? {
           id: row.employeeId,
@@ -103,7 +105,7 @@ class CertificateViewListModel extends BaseViewListModel<
   ): Promise<ListParamsResponse<CertificateRow>> => {
     return this.buildQueryDataList(params, (query) =>
       query
-        .leftJoin(employee, eq(this.table.employeeId, employee.id))
+        .leftJoin(employee, eq(this.table.userId, employee.userId))
         .leftJoin(user, eq(employee.userId, user.id)),
     );
   };

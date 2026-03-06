@@ -3,7 +3,7 @@
 
 CREATE TABLE "mdl_hrm"."onboarding_checklists" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
-	"employee_id" uuid NOT NULL,
+	"user_id" uuid NOT NULL REFERENCES "md_base"."users"("id") ON DELETE CASCADE,
 	"task_name" jsonb NOT NULL,
 	"task_description" text,
 	"category" varchar(50),
@@ -18,14 +18,7 @@ CREATE TABLE "mdl_hrm"."onboarding_checklists" (
 	"updated_by" varchar(36)
 );
 
--- Add foreign key constraint
-ALTER TABLE "mdl_hrm"."onboarding_checklists"
-	ADD CONSTRAINT "onboarding_checklists_employee_id_employees_id_fk"
-	FOREIGN KEY ("employee_id") 
-	REFERENCES "mdl_hrm"."employees"("id") 
-	ON DELETE CASCADE;
-
 -- Add indexes
-CREATE INDEX IF NOT EXISTS "onboarding_checklists_employee_idx" ON "mdl_hrm"."onboarding_checklists"("employee_id");
+CREATE INDEX IF NOT EXISTS "onboarding_checklists_user_idx" ON "mdl_hrm"."onboarding_checklists"("user_id");
 CREATE INDEX IF NOT EXISTS "onboarding_checklists_assigned_idx" ON "mdl_hrm"."onboarding_checklists"("assigned_to");
 CREATE INDEX IF NOT EXISTS "onboarding_checklists_completed_idx" ON "mdl_hrm"."onboarding_checklists"("is_completed");

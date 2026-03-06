@@ -9,9 +9,10 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import { base_tb_users } from "@base/server/schemas/base.user";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_courses } from "./hrm.course";
-import { hrm_tb_employees } from "./hrm.employee";
 
 // Employee Training - Đào tạo nhân viên
 export const hrm_tb_employees_training = mdlHrmSchema.table(
@@ -20,8 +21,8 @@ export const hrm_tb_employees_training = mdlHrmSchema.table(
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
-    employeeId: uuid("employee_id")
-      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
+    userId: uuid("user_id")
+      .references(() => base_tb_users.id, { onDelete: "cascade" })
       .notNull(),
     courseId: uuid("course_id")
       .references(() => hrm_tb_courses.id, { onDelete: "restrict" })
@@ -38,7 +39,7 @@ export const hrm_tb_employees_training = mdlHrmSchema.table(
     updatedBy: varchar("updated_by", { length: 36 }),
   },
   (table) => [
-    index("employee_trainings_employee_idx").on(table.employeeId),
+    index("employee_trainings_user_idx").on(table.userId),
     index("employee_trainings_course_idx").on(table.courseId),
     index("employee_trainings_status_idx").on(table.status),
   ],

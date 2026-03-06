@@ -11,6 +11,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import { base_tb_users } from "@base/server/schemas/base.user";
 import { hrm_tb_employees } from "./hrm.employee";
 import { mdlHrmSchema } from "./schema";
 
@@ -24,8 +25,8 @@ export const hrm_tb_contracts = mdlHrmSchema.table(
     contractNumber: varchar("contract_number", { length: 100 })
       .notNull()
       .unique(), // Số hợp đồng
-    employeeId: uuid("employee_id")
-      .references(() => hrm_tb_employees.id, { onDelete: "restrict" })
+    userId: uuid("user_id")
+      .references(() => base_tb_users.id, { onDelete: "restrict" })
       .notNull(),
     contractType: varchar("contract_type", { length: 50 }).notNull(), // probation, fixed_term, indefinite, part_time
     startDate: date("start_date").notNull(),
@@ -49,7 +50,7 @@ export const hrm_tb_contracts = mdlHrmSchema.table(
   },
   (table) => [
     index("contracts_number_idx").on(table.contractNumber),
-    index("contracts_employee_idx").on(table.employeeId),
+    index("contracts_user_idx").on(table.userId),
     index("contracts_type_idx").on(table.contractType),
     index("contracts_status_idx").on(table.status),
     index("contracts_dates_idx").on(table.startDate, table.endDate),

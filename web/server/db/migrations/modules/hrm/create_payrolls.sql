@@ -4,7 +4,7 @@
 CREATE TABLE "mdl_hrm"."payrolls" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"payroll_period_id" uuid NOT NULL,
-	"employee_id" uuid NOT NULL,
+	"user_id" uuid NOT NULL REFERENCES "md_base"."users"("id") ON DELETE RESTRICT,
 	"base_salary" integer NOT NULL,
 	"allowances" jsonb,
 	"overtime_pay" integer DEFAULT 0,
@@ -28,3 +28,8 @@ CREATE TABLE "mdl_hrm"."payrolls" (
 	"created_by" varchar(36),
 	"updated_by" varchar(36)
 );
+
+CREATE INDEX IF NOT EXISTS "payrolls_period_idx" ON "mdl_hrm"."payrolls"("payroll_period_id");
+CREATE INDEX IF NOT EXISTS "payrolls_user_idx" ON "mdl_hrm"."payrolls"("user_id");
+CREATE INDEX IF NOT EXISTS "payrolls_period_user_idx" ON "mdl_hrm"."payrolls"("payroll_period_id", "user_id");
+CREATE INDEX IF NOT EXISTS "payrolls_status_idx" ON "mdl_hrm"."payrolls"("status");

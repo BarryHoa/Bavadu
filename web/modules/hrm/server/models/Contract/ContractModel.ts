@@ -16,7 +16,8 @@ const signedByUser = alias(base_tb_users, "signed_by_user");
 export interface ContractRow {
   id: string;
   contractNumber: string;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -48,7 +49,9 @@ export interface ContractRow {
 
 export interface ContractInput {
   contractNumber: string;
-  employeeId: string;
+  userId?: string;
+  /** When form sends employeeId (e.g. from employee dropdown), resolved to userId. */
+  employeeId?: string;
   contractType: string;
   startDate: string;
   endDate?: string | null;
@@ -71,12 +74,29 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
     super(hrm_tb_contracts);
   }
 
+  private async resolveUserId(payload: {
+    userId?: string;
+    employeeId?: string;
+  }): Promise<string> {
+    if (payload.userId) return payload.userId;
+    if (payload.employeeId) {
+      const [e] = await this.db
+        .select({ userId: hrm_tb_employees.userId })
+        .from(hrm_tb_employees)
+        .where(eq(hrm_tb_employees.id, payload.employeeId))
+        .limit(1);
+      if (e?.userId) return e.userId;
+    }
+    throw new Error("userId or employeeId (resolvable to user) is required");
+  }
+
   getContractById = async (id: string): Promise<ContractRow | null> => {
     const result = await this.db
       .select({
         id: this.table.id,
         contractNumber: this.table.contractNumber,
-        employeeId: this.table.employeeId,
+        userId: this.table.userId,
+        employeeId: employee.id,
         employeeCode: employee.code,
         employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
         contractType: this.table.contractType,
@@ -100,8 +120,8 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
         updatedAt: this.table.updatedAt,
       })
       .from(this.table)
-      .leftJoin(employee, eq(this.table.employeeId, employee.id))
-      .leftJoin(user, eq(employee.userId, user.id))
+      .leftJoin(employee, eq(this.table.userId, employee.userId))
+      .leftJoin(user, eq(this.table.userId, user.id))
       .leftJoin(signedByEmployee, eq(this.table.signedBy, signedByEmployee.id))
       .leftJoin(signedByUser, eq(signedByEmployee.userId, signedByUser.id))
       .where(eq(this.table.id, id))
@@ -116,7 +136,8 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
     return {
       id: row.id,
       contractNumber: row.contractNumber,
-      employeeId: row.employeeId,
+      userId: row.userId,
+      employeeId: row.employeeId ?? undefined,
       employee: row.employeeId
         ? {
             id: row.employeeId,
@@ -156,10 +177,11 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
   };
 
   createContract = async (payload: ContractInput): Promise<ContractRow> => {
+    const userId = await this.resolveUserId(payload);
     const now = new Date();
     const insertData: NewHrmTbContract = {
       contractNumber: payload.contractNumber,
-      employeeId: payload.employeeId,
+      userId,
       contractType: payload.contractType,
       startDate: payload.startDate,
       endDate: payload.endDate ?? null,
@@ -210,8 +232,12 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
 
     if (payload.contractNumber !== undefined)
       updateData.contractNumber = payload.contractNumber;
-    if (payload.employeeId !== undefined)
-      updateData.employeeId = payload.employeeId;
+    if (payload.userId !== undefined) updateData.userId = payload.userId;
+    if (payload.employeeId !== undefined) {
+      updateData.userId = await this.resolveUserId({
+        employeeId: payload.employeeId,
+      });
+    }
     if (payload.contractType !== undefined)
       updateData.contractType = payload.contractType;
     if (payload.startDate !== undefined)
@@ -255,6 +281,9 @@ export default class ContractModel extends BaseModel<typeof hrm_tb_contracts> {
 
     if (payload.contractNumber !== undefined) {
       normalizedPayload.contractNumber = String(payload.contractNumber);
+    }
+    if (payload.userId !== undefined) {
+      normalizedPayload.userId = String(payload.userId);
     }
     if (payload.employeeId !== undefined) {
       normalizedPayload.employeeId = String(payload.employeeId);

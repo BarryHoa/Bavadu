@@ -10,8 +10,9 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import { base_tb_users } from "@base/server/schemas/base.user";
+
 import { mdlHrmSchema } from "./schema";
-import { hrm_tb_employees } from "./hrm.employee";
 
 // Goals - Mục tiêu (KPI/OKR)
 export const hrm_tb_goals = mdlHrmSchema.table(
@@ -20,8 +21,8 @@ export const hrm_tb_goals = mdlHrmSchema.table(
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
-    employeeId: uuid("employee_id")
-      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
+    userId: uuid("user_id")
+      .references(() => base_tb_users.id, { onDelete: "cascade" })
       .notNull(),
     goalType: varchar("goal_type", { length: 50 }).notNull(), // kpi, okr
     title: jsonb("title").notNull(), // LocaleDataType<string>
@@ -40,7 +41,7 @@ export const hrm_tb_goals = mdlHrmSchema.table(
     updatedBy: varchar("updated_by", { length: 36 }),
   },
   (table) => [
-    index("goals_employee_idx").on(table.employeeId),
+    index("goals_user_idx").on(table.userId),
     index("goals_type_idx").on(table.goalType),
     index("goals_status_idx").on(table.status),
     index("goals_dates_idx").on(table.startDate, table.endDate),

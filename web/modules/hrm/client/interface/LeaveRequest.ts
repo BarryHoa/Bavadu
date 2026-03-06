@@ -2,7 +2,8 @@ import type { LocaleDataType } from "@base/shared/interface/Locale";
 
 export interface LeaveRequestDto {
   id: string;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -29,7 +30,8 @@ export interface LeaveRequestDto {
 }
 
 export interface CreateLeaveRequestPayload {
-  employeeId: string;
+  userId?: string;
+  employeeId?: string;
   leaveTypeId: string;
   startDate: string;
   endDate: string;

@@ -1,25 +1,16 @@
 import { and, eq, sql } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
 
-import { BaseModel } from "@base/server/models/BaseModel";
-import { base_tb_users } from "@base/server/schemas/base.user";
 import { LocaleDataType } from "@base/shared/interface/Locale";
 
-import { NewHrmTbNotification, hrm_tb_notifications } from "../../schemas";
-import { hrm_tb_employees } from "../../schemas/hrm.employee";
-import { fullNameSqlFrom } from "../Employee/employee.helpers";
-
-const employee = alias(hrm_tb_employees, "employee");
-const user = alias(base_tb_users, "user");
+import { BaseModel } from "../BaseModel";
+import {
+  base_tb_notifications,
+  NewBaseTbNotification,
+} from "../../schemas/base.notification";
 
 export interface NotificationRow {
   id: string;
-  employeeId: string;
-  employee?: {
-    id: string;
-    employeeCode?: string;
-    fullName?: unknown;
-  } | null;
+  userId: string;
   type: string;
   title?: unknown;
   message?: unknown;
@@ -31,7 +22,7 @@ export interface NotificationRow {
 }
 
 export interface NotificationInput {
-  employeeId: string;
+  userId: string;
   type: string;
   title: LocaleDataType<string>;
   message: LocaleDataType<string>;
@@ -40,7 +31,7 @@ export interface NotificationInput {
 }
 
 export interface NotificationQuery {
-  employeeId: string;
+  userId: string;
   isRead?: boolean;
   type?: string;
   limit?: number;
@@ -48,56 +39,25 @@ export interface NotificationQuery {
 }
 
 export default class NotificationModel extends BaseModel<
-  typeof hrm_tb_notifications
+  typeof base_tb_notifications
 > {
   constructor() {
-    super(hrm_tb_notifications);
-  }
-
-  private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
-    if (!value) return null;
-    if (typeof value === "string") return { en: value };
-    if (typeof value === "object") return value as LocaleDataType<string>;
-
-    return null;
+    super(base_tb_notifications);
   }
 
   getNotificationById = async (id: string): Promise<NotificationRow | null> => {
     const result = await this.db
-      .select({
-        id: this.table.id,
-        employeeId: this.table.employeeId,
-        employeeCode: employee.code,
-        employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
-        type: this.table.type,
-        title: this.table.title,
-        message: this.table.message,
-        link: this.table.link,
-        isRead: this.table.isRead,
-        readAt: this.table.readAt,
-        metadata: this.table.metadata,
-        createdAt: this.table.createdAt,
-      })
+      .select()
       .from(this.table)
-      .leftJoin(employee, eq(this.table.employeeId, employee.id))
-      .leftJoin(user, eq(employee.userId, user.id))
       .where(eq(this.table.id, id))
       .limit(1);
 
     const row = result[0];
-
     if (!row) return null;
 
     return {
       id: row.id,
-      employeeId: row.employeeId,
-      employee: row.employeeId
-        ? {
-            id: row.employeeId,
-            employeeCode: row.employeeCode ?? undefined,
-            fullName: row.employeeFullName ?? undefined,
-          }
-        : null,
+      userId: row.userId,
       type: row.type,
       title: row.title,
       message: row.message,
@@ -118,8 +78,8 @@ export default class NotificationModel extends BaseModel<
   createNotification = async (
     payload: NotificationInput,
   ): Promise<NotificationRow> => {
-    const insertData: NewHrmTbNotification = {
-      employeeId: payload.employeeId,
+    const insertData: NewBaseTbNotification = {
+      userId: payload.userId,
       type: payload.type,
       title: payload.title,
       message: payload.message,
@@ -137,7 +97,6 @@ export default class NotificationModel extends BaseModel<
     if (!created) throw new Error("Failed to create notification");
 
     const notification = await this.getNotificationById(created.id);
-
     if (!notification)
       throw new Error("Failed to load notification after creation");
 
@@ -147,7 +106,7 @@ export default class NotificationModel extends BaseModel<
   queryNotifications = async (
     query: NotificationQuery,
   ): Promise<{ notifications: NotificationRow[]; total: number }> => {
-    const conditions = [eq(this.table.employeeId, query.employeeId)];
+    const conditions = [eq(this.table.userId, query.userId)];
 
     if (query.isRead !== undefined) {
       conditions.push(eq(this.table.isRead, query.isRead));
@@ -158,25 +117,10 @@ export default class NotificationModel extends BaseModel<
 
     const whereClause = and(...conditions);
 
-    const [notifications, totalResult] = await Promise.all([
+    const [rows, totalResult] = await Promise.all([
       this.db
-        .select({
-          id: this.table.id,
-          employeeId: this.table.employeeId,
-          employeeCode: employee.code,
-          employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
-          type: this.table.type,
-          title: this.table.title,
-          message: this.table.message,
-          link: this.table.link,
-          isRead: this.table.isRead,
-          readAt: this.table.readAt,
-          metadata: this.table.metadata,
-          createdAt: this.table.createdAt,
-        })
+        .select()
         .from(this.table)
-        .leftJoin(employee, eq(this.table.employeeId, employee.id))
-        .leftJoin(user, eq(employee.userId, user.id))
         .where(whereClause)
         .orderBy(this.table.createdAt)
         .limit(query.limit ?? 50)
@@ -188,16 +132,9 @@ export default class NotificationModel extends BaseModel<
     ]);
 
     return {
-      notifications: notifications.map((row) => ({
+      notifications: rows.map((row) => ({
         id: row.id,
-        employeeId: row.employeeId,
-        employee: row.employeeId
-          ? {
-              id: row.employeeId,
-              employeeCode: row.employeeCode ?? undefined,
-              fullName: row.employeeFullName ?? undefined,
-            }
-          : null,
+        userId: row.userId,
         type: row.type,
         title: row.title,
         message: row.message,
@@ -223,7 +160,7 @@ export default class NotificationModel extends BaseModel<
     return this.getNotificationById(id);
   };
 
-  markAllAsRead = async (employeeId: string): Promise<void> => {
+  markAllAsRead = async (userId: string): Promise<void> => {
     await this.db
       .update(this.table)
       .set({
@@ -232,7 +169,7 @@ export default class NotificationModel extends BaseModel<
       })
       .where(
         and(
-          eq(this.table.employeeId, employeeId),
+          eq(this.table.userId, userId),
           eq(this.table.isRead, false),
         ),
       );

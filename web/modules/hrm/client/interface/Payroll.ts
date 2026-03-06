@@ -8,7 +8,8 @@ export interface PayrollDto {
     code?: string;
     name?: string | null;
   } | null;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -38,7 +39,8 @@ export interface PayrollDto {
 
 export interface CreatePayrollPayload {
   payrollPeriodId: string;
-  employeeId: string;
+  userId?: string;
+  employeeId?: string;
   baseSalary: number;
   allowances?: Record<string, number>;
   overtimePay?: number;

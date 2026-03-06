@@ -3,7 +3,7 @@
 
 CREATE TABLE "mdl_hrm"."employee_trainings" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
-	"employee_id" uuid NOT NULL,
+	"user_id" uuid NOT NULL REFERENCES "md_base"."users"("id") ON DELETE CASCADE,
 	"course_id" uuid NOT NULL,
 	"enrollment_date" date NOT NULL,
 	"completion_date" date,
@@ -16,3 +16,7 @@ CREATE TABLE "mdl_hrm"."employee_trainings" (
 	"created_by" varchar(36),
 	"updated_by" varchar(36)
 );
+
+CREATE INDEX IF NOT EXISTS "employee_trainings_user_idx" ON "mdl_hrm"."employee_trainings"("user_id");
+CREATE INDEX IF NOT EXISTS "employee_trainings_course_idx" ON "mdl_hrm"."employee_trainings"("course_id");
+CREATE INDEX IF NOT EXISTS "employee_trainings_status_idx" ON "mdl_hrm"."employee_trainings"("status");

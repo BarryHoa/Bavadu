@@ -9,8 +9,9 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import { base_tb_users } from "@base/server/schemas/base.user";
+
 import { mdlHrmSchema } from "./schema";
-import { hrm_tb_employees } from "./hrm.employee";
 
 // Certificates - Chứng chỉ
 export const hrm_tb_certificates = mdlHrmSchema.table(
@@ -19,8 +20,8 @@ export const hrm_tb_certificates = mdlHrmSchema.table(
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
-    employeeId: uuid("employee_id")
-      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
+    userId: uuid("user_id")
+      .references(() => base_tb_users.id, { onDelete: "cascade" })
       .notNull(),
     name: jsonb("name").notNull(), // LocaleDataType<string>
     issuer: varchar("issuer", { length: 255 }).notNull(),
@@ -35,7 +36,7 @@ export const hrm_tb_certificates = mdlHrmSchema.table(
     updatedBy: varchar("updated_by", { length: 36 }),
   },
   (table) => [
-    index("certificates_employee_idx").on(table.employeeId),
+    index("certificates_user_idx").on(table.userId),
     index("certificates_expiry_idx").on(table.expiryDate),
     index("certificates_active_idx").on(table.isActive),
   ],

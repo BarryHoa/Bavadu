@@ -32,7 +32,8 @@ export interface PayrollRow {
     code?: string;
     name?: string | null;
   } | null;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -63,7 +64,7 @@ class PayrollViewListModel extends BaseViewListModel<
         "payrollPeriodId",
         { column: hrm_tb_payrolls.payrollPeriodId, sort: true },
       ],
-      ["employeeId", { column: hrm_tb_payrolls.employeeId, sort: true }],
+      ["userId", { column: hrm_tb_payrolls.userId, sort: true }],
       ["grossSalary", { column: hrm_tb_payrolls.grossSalary, sort: true }],
       [
         "totalDeductions",
@@ -98,7 +99,8 @@ class PayrollViewListModel extends BaseViewListModel<
           name: row.periodName ?? undefined,
         }
       : null,
-    employeeId: row.employeeId,
+    userId: row.userId,
+    employeeId: row.employeeId ?? undefined,
     employee: row.employeeId
       ? {
           id: row.employeeId,
@@ -120,7 +122,7 @@ class PayrollViewListModel extends BaseViewListModel<
   ): Promise<ListParamsResponse<PayrollRow>> => {
     return this.buildQueryDataList(params, (query) =>
       query
-        .leftJoin(employee, eq(this.table.employeeId, employee.id))
+        .leftJoin(employee, eq(this.table.userId, employee.userId))
         .leftJoin(user, eq(employee.userId, user.id))
         .leftJoin(period, eq(this.table.payrollPeriodId, period.id)),
     );

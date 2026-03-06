@@ -26,7 +26,8 @@ const user = alias(base_tb_users, "user");
 
 export interface LeaveRequestRow {
   id: string;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -58,7 +59,7 @@ class LeaveRequestViewListModel extends BaseViewListModel<
       }
     >([
       ["id", { column: hrm_tb_leave_requests.id, sort: true }],
-      ["employeeId", { column: hrm_tb_leave_requests.employeeId, sort: true }],
+      ["userId", { column: hrm_tb_leave_requests.userId, sort: true }],
       [
         "leaveTypeId",
         { column: hrm_tb_leave_requests.leaveTypeId, sort: true },
@@ -86,7 +87,8 @@ class LeaveRequestViewListModel extends BaseViewListModel<
 
   protected declarationMappingData = (row: any): LeaveRequestRow => ({
     id: row.id,
-    employeeId: row.employeeId,
+    userId: row.userId,
+    employeeId: row.employeeId ?? undefined,
     employee: row.employeeId
       ? {
           id: row.employeeId,
@@ -115,7 +117,7 @@ class LeaveRequestViewListModel extends BaseViewListModel<
   ): Promise<ListParamsResponse<LeaveRequestRow>> => {
     return this.buildQueryDataList(params, (query) =>
       query
-        .leftJoin(employee, eq(this.table.employeeId, employee.id))
+        .leftJoin(employee, eq(this.table.userId, employee.userId))
         .leftJoin(user, eq(employee.userId, user.id))
         .leftJoin(leaveType, eq(this.table.leaveTypeId, leaveType.id)),
     );

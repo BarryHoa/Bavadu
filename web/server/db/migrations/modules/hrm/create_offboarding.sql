@@ -3,7 +3,7 @@
 
 CREATE TABLE "mdl_hrm"."offboarding" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
-	"employee_id" uuid NOT NULL,
+	"user_id" uuid NOT NULL REFERENCES "md_base"."users"("id") ON DELETE CASCADE,
 	"resignation_date" date NOT NULL,
 	"last_working_date" date NOT NULL,
 	"reason" varchar(50),
@@ -19,3 +19,6 @@ CREATE TABLE "mdl_hrm"."offboarding" (
 	"created_by" varchar(36),
 	"updated_by" varchar(36)
 );
+
+CREATE INDEX IF NOT EXISTS "offboarding_user_idx" ON "mdl_hrm"."offboarding"("user_id");
+CREATE INDEX IF NOT EXISTS "offboarding_status_idx" ON "mdl_hrm"."offboarding"("status");

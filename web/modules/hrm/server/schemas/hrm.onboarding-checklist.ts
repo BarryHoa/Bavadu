@@ -10,6 +10,8 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import { base_tb_users } from "@base/server/schemas/base.user";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_employees } from "./hrm.employee";
 
@@ -20,8 +22,8 @@ export const hrm_tb_onboarding_checklists = mdlHrmSchema.table(
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
-    employeeId: uuid("employee_id")
-      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
+    userId: uuid("user_id")
+      .references(() => base_tb_users.id, { onDelete: "cascade" })
       .notNull(),
     taskName: jsonb("task_name").notNull(), // LocaleDataType<string>
     taskDescription: text("task_description"), // Text description
@@ -37,7 +39,7 @@ export const hrm_tb_onboarding_checklists = mdlHrmSchema.table(
     updatedBy: varchar("updated_by", { length: 36 }),
   },
   (table) => [
-    index("onboarding_checklists_employee_idx").on(table.employeeId),
+    index("onboarding_checklists_user_idx").on(table.userId),
     index("onboarding_checklists_assigned_idx").on(table.assignedTo),
     index("onboarding_checklists_completed_idx").on(table.isCompleted),
   ],

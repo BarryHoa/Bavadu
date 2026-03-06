@@ -4,6 +4,7 @@ export * from "./base.currency";
 export * from "./base.dynamic-entity";
 export * from "./base.guideline";
 export * from "./base.news";
+export * from "./base.notification";
 export * from "./base.payment-method";
 export * from "./base.payment-term";
 export * from "./base.permission";

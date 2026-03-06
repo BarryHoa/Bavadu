@@ -8,8 +8,9 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import { base_tb_users } from "@base/server/schemas/base.user";
+
 import { mdlHrmSchema } from "./schema";
-import { hrm_tb_employees } from "./hrm.employee";
 import { hrm_tb_payrolls_period } from "./hrm.payroll-period";
 
 // Payroll - Bảng lương
@@ -22,8 +23,8 @@ export const hrm_tb_payrolls = mdlHrmSchema.table(
     payrollPeriodId: uuid("payroll_period_id")
       .references(() => hrm_tb_payrolls_period.id, { onDelete: "restrict" })
       .notNull(),
-    employeeId: uuid("employee_id")
-      .references(() => hrm_tb_employees.id, { onDelete: "restrict" })
+    userId: uuid("user_id")
+      .references(() => base_tb_users.id, { onDelete: "restrict" })
       .notNull(),
     // Earnings - Thu nhập
     baseSalary: integer("base_salary").notNull(),
@@ -54,10 +55,10 @@ export const hrm_tb_payrolls = mdlHrmSchema.table(
   },
   (table) => [
     index("payrolls_period_idx").on(table.payrollPeriodId),
-    index("payrolls_employee_idx").on(table.employeeId),
-    index("payrolls_period_employee_idx").on(
+    index("payrolls_user_idx").on(table.userId),
+    index("payrolls_period_user_idx").on(
       table.payrollPeriodId,
-      table.employeeId,
+      table.userId,
     ),
     index("payrolls_status_idx").on(table.status),
   ],

@@ -25,7 +25,8 @@ const user = alias(base_tb_users, "user");
 
 export interface PerformanceReviewRow {
   id: string;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -60,8 +61,8 @@ class PerformanceReviewViewListModel extends BaseViewListModel<
     >([
       ["id", { column: hrm_tb_performance_reviews.id, sort: true }],
       [
-        "employeeId",
-        { column: hrm_tb_performance_reviews.employeeId, sort: true },
+        "userId",
+        { column: hrm_tb_performance_reviews.userId, sort: true },
       ],
       [
         "reviewType",
@@ -105,7 +106,8 @@ class PerformanceReviewViewListModel extends BaseViewListModel<
 
   protected declarationMappingData = (row: any): PerformanceReviewRow => ({
     id: row.id,
-    employeeId: row.employeeId,
+    userId: row.userId,
+    employeeId: row.employeeId ?? undefined,
     employee: row.employeeId
       ? {
           id: row.employeeId,
@@ -139,7 +141,7 @@ class PerformanceReviewViewListModel extends BaseViewListModel<
   ): Promise<ListParamsResponse<PerformanceReviewRow>> => {
     return this.buildQueryDataList(params, (query) =>
       query
-        .leftJoin(employee, eq(this.table.employeeId, employee.id))
+        .leftJoin(employee, eq(this.table.userId, employee.userId))
         .leftJoin(user, eq(employee.userId, user.id))
         .leftJoin(reviewer, eq(this.table.reviewerId, reviewer.id)),
     );

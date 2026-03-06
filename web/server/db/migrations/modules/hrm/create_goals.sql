@@ -3,7 +3,7 @@
 
 CREATE TABLE "mdl_hrm"."goals" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
-	"employee_id" uuid NOT NULL,
+	"user_id" uuid NOT NULL REFERENCES "md_base"."users"("id") ON DELETE CASCADE,
 	"goal_type" varchar(50) NOT NULL,
 	"title" jsonb NOT NULL,
 	"description" text,
@@ -21,15 +21,8 @@ CREATE TABLE "mdl_hrm"."goals" (
 	"updated_by" varchar(36)
 );
 
--- Add foreign key constraint
-ALTER TABLE "mdl_hrm"."goals"
-	ADD CONSTRAINT "goals_employee_id_employees_id_fk"
-	FOREIGN KEY ("employee_id") 
-	REFERENCES "mdl_hrm"."employees"("id") 
-	ON DELETE CASCADE;
-
 -- Add indexes
-CREATE INDEX IF NOT EXISTS "goals_employee_idx" ON "mdl_hrm"."goals"("employee_id");
+CREATE INDEX IF NOT EXISTS "goals_user_idx" ON "mdl_hrm"."goals"("user_id");
 CREATE INDEX IF NOT EXISTS "goals_type_idx" ON "mdl_hrm"."goals"("goal_type");
 CREATE INDEX IF NOT EXISTS "goals_status_idx" ON "mdl_hrm"."goals"("status");
 CREATE INDEX IF NOT EXISTS "goals_dates_idx" ON "mdl_hrm"."goals"("start_date", "end_date");

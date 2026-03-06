@@ -19,7 +19,8 @@ const assignedUser = alias(base_tb_users, "assigned_user");
 
 export interface OnboardingChecklistRow {
   id: string;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -43,7 +44,8 @@ export interface OnboardingChecklistRow {
 }
 
 export interface OnboardingChecklistInput {
-  employeeId: string;
+  userId?: string;
+  employeeId?: string;
   taskName: LocaleDataType<string>;
   taskDescription?: LocaleDataType<string> | null;
   category?: string | null;
@@ -60,6 +62,22 @@ export default class OnboardingChecklistModel extends BaseModel<
     super(hrm_tb_onboarding_checklists);
   }
 
+  private async resolveUserId(payload: {
+    userId?: string;
+    employeeId?: string;
+  }): Promise<string> {
+    if (payload.userId) return payload.userId;
+    if (payload.employeeId) {
+      const [e] = await this.db
+        .select({ userId: hrm_tb_employees.userId })
+        .from(hrm_tb_employees)
+        .where(eq(hrm_tb_employees.id, payload.employeeId))
+        .limit(1);
+      if (e?.userId) return e.userId;
+    }
+    throw new Error("userId or employeeId (resolvable to user) is required");
+  }
+
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
     if (!value) return null;
     if (typeof value === "string") return { en: value };
@@ -74,7 +92,8 @@ export default class OnboardingChecklistModel extends BaseModel<
     const result = await this.db
       .select({
         id: this.table.id,
-        employeeId: this.table.employeeId,
+        userId: this.table.userId,
+        employeeId: employee.id,
         employeeCode: employee.code,
         employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
         taskName: this.table.taskName,
@@ -93,7 +112,7 @@ export default class OnboardingChecklistModel extends BaseModel<
         updatedAt: this.table.updatedAt,
       })
       .from(this.table)
-      .leftJoin(employee, eq(this.table.employeeId, employee.id))
+      .leftJoin(employee, eq(this.table.userId, employee.userId))
       .leftJoin(user, eq(employee.userId, user.id))
       .leftJoin(
         assignedEmployee,
@@ -109,7 +128,8 @@ export default class OnboardingChecklistModel extends BaseModel<
 
     return {
       id: row.id,
-      employeeId: row.employeeId,
+      userId: row.userId,
+      employeeId: row.employeeId ?? undefined,
       employee: row.employeeId
         ? {
             id: row.employeeId,
@@ -148,7 +168,7 @@ export default class OnboardingChecklistModel extends BaseModel<
   ): Promise<OnboardingChecklistRow> => {
     const now = new Date();
     const insertData: NewHrmTbOnboardingChecklist = {
-      employeeId: payload.employeeId,
+      userId: await this.resolveUserId(payload),
       taskName: payload.taskName,
       taskDescription: payload.taskDescription
         ? typeof payload.taskDescription === "string"
@@ -188,7 +208,11 @@ export default class OnboardingChecklistModel extends BaseModel<
     };
 
     if (payload.employeeId !== undefined)
-      updateData.employeeId = payload.employeeId;
+      if (payload.userId !== undefined) updateData.userId = payload.userId;
+    if (payload.employeeId !== undefined)
+      updateData.userId = await this.resolveUserId({
+        employeeId: payload.employeeId,
+      });
     if (payload.taskName !== undefined) updateData.taskName = payload.taskName;
     if (payload.taskDescription !== undefined)
       updateData.taskDescription = payload.taskDescription
@@ -222,9 +246,10 @@ export default class OnboardingChecklistModel extends BaseModel<
     const { id, payload } = params;
     const normalizedPayload: Partial<OnboardingChecklistInput> = {};
 
-    if (payload.employeeId !== undefined) {
+    if (payload.userId !== undefined)
+      normalizedPayload.userId = String(payload.userId);
+    if (payload.employeeId !== undefined)
       normalizedPayload.employeeId = String(payload.employeeId);
-    }
     if (payload.taskName !== undefined) {
       normalizedPayload.taskName = this.normalizeLocaleInput(
         payload.taskName,

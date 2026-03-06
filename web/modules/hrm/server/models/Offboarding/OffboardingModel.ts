@@ -13,7 +13,8 @@ const user = alias(base_tb_users, "user");
 
 export interface OffboardingRow {
   id: string;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -53,11 +54,28 @@ export default class OffboardingModel extends BaseModel<
     super(hrm_tb_offboardings);
   }
 
+  private async resolveUserId(payload: {
+    userId?: string;
+    employeeId?: string;
+  }): Promise<string> {
+    if (payload.userId) return payload.userId;
+    if (payload.employeeId) {
+      const [e] = await this.db
+        .select({ userId: hrm_tb_employees.userId })
+        .from(hrm_tb_employees)
+        .where(eq(hrm_tb_employees.id, payload.employeeId))
+        .limit(1);
+      if (e?.userId) return e.userId;
+    }
+    throw new Error("userId or employeeId (resolvable to user) is required");
+  }
+
   getOffboardingById = async (id: string): Promise<OffboardingRow | null> => {
     const result = await this.db
       .select({
         id: this.table.id,
-        employeeId: this.table.employeeId,
+        userId: this.table.userId,
+        employeeId: employee.id,
         employeeCode: employee.code,
         employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
         resignationDate: this.table.resignationDate,
@@ -74,7 +92,7 @@ export default class OffboardingModel extends BaseModel<
         updatedAt: this.table.updatedAt,
       })
       .from(this.table)
-      .leftJoin(employee, eq(this.table.employeeId, employee.id))
+      .leftJoin(employee, eq(this.table.userId, employee.userId))
       .leftJoin(user, eq(employee.userId, user.id))
       .where(eq(this.table.id, id))
       .limit(1);
@@ -85,7 +103,8 @@ export default class OffboardingModel extends BaseModel<
 
     return {
       id: row.id,
-      employeeId: row.employeeId,
+      userId: row.userId,
+      employeeId: row.employeeId ?? undefined,
       employee: row.employeeId
         ? {
             id: row.employeeId,
@@ -119,7 +138,7 @@ export default class OffboardingModel extends BaseModel<
   ): Promise<OffboardingRow> => {
     const now = new Date();
     const insertData: NewHrmTbOffboarding = {
-      employeeId: payload.employeeId,
+      userId: await this.resolveUserId(payload),
       resignationDate: payload.resignationDate,
       lastWorkingDate: payload.lastWorkingDate,
       reason: payload.reason ?? null,
@@ -157,7 +176,11 @@ export default class OffboardingModel extends BaseModel<
     };
 
     if (payload.employeeId !== undefined)
-      updateData.employeeId = payload.employeeId;
+      if (payload.userId !== undefined) updateData.userId = payload.userId;
+    if (payload.employeeId !== undefined)
+      updateData.userId = await this.resolveUserId({
+        employeeId: payload.employeeId,
+      });
     if (payload.resignationDate !== undefined)
       updateData.resignationDate = payload.resignationDate;
     if (payload.lastWorkingDate !== undefined)
@@ -194,6 +217,9 @@ export default class OffboardingModel extends BaseModel<
     const normalizedPayload: Partial<OffboardingInput> = {};
 
     if (payload.employeeId !== undefined) {
+      if (payload.userId !== undefined)
+      normalizedPayload.userId = String(payload.userId);
+    if (payload.employeeId !== undefined)
       normalizedPayload.employeeId = String(payload.employeeId);
     }
     if (payload.resignationDate !== undefined) {

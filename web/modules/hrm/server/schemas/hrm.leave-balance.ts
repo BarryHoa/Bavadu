@@ -1,8 +1,9 @@
 import { sql } from "drizzle-orm";
 import { index, integer, timestamp, uuid } from "drizzle-orm/pg-core";
 
+import { base_tb_users } from "@base/server/schemas/base.user";
+
 import { mdlHrmSchema } from "./schema";
-import { hrm_tb_employees } from "./hrm.employee";
 import { hrm_tb_leave_types } from "./hrm.leave-type";
 
 // Leave Balance - Tồn phép
@@ -12,8 +13,8 @@ export const hrm_tb_leave_balances = mdlHrmSchema.table(
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
-    employeeId: uuid("employee_id")
-      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
+    userId: uuid("user_id")
+      .references(() => base_tb_users.id, { onDelete: "cascade" })
       .notNull(),
     leaveTypeId: uuid("leave_type_id")
       .references(() => hrm_tb_leave_types.id, { onDelete: "restrict" })
@@ -27,11 +28,11 @@ export const hrm_tb_leave_balances = mdlHrmSchema.table(
     updatedAt: timestamp("updated_at", { withTimezone: true }),
   },
   (table) => [
-    index("leave_balances_employee_idx").on(table.employeeId),
+    index("leave_balances_user_idx").on(table.userId),
     index("leave_balances_type_idx").on(table.leaveTypeId),
     index("leave_balances_year_idx").on(table.year),
-    index("leave_balances_employee_type_year_idx").on(
-      table.employeeId,
+    index("leave_balances_user_type_year_idx").on(
+      table.userId,
       table.leaveTypeId,
       table.year,
     ),

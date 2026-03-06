@@ -9,8 +9,9 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import { base_tb_users } from "@base/server/schemas/base.user";
+
 import { mdlHrmSchema } from "./schema";
-import { hrm_tb_employees } from "./hrm.employee";
 
 // Employee History - Lịch sử thay đổi nhân viên
 export const hrm_tb_employees_history = mdlHrmSchema.table(
@@ -19,8 +20,8 @@ export const hrm_tb_employees_history = mdlHrmSchema.table(
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
-    employeeId: uuid("employee_id")
-      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
+    userId: uuid("user_id")
+      .references(() => base_tb_users.id, { onDelete: "cascade" })
       .notNull(),
     changeType: varchar("change_type", { length: 50 }).notNull(), // position_change, department_change, salary_change, status_change, contract_change
     effectiveDate: date("effective_date").notNull(),
@@ -33,7 +34,7 @@ export const hrm_tb_employees_history = mdlHrmSchema.table(
     createdBy: varchar("created_by", { length: 36 }),
   },
   (table) => [
-    index("employee_history_employee_idx").on(table.employeeId),
+    index("employee_history_user_idx").on(table.userId),
     index("employee_history_type_idx").on(table.changeType),
     index("employee_history_date_idx").on(table.effectiveDate),
   ],

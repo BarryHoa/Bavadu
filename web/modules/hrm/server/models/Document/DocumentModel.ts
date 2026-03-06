@@ -18,6 +18,7 @@ export interface DocumentRow {
   documentType: string;
   title?: unknown;
   description?: unknown;
+  userId?: string | null;
   employeeId?: string | null;
   employee?: {
     id: string;
@@ -41,6 +42,7 @@ export interface DocumentInput {
   documentType: string;
   title: LocaleDataType<string>;
   description?: LocaleDataType<string> | null;
+  userId?: string | null;
   employeeId?: string | null;
   fileUrl: string;
   fileSize?: number | null;
@@ -55,6 +57,22 @@ export interface DocumentInput {
 export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
   constructor() {
     super(hrm_tb_documents);
+  }
+
+  private async resolveUserId(payload: {
+    userId?: string | null;
+    employeeId?: string | null;
+  }): Promise<string | null> {
+    if (payload.userId) return payload.userId;
+    if (payload.employeeId) {
+      const [e] = await this.db
+        .select({ userId: hrm_tb_employees.userId })
+        .from(hrm_tb_employees)
+        .where(eq(hrm_tb_employees.id, payload.employeeId))
+        .limit(1);
+      return e?.userId ?? null;
+    }
+    return null;
   }
 
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
@@ -73,7 +91,8 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
         documentType: this.table.documentType,
         title: this.table.title,
         description: this.table.description,
-        employeeId: this.table.employeeId,
+        userId: this.table.userId,
+        employeeId: employee.id,
         employeeCode: employee.code,
         employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
         fileUrl: this.table.fileUrl,
@@ -88,7 +107,7 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
         updatedAt: this.table.updatedAt,
       })
       .from(this.table)
-      .leftJoin(employee, eq(this.table.employeeId, employee.id))
+      .leftJoin(employee, eq(this.table.userId, employee.userId))
       .leftJoin(user, eq(employee.userId, user.id))
       .where(eq(this.table.id, id))
       .limit(1);
@@ -105,6 +124,7 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
       documentType: row.documentType,
       title: row.title,
       description: row.description,
+      userId: row.userId ?? undefined,
       employeeId: row.employeeId ?? undefined,
       employee: row.employeeId
         ? {
@@ -141,7 +161,7 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
           ? payload.description
           : JSON.stringify(payload.description)
         : null,
-      employeeId: payload.employeeId ?? null,
+      userId: payload.userId ?? (payload.employeeId ? await this.resolveUserId({ employeeId: payload.employeeId }) : null),
       fileUrl: payload.fileUrl,
       fileSize: payload.fileSize ?? null,
       mimeType: payload.mimeType ?? null,
@@ -194,8 +214,12 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
           ? payload.description
           : JSON.stringify(payload.description)
         : null;
+    if (payload.userId !== undefined)
+      updateData.userId = payload.userId ?? null;
     if (payload.employeeId !== undefined)
-      updateData.employeeId = payload.employeeId ?? null;
+      updateData.userId = payload.employeeId
+        ? await this.resolveUserId({ employeeId: payload.employeeId })
+        : null;
     if (payload.fileUrl !== undefined) updateData.fileUrl = payload.fileUrl;
     if (payload.fileSize !== undefined)
       updateData.fileSize = payload.fileSize ?? null;
@@ -247,12 +271,14 @@ export default class DocumentModel extends BaseModel<typeof hrm_tb_documents> {
         payload.description,
       );
     }
-    if (payload.employeeId !== undefined) {
+    if (payload.userId !== undefined)
+      normalizedPayload.userId =
+        payload.userId === null || payload.userId === "" ? null : String(payload.userId);
+    if (payload.employeeId !== undefined)
       normalizedPayload.employeeId =
         payload.employeeId === null || payload.employeeId === ""
           ? null
           : String(payload.employeeId);
-    }
     if (payload.fileUrl !== undefined) {
       normalizedPayload.fileUrl = String(payload.fileUrl);
     }

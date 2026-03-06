@@ -18,7 +18,6 @@ export * from "./hrm.job-requisition";
 export * from "./hrm.leave-balance";
 export * from "./hrm.leave-request";
 export * from "./hrm.leave-type";
-export * from "./hrm.notification";
 export * from "./hrm.offboarding";
 export * from "./hrm.offer";
 export * from "./hrm.onboarding-checklist";

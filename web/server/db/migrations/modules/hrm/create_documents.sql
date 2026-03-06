@@ -7,7 +7,7 @@ CREATE TABLE "mdl_hrm"."documents" (
 	"document_type" varchar(50) NOT NULL,
 	"title" jsonb NOT NULL,
 	"description" text,
-	"employee_id" uuid,
+	"user_id" uuid REFERENCES "md_base"."users"("id") ON DELETE CASCADE,
 	"file_url" varchar(500) NOT NULL,
 	"file_size" integer,
 	"mime_type" varchar(100),
@@ -23,9 +23,3 @@ CREATE TABLE "mdl_hrm"."documents" (
 	CONSTRAINT "documents_document_number_unique" UNIQUE("document_number")
 );
 
--- Add foreign key constraint
-ALTER TABLE "mdl_hrm"."documents"
-	ADD CONSTRAINT "documents_employee_id_employees_id_fk"
-	FOREIGN KEY ("employee_id") 
-	REFERENCES "mdl_hrm"."employees"("id") 
-	ON DELETE CASCADE;

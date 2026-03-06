@@ -13,16 +13,20 @@ import {
   BaseViewListModel,
   type FilterConditionMap,
 } from "@base/server/models/BaseViewListModel";
+import { base_tb_users } from "@base/server/schemas/base.user";
 
 import { hrm_tb_contracts } from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";
+import { fullNameSqlFrom } from "../Employee/employee.helpers";
 
 const employee = alias(hrm_tb_employees, "employee");
+const user = alias(base_tb_users, "user");
 
 export interface ContractRow {
   id: string;
   contractNumber: string;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -55,7 +59,7 @@ class ContractViewListModel extends BaseViewListModel<
         "contractNumber",
         { column: hrm_tb_contracts.contractNumber, sort: true },
       ],
-      ["employeeId", { column: hrm_tb_contracts.employeeId, sort: true }],
+      ["userId", { column: hrm_tb_contracts.userId, sort: true }],
       ["contractType", { column: hrm_tb_contracts.contractType, sort: true }],
       ["startDate", { column: hrm_tb_contracts.startDate, sort: true }],
       ["endDate", { column: hrm_tb_contracts.endDate, sort: true }],
@@ -84,7 +88,8 @@ class ContractViewListModel extends BaseViewListModel<
   protected declarationMappingData = (row: any): ContractRow => ({
     id: row.id,
     contractNumber: row.contractNumber,
-    employeeId: row.employeeId,
+    userId: row.userId,
+    employeeId: row.employeeId ?? undefined,
     employee: row.employeeId
       ? {
           id: row.employeeId,
@@ -106,9 +111,33 @@ class ContractViewListModel extends BaseViewListModel<
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<ContractRow>> => {
-    return this.buildQueryDataList(params, (query) =>
-      query.leftJoin(employee, eq(this.table.employeeId, employee.id)),
-    );
+    const selectColumns = {
+      id: hrm_tb_contracts.id,
+      contractNumber: hrm_tb_contracts.contractNumber,
+      userId: hrm_tb_contracts.userId,
+      employeeId: employee.id,
+      employeeCode: employee.code,
+      employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
+      contractType: hrm_tb_contracts.contractType,
+      startDate: hrm_tb_contracts.startDate,
+      endDate: hrm_tb_contracts.endDate,
+      baseSalary: hrm_tb_contracts.baseSalary,
+      status: hrm_tb_contracts.status,
+      isActive: hrm_tb_contracts.isActive,
+      createdAt: hrm_tb_contracts.createdAt,
+      updatedAt: hrm_tb_contracts.updatedAt,
+    };
+    return this.buildQueryDataListWithSelect(
+      params,
+      selectColumns as unknown as Record<string, Column>,
+      (query) =>
+        query
+          .leftJoin(employee, eq(this.table.userId, employee.userId))
+          .leftJoin(user, eq(this.table.userId, user.id)),
+    ).then((res) => ({
+      data: (res?.data ?? []).map((row) => this.declarationMappingData(row)),
+      total: res?.total ?? 0,
+    }));
   };
 }
 

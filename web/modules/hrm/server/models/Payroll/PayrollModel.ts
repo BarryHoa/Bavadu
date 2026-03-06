@@ -22,7 +22,8 @@ export interface PayrollRow {
     code?: string;
     name?: string | null;
   } | null;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -52,7 +53,8 @@ export interface PayrollRow {
 
 export interface PayrollInput {
   payrollPeriodId: string;
-  employeeId: string;
+  userId?: string;
+  employeeId?: string;
   baseSalary: number;
   allowances?: Record<string, number>;
   overtimePay?: number;
@@ -75,6 +77,22 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
     super(hrm_tb_payrolls);
   }
 
+  private async resolveUserId(payload: {
+    userId?: string;
+    employeeId?: string;
+  }): Promise<string> {
+    if (payload.userId) return payload.userId;
+    if (payload.employeeId) {
+      const [e] = await this.db
+        .select({ userId: hrm_tb_employees.userId })
+        .from(hrm_tb_employees)
+        .where(eq(hrm_tb_employees.id, payload.employeeId))
+        .limit(1);
+      if (e?.userId) return e.userId;
+    }
+    throw new Error("userId or employeeId (resolvable to user) is required");
+  }
+
   getPayrollById = async (id: string): Promise<PayrollRow | null> => {
     const result = await this.db
       .select({
@@ -82,7 +100,8 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
         payrollPeriodId: this.table.payrollPeriodId,
         periodCode: period.code,
         periodName: period.name,
-        employeeId: this.table.employeeId,
+        userId: this.table.userId,
+        employeeId: employee.id,
         employeeCode: employee.code,
         employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
         baseSalary: this.table.baseSalary,
@@ -108,7 +127,7 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
       })
       .from(this.table)
       .leftJoin(period, eq(this.table.payrollPeriodId, period.id))
-      .leftJoin(employee, eq(this.table.employeeId, employee.id))
+      .leftJoin(employee, eq(this.table.userId, employee.userId))
       .leftJoin(user, eq(employee.userId, user.id))
       .where(eq(this.table.id, id))
       .limit(1);
@@ -127,7 +146,8 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
             name: row.periodName ?? undefined,
           }
         : null,
-      employeeId: row.employeeId,
+      userId: row.userId,
+      employeeId: row.employeeId ?? undefined,
       employee: row.employeeId
         ? {
             id: row.employeeId,
@@ -195,7 +215,7 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
 
     const insertData: NewHrmTbPayroll = {
       payrollPeriodId: payload.payrollPeriodId,
-      employeeId: payload.employeeId,
+      userId: await this.resolveUserId(payload),
       baseSalary: payload.baseSalary,
       allowances: payload.allowances ?? null,
       overtimePay: payload.overtimePay ?? 0,
@@ -242,8 +262,11 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
 
     if (payload.payrollPeriodId !== undefined)
       updateData.payrollPeriodId = payload.payrollPeriodId;
+    if (payload.userId !== undefined) updateData.userId = payload.userId;
     if (payload.employeeId !== undefined)
-      updateData.employeeId = payload.employeeId;
+      updateData.userId = await this.resolveUserId({
+        employeeId: payload.employeeId,
+      });
     if (payload.baseSalary !== undefined)
       updateData.baseSalary = payload.baseSalary;
     if (payload.allowances !== undefined)
@@ -347,6 +370,9 @@ export default class PayrollModel extends BaseModel<typeof hrm_tb_payrolls> {
 
     if (payload.payrollPeriodId !== undefined) {
       normalizedPayload.payrollPeriodId = String(payload.payrollPeriodId);
+    }
+    if (payload.userId !== undefined) {
+      normalizedPayload.userId = String(payload.userId);
     }
     if (payload.employeeId !== undefined) {
       normalizedPayload.employeeId = String(payload.employeeId);

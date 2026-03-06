@@ -3,7 +3,7 @@
 
 CREATE TABLE "mdl_hrm"."performance_reviews" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
-	"employee_id" uuid NOT NULL,
+	"user_id" uuid NOT NULL REFERENCES "md_base"."users"("id") ON DELETE CASCADE,
 	"review_type" varchar(50) NOT NULL,
 	"review_period" varchar(50),
 	"review_date" date NOT NULL,
@@ -21,3 +21,8 @@ CREATE TABLE "mdl_hrm"."performance_reviews" (
 	"created_by" varchar(36),
 	"updated_by" varchar(36)
 );
+
+CREATE INDEX IF NOT EXISTS "performance_reviews_user_idx" ON "mdl_hrm"."performance_reviews"("user_id");
+CREATE INDEX IF NOT EXISTS "performance_reviews_reviewer_idx" ON "mdl_hrm"."performance_reviews"("reviewer_id");
+CREATE INDEX IF NOT EXISTS "performance_reviews_type_idx" ON "mdl_hrm"."performance_reviews"("review_type");
+CREATE INDEX IF NOT EXISTS "performance_reviews_status_idx" ON "mdl_hrm"."performance_reviews"("status");

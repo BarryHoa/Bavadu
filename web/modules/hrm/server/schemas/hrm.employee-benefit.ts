@@ -1,9 +1,10 @@
 import { sql } from "drizzle-orm";
 import { date, index, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
+import { base_tb_users } from "@base/server/schemas/base.user";
+
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_benefit_packages } from "./hrm.benefit-package";
-import { hrm_tb_employees } from "./hrm.employee";
 
 // Employee Benefits - Phúc lợi của nhân viên
 export const hrm_tb_employees_benefit = mdlHrmSchema.table(
@@ -12,8 +13,8 @@ export const hrm_tb_employees_benefit = mdlHrmSchema.table(
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
-    employeeId: uuid("employee_id")
-      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
+    userId: uuid("user_id")
+      .references(() => base_tb_users.id, { onDelete: "cascade" })
       .notNull(),
     benefitPackageId: uuid("benefit_package_id")
       .references(() => hrm_tb_benefit_packages.id, { onDelete: "restrict" })
@@ -30,7 +31,7 @@ export const hrm_tb_employees_benefit = mdlHrmSchema.table(
     updatedBy: varchar("updated_by", { length: 36 }),
   },
   (table) => [
-    index("employee_benefits_employee_idx").on(table.employeeId),
+    index("employee_benefits_user_idx").on(table.userId),
     index("employee_benefits_package_idx").on(table.benefitPackageId),
     index("employee_benefits_status_idx").on(table.status),
     index("employee_benefits_dates_idx").on(

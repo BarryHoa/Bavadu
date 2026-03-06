@@ -2,7 +2,8 @@ import type { LocaleDataType } from "@base/shared/interface/Locale";
 
 export interface PerformanceReviewDto {
   id: string;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -30,7 +31,8 @@ export interface PerformanceReviewDto {
 }
 
 export interface CreatePerformanceReviewPayload {
-  employeeId: string;
+  userId?: string;
+  employeeId?: string;
   reviewType: string;
   reviewPeriod?: string | null;
   reviewDate: string;

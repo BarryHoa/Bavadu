@@ -9,8 +9,9 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import { base_tb_users } from "@base/server/schemas/base.user";
+
 import { mdlHrmSchema } from "./schema";
-import { hrm_tb_employees } from "./hrm.employee";
 import { hrm_tb_leave_types } from "./hrm.leave-type";
 
 // Leave Requests - Đơn xin nghỉ phép
@@ -20,8 +21,8 @@ export const hrm_tb_leave_requests = mdlHrmSchema.table(
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
-    employeeId: uuid("employee_id")
-      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
+    userId: uuid("user_id")
+      .references(() => base_tb_users.id, { onDelete: "cascade" })
       .notNull(),
     leaveTypeId: uuid("leave_type_id")
       .references(() => hrm_tb_leave_types.id, { onDelete: "restrict" })
@@ -43,7 +44,7 @@ export const hrm_tb_leave_requests = mdlHrmSchema.table(
     updatedBy: varchar("updated_by", { length: 36 }),
   },
   (table) => [
-    index("leave_requests_employee_idx").on(table.employeeId),
+    index("leave_requests_user_idx").on(table.userId),
     index("leave_requests_type_idx").on(table.leaveTypeId),
     index("leave_requests_status_idx").on(table.status),
     index("leave_requests_dates_idx").on(table.startDate, table.endDate),

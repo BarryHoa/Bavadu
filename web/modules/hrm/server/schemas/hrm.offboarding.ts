@@ -9,8 +9,9 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import { base_tb_users } from "@base/server/schemas/base.user";
+
 import { mdlHrmSchema } from "./schema";
-import { hrm_tb_employees } from "./hrm.employee";
 
 // Offboarding - Quy trình nghỉ việc
 export const hrm_tb_offboardings = mdlHrmSchema.table(
@@ -19,8 +20,8 @@ export const hrm_tb_offboardings = mdlHrmSchema.table(
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
-    employeeId: uuid("employee_id")
-      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
+    userId: uuid("user_id")
+      .references(() => base_tb_users.id, { onDelete: "cascade" })
       .notNull(),
     resignationDate: date("resignation_date").notNull(),
     lastWorkingDate: date("last_working_date").notNull(),
@@ -38,7 +39,7 @@ export const hrm_tb_offboardings = mdlHrmSchema.table(
     updatedBy: varchar("updated_by", { length: 36 }),
   },
   (table) => [
-    index("offboarding_employee_idx").on(table.employeeId),
+    index("offboarding_user_idx").on(table.userId),
     index("offboarding_status_idx").on(table.status),
   ],
 );

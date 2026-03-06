@@ -14,7 +14,8 @@ const user = alias(base_tb_users, "user");
 
 export interface CertificateRow {
   id: string;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -32,7 +33,8 @@ export interface CertificateRow {
 }
 
 export interface CertificateInput {
-  employeeId: string;
+  userId?: string;
+  employeeId?: string;
   name: LocaleDataType<string>;
   issuer: string;
   certificateNumber?: string | null;
@@ -49,6 +51,22 @@ export default class CertificateModel extends BaseModel<
     super(hrm_tb_certificates);
   }
 
+  private async resolveUserId(payload: {
+    userId?: string;
+    employeeId?: string;
+  }): Promise<string> {
+    if (payload.userId) return payload.userId;
+    if (payload.employeeId) {
+      const [e] = await this.db
+        .select({ userId: hrm_tb_employees.userId })
+        .from(hrm_tb_employees)
+        .where(eq(hrm_tb_employees.id, payload.employeeId))
+        .limit(1);
+      if (e?.userId) return e.userId;
+    }
+    throw new Error("userId or employeeId (resolvable to user) is required");
+  }
+
   private normalizeLocaleInput(value: unknown): LocaleDataType<string> | null {
     if (!value) return null;
     if (typeof value === "string") return { en: value };
@@ -61,7 +79,8 @@ export default class CertificateModel extends BaseModel<
     const result = await this.db
       .select({
         id: this.table.id,
-        employeeId: this.table.employeeId,
+        userId: this.table.userId,
+        employeeId: employee.id,
         employeeCode: employee.code,
         employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
         name: this.table.name,
@@ -75,7 +94,7 @@ export default class CertificateModel extends BaseModel<
         updatedAt: this.table.updatedAt,
       })
       .from(this.table)
-      .leftJoin(employee, eq(this.table.employeeId, employee.id))
+      .leftJoin(employee, eq(this.table.userId, employee.userId))
       .leftJoin(user, eq(employee.userId, user.id))
       .where(eq(this.table.id, id))
       .limit(1);
@@ -86,7 +105,8 @@ export default class CertificateModel extends BaseModel<
 
     return {
       id: row.id,
-      employeeId: row.employeeId,
+      userId: row.userId,
+      employeeId: row.employeeId ?? undefined,
       employee: row.employeeId
         ? {
             id: row.employeeId,
@@ -117,7 +137,7 @@ export default class CertificateModel extends BaseModel<
   ): Promise<CertificateRow> => {
     const now = new Date();
     const insertData: NewHrmTbCertificate = {
-      employeeId: payload.employeeId,
+      userId: await this.resolveUserId(payload),
       name: payload.name,
       issuer: payload.issuer,
       certificateNumber: payload.certificateNumber ?? null,
@@ -152,8 +172,11 @@ export default class CertificateModel extends BaseModel<
       updatedAt: new Date(),
     };
 
+    if (payload.userId !== undefined) updateData.userId = payload.userId;
     if (payload.employeeId !== undefined)
-      updateData.employeeId = payload.employeeId;
+      updateData.userId = await this.resolveUserId({
+        employeeId: payload.employeeId,
+      });
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.issuer !== undefined) updateData.issuer = payload.issuer;
     if (payload.certificateNumber !== undefined)
@@ -178,6 +201,9 @@ export default class CertificateModel extends BaseModel<
     const { id, payload } = params;
     const normalizedPayload: Partial<CertificateInput> = {};
 
+    if (payload.userId !== undefined) {
+      normalizedPayload.userId = String(payload.userId);
+    }
     if (payload.employeeId !== undefined) {
       normalizedPayload.employeeId = String(payload.employeeId);
     }

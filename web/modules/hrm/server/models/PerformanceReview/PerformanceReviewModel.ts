@@ -18,7 +18,8 @@ const reviewerUser = alias(base_tb_users, "reviewer_user");
 
 export interface PerformanceReviewRow {
   id: string;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -46,7 +47,8 @@ export interface PerformanceReviewRow {
 }
 
 export interface PerformanceReviewInput {
-  employeeId: string;
+  userId?: string;
+  employeeId?: string;
   reviewType: string;
   reviewPeriod?: string | null;
   reviewDate: string;
@@ -67,13 +69,30 @@ export default class PerformanceReviewModel extends BaseModel<
     super(hrm_tb_performance_reviews);
   }
 
+  private async resolveUserId(payload: {
+    userId?: string;
+    employeeId?: string;
+  }): Promise<string> {
+    if (payload.userId) return payload.userId;
+    if (payload.employeeId) {
+      const [e] = await this.db
+        .select({ userId: hrm_tb_employees.userId })
+        .from(hrm_tb_employees)
+        .where(eq(hrm_tb_employees.id, payload.employeeId))
+        .limit(1);
+      if (e?.userId) return e.userId;
+    }
+    throw new Error("userId or employeeId (resolvable to user) is required");
+  }
+
   getPerformanceReviewById = async (
     id: string,
   ): Promise<PerformanceReviewRow | null> => {
     const result = await this.db
       .select({
         id: this.table.id,
-        employeeId: this.table.employeeId,
+        userId: this.table.userId,
+        employeeId: employee.id,
         employeeCode: employee.code,
         employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
         reviewType: this.table.reviewType,
@@ -94,7 +113,7 @@ export default class PerformanceReviewModel extends BaseModel<
         updatedAt: this.table.updatedAt,
       })
       .from(this.table)
-      .leftJoin(employee, eq(this.table.employeeId, employee.id))
+      .leftJoin(employee, eq(this.table.userId, employee.userId))
       .leftJoin(user, eq(employee.userId, user.id))
       .leftJoin(reviewer, eq(this.table.reviewerId, reviewer.id))
       .leftJoin(reviewerUser, eq(reviewer.userId, reviewerUser.id))
@@ -107,7 +126,8 @@ export default class PerformanceReviewModel extends BaseModel<
 
     return {
       id: row.id,
-      employeeId: row.employeeId,
+      userId: row.userId,
+      employeeId: row.employeeId ?? undefined,
       employee: row.employeeId
         ? {
             id: row.employeeId,
@@ -150,7 +170,7 @@ export default class PerformanceReviewModel extends BaseModel<
   ): Promise<PerformanceReviewRow> => {
     const now = new Date();
     const insertData: NewHrmTbPerformanceReview = {
-      employeeId: payload.employeeId,
+      userId: await this.resolveUserId(payload),
       reviewType: payload.reviewType,
       reviewPeriod: payload.reviewPeriod ?? null,
       reviewDate: payload.reviewDate,
@@ -189,8 +209,11 @@ export default class PerformanceReviewModel extends BaseModel<
       updatedAt: new Date(),
     };
 
+    if (payload.userId !== undefined) updateData.userId = payload.userId;
     if (payload.employeeId !== undefined)
-      updateData.employeeId = payload.employeeId;
+      updateData.userId = await this.resolveUserId({
+        employeeId: payload.employeeId,
+      });
     if (payload.reviewType !== undefined)
       updateData.reviewType = payload.reviewType;
     if (payload.reviewPeriod !== undefined)
@@ -229,6 +252,9 @@ export default class PerformanceReviewModel extends BaseModel<
     const { id, payload } = params;
     const normalizedPayload: Partial<PerformanceReviewInput> = {};
 
+    if (payload.userId !== undefined) {
+      normalizedPayload.userId = String(payload.userId);
+    }
     if (payload.employeeId !== undefined) {
       normalizedPayload.employeeId = String(payload.employeeId);
     }

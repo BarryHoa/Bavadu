@@ -10,6 +10,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import { base_tb_users } from "@base/server/schemas/base.user";
 import { mdlHrmSchema } from "./schema";
 import { hrm_tb_employees } from "./hrm.employee";
 
@@ -20,8 +21,8 @@ export const hrm_tb_performance_reviews = mdlHrmSchema.table(
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
-    employeeId: uuid("employee_id")
-      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
+    userId: uuid("user_id")
+      .references(() => base_tb_users.id, { onDelete: "cascade" })
       .notNull(),
     reviewType: varchar("review_type", { length: 50 }).notNull(), // annual, quarterly, monthly, 1on1, 360
     reviewPeriod: varchar("review_period", { length: 50 }), // e.g., "2024-Q1"
@@ -43,7 +44,7 @@ export const hrm_tb_performance_reviews = mdlHrmSchema.table(
     updatedBy: varchar("updated_by", { length: 36 }),
   },
   (table) => [
-    index("performance_reviews_employee_idx").on(table.employeeId),
+    index("performance_reviews_user_idx").on(table.userId),
     index("performance_reviews_reviewer_idx").on(table.reviewerId),
     index("performance_reviews_type_idx").on(table.reviewType),
     index("performance_reviews_status_idx").on(table.status),

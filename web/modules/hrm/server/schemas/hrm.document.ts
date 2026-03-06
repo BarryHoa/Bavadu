@@ -9,7 +9,8 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { hrm_tb_employees } from "./hrm.employee";
+import { base_tb_users } from "@base/server/schemas/base.user";
+
 import { mdlHrmSchema } from "./schema";
 
 // Documents - Tài liệu pháp lý và hồ sơ
@@ -23,7 +24,7 @@ export const hrm_tb_documents = mdlHrmSchema.table(
     documentType: varchar("document_type", { length: 50 }).notNull(), // contract, amendment, certificate, id_card, etc.
     title: jsonb("title").notNull(), // LocaleDataType<string>
     description: text("description"), // Text description
-    employeeId: uuid("employee_id").references(() => hrm_tb_employees.id, {
+    userId: uuid("user_id").references(() => base_tb_users.id, {
       onDelete: "cascade",
     }),
     fileUrl: varchar("file_url", { length: 500 }).notNull(),

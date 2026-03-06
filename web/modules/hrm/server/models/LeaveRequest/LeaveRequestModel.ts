@@ -15,7 +15,8 @@ const user = alias(base_tb_users, "user");
 
 export interface LeaveRequestRow {
   id: string;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -42,7 +43,8 @@ export interface LeaveRequestRow {
 }
 
 export interface LeaveRequestInput {
-  employeeId: string;
+  userId?: string;
+  employeeId?: string;
   leaveTypeId: string;
   startDate: string;
   endDate: string;
@@ -59,11 +61,28 @@ export default class LeaveRequestModel extends BaseModel<
     super(hrm_tb_leave_requests);
   }
 
+  private async resolveUserId(payload: {
+    userId?: string;
+    employeeId?: string;
+  }): Promise<string> {
+    if (payload.userId) return payload.userId;
+    if (payload.employeeId) {
+      const [e] = await this.db
+        .select({ userId: hrm_tb_employees.userId })
+        .from(hrm_tb_employees)
+        .where(eq(hrm_tb_employees.id, payload.employeeId))
+        .limit(1);
+      if (e?.userId) return e.userId;
+    }
+    throw new Error("userId or employeeId (resolvable to user) is required");
+  }
+
   getLeaveRequestById = async (id: string): Promise<LeaveRequestRow | null> => {
     const result = await this.db
       .select({
         id: this.table.id,
-        employeeId: this.table.employeeId,
+        userId: this.table.userId,
+        employeeId: employee.id,
         employeeCode: employee.code,
         employeeFullName: fullNameSqlFrom(user).as("employeeFullName"),
         leaveTypeId: this.table.leaveTypeId,
@@ -83,8 +102,8 @@ export default class LeaveRequestModel extends BaseModel<
         updatedAt: this.table.updatedAt,
       })
       .from(this.table)
-      .leftJoin(employee, eq(this.table.employeeId, employee.id))
-      .leftJoin(user, eq(employee.userId, user.id))
+      .leftJoin(employee, eq(this.table.userId, employee.userId))
+      .leftJoin(user, eq(this.table.userId, user.id))
       .leftJoin(leaveType, eq(this.table.leaveTypeId, leaveType.id))
       .where(eq(this.table.id, id))
       .limit(1);
@@ -95,7 +114,8 @@ export default class LeaveRequestModel extends BaseModel<
 
     return {
       id: row.id,
-      employeeId: row.employeeId,
+      userId: row.userId,
+      employeeId: row.employeeId ?? undefined,
       employee: row.employeeId
         ? {
             id: row.employeeId,
@@ -137,7 +157,7 @@ export default class LeaveRequestModel extends BaseModel<
   ): Promise<LeaveRequestRow> => {
     const now = new Date();
     const insertData: NewHrmTbLeaveRequest = {
-      employeeId: payload.employeeId,
+      userId: await this.resolveUserId(payload),
       leaveTypeId: payload.leaveTypeId,
       startDate: payload.startDate,
       endDate: payload.endDate,
@@ -172,8 +192,11 @@ export default class LeaveRequestModel extends BaseModel<
       updatedAt: new Date(),
     };
 
+    if (payload.userId !== undefined) updateData.userId = payload.userId;
     if (payload.employeeId !== undefined)
-      updateData.employeeId = payload.employeeId;
+      updateData.userId = await this.resolveUserId({
+        employeeId: payload.employeeId,
+      });
     if (payload.leaveTypeId !== undefined)
       updateData.leaveTypeId = payload.leaveTypeId;
     if (payload.startDate !== undefined)
@@ -198,6 +221,9 @@ export default class LeaveRequestModel extends BaseModel<
     const { id, payload } = params;
     const normalizedPayload: Partial<LeaveRequestInput> = {};
 
+    if (payload.userId !== undefined) {
+      normalizedPayload.userId = String(payload.userId);
+    }
     if (payload.employeeId !== undefined) {
       normalizedPayload.employeeId = String(payload.employeeId);
     }
