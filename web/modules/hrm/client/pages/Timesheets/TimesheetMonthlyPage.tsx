@@ -15,6 +15,7 @@ import {
   TimesheetDetailModal,
   TimesheetErrorState,
   TimesheetMonthNav,
+  type TimesheetViewMode,
 } from "./components";
 import { getMonthDays } from "./components/utils";
 
@@ -29,6 +30,7 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
   const [detailTimesheet, setDetailTimesheet] = useState<TimesheetDto | null>(
     null,
   );
+  const [viewMode, setViewMode] = useState<TimesheetViewMode>("grid");
 
   const dataWeek = useMemo(
     () =>
@@ -140,12 +142,15 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
         onCurrent={goCurrent}
         onNext={goNext}
         onPrev={goPrev}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
       <TimesheetCalendarGrid
         isLoading={isLoading}
         month={month}
         monthDays={monthDays}
         timesheetList={timesheetList}
+        viewMode={viewMode}
         weekdays={dataWeek}
         year={year}
         onDayClick={handleDayClick}

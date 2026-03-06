@@ -1,9 +1,17 @@
 "use client";
 
-import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  LayoutGrid,
+  List,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { IBaseButton } from "@base/client/components";
+
+export type TimesheetViewMode = "grid" | "list";
 
 interface TimesheetMonthNavProps {
   monthLabel: string;
@@ -11,6 +19,8 @@ interface TimesheetMonthNavProps {
   onNext: () => void;
   onCurrent: () => void;
   isNextDisabled: boolean;
+  viewMode: TimesheetViewMode;
+  onViewModeChange: (mode: TimesheetViewMode) => void;
 }
 
 export function TimesheetMonthNav({
@@ -19,6 +29,8 @@ export function TimesheetMonthNav({
   onNext,
   onCurrent,
   isNextDisabled,
+  viewMode,
+  onViewModeChange,
 }: TimesheetMonthNavProps): React.ReactNode {
   const t = useTranslations("hrm.timesheets");
 
@@ -53,6 +65,29 @@ export function TimesheetMonthNav({
           onPress={onNext}
         >
           {t("nextMonth")}
+        </IBaseButton>
+        <span className="mx-1 h-5 w-px bg-default-200" aria-hidden />
+        <IBaseButton
+          size="sm"
+          variant="bordered"
+          isIconOnly
+          aria-label={t("viewGrid")}
+          title={t("viewGrid")}
+          className={viewMode === "grid" ? "bg-primary-100 text-primary-700" : ""}
+          onPress={() => onViewModeChange("grid")}
+        >
+          <LayoutGrid className="size-4" />
+        </IBaseButton>
+        <IBaseButton
+          size="sm"
+          variant="bordered"
+          isIconOnly
+          aria-label={t("viewList")}
+          title={t("viewList")}
+          className={viewMode === "list" ? "bg-primary-100 text-primary-700" : ""}
+          onPress={() => onViewModeChange("list")}
+        >
+          <List className="size-4" />
         </IBaseButton>
       </div>
     </div>
