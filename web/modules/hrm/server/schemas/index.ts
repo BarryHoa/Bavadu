@@ -13,6 +13,7 @@ export * from "./hrm.employee-benefit";
 export * from "./hrm.employee-history";
 export * from "./hrm.employee-training";
 export * from "./hrm.goal";
+export * from "./hrm.holiday";
 export * from "./hrm.interview";
 export * from "./hrm.job-requisition";
 export * from "./hrm.leave-balance";

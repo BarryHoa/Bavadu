@@ -2,6 +2,7 @@
 
 import type { TimesheetDto } from "@mdl/hrm/client/interface/Timesheet";
 
+import { holidayService } from "@mdl/hrm/client/services/HolidayService";
 import { timesheetService } from "@mdl/hrm/client/services/TimesheetService";
 
 import { useQuery } from "@tanstack/react-query";
@@ -55,7 +56,20 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
     },
   });
 
+  const { data: holidaysData } = useQuery({
+    queryKey: ["base-holidays", year, month],
+    queryFn: async () => {
+      const r = await holidayService.getHolidaysForWorkingDays({
+        year,
+        month,
+      });
+
+      return r?.data ?? [];
+    },
+  });
+
   const timesheetList = monthData ?? [];
+  const holidays = holidaysData ?? [];
   const monthDays = useMemo(() => getMonthDays(year, month), [year, month]);
   const monthLabel = useMemo(
     () =>
@@ -150,6 +164,7 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
         month={month}
         monthDays={monthDays}
         timesheetList={timesheetList}
+        holidays={holidays}
         viewMode={viewMode}
         weekdays={dataWeek}
         year={year}

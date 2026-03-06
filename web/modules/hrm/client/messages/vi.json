@@ -434,6 +434,7 @@
       "noDataMonth": "Không có dữ liệu chấm công trong tháng",
       "statistics": {
         "workingDaysInMonth": "Số ngày công trong tháng",
+        "holidayDaysInMonth": "Số ngày lễ",
         "totalWorkHours": "Tổng số giờ làm việc",
         "totalWorkDays": "Tổng ngày công làm việc",
         "totalLateHours": "Tổng giờ đi trễ",
@@ -836,6 +837,51 @@
         "failedToCreateCertificate": "Không thể tạo chứng chỉ",
         "failedToLoadCertificate": "Không thể tải thông tin chứng chỉ",
         "failedToUpdateCertificate": "Không thể cập nhật chứng chỉ"
+      }
+    },
+    "holidays": {
+      "title": "Ngày lễ",
+      "create": "Thêm ngày lễ",
+      "createFirst": "Tạo ngày lễ đầu tiên",
+      "createTitle": "Thêm ngày lễ mới",
+      "editTitle": "Sửa ngày lễ",
+      "currentYear": "Năm hiện tại",
+      "noHolidays": "Không có ngày lễ nào trong năm này",
+      "selectAll": "Chọn tất cả",
+      "selectedCount": "Đã chọn {count} mục",
+      "deleteSelected": "Xóa đã chọn",
+      "confirmDeleteTitle": "Xác nhận xóa",
+      "confirmDeleteMessage": "Bạn có chắc chắn muốn xóa ngày lễ \"{name}\"?",
+      "confirmBulkDeleteTitle": "Xác nhận xóa nhiều",
+      "confirmBulkDeleteMessage": "Bạn có chắc chắn muốn xóa {count} ngày lễ đã chọn?",
+      "recurring": "Hàng năm",
+      "companyHoliday": "Công ty",
+      "unpaid": "Không lương",
+      "today": "Hôm nay",
+      "tomorrow": "Ngày mai",
+      "daysRemaining": "Còn {days} ngày",
+      "dateRangeInfo": "Sẽ tạo {days} ngày lễ liên tiếp",
+      "labels": {
+        "name": "Tên ngày lễ",
+        "date": "Ngày",
+        "dateRange": "Chọn ngày",
+        "startDate": "Từ ngày",
+        "endDate": "Đến ngày",
+        "year": "Năm",
+        "holidayType": "Loại ngày lễ",
+        "description": "Mô tả",
+        "isPaid": "Có lương",
+        "isActive": "Đang hoạt động"
+      },
+      "placeholders": {
+        "name": "Nhập tên ngày lễ",
+        "description": "Mô tả ngắn về ngày lễ"
+      },
+      "errors": {
+        "dateRequired": "Ngày là bắt buộc",
+        "dateExists": "Ngày lễ đã tồn tại cho ngày này",
+        "endDateBeforeStart": "Ngày kết thúc phải sau ngày bắt đầu",
+        "differentYear": "Ngày bắt đầu và ngày kết thúc phải trong cùng một năm"
       }
     },
     "performanceReviews": {

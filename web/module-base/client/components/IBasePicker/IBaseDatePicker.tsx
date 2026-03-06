@@ -411,7 +411,7 @@ export function IBaseDatePicker(props: IBaseDatePickerProps) {
     ? dropdownRenderer({ content, close: commitAndClose, isOpen })
     : content;
 
-  const showClearIcon = allowClear && Boolean(draftText.trim());
+  const showClearIcon = allowClear && !isDisabled && Boolean(draftText.trim());
   const resolvedPlaceholder = useMemo(() => {
     if (rest.placeholder) return rest.placeholder;
 

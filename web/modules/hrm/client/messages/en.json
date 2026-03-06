@@ -439,6 +439,7 @@
       "noDataMonth": "No timesheet data for this month",
       "statistics": {
         "workingDaysInMonth": "Working days in month",
+        "holidayDaysInMonth": "Holiday days",
         "totalWorkHours": "Total work hours",
         "totalWorkDays": "Total working days",
         "totalLateHours": "Total late arrival hours",
@@ -807,6 +808,51 @@
         "failedToCreateCertificate": "Failed to create certificate",
         "failedToLoadCertificate": "Failed to load certificate",
         "failedToUpdateCertificate": "Failed to update certificate"
+      }
+    },
+    "holidays": {
+      "title": "Holidays",
+      "create": "New Holiday",
+      "createFirst": "Create first holiday",
+      "createTitle": "Create Holiday",
+      "editTitle": "Edit Holiday",
+      "currentYear": "Current Year",
+      "noHolidays": "No holidays in this year",
+      "selectAll": "Select all",
+      "selectedCount": "{count} selected",
+      "deleteSelected": "Delete selected",
+      "confirmDeleteTitle": "Confirm Delete",
+      "confirmDeleteMessage": "Are you sure you want to delete the holiday \"{name}\"?",
+      "confirmBulkDeleteTitle": "Confirm Bulk Delete",
+      "confirmBulkDeleteMessage": "Are you sure you want to delete {count} selected holidays?",
+      "recurring": "Recurring",
+      "companyHoliday": "Company",
+      "unpaid": "Unpaid",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "daysRemaining": "{days} days left",
+      "dateRangeInfo": "Will create {days} consecutive holidays",
+      "labels": {
+        "name": "Holiday name",
+        "date": "Date",
+        "dateRange": "Select date",
+        "startDate": "From date",
+        "endDate": "To date",
+        "year": "Year",
+        "holidayType": "Holiday Type",
+        "description": "Description",
+        "isPaid": "Paid",
+        "isActive": "Active"
+      },
+      "placeholders": {
+        "name": "Enter holiday name",
+        "description": "Brief description of the holiday"
+      },
+      "errors": {
+        "dateRequired": "Date is required",
+        "dateExists": "A holiday already exists on this date",
+        "endDateBeforeStart": "End date must be after start date",
+        "differentYear": "Start date and end date must be in the same year"
       }
     },
     "performanceReviews": {

@@ -84,6 +84,16 @@ VALUES
 ('hrm.timesheet.import', 'hrm', 'timesheet', 'import', '{"en": "Import Timesheets", "vi": "Nhập chấm công"}', '{"en": "Permission to import timesheets", "vi": "Quyền nhập chấm công"}', true, now())
 ON CONFLICT ("key") DO NOTHING;
 
+-- Holidays
+INSERT INTO "md_base"."permissions" ("key", "module", "resource", "action", "name", "description", "is_active", "created_at")
+VALUES 
+('hrm.holiday.view', 'hrm', 'holiday', 'view', '{"en": "View Holidays", "vi": "Xem ngày lễ"}', '{"en": "Permission to view holidays", "vi": "Quyền xem ngày lễ"}', true, now()),
+('hrm.holiday.create', 'hrm', 'holiday', 'create', '{"en": "Create Holidays", "vi": "Tạo ngày lễ"}', '{"en": "Permission to create holidays", "vi": "Quyền tạo ngày lễ"}', true, now()),
+('hrm.holiday.edit', 'hrm', 'holiday', 'edit', '{"en": "Edit Holidays", "vi": "Sửa ngày lễ"}', '{"en": "Permission to edit holidays", "vi": "Quyền sửa ngày lễ"}', true, now()),
+('hrm.holiday.delete', 'hrm', 'holiday', 'delete', '{"en": "Delete Holidays", "vi": "Xóa ngày lễ"}', '{"en": "Permission to delete holidays", "vi": "Quyền xóa ngày lễ"}', true, now()),
+('hrm.holiday.import', 'hrm', 'holiday', 'import', '{"en": "Import Holidays", "vi": "Nhập ngày lễ"}', '{"en": "Permission to import holidays", "vi": "Quyền nhập ngày lễ"}', true, now())
+ON CONFLICT ("key") DO NOTHING;
+
 -- ============================================
 -- Product Module Permissions
 -- ============================================

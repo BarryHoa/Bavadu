@@ -50,6 +50,7 @@
     "course.list": "Course/CourseViewListModel",
     "certificate.curd": "Certificate/CertificateModel",
     "certificate.list": "Certificate/CertificateViewListModel",
-    "compliance-report.curd": "ComplianceReport/ComplianceReportModel"
+    "compliance-report.curd": "ComplianceReport/ComplianceReportModel",
+    "holiday.curd": "Holiday/HolidayModel"
   }
 }

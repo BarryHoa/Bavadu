@@ -7,15 +7,32 @@ import type { TimesheetDto } from "@mdl/hrm/client/interface/Timesheet";
 import { IBaseCard, IBaseCardBody } from "@base/client/components";
 import { useTranslations } from "next-intl";
 
-/** Count weekdays (Mon–Fri) in the given month. */
-function getWorkingDaysInMonth(year: number, month: number): number {
+/**
+ * Count weekdays (Mon–Fri) in the given month, excluding holidays.
+ * @param year - Year (e.g. 2024)
+ * @param month - Month 1-12
+ * @param holidays - Array of holiday dates (YYYY-MM-DD format)
+ * @param workingDays - Array of weekday numbers (0=Sun, 1=Mon, ..., 6=Sat). Default: [1,2,3,4,5] (Mon-Fri)
+ */
+function getWorkingDaysInMonth(
+  year: number,
+  month: number,
+  holidays: string[] = [],
+  workingDays: number[] = [1, 2, 3, 4, 5],
+): number {
   const daysInMonth = new Date(year, month, 0).getDate();
+  const holidaySet = new Set(holidays);
   let count = 0;
 
   for (let day = 1; day <= daysInMonth; day++) {
-    const dow = new Date(year, month - 1, day).getDay();
+    const date = new Date(year, month - 1, day);
+    const dow = date.getDay();
+    const dateStr = date.toISOString().split("T")[0];
 
-    if (dow >= 1 && dow <= 5) count++;
+    // Là ngày làm việc VÀ không phải ngày lễ
+    if (workingDays.includes(dow) && !holidaySet.has(dateStr)) {
+      count++;
+    }
   }
 
   return count;
@@ -35,10 +52,24 @@ function getRestDaysInMonth(year: number, month: number): number {
   return count;
 }
 
+/** Count holiday days in the given month. */
+function getHolidayDaysInMonth(
+  year: number,
+  month: number,
+  holidays: string[],
+): number {
+  const startDate = `${year}-${String(month).padStart(2, "0")}-01`;
+  const lastDay = new Date(year, month, 0).getDate();
+  const endDate = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+
+  return holidays.filter((h) => h >= startDate && h <= endDate).length;
+}
+
 function computeStats(
   timesheetList: TimesheetDto[],
   year: number,
   month: number,
+  holidays: string[] = [],
 ): {
   workingDaysInMonth: number;
   totalWorkHours: number;
@@ -47,9 +78,11 @@ function computeStats(
   totalEarlyLeaveHours: number;
   totalOvertimeHours: number;
   restDaysInMonth: number;
+  holidayDaysInMonth: number;
 } {
-  const workingDaysInMonth = getWorkingDaysInMonth(year, month);
+  const workingDaysInMonth = getWorkingDaysInMonth(year, month, holidays);
   const restDaysInMonth = getRestDaysInMonth(year, month);
+  const holidayDaysInMonth = getHolidayDaysInMonth(year, month, holidays);
 
   let totalWorkHours = 0;
   let totalWorkDays = 0;
@@ -67,8 +100,6 @@ function computeStats(
     if (ts.overtimeHours != null && ts.overtimeHours > 0) {
       totalOvertimeHours += ts.overtimeHours;
     }
-
-    // Late/early not in schema yet; keep at 0
   }
 
   return {
@@ -79,6 +110,7 @@ function computeStats(
     totalEarlyLeaveHours,
     totalOvertimeHours,
     restDaysInMonth,
+    holidayDaysInMonth,
   };
 }
 
@@ -100,6 +132,8 @@ interface TimesheetStatisticsProps {
   timesheetList: TimesheetDto[];
   year: number;
   month: number;
+  /** Array of holiday dates (YYYY-MM-DD format) for the month */
+  holidays?: string[];
   /** "default" = card above/below content; "sidebar" = compact vertical list for 30% sticky panel */
   variant?: "default" | "sidebar";
 }
@@ -108,13 +142,14 @@ export function TimesheetStatistics({
   timesheetList,
   year,
   month,
+  holidays = [],
   variant = "default",
 }: TimesheetStatisticsProps): React.ReactElement {
   const t = useTranslations("hrm.timesheets.statistics");
 
   const stats = React.useMemo(
-    () => computeStats(timesheetList, year, month),
-    [timesheetList, year, month],
+    () => computeStats(timesheetList, year, month, holidays),
+    [timesheetList, year, month, holidays],
   );
 
   const formatHours = (h: number): string =>
@@ -122,6 +157,7 @@ export function TimesheetStatistics({
 
   const items = [
     { label: t("workingDaysInMonth"), value: stats.workingDaysInMonth },
+    { label: t("holidayDaysInMonth"), value: stats.holidayDaysInMonth },
     { label: t("totalWorkHours"), value: formatHours(stats.totalWorkHours) },
     { label: t("totalWorkDays"), value: stats.totalWorkDays },
     { label: t("totalLateHours"), value: formatHours(stats.totalLateHours) },

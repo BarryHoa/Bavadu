@@ -89,6 +89,14 @@
           "as": "/leave-requests",
           "order": 3,
           "permission": "hrm.leave_request.view"
+        },
+        {
+          "key": "hrm-holidays",
+          "name": "Holidays",
+          "path": "/holidays",
+          "as": "/holidays",
+          "order": 4,
+          "permission": "hrm.holiday.view"
         }
       ]
     },

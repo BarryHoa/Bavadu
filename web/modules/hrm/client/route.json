@@ -58,6 +58,12 @@
     ]
   },
   {
+    "path": "/holidays",
+    "routes": [
+      { "path": "/", "page": "/Holidays/HolidaysListPage" }
+    ]
+  },
+  {
     "path": "/leave-requests",
     "routes": [
       { "path": "/", "page": "/LeaveRequests/LeaveRequestsListPage" },

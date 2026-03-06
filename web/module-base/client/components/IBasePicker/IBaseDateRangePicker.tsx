@@ -62,6 +62,11 @@ export interface IBaseDateRangePickerProps extends Omit<
   minDate?: string | Dayjs;
   maxDate?: string | Dayjs;
   timezone?: string;
+  /**
+   * Show preset buttons (Today, This week, etc.)
+   * @default true
+   */
+  showPresets?: boolean;
   presets?: RangePreset[];
   dropdownRenderer?: (params: {
     content: React.ReactNode;
@@ -77,19 +82,12 @@ function defaultPresets(
   labels: {
     today: React.ReactNode;
     thisWeek: React.ReactNode;
-    lastWeek: React.ReactNode;
     thisMonth: React.ReactNode;
-    lastMonth: React.ReactNode;
-    last3Months: React.ReactNode;
-    last6Months: React.ReactNode;
+    nextMonth: React.ReactNode;
     thisYear: React.ReactNode;
-    lastYear: React.ReactNode;
-    last2Years: React.ReactNode;
-    last3Years: React.ReactNode;
-    last5Years: React.ReactNode;
-  }
+  },
 ): RangePreset[] {
-  const presets: RangePreset[] = [
+  return [
     {
       key: "today",
       label: labels.today,
@@ -101,15 +99,6 @@ function defaultPresets(
       range: (now) => ({ start: now.startOf("week"), end: now.endOf("week") }),
     },
     {
-      key: "last-week",
-      label: labels.lastWeek,
-      range: (now) => {
-        const start = now.subtract(1, "week").startOf("week");
-
-        return { start, end: start.endOf("week") };
-      },
-    },
-    {
       key: "this-month",
       label: labels.thisMonth,
       range: (now) => ({
@@ -118,71 +107,19 @@ function defaultPresets(
       }),
     },
     {
-      key: "last-month",
-      label: labels.lastMonth,
+      key: "next-month",
+      label: labels.nextMonth,
       range: (now) => {
-        const start = now.subtract(1, "month").startOf("month");
-
+        const start = now.add(1, "month").startOf("month");
         return { start, end: start.endOf("month") };
       },
-    },
-    {
-      key: "last-3-months",
-      label: labels.last3Months,
-      range: (now) => ({
-        start: now.subtract(3, "month").startOf("month"),
-        end: now.endOf("month"),
-      }),
-    },
-    {
-      key: "last-6-months",
-      label: labels.last6Months,
-      range: (now) => ({
-        start: now.subtract(6, "month").startOf("month"),
-        end: now.endOf("month"),
-      }),
     },
     {
       key: "this-year",
       label: labels.thisYear,
       range: (now) => ({ start: now.startOf("year"), end: now.endOf("year") }),
     },
-    {
-      key: "last-year",
-      label: labels.lastYear,
-      range: (now) => {
-        const start = now.subtract(1, "year").startOf("year");
-
-        return { start, end: start.endOf("year") };
-      },
-    },
-    {
-      key: "last-2-years",
-      label: labels.last2Years,
-      range: (now) => ({
-        start: now.subtract(2, "year").startOf("year"),
-        end: now.endOf("year"),
-      }),
-    },
-    {
-      key: "last-3-years",
-      label: labels.last3Years,
-      range: (now) => ({
-        start: now.subtract(3, "year").startOf("year"),
-        end: now.endOf("year"),
-      }),
-    },
-    {
-      key: "last-5-years",
-      label: labels.last5Years,
-      range: (now) => ({
-        start: now.subtract(5, "year").startOf("year"),
-        end: now.endOf("year"),
-      }),
-    },
   ];
-
-  return presets;
 }
 
 export function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
@@ -197,6 +134,7 @@ export function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
     minDate,
     maxDate,
     allowClear = true,
+    showPresets = true,
     presets: customPresets,
     dropdownRenderer,
     label,
@@ -263,23 +201,17 @@ export function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
   const resolvedEndPlaceholder = endPlaceholder || t("range.endLabel");
 
   const presets = useMemo(() => {
+    if (!showPresets) return [];
     if (customPresets) return customPresets;
 
     return defaultPresets(timezone, {
       today: t("presets.today"),
       thisWeek: t("presets.thisWeek"),
-      lastWeek: t("presets.lastWeek"),
       thisMonth: t("presets.thisMonth"),
-      lastMonth: t("presets.lastMonth"),
-      last3Months: t("presets.last3Months"),
-      last6Months: t("presets.last6Months"),
+      nextMonth: t("presets.nextMonth"),
       thisYear: t("presets.thisYear"),
-      lastYear: t("presets.lastYear"),
-      last2Years: t("presets.last2Years"),
-      last3Years: t("presets.last3Years"),
-      last5Years: t("presets.last5Years"),
     });
-  }, [customPresets, timezone, t]);
+  }, [showPresets, customPresets, timezone, t]);
 
   const minCalendarDate = useMemo(() => {
     const d = toDayjs(minDate, timezone);
@@ -451,13 +383,14 @@ export function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
         </div>
       )}
 
-      {/* Calendar Area */}
+      {/* Calendar Area - 2 months side by side */}
       <div className="p-3">
         <RangeCalendar
           aria-label={t("range.calendarAriaLabel")}
           maxValue={maxCalendarDate}
           minValue={minCalendarDate}
           value={heroRangeValue}
+          visibleMonths={2}
           onChange={handleRangeChange}
         />
         <div className="mt-4 flex items-center justify-between gap-2 border-t border-divider pt-3">

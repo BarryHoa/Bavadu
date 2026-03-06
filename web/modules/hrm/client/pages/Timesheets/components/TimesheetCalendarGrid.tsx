@@ -21,6 +21,8 @@ interface TimesheetCalendarGridProps {
   year: number;
   month: number;
   weekdays: WeekdayItem[];
+  /** Array of holiday dates (YYYY-MM-DD format) */
+  holidays?: string[];
   onDayClick: (day: number) => void;
 }
 
@@ -32,6 +34,7 @@ export function TimesheetCalendarGrid({
   year,
   month,
   weekdays,
+  holidays = [],
   onDayClick,
 }: TimesheetCalendarGridProps): React.ReactNode {
   return (
@@ -44,6 +47,7 @@ export function TimesheetCalendarGrid({
                 timesheetList={timesheetList}
                 year={year}
                 month={month}
+                holidays={holidays}
                 variant="default"
               />
               <TimesheetGridView
@@ -70,6 +74,7 @@ export function TimesheetCalendarGrid({
                   timesheetList={timesheetList}
                   year={year}
                   month={month}
+                  holidays={holidays}
                   variant="sidebar"
                 />
               </div>
