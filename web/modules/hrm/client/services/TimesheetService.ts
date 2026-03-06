@@ -25,7 +25,7 @@ export default class TimesheetService extends JsonRpcClientService {
   getMyTimesheet(params: {
     year: number;
     month: number;
-    employeeId?: string | null;
+    userId?: string | null;
   }) {
     return this.call<{
       data: TimesheetDto[];

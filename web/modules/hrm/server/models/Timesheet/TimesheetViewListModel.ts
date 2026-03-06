@@ -26,7 +26,8 @@ const user = alias(base_tb_users, "user");
 
 export interface TimesheetRow {
   id: string;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -61,7 +62,7 @@ class TimesheetViewListModel extends BaseViewListModel<
       }
     >([
       ["id", { column: hrm_tb_timesheets.id, sort: true }],
-      ["employeeId", { column: hrm_tb_timesheets.employeeId, sort: true }],
+      ["userId", { column: hrm_tb_timesheets.userId, sort: true }],
       ["workDate", { column: hrm_tb_timesheets.workDate, sort: true }],
       ["shiftId", { column: hrm_tb_timesheets.shiftId, sort: true }],
       ["checkInTime", { column: hrm_tb_timesheets.checkInTime, sort: true }],
@@ -87,12 +88,13 @@ class TimesheetViewListModel extends BaseViewListModel<
 
   protected declarationMappingData = (row: any): TimesheetRow => ({
     id: row.id,
-    employeeId: row.employeeId,
-    employee: row.employeeId
+    userId: row.userId,
+    employeeId: row.employeeId ?? undefined,
+    employee: row.userId
       ? {
-          id: row.employeeId,
+          id: row.userId,
           employeeCode: row.employeeCode ?? undefined,
-          fullName: row.employeeFullName ?? undefined,
+          fullName: row.userFullName ?? undefined,
         }
       : null,
     workDate: row.workDate,
@@ -117,12 +119,36 @@ class TimesheetViewListModel extends BaseViewListModel<
   getData = async (
     params: ListParamsRequest,
   ): Promise<ListParamsResponse<TimesheetRow>> => {
-    return this.buildQueryDataList(params, (query) =>
-      query
-        .leftJoin(employee, eq(this.table.employeeId, employee.id))
-        .leftJoin(user, eq(employee.userId, user.id))
-        .leftJoin(shift, eq(this.table.shiftId, shift.id)),
-    );
+    const selectColumns = {
+      id: hrm_tb_timesheets.id,
+      userId: hrm_tb_timesheets.userId,
+      employeeId: employee.id,
+      workDate: hrm_tb_timesheets.workDate,
+      shiftId: hrm_tb_timesheets.shiftId,
+      shiftName: shift.name,
+      checkInTime: hrm_tb_timesheets.checkInTime,
+      checkOutTime: hrm_tb_timesheets.checkOutTime,
+      actualHours: hrm_tb_timesheets.actualHours,
+      regularHours: hrm_tb_timesheets.regularHours,
+      overtimeHours: hrm_tb_timesheets.overtimeHours,
+      status: hrm_tb_timesheets.status,
+      createdAt: hrm_tb_timesheets.createdAt,
+      updatedAt: hrm_tb_timesheets.updatedAt,
+      userFullName: fullNameSqlFrom(user).as("userFullName"),
+      employeeCode: employee.code,
+    };
+    return this.buildQueryDataListWithSelect(
+      params,
+      selectColumns as unknown as Record<string, Column>,
+      (query) =>
+        query
+          .leftJoin(user, eq(this.table.userId, user.id))
+          .leftJoin(employee, eq(employee.userId, this.table.userId))
+          .leftJoin(shift, eq(this.table.shiftId, shift.id)),
+    ).then((res) => ({
+      data: (res?.data ?? []).map((row) => this.declarationMappingData(row)),
+      total: res?.total ?? 0,
+    }));
   };
 }
 

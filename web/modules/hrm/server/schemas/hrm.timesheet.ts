@@ -8,8 +8,9 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import { base_tb_users } from "@base/server/schemas/base.user";
+
 import { mdlHrmSchema } from "./schema";
-import { hrm_tb_employees } from "./hrm.employee";
 import { hrm_tb_rosters } from "./hrm.roster";
 import { hrm_tb_shifts } from "./hrm.shift";
 
@@ -20,8 +21,8 @@ export const hrm_tb_timesheets = mdlHrmSchema.table(
     id: uuid("id")
       .primaryKey()
       .default(sql`uuid_generate_v7()`),
-    employeeId: uuid("employee_id")
-      .references(() => hrm_tb_employees.id, { onDelete: "cascade" })
+    userId: uuid("user_id")
+      .references(() => base_tb_users.id, { onDelete: "cascade" })
       .notNull(),
     rosterId: uuid("roster_id").references(() => hrm_tb_rosters.id, {
       onDelete: "set null",
@@ -50,9 +51,9 @@ export const hrm_tb_timesheets = mdlHrmSchema.table(
     updatedBy: varchar("updated_by", { length: 36 }),
   },
   (table) => [
-    index("timesheets_employee_idx").on(table.employeeId),
+    index("timesheets_user_idx").on(table.userId),
     index("timesheets_date_idx").on(table.workDate),
-    index("timesheets_employee_date_idx").on(table.employeeId, table.workDate),
+    index("timesheets_user_date_idx").on(table.userId, table.workDate),
     index("timesheets_status_idx").on(table.status),
   ],
 );

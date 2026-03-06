@@ -2,7 +2,9 @@ import type { LocaleDataType } from "@base/shared/interface/Locale";
 
 export interface TimesheetDto {
   id: string;
-  employeeId: string;
+  userId: string;
+  /** Present when backend joined employee (e.g. for form pre-fill). */
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -34,7 +36,8 @@ export interface TimesheetDto {
 }
 
 export interface CreateTimesheetPayload {
-  employeeId: string;
+  userId?: string;
+  employeeId?: string;
   rosterId?: string | null;
   workDate: string;
   shiftId?: string | null;

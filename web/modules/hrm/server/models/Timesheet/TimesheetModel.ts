@@ -8,14 +8,21 @@ import {
   JsonRpcError,
 } from "@/module-base/server/rpc/jsonRpcHandler";
 import { BaseModel, PermissionRequired } from "@base/server/models/BaseModel";
+import { base_tb_users } from "@base/server/schemas/base.user";
 
 import { NewHrmTbTimesheet, hrm_tb_timesheets } from "../../schemas";
+import { hrm_tb_employees } from "../../schemas/hrm.employee";
 import { hrm_tb_shifts } from "../../schemas/hrm.shift";
+import { fullNameSqlFrom } from "../Employee/employee.helpers";
+
 const shift = alias(hrm_tb_shifts, "shift");
+const user = alias(base_tb_users, "user");
+const employee = alias(hrm_tb_employees, "employee");
 
 export interface TimesheetRow {
   id: string;
-  employeeId: string;
+  userId: string;
+  employeeId?: string;
   employee?: {
     id: string;
     employeeCode?: string;
@@ -47,7 +54,9 @@ export interface TimesheetRow {
 }
 
 export interface TimesheetInput {
-  employeeId: string;
+  userId?: string;
+  /** When form sends employeeId (e.g. from employee dropdown), resolved to userId. */
+  employeeId?: string;
   rosterId?: string | null;
   workDate: string;
   shiftId?: string | null;
@@ -71,11 +80,13 @@ export default class TimesheetModel extends BaseModel<
 
   private selectJoined = () => ({
     id: this.table.id,
-    employeeId: this.table.employeeId,
+    userId: this.table.userId,
+    employeeId: employee.id,
     rosterId: this.table.rosterId,
     workDate: this.table.workDate,
     shiftId: this.table.shiftId,
     shiftName: shift.name,
+    userFullName: fullNameSqlFrom(user).as("userFullName"),
     checkInTime: this.table.checkInTime,
     checkOutTime: this.table.checkOutTime,
     actualHours: this.table.actualHours,
@@ -96,11 +107,12 @@ export default class TimesheetModel extends BaseModel<
 
   private mapJoinedRow = (row: any): TimesheetRow => ({
     id: row.id,
-    employeeId: row.employeeId,
-    employee: row.employeeFullName
+    userId: row.userId,
+    employeeId: row.employeeId ?? undefined,
+    employee: row.userFullName
       ? {
-          id: row.employeeId,
-          fullName: row.employeeFullName,
+          id: row.userId,
+          fullName: row.userFullName,
         }
       : null,
     rosterId: row.rosterId ?? undefined,
@@ -134,6 +146,8 @@ export default class TimesheetModel extends BaseModel<
     const result = await this.db
       .select(this.selectJoined())
       .from(this.table)
+      .leftJoin(user, eq(this.table.userId, user.id))
+      .leftJoin(employee, eq(employee.userId, this.table.userId))
       .leftJoin(shift, eq(this.table.shiftId, shift.id))
       .where(eq(this.table.id, id))
       .limit(1);
@@ -150,9 +164,8 @@ export default class TimesheetModel extends BaseModel<
   };
 
   /**
-   * Get timesheets for a given month, optionally filtered by employee.
-   * Params: { year, month, employeeId? }.
-   * - If employeeId is omitted: returns current user's timesheets (resolved via session).
+   * Get timesheets for a given month for the current user.
+   * Params: { year, month }. User resolved via session (x-user-id).
    */
   @PermissionRequired({
     auth: true,
@@ -180,12 +193,14 @@ export default class TimesheetModel extends BaseModel<
     const conditions = [
       gte(this.table.workDate, firstDay),
       lte(this.table.workDate, lastDay),
-      eq(this.table.employeeId, userId),
+      eq(this.table.userId, userId),
     ];
 
     const result = await this.db
       .select(this.selectJoined())
       .from(this.table)
+      .leftJoin(user, eq(this.table.userId, user.id))
+      .leftJoin(employee, eq(employee.userId, this.table.userId))
       .leftJoin(shift, eq(this.table.shiftId, shift.id))
       .where(and(...conditions))
       .orderBy(this.table.workDate);
@@ -195,7 +210,23 @@ export default class TimesheetModel extends BaseModel<
     return { data };
   };
 
+  private resolveUserId = async (
+    payload: TimesheetInput,
+  ): Promise<string> => {
+    if (payload.userId) return payload.userId;
+    if (payload.employeeId) {
+      const [row] = await this.db
+        .select({ userId: hrm_tb_employees.userId })
+        .from(hrm_tb_employees)
+        .where(eq(hrm_tb_employees.id, payload.employeeId))
+        .limit(1);
+      if (row?.userId) return row.userId;
+    }
+    throw new Error("userId or employeeId (resolvable to user) is required");
+  };
+
   createTimesheet = async (payload: TimesheetInput): Promise<TimesheetRow> => {
+    const userId = await this.resolveUserId(payload);
     const now = new Date();
     const checkInTime = payload.checkInTime
       ? new Date(payload.checkInTime)
@@ -220,7 +251,7 @@ export default class TimesheetModel extends BaseModel<
     }
 
     const insertData: NewHrmTbTimesheet = {
-      employeeId: payload.employeeId,
+      userId,
       rosterId: payload.rosterId ?? null,
       workDate: payload.workDate,
       shiftId: payload.shiftId ?? null,
@@ -262,8 +293,15 @@ export default class TimesheetModel extends BaseModel<
       updatedAt: new Date(),
     };
 
-    if (payload.employeeId !== undefined)
-      updateData.employeeId = payload.employeeId;
+    if (payload.userId !== undefined) {
+      updateData.userId = payload.userId;
+    } else if (payload.employeeId !== undefined) {
+      const userId = await this.resolveUserId({
+        userId: undefined,
+        employeeId: payload.employeeId,
+      });
+      updateData.userId = userId;
+    }
     if (payload.rosterId !== undefined)
       updateData.rosterId = payload.rosterId ?? null;
     if (payload.workDate !== undefined) updateData.workDate = payload.workDate;
@@ -332,6 +370,9 @@ export default class TimesheetModel extends BaseModel<
     const { id, payload } = params;
     const normalizedPayload: Partial<TimesheetInput> = {};
 
+    if (payload.userId !== undefined) {
+      normalizedPayload.userId = String(payload.userId);
+    }
     if (payload.employeeId !== undefined) {
       normalizedPayload.employeeId = String(payload.employeeId);
     }

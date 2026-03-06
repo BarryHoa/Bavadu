@@ -33,6 +33,13 @@ function getTimePart(value: string | number): string {
   return formatDateWithTime(value).split(" ")[1] ?? "";
 }
 
+const getTsVal = (ts: TimesheetDto | undefined): string => {
+  if (!ts) return "";
+  return [
+    ts.checkInTime ? getTimePart(ts.checkInTime) : "",
+    ts.checkOutTime ? ` – ${getTimePart(ts.checkOutTime)}` : "",
+  ].join(" - ");
+};
 export function TimesheetCalendarGrid({
   isLoading,
   monthDays,
@@ -77,7 +84,7 @@ export function TimesheetCalendarGrid({
                     return (
                       <td key={di} className="p-1 align-top">
                         <button
-                          className={`min-h-[72px] w-full rounded-lg border p-2 text-left text-sm transition-colors ${
+                          className={`flex min-h-[72px] w-full flex-col items-start rounded-lg border p-2 text-left text-sm transition-colors ${
                             hasData
                               ? "border-primary-300 bg-primary-50 hover:bg-primary-100"
                               : "border-default-200 bg-default-50/50 hover:bg-default-100"
@@ -87,16 +94,8 @@ export function TimesheetCalendarGrid({
                         >
                           <span className="font-medium">{day}</span>
                           {hasData && ts && (
-                            <div className="mt-1 truncate text-xs text-default-600">
-                              {ts.checkInTime
-                                ? getTimePart(ts.checkInTime)
-                                : ""}
-                              {ts.checkOutTime
-                                ? ` – ${getTimePart(ts.checkOutTime)}`
-                                : ""}
-                              {ts.actualHours != null
-                                ? ` · ${ts.actualHours}h`
-                                : ""}
+                            <div className="mt-1 w-full truncate text-xs text-default-600">
+                              {getTsVal(ts)}
                             </div>
                           )}
                         </button>

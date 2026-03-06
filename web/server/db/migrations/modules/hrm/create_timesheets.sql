@@ -1,9 +1,9 @@
 -- Migration: Create timesheets table
--- Tạo bảng timesheets
+-- Tạo bảng timesheets (user_id tham chiếu md_base.users)
 
 CREATE TABLE "mdl_hrm"."timesheets" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
-	"employee_id" uuid NOT NULL,
+	"user_id" uuid NOT NULL REFERENCES "md_base"."users"("id") ON DELETE CASCADE,
 	"roster_id" uuid,
 	"work_date" date NOT NULL,
 	"shift_id" uuid,
@@ -26,3 +26,8 @@ CREATE TABLE "mdl_hrm"."timesheets" (
 	"created_by" varchar(36),
 	"updated_by" varchar(36)
 );
+
+CREATE INDEX IF NOT EXISTS "timesheets_user_idx" ON "mdl_hrm"."timesheets"("user_id");
+CREATE INDEX IF NOT EXISTS "timesheets_date_idx" ON "mdl_hrm"."timesheets"("work_date");
+CREATE INDEX IF NOT EXISTS "timesheets_user_date_idx" ON "mdl_hrm"."timesheets"("user_id", "work_date");
+CREATE INDEX IF NOT EXISTS "timesheets_status_idx" ON "mdl_hrm"."timesheets"("status");
