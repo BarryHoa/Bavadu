@@ -13,6 +13,7 @@ import {
   IBaseTabPrimary,
   IBaseTabsPrimary,
 } from "@base/client/components";
+import type { Role } from "@base/client/interface/RoleAndPermission";
 import { useLocalizedText } from "@base/client/hooks/useLocalizedText";
 import JsonRpcClientService from "@base/client/services/JsonRpcClientService";
 import roleService from "@base/client/services/RoleService";
@@ -114,7 +115,8 @@ export default function EmployeeForm({
   });
 
   const allRoles = useMemo(
-    () => (roleListData?.data ?? []).filter((r) => r.code !== "system"),
+    () =>
+      (roleListData?.data ?? []).filter((r) => r.code !== "system") as Role[],
     [roleListData],
   );
   const allPermissions = useMemo(

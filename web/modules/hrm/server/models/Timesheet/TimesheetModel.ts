@@ -210,9 +210,10 @@ export default class TimesheetModel extends BaseModel<
     return { data };
   };
 
-  private resolveUserId = async (
-    payload: TimesheetInput,
-  ): Promise<string> => {
+  private resolveUserId = async (payload: {
+    userId?: string;
+    employeeId?: string;
+  }): Promise<string> => {
     if (payload.userId) return payload.userId;
     if (payload.employeeId) {
       const [row] = await this.db

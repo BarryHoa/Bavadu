@@ -35,7 +35,8 @@ export interface OffboardingRow {
 }
 
 export interface OffboardingInput {
-  employeeId: string;
+  userId?: string;
+  employeeId?: string;
   resignationDate: string;
   lastWorkingDate: string;
   reason?: string | null;
@@ -175,12 +176,13 @@ export default class OffboardingModel extends BaseModel<
       updatedAt: new Date(),
     };
 
-    if (payload.employeeId !== undefined)
-      if (payload.userId !== undefined) updateData.userId = payload.userId;
-    if (payload.employeeId !== undefined)
+    if (payload.userId !== undefined) {
+      updateData.userId = payload.userId;
+    } else if (payload.employeeId !== undefined) {
       updateData.userId = await this.resolveUserId({
         employeeId: payload.employeeId,
       });
+    }
     if (payload.resignationDate !== undefined)
       updateData.resignationDate = payload.resignationDate;
     if (payload.lastWorkingDate !== undefined)
@@ -217,10 +219,10 @@ export default class OffboardingModel extends BaseModel<
     const normalizedPayload: Partial<OffboardingInput> = {};
 
     if (payload.employeeId !== undefined) {
-      if (payload.userId !== undefined)
-      normalizedPayload.userId = String(payload.userId);
-    if (payload.employeeId !== undefined)
       normalizedPayload.employeeId = String(payload.employeeId);
+    }
+    if (payload.userId !== undefined) {
+      normalizedPayload.userId = String(payload.userId);
     }
     if (payload.resignationDate !== undefined) {
       normalizedPayload.resignationDate = String(payload.resignationDate);
