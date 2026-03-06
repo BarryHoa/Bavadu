@@ -2,14 +2,9 @@
 
 import type { TimesheetDto } from "@mdl/hrm/client/interface/Timesheet";
 
-import { useTranslations } from "next-intl";
-
 import IBaseSpinnerContent from "@/module-base/client/components/IBaseSpinnerContent";
 import { IBaseCard, IBaseCardBody } from "@base/client/components";
-import {
-  formatDate,
-  formatDateWithTime,
-} from "@base/client/utils/date/formatDate";
+import { formatDateWithTime } from "@base/client/utils/date/formatDate";
 
 import type { WeekdayItem } from "./utils";
 
@@ -59,7 +54,7 @@ export function TimesheetCalendarGrid({
                     key={w.key}
                     className="p-2 text-center text-sm font-medium text-default-600"
                   >
-                    {w.name}
+                    {w.shortName}
                   </th>
                 ))}
               </tr>

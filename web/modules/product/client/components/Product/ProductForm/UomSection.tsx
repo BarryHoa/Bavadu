@@ -32,7 +32,7 @@ export default function UomSection({
 }: UomSectionProps) {
   const tProduct = useTranslations("mdl-product");
   const tProductForm = useTranslations("mdl-product.product-create");
-  const t = useTranslations("common");
+  const t = useTranslations("base.general");
 
   const { setValue } = useFormContext();
 

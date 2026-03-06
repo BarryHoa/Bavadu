@@ -207,7 +207,7 @@ export function IBaseDateRangePicker(props: IBaseDateRangePickerProps) {
     ...rest
   } = props;
 
-  const t = useTranslations("components.dateRangePicker");
+  const t = useTranslations("base.components.dateRangePicker");
 
   const [isOpen, setIsOpen] = useState(false);
   const startRef = useRef<HTMLInputElement>(null);

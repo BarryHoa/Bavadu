@@ -78,7 +78,7 @@ export const IBaseSingleSelectAsync = React.forwardRef<
 
   const localizedText = useLocalizedText();
 
-  const tSelectAsync = useTranslations("components.selectAsync");
+  const tSelectAsync = useTranslations("base.components.selectAsync");
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");

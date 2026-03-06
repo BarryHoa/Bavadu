@@ -56,7 +56,7 @@ const formatStockRange = (warehouse: WarehouseDto) => {
 
 export default function WarehouseListPage(): React.ReactNode {
   const t = useTranslations("stock.warehouse.list");
-  const tDataTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("base.components.dataTable");
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<WarehouseDto>[] = [

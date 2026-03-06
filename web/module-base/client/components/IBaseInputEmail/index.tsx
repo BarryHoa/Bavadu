@@ -15,7 +15,7 @@ export const IBaseInputEmail = React.forwardRef<
   HTMLInputElement,
   IBaseInputEmailProps
 >(function IBaseInputEmail(props, ref) {
-  const t = useTranslations("components.input");
+  const t = useTranslations("base.components.input");
   const { placeholder, ...rest } = props;
 
   return (

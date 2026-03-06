@@ -39,7 +39,7 @@ export function IBaseImportTemplate({
   onSuccess,
   onError,
 }: IBaseImportTemplateProps): React.ReactNode {
-  const t = useTranslations("common");
+  const t = useTranslations("base.general");
   const { hasPermission } = usePermission();
   const canImport = hasPermission(requiredPermission);
 

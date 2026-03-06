@@ -36,9 +36,9 @@ type RoleRow = RoleWithPermissions & {
 };
 
 export default function RolesListPage() {
-  const tIBaseTable = useTranslations("dataTable");
-  const t = useTranslations("settings.roles");
-  const actionsT = useTranslations("common.actions");
+  const tIBaseTable = useTranslations("base.components.dataTable");
+  const t = useTranslations("base.pages.settings.roles");
+  const actionsT = useTranslations("base.general.actions");
   const queryClient = useQueryClient();
   const getText = useLocalizedText();
   const [deleteConfirm, setDeleteConfirm] = useState<Role | null>(null);

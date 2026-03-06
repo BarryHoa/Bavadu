@@ -22,7 +22,7 @@ type SalesOrderB2CRow = SalesOrderB2C & {
 };
 
 export default function SalesOrdersB2CListPage(): React.ReactNode {
-  const tDataTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("base.components.dataTable");
   const t = useTranslations("b2cSales.order.create.labels.list");
 
   // React Compiler will automatically optimize this array creation

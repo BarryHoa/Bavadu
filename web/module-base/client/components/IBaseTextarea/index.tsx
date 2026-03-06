@@ -10,7 +10,7 @@ export const IBaseTextarea = React.forwardRef<
   HTMLTextAreaElement,
   IBaseTextareaProps
 >((props, ref) => {
-  const t = useTranslations("components.textarea");
+  const t = useTranslations("base.components.textarea");
   const {
     isDisabled,
     size = "sm",

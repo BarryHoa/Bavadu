@@ -14,7 +14,7 @@ export const IBaseInputSearch = React.forwardRef<
   HTMLInputElement,
   IBaseInputSearchProps
 >((props, ref) => {
-  const t = useTranslations("components.input");
+  const t = useTranslations("base.components.input");
   const {
     isDisabled,
     size = "sm",

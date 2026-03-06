@@ -37,7 +37,7 @@ export default function IBaseUploadImageDrag({
   isDisabled = false,
   label,
 }: IBaseUploadImageDragProps) {
-  const t = useTranslations("components.uploadImage");
+  const t = useTranslations("base.components.uploadImage");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingItems, setUploadingItems] = useState<Set<string>>(new Set());
 

@@ -22,8 +22,7 @@ const WEEKDAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
 export default function TimesheetMonthlyPage(): React.ReactNode {
   const t = useTranslations("hrm.timesheets");
-  const tPicker = useTranslations("common.picker");
-
+  const tPicker = useTranslations("base.components.picker");
   const today = useMemo(() => dayjs(), []);
   const [year, setYear] = useState(() => today.year());
   const [month, setMonth] = useState(() => today.month() + 1);

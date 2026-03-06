@@ -43,7 +43,7 @@ type EmployeeRow = Employee & {
 
 export default function EmployeesListPage(): React.ReactNode {
   const queryClient = useQueryClient();
-  const tDataTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("base.components.dataTable");
   const t = useTranslations("hrm.employee.list");
   const getLocalizedText = useLocalizedText();
   const { hasPermission } = usePermission();

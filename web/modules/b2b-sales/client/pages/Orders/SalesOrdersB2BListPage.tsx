@@ -22,7 +22,7 @@ type SalesOrderB2BRow = SalesOrderB2B & {
 
 export default function SalesOrdersB2BListPage(): React.ReactNode {
   const t = useTranslations("sale.ordersB2B.list");
-  const tDataTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("base.components.dataTable");
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<SalesOrderB2BRow>[] = [

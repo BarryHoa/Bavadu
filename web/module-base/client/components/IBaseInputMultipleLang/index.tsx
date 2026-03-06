@@ -45,7 +45,7 @@ export const IBaseInputMultipleLang = React.forwardRef<
   HTMLInputElement,
   IBaseInputMultipleLangProps
 >((props, ref) => {
-  const t = useTranslations("components.translate");
+  const t = useTranslations("base.components.translate");
   const locale = useLocale();
   const { value, onValueChange, defaultLangs, ...restProps } = props;
 

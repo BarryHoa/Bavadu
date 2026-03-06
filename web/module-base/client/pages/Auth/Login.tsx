@@ -22,7 +22,7 @@ import { broadcastPermissionsRefresh } from "@base/client/stores";
 const DEFAULT_PAGE_AFTER_LOGIN = "/workspace/news";
 
 export default function LoginPage() {
-  const t = useTranslations("auth.login");
+  const t = useTranslations("base.pages.auth.login");
   const router = useRouter();
   const authService = useMemo(() => new AuthService(), []);
   const [username, setUsername] = useState("");

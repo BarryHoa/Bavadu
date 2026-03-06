@@ -27,8 +27,8 @@ export default function RoleDetailModal({
   isOpen,
   onClose,
 }: RoleDetailModalProps) {
-  const t = useTranslations("settings.roles");
-  const actionsT = useTranslations("common.actions");
+  const t = useTranslations("base.pages.settings.roles");
+  const actionsT = useTranslations("base.general.actions");
   const getText = useLocalizedText();
 
   const detailQuery = useQuery({

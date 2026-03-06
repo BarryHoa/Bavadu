@@ -33,8 +33,8 @@ export default function TranslateModal({
   onSave,
   value,
 }: TranslateModalProps) {
-  const t = useTranslations("components.translate");
-  const tCommon = useTranslations("common.actions");
+  const t = useTranslations("base.components.translate");
+  const tCommon = useTranslations("base.general.actions");
   const currentLocale = useLocale();
   const [langValues, setLangValues] = useState<LocalizeText>(() => {
     if (typeof value === "object" && value !== null) {

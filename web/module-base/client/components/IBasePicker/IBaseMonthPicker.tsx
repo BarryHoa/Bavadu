@@ -20,7 +20,7 @@ export type IBaseMonthPickerProps = Omit<
 };
 
 export function IBaseMonthPicker(props: IBaseMonthPickerProps) {
-  const t = useTranslations("components.picker");
+  const t = useTranslations("base.components.picker");
   const {
     placeholder,
     format = "MM/YYYY",

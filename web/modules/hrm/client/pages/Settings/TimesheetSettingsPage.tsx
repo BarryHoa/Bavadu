@@ -49,7 +49,7 @@ function timeToInputValue(v: string | null | undefined): string {
 
 export default function TimesheetSettingsPage(): React.ReactNode {
   const t = useTranslations("hrm.settings.timesheets");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("base.general");
   const queryClient = useQueryClient();
 
   const [defaultCheckInTime, setDefaultCheckInTime] = useState("");

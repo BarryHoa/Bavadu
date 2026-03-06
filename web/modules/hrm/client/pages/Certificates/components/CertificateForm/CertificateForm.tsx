@@ -42,7 +42,7 @@ export default function CertificateForm({
   defaultValues,
 }: CertificateFormProps) {
   const t = useTranslations("hrm.certificates");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("base.general");
 
   // React Compiler will automatically optimize this computation
   const validation = createCertificateValidation(t);

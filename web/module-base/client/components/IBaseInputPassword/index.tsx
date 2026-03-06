@@ -16,7 +16,7 @@ export const IBaseInputPassword = React.forwardRef<
   HTMLInputElement,
   IBaseInputPasswordProps
 >(function IBaseInputPassword(props, ref) {
-  const t = useTranslations("components.input");
+  const t = useTranslations("base.components.input");
   const { placeholder, endContent, ...rest } = props;
   const [isVisible, setIsVisible] = useState(false);
 

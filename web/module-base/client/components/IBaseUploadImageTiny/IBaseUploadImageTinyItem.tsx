@@ -32,7 +32,7 @@ export default function IBaseUploadImageTinyItem({
   isDisabled,
   onRemove,
 }: IBaseUploadImageTinyItemProps) {
-  const t = useTranslations("components.uploadImage");
+  const t = useTranslations("base.components.uploadImage");
   const [imageError, setImageError] = useState(false);
   const base64SrcRef = useRef<string | null>(null);
   const blobRef = useRef<Blob | null>(null);

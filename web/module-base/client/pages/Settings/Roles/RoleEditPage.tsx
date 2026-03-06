@@ -30,9 +30,9 @@ const ROLES_LIST_QUERY_KEY = ["settings", "roles", "list"] as const;
 const ROLES_LIST_PATH = "/workspace/settings/roles";
 
 export default function RoleEditPage() {
-  const t = useTranslations("settings.roles");
-  const actionsT = useTranslations("common.actions");
-  const errorsT = useTranslations("common.errors");
+  const t = useTranslations("base.pages.settings.roles");
+  const actionsT = useTranslations("base.general.actions");
+  const errorsT = useTranslations("base.general.errors");
   const queryClient = useQueryClient();
   const router = useRouter();
   const params = useParams();

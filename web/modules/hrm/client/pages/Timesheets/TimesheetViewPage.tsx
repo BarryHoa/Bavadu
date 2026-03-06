@@ -25,7 +25,8 @@ export default function TimesheetViewPage(): React.ReactNode {
   const params = useParams();
   const id = params.id as string;
   const t = useTranslations("hrm.timesheets");
-  const tCommon = useTranslations("common");
+  const errorsT = useTranslations("base.general.errors");
+  const tCommon = useTranslations("base.general");
   const getLocalizedText = useLocalizedText();
 
   const {
@@ -63,9 +64,9 @@ export default function TimesheetViewPage(): React.ReactNode {
           ]
         : [
             { label: t("title"), href: TIMESHEETS_LIST_PATH },
-            { label: isLoading ? "..." : tCommon("errors.dataNotFound") },
+            { label: isLoading ? "..." : errorsT("dataNotFound") },
           ],
-    [t, timesheetData, isLoading, tCommon, getLocalizedText],
+    [t, timesheetData, isLoading, errorsT, getLocalizedText],
   );
 
   useSetBreadcrumbs(breadcrumbs);
@@ -83,7 +84,7 @@ export default function TimesheetViewPage(): React.ReactNode {
     return (
       <div className="flex flex-col gap-4 rounded-xl border-2 border-danger-200 bg-danger-50/50 p-6">
         <p className="font-medium text-danger-700">
-          {error instanceof Error ? error.message : tCommon("errors.dataNotFound")}
+          {error instanceof Error ? error.message : errorsT("dataNotFound")}
         </p>
         <IBaseButton
           color="danger"

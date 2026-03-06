@@ -21,7 +21,7 @@ export default function ContractEditPage(): React.ReactNode {
   const id = params.id as string;
   const t = useTranslations("hrm.contract.create.labels");
   const tTitle = useTranslations("hrm.contract");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("base.general");
   const getLocalizedText = useLocalizedText();
 
   const {

@@ -118,7 +118,7 @@ export const IBaseInputNumber = React.forwardRef<
   HTMLInputElement,
   IBaseInputNumberProps
 >((props, ref) => {
-  const t = useTranslations("components.input");
+  const t = useTranslations("base.components.input");
   const {
     value: controlledValue,
     defaultValue,

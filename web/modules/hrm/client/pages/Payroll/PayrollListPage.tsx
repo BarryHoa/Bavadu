@@ -20,7 +20,7 @@ type PayrollRow = PayrollDto & {
 };
 
 export default function PayrollListPage(): React.ReactNode {
-  const tDataTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("base.components.dataTable");
   const t = useTranslations("hrm.payroll");
   const getLocalizedText = useLocalizedText();
   const { hasPermission: canCreate } = useHasPermissions(["hrm.payroll.create"]);

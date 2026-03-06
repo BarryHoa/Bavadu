@@ -55,7 +55,7 @@ export default function MasterTab({
   categoryQueryLoading,
   onUpdate,
 }: MasterTabProps) {
-  const t = useTranslations("common");
+  const t = useTranslations("base.general");
   const tProduct = useTranslations("mdl-product");
   const getLocalizedText = useLocalizedText();
 

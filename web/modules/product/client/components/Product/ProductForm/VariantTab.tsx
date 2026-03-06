@@ -53,7 +53,7 @@ export default function VariantTab({
   onRemove,
   onUpdate,
 }: VariantTabProps) {
-  const t = useTranslations("common");
+  const t = useTranslations("base.general");
   const tProductForm = useTranslations("mdl-product.product-create");
 
   return (

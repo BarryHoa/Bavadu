@@ -74,7 +74,7 @@ export interface IBaseDatePickerProps extends Omit<
 const DEFAULT_FORMAT = "DD/MM/YYYY";
 
 export function IBaseDatePicker(props: IBaseDatePickerProps) {
-  const t = useTranslations("components.picker");
+  const t = useTranslations("base.components.picker");
   const {
     value,
     defaultValue,

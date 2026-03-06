@@ -34,7 +34,7 @@ import {
 const DEFAULT_AVATAR = "/favicon/favicon-32x32.png";
 
 export default function Nav() {
-  const t = useTranslations("auth.logoutConfirm");
+  const t = useTranslations("base.pages.auth.logoutConfirm");
   const router = useRouter();
   const authService = useMemo(() => new AuthService(), []);
   const [avatarError, setAvatarError] = useState(false);

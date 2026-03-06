@@ -115,7 +115,7 @@ export default function ViewListDataTable<T = any>(
 
   const columnVisibilitySavingKey = columnVisibility?.savingKey ?? model;
   const getLocalizedText = useLocalizedText();
-  const tDataTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("base.components.dataTable");
   const defaultEmptyContent = <IBaseEmpty description={tDataTable("empty")} />;
   const effectiveEmptyContent =
     dataTableProps.emptyContent !== undefined &&

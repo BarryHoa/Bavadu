@@ -29,7 +29,7 @@ export function TimesheetDetailModal({
   onClose,
 }: TimesheetDetailModalProps): React.ReactNode {
   const t = useTranslations("hrm.timesheets");
-  const tCommon = useTranslations("common");
+  const actionsT = useTranslations("base.general.actions");
   const getLocalizedText = useLocalizedText();
 
   if (!timesheet) return null;
@@ -101,7 +101,7 @@ export function TimesheetDetailModal({
         </IBaseModalBody>
         <IBaseModalFooter>
           <IBaseButton variant="bordered" onPress={onClose}>
-            {tCommon("actions.close")}
+            {actionsT("close")}
           </IBaseButton>
         </IBaseModalFooter>
       </IBaseModalContent>

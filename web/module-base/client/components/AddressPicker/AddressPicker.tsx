@@ -50,8 +50,8 @@ export default function AddressPicker({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const getLocalizedName = useLocalizedText();
   const locale = useLocale();
-  const t = useTranslations("addressPicker");
-  const tCommon = useTranslations("common");
+  const t = useTranslations("base.components.addressPicker");
+  const tCommon = useTranslations("base.general");
   const isChangeAddress =
     !!value?.formattedAddress && value.formattedAddress !== "";
 

@@ -23,9 +23,9 @@ const SEQUENCES_LIST_QUERY_KEY = ["settings", "sequences", "list"] as const;
 const BASE_PATH = "/workspace/settings/sequences";
 
 export default function SequenceCreatePage() {
-  const t = useTranslations("settings.sequences");
-  const actionsT = useTranslations("common.actions");
-  const errorsT = useTranslations("common.errors");
+  const t = useTranslations("base.pages.settings.sequences");
+  const actionsT = useTranslations("base.general.actions");
+  const errorsT = useTranslations("base.general.errors");
   const queryClient = useQueryClient();
   const router = useRouter();
 

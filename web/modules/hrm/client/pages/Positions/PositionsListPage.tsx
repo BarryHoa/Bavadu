@@ -19,7 +19,7 @@ type PositionRow = Position & {
 };
 
 export default function PositionsListPage(): React.ReactNode {
-  const tDataTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("base.components.dataTable");
   const t = useTranslations("hrm.position.list");
   const getLocalizedText = useLocalizedText();
   const { hasPermission: canCreate } = useHasPermissions(["hrm.position.create"]);

@@ -32,7 +32,7 @@ const PickerAddressByCountryVN = ({
   setTempAddress,
 }: PickerAddressByCountryVNProps) => {
   const getLocalizedName = useLocalizedText();
-  const t = useTranslations("addressPicker.vietnam");
+  const t = useTranslations("base.components.addressPicker.vietnam");
   const [selectedProvinceId, setSelectedProvinceId] = useState<string>("");
   const [selectedWardId, setSelectedWardId] = useState<string>("");
 

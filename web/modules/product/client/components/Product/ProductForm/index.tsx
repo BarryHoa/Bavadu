@@ -67,7 +67,7 @@ export default function ProductForm({
   onCancel,
 }: ProductFormProps) {
   const getLocalizedText = useLocalizedText();
-  const t = useTranslations("common");
+  const t = useTranslations("base.general");
   const tProduct = useTranslations("mdl-product");
   const tProductForm = useTranslations("mdl-product.product-create");
 

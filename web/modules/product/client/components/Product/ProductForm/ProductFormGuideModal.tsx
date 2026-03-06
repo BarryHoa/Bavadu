@@ -17,7 +17,7 @@ export default function ProductFormGuideModal({
   isOpen,
   onClose,
 }: ProductFormGuideModalProps) {
-  const t = useTranslations("guidelines");
+  const t = useTranslations("base.guidelines");
   const {
     data: guideContent,
     isLoading,

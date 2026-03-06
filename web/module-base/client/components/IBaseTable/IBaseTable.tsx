@@ -39,7 +39,7 @@ export function IBaseTable<T = any>({
   onRefresh,
   ...rest
 }: IBaseTablePropsType<T>) {
-  const t = useTranslations("dataTable");
+  const t = useTranslations("base.components.dataTable");
 
   const iBaseTableColumns = useMemo(
     () => columns.map((col) => processColumn<T>(col, isResizableColumns)),

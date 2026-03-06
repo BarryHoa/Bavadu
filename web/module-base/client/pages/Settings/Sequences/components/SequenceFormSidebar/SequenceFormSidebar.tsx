@@ -14,8 +14,8 @@ import guidelineService from "@base/client/services/GuidelineService";
 const GUIDELINE_KEY = "sequence-form";
 
 export function SequenceFormSidebar() {
-  const t = useTranslations("settings.sequences.sidebar");
-  const tGuidelines = useTranslations("guidelines");
+  const t = useTranslations("base.pages.settings.sequences.sidebar");
+  const tGuidelines = useTranslations("base.guidelines");
 
   const { data: content, isLoading, error } = useQuery({
     queryKey: ["guideline", GUIDELINE_KEY],

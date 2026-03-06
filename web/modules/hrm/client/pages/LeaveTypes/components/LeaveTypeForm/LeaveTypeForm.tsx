@@ -44,7 +44,7 @@ export default function LeaveTypeForm({
   mode = "create",
 }: LeaveTypeFormProps) {
   const t = useTranslations("hrm.leaveTypes");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("base.general");
 
   // React Compiler will automatically optimize this computation
   const validation = createLeaveTypeValidation(t);

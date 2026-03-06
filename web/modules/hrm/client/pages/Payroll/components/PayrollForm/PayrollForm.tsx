@@ -35,7 +35,7 @@ export default function PayrollForm({
   defaultValues,
 }: PayrollFormProps) {
   const t = useTranslations("hrm.payroll");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("base.general");
 
   // React Compiler will automatically optimize this computation
   const validation = createPayrollValidation(t);

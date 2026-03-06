@@ -19,7 +19,7 @@ type DepartmentRow = Department & {
 };
 
 export default function DepartmentsListPage(): React.ReactNode {
-  const tDataTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("base.components.dataTable");
   const t = useTranslations("hrm.department.list");
   const getLocalizedText = useLocalizedText();
   const { hasPermission: canCreate } = useHasPermissions(["hrm.department.create"]);

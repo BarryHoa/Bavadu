@@ -115,7 +115,7 @@ export default function RolePermissionMatrix({
   adminModules,
   onAdminModulesChange,
 }: RolePermissionMatrixProps) {
-  const t = useTranslations("settings.roles.permissionMatrix");
+  const t = useTranslations("base.pages.settings.roles.permissionMatrix");
   const fieldsetId = useId();
 
   const grouped = useMemo(() => groupPermissions(permissions), [permissions]);

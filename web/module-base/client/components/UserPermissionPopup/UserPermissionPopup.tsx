@@ -35,8 +35,8 @@ export function UserPermissionPopup({
   displayName,
   onSuccess,
 }: UserPermissionPopupProps) {
-  const t = useTranslations("common");
-  const tPerm = useTranslations("userPermission");
+  const t = useTranslations("base.general");
+  const tPerm = useTranslations("base.pages.userPermission");
   const getLocalizedText = useLocalizedText();
   const queryClient = useQueryClient();
   const [selectedRoleIds, setSelectedRoleIds] = useState<Set<string>>(

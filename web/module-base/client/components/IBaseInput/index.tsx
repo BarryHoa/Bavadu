@@ -13,7 +13,7 @@ export type IBaseInputProps = Omit<InputProps, "type"> & {
 };
 export const IBaseInput = React.forwardRef<HTMLInputElement, IBaseInputProps>(
   (props, ref) => {
-    const t = useTranslations("components.input");
+    const t = useTranslations("base.components.input");
     const {
       isDisabled,
       size = "sm",

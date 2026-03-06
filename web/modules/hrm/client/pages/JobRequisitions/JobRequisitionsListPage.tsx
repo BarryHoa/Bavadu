@@ -21,7 +21,7 @@ type JobRequisitionRow = JobRequisitionDto & {
 };
 
 export default function JobRequisitionsListPage(): React.ReactNode {
-  const tDataTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("base.components.dataTable");
   const t = useTranslations("hrm.jobRequisitions");
   const getLocalizedText = useLocalizedText();
   const { hasPermission: canCreate } = useHasPermissions(["hrm.job_requisition.create"]);

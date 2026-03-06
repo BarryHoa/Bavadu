@@ -35,7 +35,7 @@ export default function EmployeeActionMenu({
   onPermissionChange,
 }: EmployeeActionMenuProps) {
   const t = useTranslations("hrm.employee.list");
-  const tPerm = useTranslations("userPermission");
+  const tPerm = useTranslations("base.pages.userPermission");
   const isGlobalAdmin = usePermissionsStore((s) => s.isGlobalAdmin);
   const { hasPermission } = usePermission();
   const [permissionOpen, setPermissionOpen] = useState(false);

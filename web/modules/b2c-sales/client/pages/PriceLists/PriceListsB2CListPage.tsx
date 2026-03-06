@@ -23,7 +23,7 @@ type PriceListB2CRow = PriceListB2CDto & {
 };
 
 export default function PriceListsB2CListPage(): React.ReactNode {
-  const tDataTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("base.components.dataTable");
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<PriceListB2CRow>[] = [

@@ -13,7 +13,7 @@ import {
 } from "@base/client/components";
 
 export default function ResetPasswordPage() {
-  const t = useTranslations("auth.resetPassword");
+  const t = useTranslations("base.pages.auth.resetPassword");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);

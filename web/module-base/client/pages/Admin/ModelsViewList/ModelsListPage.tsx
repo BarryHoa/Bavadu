@@ -25,8 +25,8 @@ import adminModelService, {
 const MODEL_LIST_QUERY_KEY = ["admin", "models", "list"] as const;
 
 export default function ModelsListPage() {
-  const t = useTranslations("admin.models");
-  const actionsT = useTranslations("common.actions");
+  const t = useTranslations("base.pages.admin.models");
+  const actionsT = useTranslations("base.general.actions");
   const queryClient = useQueryClient();
   const [actionError, setActionError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");

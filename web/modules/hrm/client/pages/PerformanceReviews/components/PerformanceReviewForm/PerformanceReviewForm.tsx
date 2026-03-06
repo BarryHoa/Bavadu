@@ -42,7 +42,7 @@ export default function PerformanceReviewForm({
   defaultValues,
 }: PerformanceReviewFormProps) {
   const t = useTranslations("hrm.performanceReviews");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("base.general");
 
   // React Compiler will automatically optimize this computation
   const validation = createPerformanceReviewValidation(t);

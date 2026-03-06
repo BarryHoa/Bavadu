@@ -22,7 +22,7 @@ type CandidateRow = CandidateDto & {
 };
 
 export default function CandidatesListPage(): React.ReactNode {
-  const tDataTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("base.components.dataTable");
   const t = useTranslations("hrm.candidates");
   const getLocalizedText = useLocalizedText();
   const { hasPermission: canCreate } = useHasPermissions(["hrm.candidate.create"]);

@@ -61,7 +61,7 @@ function buildTimes(step: number) {
 }
 
 export function IBaseTimePicker(props: IBaseTimePickerProps) {
-  const t = useTranslations("components.picker");
+  const t = useTranslations("base.components.picker");
   const {
     value,
     defaultValue,

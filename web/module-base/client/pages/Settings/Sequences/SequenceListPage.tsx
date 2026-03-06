@@ -36,9 +36,9 @@ type SequenceRow = SequenceRule & {
 };
 
 export default function SequenceListPage() {
-  const tIBaseTable = useTranslations("dataTable");
-  const t = useTranslations("settings.sequences");
-  const actionsT = useTranslations("common.actions");
+  const tIBaseTable = useTranslations("base.components.dataTable");
+  const t = useTranslations("base.pages.settings.sequences");
+  const actionsT = useTranslations("base.general.actions");
   const queryClient = useQueryClient();
   const [deleteConfirm, setDeleteConfirm] = useState<SequenceRule | null>(null);
   const [toggleConfirmRow, setToggleConfirmRow] = useState<SequenceRule | null>(null);

@@ -22,7 +22,7 @@ type PurchaseOrderRow = PurchaseOrder & {
 
 export default function PurchaseOrdersListPage(): React.ReactNode {
   const t = useTranslations("purchase.orders.list");
-  const tDataTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("base.components.dataTable");
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<PurchaseOrderRow>[] = [

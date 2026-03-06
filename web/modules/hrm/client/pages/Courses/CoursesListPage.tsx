@@ -20,7 +20,7 @@ type CourseRow = CourseDto & {
 };
 
 export default function CoursesListPage(): React.ReactNode {
-  const tDataTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("base.components.dataTable");
   const t = useTranslations("hrm.courses");
   const getLocalizedText = useLocalizedText();
   const { hasPermission: canCreate } = useHasPermissions(["hrm.course.create"]);

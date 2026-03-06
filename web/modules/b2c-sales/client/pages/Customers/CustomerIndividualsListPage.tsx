@@ -21,7 +21,7 @@ type CustomerIndividualRow = CustomerIndividual & {
 };
 
 export default function CustomerIndividualsListPage(): React.ReactNode {
-  const tDataTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("base.components.dataTable");
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<CustomerIndividualRow>[] = [

@@ -43,7 +43,7 @@ export default function CandidateForm({
   defaultValues,
 }: CandidateFormProps) {
   const t = useTranslations("hrm.candidates");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("base.general");
 
   // React Compiler will automatically optimize this computation
   const validation = createCandidateValidation(t);

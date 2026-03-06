@@ -21,7 +21,7 @@ import { ProductCategoryRow } from "../../interface/ProductCategory";
 
 const ProductCategoryListPage = (): React.ReactNode => {
   const localized = useLocalizedText();
-  const t = useTranslations("dataTable");
+  const t = useTranslations("base.components.dataTable");
 
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<ProductCategoryRow>[] = [

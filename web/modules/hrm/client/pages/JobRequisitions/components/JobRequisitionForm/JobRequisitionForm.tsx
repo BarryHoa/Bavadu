@@ -44,7 +44,7 @@ export default function JobRequisitionForm({
   defaultValues,
 }: JobRequisitionFormProps) {
   const t = useTranslations("hrm.jobRequisitions");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("base.general");
 
   // React Compiler will automatically optimize this computation
   const validation = createJobRequisitionValidation(t);

@@ -21,7 +21,7 @@ type CertificateRow = CertificateDto & {
 };
 
 export default function CertificatesListPage(): React.ReactNode {
-  const tDataTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("base.components.dataTable");
   const t = useTranslations("hrm.certificates");
   const getLocalizedText = useLocalizedText();
   const { hasPermission: canCreate } = useHasPermissions(["hrm.certificate.create"]);

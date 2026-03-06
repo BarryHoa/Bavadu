@@ -43,7 +43,7 @@ export const IBaseInputPhone = React.forwardRef<
   HTMLInputElement,
   IBaseInputPhoneProps
 >(function IBaseInputPhone(props, ref) {
-  const t = useTranslations("components.input");
+  const t = useTranslations("base.components.input");
   const {
     value: controlledValue,
     defaultValue = "",

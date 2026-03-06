@@ -21,7 +21,7 @@ type PerformanceReviewRow = PerformanceReviewDto & {
 };
 
 export default function PerformanceReviewsListPage(): React.ReactNode {
-  const tDataTable = useTranslations("dataTable");
+  const tDataTable = useTranslations("base.components.dataTable");
   const t = useTranslations("hrm.performanceReviews");
   const getLocalizedText = useLocalizedText();
   const { hasPermission: canCreate } = useHasPermissions(["hrm.performance_review.create"]);

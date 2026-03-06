@@ -1,444 +1,484 @@
 {
-  "common": {
-    "settings": "Cài đặt",
-    "background": "Hình nền",
-    "transparency": "Độ trong suốt",
-    "name": "Tên",
-    "code": "Mã",
-    "description": "Mô tả",
-    "type": "Loại",
-    "active": "Hoạt động",
-    "master": "Master",
-    "variant": "Biến thể",
-    "another": "một cái khác",
-    "required": "Bắt buộc",
-    "optional": "Tùy chọn",
-    "brand": "Thương hiệu",
-    "category": "Danh mục",
-    "sku": "SKU",
-    "barcode": "Mã vạch",
-    "value": "Giá trị",
-    "guide": "Hướng dẫn",
-    "help": "Trợ giúp",
-    "information": "Thông tin",
-    "errors": {
-      "required": "Trường này là bắt buộc",
-      "minLength": "Tối thiểu {count} ký tự",
-      "maxLength": "Tối đa {count} ký tự",
-      "invalid": "Giá trị không hợp lệ",
-      "barcodeRequired": "Mã vạch là bắt buộc",
-      "skuRequired": "SKU là bắt buộc"
-    },
-    "actions": {
-      "save": "Lưu",
-      "cancel": "Hủy",
-      "confirm": "Xác nhận",
-      "apply": "Áp dụng",
-      "preview": "Xem trước",
-      "add": "Thêm",
-      "remove": "Xóa",
-      "delete": "Xóa",
-      "edit": "Sửa",
-      "view": "Xem",
-      "copy": "Sao chép vào clipboard",
-      "saveChanges": "Lưu thay đổi",
-      "close": "Đóng",
-      "regenerate": "Tạo lại",
-      "reload": "Tải lại",
-      "refresh": "Làm mới",
-      "search": "Tìm kiếm",
-      "action": "Thao tác"
-    },
-    "modal": {
-      "buttons": {
-        "close": "Đóng",
-        "save": "Lưu",
-        "cancel": "Hủy",
-        "apply": "Áp dụng"
-      }
-    }
-  },
-  "dataTable": {
-    "ariaLabel": "Bảng dữ liệu",
-    "empty": "Không có dữ liệu",
-    "loading": "Đang tải...",
-    "refresh": "Làm mới dữ liệu",
-    "summary": "Hiển thị {from} đến {to} trong tổng {total} mục",
-    "columns": {
-      "action": "Thao tác"
-    }
-  },
-  "admin": {
-    "models": {
-      "filters": {
-        "searchPlaceholder": "Tìm kiếm theo mã mô hình, module hoặc đường dẫn...",
-        "refresh": "Làm mới"
-      },
-      "table": {
-        "columns": {
-          "key": "Mô hình",
-          "module": "Module",
-          "path": "Đường dẫn",
-          "action": "Thao tác"
-        },
-        "empty": {
-          "search": "Không có mô hình nào khớp với tìm kiếm hiện tại.",
-          "default": "Chưa có mô hình nào."
-        }
-      },
-      "toast": {
-        "reloadSuccess": "Tải lại mô hình {key} thành công.",
-        "reloadError": "Không thể tải lại mô hình {key}.",
-        "loadError": "Không thể tải danh sách mô hình."
-      }
-    }
-  },
-  "addressPicker": {
-    "tooltip": {
-      "change": "Thay đổi địa chỉ",
-      "select": "Chọn địa chỉ"
-    },
-    "modal": {
-      "title": "Chọn địa chỉ",
-      "country": {
-        "label": "Quốc gia",
-        "placeholder": "Chọn quốc gia"
-      },
-      "postalCode": {
-        "label": "Mã bưu điện",
-        "placeholder": "Nhập mã bưu điện"
-      }
-    },
-    "vietnam": {
-      "province": {
-        "label": "Tỉnh/Thành phố",
-        "placeholder": "Chọn tỉnh hoặc thành phố"
-      },
-      "ward": {
-        "label": "Phường/Xã/Thị trấn",
-        "placeholder": "Chọn phường, xã hoặc thị trấn (trực thuộc tỉnh/TP)"
-      },
-      "street": {
-        "label": "Địa chỉ đường",
-        "placeholder": "Số nhà, tên đường"
-      }
-    }
-  },
-  "guidelines": {
-    "title": "Thông tin cần biết",
-    "loading": "Đang tải nội dung hướng dẫn...",
-    "error": "Không thể tải nội dung hướng dẫn. Vui lòng thử lại sau.",
-    "notFound": "Không tìm thấy nội dung hướng dẫn."
-  },
-  "components": {
-    "input": {
-      "placeholder": "Nhập thông tin...",
-      "numberPlaceholder": "Nhập số...",
-      "searchPlaceholder": "Tìm kiếm...",
-      "emailPlaceholder": "Nhập email...",
-      "phonePlaceholder": "Nhập số điện thoại...",
-      "passwordPlaceholder": "Nhập mật khẩu...",
-      "showPassword": "Hiện mật khẩu",
-      "hidePassword": "Ẩn mật khẩu"
-    },
-    "textarea": {
-      "placeholder": "Nhập thông tin..."
-    },
-    "translate": {
-      "title": "Dịch",
-      "english": "Tiếng Anh",
-      "vietnamese": "Tiếng Việt",
-      "copyToAll": "Sao chép sang tất cả ngôn ngữ"
-    },
-    "selectAsync": {
-      "searchLabel": "Tìm kiếm",
-      "error": "Không thể tải danh sách lựa chọn",
+  "base": {
+    "general": {
+      "settings": "Cài đặt",
+      "background": "Hình nền",
+      "transparency": "Độ trong suốt",
+      "name": "Tên",
+      "code": "Mã",
+      "description": "Mô tả",
+      "type": "Loại",
+      "active": "Hoạt động",
+      "inactive": "Không hoạt động",
+      "master": "Master",
+      "variant": "Biến thể",
+      "another": "một cái khác",
+      "required": "Bắt buộc",
+      "optional": "Tùy chọn",
+      "brand": "Thương hiệu",
+      "category": "Danh mục",
+      "sku": "SKU",
+      "barcode": "Mã vạch",
+      "value": "Giá trị",
+      "guide": "Hướng dẫn",
+      "help": "Trợ giúp",
+      "information": "Thông tin",
       "loading": "Đang tải...",
-      "noResults": "Không tìm thấy dữ liệu",
-      "loadingMore": "Đang tải thêm..."
-    },
-    "uploadImage": {
-      "tooManyFiles": "Quá nhiều file",
-      "tooManyFilesDescription": "Bạn chỉ có thể tải lên thêm {count} file",
-      "invalidFile": "File không hợp lệ",
-      "uploadFailed": "Tải lên thất bại",
-      "uploadFailedDescription": "Không thể tải lên hình ảnh. Vui lòng thử lại.",
-      "clickOrDrag": "Nhấp hoặc kéo hình ảnh vào đây để tải lên",
-      "maxReached": "Đã đạt tối đa {count} hình ảnh",
-      "accepted": "Chấp nhận: {types}",
-      "maxSize": "(Tối đa {size}MB mỗi file)",
-      "uploading": "Đang tải lên...",
-      "uploadImages": "Tải lên hình ảnh",
-      "removeImage": "Xóa hình ảnh"
-    },
-    "picker": {
-      "date": {
-        "placeholder": "Nhập ngày ({format})",
-        "placeholderDateTime": "Nhập ngày giờ ({format})",
-        "clearAriaLabel": "Xóa ngày",
-        "quickToday": "Hôm nay",
-        "weekdays": {
-          "MON": "Thứ hai",
-          "TUE": "Thứ ba",
-          "WED": "Thứ tư",
-          "THU": "Thứ năm",
-          "FRI": "Thứ sáu",
-          "SAT": "Thứ bảy",
-          "SUN": "Chủ nhật"
-        },
-        "shortWeekdays": {
-          "MON": "T2",
-          "TUE": "T3",
-          "WED": "T4",
-          "THU": "T5",
-          "FRI": "T6",
-          "SAT": "T7",
-          "SUN": "CN"
-        }
-      },
-      "time": {
-        "placeholder": "Nhập giờ ({format})",
-        "clearAriaLabel": "Xóa giờ",
-        "now": "Bây giờ"
-      },
-      "range": {
-        "startPlaceholder": "Từ ngày ({format})",
-        "endPlaceholder": "Đến ngày ({format})",
-        "startPlaceholderDateTime": "Từ ngày giờ ({format})",
-        "endPlaceholderDateTime": "Đến ngày giờ ({format})",
-        "clearStartAriaLabel": "Xóa ngày bắt đầu",
-        "clearEndAriaLabel": "Xóa ngày kết thúc"
-      },
-      "month": {
-        "placeholder": "Nhập tháng ({format})",
-        "thisMonth": "Tháng này"
-      },
-      "year": {
-        "placeholder": "Nhập năm ({format})",
-        "thisYear": "Năm nay"
-      },
-      "presets": {
-        "today": "Hôm nay",
-        "thisWeek": "Tuần này",
-        "lastWeek": "Tuần trước",
-        "thisMonth": "Tháng này",
-        "lastMonth": "Tháng trước",
-        "last3Months": "3 tháng gần nhất",
-        "last6Months": "6 tháng gần nhất",
-        "thisYear": "Năm nay",
-        "lastYear": "Năm trước",
-        "last2Years": "2 năm gần nhất",
-        "last3Years": "3 năm gần nhất",
-        "last5Years": "5 năm gần nhất"
-      }
-    }
-  },
-  "settings": {
-    "roles": {
-      "loading": "Đang tải role...",
-      "notFound": "Không tìm thấy role",
-      "cannotEditSystemRole": "Không thể chỉnh sửa role hệ thống",
-      "create": {
-        "title": "Tạo Role Mới"
-      },
-      "edit": {
-        "title": "Chỉnh Sửa Role"
+      "errors": {
+        "required": "Trường này là bắt buộc",
+        "minLength": "Tối thiểu {count} ký tự",
+        "maxLength": "Tối đa {count} ký tự",
+        "invalid": "Giá trị không hợp lệ",
+        "barcodeRequired": "Mã vạch là bắt buộc",
+        "skuRequired": "SKU là bắt buộc",
+        "dataNotFound": "Không tìm thấy dữ liệu"
       },
       "actions": {
-        "addRole": "Thêm Role"
+        "save": "Lưu",
+        "cancel": "Hủy",
+        "confirm": "Xác nhận",
+        "apply": "Áp dụng",
+        "preview": "Xem trước",
+        "add": "Thêm",
+        "remove": "Xóa",
+        "delete": "Xóa",
+        "edit": "Sửa",
+        "view": "Xem",
+        "copy": "Sao chép vào clipboard",
+        "saveChanges": "Lưu thay đổi",
+        "close": "Đóng",
+        "regenerate": "Tạo lại",
+        "reload": "Tải lại",
+        "refresh": "Làm mới",
+        "search": "Tìm kiếm",
+        "action": "Thao tác"
       },
-      "filters": {
-        "searchPlaceholder": "Tìm kiếm role theo mã..."
-      },
-      "table": {
-        "columns": {
-          "code": "Mã",
-          "name": "Tên",
-          "description": "Mô tả",
-          "type": "Loại",
-          "status": "Trạng thái",
-          "systemRole": "Hệ thống",
-          "customRole": "Tùy chỉnh",
-          "active": "Hoạt động",
-          "inactive": "Không hoạt động"
-        },
-        "empty": {
-          "search": "Không có role nào khớp với tìm kiếm hiện tại.",
-          "default": "Chưa có role nào."
+      "modal": {
+        "buttons": {
+          "close": "Đóng",
+          "save": "Lưu",
+          "cancel": "Hủy",
+          "apply": "Áp dụng"
         }
-      },
-      "permissionMatrix": {
-        "legend": "Quyền của role",
-        "description": "Chọn các quyền mà role này được phép sử dụng. Quyền được nhóm theo module và resource. Dùng Admin module để cấp toàn quyền và khóa chỉnh chi tiết.",
-        "loading": "Đang tải danh sách quyền...",
-        "noPermissions": "Chưa có quyền nào.",
-        "selectAll": "Chọn tất cả",
-        "deselectAll": "Bỏ chọn tất cả",
-        "selectModule": "Chọn tất cả trong module",
-        "deselectModule": "Bỏ chọn tất cả trong module",
-        "selectAllInModule": "Chọn hoặc bỏ chọn tất cả quyền trong module này",
-        "all": "Tất cả",
-        "resource": "Resource",
-        "adminModule": "Admin module",
-        "action": {
-          "view": "Xem",
-          "create": "Tạo",
-          "update": "Sửa",
-          "delete": "Xóa",
-          "print": "In",
-          "export": "Xuất",
-          "import": "Nhập",
-          "approve": "Duyệt"
-        }
-      },
-      "form": {
-        "code": "Mã",
-        "name": "Tên",
-        "description": "Mô tả",
-        "type": "Loại",
-        "status": "Trạng thái",
-        "defaultPermissions": "Quyền Mặc Định",
-        "codeDescription": "Mã role (chỉ chữ thường, số và dấu gạch dưới)",
-        "codeInvalid": "Mã chỉ được chứa chữ thường, số và dấu gạch dưới",
-        "descriptionDescription": "Mô tả tùy chọn cho role này",
-        "permissionsDescription": "Chọn quyền mặc định cho role này",
-        "selectPermissions": "Chọn quyền...",
-        "systemRole": "Role Hệ Thống",
-        "customRole": "Role Tùy Chỉnh",
-        "active": "Hoạt động",
-        "inactive": "Không hoạt động",
-        "noPermissions": "Chưa có quyền nào được gán"
-      },
-      "detail": {
-        "title": "Chi tiết role",
-        "permissionsTitle": "Danh sách quyền"
-      },
-      "deleteConfirm": {
-        "title": "Xóa Role",
-        "message": "Những user đã gắng role này sẽ được xóa role"
-      },
-      "toast": {
-        "createSuccess": "Tạo role thành công",
-        "createError": "Không thể tạo role",
-        "updateSuccess": "Cập nhật role thành công",
-        "updateError": "Không thể cập nhật role",
-        "deleteSuccess": "Xóa role thành công",
-        "deleteError": "Không thể xóa role",
-        "loadError": "Không thể tải danh sách role"
       }
     },
-    "sequences": {
-      "listTitle": "Sequence Rules",
-      "loading": "Đang tải sequence...",
-      "notFound": "Không tìm thấy rule",
-      "sidebar": {
-        "guidelines": "Hướng dẫn"
-      },
-      "create": { "title": "Tạo Rule Sequence" },
-      "edit": { "title": "Sửa Rule Sequence" },
-      "actions": { "addSequence": "Thêm Rule" },
-      "table": {
-        "copyCode": "Sao chép mã",
+    "components": {
+      "dataTable": {
+        "ariaLabel": "Bảng dữ liệu",
+        "empty": "Không có dữ liệu",
+        "loading": "Đang tải...",
+        "refresh": "Làm mới dữ liệu",
+        "summary": "Hiển thị {from} đến {to} trong tổng {total} mục",
         "columns": {
-          "code": "Mã (code)",
-          "name": "Tên hiển thị",
-          "prefix": "Prefix",
-          "suffix": "Suffix",
-          "format": "Format",
-          "start": "Start",
-          "step": "Step",
-          "currentValue": "Giá trị hiện tại",
-          "countCount": "Counts",
-          "status": "Trạng thái",
-          "setActive": "Kích hoạt",
-          "setInactive": "Vô hiệu hóa"
-        },
-        "empty": {
-          "search": "Không tìm thấy rule nào phù hợp.",
-          "default": "Chưa có rule nào."
+          "number": "STT",
+          "action": "Thao tác"
         }
       },
-      "form": {
-        "code": "Mã (code)",
-        "codeDescription": "Mã unique dùng cho getNext(code), VD: employee.code",
-        "name": "Tên hiển thị",
-        "nameDescription": "Tên mô tả (tùy chọn)",
-        "prefix": "Prefix",
-        "prefixDescription": "VD: ROLE, ORD",
-        "suffix": "Suffix",
-        "suffixDescription": "Chuỗi thêm vào sau phần số",
-        "description": "Mô tả",
-        "descriptionPlaceholder": "Mô tả rule (tùy chọn)",
-        "format": "Format",
-        "formatDescription": "VD: %06d",
-        "start": "Start",
-        "step": "Step",
-        "status": "Trạng thái",
-        "active": "Active",
-        "inactive": "Inactive",
-        "cannotEditHasCount": "Đã có ít nhất một Sequence count. Chỉ được thay đổi: Tên hiển thị, Mô tả, Trạng thái. Không được sửa: Mã (code), Prefix, Suffix, Format, Start, Step.",
-        "lockedFieldsSection": "Thông tin cố định (không thể sửa)"
+      "addressPicker": {
+        "tooltip": {
+          "change": "Thay đổi địa chỉ",
+          "select": "Chọn địa chỉ"
+        },
+        "modal": {
+          "title": "Chọn địa chỉ",
+          "country": {
+            "label": "Quốc gia",
+            "placeholder": "Chọn quốc gia"
+          },
+          "postalCode": {
+            "label": "Mã bưu điện",
+            "placeholder": "Nhập mã bưu điện"
+          }
+        },
+        "vietnam": {
+          "province": {
+            "label": "Tỉnh/Thành phố",
+            "placeholder": "Chọn tỉnh hoặc thành phố"
+          },
+          "ward": {
+            "label": "Phường/Xã/Thị trấn",
+            "placeholder": "Chọn phường, xã hoặc thị trấn (trực thuộc tỉnh/TP)"
+          },
+          "street": {
+            "label": "Địa chỉ đường",
+            "placeholder": "Số nhà, tên đường"
+          }
+        }
       },
-      "deleteConfirm": {
-        "title": "Xóa Rule",
-        "message": "Bạn có chắc muốn xóa rule này?"
+      "input": {
+        "placeholder": "Nhập thông tin...",
+        "numberPlaceholder": "Nhập số...",
+        "searchPlaceholder": "Tìm kiếm...",
+        "emailPlaceholder": "Nhập email...",
+        "phonePlaceholder": "Nhập số điện thoại...",
+        "passwordPlaceholder": "Nhập mật khẩu...",
+        "showPassword": "Hiện mật khẩu",
+        "hidePassword": "Ẩn mật khẩu"
       },
-      "toggleStatusConfirm": {
-        "title": "Thay đổi trạng thái",
-        "message": "Bạn có muốn thay đổi trạng thái (Active/Inactive) của rule này?"
+      "textarea": {
+        "placeholder": "Nhập thông tin..."
       },
-      "toast": {
-        "createSuccess": "Tạo rule thành công",
-        "createError": "Không thể tạo rule",
-        "updateSuccess": "Cập nhật thành công",
-        "updateError": "Không thể cập nhật",
-        "deleteSuccess": "Xóa thành công",
-        "deleteError": "Không thể xóa",
-        "copied": "Đã sao chép",
-        "copyFailed": "Sao chép thất bại"
+      "translate": {
+        "title": "Dịch",
+        "english": "Tiếng Anh",
+        "vietnamese": "Tiếng Việt",
+        "copyToAll": "Sao chép sang tất cả ngôn ngữ"
+      },
+      "selectAsync": {
+        "searchLabel": "Tìm kiếm",
+        "error": "Không thể tải danh sách lựa chọn",
+        "loading": "Đang tải...",
+        "noResults": "Không tìm thấy dữ liệu",
+        "loadingMore": "Đang tải thêm..."
+      },
+      "uploadImage": {
+        "tooManyFiles": "Quá nhiều file",
+        "tooManyFilesDescription": "Bạn chỉ có thể tải lên thêm {count} file",
+        "invalidFile": "File không hợp lệ",
+        "uploadFailed": "Tải lên thất bại",
+        "uploadFailedDescription": "Không thể tải lên hình ảnh. Vui lòng thử lại.",
+        "clickOrDrag": "Nhấp hoặc kéo hình ảnh vào đây để tải lên",
+        "maxReached": "Đã đạt tối đa {count} hình ảnh",
+        "accepted": "Chấp nhận: {types}",
+        "maxSize": "(Tối đa {size}MB mỗi file)",
+        "uploading": "Đang tải lên...",
+        "uploadImages": "Tải lên hình ảnh",
+        "removeImage": "Xóa hình ảnh"
+      },
+      "picker": {
+        "date": {
+          "placeholder": "Nhập ngày ({format})",
+          "placeholderDateTime": "Nhập ngày giờ ({format})",
+          "clearAriaLabel": "Xóa ngày",
+          "quickToday": "Hôm nay",
+          "weekdays": {
+            "MON": "Thứ hai",
+            "TUE": "Thứ ba",
+            "WED": "Thứ tư",
+            "THU": "Thứ năm",
+            "FRI": "Thứ sáu",
+            "SAT": "Thứ bảy",
+            "SUN": "Chủ nhật"
+          },
+          "shortWeekdays": {
+            "MON": "T2",
+            "TUE": "T3",
+            "WED": "T4",
+            "THU": "T5",
+            "FRI": "T6",
+            "SAT": "T7",
+            "SUN": "CN"
+          }
+        },
+        "time": {
+          "placeholder": "Nhập giờ ({format})",
+          "clearAriaLabel": "Xóa giờ",
+          "now": "Bây giờ"
+        },
+        "range": {
+          "startPlaceholder": "Từ ngày ({format})",
+          "endPlaceholder": "Đến ngày ({format})",
+          "startPlaceholderDateTime": "Từ ngày giờ ({format})",
+          "endPlaceholderDateTime": "Đến ngày giờ ({format})",
+          "clearStartAriaLabel": "Xóa ngày bắt đầu",
+          "clearEndAriaLabel": "Xóa ngày kết thúc"
+        },
+        "month": {
+          "placeholder": "Nhập tháng ({format})",
+          "thisMonth": "Tháng này"
+        },
+        "year": {
+          "placeholder": "Nhập năm ({format})",
+          "thisYear": "Năm nay"
+        },
+        "presets": {
+          "today": "Hôm nay",
+          "thisWeek": "Tuần này",
+          "lastWeek": "Tuần trước",
+          "thisMonth": "Tháng này",
+          "lastMonth": "Tháng trước",
+          "last3Months": "3 tháng gần nhất",
+          "last6Months": "6 tháng gần nhất",
+          "thisYear": "Năm nay",
+          "lastYear": "Năm trước",
+          "last2Years": "2 năm gần nhất",
+          "last3Years": "3 năm gần nhất",
+          "last5Years": "5 năm gần nhất"
+        }
+      },
+      "dateRangePicker": {
+        "range": {
+          "startLabel": "Từ ngày",
+          "endLabel": "Đến ngày",
+          "startPlaceholder": "Từ ngày ({format})",
+          "endPlaceholder": "Đến ngày ({format})",
+          "clearStartAriaLabel": "Xóa ngày bắt đầu",
+          "clearEndAriaLabel": "Xóa ngày kết thúc",
+          "calendarAriaLabel": "Chọn khoảng ngày",
+          "selectedLabel": "Khoảng đã chọn"
+        },
+        "presets": {
+          "title": "Nhanh",
+          "today": "Hôm nay",
+          "thisWeek": "Tuần này",
+          "lastWeek": "Tuần trước",
+          "thisMonth": "Tháng này",
+          "lastMonth": "Tháng trước",
+          "last3Months": "3 tháng gần nhất",
+          "last6Months": "6 tháng gần nhất",
+          "thisYear": "Năm nay",
+          "lastYear": "Năm trước",
+          "last2Years": "2 năm gần nhất",
+          "last3Years": "3 năm gần nhất",
+          "last5Years": "5 năm gần nhất"
+        },
+        "actions": {
+          "clear": "Xóa",
+          "close": "Đóng"
+        }
       }
-    }
-  },
-  "userPermission": {
-    "title": "Vai trò & quyền",
-    "titleForUser": "Vai trò & quyền: {name}",
-    "noRoles": "Chưa có vai trò nào",
-    "saved": "Đã lưu quyền",
-    "saveFailed": "Lưu quyền thất bại"
-  },
-  "auth": {
-    "login": {
-      "title": "Đăng nhập vào tài khoản",
-      "subtitle": "Nhập thông tin đăng nhập để truy cập tài khoản",
-      "username": "Tên đăng nhập",
-      "usernamePlaceholder": "Nhập tên đăng nhập",
-      "password": "Mật khẩu",
-      "passwordPlaceholder": "Nhập mật khẩu",
-      "rememberMe": "Ghi nhớ đăng nhập",
-      "forgotPassword": "Quên mật khẩu?",
-      "submit": "Đăng nhập",
-      "errorGeneric": "Đã xảy ra lỗi. Vui lòng thử lại.",
-      "logoAlt": "Logo BAVADU",
-      "showPassword": "Hiện mật khẩu",
-      "hidePassword": "Ẩn mật khẩu"
     },
-    "resetPassword": {
-      "title": "Đặt lại mật khẩu",
-      "subtitle": "Nhập email của bạn, chúng tôi sẽ gửi link đặt lại mật khẩu",
-      "checkEmailTitle": "Kiểm tra email",
-      "checkEmailMessage": "Chúng tôi đã gửi link đặt lại mật khẩu đến email của bạn",
-      "checkEmailDetail": "Nếu có tài khoản với email {email}, bạn sẽ nhận được link đặt lại mật khẩu trong thời gian sớm nhất.",
-      "email": "Email",
-      "emailPlaceholder": "Nhập email",
-      "sendLink": "Gửi link đặt lại",
-      "backToLogin": "Quay lại đăng nhập",
-      "errorGeneric": "Đã xảy ra lỗi. Vui lòng thử lại."
+    "pages": {
+      "admin": {
+        "models": {
+          "filters": {
+            "searchPlaceholder": "Tìm kiếm theo mã mô hình, module hoặc đường dẫn...",
+            "refresh": "Làm mới"
+          },
+          "table": {
+            "columns": {
+              "key": "Mô hình",
+              "module": "Module",
+              "path": "Đường dẫn",
+              "action": "Thao tác"
+            },
+            "empty": {
+              "search": "Không có mô hình nào khớp với tìm kiếm hiện tại.",
+              "default": "Chưa có mô hình nào."
+            }
+          },
+          "toast": {
+            "reloadSuccess": "Tải lại mô hình {key} thành công.",
+            "reloadError": "Không thể tải lại mô hình {key}.",
+            "loadError": "Không thể tải danh sách mô hình."
+          }
+        }
+      },
+      "settings": {
+        "roles": {
+          "listTitle": "Vai trò và quyền",
+          "loading": "Đang tải role...",
+          "notFound": "Không tìm thấy role",
+          "cannotEditSystemRole": "Không thể chỉnh sửa role hệ thống",
+          "create": {
+            "title": "Tạo Role Mới"
+          },
+          "edit": {
+            "title": "Chỉnh Sửa Role"
+          },
+          "actions": {
+            "addRole": "Thêm Role"
+          },
+          "filters": {
+            "searchPlaceholder": "Tìm kiếm role theo mã..."
+          },
+          "table": {
+            "columns": {
+              "code": "Mã",
+              "name": "Tên",
+              "description": "Mô tả",
+              "type": "Loại",
+              "status": "Trạng thái",
+              "systemRole": "Hệ thống",
+              "customRole": "Tùy chỉnh",
+              "active": "Hoạt động",
+              "inactive": "Không hoạt động"
+            },
+            "empty": {
+              "search": "Không có role nào khớp với tìm kiếm hiện tại.",
+              "default": "Chưa có role nào."
+            }
+          },
+          "permissionMatrix": {
+            "legend": "Quyền của role",
+            "description": "Chọn các quyền mà role này được phép sử dụng. Quyền được nhóm theo module và resource. Dùng Admin module để cấp toàn quyền và khóa chỉnh chi tiết.",
+            "loading": "Đang tải danh sách quyền...",
+            "noPermissions": "Chưa có quyền nào.",
+            "selectAll": "Chọn tất cả",
+            "deselectAll": "Bỏ chọn tất cả",
+            "selectModule": "Chọn tất cả trong module",
+            "deselectModule": "Bỏ chọn tất cả trong module",
+            "selectAllInModule": "Chọn hoặc bỏ chọn tất cả quyền trong module này",
+            "all": "Tất cả",
+            "resource": "Resource",
+            "adminModule": "Admin module",
+            "action": {
+              "view": "Xem",
+              "create": "Tạo",
+              "update": "Sửa",
+              "delete": "Xóa",
+              "print": "In",
+              "export": "Xuất",
+              "import": "Nhập",
+              "approve": "Duyệt"
+            }
+          },
+          "form": {
+            "code": "Mã",
+            "name": "Tên",
+            "description": "Mô tả",
+            "type": "Loại",
+            "status": "Trạng thái",
+            "defaultPermissions": "Quyền Mặc Định",
+            "codeDescription": "Mã role (chỉ chữ thường, số và dấu gạch dưới)",
+            "codeInvalid": "Mã chỉ được chứa chữ thường, số và dấu gạch dưới",
+            "descriptionDescription": "Mô tả tùy chọn cho role này",
+            "permissionsDescription": "Chọn quyền mặc định cho role này",
+            "selectPermissions": "Chọn quyền...",
+            "systemRole": "Role Hệ Thống",
+            "customRole": "Role Tùy Chỉnh",
+            "active": "Hoạt động",
+            "inactive": "Không hoạt động",
+            "noPermissions": "Chưa có quyền nào được gán"
+          },
+          "detail": {
+            "title": "Chi tiết role",
+            "permissionsTitle": "Danh sách quyền"
+          },
+          "deleteConfirm": {
+            "title": "Xóa Role",
+            "message": "Những user đã gắng role này sẽ được xóa role"
+          },
+          "toast": {
+            "createSuccess": "Tạo role thành công",
+            "createError": "Không thể tạo role",
+            "updateSuccess": "Cập nhật role thành công",
+            "updateError": "Không thể cập nhật role",
+            "deleteSuccess": "Xóa role thành công",
+            "deleteError": "Không thể xóa role",
+            "loadError": "Không thể tải danh sách role"
+          }
+        },
+        "sequences": {
+          "listTitle": "Sequence Rules",
+          "loading": "Đang tải sequence...",
+          "notFound": "Không tìm thấy rule",
+          "sidebar": {
+            "guidelines": "Hướng dẫn"
+          },
+          "create": { "title": "Tạo Rule Sequence" },
+          "edit": { "title": "Sửa Rule Sequence" },
+          "actions": { "addSequence": "Thêm Rule" },
+          "table": {
+            "copyCode": "Sao chép mã",
+            "columns": {
+              "code": "Mã (code)",
+              "name": "Tên hiển thị",
+              "prefix": "Prefix",
+              "suffix": "Suffix",
+              "format": "Format",
+              "start": "Start",
+              "step": "Step",
+              "currentValue": "Giá trị hiện tại",
+              "countCount": "Counts",
+              "status": "Trạng thái",
+              "setActive": "Kích hoạt",
+              "setInactive": "Vô hiệu hóa"
+            },
+            "empty": {
+              "search": "Không tìm thấy rule nào phù hợp.",
+              "default": "Chưa có rule nào."
+            }
+          },
+          "form": {
+            "code": "Mã (code)",
+            "codeDescription": "Mã unique dùng cho getNext(code), VD: employee.code",
+            "name": "Tên hiển thị",
+            "nameDescription": "Tên mô tả (tùy chọn)",
+            "prefix": "Prefix",
+            "prefixDescription": "VD: ROLE, ORD",
+            "suffix": "Suffix",
+            "suffixDescription": "Chuỗi thêm vào sau phần số",
+            "description": "Mô tả",
+            "descriptionPlaceholder": "Mô tả rule (tùy chọn)",
+            "format": "Format",
+            "formatDescription": "VD: %06d",
+            "start": "Start",
+            "step": "Step",
+            "status": "Trạng thái",
+            "active": "Active",
+            "inactive": "Inactive",
+            "cannotEditHasCount": "Đã có ít nhất một Sequence count. Chỉ được thay đổi: Tên hiển thị, Mô tả, Trạng thái. Không được sửa: Mã (code), Prefix, Suffix, Format, Start, Step.",
+            "lockedFieldsSection": "Thông tin cố định (không thể sửa)"
+          },
+          "deleteConfirm": {
+            "title": "Xóa Rule",
+            "message": "Bạn có chắc muốn xóa rule này?"
+          },
+          "toggleStatusConfirm": {
+            "title": "Thay đổi trạng thái",
+            "message": "Bạn có muốn thay đổi trạng thái (Active/Inactive) của rule này?"
+          },
+          "toast": {
+            "createSuccess": "Tạo rule thành công",
+            "createError": "Không thể tạo rule",
+            "updateSuccess": "Cập nhật thành công",
+            "updateError": "Không thể cập nhật",
+            "deleteSuccess": "Xóa thành công",
+            "deleteError": "Không thể xóa",
+            "copied": "Đã sao chép",
+            "copyFailed": "Sao chép thất bại"
+          }
+        }
+      },
+      "userPermission": {
+        "title": "Vai trò & quyền",
+        "titleForUser": "Vai trò & quyền: {name}",
+        "noRoles": "Chưa có vai trò nào",
+        "saved": "Đã lưu quyền",
+        "saveFailed": "Lưu quyền thất bại"
+      },
+      "auth": {
+        "login": {
+          "title": "Đăng nhập vào tài khoản",
+          "subtitle": "Nhập thông tin đăng nhập để truy cập tài khoản",
+          "username": "Tên đăng nhập",
+          "usernamePlaceholder": "Nhập tên đăng nhập",
+          "password": "Mật khẩu",
+          "passwordPlaceholder": "Nhập mật khẩu",
+          "rememberMe": "Ghi nhớ đăng nhập",
+          "forgotPassword": "Quên mật khẩu?",
+          "submit": "Đăng nhập",
+          "errorGeneric": "Đã xảy ra lỗi. Vui lòng thử lại.",
+          "logoAlt": "Logo BAVADU",
+          "showPassword": "Hiện mật khẩu",
+          "hidePassword": "Ẩn mật khẩu"
+        },
+        "resetPassword": {
+          "title": "Đặt lại mật khẩu",
+          "subtitle": "Nhập email của bạn, chúng tôi sẽ gửi link đặt lại mật khẩu",
+          "checkEmailTitle": "Kiểm tra email",
+          "checkEmailMessage": "Chúng tôi đã gửi link đặt lại mật khẩu đến email của bạn",
+          "checkEmailDetail": "Nếu có tài khoản với email {email}, bạn sẽ nhận được link đặt lại mật khẩu trong thời gian sớm nhất.",
+          "email": "Email",
+          "emailPlaceholder": "Nhập email",
+          "sendLink": "Gửi link đặt lại",
+          "backToLogin": "Quay lại đăng nhập",
+          "errorGeneric": "Đã xảy ra lỗi. Vui lòng thử lại."
+        },
+        "logoutConfirm": {
+          "title": "Xác nhận thoát",
+          "message": "Bạn có chắc muốn thoát? Các tab khác cũng sẽ chuyển về màn hình đăng nhập.",
+          "cancel": "Hủy",
+          "confirm": "Xác nhận"
+        }
+      }
     },
-    "logoutConfirm": {
-      "title": "Xác nhận thoát",
-      "message": "Bạn có chắc muốn thoát? Các tab khác cũng sẽ chuyển về màn hình đăng nhập.",
-      "cancel": "Hủy",
-      "confirm": "Xác nhận"
+    "guidelines": {
+      "title": "Thông tin cần biết",
+      "loading": "Đang tải nội dung hướng dẫn...",
+      "error": "Không thể tải nội dung hướng dẫn. Vui lòng thử lại sau.",
+      "notFound": "Không tìm thấy nội dung hướng dẫn."
     }
   }
 }

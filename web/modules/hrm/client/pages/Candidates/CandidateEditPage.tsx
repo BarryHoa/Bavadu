@@ -20,7 +20,7 @@ export default function CandidateEditPage(): React.ReactNode {
   const params = useParams();
   const id = params.id as string;
   const t = useTranslations("hrm.candidates");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("base.general");
   const getLocalizedText = useLocalizedText();
 
   const {

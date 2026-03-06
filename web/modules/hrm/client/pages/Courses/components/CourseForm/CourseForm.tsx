@@ -37,7 +37,7 @@ export default function CourseForm({
   defaultValues,
 }: CourseFormProps) {
   const t = useTranslations("hrm.courses");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("base.general");
 
   // React Compiler will automatically optimize this computation
   const validation = createCourseValidation(t);

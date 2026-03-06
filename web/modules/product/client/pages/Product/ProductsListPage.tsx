@@ -22,7 +22,7 @@ import { getNameProductType } from "../../utils/getNameProductType";
 
 export default function ProductsListPage(): React.ReactNode {
   const localized = useLocalizedText();
-  const t = useTranslations("dataTable");
+  const t = useTranslations("base.components.dataTable");
   const tProduct = useTranslations("mdl-product");
   // React Compiler will automatically optimize this array creation
   const columns: IBaseTableColumnDefinition<ProductRow>[] = [

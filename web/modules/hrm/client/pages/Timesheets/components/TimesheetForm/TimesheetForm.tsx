@@ -42,7 +42,7 @@ export default function TimesheetForm({
   defaultValues,
 }: TimesheetFormProps) {
   const t = useTranslations("hrm.timesheets");
-  const tCommon = useTranslations("common");
+  const actionsT = useTranslations("base.general.actions");
 
   // React Compiler will automatically optimize this computation
   const validation = createTimesheetValidation(t);
@@ -271,11 +271,11 @@ export default function TimesheetForm({
               size="md"
               type="submit"
             >
-              {tCommon("actions.save")}
+              {actionsT("save")}
             </IBaseButton>
             {onCancel && (
               <IBaseButton size="md" variant="light" onPress={onCancel}>
-                {tCommon("actions.cancel")}
+                {actionsT("cancel")}
               </IBaseButton>
             )}
           </div>

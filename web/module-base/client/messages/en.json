@@ -1,449 +1,484 @@
 {
-  "common": {
-    "settings": "Settings",
-    "background": "Background",
-    "transparency": "Transparency",
-    "name": "Name",
-    "code": "Code",
-    "description": "Description",
-    "type": "Type",
-    "active": "Active",
-    "inactive": "Inactive",
-    "loading": "Loading...",
-    "master": "Master",
-    "variant": "Variant",
-    "another": "another",
-    "required": "Required",
-    "optional": "Optional",
-    "brand": "Brand",
-    "category": "Category",
-    "sku": "SKU",
-    "barcode": "Barcode",
-    "value": "Value",
-    "guide": "Guide",
-    "help": "Help",
-    "information": "Information",
-    "errors": {
-      "required": "This field is required",
-      "minLength": "Minimum {count} characters required",
-      "maxLength": "Maximum {count} characters allowed",
-      "invalid": "Invalid value",
-      "barcodeRequired": "Barcode is required",
-      "skuRequired": "SKU is required",
-      "dataNotFound": "Data not found"
-    },
-    "actions": {
-      "save": "Save",
-      "cancel": "Cancel",
-      "confirm": "Confirm",
-      "apply": "Apply",
-      "preview": "Preview",
-      "add": "Add",
-      "remove": "Remove",
-      "delete": "Delete",
-      "edit": "Edit",
-      "view": "View",
-      "copy": "Copy to clipboard",
-      "saveChanges": "Save changes",
-      "close": "Close",
-      "regenerate": "Regenerate",
-      "reload": "Reload",
-      "refresh": "Refresh",
-      "search": "Search",
-      "action": "Action"
-    },
-    "modal": {
-      "buttons": {
-        "close": "Close",
-        "save": "Save",
-        "cancel": "Cancel",
-        "apply": "Apply"
-      }
-    }
-  },
-  "dataTable": {
-    "ariaLabel": "Data table",
-    "empty": "No data available",
-    "loading": "Loading...",
-    "refresh": "Refresh data",
-    "summary": "Showing {from} to {to} of {total} entries",
-    "columns": {
-      "number": "No.",
-      "action": "Action"
-    }
-  },
-  "admin": {
-    "models": {
-      "filters": {
-        "searchPlaceholder": "Search models by key, module, or path...",
-        "refresh": "Refresh"
-      },
-      "table": {
-        "columns": {
-          "key": "Model",
-          "module": "Module",
-          "path": "Path",
-          "action": "Action"
-        },
-        "empty": {
-          "search": "No models match the current search.",
-          "default": "No models found."
-        }
-      },
-      "toast": {
-        "reloadSuccess": "Reloaded model {key} successfully.",
-        "reloadError": "Failed to reload model {key}.",
-        "loadError": "Failed to load model list."
-      }
-    }
-  },
-  "addressPicker": {
-    "tooltip": {
-      "change": "Change address",
-      "select": "Select address"
-    },
-    "modal": {
-      "title": "Select address",
-      "country": {
-        "label": "Country",
-        "placeholder": "Select country"
-      },
-      "postalCode": {
-        "label": "Postal code",
-        "placeholder": "Enter postal code"
-      }
-    },
-    "vietnam": {
-      "province": {
-        "label": "Province/City",
-        "placeholder": "Select province or city"
-      },
-      "ward": {
-        "label": "Ward/Commune/Township",
-        "placeholder": "Select ward, commune or township (under province/city)"
-      },
-      "street": {
-        "label": "Street address",
-        "placeholder": "House number, street name"
-      }
-    }
-  },
-  "guidelines": {
-    "title": "Information needed",
-    "loading": "Loading guide content...",
-    "error": "Unable to load guide content. Please try again later.",
-    "notFound": "Guide content not found."
-  },
-  "components": {
-    "input": {
-      "placeholder": "Enter information...",
-      "numberPlaceholder": "Enter number...",
-      "searchPlaceholder": "Search...",
-      "emailPlaceholder": "Enter email...",
-      "phonePlaceholder": "Enter phone number...",
-      "passwordPlaceholder": "Enter password...",
-      "showPassword": "Show password",
-      "hidePassword": "Hide password"
-    },
-    "textarea": {
-      "placeholder": "Enter information..."
-    },
-    "translate": {
-      "title": "Translate",
-      "english": "English",
-      "vietnamese": "Vietnamese",
-      "copyToAll": "Copy to all languages"
-    },
-    "selectAsync": {
-      "searchLabel": "Search",
-      "error": "Failed to load options",
+  "base": {
+    "general": {
+      "settings": "Settings",
+      "background": "Background",
+      "transparency": "Transparency",
+      "name": "Name",
+      "code": "Code",
+      "description": "Description",
+      "type": "Type",
+      "active": "Active",
+      "inactive": "Inactive",
       "loading": "Loading...",
-      "noResults": "No results found",
-      "loadingMore": "Loading more..."
-    },
-    "uploadImage": {
-      "tooManyFiles": "Too many files",
-      "tooManyFilesDescription": "You can only upload {count} more file(s)",
-      "invalidFile": "Invalid file",
-      "uploadFailed": "Upload failed",
-      "uploadFailedDescription": "Failed to upload image. Please try again.",
-      "clickOrDrag": "Click or drag images here to upload",
-      "maxReached": "Maximum {count} images reached",
-      "accepted": "Accepted: {types}",
-      "maxSize": "(Max {size}MB per file)",
-      "uploading": "Uploading...",
-      "uploadImages": "Upload images",
-      "removeImage": "Remove image"
-    },
-    "picker": {
-      "date": {
-        "placeholder": "Enter date ({format})",
-        "placeholderDateTime": "Enter date & time ({format})",
-        "clearAriaLabel": "Clear date",
-        "quickToday": "Today",
-        "weekdays": {
-          "MON": "Monday",
-          "TUE": "Tuesday",
-          "WED": "Wednesday",
-          "THU": "Thursday",
-          "FRI": "Friday",
-          "SAT": "Saturday",
-          "SUN": "Sunday"
-        },
-        "shortWeekdays": {
-          "MON": "Mon",
-          "TUE": "Tue",
-          "WED": "Wed",
-          "THU": "Thu",
-          "FRI": "Fri",
-          "SAT": "Sat",
-          "SUN": "Sun"
-        }
-      },
-      "time": {
-        "placeholder": "Enter time ({format})",
-        "clearAriaLabel": "Clear time",
-        "now": "Now"
-      },
-      "range": {
-        "startPlaceholder": "Start date ({format})",
-        "endPlaceholder": "End date ({format})",
-        "startPlaceholderDateTime": "Start date & time ({format})",
-        "endPlaceholderDateTime": "End date & time ({format})",
-        "clearStartAriaLabel": "Clear start date",
-        "clearEndAriaLabel": "Clear end date"
-      },
-      "month": {
-        "placeholder": "Enter month ({format})",
-        "thisMonth": "This month"
-      },
-      "year": {
-        "placeholder": "Enter year ({format})",
-        "thisYear": "This year"
-      },
-      "presets": {
-        "today": "Today",
-        "thisWeek": "This week",
-        "lastWeek": "Last week",
-        "thisMonth": "This month",
-        "lastMonth": "Last month",
-        "last3Months": "Last 3 months",
-        "last6Months": "Last 6 months",
-        "thisYear": "This year",
-        "lastYear": "Last year",
-        "last2Years": "Last 2 years",
-        "last3Years": "Last 3 years",
-        "last5Years": "Last 5 years"
-      }
-    }
-  },
-  "settings": {
-    "roles": {
-      "listTitle": "Roles and Permission",
-      "loading": "Loading role...",
-      "notFound": "Role not found",
-      "cannotEditSystemRole": "System roles cannot be edited",
-      "create": {
-        "title": "Create New Role"
-      },
-      "edit": {
-        "title": "Edit Role"
+      "master": "Master",
+      "variant": "Variant",
+      "another": "another",
+      "required": "Required",
+      "optional": "Optional",
+      "brand": "Brand",
+      "category": "Category",
+      "sku": "SKU",
+      "barcode": "Barcode",
+      "value": "Value",
+      "guide": "Guide",
+      "help": "Help",
+      "information": "Information",
+      "errors": {
+        "required": "This field is required",
+        "minLength": "Minimum {count} characters required",
+        "maxLength": "Maximum {count} characters allowed",
+        "invalid": "Invalid value",
+        "barcodeRequired": "Barcode is required",
+        "skuRequired": "SKU is required",
+        "dataNotFound": "Data not found"
       },
       "actions": {
-        "addRole": "Add Role"
+        "save": "Save",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "apply": "Apply",
+        "preview": "Preview",
+        "add": "Add",
+        "remove": "Remove",
+        "delete": "Delete",
+        "edit": "Edit",
+        "view": "View",
+        "copy": "Copy to clipboard",
+        "saveChanges": "Save changes",
+        "close": "Close",
+        "regenerate": "Regenerate",
+        "reload": "Reload",
+        "refresh": "Refresh",
+        "search": "Search",
+        "action": "Action"
       },
-      "filters": {
-        "searchPlaceholder": "Search roles by code..."
-      },
-      "table": {
-        "columns": {
-          "code": "Code",
-          "name": "Name",
-          "description": "Description",
-          "type": "Type",
-          "status": "Status",
-          "systemRole": "System",
-          "customRole": "Custom",
-          "active": "Active",
-          "inactive": "Inactive"
-        },
-        "empty": {
-          "search": "No roles match the current search.",
-          "default": "No roles found."
+      "modal": {
+        "buttons": {
+          "close": "Close",
+          "save": "Save",
+          "cancel": "Cancel",
+          "apply": "Apply"
         }
-      },
-      "permissionMatrix": {
-        "legend": "Role permissions",
-        "description": "Tick the permissions this role should have. Permissions are grouped by module and resource. Use Admin module to grant full access and lock detailed toggles.",
-        "loading": "Loading permissions...",
-        "noPermissions": "No permissions available.",
-        "selectAll": "Select all",
-        "deselectAll": "Deselect all",
-        "selectModule": "Select all in module",
-        "deselectModule": "Deselect all in module",
-        "selectAllInModule": "Select or deselect all permissions in this module",
-        "all": "All",
-        "resource": "Resource",
-        "adminModule": "Admin module",
-        "action": {
-          "view": "View",
-          "create": "Create",
-          "update": "Update",
-          "delete": "Delete",
-          "print": "Print",
-          "export": "Export",
-          "import": "Import",
-          "approve": "Approve"
-        }
-      },
-      "form": {
-        "code": "Code",
-        "name": "Name",
-        "description": "Description",
-        "type": "Type",
-        "status": "Status",
-        "defaultPermissions": "Default Permissions",
-        "codeDescription": "Role code (lowercase letters, numbers, and underscores only)",
-        "codeInvalid": "Code must contain only lowercase letters, numbers, and underscores",
-        "descriptionDescription": "Optional description for this role",
-        "permissionsDescription": "Select default permissions for this role",
-        "selectPermissions": "Select permissions...",
-        "systemRole": "System Role",
-        "customRole": "Custom Role",
-        "active": "Active",
-        "inactive": "Inactive",
-        "noPermissions": "No permissions assigned"
-      },
-      "detail": {
-        "title": "Role details",
-        "permissionsTitle": "Permissions"
-      },
-      "deleteConfirm": {
-        "title": "Delete Role",
-        "message": "Những user đã gắng role này sẽ được xóa role"
-      },
-      "toast": {
-        "createSuccess": "Role created successfully",
-        "createError": "Failed to create role",
-        "updateSuccess": "Role updated successfully",
-        "updateError": "Failed to update role",
-        "deleteSuccess": "Role deleted successfully",
-        "deleteError": "Failed to delete role",
-        "loadError": "Failed to load roles"
       }
     },
-    "sequences": {
-      "listTitle": "Sequence Rules",
-      "loading": "Loading sequence...",
-      "notFound": "Sequence rule not found",
-      "sidebar": {
-        "guidelines": "Guidelines"
-      },
-      "create": { "title": "Create Sequence Rule" },
-      "edit": { "title": "Edit Sequence Rule" },
-      "actions": { "addSequence": "Add Rule" },
-      "table": {
-        "copyCode": "Copy to clipboard",
+    "components": {
+      "dataTable": {
+        "ariaLabel": "Data table",
+        "empty": "No data available",
+        "loading": "Loading...",
+        "refresh": "Refresh data",
+        "summary": "Showing {from} to {to} of {total} entries",
         "columns": {
-          "code": "Code",
-          "name": "Display name",
-          "prefix": "Prefix",
-          "suffix": "Suffix",
-          "format": "Format",
-          "start": "Start",
-          "step": "Step",
-          "currentValue": "Current Value",
-          "countCount": "Counts",
-          "status": "Status",
-          "setActive": "Set Active",
-          "setInactive": "Set Inactive"
-        },
-        "empty": {
-          "search": "No sequence rules match the search.",
-          "default": "No sequence rules found."
+          "number": "No.",
+          "action": "Action"
         }
       },
-      "form": {
-        "code": "Code",
-        "codeDescription": "Unique code for getNext(code), e.g. employee.code",
-        "name": "Display name",
-        "nameDescription": "Optional display name",
-        "prefix": "Prefix",
-        "prefixDescription": "e.g. ROLE, ORD",
-        "suffix": "Suffix",
-        "suffixDescription": "String appended after the number part",
-        "description": "Description",
-        "descriptionPlaceholder": "Optional rule description",
-        "format": "Format",
-        "formatDescription": "e.g. %06d",
-        "start": "Start",
-        "step": "Step",
-        "status": "Status",
-        "active": "Active",
-        "inactive": "Inactive",
-        "cannotEditHasCount": "This rule has at least one sequence count. You can only change: Display name, Description, and Status. You cannot change: Code, Prefix, Suffix, Format, Start, or Step.",
-        "lockedFieldsSection": "Locked fields (cannot be changed)"
+      "addressPicker": {
+        "tooltip": {
+          "change": "Change address",
+          "select": "Select address"
+        },
+        "modal": {
+          "title": "Select address",
+          "country": {
+            "label": "Country",
+            "placeholder": "Select country"
+          },
+          "postalCode": {
+            "label": "Postal code",
+            "placeholder": "Enter postal code"
+          }
+        },
+        "vietnam": {
+          "province": {
+            "label": "Province/City",
+            "placeholder": "Select province or city"
+          },
+          "ward": {
+            "label": "Ward/Commune/Township",
+            "placeholder": "Select ward, commune or township (under province/city)"
+          },
+          "street": {
+            "label": "Street address",
+            "placeholder": "House number, street name"
+          }
+        }
       },
-      "deleteConfirm": {
-        "title": "Delete Sequence Rule",
-        "message": "Are you sure you want to delete this rule?"
+      "input": {
+        "placeholder": "Enter information...",
+        "numberPlaceholder": "Enter number...",
+        "searchPlaceholder": "Search...",
+        "emailPlaceholder": "Enter email...",
+        "phonePlaceholder": "Enter phone number...",
+        "passwordPlaceholder": "Enter password...",
+        "showPassword": "Show password",
+        "hidePassword": "Hide password"
       },
-      "toggleStatusConfirm": {
-        "title": "Change status",
-        "message": "Do you want to change the status (Active/Inactive) of this rule?"
+      "textarea": {
+        "placeholder": "Enter information..."
       },
-      "toast": {
-        "createSuccess": "Sequence rule created",
-        "createError": "Failed to create rule",
-        "updateSuccess": "Rule updated",
-        "updateError": "Failed to update rule",
-        "deleteSuccess": "Rule deleted",
-        "deleteError": "Failed to delete rule",
-        "copied": "Copied to clipboard",
-        "copyFailed": "Failed to copy"
+      "translate": {
+        "title": "Translate",
+        "english": "English",
+        "vietnamese": "Vietnamese",
+        "copyToAll": "Copy to all languages"
+      },
+      "selectAsync": {
+        "searchLabel": "Search",
+        "error": "Failed to load options",
+        "loading": "Loading...",
+        "noResults": "No results found",
+        "loadingMore": "Loading more..."
+      },
+      "uploadImage": {
+        "tooManyFiles": "Too many files",
+        "tooManyFilesDescription": "You can only upload {count} more file(s)",
+        "invalidFile": "Invalid file",
+        "uploadFailed": "Upload failed",
+        "uploadFailedDescription": "Failed to upload image. Please try again.",
+        "clickOrDrag": "Click or drag images here to upload",
+        "maxReached": "Maximum {count} images reached",
+        "accepted": "Accepted: {types}",
+        "maxSize": "(Max {size}MB per file)",
+        "uploading": "Uploading...",
+        "uploadImages": "Upload images",
+        "removeImage": "Remove image"
+      },
+      "picker": {
+        "date": {
+          "placeholder": "Enter date ({format})",
+          "placeholderDateTime": "Enter date & time ({format})",
+          "clearAriaLabel": "Clear date",
+          "quickToday": "Today",
+          "weekdays": {
+            "MON": "Monday",
+            "TUE": "Tuesday",
+            "WED": "Wednesday",
+            "THU": "Thursday",
+            "FRI": "Friday",
+            "SAT": "Saturday",
+            "SUN": "Sunday"
+          },
+          "shortWeekdays": {
+            "MON": "Mon",
+            "TUE": "Tue",
+            "WED": "Wed",
+            "THU": "Thu",
+            "FRI": "Fri",
+            "SAT": "Sat",
+            "SUN": "Sun"
+          }
+        },
+        "time": {
+          "placeholder": "Enter time ({format})",
+          "clearAriaLabel": "Clear time",
+          "now": "Now"
+        },
+        "range": {
+          "startPlaceholder": "Start date ({format})",
+          "endPlaceholder": "End date ({format})",
+          "startPlaceholderDateTime": "Start date & time ({format})",
+          "endPlaceholderDateTime": "End date & time ({format})",
+          "clearStartAriaLabel": "Clear start date",
+          "clearEndAriaLabel": "Clear end date"
+        },
+        "month": {
+          "placeholder": "Enter month ({format})",
+          "thisMonth": "This month"
+        },
+        "year": {
+          "placeholder": "Enter year ({format})",
+          "thisYear": "This year"
+        },
+        "presets": {
+          "today": "Today",
+          "thisWeek": "This week",
+          "lastWeek": "Last week",
+          "thisMonth": "This month",
+          "lastMonth": "Last month",
+          "last3Months": "Last 3 months",
+          "last6Months": "Last 6 months",
+          "thisYear": "This year",
+          "lastYear": "Last year",
+          "last2Years": "Last 2 years",
+          "last3Years": "Last 3 years",
+          "last5Years": "Last 5 years"
+        }
+      },
+      "dateRangePicker": {
+        "range": {
+          "startLabel": "Start date",
+          "endLabel": "End date",
+          "startPlaceholder": "Start date ({format})",
+          "endPlaceholder": "End date ({format})",
+          "clearStartAriaLabel": "Clear start date",
+          "clearEndAriaLabel": "Clear end date",
+          "calendarAriaLabel": "Select date range",
+          "selectedLabel": "Selected range"
+        },
+        "presets": {
+          "title": "Presets",
+          "today": "Today",
+          "thisWeek": "This week",
+          "lastWeek": "Last week",
+          "thisMonth": "This month",
+          "lastMonth": "Last month",
+          "last3Months": "Last 3 months",
+          "last6Months": "Last 6 months",
+          "thisYear": "This year",
+          "lastYear": "Last year",
+          "last2Years": "Last 2 years",
+          "last3Years": "Last 3 years",
+          "last5Years": "Last 5 years"
+        },
+        "actions": {
+          "clear": "Clear",
+          "close": "Close"
+        }
       }
-    }
-  },
-  "userPermission": {
-    "title": "Roles & permissions",
-    "titleForUser": "Roles & permissions: {name}",
-    "noRoles": "No roles available",
-    "saved": "Permissions saved",
-    "saveFailed": "Failed to save permissions"
-  },
-  "auth": {
-    "login": {
-      "title": "Sign in to your account",
-      "subtitle": "Enter your credentials to access your account",
-      "username": "Username",
-      "usernamePlaceholder": "Enter your username",
-      "password": "Password",
-      "passwordPlaceholder": "Enter your password",
-      "rememberMe": "Remember me",
-      "forgotPassword": "Forgot password?",
-      "submit": "Sign in",
-      "errorGeneric": "An error occurred. Please try again.",
-      "logoAlt": "BAVADU Logo",
-      "showPassword": "Show password",
-      "hidePassword": "Hide password"
     },
-    "resetPassword": {
-      "title": "Reset your password",
-      "subtitle": "Enter your email address and we'll send you a link to reset your password",
-      "checkEmailTitle": "Check your email",
-      "checkEmailMessage": "We've sent a password reset link to your email address",
-      "checkEmailDetail": "If an account exists with the email {email}, you will receive a password reset link shortly.",
-      "email": "Email",
-      "emailPlaceholder": "Enter your email",
-      "sendLink": "Send reset link",
-      "backToLogin": "Back to login",
-      "errorGeneric": "An error occurred. Please try again."
+    "pages": {
+      "admin": {
+        "models": {
+          "filters": {
+            "searchPlaceholder": "Search models by key, module, or path...",
+            "refresh": "Refresh"
+          },
+          "table": {
+            "columns": {
+              "key": "Model",
+              "module": "Module",
+              "path": "Path",
+              "action": "Action"
+            },
+            "empty": {
+              "search": "No models match the current search.",
+              "default": "No models found."
+            }
+          },
+          "toast": {
+            "reloadSuccess": "Reloaded model {key} successfully.",
+            "reloadError": "Failed to reload model {key}.",
+            "loadError": "Failed to load model list."
+          }
+        }
+      },
+      "settings": {
+        "roles": {
+          "listTitle": "Roles and Permission",
+          "loading": "Loading role...",
+          "notFound": "Role not found",
+          "cannotEditSystemRole": "System roles cannot be edited",
+          "create": {
+            "title": "Create New Role"
+          },
+          "edit": {
+            "title": "Edit Role"
+          },
+          "actions": {
+            "addRole": "Add Role"
+          },
+          "filters": {
+            "searchPlaceholder": "Search roles by code..."
+          },
+          "table": {
+            "columns": {
+              "code": "Code",
+              "name": "Name",
+              "description": "Description",
+              "type": "Type",
+              "status": "Status",
+              "systemRole": "System",
+              "customRole": "Custom",
+              "active": "Active",
+              "inactive": "Inactive"
+            },
+            "empty": {
+              "search": "No roles match the current search.",
+              "default": "No roles found."
+            }
+          },
+          "permissionMatrix": {
+            "legend": "Role permissions",
+            "description": "Tick the permissions this role should have. Permissions are grouped by module and resource. Use Admin module to grant full access and lock detailed toggles.",
+            "loading": "Loading permissions...",
+            "noPermissions": "No permissions available.",
+            "selectAll": "Select all",
+            "deselectAll": "Deselect all",
+            "selectModule": "Select all in module",
+            "deselectModule": "Deselect all in module",
+            "selectAllInModule": "Select or deselect all permissions in this module",
+            "all": "All",
+            "resource": "Resource",
+            "adminModule": "Admin module",
+            "action": {
+              "view": "View",
+              "create": "Create",
+              "update": "Update",
+              "delete": "Delete",
+              "print": "Print",
+              "export": "Export",
+              "import": "Import",
+              "approve": "Approve"
+            }
+          },
+          "form": {
+            "code": "Code",
+            "name": "Name",
+            "description": "Description",
+            "type": "Type",
+            "status": "Status",
+            "defaultPermissions": "Default Permissions",
+            "codeDescription": "Role code (lowercase letters, numbers, and underscores only)",
+            "codeInvalid": "Code must contain only lowercase letters, numbers, and underscores",
+            "descriptionDescription": "Optional description for this role",
+            "permissionsDescription": "Select default permissions for this role",
+            "selectPermissions": "Select permissions...",
+            "systemRole": "System Role",
+            "customRole": "Custom Role",
+            "active": "Active",
+            "inactive": "Inactive",
+            "noPermissions": "No permissions assigned"
+          },
+          "detail": {
+            "title": "Role details",
+            "permissionsTitle": "Permissions"
+          },
+          "deleteConfirm": {
+            "title": "Delete Role",
+            "message": "Những user đã gắng role này sẽ được xóa role"
+          },
+          "toast": {
+            "createSuccess": "Role created successfully",
+            "createError": "Failed to create role",
+            "updateSuccess": "Role updated successfully",
+            "updateError": "Failed to update role",
+            "deleteSuccess": "Role deleted successfully",
+            "deleteError": "Failed to delete role",
+            "loadError": "Failed to load roles"
+          }
+        },
+        "sequences": {
+          "listTitle": "Sequence Rules",
+          "loading": "Loading sequence...",
+          "notFound": "Sequence rule not found",
+          "sidebar": {
+            "guidelines": "Guidelines"
+          },
+          "create": { "title": "Create Sequence Rule" },
+          "edit": { "title": "Edit Sequence Rule" },
+          "actions": { "addSequence": "Add Rule" },
+          "table": {
+            "copyCode": "Copy to clipboard",
+            "columns": {
+              "code": "Code",
+              "name": "Display name",
+              "prefix": "Prefix",
+              "suffix": "Suffix",
+              "format": "Format",
+              "start": "Start",
+              "step": "Step",
+              "currentValue": "Current Value",
+              "countCount": "Counts",
+              "status": "Status",
+              "setActive": "Set Active",
+              "setInactive": "Set Inactive"
+            },
+            "empty": {
+              "search": "No sequence rules match the search.",
+              "default": "No sequence rules found."
+            }
+          },
+          "form": {
+            "code": "Code",
+            "codeDescription": "Unique code for getNext(code), e.g. employee.code",
+            "name": "Display name",
+            "nameDescription": "Optional display name",
+            "prefix": "Prefix",
+            "prefixDescription": "e.g. ROLE, ORD",
+            "suffix": "Suffix",
+            "suffixDescription": "String appended after the number part",
+            "description": "Description",
+            "descriptionPlaceholder": "Optional rule description",
+            "format": "Format",
+            "formatDescription": "e.g. %06d",
+            "start": "Start",
+            "step": "Step",
+            "status": "Status",
+            "active": "Active",
+            "inactive": "Inactive",
+            "cannotEditHasCount": "This rule has at least one sequence count. You can only change: Display name, Description, and Status. You cannot change: Code, Prefix, Suffix, Format, Start, or Step.",
+            "lockedFieldsSection": "Locked fields (cannot be changed)"
+          },
+          "deleteConfirm": {
+            "title": "Delete Sequence Rule",
+            "message": "Are you sure you want to delete this rule?"
+          },
+          "toggleStatusConfirm": {
+            "title": "Change status",
+            "message": "Do you want to change the status (Active/Inactive) of this rule?"
+          },
+          "toast": {
+            "createSuccess": "Sequence rule created",
+            "createError": "Failed to create rule",
+            "updateSuccess": "Rule updated",
+            "updateError": "Failed to update rule",
+            "deleteSuccess": "Rule deleted",
+            "deleteError": "Failed to delete rule",
+            "copied": "Copied to clipboard",
+            "copyFailed": "Failed to copy"
+          }
+        }
+      },
+      "userPermission": {
+        "title": "Roles & permissions",
+        "titleForUser": "Roles & permissions: {name}",
+        "noRoles": "No roles available",
+        "saved": "Permissions saved",
+        "saveFailed": "Failed to save permissions"
+      },
+      "auth": {
+        "login": {
+          "title": "Sign in to your account",
+          "subtitle": "Enter your credentials to access your account",
+          "username": "Username",
+          "usernamePlaceholder": "Enter your username",
+          "password": "Password",
+          "passwordPlaceholder": "Enter your password",
+          "rememberMe": "Remember me",
+          "forgotPassword": "Forgot password?",
+          "submit": "Sign in",
+          "errorGeneric": "An error occurred. Please try again.",
+          "logoAlt": "BAVADU Logo",
+          "showPassword": "Show password",
+          "hidePassword": "Hide password"
+        },
+        "resetPassword": {
+          "title": "Reset your password",
+          "subtitle": "Enter your email address and we'll send you a link to reset your password",
+          "checkEmailTitle": "Check your email",
+          "checkEmailMessage": "We've sent a password reset link to your email address",
+          "checkEmailDetail": "If an account exists with the email {email}, you will receive a password reset link shortly.",
+          "email": "Email",
+          "emailPlaceholder": "Enter your email",
+          "sendLink": "Send reset link",
+          "backToLogin": "Back to login",
+          "errorGeneric": "An error occurred. Please try again."
+        },
+        "logoutConfirm": {
+          "title": "Confirm sign out",
+          "message": "Are you sure you want to sign out? Other tabs will also be redirected to the login screen.",
+          "cancel": "Cancel",
+          "confirm": "Confirm"
+        }
+      }
     },
-    "logoutConfirm": {
-      "title": "Confirm sign out",
-      "message": "Are you sure you want to sign out? Other tabs will also be redirected to the login screen.",
-      "cancel": "Cancel",
-      "confirm": "Confirm"
+    "guidelines": {
+      "title": "Information needed",
+      "loading": "Loading guide content...",
+      "error": "Unable to load guide content. Please try again later.",
+      "notFound": "Guide content not found."
     }
   }
 }

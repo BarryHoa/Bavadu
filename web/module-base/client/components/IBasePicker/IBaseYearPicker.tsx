@@ -17,7 +17,7 @@ export type IBaseYearPickerProps = Omit<IBaseDatePickerProps, "quickSelect"> & {
 };
 
 export function IBaseYearPicker(props: IBaseYearPickerProps) {
-  const t = useTranslations("components.picker");
+  const t = useTranslations("base.components.picker");
   const { placeholder, format = "YYYY", showThisYear = true, ...rest } = props;
 
   return (
