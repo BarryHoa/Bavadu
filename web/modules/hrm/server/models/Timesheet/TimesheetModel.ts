@@ -1,7 +1,8 @@
 import type { NextRequest } from "next/server";
 
-import { and, eq, gte, lte } from "drizzle-orm";
+import { and, count, eq, gte, lte, or, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
+import dayjs from "dayjs";
 
 import {
   JSON_RPC_ERROR_CODES,
@@ -12,6 +13,8 @@ import { base_tb_users } from "@base/server/schemas/base.user";
 
 import { NewHrmTbTimesheet, hrm_tb_timesheets } from "../../schemas";
 import { hrm_tb_employees } from "../../schemas/hrm.employee";
+import { hrm_tb_holidays } from "../../schemas/hrm.holiday";
+import { hrm_tb_leave_requests } from "../../schemas/hrm.leave-request";
 import { hrm_tb_shifts } from "../../schemas/hrm.shift";
 import { fullNameSqlFrom } from "../Employee/employee.helpers";
 
@@ -185,6 +188,45 @@ export default class TimesheetModel extends BaseModel<
     if (!userId) {
       throw new JsonRpcError(JSON_RPC_ERROR_CODES.AUTHENTICATION_ERROR);
     }
+
+    const firstDay = `${year}-${String(month).padStart(2, "0")}-01`;
+    const lastDate = new Date(year, month, 0);
+    const lastDay = lastDate.toISOString().slice(0, 10);
+
+    const conditions = [
+      gte(this.table.workDate, firstDay),
+      lte(this.table.workDate, lastDay),
+      eq(this.table.userId, userId),
+    ];
+
+    const result = await this.db
+      .select(this.selectJoined())
+      .from(this.table)
+      .leftJoin(user, eq(this.table.userId, user.id))
+      .leftJoin(employee, eq(employee.userId, this.table.userId))
+      .leftJoin(shift, eq(this.table.shiftId, shift.id))
+      .where(and(...conditions))
+      .orderBy(this.table.workDate);
+
+    const data: TimesheetRow[] = result.map(this.mapJoinedRow);
+
+    return { data };
+  };
+
+  /**
+   * Get timesheets for a specific user by userId (admin/HR only).
+   * Params: { userId, year, month }
+   */
+  @PermissionRequired({
+    auth: true,
+    permissions: ["hrm.timesheet.view_all"],
+  })
+  getTimesheetsByUserId = async (params: {
+    userId: string;
+    year: number;
+    month: number;
+  }): Promise<{ data: TimesheetRow[] }> => {
+    const { userId, year, month } = params;
 
     const firstDay = `${year}-${String(month).padStart(2, "0")}-01`;
     const lastDate = new Date(year, month, 0);
@@ -443,4 +485,191 @@ export default class TimesheetModel extends BaseModel<
 
     return this.updateTimesheet(id, normalizedPayload);
   };
+
+  /**
+   * Get timesheet statistics for a user in a specific month.
+   * Returns working days, hours, leave days, holidays, etc.
+   * Optimized: runs queries in parallel and uses SQL aggregation.
+   */
+  @PermissionRequired({
+    auth: true,
+    permissions: ["hrm.timesheet.view"],
+  })
+  getTimesheetStatistics = async (
+    params: {
+      userId?: string;
+      year: number;
+      month: number;
+    },
+    request?: NextRequest,
+  ): Promise<TimesheetStatistics> => {
+    const { year, month } = params;
+
+    const userId =
+      params.userId || request?.headers.get("x-user-id") || null;
+
+    if (!userId) {
+      throw new JsonRpcError(JSON_RPC_ERROR_CODES.AUTHENTICATION_ERROR);
+    }
+
+    const monthStart = dayjs(`${year}-${String(month).padStart(2, "0")}-01`);
+    const firstDay = monthStart.format("YYYY-MM-DD");
+    const lastDay = monthStart.endOf("month").format("YYYY-MM-DD");
+    const totalDaysInMonth = monthStart.daysInMonth();
+
+    // Run all queries in parallel for better performance
+    const [timesheetAggResult, statusCountsResult, holidays, leaveResult] =
+      await Promise.all([
+        // Aggregated timesheet stats using SQL
+        this.db
+          .select({
+            workedDays: count(this.table.id),
+            totalActualHours: sql<number>`COALESCE(SUM(${this.table.actualHours}), 0)`,
+            totalRegularHours: sql<number>`COALESCE(SUM(${this.table.regularHours}), 0)`,
+            totalOvertimeHours: sql<number>`COALESCE(SUM(${this.table.overtimeHours}), 0)`,
+          })
+          .from(this.table)
+          .where(
+            and(
+              eq(this.table.userId, userId),
+              gte(this.table.workDate, firstDay),
+              lte(this.table.workDate, lastDay),
+            ),
+          ),
+
+        // Status counts using SQL GROUP BY
+        this.db
+          .select({
+            status: this.table.status,
+            count: count(this.table.id),
+          })
+          .from(this.table)
+          .where(
+            and(
+              eq(this.table.userId, userId),
+              gte(this.table.workDate, firstDay),
+              lte(this.table.workDate, lastDay),
+            ),
+          )
+          .groupBy(this.table.status),
+
+        // Holidays query
+        this.db
+          .select({
+            id: hrm_tb_holidays.id,
+            date: hrm_tb_holidays.date,
+            isPaid: hrm_tb_holidays.isPaid,
+          })
+          .from(hrm_tb_holidays)
+          .where(
+            and(
+              eq(hrm_tb_holidays.isActive, true),
+              gte(hrm_tb_holidays.date, firstDay),
+              lte(hrm_tb_holidays.date, lastDay),
+              or(
+                eq(hrm_tb_holidays.year, year),
+                eq(hrm_tb_holidays.isRecurring, true),
+              ),
+            ),
+          ),
+
+        // Leave days aggregation using SQL
+        this.db
+          .select({
+            totalDays: sql<number>`COALESCE(SUM(
+              LEAST(${hrm_tb_leave_requests.endDate}::date, ${lastDay}::date) -
+              GREATEST(${hrm_tb_leave_requests.startDate}::date, ${firstDay}::date) + 1
+            ), 0)`,
+          })
+          .from(hrm_tb_leave_requests)
+          .where(
+            and(
+              eq(hrm_tb_leave_requests.userId, userId),
+              eq(hrm_tb_leave_requests.status, "approved"),
+              lte(hrm_tb_leave_requests.startDate, lastDay),
+              gte(hrm_tb_leave_requests.endDate, firstDay),
+            ),
+          ),
+      ]);
+
+    // Extract aggregated values
+    const timesheetStats = timesheetAggResult[0] ?? {
+      workedDays: 0,
+      totalActualHours: 0,
+      totalRegularHours: 0,
+      totalOvertimeHours: 0,
+    };
+
+    // Build status counts map
+    const statusCounts: Record<string, number> = {};
+    for (const row of statusCountsResult) {
+      statusCounts[row.status] = Number(row.count);
+    }
+
+    // Holiday calculations
+    const holidayDays = holidays.length;
+    const paidHolidayDays = holidays.filter((h) => h.isPaid).length;
+
+    // Leave days from SQL result
+    const leaveDays = Number(leaveResult[0]?.totalDays ?? 0);
+
+    // Calculate weekends (Saturday = 6, Sunday = 0) - computed in JS as it's fast
+    let weekendDays = 0;
+    for (let d = 0; d < totalDaysInMonth; d++) {
+      const dayOfWeek = monthStart.add(d, "day").day();
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        weekendDays++;
+      }
+    }
+
+    // Standard working days = total days - weekends - holidays
+    const standardWorkingDays = totalDaysInMonth - weekendDays - holidayDays;
+
+    return {
+      userId,
+      year,
+      month,
+      totalDaysInMonth,
+      weekendDays,
+      holidayDays,
+      paidHolidayDays,
+      standardWorkingDays,
+      workedDays: Number(timesheetStats.workedDays),
+      leaveDays,
+      totalActualHours:
+        Math.round(Number(timesheetStats.totalActualHours) * 100) / 100,
+      totalRegularHours:
+        Math.round(Number(timesheetStats.totalRegularHours) * 100) / 100,
+      totalOvertimeHours:
+        Math.round(Number(timesheetStats.totalOvertimeHours) * 100) / 100,
+      statusCounts,
+      holidays: holidays.map((h) => ({
+        id: h.id,
+        date: h.date,
+        isPaid: h.isPaid,
+      })),
+    };
+  };
+}
+
+export interface TimesheetStatistics {
+  userId: string;
+  year: number;
+  month: number;
+  totalDaysInMonth: number;
+  weekendDays: number;
+  holidayDays: number;
+  paidHolidayDays: number;
+  standardWorkingDays: number;
+  workedDays: number;
+  leaveDays: number;
+  totalActualHours: number;
+  totalRegularHours: number;
+  totalOvertimeHours: number;
+  statusCounts: Record<string, number>;
+  holidays: Array<{
+    id: string;
+    date: string;
+    isPaid: boolean;
+  }>;
 }

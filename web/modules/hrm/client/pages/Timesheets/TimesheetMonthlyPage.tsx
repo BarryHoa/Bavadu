@@ -57,14 +57,11 @@ export default function TimesheetMonthlyPage(): React.ReactNode {
   });
 
   const { data: holidaysData } = useQuery({
-    queryKey: ["base-holidays", year, month],
+    queryKey: ["hrm-holidays-month", year, month],
     queryFn: async () => {
-      const r = await holidayService.getHolidaysForWorkingDays({
-        year,
-        month,
-      });
+      const r = await holidayService.getByMonth(year, month);
 
-      return r?.data ?? [];
+      return r ?? [];
     },
   });
 

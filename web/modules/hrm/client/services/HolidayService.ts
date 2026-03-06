@@ -66,6 +66,17 @@ export default class HolidayService extends JsonRpcClientService {
   }
 
   /**
+   * Lấy danh sách ngày lễ theo tháng với đầy đủ thông tin.
+   */
+  getByMonth(year: number, month: number, countryCode?: string) {
+    return this.call<HolidayDto[]>("holiday.curd.getHolidaysWithDetailsByMonth", {
+      year,
+      month,
+      countryCode: countryCode ?? "VN",
+    });
+  }
+
+  /**
    * Kiểm tra ngày đã tồn tại chưa.
    */
   checkDateExists(date: string, excludeId?: string) {

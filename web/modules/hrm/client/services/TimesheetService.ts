@@ -33,6 +33,13 @@ export default class TimesheetService extends JsonRpcClientService {
     }>("timesheet.curd.getMyTimesheet", params);
   }
 
+  getTimesheetsByUserId(params: { userId: string; year: number; month: number }) {
+    return this.call<{
+      data: TimesheetDto[];
+      message?: string;
+    }>("timesheet.curd.getTimesheetsByUserId", params);
+  }
+
   create(payload: CreateTimesheetPayload) {
     return this.call<{
       data: TimesheetDto;

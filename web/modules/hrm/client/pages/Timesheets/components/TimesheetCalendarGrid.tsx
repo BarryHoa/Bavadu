@@ -3,6 +3,7 @@
 import * as React from "react";
 
 import type { TimesheetDto } from "@mdl/hrm/client/interface/Timesheet";
+import type { HolidayDto } from "@mdl/hrm/client/services/HolidayService";
 
 import IBaseSpinnerContent from "@/module-base/client/components/IBaseSpinnerContent";
 import { IBaseCard, IBaseCardBody } from "@base/client/components";
@@ -21,8 +22,8 @@ interface TimesheetCalendarGridProps {
   year: number;
   month: number;
   weekdays: WeekdayItem[];
-  /** Array of holiday dates (YYYY-MM-DD format) */
-  holidays?: string[];
+  /** Array of holidays with full details */
+  holidays?: HolidayDto[];
   onDayClick: (day: number) => void;
 }
 
@@ -47,7 +48,7 @@ export function TimesheetCalendarGrid({
                 timesheetList={timesheetList}
                 year={year}
                 month={month}
-                holidays={holidays}
+                holidays={holidays?.map((h) => h.date) ?? []}
                 variant="default"
               />
               <TimesheetGridView
@@ -56,6 +57,7 @@ export function TimesheetCalendarGrid({
                 year={year}
                 month={month}
                 weekdays={weekdays}
+                holidays={holidays}
                 onDayClick={onDayClick}
               />
             </div>
@@ -74,7 +76,7 @@ export function TimesheetCalendarGrid({
                   timesheetList={timesheetList}
                   year={year}
                   month={month}
-                  holidays={holidays}
+                  holidays={holidays?.map((h) => h.date) ?? []}
                   variant="sidebar"
                 />
               </div>

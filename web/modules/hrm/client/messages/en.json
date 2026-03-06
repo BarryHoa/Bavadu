@@ -450,6 +450,12 @@
       "viewDetail": "View detail",
       "allPeople": "All timesheets",
       "allPeoplePlaceholder": "List of employees with timesheet summary will be shown here. Click an employee to view their monthly timesheet.",
+      "selectEmployee": "Select employee",
+      "selectEmployeePlaceholder": "Search employee...",
+      "selectEmployeeToView": "Please select an employee to view timesheets.",
+      "import": "Import",
+      "export": "Export",
+      "importTimesheet": "Import Timesheets",
       "labels": {
         "employee": "Employee",
         "workDate": "Work Date",

@@ -1,4 +1,5 @@
 import { and, desc, eq, gte, lte, or, sql } from "drizzle-orm";
+import dayjs from "dayjs";
 
 import { BaseModel, PermissionRequired } from "@base/server/models/BaseModel";
 import { LocaleDataType } from "@base/shared/interface/Locale";
@@ -116,9 +117,9 @@ export default class HolidayModel extends BaseModel<typeof hrm_tb_holidays> {
     month: number,
     countryCode: string = "VN",
   ): Promise<HolidayRow[]> => {
-    const startDate = `${year}-${String(month).padStart(2, "0")}-01`;
-    const lastDay = new Date(year, month, 0).getDate();
-    const endDate = `${year}-${String(month).padStart(2, "0")}-${lastDay}`;
+    const monthStart = dayjs(`${year}-${String(month).padStart(2, "0")}-01`);
+    const startDate = monthStart.format("YYYY-MM-DD");
+    const endDate = monthStart.endOf("month").format("YYYY-MM-DD");
 
     const rows = await this.db
       .select()
@@ -226,7 +227,7 @@ export default class HolidayModel extends BaseModel<typeof hrm_tb_holidays> {
       throw new Error(`Holiday already exists for date ${payload.date}`);
     }
 
-    const now = new Date();
+    const now = dayjs().toDate();
     const insertData: NewHrmTbHoliday = {
       name: payload.name,
       date: payload.date,
@@ -260,7 +261,7 @@ export default class HolidayModel extends BaseModel<typeof hrm_tb_holidays> {
     payload: Partial<Omit<HolidayInput, "date" | "year">>,
   ): Promise<HolidayRow | null> => {
     const updateData: Partial<typeof this.table.$inferInsert> = {
-      updatedAt: new Date(),
+      updatedAt: dayjs().toDate(),
     };
 
     // Chỉ cho sửa nội dung, không cho sửa date và year
@@ -296,7 +297,7 @@ export default class HolidayModel extends BaseModel<typeof hrm_tb_holidays> {
     if (ids.length === 0) return { updated: 0 };
 
     const updateData: Partial<typeof this.table.$inferInsert> = {
-      updatedAt: new Date(),
+      updatedAt: dayjs().toDate(),
     };
 
     if (payload.isRecurring !== undefined)
@@ -365,5 +366,21 @@ export default class HolidayModel extends BaseModel<typeof hrm_tb_holidays> {
     return {
       data: holidays.map((h) => h.date),
     };
+  };
+
+  /**
+   * API cho RPC: Lấy danh sách ngày lễ theo tháng với đầy đủ thông tin.
+   */
+  @PermissionRequired({ auth: true })
+  getHolidaysWithDetailsByMonth = async (params: {
+    year: number;
+    month: number;
+    countryCode?: string;
+  }): Promise<HolidayRow[]> => {
+    return this.getHolidaysByMonth(
+      params.year,
+      params.month,
+      params.countryCode ?? "VN",
+    );
   };
 }
